@@ -1,0 +1,66 @@
+- schema: as.item.v1
+  id: magazine_9mm_15
+  stackable: true
+  name: 9 mm magazine
+  plural: 9 mm magazines
+  kind: magazine
+  mass_g: 80
+  bulk: 0
+  tags: [magazine, 9mm]
+  barter_value: 10
+  description: A 15-round magazine for a Glock 19. The rounds inside are counted in its props.
+- schema: as.item.v1
+  id: ammo_9mm
+  name: 9 mm round
+  plural: 9 mm rounds
+  kind: ammo
+  mass_g: 12
+  bulk: 0
+  stackable: true
+  tags: [ammo, 9mm]
+  barter_value: 2
+  description: Full metal jacket pistol ammunition. Currency in most places.
+- schema: as.item.v1
+  id: ammo_38
+  name: .38 round
+  plural: .38 rounds
+  kind: ammo
+  mass_g: 10
+  bulk: 0
+  stackable: true
+  tags: [ammo, 38spl]
+  barter_value: 2
+  description: Revolver cartridges, some green with age.
+- schema: as.item.v1
+  id: shell_12ga
+  name: 12 gauge shell
+  plural: 12 gauge shells
+  kind: ammo
+  mass_g: 40
+  bulk: 0
+  stackable: true
+  tags: [ammo, 12ga]
+  barter_value: 3
+  description: Buckshot shells in faded red plastic.
+- schema: as.item.v1
+  id: ammo_308
+  name: .308 round
+  plural: .308 rounds
+  kind: ammo
+  mass_g: 25
+  bulk: 0
+  stackable: true
+  tags: [ammo, 308win]
+  barter_value: 4
+  description: Hunting rifle cartridges.
+- schema: as.item.v1
+  id: ammo_22
+  name: .22 round
+  plural: .22 rounds
+  kind: ammo
+  mass_g: 3
+  bulk: 0
+  stackable: true
+  tags: [ammo, 22lr]
+  barter_value: 1
+  description: Rimfire rounds, loose in a plastic tub.

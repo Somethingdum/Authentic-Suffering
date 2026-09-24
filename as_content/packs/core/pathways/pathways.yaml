@@ -1,0 +1,119 @@
+# The four infection pathways stay orthogonal and separate (AS Rebuild Plan §11.5; CMG §42).
+# 42.2 Absolute No-Cure Rule: no intervention here ever restores a truly infected person — the best
+# case buys limited extra time at extreme cost and still ends in a worse infected result.
+- schema: as.pathway.v1
+  id: wet
+  canon_status: canon
+  exposure:
+    bite: 0.9
+    deep_scratch_with_saliva_contact: 0.35
+  stages:
+    - name: incubation
+      starts_at_h: 0.0
+      effects: [localized_infection_site, mild_fever_onset]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+    - name: living_spreader_week1
+      starts_at_h: 24.0
+      effects: [territorial_takeover_in_host, competing_infection_suppressed, wound_closes_deceptively_well]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 1
+    - name: living_spreader_week2
+      starts_at_h: 168.0
+      effects: [saliva_infectious_from_day3, growing_compulsion_toward_mouth_contact_sharing, will_progressively_weakening]
+      saliva_infectious: true
+      compulsion: 1
+      impairment: 2
+    - name: living_spreader_week3
+      starts_at_h: 336.0
+      effects: [training_discipline_morality_no_longer_stop_compliance, escalating_consequences_for_resistance, lower_salience_to_baseline_infected]
+      saliva_infectious: true
+      compulsion: 3
+      impairment: 3
+    - name: terminal_kill_phase_week4
+      starts_at_h: 504.0
+      effects: [fever, mucus, escalating_pain, bodily_collapse]
+      saliva_infectious: true
+      compulsion: 3
+      impairment: 6
+  death_at_h: 672.0
+  rise_after_death_h: [10.0, 14.0]
+  rise_as: [ZOMBIE_VARIANT_ID_RUNNER01]
+  notes:
+    - CMG §42.13-15 — the body stays dead for about 12 hours after terminal death; immune resistance is gone and the takeover completes; the original person is gone.
+    - CMG §42.17 — Runner is the first-rise high-integrity state and is usually temporary; it degrades toward Shambler or Crawler over time, never the reverse (modeled by the state/degradation clock, not by this pathway record).
+- schema: as.pathway.v1
+  id: cold_start
+  canon_status: canon
+  exposure:
+    unbitten_death_with_intact_neural_structures: 1.0
+  stages:
+    - name: post_mortem_incubation
+      starts_at_h: 0.0
+      effects: [rigor_mortis, early_decay, no_conscious_host_behaviour]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 6
+  death_at_h: 0.0
+  rise_after_death_h: [66.0, 78.0]
+  rise_as: [ZOMBIE_ARCHETYPE_SHAMBLER01, ZOMBIE_ARCHETYPE_CRAWLER01]
+  notes:
+    - CMG §42.16 — a person who dies without being bitten may still convert if zombie-operating neural structures remain usable; rise takes roughly 3 days.
+    - Limited to Shambler, Crawler or a dormant outcome — rigor mortis, early decay and worse tissue quality rule out a Runner-quality rise.
+- schema: as.pathway.v1
+  id: air
+  canon_status: canon
+  exposure:
+    ambient_daily: 0.02
+  stages:
+    - name: onset
+      starts_at_h: 0.0
+      effects: [corrupted_sleep, stronger_drive_toward_immediate_comfort]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+    - name: established
+      starts_at_h: 720.0
+      effects: [cold_intolerance, stronger_clustering_and_warmth_seeking, pair_bond_and_reproductive_drift]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+    - name: entrenched
+      starts_at_h: 4320.0
+      effects: [unstable_but_persistent_attachment_behaviour, idle_zoning_out, fixation_on_trivial_details]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+  death_at_h: null
+  rise_after_death_h: null
+  rise_as: []
+  notes:
+    - CMG §42.4-6 — a population-wide neurological drift, not a personal death sentence. The infected stay socially functional enough for factions and family units to keep operating while being altered.
+    - Cold intolerance pushes humans toward proximity and warmth-sharing; use this to seed household and settlement clustering, not individual horror beats.
+- schema: as.pathway.v1
+  id: lurker_deep
+  canon_status: proposed
+  exposure:
+    lurker_claw_wound: 0.35
+  stages:
+    - name: hidden_incubation
+      starts_at_h: 0.0
+      effects: [wound_appears_to_heal_normally, no_observable_symptom]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+    - name: unwitnessed_transformation
+      starts_at_h: 720.0
+      effects: [victim_vanishes_into_a_horde_or_dense_gathering, transformation_occurs_unseen_and_untracked]
+      saliva_infectious: false
+      compulsion: 0
+      impairment: 0
+  death_at_h: null
+  rise_after_death_h: null
+  rise_as: [ZOMBIE_VARIANT_ID_LURKER01]
+  notes:
+    - Lore_and_World_Building.pdf §4 / Codex Ultima Super — survival without infection is possible; the claw carries a significant but not certain chance of this outcome, and no one in-world truly knows the mechanism.
+    - canon_status is 'proposed' because the exact conversion probability and incubation length are not pinned in source material; flagged in SPEC_ISSUES.md for a ruling before P8 (worldgen/infection) locks.
+    - CMG §42.19 hard rule — once a victim has crossed into true Lurker Infected state, baseline infected will not attempt to bite or kill that victim; enforce this in the sense/threat-assessment layer, not here.

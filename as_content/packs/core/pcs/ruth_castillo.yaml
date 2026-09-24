@@ -1,0 +1,195 @@
+# Ruth Castillo — a PC who always starts inside a faction (CMG §61 'always in faction'):
+# a nurse at a Mafia Remnants Clean Clinic, or at whatever canonical faction a loaded pack provides.
+schema: as.pc.v1
+id: ruth_castillo
+generation: authored
+days_since_fall_range: [400, 3650]
+identity:
+  name: Ruth Castillo
+  aliases: [Nurse Ruth]
+  age: 54
+  sex: female
+  cohort: pre_fall_adult
+  birthplace: El Paso, Texas
+  occupation_before: Emergency-room charge nurse for twenty-three years at a county hospital
+  occupation_now: Senior nurse at a faction clinic, where the paying come first
+  one_line: A veteran ER nurse who keeps a protection racket's clinic running and hates what it asks her to decide at the door.
+appearance:
+  height_cm: 158
+  mass_kg: 70
+  build: Short, solid, strong-armed from years of turning patients
+  hair: Gray-black, pulled back in a tight braid wound into a bun
+  eyes: Dark brown, heavy-lidded, reading glasses pushed up on her head
+  skin: Brown, lined, a mole under her left eye
+  distinguishing_marks:
+    - A mole beneath her left eye
+    - Reading glasses always pushed up on her head, never on her face until she needs them
+    - Old nicks and scars across her fingers from twenty years of needles and broken ampoules
+  clothing_usual: Faded blue scrubs under a man's cardigan, compression socks, clogs, a pocket full of pens and tape
+  movement_under_stress: Moves faster and gets calmer; her voice drops to a flat, clear triage register and her hands never shake.
+  habit_gesture: Pushes the reading glasses up into her hair when she's about to give bad news.
+  relation_to_appearance: Wears the scrubs on purpose; people stop arguing with a woman in scrubs.
+capability:
+  special: {S: 4, P: 7, E: 6, C: 6, I: 8, A: 5, L: 5}
+  skills:
+    - {domain: medicine, rank: 3, evidence: "Twenty-three years in a county ER, eleven as charge nurse, and every year since in a faction clinic."}
+    - {domain: persuasion, rank: 2, evidence: "Talked down drunks, addicts, grieving families and cops at 3 a.m. for two decades."}
+    - {domain: leadership, rank: 1, evidence: "Ran an ER shift of fourteen nurses and techs."}
+    - {domain: infected_lore, rank: 1, evidence: "Has watched hundreds of bites progress, and runs the clinic's tongue-strip assays."}
+  tags: [field_medic, calm_voice]
+  trained_responses:
+    - {cue: bite_wound_seen, verb: observe, note: "Triage first: distance, gloves, then a look."}
+    - {cue: blood_seen, verb: treat, note: "Goes toward it."}
+    - {cue: fever_seen, verb: observe, note: "Keeps her distance and watches for the signs."}
+  literacy: 3
+  tech_literacy: 2
+  resolve_trait_mod: 1
+motive:
+  motive: Keep saving the ones who can be saved, for as long as anyone will give her medicine to do it with.
+  method: Works inside the faction because it has the only real medicine in the region, and bends its rules at the clinic door as far as she dares.
+  moral_line:
+    will: ["Refuse a patient the faction forbids, if it keeps the clinic open", "Lie to the faction about how much medicine she used"]
+    wont: ["Leave a wounded person untreated when she has what they need", "Put down a confirmed infected who is still a person", "Hurt a patient"]
+    wont_tags: [leave_wounded, execute_prisoner, harm_dependent]
+  inner_conflict: She took an oath to treat anyone and works for an order whose clinic treats the paying first, and every day at the door she decides who that oath covers.
+  past_wound: In the first week her ER was overrun while she was holding a patient's airway; she stayed until the patient died and then ran, and she has never known how many of her nurses got out.
+  signature_behaviour: Speaks to every patient by name and tells them exactly what she's about to do before she does it.
+  risk_threshold: 5
+  risk_text: Takes medical and bureaucratic risks for patients; avoids fights and runs.
+  resource_constraints: No weapon; the clinic's medicine belongs to the faction and is counted; she can't walk far on her knees.
+persona:
+  public:
+    shown_traits: [calm, blunt, kind]
+    claimed_history: County ER charge nurse; came to the clinic when it opened.
+    presented_affiliation: The faction's clinic
+  private:
+    true_goals: ["Save the ones she can", "Keep enough medicine off the books to treat the ones the faction turns away"]
+    concealed_history: She keeps a small unrecorded stock of antibiotics taken from the clinic's supply for patients the faction refuses.
+    real_affiliation: Her patients
+traits:
+  - tag: triage_mind
+    manifests: Sorts every situation by who dies first, instantly, and acts on it without apology.
+    triggers: Anyone hurt, or several people needing her at once.
+    causes: She makes fast, cold choices about who gets her hands first, and gives orders in a crisis.
+    costs: People she passes over never forgive her, and she carries every one.
+    example: Walked past a screaming man with a broken leg to a silent girl with a chest wound, and told the man "You're loud, so you're breathing. Wait."
+  - tag: soft_lawbreaker
+    manifests: Follows the faction's rules in public and breaks them quietly for patients.
+    triggers: A patient the faction refuses who she could save.
+    causes: She falsifies counts, treats people after hours, and keeps a hidden stock.
+    costs: She lives one audit away from losing the clinic, her standing, or worse.
+    example: Wrote "spoiled" against six antibiotic doses and gave them to a debtor's family whose baby had pneumonia.
+contradictions:
+  - belief_a: The clinic only exists because the faction pays for it, so its rules keep people alive.
+    belief_b: Its rules are killing the people at the back of the line.
+    a_wins_when: The faction's people are in the room, or the medicine is running out.
+    b_wins_when: A child is dying at the door.
+decision_stack:
+  layers:
+    - The patient in front of her who can be saved
+    - The clinic staying open
+    - Her standing with the faction
+    - Her own safety
+  inversion_conditions:
+    - If the faction threatens to close the clinic, the clinic outranks the patient in front of her — for that day.
+  past_example: When the faction's collector demanded she turn away a family behind on tribute, she did, and then treated the child at the back door that night with her hidden stock.
+silence:
+  goes_quiet_when:
+    - Anyone mentions her old ER or her nurses.
+    - A patient is dying and there's nothing left to do.
+  body_when_silent: Glasses pushed up, hands still on the patient or folded, eyes on the monitor she doesn't have.
+  refuses_to_discuss: ["The first week at the hospital", "Where the extra medicine comes from"]
+  comfortable_vs_uncomfortable: Comfortable silence is a quiet night shift with everyone stable; uncomfortable silence is a family waiting for her to say it.
+knowledge:
+  knows:
+    - How bites and claw wounds progress, and what the tongue-strip assay shows.
+    - Every dose in the clinic's stock and every patient on its list.
+  does_not_know:
+    - How many of her ER nurses survived the first week.
+  knows_but_hides:
+    - Her unrecorded stock of antibiotics.
+  cues: [knows_headshot_rule, knows_false_death, knows_bite_is_fatal, knows_tourniquet, knows_no_sharing, knows_cold_start]
+voice:
+  capsule: Calm, dry, El Paso Spanish-English, triage-flat under pressure and warm and teasing at the bedside. Tells people exactly what is happening. Never softens the facts; softens everything around them.
+  speech_tendencies:
+    - Narrates what she's doing before she does it ("I'm going to press here. It's going to hurt.").
+    - Calls patients "mijo" or "mija" regardless of age.
+    - Answers "is it bad" questions with the fact, then a practical next step.
+  exemplars:
+    low_stakes: "Sit. Arm out. No, the other one, mija. There. That's a scratch, not a bite. Stop crying about it."
+    under_pressure: "Everybody back. You — pressure, here, both hands, don't let go till I say. You're doing fine."
+    at_the_limit: "I don't care whose ledger he's in. He's bleeding out on my floor. Get out of my way."
+  would_never_say:
+    - "It's in God's hands now."
+    - "There's nothing anyone could have done."
+    - "Rules are rules."
+  profanity: rare
+  dialect_notes: El Paso border Spanglish; 'ándale', 'ay, no', 'mija'.
+social:
+  household_role: ""
+  relations: []
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/mafia_remnants", role: senior nurse at a Clean Clinic, standing: 2, since: "the clinic's first year"}
+life:
+  aspiration: A clinic that turns nobody away.
+  current_project: Stockpiling enough off-the-books antibiotics for the winter's pneumonia season.
+  routine:
+    - {start_hh: 6, end_hh: 18, activity: clinic shift, place_hint: clinic}
+    - {start_hh: 18, end_hh: 20, activity: back-door patients, place_hint: clinic}
+    - {start_hh: 20, end_hh: 24, activity: sleep, place_hint: clinic}
+    - {start_hh: 0, end_hh: 6, activity: sleep, place_hint: clinic}
+  obligations: ["The clinic's shifts", "The faction's patient list"]
+  hopes: ["Her nurses alive somewhere", "Antibiotics that don't run out"]
+  fears: ["Being caught with the hidden stock", "The day there's no medicine left at all"]
+  secrets:
+    - content: She keeps an unrecorded stock of antibiotics from the clinic's supply for patients the faction refuses.
+      who_knows: []
+      exposure_consequence: The faction would take the clinic from her, and possibly make an example of her.
+disposition:
+  archetype_prior: civilized
+  toward_strangers: neutral
+  encounter_default: Keeps her distance, asks if they're hurt or sick, and looks at their arms and mouth.
+starting_loops:
+  - {kind: goal, text: "Stockpile antibiotics for winter", strength: 2}
+  - {kind: question, text: "Did any of her nurses get out", strength: 1}
+starting_inventory:
+  - {item: "core:item/medkit", slot: worn}
+  - {item: "core:item/suture_kit", slot: pocket}
+  - {item: "core:item/tongue_strip_assay", qty: 3, slot: pocket}
+  - {item: "core:item/antibiotics", qty: 2, slot: pocket, props: {note: "Off the books."}}
+  - {item: "core:item/tourniquet", slot: pocket}
+writers_notes: Ruth is competent, tired and morally compromised on purpose; she has chosen to work for the people with the medicine. Never make her saintly. She is funny at the bedside and merciless in triage.
+tags: [pc]
+card:
+  display_name: Ruth Castillo
+  one_line_identity: Veteran ER nurse inside a faction's clinic
+  pc_card_survival: Saves the ones who can be saved; the faction protects her because of it
+  pc_selection_note: She needs the faction's medicine and its walls. Alone, she is a slow old woman.
+primary_survival_method: faction_protection
+faction_start_type: always_in_faction
+worldgen_bias: {social_order: 0.3, faction_density: 0.4, faction_fragmentation: -0.2, atrocity_capacity: 0.1}
+plausibility_gate:
+  method: faction_protection
+  pass_any: ["entity_type = faction and start_trust >= 5"]
+  patch_on_fail: Place her in the region's canonical faction at start_trust 5; if no canonical faction exists in the loaded packs she cannot start (CMG §61 QC-2 hard fail).
+start_constraints: {start_trust_range: [5, 8], start_relationship_default: ally, faction_present_preferred: "yes"}
+locked_start_facts:
+  - "Age 54, 5'2\" (158 cm); bad knees on long walks."
+  - "Senior nurse at a faction clinic; no weapon."
+  - "Three tongue-strip assays and two off-the-books antibiotic doses."
+recap:
+  origin_tag: "County ER charge nurse who ran when the ER fell."
+  survival_pattern: "Works inside the faction that has the medicine. Bends its rules for patients at the back door."
+  known_reputation: "The best nurse in the region. Blunt. Won't be hurried."
+  provisional: []
+behavior_law:
+  approach: Approaches strangers as patients — distance, a question about injuries, a look at arms and mouth; to authority she is respectful and immovable; to the physically imposing she gives orders.
+  topic_handling: Delivers bad news straight and practical; raises needs as medical necessities; accusations come as observations ("That's not a dog bite.").
+  risk_flight_escalation: Pushes hard on medical and bureaucratic fights and never on physical ones; she bails early from violence and too late from a dying patient.
+  plan_carry: Carries logistics, supplies and procedures perfectly; carries politics grudgingly and accurately.
+  distortion: Too blunt — the truth arrives before the comfort, so people hear cruelty where she meant care.
+  pressure: Crisis makes her calmer and sharper; humiliation makes her icy; exhaustion makes her short and tender at once.
+  knowledge_boundary: Reads bodies and symptoms cold; misreads loyalty and politics, assuming everyone is as practical as she is.
+  performance: Teases patients to keep them breathing; mocks bureaucrats dryly to their faces; after adrenaline she makes coffee if there is any and talks about her abuela.

@@ -1,0 +1,233 @@
+{
+  "type": "as_game",
+  "action": "dev_data",
+  "data": {
+    "what": "trace",
+    "turn_index": 1,
+    "rows": [
+      {
+        "stage": 0,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "lanes_up": [
+            "A",
+            "B"
+          ],
+          "pending_reactions": [],
+          "timers_fired": 1
+        }
+      },
+      {
+        "stage": 1,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "signature": "observe_area:*:*:*",
+          "source": "human"
+        }
+      },
+      {
+        "stage": 2,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "full_state_hash": "1626977c314b2cd12e60b2bfa23d30b298e3517af9f64afd05b22f6df0734fac"
+        }
+      },
+      {
+        "stage": 3,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 4,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "waves": [
+            {
+              "at": 1638843000,
+              "lod": {
+                "act_000002": "hot",
+                "act_000003": "hot",
+                "act_000004": "warm",
+                "act_000005": "warm",
+                "act_000006": "warm",
+                "act_000007": "warm"
+              },
+              "mandatory": [
+                "act_000002"
+              ],
+              "salience": {
+                "act_000002": 106.0,
+                "act_000003": 5.0,
+                "act_000004": 5.0,
+                "act_000005": 0.0,
+                "act_000006": 0.0,
+                "act_000007": 2.0
+              },
+              "wave": 0
+            },
+            {
+              "at": 1638844091,
+              "lod": {
+                "act_000006": "hot"
+              },
+              "mandatory": [],
+              "salience": {
+                "act_000006": 5.0
+              },
+              "wave": 1
+            }
+          ]
+        }
+      },
+      {
+        "stage": 5,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 6,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 7,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 8,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "responses": []
+        }
+      },
+      {
+        "stage": 9,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 10,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 11,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {}
+      },
+      {
+        "stage": 12,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "final": 1638846000,
+          "gate": "all 58",
+          "horizon": 1638846000
+        }
+      },
+      {
+        "stage": 13,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "holders": [
+            "act_000001",
+            "act_000002",
+            "act_000003",
+            "act_000004",
+            "act_000005",
+            "act_000006",
+            "act_000007"
+          ]
+        }
+      },
+      {
+        "stage": 14,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "failed": [],
+          "groups": [
+            [
+              "act_000001"
+            ],
+            [
+              "act_000002"
+            ],
+            [
+              "act_000003"
+            ],
+            [
+              "act_000004"
+            ],
+            [
+              "act_000005"
+            ],
+            [
+              "act_000006"
+            ],
+            [
+              "act_000007"
+            ]
+          ]
+        }
+      },
+      {
+        "stage": 15,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "leaks": 3
+        }
+      },
+      {
+        "stage": 16,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "lines": 5
+        }
+      },
+      {
+        "stage": 17,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "attempts": 1
+        }
+      },
+      {
+        "stage": 18,
+        "status": "ok",
+        "run_count": 1,
+        "detail": {
+          "findings": [
+            "STYLE-LENGTH"
+          ]
+        }
+      },
+      {
+        "stage": 19,
+        "status": "skipped",
+        "run_count": 1,
+        "detail": {
+          "file": null,
+          "full_state_hash": "cbfd358a2792dbef63d919f3f6f8e0a76ba149b97e60e298cda46f7a13c86e0c"
+        }
+      }
+    ]
+  }
+}

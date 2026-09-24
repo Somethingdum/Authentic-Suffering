@@ -1,0 +1,20 @@
+THE CHARACTER'S RECORD
+{{ ctx.packet.identity_text }}
+{% for line in ctx.packet.motive_lines %}{{ line }}
+{% endfor %}{% for line in ctx.packet.moral_lines %}{{ line }}
+{% endfor %}{% for line in ctx.packet.decision_lines %}{{ line }}
+{% endfor %}Nerve: {{ ctx.packet.resolve_cur }} of {{ ctx.packet.resolve_max }}.
+Voice: {{ ctx.packet.voice_capsule }}
+Would never say: {{ ctx.packet.would_never_say | join(' / ') }}
+
+WHAT THEY KNEW AND FACED
+{% for s in ctx.packet.perceived_now %}- {{ s.text }}
+{% endfor %}{% for u in ctx.packet.utterances %}- Heard: "{{ u.words }}" ({{ u.form.value }}, {{ u.standing.value | replace('_',' ') }})
+{% endfor %}- In the middle of: {{ ctx.packet.commitments.current_task or "nothing" }}
+{% for d in ctx.packet.stakes.dependents %}- Depends on them: {{ d }}
+{% endfor %}
+THE CHOICE
+They chose: {{ ctx.chosen_label }}
+{% if ctx.output.speech %}They said: "{{ ctx.output.speech.text }}"
+{% endif %}Their goal: {{ ctx.output.goal }}
+Their reason: {{ ctx.output.private_reason }}

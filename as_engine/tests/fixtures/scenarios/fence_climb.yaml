@@ -1,0 +1,52 @@
+# P7 fixture (PROTECTED): a failed climb, committed and narrated (docs/as/13_BUILD_ORDER.md §5.7
+# "Actions fail"). Owen tries to go over a high chain-link fence at the back of a yard. The fence is
+# 250 cm (obstacle class 5, 07_RULES.md §1.2), so even a fit man usually cannot; with this seed
+# the first check of the run fails. Ada, a neighbour mending a bucket, watches from the porch.
+schema: as.scenario.v1
+name: fence_climb
+description: A high fence, a man who thinks he can climb it, and a neighbour who sees him fail.
+seed: 7
+start: {day: 40, time: "15:00:00"}
+weather: {kind: clear}
+places:
+  - id: yard
+    name: Back yard
+    kind: outdoor
+    indoor: false
+    material: open_air
+    width_m: 12
+    depth_m: 8
+    ambient_db: 35
+    anchors:
+      - {id: fence_near, name: foot of the fence, kind: feature, x: 6, y: 7.7}
+      - {id: porch, name: back porch, kind: furniture, x: 2, y: 1}
+      - {id: shed, name: shed, kind: cover, x: 10, y: 3, cover: 2, concealment: 2}
+  - id: lot
+    name: Empty lot
+    kind: outdoor
+    indoor: false
+    material: open_air
+    width_m: 20
+    depth_m: 10
+    ambient_db: 35
+    anchors:
+      - {id: fence_far, name: far side of the fence, kind: feature, x: 6, y: 0.3}
+portals:
+  - {id: high_fence, a: yard, b: lot, anchor_a: fence_near, anchor_b: fence_far, kind: fence, name: high chain-link fence, w: 0, h: 0, seal_db: 2, transparent: true, height: 250}
+bodies:
+  - id: pc
+    dossier: core:pc/owen_marsh
+    controller: human
+    place: yard
+    anchor: fence_near
+  - id: ada
+    stub: {name: Ada Brooks, age: 61, sex: female, occupation: retired nurse}
+    place: yard
+    anchor: porch
+    task: {kind: mend, label: mending a bucket, steps_total: 40, steps_done: 3, step_s: 30, interrupt_on: [loud_noise]}
+knows:
+  - {holder: pc, subject: ada, name: Ada}
+  - {holder: ada, subject: pc, name: Owen}
+notes:
+  - The seed is chosen so the first 'resolve' draw of the run fails Owen's climb; the test asserts a
+    failing band, not a particular one.

@@ -1,0 +1,78 @@
+# The Mafia Remnants — canonical faction (CMG §43.B expanded ruleset, §43.C intake doctrine).
+# CMG §43.B "Addison Containment Rule": Addison is never a member; when she is the PC her standing
+# is 'Protected External Retrieval Asset' (pcs/addison_flores.yaml faction_standing). When she is
+# not the PC the rule has nothing to act on (I-AS-12).
+schema: as.faction.v1
+id: mafia_remnants
+name: The Mafia Remnants
+kind: faction
+one_line: A tribute-fed protection order that keeps whole regions alive by owning the food, the roads and the debts.
+wants: Regional dependency — a world where eating, travelling, trading and being treated all pass through their routes, reserves, permissions and ledgers, so nobody can afford to be rid of them.
+stated_purpose: Order, fair markets and protection for anyone who pays their share.
+methods: Tribute collection, route security for convoys, protected markets, debt entered in a ledger that outlives the debtor, a clinic system that treats paying households first, and selective, public violence against the few who test them — never against the many who pay.
+will_not_do:
+  - Burn a paying market or farm; a producer is worth more alive and afraid than dead.
+  - Kill a debtor who is still paying.
+  - Let an untested outsider past a Clean Clinic or Seat House gate.
+  - Provoke a force they cannot measure; unknown strength is reported upward, never fought freelance.
+resources_have:
+  - Provision Yards holding grain, canned stock and seed across the region.
+  - Motor Yards with working trucks, fuel reserves and mechanics who keep them running.
+  - A radio and courier network through Relay Houses, with coded phrases and blackout procedures.
+  - Clean Clinics with the region's best-stocked medicine and the only tongue-strip assays.
+  - Ledgers — the master record of who owes what to whom, kept at the Audit House.
+resources_need:
+  - Producers — farms, workshops and markets — willing to keep paying.
+  - Fuel, which runs down every season faster than the Motor Yards can find it.
+  - Trustworthy route knowledge past infected and raider ground.
+  - Antibiotics and assay strips, which cannot be made, only found.
+pressure: Every convoy lost to infected or raiders is tribute that did not arrive; every season the fuel reserve is smaller, and the day trucks stop is the day the Provision Yards stop feeding the zones that pay for protection.
+leaders:
+  - {title: The Steward, role: "Holds the Seat House; final word on alliances, sanctions and anything touching an unknown power."}
+  - {title: The Provisioner, role: "Runs the Provision Yards and convoys; decides who eats when stocks are short."}
+  - {title: The Auditor, role: "Keeps the master ledger at the Audit House; checks every collector's page against what arrived.", actor: "core:actor/irene_kowalski"}
+  - {title: The Warden, role: "Commands the crews, the shield men and the Sanction Sites; carries out what the Steward orders."}
+how_leadership_is_contested: Nobody challenges the Steward openly; the three below compete for the Steward's ear by delivering — the Provisioner with full yards, the Auditor with clean books, the Warden with quiet streets — and a Steward who dies or fails is replaced by whichever of them the other two can live with.
+fault_lines:
+  - Provisioner against Warden — the Provisioner wants convoys guarded, the Warden wants crews on the streets.
+  - The Auditor against everybody — her ledgers catch skimming at every level, and every level resents it.
+  - Old-family professionals against the bastard crews recruited after the Fall, who enjoy the violence more than the order.
+  - Embedded men going native — people placed inside settlements who start siding with the settlements.
+  - Old guard against expansionists who want to take zones by force instead of by dependency.
+  - Members who resent protected outsiders — people like retrieval runners and clinic staff who are paid well without swearing in.
+relations:
+  - faction: "core:faction/delgados_crew"
+    stance: unaware
+    history: Delgado's crew held a single store in the first months after the Fall; by the time the Remnants had a tribute network, that store's people were dead, scattered or paying somewhere under other names.
+doctrine:
+  challenge_procedure: A stranger at a gate or on a Remnants road is halted at a distance with a raised hand and a called question — "Who do you pay?" — and kept at that distance until a name, a ledger entry or a shield token is produced.
+  escalation_ladder:
+    - Halt and question at distance.
+    - Order to set weapons down and show hands and mouth.
+    - Warning shot or a shown rifle.
+    - Detention for intake at the nearest gate.
+    - Shots to disable, then to kill if the stranger closes or draws.
+  treatment_of_unknowns: Unknowns are useful until proven otherwise — questioned, searched, weighed for what they know or can do, and offered a place in the ledger. Unknowns who resist become examples.
+  treatment_of_visibly_sick: Anyone showing fever, a fresh bite or a claw wound is kept at rifle distance, isolated, and walked to quarantine under escort; confirmed infected are never released — contained, observed, or put down (CMG §43.C No-Release Quarantine).
+  prisoner_policy: Prisoners are assets. Debtors work off what they owe; enemies are traded, ransomed or used at a Sanction Site as a message; nobody is killed quietly when their death could be useful loudly.
+  intake_screening:
+    - Halt and disarm at the gate.
+    - Strip search; inspect every wound and the inside of the mouth.
+    - Confiscate bottles, cigarettes, utensils and anything that touches lips.
+    - Tongue-strip assay.
+    - Wash and re-clothe in issued clothing.
+    - Short quarantine, then a second assay before entry.
+laws: ["core:law/tribute_due", "core:law/market_shield_peace", "core:law/ledger_debt", "core:law/intake_screening", "core:law/contamination_quarantine"]
+node_classes: [seat_house, provision_yard, audit_house, motor_yard, relay_house, clean_clinic, shadow_depot, sanction_site, market_shield_zone]
+presence:
+  regional_reach: One region per Seat House, typically three to six towns and the roads between them.
+  start_trust_ranges: {ally: [7, 10], neutral: [4, 6], suspicious: [2, 4], indebted: [3, 7], enemy: [1, 2]}
+  era_exceptions:
+    early: Not yet the Remnants — scattered crews of the old family holding warehouses and trucks; no tribute network, no nodes, no ledger beyond what one man keeps in his head.
+    established: Nodes forming — a Seat House, one or two Provision Yards and a Motor Yard; tribute taken by force as often as by habit.
+  presence_conditions: ["days_since_fall >= 400", "faction_density >= 3", "social_order >= 2"]
+  population_baseline: 400
+member_archetypes: [collector, shield_man, convoy_driver, yard_hand, clinic_orderly, relay_operator, enforcer, bookkeeper]
+belief_text: "They're thieves with a filing system. But the market's safe, the trucks come, and the clinic has antibiotics. People say that last part quieter."
+truth_text: They are the most important civil infrastructure left in the region, and they know it. Their power is administrative more than military; their intelligence comes from shops, clinics, convoy crews and debtors rather than spies, so they know a great deal and not everything. Their weak point is fuel, and the Provisioner's projections, which nobody below the Steward has seen, give the convoys about three more years.
+depth_reference: "CMG §43.B–C"

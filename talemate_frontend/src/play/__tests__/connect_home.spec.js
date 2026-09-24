@@ -1,0 +1,149 @@
+// The Connect and Home screens and the Content screen (10_UI §2.1, §2.2, §2.7). PROTECTED.
+import { describe, expect, test } from 'vitest'
+import ConnectScreen from '../screens/ConnectScreen.vue'
+import ContentScreen from '../screens/ContentScreen.vue'
+import HomeScreen from '../screens/HomeScreen.vue'
+import { byId, field, fixture, flush, has, mountWith, one, storeWith } from './helpers.js'
+
+describe('Connect', () => {
+  test('asks for the models and the config; shows both brains with their addresses and models', async () => {
+    const { store, sock } = storeWith('welcome_connect')
+    sock.sent.length = 0
+    const w = mountWith(ConnectScreen, { store })
+    expect(sock.actions()).toEqual(expect.arrayContaining(['models_list', 'config_get']))
+    sock.emit(fixture('config'))
+    sock.emit(fixture('models_a'))
+    sock.emit(fixture('models_b'))
+    await flush()
+    for (const lane of ['A', 'B']) {
+      expect(has(w, `lane-${lane}-card`)).toBe(true)
+      expect(has(w, `lane-${lane}-test`)).toBe(true)
+    }
+    expect(field(w, 'lane-A-url').element.value).toBe('http://localhost:1234/v1')
+    expect(field(w, 'lane-A-model').element.value).toBe('nemotron-cascade-2-30b-a3b')
+    expect(byId(w, 'lane-A-model-option').map((o) => o.text())).toEqual(['nemotron-cascade-2-30b-a3b', 'qwen3-32b'])
+    expect(byId(w, 'lane-B-model-option')).toEqual([])
+  })
+
+  test('Test saves what was typed, then tests; the result is shown in words', async () => {
+    const { store, sock } = storeWith('welcome_connect', 'config', 'models_a', 'models_b')
+    const w = mountWith(ConnectScreen, { store })
+    await flush()
+    await byId(w, 'lane-A-model-option')[1].trigger('click')
+    await field(w, 'lane-A-url').setValue('http://127.0.0.1:1234/v1')
+    sock.sent.length = 0
+    await one(w, 'lane-A-test').trigger('click')
+    expect(sock.sent).toEqual([
+      { action: 'config_set', patch: { lanes: { A: { base_url: 'http://127.0.0.1:1234/v1', model: 'qwen3-32b' } } } },
+      { action: 'models_test', lane: 'A' },
+    ])
+    sock.emit(fixture('test_a_ok'))
+    sock.emit(fixture('test_b_down'))
+    await flush()
+    expect(one(w, 'lane-A-status').text()).toContain('Working — answered in 1.8 s.')
+    expect(one(w, 'lane-B-status').text()).toContain('Not answering at http://localhost:1234/v1.')
+  })
+
+  test('Continue needs at least the storyteller brain; it asks the server where to go', async () => {
+    const { store, sock } = storeWith('welcome_connect', 'config', 'models_a', 'models_b')
+    const w = mountWith(ConnectScreen, { store })
+    await flush()
+    expect(one(w, 'connect-continue').attributes('disabled')).toBeDefined()
+    sock.emit(fixture('test_b_down'))
+    await flush()
+    expect(one(w, 'connect-continue').attributes('disabled')).toBeDefined()
+    sock.emit(fixture('test_a_ok'))
+    await flush()
+    expect(one(w, 'connect-continue').attributes('disabled')).toBeUndefined()
+    sock.sent.length = 0
+    await one(w, 'connect-continue').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'get_state' }])
+  })
+})
+
+describe('Home', () => {
+  test('big buttons with words; Continue names the newest run', async () => {
+    const { store, sock } = storeWith('welcome_home', 'runs')
+    const w = mountWith(HomeScreen, { store })
+    await flush()
+    for (const id of ['home-continue', 'home-new-life', 'home-load', 'home-worlds', 'home-content', 'home-settings']) {
+      expect(one(w, id).text().trim().length, id).toBeGreaterThan(2)
+    }
+    expect(one(w, 'home-continue').text()).toContain('Owen Marsh')
+    expect(one(w, 'home-continue').text()).toContain('day 18')
+    expect(one(w, 'home-continue').text()).toContain('alive')
+    sock.sent.length = 0
+    await one(w, 'home-continue').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'run_load', run_id: 'owen_marsh_71a', save_slot: null }])
+  })
+
+  test('no runs: no Continue', async () => {
+    const { store, sock } = storeWith('welcome_home')
+    sock.emit({ type: 'as_game', action: 'runs', data: { runs: [] } })
+    const w = mountWith(HomeScreen, { store })
+    await flush()
+    expect(has(w, 'home-continue')).toBe(false)
+  })
+
+  test('Load lists every run as a card; delete needs a confirmation', async () => {
+    const { store, sock } = storeWith('welcome_home', 'runs')
+    const w = mountWith(HomeScreen, { store })
+    await flush()
+    expect(has(w, 'run-card')).toBe(false)
+    await one(w, 'home-load').trigger('click')
+    const cards = byId(w, 'run-card')
+    expect(cards.length).toBe(2)
+    const second = cards[1].text()
+    for (const word of ['Addison Flores', 'day 212', 'dead', 'Realism', 'Sandbox', 'Ironman', '2026-09-20 19:02']) {
+      expect(second).toContain(word)
+    }
+    expect(cards[0].text()).not.toContain('Sandbox')
+    sock.sent.length = 0
+    await cards[1].get('[data-testid="run-card-load"]').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'run_load', run_id: 'addison_flores_5c2', save_slot: null }])
+    sock.sent.length = 0
+    await cards[0].get('[data-testid="run-card-delete"]').trigger('click')
+    expect(sock.sent).toEqual([])
+    await one(w, 'run-card-delete-confirm').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'run_delete', run_id: 'owen_marsh_71a' }])
+  })
+
+  test('the other buttons go where they say', async () => {
+    const { store } = storeWith('welcome_home', 'runs')
+    const w = mountWith(HomeScreen, { store })
+    await one(w, 'home-content').trigger('click')
+    expect(store.screen).toBe('content')
+    await one(w, 'home-settings').trigger('click')
+    expect(store.settingsOpen).toBe(true)
+    await one(w, 'home-new-life').trigger('click')
+    expect(store.screen).toBe('wizard')
+    store.go('home')
+    await one(w, 'home-worlds').trigger('click')
+    expect(store.screen).toBe('worlds')
+  })
+})
+
+describe('Your characters & world', () => {
+  test('pack rows with counts; Validate shows the report in plain lines', async () => {
+    const { store, sock } = storeWith('welcome_home')
+    sock.sent.length = 0
+    const w = mountWith(ContentScreen, { store })
+    expect(sock.sent).toEqual([{ action: 'packs_list' }])
+    sock.emit(fixture('packs'))
+    await flush()
+    const rows = byId(w, 'pack-row')
+    expect(rows.length).toBe(2)
+    expect(rows[0].text()).toContain('Authentic Suffering — core')
+    expect(rows[0].text()).toContain('227 records')
+    sock.sent.length = 0
+    await rows[1].get('[data-testid="pack-validate"]').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'content_validate', pack_id: 'my_content' }])
+    sock.emit(fixture('content_report_bad'))
+    await flush()
+    expect(byId(w, 'content-report-error').map((e) => e.text())).toEqual(
+      ['actors/mara_voss.yaml — voice.would_never_say needs at least 3 lines (it has 1)'])
+    expect(byId(w, 'content-report-warning').length).toBe(1)
+    await one(w, 'content-back').trigger('click')
+    expect(store.screen).toBe('home')
+  })
+})

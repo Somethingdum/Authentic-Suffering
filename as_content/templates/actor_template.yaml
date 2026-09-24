@@ -1,0 +1,118 @@
+# ACTOR TEMPLATE — copy into <your_pack>/actors/<id>.yaml, replace every <angle-bracket> value,
+# delete the comments you no longer need. The validator (CNT-10) tells you in plain words what is
+# missing. A dossier describes ONE PERSON, never a category: if a line would fit a thousand people,
+# it is not finished. Worked examples: as_content/packs/core/actors/ (start with mara_voss.yaml).
+schema: as.actor.v1
+id: <lowercase_id>                      # file name without .yaml; letters, digits, underscore
+generation: authored
+days_since_fall_range: [<min_days>, <max_days>]   # world ages this person's age + history fit (WG-34); delete if any age works
+identity:
+  name: <Full Name>
+  aliases: []                           # other names people use for them (max 8)
+  age: <0-110>
+  sex: <female | male | other>
+  cohort: <pre_fall_adult | fall_child | post_fall_born>
+  birthplace: <town, region>
+  occupation_before: <what they did before the Fall, specifically>
+  occupation_now: <what they do now>
+  one_line: <10-140 chars: who they are in one sentence>
+appearance:
+  height_cm: <45-230>
+  mass_kg: <3-250>
+  build: <specific>
+  hair: <specific>
+  eyes: <specific>
+  skin: <specific>
+  distinguishing_marks: ["<one unusual, memorable physical detail>"]
+  clothing_usual: <what they wear>
+  movement_under_stress: <how they move when scared or angry>
+  habit_gesture: <one repeated physical habit>
+  relation_to_appearance: <how they feel about how they look>
+capability:
+  special: {S: <1-10>, P: <1-10>, E: <1-10>, C: <1-10>, I: <1-10>, A: <1-10>, L: <1-10>}
+  skills:                               # rank 1 trained, 2 skilled, 3 expert; absent = untrained
+    - {domain: <skill domain>, rank: <1-3>, evidence: "<where it came from — years, jobs, events>"}
+  tags: []                              # capability tags: parkour climber quiet_mover locksmith breacher calm_voice field_medic marksman heavy_hitter
+  trained_responses:                    # cue ids from cues.yaml; verb from the verb list
+    - {cue: <cue_id>, verb: <verb>, note: "<what they do, reflexively>"}
+  literacy: <0-3>
+  tech_literacy: <0-3>
+  resolve_trait_mod: <-2..2>
+motive:
+  motive: <what they want most>
+  method: <how they go after it>
+  moral_line:
+    will: ["<something hard they WILL do>"]
+    wont: ["<something they will not do, whatever it costs>"]
+    wont_tags: []                       # machine subset: kill_human kill_child harm_dependent abandon_dependent abandon_post leave_wounded steal betray_group torture execute_prisoner attack_unarmed break_promise eat_human lie_to_family
+  inner_conflict: <the argument they have with themselves>
+  past_wound: <the thing that still hurts, specifically>
+  signature_behaviour: <what they visibly do that nobody else does>
+  risk_threshold: <1-10>
+  risk_text: <what risks they take and for whom>
+  resource_constraints: <what they lack>
+persona:
+  public: {shown_traits: ["<trait>"], claimed_history: "<what they say about themselves>", presented_affiliation: "<who they say they're with>"}
+  private: {true_goals: ["<real goal>"], concealed_history: "<what they hide>", real_affiliation: "<who they're really with>"}
+traits:                                 # at least two; each defined for THIS person
+  - tag: <trait_word>
+    manifests: <how it looks from outside>
+    triggers: <what sets it off>
+    causes: <what it makes them do>
+    costs: <what it costs them>
+    example: <one specific time it happened>
+  - tag: <trait_word>
+    manifests: <...>
+    triggers: <...>
+    causes: <...>
+    costs: <...>
+    example: <...>
+contradictions:
+  - {belief_a: "<one belief>", belief_b: "<a belief in tension with it>", a_wins_when: "<condition>", b_wins_when: "<condition>"}
+decision_stack:
+  layers: ["<highest priority>", "<next>", "<next>", "<lowest>"]   # at least four
+  inversion_conditions: ["<when two layers swap>"]
+  past_example: <a past decision that shows the stack working>
+silence:
+  goes_quiet_when: ["<situation>", "<situation>"]
+  body_when_silent: <what their body does>
+  refuses_to_discuss: []
+  comfortable_vs_uncomfortable: <the difference, for them>
+knowledge:
+  knows: []                             # facts they start with (become beliefs with provenance)
+  does_not_know: []
+  knows_but_hides: []
+  cues: []                              # belief cues from cues.yaml they hold (e.g. knows_headshot_rule)
+voice:
+  capsule: <20-500 chars: how they sound>
+  speech_tendencies: ["<tendency>", "<tendency>"]
+  exemplars:                            # the same person at three temperatures; never quote anyone else
+    low_stakes: "<a line on an ordinary day>"
+    under_pressure: "<a line when it's going wrong>"
+    at_the_limit: "<a line when they're past it>"
+  would_never_say: ["<exact phrasing>", "<exact phrasing>", "<exact phrasing>"]   # concrete lines, not categories
+  profanity: <none | rare | frequent | constant>
+  dialect_notes: ""
+social:
+  household_role: ""
+  relations:
+    - {target: "<pack>:actor/<id>", kind: <relation kind>, axes: {trust: 0}, history: "<why they feel this way>"}
+  dependents: []
+  guardians: []
+  memberships: []                       # {faction: "<pack>:faction/<id>", role: ..., standing: -3..3, since: "..."}
+life:
+  aspiration: <long-term want>
+  current_project: <what they're working on now>
+  routine: []                           # {start_hh: 0-23, end_hh: 0-24, activity: "...", place_hint: ...}
+  obligations: []
+  hopes: []
+  fears: ["<a specific fear>"]
+  secrets: []                           # {content: "...", who_knows: [refs], exposure_consequence: "..."}
+disposition:
+  archetype_prior: <predator | survivor | opportunist | civilized | hider | wanderer | fool | crazed | groupie>
+  toward_strangers: <hostile | wary | neutral | warm>
+  encounter_default: <what they do when they first spot a stranger>
+starting_loops: []                      # {kind: goal|grudge|promise_made|..., text: "...", strength: 0-3}
+starting_inventory: []                  # {item: "<pack>:item/<id>", qty: 1, slot: hand_r|hand_l|worn|pack|pocket, label?, container?, props?}
+writers_notes: <human-only notes; the model reads them and never writes them>
+tags: []

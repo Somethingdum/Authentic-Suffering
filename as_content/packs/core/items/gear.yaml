@@ -1,0 +1,323 @@
+# Containers, tools, lights, clothing, keys and small valuables.
+# Light sources: an item tagged light_source whose props.on is true lights the area (07 §4).
+- schema: as.item.v1
+  id: daypack
+  name: daypack
+  plural: daypacks
+  kind: container
+  mass_g: 700
+  bulk: 4
+  tags: [container, bag, worn]
+  barter_value: 12
+  container: {capacity_bulk: 25, access_time_s: 6, worn: true}
+  description: A mid-sized 20–25 litre backpack.
+- schema: as.item.v1
+  id: hiking_pack
+  name: hiking pack
+  plural: hiking packs
+  kind: container
+  mass_g: 1600
+  bulk: 6
+  tags: [container, bag, worn]
+  barter_value: 25
+  container: {capacity_bulk: 45, access_time_s: 10, worn: true}
+  description: A framed 60 litre pack with a hip belt.
+- schema: as.item.v1
+  id: shoulder_bag
+  name: shoulder bag
+  plural: shoulder bags
+  kind: container
+  mass_g: 400
+  bulk: 2
+  tags: [container, bag, worn]
+  barter_value: 6
+  container: {capacity_bulk: 10, access_time_s: 3, worn: true}
+  description: A canvas messenger bag with a broken buckle held by wire.
+- schema: as.item.v1
+  id: wooden_crate
+  name: wooden crate
+  plural: wooden crates
+  kind: container
+  mass_g: 6000
+  bulk: 14
+  tags: [container, crate]
+  barter_value: 2
+  container: {capacity_bulk: 30, access_time_s: 4}
+  description: A slatted produce crate with a loose lid.
+- schema: as.item.v1
+  id: metal_locker
+  name: metal locker
+  plural: metal lockers
+  kind: container
+  mass_g: 30000
+  bulk: 20
+  tags: [container, lockable, furniture]
+  barter_value: 0
+  container: {capacity_bulk: 20, access_time_s: 5}
+  description: A tall grey staff locker with a hasp for a padlock.
+- schema: as.item.v1
+  id: cash_register
+  name: cash register
+  plural: cash registers
+  kind: container
+  mass_g: 9000
+  bulk: 12
+  tags: [container, furniture]
+  barter_value: 0
+  container: {capacity_bulk: 2, access_time_s: 3}
+  description: A dead till with its drawer jammed half open.
+- schema: as.item.v1
+  id: cardboard_box
+  name: cardboard box
+  plural: cardboard boxes
+  kind: container
+  mass_g: 300
+  bulk: 6
+  tags: [container, box]
+  barter_value: 0
+  container: {capacity_bulk: 12, access_time_s: 2}
+  description: A soft, water-stained box.
+- schema: as.item.v1
+  id: flashlight
+  name: flashlight
+  plural: flashlights
+  kind: light
+  mass_g: 200
+  bulk: 1
+  tags: [light_source, tool]
+  barter_value: 14
+  description: A plastic torch. The switch sticks; the batteries are the real treasure.
+- schema: as.item.v1
+  id: lighter
+  stackable: true
+  name: disposable lighter
+  plural: disposable lighters
+  kind: tool
+  mass_g: 20
+  bulk: 0
+  tags: [fire, tool]
+  barter_value: 5
+  description: A cheap lighter. Needs replacing more often than anyone likes.
+- schema: as.item.v1
+  id: lockpick_set
+  name: lockpick set
+  plural: lockpick sets
+  kind: tool
+  mass_g: 60
+  bulk: 0
+  tags: [lockpick, tool]
+  barter_value: 20
+  description: Tension wrenches and rakes in a zip wallet.
+- schema: as.item.v1
+  id: duct_tape
+  name: roll of duct tape
+  plural: rolls of duct tape
+  kind: tool
+  mass_g: 300
+  bulk: 1
+  tags: [tool, repair]
+  barter_value: 6
+  description: Half a roll. Fixes almost anything for a while.
+- schema: as.item.v1
+  id: rope
+  name: length of rope
+  plural: lengths of rope
+  kind: tool
+  mass_g: 900
+  bulk: 2
+  tags: [tool, rope]
+  barter_value: 8
+  description: Ten metres of nylon rope.
+- schema: as.item.v1
+  id: binoculars
+  name: binoculars
+  plural: binoculars
+  kind: tool
+  mass_g: 700
+  bulk: 1
+  tags: [tool, optics]
+  barter_value: 22
+  description: Rubber-armoured 8x42s with one cracked eyecup.
+- schema: as.item.v1
+  id: handheld_radio
+  name: handheld radio
+  plural: handheld radios
+  kind: tool
+  mass_g: 250
+  bulk: 1
+  tags: [tool, radio]
+  barter_value: 40
+  description: A two-way radio. Range a few kilometres, battery a few hours.
+- schema: as.item.v1
+  id: tongue_strip_assay
+  name: tongue-strip assay
+  plural: tongue-strip assays
+  kind: tool
+  mass_g: 5
+  bulk: 0
+  stackable: true
+  tags: [assay, tool, contamination]
+  barter_value: 8
+  description: A polymer strip pushed onto the tongue with the outer tab bitten. Infected saliva roughens and warps the inner zone.
+- schema: as.item.v1
+  id: door_key
+  name: key
+  plural: keys
+  kind: key
+  mass_g: 10
+  bulk: 0
+  tags: [key]
+  barter_value: 1
+  description: A brass key. Which lock it opens is in its props (opens).
+- schema: as.item.v1
+  id: padlock
+  name: padlock
+  plural: padlocks
+  kind: tool
+  mass_g: 250
+  bulk: 0
+  tags: [lock, tool]
+  barter_value: 5
+  description: A hardened steel padlock.
+- schema: as.item.v1
+  id: bedroll
+  name: bedroll
+  plural: bedrolls
+  kind: misc
+  mass_g: 1200
+  bulk: 4
+  tags: [sleep]
+  barter_value: 8
+  description: A rolled foam mat and a thin blanket strapped together.
+- schema: as.item.v1
+  id: windbreaker
+  name: windbreaker
+  plural: windbreakers
+  kind: clothing
+  mass_g: 350
+  bulk: 1
+  tags: [clothing, outer]
+  barter_value: 5
+  description: An oversized nylon windbreaker.
+- schema: as.item.v1
+  id: work_jacket
+  name: canvas work jacket
+  plural: canvas work jackets
+  kind: clothing
+  mass_g: 1300
+  bulk: 2
+  tags: [clothing, outer, bite_resistant]
+  barter_value: 14
+  description: Heavy duck canvas, stiff enough to turn a scratch.
+- schema: as.item.v1
+  id: boots
+  name: pair of boots
+  plural: pairs of boots
+  kind: clothing
+  mass_g: 1500
+  bulk: 2
+  tags: [clothing, footwear]
+  barter_value: 16
+  description: Work boots resoled with tyre rubber.
+- schema: as.item.v1
+  id: running_shoes
+  name: pair of running shoes
+  plural: pairs of running shoes
+  kind: clothing
+  mass_g: 600
+  bulk: 1
+  tags: [clothing, footwear, quiet]
+  barter_value: 10
+  description: Trail runners, patched at the toes.
+- schema: as.item.v1
+  id: summer_clothes
+  name: set of summer clothes
+  plural: sets of summer clothes
+  kind: clothing
+  mass_g: 400
+  bulk: 1
+  tags: [clothing]
+  barter_value: 3
+  description: Light athletic clothes for heat — a skort and a sports top, or shorts and a tank.
+- schema: as.item.v1
+  id: spare_clothes
+  name: bundle of spare clothes
+  plural: bundles of spare clothes
+  kind: clothing
+  mass_g: 500
+  bulk: 2
+  tags: [clothing]
+  barter_value: 3
+  description: A change of clothes rolled tight.
+- schema: as.item.v1
+  id: perfume
+  name: bottle of perfume
+  plural: bottles of perfume
+  kind: valuable
+  mass_g: 120
+  bulk: 0
+  tags: [valuable, barter, keepsake]
+  barter_value: 20
+  description: Real perfume, intact, kept wrapped in a sock.
+- schema: as.item.v1
+  id: toiletries
+  name: travel toiletries
+  plural: sets of travel toiletries
+  kind: misc
+  mass_g: 200
+  bulk: 1
+  tags: [hygiene, barter]
+  barter_value: 6
+  description: Travel-sized soap, shampoo and deodorant, scavenged one at a time.
+- schema: as.item.v1
+  id: cigarettes
+  name: pack of cigarettes
+  plural: packs of cigarettes
+  kind: valuable
+  mass_g: 25
+  bulk: 0
+  stackable: true
+  tags: [valuable, barter, mouth_contact]
+  barter_value: 8
+  description: Stale, crushed, and still worth trading.
+- schema: as.item.v1
+  id: batteries_aa
+  name: pair of AA batteries
+  plural: pairs of AA batteries
+  kind: valuable
+  mass_g: 50
+  bulk: 0
+  stackable: true
+  tags: [valuable, barter, power]
+  barter_value: 7
+  description: Two batteries that probably still hold a charge.
+- schema: as.item.v1
+  id: coffee_tin
+  name: tin of coffee
+  plural: tins of coffee
+  kind: valuable
+  mass_g: 400
+  bulk: 1
+  tags: [valuable, barter, treat]
+  barter_value: 25
+  description: Ground coffee, half a tin. People remember what it smelled like.
+- schema: as.item.v1
+  id: ledger_book
+  name: ledger book
+  plural: ledger books
+  kind: document
+  mass_g: 400
+  bulk: 1
+  tags: [document, ledger]
+  barter_value: 0
+  description: A hardback accounts book full of names, dates and amounts owed.
+- schema: as.item.v1
+  id: metal_sheet
+  name: sheet of corrugated metal
+  plural: sheets of corrugated metal
+  kind: misc
+  mass_g: 8000
+  bulk: 14
+  tags: [building, noisy]
+  barter_value: 3
+  description: A rusted panel of roofing tin.

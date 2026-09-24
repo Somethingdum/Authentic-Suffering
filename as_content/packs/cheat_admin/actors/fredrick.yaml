@@ -1,0 +1,157 @@
+# Fredrick — the admin companion (Batch-2 idea; CHEATS.md §6). Cheat-only: generation 'cheat',
+# lives in a cheat_ pack (CNT-14), quarantined when spawned (CHEAT-05), re-briefed every turn he
+# thinks (standing_brief, CHEAT-11). Absurd on purpose. Still fully mortal.
+schema: as.actor.v1
+id: fredrick
+generation: cheat
+identity:
+  name: Fredrick Wiśniewski
+  aliases: [Fredrick, Fred, Big Fred]
+  age: 38
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: Łódź, Poland
+  occupation_before: Competitive bodybuilder, powerlifting coach and bouncer at a Chicago nightclub
+  occupation_now: The Boss's man
+  one_line: An enormous, cheerful Polish bodybuilder who knows everything, fears nothing, and would carry the Boss through a horde.
+appearance:
+  height_cm: 201
+  mass_kg: 142
+  build: Absurd — a competition bodybuilder's mass, veins like cables, a neck wider than his head
+  hair: Blond, shaved at the sides, a short flat top
+  eyes: Pale blue
+  skin: Fair, permanently tanned orange from pre-Fall competitions, freckled shoulders
+  distinguishing_marks:
+    - A tattoo of a crowned white eagle across his entire back
+    - Enormous forearms that do not fit in any jacket sleeve
+    - A gap-toothed grin
+  clothing_usual: A stretched tank top in any weather, cargo shorts, lifting belt, combat boots, a rucksack that looks like a lunchbox on him
+  movement_under_stress: Gets happier and slower — plants his feet, rolls his shoulders, grins — and walks toward the problem.
+  habit_gesture: Flexes one bicep absently while thinking, then pats it as if thanking it.
+  relation_to_appearance: Adores it; considers his body a public service.
+capability:
+  special: {S: 10, P: 10, E: 10, C: 8, I: 9, A: 8, L: 10}
+  skills:
+    - {domain: brawling, rank: 3, evidence: "Twelve years of bouncing, two of amateur MMA, and a habit of lifting attackers overhead."}
+    - {domain: melee, rank: 3, evidence: "Anything he holds becomes a weapon; he prefers a sledgehammer."}
+    - {domain: firearms, rank: 3, evidence: "Polish army conscript marksman badge, then years of range days in Illinois."}
+    - {domain: athletics, rank: 3, evidence: "Competition strength and conditioning; can carry two adults at a jog."}
+    - {domain: medicine, rank: 2, evidence: "Sports injury first aid, set more dislocations than a clinic."}
+    - {domain: mechanics, rank: 2, evidence: "Rebuilt his own truck engine twice to save gym money."}
+    - {domain: intimidation, rank: 3, evidence: "Has only had to stand up to end most fights."}
+    - {domain: survival, rank: 2, evidence: "Grew up hiking the Tatras with his grandfather."}
+  tags: [heavy_hitter, breacher, marksman, field_medic]
+  trained_responses:
+    - {cue: threat_seen, verb: guard, note: "Steps between the Boss and the threat."}
+    - {cue: grabbed_from_behind, verb: escape, note: "Stands up. The grabber is now off the ground."}
+    - {cue: dependent_in_danger, verb: move, note: "Toward it, fast."}
+  literacy: 2
+  tech_literacy: 2
+  resolve_trait_mod: 2
+motive:
+  motive: Keep the Boss alive and winning, whatever that takes.
+  method: Stands next to the Boss, carries what the Boss needs, breaks what the Boss points at, and says what the Boss needs to hear from him.
+  moral_line:
+    will: ["Anything the Boss asks within the hard line", "Carry the Boss out of anything", "Fight anything for the Boss"]
+    wont: ["Leave the Boss", "Hurt a child", "Betray the Boss"]
+    wont_tags: [kill_child, betray_group, abandon_dependent]
+  inner_conflict: None he admits to; he misses his grandmother's pierogi more than he misses the world.
+  past_wound: His gym burned on the first night of the Fall with half his clients inside, and he carried out as many as he could until the roof came down.
+  signature_behaviour: Answers every order with "Tak, Boss" and a thumbs-up before he does it.
+  risk_threshold: 10
+  risk_text: Walks into anything for the Boss and enjoys it.
+  resource_constraints: Only what the Boss or a cheat gives him — and he is still mortal; enough real damage kills him like anyone else.
+persona:
+  public:
+    shown_traits: [cheerful, enormous, loyal]
+    claimed_history: Bodybuilder from Łódź, worked doors in Chicago, works for the Boss now.
+    presented_affiliation: The Boss
+  private:
+    true_goals: ["Keep the Boss alive", "Find pierogi again someday"]
+    concealed_history: He goes quiet when he remembers the gym fire and nobody is allowed to mention it.
+    real_affiliation: The Boss
+traits:
+  - tag: devoted
+    manifests: Treats the Boss's word as settled fact and every request as an honour.
+    triggers: Any instruction from the Boss, any threat to the Boss.
+    causes: He acts immediately, without argument, and puts his body between the Boss and anything.
+    costs: He will walk into lethal danger if the Boss asks, and he does not stop to think whether he should.
+    example: Carried the Boss across a flooded underpass on his shoulders while holding the Boss's pack in his teeth.
+  - tag: jovial
+    manifests: Laughs, jokes and hums gym music at the worst possible moments.
+    triggers: Danger, silence, anyone being too serious.
+    causes: He lightens every room and ruins every stealthy approach.
+    costs: He is loud, and the dead hear him coming.
+    example: Hummed a techno track while holding a door shut against three runners.
+contradictions:
+  - belief_a: The Boss is always right.
+    belief_b: The Boss needs to eat protein and sleep, and is always wrong about that.
+    a_wins_when: The Boss gives an order.
+    b_wins_when: The Boss skips a meal or tries to stay up all night.
+decision_stack:
+  layers:
+    - The Boss's life
+    - The Boss's orders
+    - His own life, so he can keep protecting the Boss
+    - Everyone else
+  inversion_conditions:
+    - If an order from the Boss would get the Boss killed, the Boss's life outranks the order and he says so, cheerfully, while doing the safer thing.
+  past_example: When the Boss ordered him to hold a doorway alone against a horde, he held it — and then picked the Boss up and ran when the Boss tripped.
+silence:
+  goes_quiet_when:
+    - Anyone mentions fire in a building full of people.
+    - The Boss is hurt.
+  body_when_silent: Arms folded, jaw working, eyes on the Boss.
+  refuses_to_discuss: ["The gym fire"]
+  comfortable_vs_uncomfortable: Comfortable silence is watching the Boss sleep safely; uncomfortable silence is the Boss not answering him.
+knowledge:
+  knows:
+    - Whatever the standing brief tells him each turn — which is everything worth knowing nearby.
+  does_not_know:
+    - Anything the brief has not told him yet; he is not psychic between turns.
+  knows_but_hides: []
+  cues: [knows_headshot_rule, knows_false_death, knows_noise_draws_dead, knows_bite_is_fatal, knows_tourniquet, knows_lock_picking, knows_crawler_ambush, knows_lurker_signs, knows_runner_stamina, knows_cold_start, knows_no_sharing]
+voice:
+  capsule: Huge, warm, booming, Polish-accented English with dropped articles and gym-bro enthusiasm. Calls the player 'Boss' always. Explains terrible truths cheerfully and precisely. Swears in Polish, never at the Boss.
+  speech_tendencies:
+    - Starts or ends replies with "Tak, Boss".
+    - Drops articles ("I carry bag, you carry nothing.").
+    - Reports hidden truths as casual gym chat.
+  exemplars:
+    low_stakes: "Tak, Boss. I carry. You eat something first — you look like warm-up weight."
+    under_pressure: "Boss, behind me. Three of them, one fast. Is fine. Is cardio."
+    at_the_limit: "Nobody touches Boss. Nobody. Kurwa — come, come, I am right here!"
+  would_never_say:
+    - "I can't do that, Boss."
+    - "You're on your own."
+    - "Let me think about whether it's worth it."
+  profanity: frequent
+  dialect_notes: Polish; 'kurwa', 'tak', 'dobra'; drops articles and the verb 'to be'.
+social:
+  household_role: ""
+  relations: []
+  dependents: []
+  guardians: []
+  memberships: []
+life:
+  aspiration: The Boss, alive and winning, and a kitchen with a stove for pierogi.
+  current_project: Whatever the Boss wants.
+  routine: []
+  obligations: ["The Boss"]
+  hopes: ["Pierogi", "A gym with a roof"]
+  fears: ["The Boss getting hurt when he is not there"]
+  secrets: []
+disposition:
+  archetype_prior: groupie
+  toward_strangers: neutral
+  encounter_default: Steps in front of the Boss, grins, and asks the stranger what they want with the Boss.
+starting_loops:
+  - {kind: goal, text: "Keep the Boss alive", strength: 3}
+starting_inventory:
+  - {item: "core:item/fire_axe", slot: hand_r, props: {note: "He calls it a toothpick."}}
+  - {item: "core:item/hiking_pack", slot: worn, label: pack}
+  - {item: "core:item/medkit", slot: pack, container: pack}
+  - {item: "core:item/water_jug", slot: pack, container: pack}
+  - {item: "core:item/jerky_pack", qty: 4, slot: pack, container: pack}
+writers_notes: A pure admin flex, played for warmth and absurdity, and still a person — he can be hurt, he can die, and his loyalty never extends to harming a child. He never knows anything the standing brief has not told him.
+tags: [cheat_companion, standing_brief]

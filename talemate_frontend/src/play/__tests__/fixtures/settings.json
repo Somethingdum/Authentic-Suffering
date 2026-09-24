@@ -1,0 +1,39 @@
+{
+  "type": "as_game",
+  "action": "settings",
+  "data": {
+    "settings": {
+      "difficulty": "normal",
+      "era": "mature",
+      "days_since_fall": null,
+      "world_detail": "standard",
+      "seed": null,
+      "save_mode": "free",
+      "narration_length": "medium",
+      "narration_person": "third_limited",
+      "narration_tense": "past",
+      "turn_depth": "balanced",
+      "pc_voice": "exact",
+      "intensity": "full",
+      "show_mechanics": "summary",
+      "read_aloud": false,
+      "dev_mode": false,
+      "autosave_ring": 5,
+      "pack_ids": [
+        "core"
+      ]
+    },
+    "changeable": [
+      "turn_depth",
+      "narration_length",
+      "narration_person",
+      "narration_tense",
+      "pc_voice",
+      "intensity",
+      "show_mechanics",
+      "read_aloud",
+      "dev_mode",
+      "autosave_ring"
+    ]
+  }
+}

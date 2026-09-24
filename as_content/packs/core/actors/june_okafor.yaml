@@ -1,0 +1,175 @@
+schema: as.actor.v1
+id: june_okafor
+generation: authored
+days_since_fall_range: [14, 1460]
+identity:
+  name: June Okafor
+  aliases: []
+  age: 27
+  sex: female
+  cohort: pre_fall_adult
+  birthplace: Indianapolis, Indiana
+  occupation_before: Pharmacy technician at a chain drugstore three blocks from Delgado's
+  occupation_now: Keeps the stockroom count and whatever medicine the crew has
+  one_line: A pharmacy tech who counts cans out loud so she doesn't have to think, and who would open the door if Ray let her.
+appearance:
+  height_cm: 163
+  mass_kg: 61
+  build: Soft-shouldered and sturdy, strong hands from years of lifting totes
+  hair: Short natural coils, usually under a faded purple bandana
+  eyes: Dark brown behind cracked tortoiseshell glasses
+  skin: Deep brown, a little ashy now at the knuckles
+  distinguishing_marks:
+    - A crack across the lower left corner of her glasses that she tilts her head to see around
+    - A faded pharmacy name badge still clipped to her jacket, reading JUNE — HERE TO HELP
+  clothing_usual: A pharmacy fleece over two T-shirts, leggings, orthopedic work sneakers
+  movement_under_stress: Talks faster and louder, then catches herself and whispers; her hands keep doing whatever they were doing, counting or folding.
+  habit_gesture: Taps the corner of her glasses twice before she says something she is not sure of.
+  relation_to_appearance: Wears the badge on purpose; it is the only thing left that says what she was.
+capability:
+  special: {S: 4, P: 5, E: 4, C: 6, I: 6, A: 4, L: 5}
+  skills:
+    - {domain: medicine, rank: 1, evidence: "Five years as a pharmacy technician — dosages, interactions, wound dressings for walk-ins the pharmacist sent her to handle."}
+    - {domain: persuasion, rank: 1, evidence: "Talked down angry customers at a drop-off window every shift for five years."}
+    - {domain: trade, rank: 1, evidence: "Ran inventory counts and supplier orders for the pharmacy."}
+  tags: [calm_voice]
+  trained_responses:
+    - {cue: bite_wound_seen, verb: treat, note: "Reaches for gloves and the kit before she remembers what a bite means now."}
+  literacy: 3
+  tech_literacy: 2
+  resolve_trait_mod: -1
+motive:
+  motive: Keep being the kind of person who helps, even now.
+  method: Makes herself the crew's medic and its conscience, and pushes Ray — gently and constantly — to let desperate people trade at the window.
+  moral_line:
+    will: ["Give away part of her own ration", "Treat a stranger's wound through the barricade"]
+    wont: ["Shoot anyone", "Leave a wounded person where she could reach them", "Hurt a child"]
+    wont_tags: [kill_human, leave_wounded, kill_child, harm_dependent]
+  inner_conflict: She believes every person turned away from the door is someone she let die, and she also knows she cannot tell a bitten person from a scared one through a gap in a barricade.
+  past_wound: On the first day she handed out the pharmacy's insulin to a line of customers until a man in the line started biting, and she ran and left the rest of them.
+  signature_behaviour: Counts under her breath when she is frightened — cans, steps, breaths — and loses her place when anyone speaks to her.
+  risk_threshold: 6
+  risk_text: Takes real risks to help someone hurt; freezes when the danger is to herself alone.
+  resource_constraints: No weapon and no wish for one; the crew's medicine is a shoebox of painkillers, bandages and one bottle of antiseptic.
+persona:
+  public:
+    shown_traits: [cheerful, chatty]
+    claimed_history: Worked at the pharmacy down the street and walked here on day one.
+    presented_affiliation: Ray's crew, stockroom
+  private:
+    true_goals: ["Get Ray to open the window to trade with anyone who comes in daylight", "Stop having the dream about the insulin line"]
+    concealed_history: She ran from the insulin line on the first day and left an old woman in a wheelchair at the counter.
+    real_affiliation: Anybody who needs her, which scares her
+traits:
+  - tag: chatterbox
+    manifests: Fills every silence with talk — prices from before, drug names, what her mother used to cook.
+    triggers: Quiet rooms, nights, and being scared.
+    causes: She talks when she should be listening, and says things aloud that should stay private.
+    costs: Mara has to tell her to be quiet more than anyone, and she is louder than she knows.
+    example: During the first night alarm she whispered the whole Latin name of every antibiotic she could remember until Mara put a hand over her mouth.
+  - tag: soft_touch
+    manifests: Gives things away — food, time, her place in line — and apologizes while doing it.
+    triggers: Anyone hungry, hurt, or younger than her.
+    causes: She arrives at the end of the day with less than everyone else, and pushes Ray to be kinder than the numbers allow.
+    costs: She is hungrier and weaker every week, and Ray thinks of her as a liability in any argument about the door.
+    example: Has been giving Eli a third of her dinner every night since the second week.
+contradictions:
+  - belief_a: You help people. That is the whole job.
+    belief_b: Opening the door for the wrong person kills everyone inside.
+    a_wins_when: Someone is hurt in front of her and she can reach them.
+    b_wins_when: It is dark, or she cannot see the stranger's hands and arms.
+decision_stack:
+  layers:
+    - Help whoever is hurt closest to her
+    - Keep Eli and Mara safe
+    - Keep the crew's count honest
+    - Keep herself safe
+  inversion_conditions:
+    - When the danger is loud and close — a gunshot, a scream in the building — her own safety jumps to the top and she freezes or hides.
+  past_example: When Nita came back from a run with a gashed forearm, June cleaned and closed it on the sales floor while Ray was still yelling about the noise Nita had made.
+silence:
+  goes_quiet_when:
+    - Someone mentions insulin or diabetes.
+    - A gun is drawn in the room.
+    - Ray says no to her in front of everyone.
+  body_when_silent: Hands folded tight in her lap or wrapped around a can, head tilted to see past the crack in her glasses.
+  refuses_to_discuss: ["The insulin line on the first day"]
+  comfortable_vs_uncomfortable: Comfortable silence almost never happens to her; uncomfortable silence is when she has stopped counting and is just listening.
+knowledge:
+  knows:
+    - Which of the crew's pills are expired and which still work.
+    - A bite wound can close clean and still kill you.
+    - How much food is on the shelves to within a few cans.
+  does_not_know:
+    - Who has been taking extra from the count.
+  knows_but_hides:
+    - She is giving Eli part of her dinner every night.
+    - She ran from the insulin line on the first day.
+  cues: [knows_bite_is_fatal, knows_no_sharing, knows_noise_draws_dead]
+voice:
+  capsule: Warm, quick and a little too loud; strings clauses together with 'and' and 'like'. Pharmacy politeness — 'hon', 'okay, so' — survives. When frightened she either chatters or goes dead quiet, and her voice cracks upward.
+  speech_tendencies:
+    - Starts sentences with "Okay, so".
+    - Uses exact numbers from her counts.
+    - Says "hon" to anyone younger or hurt.
+  exemplars:
+    low_stakes: "Okay, so, forty-one cans of beans, and I swear there were forty-six on Tuesday, and I'm not saying anything, I'm just saying the number."
+    under_pressure: "What was that? Mara? Was that the back? I'm — okay. Okay. I'm by the door."
+    at_the_limit: "Don't. Don't, please, he's bleeding, just let me get to him, you can point that at me the whole time."
+  would_never_say:
+    - "Not my problem."
+    - "Leave him."
+    - "I'll shoot, I swear to God."
+  profanity: rare
+  dialect_notes: Indianapolis flat vowels; her mother's Nigerian English comes out in 'abeg' and 'ehn' when she is very tired.
+social:
+  household_role: ""
+  relations:
+    - target: "core:actor/mara_voss"
+      kind: friend
+      axes: {trust: 2, affection: 1}
+      history: June adopted Mara on the first night by talking at her until she answered; Mara is the only one who can make her stop talking.
+    - target: "core:actor/eli_voss"
+      kind: friend
+      axes: {trust: 2, affection: 3}
+      history: She lets Eli help count and gives him part of her dinner; she would not be able to say which of them it helps more.
+    - target: "core:actor/ray_delgado"
+      kind: acquaintance
+      axes: {trust: 1, respect: 1, resentment: 1}
+      history: Ray took her in on the first day and has refused every stranger since; she is grateful and she argues with him every week.
+    - target: "core:actor/alice_tran"
+      kind: acquaintance
+      axes: {trust: 1}
+      history: They keep the count together and June does all the talking.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/delgados_crew", role: stockroom and medic, standing: 1, since: "day 1"}
+life:
+  aspiration: To work in a real clinic again, one that turns nobody away.
+  current_project: Recounting the whole stockroom to prove to Ray that the numbers are dropping faster than they eat.
+  routine:
+    - {start_hh: 8, end_hh: 12, activity: stockroom count, place_hint: storeroom}
+    - {start_hh: 12, end_hh: 18, activity: medicine and meals, place_hint: sales floor}
+    - {start_hh: 18, end_hh: 24, activity: stockroom count, place_hint: storeroom}
+    - {start_hh: 0, end_hh: 8, activity: sleep, place_hint: storeroom}
+  obligations: ["The count, twice a day", "Checking everyone's cuts and blisters"]
+  hopes: ["A clinic", "Her mother in Indianapolis being alive"]
+  fears: ["Being the one who lets the wrong person in", "Being bitten", "Being useless"]
+  secrets:
+    - content: She ran from the pharmacy insulin line on the first day and left an old woman in a wheelchair at the counter.
+      who_knows: []
+      exposure_consequence: She would believe everyone saw her as a coward, and she might do something reckless to prove otherwise.
+disposition:
+  archetype_prior: civilized
+  toward_strangers: warm
+  encounter_default: Calls out a friendly question from cover, then asks whether they are hurt.
+starting_loops:
+  - {kind: goal, text: "Prove the count is dropping", strength: 2}
+  - {kind: desire, text: "Get Ray to trade with strangers through the window", subject: "core:actor/ray_delgado", strength: 2}
+starting_inventory:
+  - {item: "core:item/bandage_roll", qty: 2, slot: pocket}
+  - {item: "core:item/painkillers", slot: pocket}
+  - {item: "core:item/ledger_book", slot: hand_l, props: {note: "The stockroom count, in pencil."}}
+writers_notes: June's warmth is her strength and her danger; do not make her naive — she knows exactly what a bite means, she just cannot stop reaching out. Her chatter should read as nerves, never as comic relief.
+tags: [delgados_crew, anchor_scene]

@@ -1,0 +1,23 @@
+WHO
+{{ a.identity_text }}
+{{ a.voice_capsule }}
+
+WHAT THEY PERCEIVED
+{% for s in a.percepts %}- {{ s.handle }} ({{ s.channel.value }}, {{ fidelity_words[s.fidelity.value] }}): {{ s.text }}
+{% else %}- Nothing clear.
+{% endfor %}{% for u in a.utterances %}- {{ u.handle }}: {{ u.speaker_handle or "someone" }} said{{ " to them" if u.addressed_to_me else "" }}: {{ ('"' ~ u.words ~ '"') if u.words else "(only the tone)" }}
+{% endfor %}
+{% if a.own_action_text %}WHAT THEY DID
+{{ a.own_action_text }}{{ (" What they expected: " ~ a.own_expectation_text) if a.own_expectation_text else "" }}
+
+{% endif %}PEOPLE
+{% for e in a.entities %}- {{ e.handle }}: {{ e.description }}
+{% else %}- nobody else
+{% endfor %}
+{% if a.relationships %}HOW THEY FELT BEFORE
+{% for r in a.relationships %}- {{ r.handle }}: {{ r.text }}
+{% endfor %}{% endif %}
+{% if a.open_loops %}THINGS HANGING OVER THEM
+{% for l in a.open_loops %}- {{ l.handle }} ({{ l.kind.value | replace('_', ' ') }}): {{ l.text }}
+{% endfor %}{% endif %}
+Cue words you may use for a lesson: {{ cue_ids | join(', ') }}

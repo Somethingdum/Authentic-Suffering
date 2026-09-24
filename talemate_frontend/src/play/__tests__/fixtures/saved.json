@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "saved",
+  "data": {
+    "slot": "before_the_depot",
+    "label": "Before the depot",
+    "turn_index": 41
+  }
+}

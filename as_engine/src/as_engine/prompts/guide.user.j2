@@ -1,0 +1,7 @@
+Character: {{ ctx.pc_name }}
+{% if ctx.pc_facts %}What they know:
+{% for f in ctx.pc_facts %}- {{ f }}
+{% endfor %}{% endif %}{% if ctx.rules_snippets and not ctx.cheat_query %}Rules text:
+{% for r in ctx.rules_snippets %}- {{ r }}
+{% endfor %}{% endif %}
+Question: {{ ctx.question }}

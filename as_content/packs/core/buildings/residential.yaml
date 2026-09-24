@@ -1,0 +1,142 @@
+# Residential archetypes: where most people lived, died, or are still hiding.
+- schema: as.building.v1
+  id: house_single_story
+  name: Single-storey house
+  kind: house
+  description: A small wood-frame family house — living room, kitchen, two bedrooms, a bathroom and an attached garage.
+  entrance_room: living_room
+  rooms:
+    - id: living_room
+      name: Living room
+      size_m2: 24
+      width_m: 6
+      depth_m: 4
+      material: wood
+      anchors:
+        - {name: couch, kind: cover, x_m: 3, y_m: 2, cover: 1, concealment: 2}
+        - {name: front window, kind: window, x_m: 1, y_m: 0.3}
+        - {name: bookcase, kind: furniture, x_m: 5.5, y_m: 3.5, cover: 1}
+      portals:
+        - {to_room: kitchen, kind: opening, name: kitchen doorway, aperture_w_cm: 100, aperture_h_cm: 210, seal_db: 0, starts_open: true}
+        - {to_room: hallway, kind: opening, name: hall doorway, aperture_w_cm: 90, aperture_h_cm: 210, seal_db: 0, starts_open: true}
+    - id: kitchen
+      name: Kitchen
+      size_m2: 12
+      width_m: 4
+      depth_m: 3
+      material: wood
+      loot_table: core:loot/kitchen_residential
+      anchors:
+        - {name: kitchen counter, kind: cover, x_m: 2, y_m: 1, cover: 1, concealment: 1}
+        - {name: pantry, kind: container, x_m: 3.5, y_m: 2.5, container_item: "core:item/cardboard_box"}
+      portals:
+        - {to_room: garage, kind: door, name: garage door, lockable: true, lock_quality: 1, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 22}
+    - id: hallway
+      name: Hallway
+      size_m2: 6
+      width_m: 1.2
+      depth_m: 5
+      material: wood
+      anchors:
+        - {name: linen closet, kind: hiding_spot, x_m: 0.6, y_m: 2.5, cover: 1, concealment: 3}
+      portals:
+        - {to_room: bedroom_main, kind: door, name: main bedroom door, lockable: true, lock_quality: 0, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 18}
+        - {to_room: bedroom_small, kind: door, name: small bedroom door, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 18}
+        - {to_room: bathroom, kind: door, name: bathroom door, lockable: true, lock_quality: 0, aperture_w_cm: 75, aperture_h_cm: 205, seal_db: 18}
+    - id: bedroom_main
+      name: Main bedroom
+      size_m2: 12
+      width_m: 4
+      depth_m: 3
+      material: wood
+      loot_table: core:loot/bedroom_residential
+      anchors:
+        - {name: bed, kind: hiding_spot, x_m: 2, y_m: 1.5, cover: 1, concealment: 2}
+        - {name: closet, kind: container, x_m: 3.5, y_m: 0.5, container_item: "core:item/cardboard_box"}
+    - id: bedroom_small
+      name: Small bedroom
+      size_m2: 9
+      width_m: 3
+      depth_m: 3
+      material: wood
+      loot_table: core:loot/bedroom_residential
+      anchors:
+        - {name: bunk bed, kind: furniture, x_m: 1, y_m: 1.5}
+        - {name: toy chest, kind: container, x_m: 2.5, y_m: 2.5, container_item: "core:item/wooden_crate"}
+    - id: bathroom
+      name: Bathroom
+      size_m2: 5
+      width_m: 2
+      depth_m: 2.5
+      material: wood
+      loot_table: core:loot/bathroom_cabinet
+      anchors:
+        - {name: bathtub, kind: cover, x_m: 1, y_m: 2, cover: 2, concealment: 2}
+    - id: garage
+      name: Garage
+      size_m2: 24
+      width_m: 4
+      depth_m: 6
+      material: concrete
+      loot_table: core:loot/garage_tools
+      anchors:
+        - {name: workbench, kind: furniture, x_m: 3.5, y_m: 5, cover: 1, container_item: "core:item/metal_locker"}
+        - {name: far side of the car, kind: cover, x_m: 2, y_m: 3, cover: 2, concealment: 2}
+  exterior_portals:
+    - {to_room: living_room, kind: door, name: front door, lockable: true, lock_quality: 1, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 22}
+    - {to_room: living_room, kind: window, name: front window, aperture_w_cm: 150, aperture_h_cm: 120, seal_db: 16, transparent: true, height_cm: 90}
+    - {to_room: kitchen, kind: door, name: back door, lockable: true, lock_quality: 1, aperture_w_cm: 85, aperture_h_cm: 205, seal_db: 20}
+    - {to_room: garage, kind: gate, name: garage door, lockable: true, lock_quality: 1, aperture_w_cm: 250, aperture_h_cm: 210, seal_db: 18}
+    - {to_room: bedroom_small, kind: window, name: bedroom window, aperture_w_cm: 90, aperture_h_cm: 90, seal_db: 16, transparent: true, height_cm: 100}
+- schema: as.building.v1
+  id: apartment_walkup_unit
+  name: Walk-up apartment
+  kind: apartment
+  description: One unit on an upper floor of a brick walk-up — a front room with a kitchenette, a bedroom and a bathroom, reached by a shared stairwell.
+  entrance_room: stair_landing
+  rooms:
+    - id: stair_landing
+      name: Stair landing
+      size_m2: 6
+      width_m: 2
+      depth_m: 3
+      material: brick
+      anchors:
+        - {name: top of the stairs, kind: vantage, x_m: 1, y_m: 0.5, cover: 0}
+      portals:
+        - {to_room: front_room, kind: door, name: apartment door, lockable: true, lock_quality: 2, aperture_w_cm: 85, aperture_h_cm: 205, seal_db: 28}
+    - id: front_room
+      name: Front room
+      size_m2: 20
+      width_m: 5
+      depth_m: 4
+      material: brick
+      loot_table: core:loot/kitchen_residential
+      anchors:
+        - {name: kitchenette, kind: cover, x_m: 4.5, y_m: 3.5, cover: 1}
+        - {name: street window, kind: window, x_m: 2.5, y_m: 0.3}
+        - {name: armchair, kind: furniture, x_m: 1, y_m: 2}
+      portals:
+        - {to_room: bedroom, kind: door, name: bedroom door, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 18}
+        - {to_room: bathroom, kind: door, name: bathroom door, lockable: true, lock_quality: 0, aperture_w_cm: 75, aperture_h_cm: 205, seal_db: 18}
+    - id: bedroom
+      name: Bedroom
+      size_m2: 10
+      width_m: 3.5
+      depth_m: 3
+      material: brick
+      loot_table: core:loot/bedroom_residential
+      anchors:
+        - {name: bed, kind: hiding_spot, x_m: 1.5, y_m: 1.5, cover: 1, concealment: 2}
+    - id: bathroom
+      name: Bathroom
+      size_m2: 4
+      width_m: 2
+      depth_m: 2
+      material: brick
+      loot_table: core:loot/bathroom_cabinet
+      anchors:
+        - {name: shower stall, kind: cover, x_m: 1, y_m: 1.5, cover: 1, concealment: 2}
+  exterior_portals:
+    - {to_room: stair_landing, kind: stairs, name: stairwell, aperture_w_cm: 110, aperture_h_cm: 220, seal_db: 0, starts_open: true}
+    - {to_room: front_room, kind: window, name: street window, aperture_w_cm: 120, aperture_h_cm: 140, seal_db: 16, transparent: true, height_cm: 600}

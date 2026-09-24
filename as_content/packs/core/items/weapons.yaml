@@ -1,0 +1,144 @@
+# Firearms and melee weapons. Wound tables: docs/as/07_RULES.md §5.1.
+- schema: as.item.v1
+  id: glock_19
+  name: Glock 19
+  plural: Glock 19s
+  kind: firearm
+  mass_g: 670
+  bulk: 2
+  tags: [firearm, handgun, 9mm]
+  barter_value: 60
+  firearm: {caliber: 9mm, capacity: 15, action: semi, noise_db: 160, effective_range_m: 25, damage_class: medium, feeds_from: magazine, magazine_item: "core:item/magazine_9mm_15"}
+  description: A compact 9 mm pistol with a polymer frame. Reliable if kept dry and clean.
+- schema: as.item.v1
+  id: revolver_38
+  name: .38 revolver
+  plural: .38 revolvers
+  kind: firearm
+  mass_g: 700
+  bulk: 2
+  tags: [firearm, handgun, 38spl]
+  barter_value: 50
+  firearm: {caliber: 38spl, capacity: 6, action: revolver, noise_db: 160, effective_range_m: 20, damage_class: medium, feeds_from: cylinder}
+  description: A six-shot revolver with worn bluing. Slow to reload, hard to break.
+- schema: as.item.v1
+  id: shotgun_pump
+  name: pump shotgun
+  plural: pump shotguns
+  kind: firearm
+  mass_g: 3400
+  bulk: 8
+  tags: [firearm, long_gun, 12ga]
+  barter_value: 90
+  firearm: {caliber: 12ga, capacity: 5, action: pump, noise_db: 165, effective_range_m: 30, damage_class: heavy, feeds_from: internal}
+  description: A pump-action 12 gauge with a scarred wooden stock. Devastating up close and loud enough to wake a street.
+- schema: as.item.v1
+  id: hunting_rifle
+  name: bolt-action hunting rifle
+  plural: bolt-action hunting rifles
+  kind: firearm
+  mass_g: 3600
+  bulk: 9
+  tags: [firearm, long_gun, 308win]
+  barter_value: 110
+  firearm: {caliber: 308win, capacity: 4, action: bolt, noise_db: 165, effective_range_m: 150, damage_class: heavy, feeds_from: internal}
+  description: A scoped .308 deer rifle. Accurate far past the range where most people can hit anything.
+- schema: as.item.v1
+  id: rifle_22
+  name: .22 rifle
+  plural: .22 rifles
+  kind: firearm
+  mass_g: 2300
+  bulk: 7
+  tags: [firearm, long_gun, 22lr]
+  barter_value: 45
+  firearm: {caliber: 22lr, capacity: 10, action: semi, noise_db: 140, effective_range_m: 50, damage_class: light, feeds_from: internal}
+  description: A light rimfire rifle for small game. Quieter than anything else with a trigger.
+- schema: as.item.v1
+  id: pocket_knife
+  name: pocket knife
+  plural: pocket knives
+  kind: melee
+  mass_g: 90
+  bulk: 0
+  tags: [melee, blade, tool]
+  barter_value: 6
+  melee: {reach_m: 0.3, damage_class: light, wound_types: [cut, stab], noise_db: 20}
+  description: A small, sturdy folding knife with a locking blade.
+- schema: as.item.v1
+  id: kitchen_knife
+  name: kitchen knife
+  plural: kitchen knives
+  kind: melee
+  mass_g: 180
+  bulk: 1
+  tags: [melee, blade]
+  barter_value: 4
+  melee: {reach_m: 0.4, damage_class: light, wound_types: [cut, stab], noise_db: 20}
+  description: A chef's knife with a chipped edge.
+- schema: as.item.v1
+  id: crowbar
+  name: crowbar
+  plural: crowbars
+  kind: melee
+  mass_g: 1600
+  bulk: 3
+  tags: [melee, blunt, pry, tool]
+  barter_value: 15
+  melee: {reach_m: 0.8, damage_class: medium, wound_types: [blunt, fracture], noise_db: 50}
+  description: A 75 cm steel pry bar. Opens doors and skulls.
+- schema: as.item.v1
+  id: baseball_bat
+  name: aluminium bat
+  plural: aluminium bats
+  kind: melee
+  mass_g: 900
+  bulk: 4
+  tags: [melee, blunt]
+  barter_value: 8
+  melee: {reach_m: 0.9, damage_class: medium, wound_types: [blunt, fracture], noise_db: 55}
+  description: A dented aluminium baseball bat with tape on the grip.
+- schema: as.item.v1
+  id: machete
+  name: machete
+  plural: machetes
+  kind: melee
+  mass_g: 700
+  bulk: 3
+  tags: [melee, blade]
+  barter_value: 18
+  melee: {reach_m: 0.7, damage_class: medium, wound_types: [cut], noise_db: 35}
+  description: A long clearing blade, sharpened often.
+- schema: as.item.v1
+  id: fire_axe
+  name: fire axe
+  plural: fire axes
+  kind: melee
+  mass_g: 2700
+  bulk: 6
+  tags: [melee, blade, heavy_weapon, breach]
+  barter_value: 25
+  melee: {reach_m: 1.0, damage_class: heavy, wound_types: [cut, fracture], noise_db: 60}
+  description: A red-handled axe with a pick on the back of the head.
+- schema: as.item.v1
+  id: steel_pipe
+  name: length of steel pipe
+  plural: lengths of steel pipe
+  kind: melee
+  mass_g: 1200
+  bulk: 3
+  tags: [melee, blunt]
+  barter_value: 2
+  melee: {reach_m: 0.8, damage_class: light, wound_types: [blunt], noise_db: 55}
+  description: Sixty centimetres of galvanised pipe.
+- schema: as.item.v1
+  id: claw_hammer
+  name: claw hammer
+  plural: claw hammers
+  kind: melee
+  mass_g: 600
+  bulk: 1
+  tags: [melee, blunt, tool, pry]
+  barter_value: 7
+  melee: {reach_m: 0.4, damage_class: light, wound_types: [blunt, fracture], noise_db: 45}
+  description: A framing hammer with a split wooden handle.

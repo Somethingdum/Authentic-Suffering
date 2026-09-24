@@ -1,0 +1,46 @@
+# Shambler / Walker — the baseline infected. Lore_and_World_Building.pdf §3-4 (page 4-5), CMG §42.17.
+# Downgrade rule (CMG 42.17): Shambler never upgrades to Runner. It is the common degraded floor state.
+- schema: as.infected.v1
+  id: ZOMBIE_ARCHETYPE_SHAMBLER01
+  name: Shambler
+  rarity: common
+  special:
+    S: {lo: 6, hi: 6}
+    P: {lo: 1, hi: 1}
+    E: {lo: 4, hi: 4}
+    C: {lo: 1, hi: 1}
+    I: {lo: 1, hi: 1}
+    A: {lo: 2, hi: 2}
+    L: {lo: 1, hi: 1}
+  senses:
+    hearing_threshold_db: 35.0
+    vision_range_m: 4.0
+    vision_mode: motion_contrast
+    thermal: false
+  speed_m_s: 1.1
+  sprint_m_s: 1.3
+  grip_strength: 9
+  alive: false
+  false_death: true
+  reanimation_window_h: [6.0, 14.0]
+  true_kill: [destroy_brainstem_spinal_junction, denature_or_pulp_core_tissue]
+  quirks: [SHAM_MUTTER_LOOP, SHAM_FRIDGE_RITUAL, SHAM_GRIP_LOCK, SHAM_BULLY_RUNNER]
+  player_facing:
+    - Primarily sound-driven; reacts to sudden movement only at close range.
+    - Grip strength is disproportionate to its build; escaping a two-handed clamp is hard without leverage.
+    - Often found repeating simple errand loops — doors, sinks, fridges, chairs — until interrupted.
+    - Does not prey on other infected; will occasionally batter a Runner for no clear reason.
+    - If starved long enough it slows, then goes still, and can be mistaken for a corpse.
+  codex_truth:
+    - Vision is functionally unusable — motion-contrast and light shifts only, near-zero recognition.
+    - Hyperacusis — most ambient sound reads as noise; it biases hard toward fresh, sharp spikes.
+    - Full-force motor recruitment is uninhibited; joints and bone snap before it eases a grip.
+    - Metabolic budget is finite — activity drains it, and feeding buys time, never cognition.
+  tactics:
+    - Noise luring — a sharp sound (chains, glass, an alarm) steers it more reliably than sight ever could.
+    - Contact-first — it does not aim; it reaches for anything in range, then clamps and chews.
+    - Horde stickiness — once one locks on, nearby Shamblers pile toward the same sound.
+  weaknesses:
+    - Stairs, clutter and narrow turns jam and stall it; it does not route-plan around them.
+    - Darkness does not help or hurt it; staying quiet does.
+    - Starved long enough it becomes a slow, then motionless, object that can still reboot later.

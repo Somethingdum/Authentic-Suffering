@@ -1,0 +1,120 @@
+# The canonical cascade (ECON-01, docs/as/06_WORLD.md §2.4): one injury must reach rations and
+# household tension, every hop citing its rule. This is a declarative rule table applied by code
+# (action/cascade.py) — never a model's search (AS Rebuild Plan §11.7). The Lane B advisory call may
+# propose cascades this table missed; its output goes to reports/cascade_debt.jsonl, never to state.
+#
+# Grammar (docs/as/07_RULES.md §9): `where` = equality filters on the trigger payload;
+# preconditions = '<path> <op> <literal>' joined by ' and '; target = a selector (CAS-05);
+# payload strings starting with '$' are resolved as selectors. A selector that resolves to nothing
+# makes that effect a no-op (CAS-07). A scheduled effect fires in a later transaction and starts
+# again at cascade depth 0 (CAS-06), which is how this 6-hop chain stays inside the depth-3 limit:
+#   HARM(0) ~> SHIFT_MISSED(0) -> ROLE_ASSIGNED(1) -> efficiency(2)
+#   PRODUCTION_CYCLE(0) -> SHORTAGE(1) -> RATION_CHANGE(2) -> TENSION_CHANGE(3) / ~> LOYALTY_CHECK(0)
+- schema: as.cascade.v1
+  id: CAS-001
+  description: A worker whose arm is hurt badly enough to lose function misses their next shift at every workplace they are assigned to.
+  trigger_event: HARM
+  where: {anatomy_group: arm}
+  preconditions: ["trigger.payload.function_loss >= 1"]
+  effects:
+    - kind: schedule_event
+      event_type: SHIFT_MISSED
+      target: work_assignments_of(trigger.payload.body_id)
+      payload: {due: next_shift_start, reason: injured, cause_wound: "$trigger.payload.wound_id"}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-002
+  description: A missed shift pulls a replacement off another post to cover the role, if anyone qualified is free to be moved.
+  trigger_event: SHIFT_MISSED
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: ROLE_ASSIGNED
+      target: cover_candidate_for(trigger.payload.workplace_id)
+      payload: {workplace_id: "$trigger.payload.workplace_id", role: "$trigger.payload.role", shift_start_hh: "$trigger.payload.shift_start_hh", shift_end_hh: "$trigger.payload.shift_end_hh", covering_for: "$trigger.payload.actor_id", is_cover: true}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-003
+  description: The replacement's own post runs short-handed while they cover elsewhere, so that workplace loses a quarter of its efficiency.
+  trigger_event: ROLE_ASSIGNED
+  where: {is_cover: true}
+  preconditions: []
+  effects:
+    - kind: adjust
+      target: workplace_of(trigger.payload.left_workplace_id)
+      field: efficiency
+      amount: -0.25
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-004
+  description: A water pump cycle that leaves the settlement with under three days of water declares a water shortage.
+  trigger_event: PRODUCTION_CYCLE
+  where: {site_type: water_pump}
+  preconditions: ["settlement_of(trigger.payload.workplace_id).days_of_water < 3 and settlement_of(trigger.payload.workplace_id).has_shortage_water == false"]
+  effects:
+    - kind: emit_event
+      event_type: SHORTAGE
+      target: settlement_of(trigger.payload.workplace_id)
+      payload: {resource: water}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-005
+  description: A water shortage cuts the settlement's ration level by one step.
+  trigger_event: SHORTAGE
+  where: {resource: water}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RATION_CHANGE
+      target: settlement_of(trigger.payload.settlement_id)
+      payload: {delta: -1, cause: shortage}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-006
+  description: A ration cut to level 2 or lower raises every dependent-holding household's tension toward the leadership, and forces the worst-hit household's head into a loyalty check.
+  trigger_event: RATION_CHANGE
+  where: {}
+  preconditions: ["trigger.payload.delta < 0 and trigger.payload.level_after <= 2"]
+  effects:
+    - kind: emit_event
+      event_type: TENSION_CHANGE
+      target: heads_of_households_with_dependents(trigger.payload.settlement_id)
+      payload: {toward: "$leadership_of(trigger.payload.settlement_id)", delta: 10, cause: ration_cut}
+    - kind: schedule_event
+      event_type: LOYALTY_CHECK
+      target: head_of_worst_hit_household(trigger.payload.settlement_id)
+      payload: {due_s: 3600, group: "$group_of(trigger.payload.settlement_id)", reason: ration_cut}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-016
+  description: A kitchen cycle that leaves the settlement with under three days of food declares a food shortage.
+  trigger_event: PRODUCTION_CYCLE
+  where: {site_type: kitchen}
+  preconditions: ["settlement_of(trigger.payload.workplace_id).days_of_food < 3 and settlement_of(trigger.payload.workplace_id).has_shortage_food == false"]
+  effects:
+    - kind: emit_event
+      event_type: SHORTAGE
+      target: settlement_of(trigger.payload.workplace_id)
+      payload: {resource: food}
+  delay_s: 0
+  cites: [ECON-01]
+- schema: as.cascade.v1
+  id: CAS-017
+  description: A food shortage cuts the settlement's ration level by one step.
+  trigger_event: SHORTAGE
+  where: {resource: food}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RATION_CHANGE
+      target: settlement_of(trigger.payload.settlement_id)
+      payload: {delta: -1, cause: shortage}
+  delay_s: 0
+  cites: [ECON-01]

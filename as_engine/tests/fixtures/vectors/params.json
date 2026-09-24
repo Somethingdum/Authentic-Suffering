@@ -1,0 +1,859 @@
+{
+ "_why": "world/worldgen/params.py with the tables in tables.py. Stream 'worldgen:params', draws in DRAW_ORDER, each exactly once; rnd = floor(x + 0.5). Each case lists every draw (purpose, n, value) so a mismatch pinpoints the first wrong draw. Contradiction passes: two patch passes then overrides (params.py docstring). days_since_fall is drawn inside ERA_DAYS_RANGE[era] intersected with the PC's days_since_fall_range (WG-34).",
+ "rnd": [
+  {
+   "x": 2.5,
+   "rnd": 3
+  },
+  {
+   "x": 3.5,
+   "rnd": 4
+  },
+  {
+   "x": -0.5,
+   "rnd": 0
+  },
+  {
+   "x": 7.4999,
+   "rnd": 7
+  },
+  {
+   "x": 8.5,
+   "rnd": 9
+  },
+  {
+   "x": 5.0,
+   "rnd": 5
+  }
+ ],
+ "generate_params": [
+  {
+   "seed": 1818,
+   "difficulty": "normal",
+   "era": "mature",
+   "bias": {
+    "climate_heat": 0.7,
+    "climate_moisture": 0.4,
+    "instability": -0.1,
+    "faction_density": 0.3,
+    "wildcard_level": 0.1
+   },
+   "days_since_fall_given": null,
+   "pc_days_since_fall_range": [
+    3287,
+    4018
+   ],
+   "expected_values": {
+    "ambient_danger": 4,
+    "zombie_common": 5,
+    "horde_pressure": 4,
+    "runner_pressure": 4,
+    "lurker_pressure": 4,
+    "hostile_human": 3,
+    "hazard_severity": 6,
+    "food": 6,
+    "water": 4,
+    "ammo": 6,
+    "fuel": 5,
+    "meds": 4,
+    "tech_baseline": 6,
+    "tech_preservation": 2,
+    "atmo_visibility": 5,
+    "climate_heat": 10,
+    "climate_moisture": 8,
+    "instability": 4,
+    "hazard_type": "structural",
+    "social_order": 6,
+    "survivor_mentality": 7,
+    "faction_density": 8,
+    "faction_fragmentation": 5,
+    "faction_relations": 6,
+    "atrocity_capacity": 7,
+    "mystery": 6,
+    "ritual_intensity": 5,
+    "subtle_anomaly": 4,
+    "lost_knowledge": 6,
+    "wildcard_level": 8,
+    "days_since_fall": 3411
+   },
+   "expected_patches": [
+    "#10: tech_baseline 7->6"
+   ],
+   "sim_mechanics": {
+    "snowball_rate": 4,
+    "warning_slack": 5,
+    "recovery_slack": 5
+   },
+   "draws": [
+    {
+     "purpose": "ambient_danger",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "zombie_common",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "horde_pressure",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "runner_pressure",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "lurker_pressure",
+     "n": 4,
+     "value": 2
+    },
+    {
+     "purpose": "hostile_human",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "hazard_severity",
+     "n": 4,
+     "value": 4
+    },
+    {
+     "purpose": "food",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "water",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "ammo",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "fuel",
+     "n": 5,
+     "value": 3
+    },
+    {
+     "purpose": "meds",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "tech_baseline",
+     "n": 6,
+     "value": 5
+    },
+    {
+     "purpose": "tech_preservation",
+     "n": 6,
+     "value": 1
+    },
+    {
+     "purpose": "atmo_visibility",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "climate_heat",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "climate_moisture",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "instability",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "hazard_type",
+     "n": 10000,
+     "value": 7498
+    },
+    {
+     "purpose": "social_order",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "survivor_mentality",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "faction_density",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_fragmentation",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "faction_relations",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "atrocity_capacity",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "mystery",
+     "n": 5,
+     "value": 4
+    },
+    {
+     "purpose": "ritual_intensity",
+     "n": 5,
+     "value": 3
+    },
+    {
+     "purpose": "subtle_anomaly",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "lost_knowledge",
+     "n": 5,
+     "value": 4
+    },
+    {
+     "purpose": "wildcard_level",
+     "n": 5,
+     "value": 5
+    },
+    {
+     "purpose": "days_since_fall",
+     "n": 364,
+     "value": 125
+    }
+   ]
+  },
+  {
+   "seed": 1,
+   "difficulty": "realism",
+   "era": "early",
+   "bias": {},
+   "days_since_fall_given": null,
+   "pc_days_since_fall_range": null,
+   "expected_values": {
+    "ambient_danger": 5,
+    "zombie_common": 5,
+    "horde_pressure": 4,
+    "runner_pressure": 4,
+    "lurker_pressure": 7,
+    "hostile_human": 6,
+    "hazard_severity": 5,
+    "food": 3,
+    "water": 3,
+    "ammo": 2,
+    "fuel": 4,
+    "meds": 2,
+    "tech_baseline": 4,
+    "tech_preservation": 3,
+    "atmo_visibility": 4,
+    "climate_heat": 4,
+    "climate_moisture": 6,
+    "instability": 6,
+    "hazard_type": "biological",
+    "social_order": 3,
+    "survivor_mentality": 6,
+    "faction_density": 4,
+    "faction_fragmentation": 6,
+    "faction_relations": 6,
+    "atrocity_capacity": 5,
+    "mystery": 7,
+    "ritual_intensity": 6,
+    "subtle_anomaly": 4,
+    "lost_knowledge": 6,
+    "wildcard_level": 4,
+    "days_since_fall": 311
+   },
+   "expected_patches": [],
+   "sim_mechanics": {
+    "snowball_rate": 6,
+    "warning_slack": 3,
+    "recovery_slack": 3
+   },
+   "draws": [
+    {
+     "purpose": "ambient_danger",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "zombie_common",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "horde_pressure",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "runner_pressure",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "lurker_pressure",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "hostile_human",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "hazard_severity",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "food",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "water",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "ammo",
+     "n": 5,
+     "value": 1
+    },
+    {
+     "purpose": "fuel",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "meds",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "tech_baseline",
+     "n": 6,
+     "value": 3
+    },
+    {
+     "purpose": "tech_preservation",
+     "n": 6,
+     "value": 3
+    },
+    {
+     "purpose": "atmo_visibility",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "climate_heat",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "climate_moisture",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "instability",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "hazard_type",
+     "n": 10000,
+     "value": 3871
+    },
+    {
+     "purpose": "social_order",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "survivor_mentality",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_density",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "faction_fragmentation",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_relations",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "atrocity_capacity",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "mystery",
+     "n": 5,
+     "value": 5
+    },
+    {
+     "purpose": "ritual_intensity",
+     "n": 5,
+     "value": 4
+    },
+    {
+     "purpose": "subtle_anomaly",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "lost_knowledge",
+     "n": 5,
+     "value": 4
+    },
+    {
+     "purpose": "wildcard_level",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "days_since_fall",
+     "n": 317,
+     "value": 298
+    }
+   ]
+  },
+  {
+   "seed": 2508,
+   "difficulty": "fuck_you",
+   "era": "established",
+   "bias": {
+    "survivor_mentality": 1.0,
+    "atrocity_capacity": 1.0
+   },
+   "days_since_fall_given": 900,
+   "pc_days_since_fall_range": null,
+   "expected_values": {
+    "ambient_danger": 9,
+    "zombie_common": 10,
+    "horde_pressure": 10,
+    "runner_pressure": 8,
+    "lurker_pressure": 10,
+    "hostile_human": 10,
+    "hazard_severity": 10,
+    "food": 3,
+    "water": 2,
+    "ammo": 1,
+    "fuel": 2,
+    "meds": 1,
+    "tech_baseline": 3,
+    "tech_preservation": 2,
+    "atmo_visibility": 6,
+    "climate_heat": 6,
+    "climate_moisture": 4,
+    "instability": 6,
+    "hazard_type": "biological",
+    "social_order": 5,
+    "survivor_mentality": 10,
+    "faction_density": 5,
+    "faction_fragmentation": 6,
+    "faction_relations": 5,
+    "atrocity_capacity": 10,
+    "mystery": 5,
+    "ritual_intensity": 4,
+    "subtle_anomaly": 4,
+    "lost_knowledge": 7,
+    "wildcard_level": 7,
+    "days_since_fall": 900
+   },
+   "expected_patches": [],
+   "sim_mechanics": {
+    "snowball_rate": 9,
+    "warning_slack": 1,
+    "recovery_slack": 1
+   },
+   "draws": [
+    {
+     "purpose": "ambient_danger",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "zombie_common",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "horde_pressure",
+     "n": 4,
+     "value": 4
+    },
+    {
+     "purpose": "runner_pressure",
+     "n": 4,
+     "value": 2
+    },
+    {
+     "purpose": "lurker_pressure",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "hostile_human",
+     "n": 4,
+     "value": 4
+    },
+    {
+     "purpose": "hazard_severity",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "food",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "water",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "ammo",
+     "n": 2,
+     "value": 1
+    },
+    {
+     "purpose": "fuel",
+     "n": 2,
+     "value": 2
+    },
+    {
+     "purpose": "meds",
+     "n": 2,
+     "value": 1
+    },
+    {
+     "purpose": "tech_baseline",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "tech_preservation",
+     "n": 2,
+     "value": 2
+    },
+    {
+     "purpose": "atmo_visibility",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "climate_heat",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "climate_moisture",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "instability",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "hazard_type",
+     "n": 10000,
+     "value": 4732
+    },
+    {
+     "purpose": "social_order",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "survivor_mentality",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "faction_density",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "faction_fragmentation",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_relations",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "atrocity_capacity",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "mystery",
+     "n": 5,
+     "value": 3
+    },
+    {
+     "purpose": "ritual_intensity",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "subtle_anomaly",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "lost_knowledge",
+     "n": 5,
+     "value": 5
+    },
+    {
+     "purpose": "wildcard_level",
+     "n": 5,
+     "value": 5
+    }
+   ]
+  },
+  {
+   "seed": 7,
+   "difficulty": "bitch_mode",
+   "era": "early",
+   "bias": {
+    "faction_density": 1.0,
+    "social_order": 1.0
+   },
+   "days_since_fall_given": null,
+   "pc_days_since_fall_range": null,
+   "expected_values": {
+    "ambient_danger": 3,
+    "zombie_common": 1,
+    "horde_pressure": 2,
+    "runner_pressure": 1,
+    "lurker_pressure": 1,
+    "hostile_human": 2,
+    "hazard_severity": 2,
+    "food": 9,
+    "water": 10,
+    "ammo": 7,
+    "fuel": 6,
+    "meds": 9,
+    "tech_baseline": 5,
+    "tech_preservation": 5,
+    "atmo_visibility": 6,
+    "climate_heat": 4,
+    "climate_moisture": 5,
+    "instability": 6,
+    "hazard_type": "structural",
+    "social_order": 4,
+    "survivor_mentality": 6,
+    "faction_density": 4,
+    "faction_fragmentation": 6,
+    "faction_relations": 6,
+    "atrocity_capacity": 6,
+    "mystery": 4,
+    "ritual_intensity": 6,
+    "subtle_anomaly": 7,
+    "lost_knowledge": 4,
+    "wildcard_level": 5,
+    "days_since_fall": 29
+   },
+   "expected_patches": [],
+   "sim_mechanics": {
+    "snowball_rate": 1,
+    "warning_slack": 9,
+    "recovery_slack": 9
+   },
+   "draws": [
+    {
+     "purpose": "ambient_danger",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "zombie_common",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "horde_pressure",
+     "n": 2,
+     "value": 2
+    },
+    {
+     "purpose": "runner_pressure",
+     "n": 2,
+     "value": 1
+    },
+    {
+     "purpose": "lurker_pressure",
+     "n": 2,
+     "value": 1
+    },
+    {
+     "purpose": "hostile_human",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "hazard_severity",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "food",
+     "n": 4,
+     "value": 3
+    },
+    {
+     "purpose": "water",
+     "n": 4,
+     "value": 4
+    },
+    {
+     "purpose": "ammo",
+     "n": 4,
+     "value": 2
+    },
+    {
+     "purpose": "fuel",
+     "n": 4,
+     "value": 1
+    },
+    {
+     "purpose": "meds",
+     "n": 4,
+     "value": 4
+    },
+    {
+     "purpose": "tech_baseline",
+     "n": 6,
+     "value": 1
+    },
+    {
+     "purpose": "tech_preservation",
+     "n": 6,
+     "value": 2
+    },
+    {
+     "purpose": "atmo_visibility",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "climate_heat",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "climate_moisture",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "instability",
+     "n": 3,
+     "value": 3
+    },
+    {
+     "purpose": "hazard_type",
+     "n": 10000,
+     "value": 7366
+    },
+    {
+     "purpose": "social_order",
+     "n": 3,
+     "value": 1
+    },
+    {
+     "purpose": "survivor_mentality",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_density",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_fragmentation",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "faction_relations",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "atrocity_capacity",
+     "n": 3,
+     "value": 2
+    },
+    {
+     "purpose": "mystery",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "ritual_intensity",
+     "n": 5,
+     "value": 4
+    },
+    {
+     "purpose": "subtle_anomaly",
+     "n": 5,
+     "value": 5
+    },
+    {
+     "purpose": "lost_knowledge",
+     "n": 5,
+     "value": 2
+    },
+    {
+     "purpose": "wildcard_level",
+     "n": 5,
+     "value": 3
+    },
+    {
+     "purpose": "days_since_fall",
+     "n": 317,
+     "value": 16
+    }
+   ]
+  }
+ ]
+}

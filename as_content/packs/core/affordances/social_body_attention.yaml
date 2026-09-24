@@ -1,0 +1,210 @@
+# Speech, signals, surrender, care of bodies, attention and waiting.
+# Speech is always an option when the body can speak; the words, addressee and volume come from
+# the mind (CognitionOutput.speech). Nothing a person says is ever a roll of the listener's will.
+- schema: as.affordance.v1
+  id: speak
+  verb: speak
+  label: "Say something to {target} (you choose the words and how loud)"
+  ui_label: "Talk to {target}"
+  binds: speech
+  range: audible
+  duration: {base_s: 1}
+  noise_db: 0
+  effect: speak
+  tags: [speech]
+- schema: as.affordance.v1
+  id: calm_person
+  verb: speak
+  label: "Talk {target} down: slow, steady, keep them from panicking"
+  ui_label: "Try to calm {target}"
+  binds: body
+  range: audible
+  duration: {base_s: 8}
+  noise_db: 0
+  check: {attribute: C, skill: persuasion, tags: [calm_voice], resistance: target.attr_mod.I}
+  effect: speak
+  tags: [speech, calm, negotiable]
+- schema: as.affordance.v1
+  id: signal
+  verb: signal
+  label: "Signal to {target} without speaking"
+  ui_label: "Signal {target}"
+  binds: body
+  range: visible
+  requires: {hands_free: 1}
+  duration: {base_s: 1}
+  noise_db: 0
+  effect: signal
+  tags: [signal, quiet]
+- schema: as.affordance.v1
+  id: surrender
+  verb: surrender
+  label: "Show your empty hands and give up"
+  ui_label: "Surrender"
+  binds: self
+  range: self
+  duration: {base_s: 2}
+  noise_db: 25
+  effect: surrender
+  tags: [surrender, comply_under_threat, threat_response]
+- schema: as.affordance.v1
+  id: shield_dependent
+  verb: guard
+  label: "Put yourself between {target} and the danger"
+  ui_label: "Shield {target}"
+  binds: body
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 2, per_meter_s: 0.29}
+  noise_db: 30
+  effect: follow_body
+  tags: [protect_dependent, guard, threat_response]
+- schema: as.affordance.v1
+  id: apply_pressure
+  verb: treat
+  label: "Press hard on {target} to slow the bleeding"
+  ui_label: "Put pressure on the wound"
+  binds: wound
+  range: touch
+  requires: {hands_free: 2}
+  duration: {base_s: 5}
+  noise_db: 20
+  effect: treat_wound
+  tags: [treat, pressure]
+- schema: as.affordance.v1
+  id: bandage_wound
+  verb: treat
+  label: "Pack and bandage {target} (about {duration})"
+  ui_label: "Bandage the wound"
+  binds: wound
+  range: touch
+  requires: {hands_free: 2, carried_item_tags: [bandage]}
+  duration: {base_s: 60}
+  noise_db: 20
+  effect: treat_wound
+  tags: [treat, bandage]
+- schema: as.affordance.v1
+  id: apply_tourniquet
+  verb: treat
+  label: "Tighten a tourniquet above {target}"
+  ui_label: "Tourniquet the limb"
+  binds: wound
+  range: touch
+  requires: {hands_free: 2, carried_item_tags: [tourniquet], skill: {domain: medicine, min_rank: 1}, skill_or_belief_cue: knows_tourniquet}
+  duration: {base_s: 30}
+  noise_db: 25
+  effect: apply_tourniquet
+  tags: [treat, tourniquet]
+- schema: as.affordance.v1
+  id: suture_wound
+  verb: treat
+  label: "Stitch {target} closed (slow, needs steady light)"
+  ui_label: "Stitch the wound"
+  binds: wound
+  range: touch
+  requires: {hands_free: 2, carried_item_tags: [suture], skill: {domain: medicine, min_rank: 1}}
+  duration: {base_s: 600}
+  noise_db: 20
+  check: {attribute: I, skill: medicine, tags: [field_medic], resistance: wound.severity}
+  effect: treat_wound
+  tags: [treat, suture]
+- schema: as.affordance.v1
+  id: clean_wound
+  verb: treat
+  label: "Clean {target} with antiseptic"
+  ui_label: "Clean the wound"
+  binds: wound
+  range: touch
+  requires: {hands_free: 2, carried_item_tags: [antiseptic]}
+  duration: {base_s: 60}
+  noise_db: 20
+  effect: treat_wound
+  tags: [treat, clean]
+- schema: as.affordance.v1
+  id: sleep
+  verb: wait
+  label: "Lie down and sleep"
+  ui_label: "Sleep"
+  binds: self
+  range: self
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 10
+  effect: sleep
+  tags: [rest, sleep]
+- schema: as.affordance.v1
+  id: rest
+  verb: wait
+  label: "Sit and rest for a while"
+  ui_label: "Rest"
+  binds: self
+  range: self
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 10
+  effect: rest
+  tags: [rest]
+- schema: as.affordance.v1
+  id: observe_area
+  verb: observe
+  label: "Stay put and watch everything you can see and hear"
+  ui_label: "Watch and listen"
+  binds: none
+  range: same_place
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 0
+  effect: observe
+  tags: [observe, attention]
+- schema: as.affordance.v1
+  id: watch_target
+  verb: observe
+  label: "Keep your eyes on {target}"
+  ui_label: "Watch {target}"
+  binds: body
+  range: visible
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 0
+  effect: observe
+  tags: [observe, attention]
+- schema: as.affordance.v1
+  id: watch_portal
+  verb: observe
+  label: "Watch {target}"
+  ui_label: "Watch {target}"
+  binds: portal
+  range: visible
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 0
+  effect: observe
+  tags: [observe, attention]
+- schema: as.affordance.v1
+  id: wait_here
+  verb: wait
+  label: "Stay where you are and do nothing yet"
+  ui_label: "Wait"
+  binds: self
+  range: self
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 0
+  effect: wait
+  tags: [wait, freeze]
+- schema: as.affordance.v1
+  id: guard_anchor
+  verb: guard
+  label: "Hold {destination} and guard it"
+  ui_label: "Guard {destination}"
+  binds: anchor
+  range: same_place
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 0
+  effect: guard
+  tags: [guard, duty]
+- schema: as.affordance.v1
+  id: keep_working
+  verb: continue_task
+  label: "Keep doing what you were doing ({target})"
+  ui_label: "Keep going"
+  binds: none
+  range: self
+  duration: {base_s: 0, condition_ended: true}
+  noise_db: 20
+  effect: continue_task
+  tags: [task]

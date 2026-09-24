@@ -1,0 +1,157 @@
+# Picking up, carrying, giving, searching, reloading, eating, drinking.
+# Item target kinds for moral_tags_if_target: 'owned' = the item's props.owner names another body,
+# household or group than the actor's own (mind/affordance.py).
+- schema: as.affordance.v1
+  id: pick_up_item
+  verb: manipulate
+  label: "Pick up {target}"
+  ui_label: "Pick up {target}"
+  binds: item_reachable
+  range: reach
+  requires: {hands_free: 1}
+  moral_tags_if_target: {owned: [steal]}
+  duration: {base_s: 1.5, per_meter_s: 0.71}
+  noise_db: 20
+  effect: pick_up
+  tags: [item]
+- schema: as.affordance.v1
+  id: drop_item
+  verb: manipulate
+  label: "Drop {item}"
+  ui_label: "Drop the {item}"
+  binds: item_held
+  range: self
+  duration: {base_s: 1}
+  noise_db: 25
+  effect: drop_item
+  tags: [item, comply_under_threat]
+- schema: as.affordance.v1
+  id: give_item
+  verb: manipulate
+  label: "Hand {item} to {target}"
+  ui_label: "Give the {item} to {target}"
+  binds: item_held
+  range: touch
+  duration: {base_s: 2}
+  noise_db: 20
+  effect: give_item
+  tags: [item, give, comply_under_threat]
+- schema: as.affordance.v1
+  id: take_from_container
+  verb: manipulate
+  label: "Take {item} out of {target}"
+  ui_label: "Take the {item} from {target}"
+  binds: container
+  range: reach
+  requires: {hands_free: 1}
+  moral_tags_if_target: {owned: [steal]}
+  duration: {base_s: 2, per_meter_s: 0.71}
+  noise_db: 25
+  effect: take_from
+  tags: [item]
+- schema: as.affordance.v1
+  id: put_into_container
+  verb: manipulate
+  label: "Put {item} into {target}"
+  ui_label: "Put the {item} in {target}"
+  binds: container
+  range: reach
+  duration: {base_s: 2, per_meter_s: 0.71}
+  noise_db: 25
+  effect: put_into
+  tags: [item]
+- schema: as.affordance.v1
+  id: search_container
+  verb: search
+  label: "Search {target} (about {duration})"
+  ui_label: "Search {target}"
+  binds: container
+  range: reach
+  requires: {hands_free: 1}
+  moral_tags_if_target: {owned: [steal]}
+  duration: {base_s: 20, per_meter_s: 0.71}
+  noise_db: 40
+  effect: search_container
+  tags: [search]
+- schema: as.affordance.v1
+  id: search_place
+  verb: search
+  label: "Search this place carefully (about {duration})"
+  ui_label: "Search the place"
+  binds: none
+  range: same_place
+  requires: {mobile: true, hands_free: 1}
+  duration: {base_s: 120}
+  noise_db: 40
+  effect: search_place
+  tags: [search]
+- schema: as.affordance.v1
+  id: equip_item
+  verb: manipulate
+  label: "Take {item} into your hand"
+  ui_label: "Get the {item} out"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 2}
+  noise_db: 20
+  effect: equip
+  tags: [item, ready_weapon]
+- schema: as.affordance.v1
+  id: holster_item
+  verb: manipulate
+  label: "Put {item} away"
+  ui_label: "Put the {item} away"
+  binds: item_held
+  range: self
+  duration: {base_s: 2}
+  noise_db: 15
+  effect: holster
+  tags: [item]
+- schema: as.affordance.v1
+  id: reload_firearm
+  verb: manipulate
+  label: "Reload {item} (about {duration})"
+  ui_label: "Reload the {item}"
+  binds: item_held
+  range: self
+  requires: {hands_free: 1, held_item_tags: [firearm], carried_item_tags: [magazine]}
+  duration: {base_s: 4}
+  noise_db: 45
+  effect: reload
+  tags: [item, reload]
+- schema: as.affordance.v1
+  id: throw_distraction
+  verb: manipulate
+  label: "Throw {item} toward {destination} to make a noise there"
+  ui_label: "Throw the {item} for a distraction"
+  binds: item_held
+  range: visible
+  duration: {base_s: 1.5}
+  noise_db: 20
+  effect: throw_distraction
+  tags: [item, distraction]
+- schema: as.affordance.v1
+  id: eat_food
+  verb: manipulate
+  label: "Eat {item} (about {duration})"
+  ui_label: "Eat the {item}"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 300}
+  noise_db: 20
+  effect: eat
+  tags: [consume, food]
+- schema: as.affordance.v1
+  id: drink_water
+  verb: manipulate
+  label: "Drink from {item}"
+  ui_label: "Drink from the {item}"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 30}
+  noise_db: 20
+  effect: drink
+  tags: [consume, water]

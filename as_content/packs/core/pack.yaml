@@ -1,0 +1,10 @@
+schema: as.pack.v1
+id: core
+name: Authentic Suffering — core
+version: 1.0.0
+description: >-
+  Canon infected (Lore v1.0, CMG §42), infection pathways, survivor contamination culture,
+  the Mafia Remnants (CMG §43.B), items, the affordance catalog, laws, buildings, loot, names,
+  style lists, ten people and three playable characters.
+depends_on: []
+authors: [SomethingDum, AS build spec v1]

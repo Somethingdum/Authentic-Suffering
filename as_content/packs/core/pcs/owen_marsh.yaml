@@ -1,0 +1,198 @@
+# Owen Marsh — a pre-Fall adult PC who fits any world age (the metal_fence anchor scene's PC).
+schema: as.pc.v1
+id: owen_marsh
+generation: authored
+days_since_fall_range: [14, 3650]
+identity:
+  name: Owen Marsh
+  aliases: [Marsh]
+  age: 46
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: Gary, Indiana
+  occupation_before: Long-haul trucker for nineteen years and volunteer firefighter in his hometown
+  occupation_now: Drifter who works for food — clearing buildings, hauling, fixing what can be fixed
+  one_line: A big, tired ex-trucker and volunteer firefighter who breaks down doors for a living and keeps his axe sharper than his temper.
+appearance:
+  height_cm: 188
+  mass_kg: 98
+  build: Heavy, broad, strong through the back and arms, a trucker's belly worn down to muscle
+  hair: Graying red, buzzed short, a thick mustache
+  eyes: Green, squinting
+  skin: Pale, weathered red across the face and neck, freckled forearms
+  distinguishing_marks:
+    - Burn scars across the backs of both hands from a kitchen fire call in 2014
+    - A trucking company's logo tattooed on his right forearm, half faded
+  clothing_usual: A canvas work coat, a volunteer fire department T-shirt gone gray, work jeans, steel-toe boots
+  movement_under_stress: Slows down and gets methodical — checks the door, the ceiling, the floor — the way he was taught on fire calls; his breathing gets loud through his nose.
+  habit_gesture: Thumbs the edge of the axe head to check it, whether or not it needs checking.
+  relation_to_appearance: Doesn't care; the scars on his hands are the only thing he's proud of.
+capability:
+  special: {S: 8, P: 5, E: 7, C: 4, I: 5, A: 4, L: 4}
+  skills:
+    - {domain: melee, rank: 2, evidence: "Fourteen years of forcible entry with an axe and a halligan on fire calls, and a year and more of using the axe on the dead."}
+    - {domain: driving, rank: 3, evidence: "Nineteen years and two million miles driving semis."}
+    - {domain: mechanics, rank: 2, evidence: "Kept his own truck running through three owners' worth of breakdowns."}
+    - {domain: building, rank: 1, evidence: "Volunteer department work — shoring, ventilation, knowing where a wall will hold."}
+    - {domain: medicine, rank: 1, evidence: "Firefighter first aid and burn care, recertified every two years."}
+  tags: [breacher, heavy_hitter]
+  trained_responses:
+    - {cue: smoke_smell, verb: observe, note: "Stops, gets low, looks for the source before he does anything else."}
+    - {cue: door_forced, verb: guard, note: "Axe up, body to the side of the door frame."}
+  literacy: 2
+  tech_literacy: 2
+  resolve_trait_mod: 0
+motive:
+  motive: Earn his keep somewhere long enough to stop moving.
+  method: Offers the hard, dangerous jobs — clearing, breaching, hauling — in trade for food and a floor, and never asks for more than he's owed.
+  moral_line:
+    will: ["Break into any building", "Kill the dead up close", "Leave a group that lies to him"]
+    wont: ["Leave someone in a burning building", "Hurt a kid", "Take a job he's been told is a robbery"]
+    wont_tags: [leave_wounded, kill_child, harm_dependent]
+  inner_conflict: He wants a home again and doesn't trust anyone enough to stay in one.
+  past_wound: He was on a run across Nebraska when the Fall came; by the time he drove home to Gary, three weeks later, his daughter and ex-wife's house had burned, and he never found out if they were inside.
+  signature_behaviour: Walks every new building's perimeter and checks every exit before he'll sit down in it.
+  risk_threshold: 5
+  risk_text: Goes into dangerous buildings as a matter of course; won't gamble on people.
+  resource_constraints: A fire axe, a knife, no working vehicle, no fuel, and a bad knee on long walks.
+persona:
+  public:
+    shown_traits: [steady, gruff, fair]
+    claimed_history: Drove trucks and ran with the volunteer department in Gary.
+    presented_affiliation: Nobody — works for whoever feeds him
+  private:
+    true_goals: ["Find somewhere worth staying", "Stop dreaming about the house on Fillmore Street"]
+    concealed_history: He never went into the burned house to look; he stood on the lawn and left.
+    real_affiliation: Himself
+traits:
+  - tag: methodical
+    manifests: Does everything in the same order every time — door, ceiling, floor, room — and talks himself through it under his breath.
+    triggers: Entering any building, starting any hard job.
+    causes: He is slow and hard to rush, and almost never surprised by a building.
+    costs: He is left behind when things need doing fast, and impatient people read him as dim.
+    example: Refused to rush a pharmacy clearing on someone else's say-so, and found the crawler under the checkout counter the others would have walked past.
+  - tag: gruff
+    manifests: Short answers, grunts, a mustache that hides whether he's smiling.
+    triggers: Small talk, questions about his past, anyone being cheerful at him.
+    causes: He keeps people at arm's length and gets hired rather than befriended.
+    costs: Nobody knows him well enough to vouch for him, so he's the first one turned out.
+    example: Answered a settlement leader's whole welcome speech with "Where do you want the axe?"
+contradictions:
+  - belief_a: You don't leave anybody in a fire.
+    belief_b: He left the house on Fillmore Street without looking.
+    a_wins_when: Someone is trapped in front of him and he can reach them.
+    b_wins_when: Someone asks him about his family.
+decision_stack:
+  layers:
+    - Get anyone trapped out
+    - Keep his axe and his feet
+    - Earn what he's owed
+    - Keep his word to whoever hired him
+  inversion_conditions:
+    - If the person who hired him lies about a job, keeping his word drops away entirely.
+  past_example: Walked off a paid clearing job when he found out the "empty" house had a family in it the crew meant to rob.
+silence:
+  goes_quiet_when:
+    - Anyone mentions a daughter, or fire in a house.
+    - He's clearing a building.
+  body_when_silent: Thumb on the axe edge, head tilted listening, mustache working.
+  refuses_to_discuss: ["Fillmore Street", "His daughter"]
+  comfortable_vs_uncomfortable: Comfortable silence is a job done and a meal eaten; uncomfortable silence is someone waiting for him to talk about home.
+knowledge:
+  knows:
+    - How buildings fail — which walls hold, which floors don't, how fire moves.
+    - How to keep an old diesel engine running.
+  does_not_know:
+    - Whether his daughter is alive.
+  knows_but_hides:
+    - He never went into the burned house.
+  cues: [knows_headshot_rule, knows_false_death, knows_noise_draws_dead, knows_crawler_ambush]
+voice:
+  capsule: Low, slow, gravel; a Region accent with trucker radio habits — 'copy', 'ten-four', 'what's your twenty'. Short sentences, practical words. Gentle with kids and the hurt, curt with everyone else.
+  speech_tendencies:
+    - Answers with the job, not the feeling.
+    - Uses radio slang out of habit.
+    - Calls children "bud" and adults nothing.
+  exemplars:
+    low_stakes: "Copy. Door's solid, hinges ain't. Give me ten minutes and a hammer."
+    under_pressure: "Back up. Back up. Let me go first — I've done this."
+    at_the_limit: "Nobody's left in there. Nobody. You hear me? I'm going in."
+  would_never_say:
+    - "Not my problem."
+    - "I'm sure they're fine."
+    - "Let's talk about how you're feeling."
+  profanity: frequent
+  dialect_notes: Northwest Indiana 'Region' accent; drops g's; 'youse' when tired.
+social:
+  household_role: ""
+  relations: []
+  dependents: []
+  guardians: []
+  memberships: []
+life:
+  aspiration: A place worth fixing up and staying in.
+  current_project: Whatever job is feeding him this week — decided at worldgen.
+  routine:
+    - {start_hh: 6, end_hh: 18, activity: working for whoever feeds him, place_hint: work site}
+    - {start_hh: 18, end_hh: 21, activity: "sharpening, mending, eating", place_hint: shelter}
+    - {start_hh: 21, end_hh: 24, activity: sleep, place_hint: shelter}
+    - {start_hh: 0, end_hh: 6, activity: sleep, place_hint: shelter}
+  obligations: ["The job he's taken"]
+  hopes: ["His daughter alive somewhere", "A truck that runs and fuel to put in it"]
+  fears: ["Fire in a building full of people", "Finding out"]
+  secrets:
+    - content: He never went into his daughter's burned house to look; he stood on the lawn and drove away.
+      who_knows: []
+      exposure_consequence: He'd lose the one belief about himself that keeps him going into fires.
+disposition:
+  archetype_prior: wanderer
+  toward_strangers: neutral
+  encounter_default: Stops at a distance, shows his empty hand, and asks if they need work done.
+starting_loops:
+  - {kind: question, text: "Is his daughter alive", strength: 2}
+starting_inventory:
+  - {item: "core:item/fire_axe", slot: hand_r, label: axe}
+  - {item: "core:item/pocket_knife", slot: pocket}
+  - {item: "core:item/hiking_pack", slot: worn, label: pack}
+  - {item: "core:item/work_jacket", slot: worn}
+  - {item: "core:item/boots", slot: worn}
+  - {item: "core:item/duct_tape", slot: pack, container: pack}
+  - {item: "core:item/bandage_roll", qty: 2, slot: pack, container: pack}
+  - {item: "core:item/water_bottle", slot: pack, container: pack}
+  - {item: "core:item/jerky_pack", slot: pack, container: pack}
+writers_notes: Owen is decent, slow and stubborn, a man who knows buildings better than people. His competence is physical and procedural; keep him out of speeches.
+tags: [pc]
+card:
+  display_name: Owen Marsh
+  one_line_identity: Big, slow, steady ex-trucker and firefighter with an axe
+  pc_card_survival: Breaks into buildings and clears them for food and a floor
+  pc_selection_note: Strong and hard to kill up close. Slow on his feet, and lonely by habit.
+primary_survival_method: combat
+faction_start_type: outsider_solo
+worldgen_bias: {climate_heat: -0.3, instability: 0.2, faction_density: -0.2, survivor_mentality: 0.2}
+plausibility_gate:
+  method: combat
+  # CMG §61 QC-2 combat: pass if ammo >= 2 OR the dossier specifies melee specialization. Owen's
+  # melee specialization always passes, so the gate is written as a condition that always holds.
+  pass_any: ["ammo >= 1"]
+  patch_on_fail: None needed; melee specialization passes.
+start_constraints: {start_trust_range: [3, 6], start_relationship_default: neutral, faction_present_preferred: either}
+locked_start_facts:
+  - "Age 46, 6'2\" (188 cm), about 215 lb, strong."
+  - "Fire axe, well kept; no firearm."
+  - "Can drive anything with wheels, given fuel."
+  - "A bad left knee on long walks."
+recap:
+  origin_tag: "A trucker who drove home through the Fall and found the house burned."
+  survival_pattern: "Clears and breaks into buildings for whoever will feed him. Moves on when they stop."
+  known_reputation: "Slow, strong, honest. Good in a building. Not much company."
+  provisional: []
+behavior_law:
+  approach: Stops at a distance with his empty hand up; to authority he is polite and short; to anyone threatening he sets his feet and waits for them to decide.
+  topic_handling: States needs as trades ("I'll clear it for a meal"); warnings are flat and final; he never raises shameful topics and shuts them down when others do.
+  risk_flight_escalation: Commits to physical danger without fuss and backs off from people fights until someone swings first; flees too late, because leaving feels like Fillmore Street.
+  plan_carry: Carries practical and technical plans perfectly; political arguments lose him in a sentence and he says so.
+  distortion: Underexplains — gives the conclusion and the order and none of the why, so good plans sound like bossiness.
+  pressure: Confinement and smoke make him calmer; being hurried or talked down to makes him stubborn and slower; injury makes him silent.
+  knowledge_boundary: Reads buildings and machines cold; misreads kindness as a setup and never guesses what women or kids are feeling.
+  performance: Jokes are dry and rare, usually radio slang; he doesn't flirt, doesn't mock; after adrenaline he gets very quiet and eats.

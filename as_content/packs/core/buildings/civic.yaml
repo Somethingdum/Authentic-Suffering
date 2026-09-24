@@ -1,0 +1,66 @@
+# Civic and utility archetypes — the places settlements are built around.
+- schema: as.building.v1
+  id: church_hall
+  name: Church hall
+  kind: hall
+  description: A plain brick church with one large open hall, a kitchen off the side and a storage room — the kind of room a settlement holds its councils in.
+  entrance_room: main_hall
+  rooms:
+    - id: main_hall
+      name: Main hall
+      size_m2: 300
+      width_m: 20
+      depth_m: 15
+      material: brick
+      anchors:
+        - {name: lectern, kind: feature, x_m: 10, y_m: 14, cover: 1}
+        - {name: front pews, kind: cover, x_m: 10, y_m: 10, cover: 1, concealment: 1}
+        - {name: back pews, kind: cover, x_m: 10, y_m: 3, cover: 1, concealment: 1}
+        - {name: side aisle, kind: feature, x_m: 1, y_m: 8}
+        - {name: choir loft, kind: vantage, x_m: 10, y_m: 1, cover: 1, concealment: 1}
+      portals:
+        - {to_room: hall_kitchen, kind: door, name: kitchen door, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 22}
+        - {to_room: storage, kind: door, name: storage door, lockable: true, lock_quality: 1, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 25}
+    - id: hall_kitchen
+      name: Hall kitchen
+      size_m2: 25
+      width_m: 5
+      depth_m: 5
+      material: brick
+      loot_table: core:loot/kitchen_residential
+      anchors:
+        - {name: serving hatch, kind: window, x_m: 2.5, y_m: 4.8}
+        - {name: stove, kind: furniture, x_m: 1, y_m: 1}
+    - id: storage
+      name: Storage room
+      size_m2: 12
+      width_m: 4
+      depth_m: 3
+      material: brick
+      loot_table: core:loot/church_storage
+      anchors:
+        - {name: stacked chairs, kind: cover, x_m: 1, y_m: 1, cover: 1, concealment: 2}
+        - {name: supply crates, kind: container, x_m: 3, y_m: 2, container_item: "core:item/wooden_crate"}
+  exterior_portals:
+    - {to_room: main_hall, kind: door, name: front doors, lockable: true, lock_quality: 2, aperture_w_cm: 180, aperture_h_cm: 240, seal_db: 28}
+    - {to_room: hall_kitchen, kind: door, name: side door, lockable: true, lock_quality: 1, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 22}
+- schema: as.building.v1
+  id: pump_house
+  name: Pump house
+  kind: utility
+  description: A squat concrete pump house over a well, with a hand-and-motor pump, a fuel store for the generator and a single steel door — the working heart of a settlement's water.
+  entrance_room: pump_room
+  rooms:
+    - id: pump_room
+      name: Pump room
+      size_m2: 20
+      width_m: 5
+      depth_m: 4
+      material: concrete
+      loot_table: core:loot/pump_house_tools
+      anchors:
+        - {name: pump head, kind: feature, x_m: 2.5, y_m: 2, cover: 2}
+        - {name: generator, kind: feature, x_m: 4.5, y_m: 3.5, cover: 2}
+        - {name: tool rack, kind: container, x_m: 0.5, y_m: 3.5, container_item: "core:item/metal_locker"}
+  exterior_portals:
+    - {to_room: pump_room, kind: door, name: steel door, lockable: true, lock_quality: 3, aperture_w_cm: 90, aperture_h_cm: 200, seal_db: 35}

@@ -1,0 +1,90 @@
+- schema: as.item.v1
+  id: bandage_roll
+  stackable: true
+  name: bandage roll
+  plural: bandage rolls
+  kind: medical
+  mass_g: 60
+  bulk: 0
+  tags: [medical, bandage]
+  barter_value: 6
+  medical: {treats: [bleeding], uses: 3}
+  description: Gauze wrap, still in its paper sleeve.
+- schema: as.item.v1
+  id: tourniquet
+  name: tourniquet
+  plural: tourniquets
+  kind: medical
+  mass_g: 80
+  bulk: 0
+  tags: [medical, tourniquet]
+  barter_value: 15
+  medical: {treats: [bleeding], uses: 1}
+  description: A windlass tourniquet with a black strap. For limbs that are pouring.
+- schema: as.item.v1
+  id: medkit
+  name: scavenged medkit
+  plural: scavenged medkits
+  kind: medical
+  mass_g: 500
+  bulk: 2
+  tags: [medical, medkit, bandage, antiseptic, painkiller]
+  barter_value: 30
+  medical: {treats: [bleeding, wound_cleaning, pain], uses: 4}
+  description: A soft zip pouch of gauze, tape, wipes and a strip of pills, restocked from whatever turns up.
+- schema: as.item.v1
+  id: suture_kit
+  name: suture kit
+  plural: suture kits
+  kind: medical
+  mass_g: 120
+  bulk: 0
+  tags: [medical, suture]
+  barter_value: 25
+  medical: {treats: [bleeding], uses: 4, skill_min: 1}
+  description: Curved needles and nylon thread in a sealed pack.
+- schema: as.item.v1
+  id: antiseptic
+  name: bottle of antiseptic
+  plural: bottles of antiseptic
+  kind: medical
+  mass_g: 250
+  bulk: 1
+  tags: [medical, antiseptic]
+  barter_value: 12
+  medical: {treats: [wound_cleaning], uses: 5}
+  description: Brown iodine solution, half full.
+- schema: as.item.v1
+  id: painkillers
+  name: strip of painkillers
+  plural: strips of painkillers
+  kind: medical
+  mass_g: 20
+  bulk: 0
+  tags: [medical, painkiller]
+  barter_value: 10
+  medical: {treats: [pain], uses: 10}
+  description: Ibuprofen in a foil strip, a year past the date.
+- schema: as.item.v1
+  id: splint
+  name: splint
+  plural: splints
+  kind: medical
+  mass_g: 150
+  bulk: 1
+  tags: [medical, splint]
+  barter_value: 8
+  medical: {treats: [fracture], uses: 1, skill_min: 1}
+  description: A padded aluminium splint that bends to shape.
+- schema: as.item.v1
+  id: antibiotics
+  stackable: true
+  name: course of antibiotics
+  plural: courses of antibiotics
+  kind: medical
+  mass_g: 40
+  bulk: 0
+  tags: [medical, antibiotic]
+  barter_value: 45
+  medical: {treats: [infection_wound], uses: 7}
+  description: Amoxicillin capsules. Worth more than a pistol in some places. Useless against the infection itself.

@@ -1,0 +1,302 @@
+{
+  "type": "as_game",
+  "action": "view",
+  "data": {
+    "view": {
+      "run_id": "metal_fence",
+      "turn_index": 1,
+      "pc_name": "Owen Marsh",
+      "alive": true,
+      "clock": {
+        "day": 18,
+        "time_text": "23:14",
+        "part_of_day": "night",
+        "weather_text": "Windy",
+        "light_text": "Dim"
+      },
+      "location": {
+        "place_name": "Sales floor",
+        "area_name": "",
+        "description_lines": [
+          "A large brick room, dim.",
+          "Wind pushes at the building.",
+          "There are a counter, a gap behind the counter and a front window here.",
+          "One other person is here.",
+          "The gap behind the counter would stop a bullet."
+        ],
+        "can_see": [],
+        "people": [
+          {
+            "ref": "p1",
+            "label": "Mara",
+            "status_words": [],
+            "known": true
+          }
+        ],
+        "exits": [
+          {
+            "ref": "x1",
+            "label": "storeroom door",
+            "state_words": [
+              "open"
+            ],
+            "leads_to": "Stockroom"
+          },
+          {
+            "ref": "x2",
+            "label": "office door",
+            "state_words": [
+              "closed"
+            ],
+            "leads_to": "Office"
+          },
+          {
+            "ref": "x3",
+            "label": "front door",
+            "state_words": [
+              "closed",
+              "barricaded"
+            ],
+            "leads_to": "Maple Street"
+          },
+          {
+            "ref": "x4",
+            "label": "boarded front window",
+            "state_words": [
+              "closed",
+              "barricaded"
+            ],
+            "leads_to": "Maple Street"
+          }
+        ],
+        "dangers": [],
+        "noise_text": "some noise"
+      },
+      "inventory": {
+        "hands": [
+          {
+            "ref": "i1",
+            "name": "Glock 19",
+            "qty": 1,
+            "condition_word": "pristine",
+            "detail": "15 rounds",
+            "mass_text": "0.7 kg",
+            "actions": [
+              "Drop",
+              "Put away",
+              "Reload"
+            ]
+          }
+        ],
+        "worn": [
+          {
+            "ref": "i2",
+            "name": "fire axe",
+            "qty": 1,
+            "condition_word": "pristine",
+            "detail": "",
+            "mass_text": "2.7 kg",
+            "actions": [
+              "Take out"
+            ]
+          }
+        ],
+        "containers": [],
+        "carried_mass_kg": 3.45,
+        "load_word": "light"
+      },
+      "body": {
+        "wounds": [],
+        "needs": [
+          {
+            "name": "Thirst",
+            "level": 0,
+            "word": "fine"
+          },
+          {
+            "name": "Hunger",
+            "level": 0,
+            "word": "fine"
+          },
+          {
+            "name": "Tiredness",
+            "level": 0,
+            "word": "fine"
+          },
+          {
+            "name": "Pain",
+            "level": 0,
+            "word": "fine"
+          }
+        ],
+        "impairment_word": "clear-headed",
+        "resolve": {
+          "cur": 5,
+          "max": 5,
+          "word": "steady"
+        },
+        "status_words": [],
+        "infection_known": null
+      },
+      "people": [
+        {
+          "ref": "p1",
+          "label": "Mara",
+          "relation_words": [],
+          "last_seen_text": "here now",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "alive"
+        },
+        {
+          "ref": "p2",
+          "label": "Alice",
+          "relation_words": [],
+          "last_seen_text": "not seen yet",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "unknown"
+        },
+        {
+          "ref": "p3",
+          "label": "June",
+          "relation_words": [],
+          "last_seen_text": "last seen day 18, 23:14, Stockroom",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "unknown"
+        },
+        {
+          "ref": "p4",
+          "label": "Eli",
+          "relation_words": [],
+          "last_seen_text": "not seen yet",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "unknown"
+        },
+        {
+          "ref": "p5",
+          "label": "Nita",
+          "relation_words": [],
+          "last_seen_text": "not seen yet",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "unknown"
+        }
+      ],
+      "journal": {
+        "promises_made": [],
+        "promises_owed": [],
+        "goals": [],
+        "rumours": [],
+        "lessons": [
+          "Knows: Believes the dead only stay down when the brainstem or upper spine is destroyed.",
+          "Knows: Believes a downed infected can get back up hours later.",
+          "Knows: Believes loud noise pulls the dead toward it.",
+          "Knows: Believes crawlers hide under cars, steps and rubble."
+        ],
+        "the_dead": [],
+        "reputation_heard": []
+      },
+      "map": {
+        "places": [
+          {
+            "ref": "m1",
+            "label": "Maple Street",
+            "visited": false,
+            "here": false,
+            "exits_known": [
+              "front door",
+              "boarded front window"
+            ],
+            "travel_text": ""
+          },
+          {
+            "ref": "m2",
+            "label": "Office",
+            "visited": false,
+            "here": false,
+            "exits_known": [
+              "office door"
+            ],
+            "travel_text": ""
+          },
+          {
+            "ref": "m3",
+            "label": "Sales floor",
+            "visited": true,
+            "here": true,
+            "exits_known": [
+              "storeroom door",
+              "office door",
+              "front door",
+              "boarded front window"
+            ],
+            "travel_text": ""
+          },
+          {
+            "ref": "m4",
+            "label": "Stockroom",
+            "visited": false,
+            "here": false,
+            "exits_known": [
+              "storeroom door"
+            ],
+            "travel_text": ""
+          }
+        ]
+      },
+      "suggestions": [
+        {
+          "ref": "s1",
+          "label": "Talk to anyone who can hear",
+          "mode": "say"
+        },
+        {
+          "ref": "s2",
+          "label": "Talk to Mara",
+          "mode": "say"
+        },
+        {
+          "ref": "s3",
+          "label": "Talk to June",
+          "mode": "say"
+        },
+        {
+          "ref": "s4",
+          "label": "Try to calm Mara",
+          "mode": "say"
+        },
+        {
+          "ref": "s5",
+          "label": "Go and look at the storeroom doorway",
+          "mode": "do"
+        },
+        {
+          "ref": "s6",
+          "label": "Wait and watch",
+          "mode": "do"
+        }
+      ],
+      "lanes": {
+        "A": {
+          "label": "Main model",
+          "ok": true,
+          "model": "nemotron-cascade-2-30b-a3b",
+          "detail": ""
+        },
+        "B": {
+          "label": "Second model",
+          "ok": true,
+          "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+          "detail": ""
+        }
+      },
+      "sandbox": false,
+      "mechanics": {
+        "lines": []
+      }
+    }
+  }
+}

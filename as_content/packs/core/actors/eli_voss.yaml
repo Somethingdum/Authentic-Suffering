@@ -1,0 +1,169 @@
+schema: as.actor.v1
+id: eli_voss
+generation: authored
+days_since_fall_range: [14, 1460]
+identity:
+  name: Eli Voss
+  aliases: [Bug]
+  age: 9
+  sex: male
+  cohort: fall_child
+  birthplace: Terre Haute, Indiana
+  occupation_before: Third-grader who wanted to be a garbage-truck driver
+  occupation_now: Sorts bolts and batteries for Ray and keeps out from underfoot
+  one_line: A nine-year-old who has learned to be very quiet, and who notices the things grown-ups do at night.
+appearance:
+  height_cm: 132
+  mass_kg: 26
+  build: Skinny, all elbows and knees, a tooth missing on the left side
+  hair: Dirty blond, cut short and uneven by his mother with kitchen scissors
+  eyes: Gray, like his mother's
+  skin: Pale, with a permanent graze on one knee or the other
+  distinguishing_marks:
+    - A gap where his upper left canine has not come in yet
+    - A faded temporary tattoo of a dinosaur on the back of his hand that he will not wash off
+  clothing_usual: An adult's hooded sweatshirt with the sleeves rolled four times, jeans, sneakers with the laces tied around his ankles
+  movement_under_stress: Freezes first, then goes small and still wherever he is — under a desk, behind his mother's legs — and holds his breath.
+  habit_gesture: Rubs the dinosaur on his hand with his thumb, the same way his mother rubs her eyebrow.
+  relation_to_appearance: Proud of the missing tooth; wants his hair long like Nita's.
+capability:
+  special: {S: 2, P: 7, E: 4, C: 5, I: 6, A: 6, L: 5}
+  skills:
+    - {domain: stealth, rank: 1, evidence: "Twenty days of being told to be quiet or else, and hiding games in the stockroom that he always wins."}
+  tags: []
+  trained_responses:
+    - {cue: loud_noise, verb: hide, note: "His mother drilled it: noise means get small and stay put until she comes."}
+    - {cue: infected_seen, verb: hide, note: "Same rule, and he believes it completely."}
+  literacy: 1
+  tech_literacy: 1
+  resolve_trait_mod: -1
+motive:
+  motive: Be useful enough that nobody ever thinks about leaving him behind.
+  method: Does every small job he is given twice as carefully as he needs to, and tells Ray when he finishes.
+  moral_line:
+    will: ["Hide somewhere he was told not to go", "Keep a grown-up's secret if they ask him to"]
+    wont: ["Leave his mother", "Tell a lie to his mother's face"]
+    wont_tags: [abandon_dependent, lie_to_family]
+  inner_conflict: He knows something about Ray that he thinks he should tell his mother, and he is scared that telling will get them thrown out.
+  past_wound: He heard the neighbor pounding and begging on the second day and his mother held her hand over his mouth until it stopped.
+  signature_behaviour: Counts things — cans, bolts, footsteps — under his breath when he is scared, the way he heard June counting.
+  risk_threshold: 2
+  risk_text: Almost never takes risks on his own; will do something brave only to stop his mother from being hurt.
+  resource_constraints: Nine years old; no weapon; a flashlight he is not allowed to use at night.
+persona:
+  public:
+    shown_traits: [helpful, quiet]
+    claimed_history: Came here with his mom. His dad went to get grandma.
+    presented_affiliation: His mom
+  private:
+    true_goals: ["Keep his mom from being sad", "Find out if his dad is coming back"]
+    concealed_history: He has watched Ray carry cans into the office cabinet at night three times.
+    real_affiliation: His mom
+traits:
+  - tag: watchful
+    manifests: Sits where he can see the whole room, and notices who moves where and when, especially after dark.
+    triggers: Grown-ups talking quietly, or anyone moving around at night.
+    causes: He stays awake pretending to sleep, and remembers things other people think nobody saw.
+    costs: He is always tired, and he carries things he is too young to know what to do with.
+    example: He can tell anyone who asks which night the storeroom door was left unlatched, and who left it.
+  - tag: eager_to_please
+    manifests: Asks for jobs, finishes them fast, and reports back to whoever gave them, waiting to be told he did well.
+    triggers: Any adult looking stressed, or being told he is in the way.
+    causes: He volunteers for things he should not, and hides mistakes so nobody will be disappointed.
+    costs: He never says when he is scared or hungry, so nobody knows until it is bad.
+    example: He sorted the batteries by size and then again by brand when Ray did not say anything the first time.
+contradictions:
+  - belief_a: Grown-ups in the store keep him safe, so he should do what they say.
+    belief_b: Ray is doing something secret at night, which grown-ups are not supposed to do.
+    a_wins_when: It is daytime and Ray is being kind to him.
+    b_wins_when: He is hungry, or he hears Ray moving in the office in the dark.
+decision_stack:
+  layers:
+    - Stay near his mother
+    - Do what his mother told him last
+    - Do what Ray or June tells him
+    - Be useful so nobody minds him
+  inversion_conditions:
+    - If his mother is hurt or in danger, staying near her beats every instruction, including hers to stay hidden.
+  past_example: When his mother told him to stay in the office during the storm he stayed, even when the window rattled, until she came and carried him out.
+silence:
+  goes_quiet_when:
+    - Anyone asks about his dad.
+    - Grown-ups argue.
+    - He hears a noise outside at night.
+  body_when_silent: Knees up, arms around them, thumb rubbing the dinosaur on his hand.
+  refuses_to_discuss: ["The neighbor on the second day"]
+  comfortable_vs_uncomfortable: Comfortable is sitting next to June while she counts; uncomfortable is any grown-up asking him a question and waiting.
+knowledge:
+  knows:
+    - Where every kind of battery and bolt is kept in the stockroom.
+    - That noise brings the dead, because his mother said so every day.
+  does_not_know:
+    - What happened to his father.
+    - Why Ray moves cans at night.
+  knows_but_hides:
+    - Ray carries cans into the office filing cabinet after everyone is asleep.
+  cues: [knows_noise_draws_dead]
+voice:
+  capsule: A nine-year-old who talks in short bursts, then stops as if he has used up his turn. Asks sideways questions instead of direct ones. Picked up June's counting and his mother's flat 'okay'.
+  speech_tendencies:
+    - Asks questions starting with "Is it okay if".
+    - Reports jobs finished with exact numbers ("I did forty-two.").
+    - Goes monosyllabic when scared.
+  exemplars:
+    low_stakes: "I did all the double-As. There's forty-two. Is it okay if I do the big ones now?"
+    under_pressure: "Mom? Mom, I'm under the desk. I'm staying. I'm staying."
+    at_the_limit: "Don't touch her! Don't — get off her!"
+  would_never_say:
+    - "Everything's going to be okay."
+    - "I'm not scared of anything."
+    - "Whatever, I don't care."
+  profanity: none
+  dialect_notes: ""
+social:
+  household_role: child
+  relations:
+    - target: "core:actor/mara_voss"
+      kind: parent
+      axes: {trust: 3, affection: 3}
+      history: His mother; she is the only fixed point he has left and he watches her face for everything.
+    - target: "core:actor/june_okafor"
+      kind: friend
+      axes: {trust: 2, affection: 2}
+      history: June lets him help count and slips him part of her dinner when his mom isn't looking.
+    - target: "core:actor/ray_delgado"
+      kind: acquaintance
+      axes: {trust: 1, fear: 1}
+      history: Ray gives him jobs and sometimes a candy from behind the counter; Ray is also the man who decides who stays.
+  dependents: []
+  guardians: ["core:actor/mara_voss"]
+  memberships: []
+life:
+  aspiration: To drive a big truck someday, like the garbage truck on his old street.
+  current_project: Sorting every battery in the store by size and brand.
+  routine:
+    - {start_hh: 8, end_hh: 12, activity: sorting jobs for Ray, place_hint: storeroom}
+    - {start_hh: 12, end_hh: 20, activity: lessons with his mother and quiet play, place_hint: office}
+    - {start_hh: 20, end_hh: 24, activity: sleep, place_hint: office}
+    - {start_hh: 0, end_hh: 8, activity: sleep, place_hint: office}
+  obligations: ["Stay where his mother puts him"]
+  hopes: ["His dad coming back", "A dog"]
+  fears: ["His mom not coming back from the window", "Being sent away"]
+  secrets:
+    - content: He has watched Ray carry cans into the office filing cabinet at night three times.
+      who_knows: []
+      exposure_consequence: His mother would confront Ray, and Eli is sure that would get them thrown out.
+    - content: June gives him part of her dinner most nights.
+      who_knows: ["core:actor/june_okafor"]
+      exposure_consequence: His mother would be angry at June and ashamed, and June might stop.
+disposition:
+  archetype_prior: hider
+  toward_strangers: wary
+  encounter_default: Hides and stays hidden until his mother or June comes for him.
+starting_loops:
+  - {kind: question, text: "Is Dad coming back", strength: 2}
+  - {kind: secret_kept, text: "What Ray does at night", subject: "core:actor/ray_delgado", strength: 2}
+starting_inventory:
+  - {item: "core:item/flashlight", slot: pocket, props: {note: "Not allowed to use it at night."}}
+writers_notes: Eli is a child, written as a child — scared, observant, trying hard. He is never a plot device for cheap tragedy and never cute on purpose. Every portrayal of him stays age-appropriate.
+tags: [delgados_crew, anchor_scene, minor]

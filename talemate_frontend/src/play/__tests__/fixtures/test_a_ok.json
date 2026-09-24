@@ -1,0 +1,12 @@
+{
+  "type": "as_game",
+  "action": "model_test_result",
+  "data": {
+    "lane": "A",
+    "ok": true,
+    "detail": "Working — answered in 1.8 s.",
+    "latency_ms": 1800,
+    "structured_ok": true,
+    "thinking_ok": null
+  }
+}

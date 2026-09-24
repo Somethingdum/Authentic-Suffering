@@ -1,0 +1,14 @@
+The character: {{ ctx.packet.identity_text }}
+Where they are: {{ ctx.packet.position_text }}
+What they can perceive:
+{% for s in ctx.packet.perceived_now %}- {{ s.text }}
+{% endfor %}
+People and things they know are here:
+{% for e in ctx.packet.entities %}- {{ e.handle }}: {{ e.description }}
+{% else %}- nobody
+{% endfor %}
+Options:
+{% for a in ctx.packet.affordances %}- {{ a.handle }}: {{ a.label }}
+{% endfor %}
+The player typed:
+{{ ctx.player_text }}

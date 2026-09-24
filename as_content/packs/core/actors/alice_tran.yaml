@@ -1,0 +1,170 @@
+schema: as.actor.v1
+id: alice_tran
+generation: authored
+days_since_fall_range: [14, 1460]
+identity:
+  name: Alice Tran
+  aliases: []
+  age: 41
+  sex: female
+  cohort: pre_fall_adult
+  birthplace: Houston, Texas
+  occupation_before: Accounts-payable bookkeeper for a restaurant supply company for fourteen years
+  occupation_now: Keeps the crew's ledger and sorts everything that comes back from a run
+  one_line: A bookkeeper who knows exactly where every can went, and has decided which of those facts to keep to herself.
+appearance:
+  height_cm: 157
+  mass_kg: 52
+  build: Small and narrow, upright posture she was scolded into as a girl
+  hair: Black with a gray streak at the left temple, cut blunt at the jaw
+  eyes: Dark brown
+  skin: Light olive, freckled with sunspots across the backs of her hands
+  distinguishing_marks:
+    - A pencil kept behind her right ear at all times, sharpened with a pocketknife
+    - A thin white scar across the base of her left thumb from a box-cutter slip
+  clothing_usual: A men's cardigan buttoned to the throat over a turtleneck, pleated slacks, cracked leather loafers
+  movement_under_stress: Slows down and tidies — squares a stack, caps a pen — as if order in her hands could put order in the room.
+  habit_gesture: Taps the pencil against her teeth twice before writing a number down.
+  relation_to_appearance: Keeps the cardigan buttoned because being neat is the last thing she controls.
+capability:
+  special: {S: 3, P: 6, E: 5, C: 4, I: 8, A: 4, L: 5}
+  skills:
+    - {domain: trade, rank: 2, evidence: "Fourteen years reconciling supplier invoices, catching short deliveries and padded bills."}
+    - {domain: deception, rank: 1, evidence: "Kept her gambling husband's debts off the household books for six years without her mother-in-law ever finding out."}
+    - {domain: scavenging, rank: 1, evidence: "Sorts every run's haul and knows which brands last and which rust."}
+  tags: []
+  trained_responses:
+    - {cue: loud_noise, verb: take_cover, note: "Gets behind the counter and keeps her hands on the ledger."}
+  literacy: 3
+  tech_literacy: 2
+  resolve_trait_mod: 0
+motive:
+  motive: Leave this building alive, with enough to start again somewhere, when it falls apart.
+  method: Keeps the ledger honest enough to be trusted and quiet enough to be useful to Ray, whose private reserve she has agreed to share when they leave.
+  moral_line:
+    will: ["Keep a secret that benefits her", "Shade a number in a report"]
+    wont: ["Take food from Eli", "Hurt anyone with her own hands"]
+    wont_tags: [harm_dependent, attack_unarmed]
+  inner_conflict: She has accepted Ray's promise of a share of his hidden reserve, and every time June recounts the stockroom out loud Alice has to decide again whether to let her.
+  past_wound: Her husband gambled away their house two years before the Fall; she was still paying the debt the day the world ended, and she has never let anyone near her money since.
+  signature_behaviour: Writes every number twice — once in the crew's ledger and once in a small notebook in her cardigan pocket.
+  risk_threshold: 3
+  risk_text: Takes risks only on paper; physically she avoids every danger she can see.
+  resource_constraints: No weapon, poor stamina, and the crew's trust in her count is her only real asset.
+persona:
+  public:
+    shown_traits: [precise, reserved]
+    claimed_history: Did the books for a restaurant supplier and walked here when the office closed.
+    presented_affiliation: Ray's crew, the ledger
+  private:
+    true_goals: ["Get her share of Ray's reserve when the crew breaks up", "Never be the one left holding someone else's debt again"]
+    concealed_history: She knows Ray is taking stock into a locked cabinet at night, and she agreed to keep quiet in return for a share.
+    real_affiliation: Herself, and Ray for exactly as long as the reserve exists
+traits:
+  - tag: meticulous
+    manifests: Every item is logged, dated and initialled, and she recounts anything that looks wrong before she mentions it.
+    triggers: A number that doesn't reconcile, or anyone moving stock without telling her.
+    causes: She catches every discrepancy and then decides what to do about it privately.
+    costs: She is slow in a crisis and cannot leave a job half-finished even when she should.
+    example: Kept sorting the haul from a run for a full minute after the alarm was called because the tally was half-written.
+  - tag: guarded
+    manifests: Answers questions exactly and no further, and changes the subject to the count when anyone asks about her.
+    triggers: Personal questions, or anyone looking at her notebook.
+    causes: She keeps parallel records, keeps her plans to herself, and keeps her face still.
+    costs: Nobody in the crew considers her a friend, and nobody would cover for her.
+    example: When June asked if she had kids, Alice said "No" and asked June how many bandages were left.
+contradictions:
+  - belief_a: An honest ledger is the only thing keeping six hungry people from each other's throats.
+    belief_b: Ray's hidden reserve is her way out, and exposing it would end it.
+    a_wins_when: The discrepancy is small and nobody is going hungry yet.
+    b_wins_when: The crew is arguing about leaving, or someone is about to find the cabinet.
+decision_stack:
+  layers:
+    - Her own survival
+    - Keeping her standing as the trusted keeper of the count
+    - Her deal with Ray
+    - The crew's fairness
+  inversion_conditions:
+    - If Eli goes hungry because of the missing stock, the crew's fairness jumps above her deal with Ray.
+  past_example: When June first said the beans were short, Alice recounted, found the same number, and wrote it down with the note "possible miscount Tuesday" instead of "missing".
+silence:
+  goes_quiet_when:
+    - Anyone mentions debt or gambling.
+    - June recounts the stockroom out loud.
+    - Ray and Mara argue about supplies.
+  body_when_silent: Pencil against her teeth, eyes down on the page, one hand flat on the notebook in her pocket.
+  refuses_to_discuss: ["Her husband", "The notebook"]
+  comfortable_vs_uncomfortable: Comfortable silence is an evening's sorting alone; uncomfortable silence is Mara watching her write.
+knowledge:
+  knows:
+    - The exact stock count, and that it is dropping faster than the crew eats.
+    - Ray moves cans and water into the office filing cabinet at night.
+  does_not_know:
+    - That Eli has seen Ray at the cabinet.
+  knows_but_hides:
+    - Ray's private reserve and her promised share of it.
+    - Her second notebook with the real numbers.
+  cues: [knows_bite_is_fatal]
+voice:
+  capsule: Clipped, precise, faintly formal — full sentences, no contractions when she is careful. Houston warmth only shows when she forgets herself. Deflects with facts and numbers; a lie from her sounds exactly like an audit.
+  speech_tendencies:
+    - Answers with a number where she can.
+    - Avoids contractions when she is lying.
+    - Ends statements with "for the record" when she wants to be believed.
+  exemplars:
+    low_stakes: "Nineteen jugs, two of them half. Put the batteries on the left shelf, please, not the right."
+    under_pressure: "I am behind the counter. I have the ledger. I am not moving."
+    at_the_limit: "You want to know where it went? Ask him. Ask him what's in the cabinet. I have it all written down."
+  would_never_say:
+    - "Take whatever you need."
+    - "I don't really keep track."
+    - "Numbers aren't everything."
+  profanity: none
+  dialect_notes: Texas vowels surface when she is angry; otherwise careful, office English.
+social:
+  household_role: ""
+  relations:
+    - target: "core:actor/ray_delgado"
+      kind: acquaintance
+      axes: {trust: 1, respect: 1, obligation: -1}
+      history: Ray promised her a share of his reserve for her silence; each of them believes the other needs them more.
+    - target: "core:actor/june_okafor"
+      kind: acquaintance
+      axes: {trust: 1, resentment: 1}
+      history: They keep the count together; June's recounting out loud is the most dangerous thing in Alice's day.
+    - target: "core:actor/mara_voss"
+      kind: acquaintance
+      axes: {fear: 1, respect: 1}
+      history: Mara corrected her count in front of Ray once; Alice has been careful around her ever since.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/delgados_crew", role: ledger keeper, standing: 1, since: "day 2"}
+life:
+  aspiration: A place of her own with a door that locks from the inside.
+  current_project: Keeping the ledger's official numbers close enough to June's recounts that nobody asks about the cabinet.
+  routine:
+    - {start_hh: 8, end_hh: 13, activity: sorting and logging, place_hint: sales floor}
+    - {start_hh: 13, end_hh: 22, activity: behind the counter with the ledger, place_hint: sales floor}
+    - {start_hh: 22, end_hh: 24, activity: sleep, place_hint: sales floor}
+    - {start_hh: 0, end_hh: 8, activity: sleep, place_hint: sales floor}
+  obligations: ["The ledger", "Sorting every run's haul"]
+  hopes: ["The crew holding together until spring", "Never owing anyone again"]
+  fears: ["Being blamed for the missing stock", "Being turned out with nothing"]
+  secrets:
+    - content: Ray keeps a private reserve of food and water in the office cabinet, and Alice has agreed to stay quiet for a share.
+      who_knows: ["core:actor/ray_delgado"]
+      exposure_consequence: The crew would see her as Ray's accomplice, and she would lose her standing and probably her place.
+disposition:
+  archetype_prior: opportunist
+  toward_strangers: wary
+  encounter_default: Stays behind the counter and lets someone else speak, while she writes down what the stranger is carrying.
+starting_loops:
+  - {kind: secret_kept, text: "Ray's reserve", subject: "core:actor/ray_delgado", strength: 3}
+  - {kind: debt_owed, text: "Ray owes her a share of the reserve", subject: "core:actor/ray_delgado", strength: 2}
+starting_inventory:
+  - {item: "core:item/ledger_book", slot: hand_r, props: {note: "The crew's official count."}}
+  - {item: "core:item/ledger_book", slot: pocket, props: {note: "Her own notebook, with the real numbers."}}
+  - {item: "core:item/pocket_knife", slot: pocket}
+writers_notes: Alice is not a villain; she is a person who got burned by trusting someone with money and has decided never to be the one left with nothing. Let her be sympathetic and wrong.
+tags: [delgados_crew, anchor_scene]

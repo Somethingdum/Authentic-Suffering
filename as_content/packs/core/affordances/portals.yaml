@@ -1,0 +1,111 @@
+# Doors, windows, gates, locks and barricades. Portal facts are orthogonal (GEO-01).
+- schema: as.affordance.v1
+  id: open_portal
+  verb: manipulate
+  label: "Open {target}"
+  ui_label: "Open {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 1}
+  duration: {base_s: 1.5, per_meter_s: 0.71}
+  noise_db: 40
+  effect: open_portal
+  tags: [portal]
+- schema: as.affordance.v1
+  id: close_portal
+  verb: manipulate
+  label: "Close {target}"
+  ui_label: "Close {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 1}
+  duration: {base_s: 1.5, per_meter_s: 0.71}
+  noise_db: 40
+  effect: close_portal
+  tags: [portal]
+- schema: as.affordance.v1
+  id: lock_portal
+  verb: manipulate
+  label: "Lock {target} with your key"
+  ui_label: "Lock {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 1, carried_item_tags: [key]}
+  duration: {base_s: 3, per_meter_s: 0.71}
+  noise_db: 35
+  effect: lock_portal
+  tags: [portal, lock]
+- schema: as.affordance.v1
+  id: unlock_portal
+  verb: manipulate
+  label: "Unlock {target} with your key"
+  ui_label: "Unlock {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 1, carried_item_tags: [key]}
+  duration: {base_s: 3, per_meter_s: 0.71}
+  noise_db: 35
+  effect: unlock_portal
+  tags: [portal, lock]
+- schema: as.affordance.v1
+  id: pick_lock
+  verb: manipulate
+  label: "Pick the lock on {target} (slow, needs quiet hands)"
+  ui_label: "Pick the lock on {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 2, carried_item_tags: [lockpick], skill: {domain: mechanics, min_rank: 1}, skill_or_belief_cue: knows_lock_picking}
+  duration: {base_s: 45, per_meter_s: 0.71}
+  noise_db: 20
+  check: {attribute: A, skill: mechanics, tags: [locksmith], resistance: portal.lock_quality}
+  effect: unlock_portal
+  tags: [portal, lock, lockpick]
+- schema: as.affordance.v1
+  id: barricade_portal
+  verb: manipulate
+  label: "Barricade {target} with whatever is at hand (about {duration})"
+  ui_label: "Barricade {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 2, mobile: true}
+  duration: {base_s: 30, per_meter_s: 0.71}
+  noise_db: 55
+  effect: barricade_portal
+  tags: [portal, barricade]
+- schema: as.affordance.v1
+  id: unbarricade_portal
+  verb: manipulate
+  label: "Clear the barricade from {target} (about {duration})"
+  ui_label: "Unblock {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 2, mobile: true}
+  duration: {base_s: 30, per_meter_s: 0.71}
+  noise_db: 55
+  effect: unbarricade_portal
+  tags: [portal, barricade]
+- schema: as.affordance.v1
+  id: force_portal
+  verb: manipulate
+  label: "Force {target} open (loud)"
+  ui_label: "Force {target}"
+  binds: portal
+  range: reach
+  requires: {hands_free: 2, mobile: true, fear_exposure: true}
+  duration: {base_s: 5, per_meter_s: 0.71}
+  noise_db: 85
+  check: {attribute: S, tags: [breacher], resistance: portal.lock_and_barricade}
+  effect: force_portal
+  tags: [portal, force, loud]
+- schema: as.affordance.v1
+  id: peek_portal
+  verb: observe
+  label: "Look through {target} without going in"
+  ui_label: "Peek through {target}"
+  binds: portal
+  range: reach
+  requires: {fear_exposure: true}
+  duration: {base_s: 3, per_meter_s: 0.71}
+  noise_db: 10
+  effect: peek_portal
+  tags: [observe, investigate]

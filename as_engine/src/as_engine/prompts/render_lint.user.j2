@@ -1,0 +1,9 @@
+FACTS (everything the person perceived)
+{% for l in ctx.packet.lines %}- {% if l.kind == 'speech' %}{{ l.speaker or 'Someone' }} said "{{ l.words }}"{% else %}{{ l.text }}{% endif %}
+
+{% endfor %}{% for d in ctx.packet.place_details %}- {{ d }}
+{% endfor %}{% for p in ctx.packet.people_present %}- present: {{ p }}
+{% endfor %}
+TEXT, SENTENCE BY SENTENCE
+{% for s in ctx.sentences %}{{ loop.index0 }}: {{ s }}
+{% endfor %}

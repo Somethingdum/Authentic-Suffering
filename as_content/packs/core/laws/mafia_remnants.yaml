@@ -1,0 +1,32 @@
+# Laws the Mafia Remnants enforce inside their protected zones (CMG §43.B). The faction also
+# applies core:law/intake_screening and core:law/contamination_quarantine at its Clean Clinics
+# and gates (CMG §43.C).
+- schema: as.law.v1
+  id: tribute_due
+  name: Tribute Day
+  kind: trade
+  text: Every stall, farm, workshop and household inside a protected zone pays the posted tribute on the posted day, in goods or in labour, and the payment is entered in the ledger in front of the payer.
+  affordance_effects: []
+  enforcement: A collector arrives with a ledger page for the street; the Audit House later checks every page against what reached the Provision Yard.
+  punishment: A late payment is entered with a surcharge. A second puts the debtor's name on the Warden's list. A third ends protection, and everyone on the street is told so.
+  belief_text: "You pay on the day, you get your name ticked, and nobody touches your stall. You don't pay, and you find out how much of your life was protection."
+- schema: as.law.v1
+  id: market_shield_peace
+  name: Market Shield Peace
+  kind: weapons
+  text: Inside a Market Shield Zone nobody draws a weapon or lays a hand on anyone except on the Warden's word; quarrels are brought to the zone's shield man.
+  affordance_effects:
+    - {affordance_tag: attack, effect: forbid, applies_to: visitors, cost_note: "Striking or drawing on anyone inside the shield brings the Warden's people within minutes."}
+    - {affordance_tag: attack, effect: cost, applies_to: members, cost_note: "A member who draws inside the shield without the Warden's word answers to the Warden, not to the victim."}
+  enforcement: Shield men stand at the market's ends and centre; any shout, shot or scuffle brings them, and the market stops trading until they have a name.
+  punishment: Visitors are beaten and barred from every shielded market in the region. Members lose their standing, and sometimes a hand.
+  belief_text: "The market's the one place you can stand next to a man who robbed you and not worry about it. That's what the tribute buys."
+- schema: as.law.v1
+  id: ledger_debt
+  name: The Ledger
+  kind: trade
+  text: A debt entered in the Remnants' ledger belongs to the Remnants, not to the lender, and it is paid to them or worked off at a rate they set; it does not die with the debtor while the debtor's household lives.
+  affordance_effects: []
+  enforcement: The Audit House keeps the master ledger; collectors carry copies of the pages for their routes and read debts aloud when they call.
+  punishment: An unpaid debt passes to the debtor's household. A household that runs from a debt is posted at every Relay House, and anyone who shelters it inherits the debt.
+  belief_text: "Nobody borrows from the Remnants twice. The first time, they're patient. They're always patient. That's the part that should scare you."

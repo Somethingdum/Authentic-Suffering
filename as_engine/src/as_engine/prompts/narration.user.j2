@@ -1,0 +1,27 @@
+Write in {{ 'third person, limited to ' ~ k.pc_name if k.person == 'third_limited' else 'second person ("you"), limited to ' ~ k.pc_name }}, {{ k.tense }} tense, {{ words[0] }} to {{ words[1] }} words.
+{% if k.comprehension == 'low' %}{{ k.pc_name }} does not read tactics or technical detail well: describe what happens plainly, without explaining why others act as they do.
+{% elif k.comprehension == 'high' %}{{ k.pc_name }} reads situations sharply: when what they perceived shows a tactic or a purpose, name it plainly as their read of it.
+{% endif %}{% if k.intensity == 'softer' %}Keep violence and injury on the edge of the frame; do not dwell on gore.
+{% endif %}Narrator texture: pacing {{ k.style.pacing }}, detail {{ k.style.descriptive_density }}, sentences {{ k.style.sentence_length }}, register {{ k.style.vocabulary_register }}, mood {{ k.style.emotional_register }}.
+{% if k.style.recently_used_images %}Images already used recently (do not reuse): {{ k.style.recently_used_images | join('; ') }}
+{% endif %}{% if k.banned_phrases %}Never use these phrases: {{ k.banned_phrases | join('; ') }}
+{% endif %}{% if k.player_input_echo_block %}Never repeat these word runs from the player: {{ k.player_input_echo_block | join('; ') }}
+{% endif %}
+TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
+{% if k.establish_place %}Establish the place (they have just arrived or it changed):
+{% for d in k.place_details %}- {{ d }}
+{% endfor %}{% endif %}{% if k.people_present %}People they can perceive here:
+{% for p in k.people_present %}- {{ p }}
+{% endfor %}{% endif %}{% if k.pc_state_lines %}{{ k.pc_name }} right now:
+{% for l in k.pc_state_lines %}- {{ l }}
+{% endfor %}{% endif %}
+WHAT {{ k.pc_name | upper }} PERCEIVED, IN ORDER
+{% for l in k.lines %}- at +{{ '%.1f' % l.seconds }}s ({{ l.kind }}): {% if l.kind == 'speech' %}{{ l.speaker or 'Someone' }} said: "{{ l.words }}"{% else %}{{ l.text }}{% endif %}
+
+{% else %}- Nothing changes.
+{% endfor %}
+{% if k.choice_prompt_hint %}End on this: {{ k.choice_prompt_hint }} — without offering options.{% else %}End on what {{ k.pc_name }} now faces, without offering options.{% endif %}
+{% if fix %}
+Your last draft broke these rules. Fix them:
+{% for f in fix %}- {{ f }}
+{% endfor %}{% endif %}

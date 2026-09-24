@@ -1,0 +1,12 @@
+The allowed options were:
+{% for a in ctx.packet.affordances %}- {{ a.handle }}: {{ a.label }}
+{% endfor %}
+The people that could be addressed were:
+{% for e in ctx.packet.entities %}- {{ e.handle }}: {{ e.description }}
+{% else %}- nobody
+{% endfor %}
+The answer that failed:
+{{ ctx.raw_text }}
+
+What was wrong with it:
+{{ ctx.error }}

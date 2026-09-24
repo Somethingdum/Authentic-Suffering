@@ -1,0 +1,62 @@
+{
+ "_why": "kernel/jsoncanon.canonical_json: sorted keys, no whitespace, ensure_ascii=False, floats via repr.",
+ "cases": [
+  {
+   "input": {
+    "b": 1,
+    "a": 2
+   },
+   "canonical": "{\"a\":2,\"b\":1}"
+  },
+  {
+   "input": {
+    "z": [
+     3,
+     2,
+     1
+    ],
+    "a": {
+     "y": null,
+     "x": true
+    }
+   },
+   "canonical": "{\"a\":{\"x\":true,\"y\":null},\"z\":[3,2,1]}"
+  },
+  {
+   "input": {
+    "f": 0.1,
+    "g": 1.0,
+    "h": -0.0
+   },
+   "canonical": "{\"f\":0.1,\"g\":1.0,\"h\":-0.0}"
+  },
+  {
+   "input": {
+    "u": "café ✓"
+   },
+   "canonical": "{\"u\":\"café ✓\"}"
+  },
+  {
+   "input": [
+    1,
+    "2",
+    3.5,
+    false
+   ],
+   "canonical": "[1,\"2\",3.5,false]"
+  },
+  {
+   "input": {
+    "nested": {
+     "b": [
+      {
+       "d": 1,
+       "c": 2
+      }
+     ]
+    }
+   },
+   "canonical": "{\"nested\":{\"b\":[{\"c\":2,\"d\":1}]}}"
+  }
+ ]
+}

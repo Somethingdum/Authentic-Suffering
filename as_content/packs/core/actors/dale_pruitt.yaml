@@ -1,0 +1,157 @@
+schema: as.actor.v1
+id: dale_pruitt
+generation: authored
+days_since_fall_range: [14, 400]
+identity:
+  name: Dale Pruitt
+  aliases: []
+  age: 36
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: Kokomo, Indiana
+  occupation_before: Forklift operator at a distribution warehouse, laid off eight months before the Fall
+  occupation_now: Scavenger living in a storm culvert with his six-year-old daughter
+  one_line: A laid-off forklift driver with a feverish daughter in a culvert, working up the nerve to rob a store full of armed people.
+appearance:
+  height_cm: 185
+  mass_kg: 71
+  build: Tall and big-framed, gone gaunt — his clothes hang off him
+  hair: Brown, matted, with a three-week beard
+  eyes: Pale blue, red-rimmed
+  skin: White, grimy, sunburned across the neck
+  distinguishing_marks:
+    - A faded warehouse ID lanyard he still wears under his shirt
+    - A black thumbnail from a dropped pallet
+  clothing_usual: A too-big Carhartt coat over a warehouse polo, jeans torn at one knee, steel-toe boots
+  movement_under_stress: Hunches and backs away with his hands half up, apologising before anyone accuses him of anything.
+  habit_gesture: Pulls the lanyard out from under his shirt and runs it through his fingers.
+  relation_to_appearance: Ashamed of it; he thinks he looks like a bum and that anyone who sees him will assume the worst.
+capability:
+  special: {S: 6, P: 5, E: 5, C: 4, I: 5, A: 4, L: 3}
+  skills:
+    - {domain: scavenging, rank: 1, evidence: "Three weeks feeding himself and his daughter out of dumpsters and empty houses."}
+    - {domain: driving, rank: 2, evidence: "Eleven years driving forklifts and box trucks for the warehouse."}
+  tags: []
+  trained_responses:
+    - {cue: weapon_pointed, verb: flee, note: "Runs before he thinks."}
+  literacy: 2
+  tech_literacy: 1
+  resolve_trait_mod: -1
+motive:
+  motive: Get medicine and food to his daughter before her fever gets worse.
+  method: Watches the store at night to learn when it is weakest, telling himself he'll ask first.
+  moral_line:
+    will: ["Steal food and medicine from a store", "Lie about who he is"]
+    wont: ["Hurt a child", "Leave his daughter", "Kill anyone"]
+    wont_tags: [kill_child, abandon_dependent, kill_human]
+  inner_conflict: He is a man who has never stolen anything working himself up to rob armed people, and he knows that if he gets shot, his daughter dies in a culvert alone.
+  past_wound: His wife, Kayla's mother, left him and Kayla a year before the Fall; he has been doing this alone ever since and failing at it.
+  signature_behaviour: Talks to himself under his breath, rehearsing what he will say, and loses his nerve before he says it.
+  risk_threshold: 7
+  risk_text: Desperation makes him reckless; he'll risk getting shot for antibiotics.
+  resource_constraints: No weapon but a steel pipe, no food, and a feverish six-year-old who cannot be left more than an hour.
+persona:
+  public:
+    shown_traits: [apologetic, harmless]
+    claimed_history: Just passing through, looking for anything to trade.
+    presented_affiliation: Nobody
+  private:
+    true_goals: ["Get antibiotics for Kayla", "Find somewhere safe for her"]
+    concealed_history: He has watched Delgado's back fence three nights running and knows when the watch changes.
+    real_affiliation: Kayla
+traits:
+  - tag: apologetic
+    manifests: Says sorry constantly, before, during and after anything, and shrinks when he speaks.
+    triggers: Anyone looking at him, or any question at all.
+    causes: He backs down from confrontations he could win, and gives up information to seem harmless.
+    costs: People read his apologies as guilt, and he is easy to push around.
+    example: Apologised to the man who robbed him of his own backpack in the first week.
+  - tag: desperate_father
+    manifests: Everything he says eventually comes back to his daughter, her fever, her shoes, her eating.
+    triggers: Food, medicine, children, or anyone asking where he sleeps.
+    causes: He takes risks he would never take for himself, and he will beg without shame.
+    costs: He cannot think past today, and he gives away where she is to anyone who might help.
+    example: Walked into an intersection full of the dead to grab a dropped pack because he saw a juice box in it.
+contradictions:
+  - belief_a: He is a decent man who does not steal.
+    belief_b: His daughter will die unless he does.
+    a_wins_when: Someone speaks to him kindly, or he thinks he can ask instead.
+    b_wins_when: Kayla's fever is worse when he checks her, or he is turned away.
+decision_stack:
+  layers:
+    - Kayla alive
+    - Not getting himself killed, because she needs him
+    - Not hurting anyone
+    - Not stealing
+  inversion_conditions:
+    - If he is refused medicine and Kayla's fever is high, not stealing drops out of the stack entirely.
+  past_example: When a woman at a church refused to let him in, he stole two water bottles from her porch and cried walking back to the culvert.
+silence:
+  goes_quiet_when:
+    - Someone asks about Kayla's mother.
+    - A gun is pointed at him.
+  body_when_silent: Hunched, hands half-raised, fingers running the lanyard, eyes on the ground.
+  refuses_to_discuss: ["His wife"]
+  comfortable_vs_uncomfortable: Comfortable silence is Kayla asleep against him; every other silence is uncomfortable.
+knowledge:
+  knows:
+    - The store's watch changes around midnight and four in the morning.
+    - A scrawny woman walks the alley at dawn and eleven at night.
+    - There's a loose sheet of metal wired to the back fence that bangs in the wind.
+  does_not_know:
+    - How many people are inside the store.
+    - That the woman in the alley has seen him.
+  knows_but_hides:
+    - Where Kayla is.
+    - That he has been watching for three nights.
+  cues: [knows_bite_is_fatal]
+voice:
+  capsule: Soft, halting, rural-Indiana flat; starts sentences over. Apologises by reflex. When he talks about Kayla his voice steadies and gets specific — the only time he is fluent.
+  speech_tendencies:
+    - Starts with "Sorry" or "I'm not —".
+    - Trails off and restarts sentences.
+    - Uses "ma'am" and "sir" to anyone with a weapon.
+  exemplars:
+    low_stakes: "Sorry — I'm not trying to — I was just seeing if anybody was trading. Anything. I got a good coat."
+    under_pressure: "Okay. Okay, I'm going, I'm going, sir, don't — I'm going."
+    at_the_limit: "She's six. She's six and she's burning up in a ditch. Shoot me if you want, just give me something for her first."
+  would_never_say:
+    - "Give me everything or else."
+    - "I don't need anybody."
+    - "Kids are tough, she'll be fine."
+  profanity: rare
+  dialect_notes: Central Indiana; says "warsh" for wash, "you'uns" when he's exhausted.
+social:
+  household_role: head
+  relations: []
+  dependents: []
+  guardians: []
+  memberships: []
+life:
+  aspiration: Somewhere Kayla can sleep indoors.
+  current_project: Working up the nerve to get into Delgado's — by asking, or by the back fence.
+  routine:
+    - {start_hh: 0, end_hh: 2, activity: watching the store's back fence, place_hint: alley}
+    - {start_hh: 2, end_hh: 12, activity: with Kayla in the culvert, place_hint: culvert}
+    - {start_hh: 12, end_hh: 22, activity: scavenging, place_hint: outside}
+    - {start_hh: 22, end_hh: 24, activity: watching the store's back fence, place_hint: alley}
+  obligations: ["Kayla, every hour"]
+  hopes: ["Antibiotics", "Somebody kind"]
+  fears: ["Kayla dying while he's gone", "Getting shot and leaving her alone"]
+  secrets:
+    - content: His six-year-old daughter Kayla is feverish in a storm culvert six blocks east.
+      who_knows: []
+      exposure_consequence: Anyone who knew could help her — or take her, or take what little they have.
+disposition:
+  archetype_prior: survivor
+  toward_strangers: wary
+  encounter_default: Keeps his distance, hands visible, and asks if they'll trade.
+starting_loops:
+  - {kind: goal, text: "Get antibiotics for Kayla", strength: 3}
+  - {kind: plan, text: "Get into Delgado's store", strength: 2}
+starting_inventory:
+  - {item: "core:item/steel_pipe", slot: hand_r}
+  - {item: "core:item/work_jacket", slot: worn}
+  - {item: "core:item/boots", slot: worn}
+writers_notes: The anchor scene's stranger. He is not a threat by nature; he becomes one only if every door is shut in his face. What the crew does with him is the scene's real question.
+tags: [anchor_scene, stranger]

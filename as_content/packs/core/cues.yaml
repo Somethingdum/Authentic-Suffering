@@ -1,0 +1,61 @@
+schema: as.cues.v1
+cues:
+  # --- sensory / situational cues (trained responses, task interrupts, lesson tags)
+  - {id: loud_noise, description: "A NOISE heard at PARTIAL fidelity or better whose source was 80 dB or louder (a crash, a shot, a scream), or any sound received at 80 dB or more. Same test as REACT-01's noise clause."}
+  - {id: gunshot_close, description: "A gunshot within about 30 metres."}
+  - {id: gunshot_distant, description: "A gunshot heard from farther away or through walls."}
+  - {id: scream, description: "A human or infected scream."}
+  - {id: glass_break, description: "Breaking glass."}
+  - {id: metal_crash, description: "Sheet metal, a fence or a vehicle panel being struck or falling."}
+  - {id: footsteps_close, description: "Footsteps within a few metres that the listener did not expect."}
+  - {id: voice_unknown, description: "A voice the listener does not recognise."}
+  - {id: addressed_by_name, description: "Someone says the listener's name to them."}
+  - {id: grabbed_from_behind, description: "Seized by a body the listener did not see coming."}
+  - {id: threat_seen, description: "A visible armed person, an infected, or an attack in progress."}
+  - {id: weapon_pointed, description: "A weapon pointed at the listener."}
+  - {id: infected_seen, description: "An infected body in view."}
+  - {id: infected_close, description: "An infected body within reach or about to be."}
+  - {id: blood_seen, description: "Fresh blood in view."}
+  - {id: corpse_seen, description: "A dead body in view."}
+  - {id: fire_seen, description: "Open fire in view."}
+  - {id: smoke_smell, description: "The smell of smoke."}
+  - {id: dark_room, description: "Entering or being in a place with light level 0 or 1."}
+  - {id: door_forced, description: "The sound or sight of a door or lock being forced."}
+  - {id: dependent_in_danger, description: "A person the holder protects is in immediate danger."}
+  - {id: bonded_hurt, description: "A person the holder is bonded to is hurt."}
+  - {id: stranger_approaching, description: "An unknown person moving toward the holder."}
+  - {id: whisper_seen, description: "People leaning close and whispering."}
+  - {id: sudden_silence, description: "A busy place going quiet all at once."}
+  - {id: bite_wound_seen, description: "A bite wound on a living person."}
+  - {id: fever_seen, description: "Someone sweating and shaking with fever."}
+  - {id: shift_change, description: "A work shift starting or ending."}
+  - {id: ration_cut, description: "Rations reduced."}
+  - {id: promise_broken, description: "A promise made to the holder was broken."}
+  # --- belief cues (things a person believes that open options)
+  - {id: knows_headshot_rule, description: "Believes the dead only stay down when the brainstem or upper spine is destroyed."}
+  - {id: knows_false_death, description: "Believes a downed infected can get back up hours later."}
+  - {id: knows_noise_draws_dead, description: "Believes loud noise pulls the dead toward it."}
+  - {id: knows_bite_is_fatal, description: "Believes a bite through the skin always ends in turning."}
+  - {id: knows_tourniquet, description: "Knows how and when to apply a tourniquet."}
+  - {id: knows_lock_picking, description: "Knows how to pick a simple pin lock."}
+  - {id: knows_crawler_ambush, description: "Believes crawlers hide under cars, steps and rubble."}
+  - {id: knows_lurker_signs, description: "Believes scratches, arranged bones and crude marks mean a lurker's territory."}
+  - {id: knows_runner_stamina, description: "Believes runners burn out if you keep them chasing."}
+  - {id: knows_cold_start, description: "Believes the unbitten dead can rise after about three days."}
+  - {id: knows_no_sharing, description: "Holds to the rule of never sharing bottles, utensils or cigarettes."}
+  # Infected policy cues (quirk trigger_cue values, infected/quirks.yaml). Evaluated by the
+  # infected policy, never by a human mind.
+  - {id: infected_idle, description: "An infected with no stimulus above its hearing threshold for at least a minute."}
+  - {id: infected_unengaged, description: "An infected that is not currently pursuing or holding a target."}
+  - {id: infected_overfed_or_unengaged, description: "An infected in the overfed state, or with no target."}
+  - {id: infected_state_overfed, description: "An infected currently in the overfed state."}
+  - {id: infected_near_infected, description: "Another infected body within reach of this one."}
+  - {id: infected_dormant_indoor_or_debris, description: "An infected settling into dormancy under cover, indoors or in rubble."}
+  - {id: infected_hunting, description: "An infected actively searching for a living target."}
+  - {id: grapple_landed, description: "This body has just established a two-handed hold on another."}
+  - {id: sound_close_range, description: "A sound received within about three metres."}
+  - {id: sprint_maneuver, description: "A sprint that includes a climb, jump, sharp turn or sudden stop."}
+  - {id: name_spoken_nearby, description: "A personal name spoken aloud within hearing."}
+  - {id: territory_marking, description: "A lurker leaving its hunting ground with no prey taken."}
+  - {id: incapacitation_confirmed, description: "The target is pinned or cannot move and fight back."}
+  - {id: prey_out_of_reach, description: "A living target is perceived but beyond reach or behind a barrier."}

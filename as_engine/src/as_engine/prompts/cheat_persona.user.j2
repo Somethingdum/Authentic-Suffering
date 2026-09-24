@@ -1,0 +1,5 @@
+Command: {{ ctx.command }}
+Outcome: {{ ctx.outcome }}
+{% if ctx.recent_lines %}Lines you already used (do not repeat them or their jokes):
+{% for l in ctx.recent_lines %}- {{ l }}
+{% endfor %}{% endif %}

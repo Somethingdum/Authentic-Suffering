@@ -1,0 +1,41 @@
+# Crawler — a Shambler subtype/outcome state from lower-limb loss, not a separate lineage.
+# Lore_and_World_Building.pdf §3-4 (page 5-6). Same sensory/cognition floor as Shambler (CMG §42.17:
+# Crawler never upgrades to a higher form).
+- schema: as.infected.v1
+  id: ZOMBIE_ARCHETYPE_CRAWLER01
+  name: Crawler
+  rarity: uncommon
+  inherits: ZOMBIE_ARCHETYPE_SHAMBLER01
+  special:
+    S: {lo: 6, hi: 6}
+    P: {lo: 1, hi: 1}
+    E: {lo: 4, hi: 4}
+    C: {lo: 1, hi: 1}
+    I: {lo: 1, hi: 1}
+    A: {lo: 1, hi: 1}
+    L: {lo: 1, hi: 1}
+  senses:
+    hearing_threshold_db: 35.0
+    vision_range_m: 4.0
+    vision_mode: motion_contrast
+    thermal: false
+  speed_m_s: 0.4
+  sprint_m_s: 1.8
+  grip_strength: 9
+  alive: false
+  false_death: true
+  reanimation_window_h: [6.0, 14.0]
+  true_kill: [destroy_brainstem_spinal_junction, denature_or_pulp_core_tissue]
+  quirks: [CRAWL_UNDERCAR, CRAWL_RUBBLE_WORM]
+  player_facing:
+    - Hides under cars, rubble and furniture, then grabs an ankle and drags.
+    - Alarmingly fast over a short distance when it thrashes forward off its arms.
+  codex_truth:
+    - Same sensory and cognition floor as a Shambler — the hazard is the angle, not the mind.
+    - Lower movement cost lets it persist longer on the same starved energy budget.
+  tactics:
+    - Ambush geometry — it lives in blind spots beneath desks, behind steps, inside collapsed doorframes.
+    - Drag-and-chew — it pulls a target down instead of chasing them.
+    - Sound magnet — it pivots toward any floor vibration it can feel through the ground.
+  weaknesses:
+    - Open ground defeats it outright — keep distance and don't trip, and it cannot close.

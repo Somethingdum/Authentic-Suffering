@@ -1,0 +1,12 @@
+{
+  "type": "as_game",
+  "action": "model_test_result",
+  "data": {
+    "lane": "B",
+    "ok": false,
+    "detail": "Not answering at http://localhost:1234/v1. Is LM Studio running there with its server on?",
+    "latency_ms": null,
+    "structured_ok": null,
+    "thinking_ok": null
+  }
+}

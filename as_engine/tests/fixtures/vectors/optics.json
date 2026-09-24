@@ -1,0 +1,93 @@
+{
+ "_why": "sense/optics.py visibility_score + band (clear >= 3, partial >= 1, silhouette >= -1, else none). Case 2 is Nita seeing the stranger through the chain-link fence in metal_fence (moonlight 1, P 8, 4.883 m).",
+ "cases": [
+  {
+   "light": 4,
+   "observer_p": 5,
+   "distance_m": 2,
+   "concealment": 0,
+   "hidden": false,
+   "moved": false,
+   "score": 4,
+   "band": "clear",
+   "why": "4 + (attr_mod(5)=3 - 3) - floor(2/10)=0 - 0 - 0 + 0 = 4"
+  },
+  {
+   "light": 1,
+   "observer_p": 8,
+   "distance_m": 4.883,
+   "concealment": 0,
+   "hidden": false,
+   "moved": false,
+   "score": 2,
+   "band": "partial",
+   "why": "1 + (attr_mod(8)=4 - 3) - floor(4.883/10)=0 - 0 - 0 + 0 = 2"
+  },
+  {
+   "light": 0,
+   "observer_p": 5,
+   "distance_m": 3,
+   "concealment": 0,
+   "hidden": false,
+   "moved": false,
+   "score": 0,
+   "band": "silhouette",
+   "why": "0 + (attr_mod(5)=3 - 3) - floor(3/10)=0 - 0 - 0 + 0 = 0"
+  },
+  {
+   "light": 0,
+   "observer_p": 5,
+   "distance_m": 3,
+   "concealment": 0,
+   "hidden": false,
+   "moved": true,
+   "score": 1,
+   "band": "partial",
+   "why": "0 + (attr_mod(5)=3 - 3) - floor(3/10)=0 - 0 - 0 + 1 = 1"
+  },
+  {
+   "light": 2,
+   "observer_p": 5,
+   "distance_m": 25,
+   "concealment": 2,
+   "hidden": true,
+   "moved": false,
+   "score": -4,
+   "band": "none",
+   "why": "2 + (attr_mod(5)=3 - 3) - floor(25/10)=2 - 2 - 2 + 0 = -4"
+  },
+  {
+   "light": 3,
+   "observer_p": 9,
+   "distance_m": 12,
+   "concealment": 1,
+   "hidden": false,
+   "moved": true,
+   "score": 4,
+   "band": "clear",
+   "why": "3 + (attr_mod(9)=5 - 3) - floor(12/10)=1 - 1 - 0 + 1 = 4"
+  },
+  {
+   "light": 1,
+   "observer_p": 3,
+   "distance_m": 0.5,
+   "concealment": 3,
+   "hidden": true,
+   "moved": false,
+   "score": -5,
+   "band": "none",
+   "why": "1 + (attr_mod(3)=2 - 3) - floor(0.5/10)=0 - 3 - 2 + 0 = -5"
+  },
+  {
+   "light": 4,
+   "observer_p": 10,
+   "distance_m": 55,
+   "concealment": 0,
+   "hidden": false,
+   "moved": false,
+   "score": 1,
+   "band": "partial",
+   "why": "4 + (attr_mod(10)=5 - 3) - floor(55/10)=5 - 0 - 0 + 0 = 1"
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+Person: {{ ctx.holder_name }}
+What they perceived:
+{% for l in ctx.lines %}- {{ l }}
+{% endfor %}

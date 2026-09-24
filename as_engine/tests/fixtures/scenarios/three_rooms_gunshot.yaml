@@ -1,0 +1,59 @@
+# SKULL-01/SKULL-04 fixture (PROTECTED). A (the PC) fires a pistol in Room 1. B is in Room 2 behind
+# a brick wall; C sleeps in Room 3, a further drywall wall away. Nobody can see anybody.
+# Expected with RulesConfig defaults (vectors/acoustics.json 'three_rooms_*'): B EXACT (~104.6 dB
+# received), C asleep ~70 dB >= 55 -> TONE_ONLY and wakes. Neither B nor C may learn WHO fired.
+schema: as.scenario.v1
+name: three_rooms_gunshot
+description: One shot, three rooms, three different truths.
+seed: 7
+start: {day: 40, time: "14:00:00"}
+places:
+  - id: room1
+    name: Room 1
+    width_m: 5
+    depth_m: 5
+    material: brick
+    anchors:
+      - {id: r1_centre, name: middle of the room, x: 2.5, y: 2.5}
+      - {id: r1_wall2, name: wall to room 2, x: 5, y: 2.5}
+  - id: room2
+    name: Room 2
+    width_m: 5
+    depth_m: 5
+    material: brick
+    anchors:
+      - {id: r2_centre, name: middle of the room, x: 2.5, y: 2.5}
+      - {id: r2_wall1, name: wall to room 1, x: 0, y: 2.5}
+      - {id: r2_wall3, name: wall to room 3, x: 5, y: 2.5}
+  - id: room3
+    name: Room 3
+    width_m: 5
+    depth_m: 5
+    material: drywall
+    anchors:
+      - {id: r3_centre, name: middle of the room, x: 2.5, y: 2.5}
+      - {id: r3_wall2, name: wall to room 2, x: 0, y: 2.5}
+portals:
+  - {id: wall_1_2, a: room1, b: room2, anchor_a: r1_wall2, anchor_b: r2_wall1, kind: wall, name: brick wall, w: 0, h: 0, seal_db: 45}
+  - {id: wall_2_3, a: room2, b: room3, anchor_a: r2_wall3, anchor_b: r3_wall2, kind: wall, name: drywall wall, w: 0, h: 0, seal_db: 30}
+bodies:
+  - id: a
+    dossier: core:pc/owen_marsh
+    controller: human
+    place: room1
+    anchor: r1_centre
+    inventory:
+      - {item: core:item/glock_19, slot: hand_r, label: glock, props: {chambered: true}}
+      - {item: core:item/magazine_9mm_15, container: glock, props: {rounds: 10}}
+  - id: b
+    dossier: core:actor/june_okafor
+    place: room2
+    anchor: r2_centre
+  - id: c
+    dossier: core:actor/alice_tran
+    place: room3
+    anchor: r3_centre
+    awareness: asleep
+    posture: lying
+events_due:
+  - {at: "14:00:00", type: NOISE, subject: a, place: room1, anchor: r1_centre, payload: {source_db: 160, kind: gunshot, text: "a gunshot"}}

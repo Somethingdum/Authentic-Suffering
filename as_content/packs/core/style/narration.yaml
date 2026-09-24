@@ -1,0 +1,63 @@
+# Narration style lists (narration/lint.py STYLE-01..06; docs/as/07_RULES.md §10).
+# Quoted speech is excluded from every metric — actors' words are theirs. The lists target the
+# stock phrasing that makes AI narration read as AI narration, and the phrases that leak knowledge
+# the viewpoint cannot have (DISC-01).
+schema: as.style.v1
+id: narration
+banned_phrases:
+  - a testament to
+  - sends shivers down
+  - shiver down your spine
+  - chill runs down
+  - the air is thick with
+  - the air grows thick
+  - hangs heavy in the air
+  - palpable tension
+  - you can't help but
+  - little did
+  - in the blink of an eye
+  - time seems to slow
+  - time stands still
+  - every fiber of your being
+  - a wave of relief
+  - washes over you
+  - heart pounds in your chest
+  - breath you didn't know you were holding
+  - eerily quiet
+  - deafening silence
+  - an eerie silence
+  - the silence is broken
+  - somewhere in the distance
+  - the world holds its breath
+  - it's as if the
+  - a sense of dread
+  - dread pools
+  - steels yourself
+  - steel yourself
+  - with bated breath
+  - the weight of the world
+  - a flicker of
+  - the ghost of a smile
+  - eyes that have seen too much
+  - you know one thing for certain
+  - nothing will ever be the same
+  - for now, at least
+  - only time will tell
+  - the calm before the storm
+  - what have you done
+vague_timers: [soon, later, eventually, before long, in time, after a while, sooner or later, at some point, in a moment, momentarily, shortly, any moment now]
+leak_phrases:
+  - unknown to you
+  - unbeknownst
+  - meanwhile
+  - while you were gone
+  - little do you know
+  - elsewhere
+  - at the same time, across
+  - behind your back
+  - without your knowledge
+  - out of your sight
+  - you have no way of knowing
+  - what you don't see
+abstract_words: [atmosphere, ambience, essence, aura, dread, despair, hope, destiny, fate, doom, tension, chaos, darkness, oblivion, eternity, inevitability, uncertainty, desolation, emptiness, foreboding, menace, malice, anguish, sorrow, serenity, tranquility, profound, palpable, visceral, ethereal, ominous, unspeakable, indescribable, otherworldly]
+adverb_exceptions: [only, early, likely, daily, nightly, weekly, family, belly, jelly, rally, ugly, holy, lonely, friendly, elderly, reply, supply, apply, fly, rely, ally, bully, italy, emily, lily, molly, sally, holly, kelly, billy, willy, jolly, curly, burly, oily, hilly, woolly, chilly, assembly, anomaly, homily, monopoly]

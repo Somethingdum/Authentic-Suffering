@@ -1,0 +1,34 @@
+{
+  "type": "as_game",
+  "action": "run_loaded",
+  "data": {
+    "run_id": "addison_flores_5c2",
+    "pc_name": "Addison Flores",
+    "notices": [
+      "Your content changed since this run started. People already in the world keep who they were."
+    ],
+    "settings": {
+      "difficulty": "normal",
+      "era": "mature",
+      "days_since_fall": null,
+      "world_detail": "standard",
+      "seed": null,
+      "save_mode": "ironman",
+      "narration_length": "medium",
+      "narration_person": "third_limited",
+      "narration_tense": "past",
+      "turn_depth": "balanced",
+      "pc_voice": "exact",
+      "intensity": "full",
+      "show_mechanics": "summary",
+      "read_aloud": false,
+      "dev_mode": false,
+      "autosave_ring": 5,
+      "pack_ids": [
+        "core"
+      ]
+    },
+    "ironman": true,
+    "sandbox": false
+  }
+}

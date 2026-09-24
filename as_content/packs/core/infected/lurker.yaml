@@ -1,0 +1,50 @@
+# Lurker — living, post-human predator (infection-symbiote), not undead: alive=true, false_death=false,
+# reanimation_window_h=null. Lore_and_World_Building.pdf §4 (page 8-9); CMG §42.19-26 behavior expansion.
+# Hard rule (CMG §42.19): once a victim has crossed into true Lurker Infected state, baseline infected
+# will not bite or kill that victim.
+- schema: as.infected.v1
+  id: ZOMBIE_VARIANT_ID_LURKER01
+  name: Lurker
+  rarity: rare
+  special:
+    S: {lo: 7, hi: 10}
+    P: {lo: 7, hi: 9}
+    E: {lo: 7, hi: 9}
+    C: {lo: 2, hi: 5}
+    I: {lo: 7, hi: 9}
+    A: {lo: 8, hi: 10}
+    L: {lo: 3, hi: 6}
+  senses:
+    hearing_threshold_db: 45.0
+    vision_range_m: 20.0
+    vision_mode: thermal
+    thermal: true
+  speed_m_s: 2.0
+  sprint_m_s: 7.0
+  grip_strength: 8
+  alive: true
+  false_death: false
+  reanimation_window_h: null
+  true_kill: [severe_blood_loss, organ_destruction, hard_blunt_or_penetrating_trauma]
+  quirks: [LUR_THERMAL_PRIMARY, LUR_STUNT_TAUNT, LUR_MOCKING_CRUELTY, LUR_MIMICRY_LURE]
+  player_facing:
+    - Seen rarely; almost never tracked back to a nest.
+    - Prefers darkness, moisture and tight access routes; turns up where it shouldn't fit.
+    - Kills quietly — if it wants to be seen, it has already won.
+    - Occasionally leaves signs — scratches, arranged bones, crude symbols — that may be deliberate.
+  codex_truth:
+    - Thermal vision is primary at night and indoors; it reads heat contrast straight through gore camouflage.
+    - Hands are hybrid — dexterous enough for tools and writing, with blade-like edges for tearing and climbing.
+    - It retains distinct human memories (language, hobbies, familiar faces) but no human self-identity or morality.
+    - It forms clans with ranks, elders and politics; attachments — friends, family units, mentorship — genuinely exist.
+    - It possesses limited human-sounding vocal mimicry as a predatory lure, strongest at distance and from concealment, and it degrades fast under direct conversational pressure.
+    - No one in-world truly knows how a person becomes a Lurker; the transformation is unwitnessed, so nobody tracks a candidate before it happens.
+  tactics:
+    - Ambush intelligence — learns patrol patterns, bait routes and safe human habits, and attacks where routines meet.
+    - Infective slash-and-leave — a fast disabling cut meant to infect, not to kill or feed, followed by an immediate disengage.
+    - Paralytic capture — only once it has already won the physical struggle and pinned the victim; it pins a still-living, conscious target and feeds slowly on non-vital tissue over hours or days.
+    - Territory enforcement — targeted terror against leaders and selective killings shape where humans dare move.
+  weaknesses:
+    - It is not magical — severe blood loss, organ destruction and hard trauma kill it like any predator.
+    - Less physically resilient than a Shambler in a stand-up fight; it relies on surprise, and a failed ambush often means it disengages to stalk again later.
+    - Thermal vision can be confused by strong heat sources and rapid temperature equalization, though nothing should be staked on that alone.

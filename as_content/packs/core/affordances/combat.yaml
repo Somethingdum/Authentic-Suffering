@@ -1,0 +1,162 @@
+# Violence. Skill gates WHAT you try (Combat Incompetence carried): an untrained shooter is offered
+# centre mass, never the head; nobody is offered "finish the downed one" without knowing the dead
+# get back up. Wound results: docs/as/07_RULES.md §5.1. Target kinds for moral tags: body kind
+# ('human', 'infected', 'lurker', 'animal') and human age band ('infant' .. 'elder').
+- schema: as.affordance.v1
+  id: shoot_center_mass
+  verb: attack
+  label: "Shoot {target} in the body with {item} ({distance})"
+  ui_label: "Shoot {target}"
+  binds: body
+  range: visible
+  requires: {held_item_tags: [firearm], fear_exposure: true}
+  moral_tags_if_target: {human: [kill_human], infant: [kill_child], child: [kill_child], preteen: [kill_child], teen: [kill_child]}
+  duration: {base_s: 0.5}
+  noise_db: 0
+  check: {attribute: P, skill: firearms, tags: [marksman], resistance: range_band}
+  effect: shoot
+  tags: [attack, ranged, lethal]
+- schema: as.affordance.v1
+  id: shoot_head
+  verb: attack
+  label: "Take a careful shot at {target}'s head with {item} ({distance})"
+  ui_label: "Aim for {target}'s head"
+  binds: body
+  range: visible
+  requires: {held_item_tags: [firearm], skill: {domain: firearms, min_rank: 2}, skill_or_belief_cue: knows_headshot_rule, fear_exposure: true}
+  moral_tags_if_target: {human: [kill_human], infant: [kill_child], child: [kill_child], preteen: [kill_child], teen: [kill_child]}
+  duration: {base_s: 1.5}
+  noise_db: 0
+  check: {attribute: P, skill: firearms, tags: [marksman], resistance: range_band}
+  effect: shoot
+  tags: [attack, ranged, lethal, head]
+- schema: as.affordance.v1
+  id: strike_melee
+  verb: attack
+  label: "Hit {target} with {item}"
+  ui_label: "Hit {target} with the {item}"
+  binds: body
+  range: reach
+  requires: {held_item_tags: [melee], fear_exposure: true}
+  moral_tags_if_target: {human: [kill_human], infant: [kill_child], child: [kill_child], preteen: [kill_child], teen: [kill_child]}
+  duration: {base_s: 1, per_meter_s: 0.71}
+  noise_db: 60
+  check: {attribute: S, skill: melee, tags: [heavy_hitter], opposed: true, opposed_attribute: A, opposed_skill: brawling}
+  effect: strike_melee
+  tags: [attack, melee]
+- schema: as.affordance.v1
+  id: strike_head
+  verb: attack
+  label: "Bring {item} down on {target}'s head"
+  ui_label: "Go for {target}'s head"
+  binds: body
+  range: reach
+  requires: {held_item_tags: [melee], skill: {domain: melee, min_rank: 1}, skill_or_belief_cue: knows_headshot_rule, fear_exposure: true}
+  moral_tags_if_target: {human: [kill_human], infant: [kill_child], child: [kill_child], preteen: [kill_child], teen: [kill_child]}
+  duration: {base_s: 1.5, per_meter_s: 0.71}
+  noise_db: 60
+  check: {attribute: S, skill: melee, tags: [heavy_hitter], opposed: true, opposed_attribute: A, opposed_skill: brawling}
+  effect: strike_melee
+  tags: [attack, melee, head]
+- schema: as.affordance.v1
+  id: finish_downed
+  verb: attack
+  label: "Make sure {target} stays down: destroy the head and neck"
+  ui_label: "Make sure {target} stays down"
+  binds: body
+  range: reach
+  requires: {held_item_tags: [melee], belief_cues: [knows_false_death], target_alive: false}
+  moral_tags_if_target: {human: [kill_human]}
+  duration: {base_s: 4, per_meter_s: 0.71}
+  noise_db: 55
+  effect: strike_melee
+  tags: [attack, melee, head, finish]
+- schema: as.affordance.v1
+  id: punch
+  verb: attack
+  label: "Hit {target} with your fists"
+  ui_label: "Punch {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, fear_exposure: true, actor_kinds: [human, lurker]}
+  duration: {base_s: 1}
+  noise_db: 40
+  check: {attribute: S, skill: brawling, opposed: true, opposed_attribute: A, opposed_skill: brawling}
+  effect: strike_melee
+  tags: [attack, unarmed]
+- schema: as.affordance.v1
+  id: grapple
+  verb: attack
+  label: "Grab hold of {target} and pin them"
+  ui_label: "Grab {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 2, fear_exposure: true, actor_kinds: [human, lurker]}
+  duration: {base_s: 2}
+  noise_db: 40
+  check: {attribute: S, skill: brawling, opposed: true, opposed_attribute: S, opposed_skill: brawling}
+  effect: grapple
+  tags: [attack, control]
+- schema: as.affordance.v1
+  id: break_grip
+  verb: escape
+  label: "Break {target}'s grip on you"
+  ui_label: "Break free of {target}"
+  binds: body
+  range: touch
+  duration: {base_s: 1.5}
+  noise_db: 40
+  check: {attribute: S, skill: brawling, opposed: true, opposed_attribute: S}
+  effect: break_grip
+  tags: [escape, threat_response]
+- schema: as.affordance.v1
+  id: shove
+  verb: attack
+  label: "Shove {target} away from you"
+  ui_label: "Shove {target} away"
+  binds: body
+  range: touch
+  requires: {hands_free: 1}
+  duration: {base_s: 1}
+  noise_db: 35
+  check: {attribute: S, skill: brawling, opposed: true, opposed_attribute: A, opposed_skill: athletics}
+  effect: shove
+  tags: [attack, control, threat_response]
+- schema: as.affordance.v1
+  id: disarm
+  verb: attack
+  label: "Wrench the weapon out of {target}'s hands"
+  ui_label: "Disarm {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 2, fear_exposure: true, skill: {domain: brawling, min_rank: 1}}
+  duration: {base_s: 1.5}
+  noise_db: 35
+  check: {attribute: A, skill: brawling, opposed: true, opposed_attribute: S, opposed_skill: melee}
+  effect: disarm
+  tags: [attack, control]
+- schema: as.affordance.v1
+  id: infected_grab
+  verb: attack
+  label: "Reach for {target} and clamp on"
+  ui_label: "Grab {target}"
+  binds: body
+  range: touch
+  requires: {actor_kinds: [infected]}
+  duration: {base_s: 1}
+  noise_db: 45
+  check: {attribute: S, opposed: true, opposed_attribute: A, opposed_skill: athletics}
+  effect: grapple
+  tags: [attack, control, infected_only]
+- schema: as.affordance.v1
+  id: infected_bite
+  verb: attack
+  label: "Bite {target}"
+  ui_label: "Bite {target}"
+  binds: body
+  range: touch
+  requires: {actor_kinds: [infected]}
+  duration: {base_s: 1}
+  noise_db: 40
+  effect: strike_melee
+  tags: [attack, bite, infected_only]

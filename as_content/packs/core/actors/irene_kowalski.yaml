@@ -1,0 +1,171 @@
+schema: as.actor.v1
+id: irene_kowalski
+generation: authored
+days_since_fall_range: [1830, 3650]
+identity:
+  name: Irene Kowalski
+  aliases: [The Auditor, Mrs. K]
+  age: 49
+  sex: female
+  cohort: pre_fall_adult
+  birthplace: Hamtramck, Michigan
+  occupation_before: Forensic accountant who kept a Detroit crime family's money looking clean for twelve years
+  occupation_now: The Auditor of the Mafia Remnants — keeper of the master ledger at the Audit House
+  one_line: The woman who knows what everyone in the region owes, and who has never once raised her voice about it.
+appearance:
+  height_cm: 160
+  mass_kg: 64
+  build: Compact and soft-looking, which people mistake for harmless
+  hair: Silver, cut in a neat bob she trims herself with a mirror
+  eyes: Pale blue behind half-moon reading glasses
+  skin: Fair, lined, powdered every morning from a compact she refills with cornstarch
+  distinguishing_marks:
+    - A steel fountain pen on a chain around her neck, always capped
+    - Ink stains on the second finger of her right hand that never quite wash out
+  clothing_usual: A gray wool skirt suit, mended at the elbows, a cardigan over it in winter, low-heeled pumps she resoles with tire rubber
+  movement_under_stress: Becomes more still and more polite; she sits down when others stand, and folds her hands on the table.
+  habit_gesture: Uncaps and recaps the fountain pen, slowly, while she listens.
+  relation_to_appearance: Dresses exactly as she did at the firm because the suit tells every collector that the old world's rules still apply to them.
+capability:
+  special: {S: 3, P: 7, E: 5, C: 6, I: 9, A: 3, L: 6}
+  skills:
+    - {domain: trade, rank: 3, evidence: "Twelve years laundering and auditing for a crime family, and nine years running the Remnants' master ledger."}
+    - {domain: deception, rank: 2, evidence: "Kept two sets of books past federal auditors for over a decade."}
+    - {domain: leadership, rank: 2, evidence: "Runs the Audit House's clerks and every collector's page in the region."}
+    - {domain: intimidation, rank: 2, evidence: "Collectors who have sat across from her while she reads their page aloud."}
+  tags: []
+  trained_responses:
+    - {cue: weapon_pointed, verb: wait, note: "Folds her hands and waits; she has been threatened by better-armed men."}
+  literacy: 3
+  tech_literacy: 2
+  resolve_trait_mod: 2
+motive:
+  motive: Keep the ledger true, because a true ledger is the only law left that everyone obeys.
+  method: Audits every collector, every yard and every convoy against every other, and lets the Warden's people act on what she finds.
+  moral_line:
+    will: ["Destroy a collector's life with a page of numbers", "Keep a truth from the Steward until she can prove it"]
+    wont: ["Kill anyone with her own hands", "Falsify an entry in the master ledger", "Forgive a debt"]
+    wont_tags: [kill_human, torture]
+  inner_conflict: She believes the ledger is justice, and she has worked out from its fuel entries that the convoys will stop within three years, which means the ledger is keeping accounts for a system that is already dying.
+  past_wound: Her younger brother died in prison on a charge her own bookkeeping had helped build against someone else; she has never told anyone what she did.
+  signature_behaviour: Reads a person's ledger page aloud to them, line by line, before she says anything else.
+  risk_threshold: 2
+  risk_text: Never takes a physical risk; takes enormous political ones, always on paper first.
+  resource_constraints: No personal guard of her own — she borrows the Warden's — and the Audit House has one working lamp at night.
+persona:
+  public:
+    shown_traits: [courteous, exact, patient]
+    claimed_history: Kept books for businesses in Detroit and came south with the family.
+    presented_affiliation: The Remnants' Audit House
+  private:
+    true_goals: ["Prove Reggie Tate's skimming", "Decide what to do with the fuel numbers before the Provisioner does"]
+    concealed_history: Her brother died in prison for a crime her books helped pin on the wrong man.
+    real_affiliation: The ledger itself, above the Steward
+traits:
+  - tag: exacting
+    manifests: Corrects every figure to the unit and asks for the date of every claim.
+    triggers: A rounded number, a vague answer, or a page that doesn't reconcile.
+    causes: She catches what others miss and forces confrontations with numbers instead of fists.
+    costs: She is feared and disliked at every level of the Remnants, and nobody brings her anything informally.
+    example: Sent a collector back out in a storm to recount a stall's tribute because his page said "about forty".
+  - tag: patient_hunter
+    manifests: Lets a suspected thief keep stealing while she builds the proof, sometimes for months.
+    triggers: A discrepancy she cannot yet prove.
+    causes: Small losses become large ones before she acts, and when she acts it is complete.
+    costs: Victims of the theft suffer in the meantime, and she accepts that as the price of proof.
+    example: Watched a Motor Yard foreman sell fuel for eleven weeks until the last delivery tied every missing gallon to his name.
+contradictions:
+  - belief_a: The ledger is justice; every debt must be paid.
+    belief_b: The system the ledger serves will fail within three years, and she knows it.
+    a_wins_when: She is at her desk with a page in front of her.
+    b_wins_when: She is alone at night with the Motor Yard entries.
+decision_stack:
+  layers:
+    - The ledger's integrity
+    - Her own position as Auditor
+    - The Remnants' survival as an order
+    - The Steward's orders
+    - The lives of individual debtors
+  inversion_conditions:
+    - If the Steward orders an entry falsified, the ledger outranks the Steward and she refuses, whatever it costs her.
+  past_example: When the Warden asked her to erase a debt owed by one of his men, she refused and read the entry aloud at the next Seat House meeting.
+silence:
+  goes_quiet_when:
+    - Anyone mentions prisons or brothers.
+    - Someone lies to her and she is deciding whether to let them know she knows.
+  body_when_silent: Hands folded on the table, the pen capped, eyes steady on the speaker over the reading glasses.
+  refuses_to_discuss: ["Her brother", "The fuel projections"]
+  comfortable_vs_uncomfortable: Comfortable silence is the Audit House at night with the ledgers open; uncomfortable silence is the Steward waiting for her answer.
+knowledge:
+  knows:
+    - Every tribute page in the region and who is behind on theirs.
+    - Reggie Tate's pages come in short by about a tenth every month.
+    - The fuel purchases in the Motor Yard entries give the convoys about three more years.
+  does_not_know:
+    - Where Reggie is putting what he skims.
+  knows_but_hides:
+    - The fuel projection.
+    - That she is letting Reggie's skimming run until she can prove it.
+  cues: [knows_headshot_rule, knows_bite_is_fatal, knows_no_sharing, knows_false_death]
+voice:
+  capsule: Soft, level, courteous, Great Lakes vowels. Full sentences, full names, never a raised voice. Asks questions she already knows the answers to. Her kindness and her threats sound identical.
+  speech_tendencies:
+    - Uses full names ("Reginald Tate").
+    - States figures to the unit.
+    - Asks "Is that your final number?" before she acts.
+  exemplars:
+    low_stakes: "Thank you. Forty-one jars of honey, entered, the twelfth of the month. You may go."
+    under_pressure: "Sit down, please. Nobody in this room is going to be shot before I have finished reading the page."
+    at_the_limit: "Reginald. I have eleven months of your pages here. I am going to read every line aloud, and then the Warden is going to decide what you are worth."
+  would_never_say:
+    - "Let's just round it off."
+    - "Forget about it, it's only a few cans."
+    - "Kill him."
+  profanity: none
+  dialect_notes: Hamtramck Polish-American — 'pop' for soda, her grandmother's 'Boże' under her breath.
+social:
+  household_role: ""
+  relations:
+    - target: "core:actor/reggie_tate"
+      kind: enemy
+      axes: {trust: -3, respect: -1}
+      history: She has watched his pages come in short for eleven months and is building the case against him.
+    - target: "core:actor/tess_nakamura"
+      kind: acquaintance
+      axes: {trust: 1, respect: 1}
+      history: Tess's stall is one of the few whose pages always reconcile; Irene does not know about the antibiotics.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/mafia_remnants", role: The Auditor, standing: 3, since: "before the Fall"}
+life:
+  aspiration: A ledger that balances when the trucks stop.
+  current_project: Closing the case on Reggie Tate's skimming.
+  routine:
+    - {start_hh: 6, end_hh: 12, activity: reconciling collectors' pages, place_hint: Audit House}
+    - {start_hh: 12, end_hh: 18, activity: hearing debtors and collectors, place_hint: Audit House}
+    - {start_hh: 18, end_hh: 23, activity: "the master ledger, alone", place_hint: Audit House}
+    - {start_hh: 23, end_hh: 24, activity: sleep, place_hint: Audit House}
+    - {start_hh: 0, end_hh: 6, activity: sleep, place_hint: Audit House}
+  obligations: ["The master ledger", "Monthly report to the Steward"]
+  hopes: ["Enough warning to plan for the end of the convoys"]
+  fears: ["The ledger being wrong", "Being the one who tells the Steward the truth"]
+  secrets:
+    - content: The Motor Yard's fuel entries show the convoys can run for about three more years.
+      who_knows: []
+      exposure_consequence: Panic in the Remnants, a scramble for fuel, and probably the Provisioner's fall — or hers.
+    - content: Her books helped convict the wrong man twenty years ago, and her brother died in prison for it.
+      who_knows: []
+      exposure_consequence: Her authority rests on the ledger being true; this would make her a liar in her own eyes.
+disposition:
+  archetype_prior: civilized
+  toward_strangers: neutral
+  encounter_default: Asks the stranger their name, who they pay, and what they owe, and writes the answers down.
+starting_loops:
+  - {kind: goal, text: "Prove Reggie Tate's skimming", subject: "core:actor/reggie_tate", strength: 3}
+  - {kind: secret_kept, text: "The fuel projection", strength: 3}
+starting_inventory:
+  - {item: "core:item/ledger_book", slot: hand_l, props: {note: "This month's collectors' pages."}}
+  - {item: "core:item/work_jacket", slot: worn, props: {note: "A mended gray wool suit jacket."}}
+writers_notes: Irene is frightening because she is fair, and because she is right about almost everything. Never make her cackle or threaten; her power is that she only ever reads the numbers aloud.
+tags: [mafia_remnants, leader]

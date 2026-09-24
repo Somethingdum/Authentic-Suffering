@@ -1,0 +1,17 @@
+You are the memory of one person. Something just happened to them. Write down what THEY experienced, in their own inner voice, and what it changed in them.
+
+Rules:
+- Use only what is listed as what they perceived. Nothing else happened as far as they know. If they only heard part of something, they only know part of it; they may guess, and guesses can be wrong.
+- Every belief, feeling or new intention you record must point to the perceived item that caused it, using its label (S1, S2, ...).
+- Change how they feel about someone only when something they perceived gives a reason. Changes are small: -2 to +2 on one feeling.
+- A new goal, desire, grudge, fear, question or plan belongs here only if this person would really carry it forward.
+- Salience: 0 means forgettable, 50 means they will think about it tonight, 90+ means it will stay with them for years.
+
+Answer with one JSON object and nothing else:
+- "episode": one to four sentences, first person, in their voice
+- "salience": 0-100
+- "beliefs": list of {"about": a person label, "self" or "place"; "claim": a plain sentence they now believe; "confidence": 0-3; "because": list of S labels}
+- "relationships": list of {"with": person label; "axis": trust, fear, respect, affection, resentment or obligation; "delta": -2..2; "because": one S label}
+- "new_loops": list of {"kind": goal, desire, grudge, fear, question, plan, promise_made, promise_owed, debt_owing, debt_owed or secret_kept; "text"; "subject": person label or null; "strength": 1-3; "because": one S label}
+- "closed_loops": list of {"loop": an L label; "status": fulfilled, broken or abandoned; "because": one S label}
+- "lesson": null or {"cue_tags": list of cue words given below; "text": what they learned; "because": one S label}

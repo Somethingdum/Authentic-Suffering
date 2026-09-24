@@ -1,0 +1,49 @@
+[project]
+name = "as-engine"
+version = "0.1.0"
+description = "Authentic Suffering simulation engine (Talemate-hosted). Pure Python, no talemate imports."
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "pydantic>=2.11,<3",
+    "jinja2>=3.1",
+    "httpx>=0.27,<1",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.25.3",
+    "pytest-timeout>=2.3",
+    "hypothesis>=6.100",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+as-engine = "as_engine.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/as_engine"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+timeout = 120
+markers = [
+    "phase(n): contract test belonging to build phase n (0-12)",
+    "live: requires a real LM Studio endpoint (AS_LIVE=1)",
+    "slow: long-running soak test",
+]
+addopts = "-p no:cacheprovider --import-mode=importlib -m 'not live'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP", "RUF100"]
+ignore = ["E501"]

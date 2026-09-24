@@ -1,0 +1,173 @@
+# Movement and position. Speeds: walk 1.4 m/s (0.71 s/m), careful 1.0, sneak 0.7 (1.43 s/m),
+# run 3.5 (0.29 s/m) — docs/as/07_RULES.md §2.
+- schema: as.affordance.v1
+  id: move_to_anchor
+  verb: move
+  label: "Walk to {destination} ({distance}, about {duration})"
+  ui_label: "Go to {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 0.5, per_meter_s: 0.71}
+  noise_db: 30
+  effect: move_to_anchor
+  tags: [move]
+- schema: as.affordance.v1
+  id: go_look
+  verb: move
+  label: "Go and look toward {destination} ({distance}, about {duration})"
+  ui_label: "Go and look at {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true, fear_exposure: true}
+  duration: {base_s: 1, per_meter_s: 1.0}
+  noise_db: 25
+  effect: move_to_anchor
+  tags: [move, investigate, careful]
+- schema: as.affordance.v1
+  id: sneak_to_anchor
+  verb: move
+  label: "Creep quietly to {destination} ({distance}, about {duration})"
+  ui_label: "Sneak to {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 1, per_meter_s: 1.43}
+  noise_db: 15
+  check: {attribute: A, skill: stealth, tags: [quiet_mover], resistance: observer.best_perception, consequence_ladder: stealth6}
+  effect: move_to_anchor
+  tags: [move, sneak]
+- schema: as.affordance.v1
+  id: run_to_anchor
+  verb: move
+  label: "Run to {destination} ({distance}, about {duration})"
+  ui_label: "Run to {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 0.3, per_meter_s: 0.29}
+  noise_db: 55
+  effect: move_to_anchor
+  tags: [move, rushed]
+- schema: as.affordance.v1
+  id: move_through_portal
+  verb: move
+  label: "Go through {target} into {destination} (about {duration})"
+  ui_label: "Go through {target}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 2, per_meter_s: 0.71}
+  noise_db: 35
+  effect: move_through_portal
+  tags: [move]
+- schema: as.affordance.v1
+  id: follow_body
+  verb: move
+  label: "Follow {target}"
+  ui_label: "Follow {target}"
+  binds: body
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 1, per_meter_s: 0.71}
+  noise_db: 30
+  effect: follow_body
+  tags: [move, follow]
+- schema: as.affordance.v1
+  id: leave_place
+  verb: move
+  label: "Leave this place by the nearest way out you know (about {duration})"
+  ui_label: "Get out of here"
+  binds: none
+  range: self
+  requires: {mobile: true}
+  duration: {base_s: 3, per_meter_s: 0.71}
+  noise_db: 35
+  effect: leave_place
+  tags: [move, leave]
+- schema: as.affordance.v1
+  id: flee_threat
+  verb: flee
+  label: "Run from the danger, away from {target}"
+  ui_label: "Run from {target}"
+  binds: body
+  range: visible
+  requires: {mobile: true}
+  duration: {base_s: 1, per_meter_s: 0.29}
+  noise_db: 55
+  effect: flee
+  tags: [flee, threat_response]
+- schema: as.affordance.v1
+  id: climb_obstacle
+  verb: move
+  label: "Climb over {target} (about {duration})"
+  ui_label: "Climb over {target}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true, hands_free: 2}
+  duration: {base_s: 6}
+  noise_db: 50
+  check: {attribute: A, skill: athletics, tags: [parkour, climber], resistance: obstacle.class}
+  effect: climb
+  tags: [move, climb]
+- schema: as.affordance.v1
+  id: take_cover
+  verb: take_cover
+  label: "Take cover at {destination}"
+  ui_label: "Take cover at {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 2, per_meter_s: 0.29}
+  noise_db: 30
+  effect: take_cover
+  tags: [cover, threat_response]
+- schema: as.affordance.v1
+  id: hide
+  verb: hide
+  label: "Hide at {destination} and keep still"
+  ui_label: "Hide at {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 4, per_meter_s: 1.0}
+  noise_db: 15
+  check: {attribute: A, skill: stealth, tags: [quiet_mover], resistance: observer.best_perception, consequence_ladder: stealth6}
+  effect: hide
+  tags: [hide, threat_response]
+- schema: as.affordance.v1
+  id: crouch
+  verb: take_cover
+  label: "Crouch low where you are"
+  ui_label: "Crouch down"
+  binds: self
+  range: self
+  requires: {posture_any: [standing, sitting]}
+  duration: {base_s: 1}
+  noise_db: 15
+  effect: crouch
+  tags: [posture]
+- schema: as.affordance.v1
+  id: stand_up
+  verb: move
+  label: "Stand up"
+  ui_label: "Stand up"
+  binds: self
+  range: self
+  requires: {posture_any: [crouched, sitting, lying, prone]}
+  duration: {base_s: 1}
+  noise_db: 15
+  effect: stand
+  tags: [posture]
+- schema: as.affordance.v1
+  id: go_prone
+  verb: take_cover
+  label: "Drop flat to the ground"
+  ui_label: "Get down flat"
+  binds: self
+  range: self
+  requires: {posture_any: [standing, crouched, sitting]}
+  duration: {base_s: 2}
+  noise_db: 25
+  effect: go_prone
+  tags: [posture, threat_response]

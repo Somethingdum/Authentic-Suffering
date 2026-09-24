@@ -1,0 +1,32 @@
+{
+  "type": "as_game",
+  "action": "runs",
+  "data": {
+    "runs": [
+      {
+        "run_id": "owen_marsh_71a",
+        "title": "Owen Marsh, day 18",
+        "pc_name": "Owen Marsh",
+        "day": 18,
+        "alive": true,
+        "difficulty": "normal",
+        "last_played_text": "2026-09-22 21:14",
+        "sandbox": false,
+        "ironman": false,
+        "world_id": null
+      },
+      {
+        "run_id": "addison_flores_5c2",
+        "title": "Addison Flores, day 212",
+        "pc_name": "Addison Flores",
+        "day": 212,
+        "alive": false,
+        "difficulty": "realism",
+        "last_played_text": "2026-09-20 19:02",
+        "sandbox": true,
+        "ironman": true,
+        "world_id": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+# States apply across types (Shambler/Crawler/Runner/Lurker) — orthogonal to InfectedTypeDef.
+# Lore_and_World_Building.pdf §3.2. bite_commitment: probability an engaged infected follows through
+# on a bite/attack this beat rather than disengaging (used by mind/affordance resolve gate & effects).
+- schema: as.infected_state.v1
+  id: dormant
+  effects: [motionless, minimal_stimulus_response, can_reboot_on_stimulus]
+  speed_mult: 0.0
+  hearing_threshold_delta_db: 10.0
+  bite_commitment: 0.1
+- schema: as.infected_state.v1
+  id: starved
+  effects: [slowed, poor_coordination, increased_sound_fixation]
+  speed_mult: 0.5
+  hearing_threshold_delta_db: -5.0
+  bite_commitment: 0.7
+- schema: as.infected_state.v1
+  id: overfed
+  effects: [temporary_disengagement, embarrassment_walk_off, reduced_bite_commitment]
+  speed_mult: 0.85
+  hearing_threshold_delta_db: 5.0
+  bite_commitment: 0.2
+- schema: as.infected_state.v1
+  id: injured
+  effects: [localized_dysfunction, does_not_prevent_reboot_unless_core_junction_fails]
+  speed_mult: 0.6
+  hearing_threshold_delta_db: 0.0
+  bite_commitment: 0.6

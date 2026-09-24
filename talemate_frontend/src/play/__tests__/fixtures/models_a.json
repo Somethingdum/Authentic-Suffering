@@ -1,0 +1,13 @@
+{
+  "type": "as_game",
+  "action": "models",
+  "data": {
+    "lane": "A",
+    "models": [
+      "nemotron-cascade-2-30b-a3b",
+      "qwen3-32b"
+    ],
+    "selected": "nemotron-cascade-2-30b-a3b",
+    "reachable": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "as_game",
+  "action": "content_report",
+  "data": {
+    "pack_id": "my_content",
+    "ok": false,
+    "errors": [
+      "actors/mara_voss.yaml — voice.would_never_say needs at least 3 lines (it has 1)"
+    ],
+    "warnings": [
+      "items/old_radio.yaml — 'Fall' is written 'fall' here"
+    ],
+    "counts": {
+      "item": 1
+    }
+  }
+}

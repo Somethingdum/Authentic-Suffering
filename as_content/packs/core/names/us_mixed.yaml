@@ -1,0 +1,9 @@
+# Name pool for generated people (worldgen WG5, materialisation from cohorts). Drawn with rng stream
+# 'names:<settlement_id>'; a drawn full name already in use in the run is redrawn (max 8 times) so no
+# two living people share a full name. Authored dossier names are never drawn from here.
+schema: as.names.v1
+id: us_mixed
+given_female: [Ana, Beatriz, Carmen, Dana, Delia, Denise, Erin, Faith, Gloria, Hana, Imani, Irene, Jolene, Kayla, Keisha, Laura, Lupe, Marisol, Maya, Nadia, Noor, Paige, Priya, Renee, Rosa, Shonda, Tamsin, Tess, Valeria, Wendy, Yesenia, Zora]
+given_male: [Aaron, Andre, Arturo, Ben, Calvin, Curtis, Dale, Darnell, Emeka, Ernesto, Frank, Gil, Hector, Isaac, Jamal, Joaquin, Kevin, Luis, Marcus, Mateo, Nate, Omar, Owen, Raymond, Reggie, Sam, Tomas, Travis, Victor, Wade, Wes, Zeke]
+family: [Acosta, Baptiste, Barnes, Bui, Castillo, Chambers, Contreras, Dawson, Diallo, Duarte, Ellison, Espinoza, Farrow, Fuentes, Garza, Gutierrez, Hale, Haskins, Ibarra, Jefferson, Kaminski, Kowalski, Lam, Lindqvist, Marsh, Medina, Moreau, Nakamura, Nguyen, Novak, Oduya, Ortega, Pruitt, Quintero, Ramos, Reyes, Salazar, Shaw, Sorensen, Tate, Trujillo, Underwood, Vance, Vargas, Villanueva, Walsh, Whitaker, Yazzie, Zamora, Zielinski]
+nicknames: [Bug, Chief, Doc, Duck, Flash, Gramps, Hoss, Kid, Lucky, Mouse, Preacher, Red, Shorty, Sparks, Tank, Twitch]

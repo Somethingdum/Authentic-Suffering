@@ -1,0 +1,233 @@
+# "Night at Delgado's" — the P7 anchor scene (Rebuild Plan §5.4; docs/as/04_TURN_PIPELINE.md §7).
+# PROTECTED. The back door is unbarred and ajar for Nita, who is finishing her 23:00 perimeter walk
+# (a lapse Ray would not allow). With RulesConfig defaults the 98 dB gust crash at the fence sheet
+# reaches everyone awake EXACT through the open back door; Eli, asleep behind a boarded window
+# (seal 20), receives ~60 dB >= the 55 dB sleeper threshold -> TONE_ONLY and wakes; the stranger,
+# right behind the chain-link fence, EXACT. June's raised call from the storeroom doorway reaches
+# Nita PARTIAL and the stranger TONE_ONLY (a voice, not words). Hand arithmetic for every listener:
+# tests/fixtures/vectors/acoustics.json (entries 'metal_fence_*').
+schema: as.scenario.v1
+name: metal_fence
+description: Night at Delgado's — the P7 anchor scene (plan §5.4)
+seed: 1818
+start: {day: 18, time: "23:14:03"}
+weather: {kind: wind, wind_level: 2}
+settings: {turn_depth: balanced, difficulty: normal}
+places:
+  - id: sales_floor
+    name: Sales floor
+    kind: room
+    width_m: 14
+    depth_m: 9
+    material: brick
+    light: 1
+    ambient_db: 35           # wind worrying the plywood over the front window
+    held: true
+    anchors:
+      - {id: counter, name: counter, kind: cover, x: 6, y: 4, cover: 2, concealment: 2}
+      - {id: behind_counter, name: gap behind the counter, kind: cover, x: 6, y: 5.5, cover: 3, concealment: 3}
+      - {id: front_window, name: front window, kind: window, x: 3, y: 0.5}
+      - {id: front_door_in, name: front door, kind: door_side, x: 7, y: 0.5}
+      - {id: rear_cover, name: end of the rear shelving, kind: cover, x: 12.5, y: 8, cover: 2, concealment: 2}
+      - {id: storeroom_door_front, name: storeroom doorway, kind: door_side, x: 13.5, y: 8.5}
+      - {id: office_door_front, name: office door, kind: door_side, x: 1, y: 8.5}
+  - id: storeroom
+    name: Stockroom
+    kind: room
+    width_m: 8
+    depth_m: 5
+    material: brick
+    light: 1
+    ambient_db: 30
+    held: true
+    anchors:
+      - {id: shelves, name: shelves, kind: furniture, x: 2, y: 2, cover: 1, concealment: 1}
+      - {id: doorway, name: doorway to the sales floor, kind: door_side, x: 7.5, y: 0.5}
+      - {id: back_door_in, name: back door, kind: door_side, x: 4, y: 4.5}
+      - {id: back_wall_in, name: back wall, kind: feature, x: 6, y: 4.8}
+      - {id: office_wall_st, name: office wall, kind: feature, x: 0.3, y: 2.5}
+  - id: office
+    name: Office
+    kind: room
+    width_m: 4
+    depth_m: 3
+    material: drywall
+    light: 0
+    ambient_db: 30
+    held: true
+    anchors:
+      - {id: cot, name: cot, kind: furniture, x: 3.2, y: 2.4}
+      - {id: office_window_in, name: boarded window, kind: window, x: 2, y: 2.9}
+      - {id: desk, name: desk, kind: furniture, x: 2, y: 1.2, cover: 1, concealment: 1}
+      - {id: office_door_in, name: office door, kind: door_side, x: 1, y: 0.3}
+      - {id: office_wall_of, name: wall to the stockroom, kind: feature, x: 3.8, y: 1.5}
+  - id: alley
+    name: Rear alley
+    kind: outdoor
+    width_m: 12
+    depth_m: 6
+    indoor: false
+    material: open_air
+    light: 1
+    ambient_db: 30           # a dead city at night; the wind adds 2 x 8 dB outdoors
+    anchors:
+      - {id: back_door_out, name: store back door, kind: door_side, x: 6, y: 0.5}
+      - {id: back_wall_out, name: store back wall, kind: feature, x: 7.5, y: 0.3}
+      - {id: office_window_out, name: boarded office window, kind: window, x: 1.5, y: 0.3}
+      - {id: dumpster, name: dumpster, kind: hiding_spot, x: 9, y: 3, cover: 3, concealment: 3}
+      - {id: fence_sheet, name: loose metal sheet on the fence, kind: feature, x: 5, y: 5.8}
+      - {id: alley_mouth, name: alley mouth, kind: feature, x: 11.5, y: 3}
+  - id: back_lot
+    name: Lot behind the fence
+    kind: outdoor
+    width_m: 20
+    depth_m: 10
+    indoor: false
+    material: open_air
+    light: 0
+    ambient_db: 30
+    anchors:
+      - {id: fence_far, name: far side of the fence, kind: feature, x: 5, y: 0.3}
+      - {id: weeds, name: tall weeds, kind: hiding_spot, x: 6, y: 2, cover: 0, concealment: 2}
+      - {id: lot_east, name: east end of the lot, kind: feature, x: 19.5, y: 5}
+  - id: street
+    name: Maple Street
+    kind: street
+    width_m: 30
+    depth_m: 12
+    indoor: false
+    material: open_air
+    light: 1
+    ambient_db: 40
+    anchors:
+      - {id: front_door_out, name: store front door, kind: door_side, x: 7, y: 0.3}
+      - {id: front_window_out, name: store front window, kind: window, x: 3, y: 0.3}
+      - {id: sidewalk, name: sidewalk, kind: feature, x: 10, y: 2}
+portals:
+  - {id: storeroom_door, a: sales_floor, b: storeroom, anchor_a: storeroom_door_front, anchor_b: doorway, kind: door, name: storeroom door, open: true, w: 90, h: 205, seal_db: 25}
+  - {id: office_door, a: sales_floor, b: office, anchor_a: office_door_front, anchor_b: office_door_in, kind: door, name: office door, open: false, w: 80, h: 205, seal_db: 25}
+  - {id: office_wall, a: storeroom, b: office, anchor_a: office_wall_st, anchor_b: office_wall_of, kind: wall, name: office wall, w: 0, h: 0, seal_db: 30}
+  - {id: back_door, a: storeroom, b: alley, anchor_a: back_door_in, anchor_b: back_door_out, kind: door, name: back door, open: true, lock_quality: 2, w: 90, h: 205, seal_db: 30}   # unbarred and ajar for Nita's return
+  - {id: office_window, a: office, b: alley, anchor_a: office_window_in, anchor_b: office_window_out, kind: window, name: boarded office window, open: false, barricade: 2, w: 60, h: 90, seal_db: 20, height: 150}
+  - {id: back_wall, a: storeroom, b: alley, anchor_a: back_wall_in, anchor_b: back_wall_out, kind: wall, name: back wall, w: 0, h: 0, seal_db: 45}
+  - {id: rear_fence, a: alley, b: back_lot, anchor_a: fence_sheet, anchor_b: fence_far, kind: fence, name: chain-link fence, w: 0, h: 0, seal_db: 2, transparent: true, height: 180}
+  - {id: front_door, a: sales_floor, b: street, anchor_a: front_door_in, anchor_b: front_door_out, kind: door, name: front door, open: false, locked: true, lock_quality: 2, barricade: 2, w: 90, h: 210, seal_db: 30}
+  - {id: front_window_pane, a: sales_floor, b: street, anchor_a: front_window, anchor_b: front_window_out, kind: window, name: boarded front window, open: false, barricade: 2, w: 240, h: 150, seal_db: 28, height: 60}
+bodies:
+  - id: pc
+    dossier: core:pc/owen_marsh     # a pre-Fall adult, so day 18 fits him (WG-34)
+    controller: human
+    place: sales_floor
+    anchor: counter
+    inventory:
+      - {item: core:item/glock_19, slot: hand_r, label: glock, props: {chambered: true}}
+      - {item: core:item/magazine_9mm_15, container: glock, props: {rounds: 14}}
+      - {item: core:item/fire_axe, slot: worn, label: axe}
+  - id: mara
+    dossier: core:actor/mara_voss
+    place: sales_floor
+    anchor: front_window
+    duty_anchor: front_window
+    needs: {fatigue: 3}
+    plan:
+      goal: watch the front window
+      standing_orders:
+        - {trigger: loud_noise, response: find the source and cover it}
+    inventory:
+      - {item: core:item/revolver_38, slot: worn, label: revolver, props: {rounds: 6, holstered: true}}
+      - {item: core:item/ammo_38, qty: 11, slot: pocket}
+  - id: alice
+    dossier: core:actor/alice_tran
+    place: sales_floor
+    anchor: behind_counter
+    task: {kind: sort_goods, label: sorting the run's haul, steps_total: 30, steps_done: 12, step_s: 20, interrupt_on: [loud_noise]}
+    inventory:
+      - {item: core:item/ledger_book, slot: hand_l, label: alice_ledger}
+  - id: june
+    dossier: core:actor/june_okafor
+    place: storeroom
+    anchor: shelves
+    resolve: 3
+    task: {kind: count_stock, label: counting cans, steps_total: 60, steps_done: 41, step_s: 10, interrupt_on: [loud_noise, addressed_by_name]}
+    inventory:
+      - {item: core:item/ledger_book, slot: hand_l, label: june_ledger}
+  - id: eli
+    dossier: core:actor/eli_voss
+    place: office
+    anchor: cot
+    awareness: asleep
+    posture: lying
+  - id: nita
+    dossier: core:actor/nita_reyes
+    place: alley
+    anchor: dumpster
+    goal: finish the perimeter walk
+    inventory:
+      - {item: core:item/kitchen_knife, slot: worn}
+  - id: stranger
+    dossier: core:actor/dale_pruitt
+    place: back_lot
+    anchor: fence_far
+    goal: watch the store's back fence
+    inventory:
+      - {item: core:item/steel_pipe, slot: hand_r}
+relationships:
+  - {from: june, to: mara, kind: friend, trust: 2, affection: 1}
+  - {from: mara, to: june, kind: friend, trust: 2, affection: 2}
+  - {from: mara, to: eli, kind: child, trust: 3, affection: 3}
+  - {from: eli, to: mara, kind: parent, trust: 3, affection: 3}
+  - {from: nita, to: mara, kind: comrade, trust: 1, respect: 2}
+  - {from: mara, to: nita, kind: comrade, trust: 1, respect: 2}
+  - {from: mara, to: pc, kind: comrade, trust: 1}
+  - {from: june, to: pc, kind: acquaintance, trust: 1}
+  - {from: alice, to: pc, kind: acquaintance}
+  - {from: nita, to: pc, kind: acquaintance}
+knows:
+  - {holder: pc, subject: mara, name: Mara}
+  - {holder: pc, subject: june, name: June}
+  - {holder: pc, subject: alice, name: Alice}
+  - {holder: pc, subject: nita, name: Nita}
+  - {holder: pc, subject: eli, name: Eli}
+  - {holder: mara, subject: pc, name: Owen}
+  - {holder: mara, subject: june, name: June}
+  - {holder: mara, subject: alice, name: Alice}
+  - {holder: mara, subject: nita, name: Nita}
+  - {holder: mara, subject: eli, name: Eli}
+  - {holder: june, subject: mara, name: Mara}
+  - {holder: june, subject: pc, name: Owen}
+  - {holder: june, subject: alice, name: Alice}
+  - {holder: june, subject: nita, name: Nita}
+  - {holder: june, subject: eli, name: Eli}
+  - {holder: alice, subject: mara, name: Mara}
+  - {holder: alice, subject: pc, name: Owen}
+  - {holder: alice, subject: june, name: June}
+  - {holder: alice, subject: nita, name: Nita}
+  - {holder: nita, subject: mara, name: Mara}
+  - {holder: nita, subject: pc, name: Owen}
+  - {holder: nita, subject: june, name: June}
+  - {holder: nita, subject: stranger, description: the thin man who watches the back fence}
+  - {holder: eli, subject: mara, name: Mom}
+  - {holder: eli, subject: june, name: June}
+beliefs:
+  - {holder: nita, subject_type: place, subject: alley, predicate: status, text: "The alley was clear at eleven.", confidence: 2, provenance: witnessed}
+  - {holder: nita, subject_type: body, subject: stranger, predicate: watching, text: "A thin man has been watching the back fence at night.", confidence: 2, provenance: witnessed, true_in_world: true}
+  - {holder: mara, subject_type: place, subject: alley, predicate: status, text: "Nita walks the alley at eleven; it's clear.", confidence: 1, provenance: "told_by:nita"}
+households:
+  - {id: voss, dwelling: office, members: [{actor: mara, role: head, guardian_of: [eli]}, {actor: eli, role: child}]}
+groups:
+  - id: crew
+    kind: group
+    name: "Delgado's crew"
+    content_ref: core:faction/delgados_crew
+    members:
+      - {actor: mara, role: guard, standing: 2}
+      - {actor: june, role: stockroom, standing: 1}
+      - {actor: alice, role: ledger, standing: 1}
+      - {actor: nita, role: scout, standing: 1}
+      - {actor: pc, role: hired hand, standing: 0}
+events_due:
+  - {at: "23:14:03", type: NOISE, place: alley, anchor: fence_sheet, payload: {source_db: 98, kind: metal_crash, text: "a loud metal crash"}}
+notes:
+  - The stranger is Dale Pruitt; nobody inside knows his name. Nita has seen him twice and told nobody.
+  - Layout — building back wall along the alley's y=0 edge; storeroom back door at alley x=6, office window at alley x=1.5; the chain-link fence runs along alley y=6 with the loose sheet at x=5; the lot lies beyond it.
+  - Ray Delgado is not in this scene (asleep upstairs in the source plan; absent from the fixture).

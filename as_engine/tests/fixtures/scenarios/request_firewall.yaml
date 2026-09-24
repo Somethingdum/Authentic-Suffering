@@ -1,0 +1,71 @@
+# WILL-01..09 fixture (PROTECTED). Mara is boarding up a window (task) while Eli sleeps on a
+# mattress in the same room. Ray — the only person in her accepted authority — sits by the door.
+# The PC is a stranger to both of them (no acquaintance rows). Requests, demands, orders and
+# threats from the PC and from Ray must reach Mara as perceived utterances, never as commands.
+schema: as.scenario.v1
+name: request_firewall
+description: A stranger asks, demands and threatens; the commander orders; Mara decides.
+seed: 21
+start: {day: 30, time: "16:00:00"}
+places:
+  - id: front_room
+    name: Front room
+    width_m: 6
+    depth_m: 5
+    material: wood
+    light: 2
+    ambient_db: 30
+    anchors:
+      - {id: window, name: the window being boarded, kind: window, x: 1, y: 0.5}
+      - {id: mattress, name: mattress, kind: furniture, x: 5, y: 4}
+      - {id: door_side, name: the door, kind: door_side, x: 5.5, y: 0.5}
+      - {id: table, name: table, kind: furniture, x: 3, y: 2.5, cover: 1, concealment: 1}
+  - id: porch
+    name: Porch
+    kind: outdoor
+    indoor: false
+    material: open_air
+    width_m: 6
+    depth_m: 3
+    anchors:
+      - {id: porch_steps, name: porch steps, x: 3, y: 2.5}
+      - {id: porch_door, name: front door, kind: door_side, x: 5.5, y: 0.3}
+portals:
+  - {id: front_door, a: front_room, b: porch, anchor_a: door_side, anchor_b: porch_door, kind: door, name: front door, open: true, w: 90, h: 205, seal_db: 25}
+bodies:
+  - id: pc
+    dossier: core:pc/owen_marsh
+    controller: human
+    place: front_room
+    anchor: table
+  - id: mara
+    dossier: core:actor/mara_voss
+    place: front_room
+    anchor: window
+    accepted_authority: [ray]
+    task: {kind: board_window, label: boarding up the window, steps_total: 12, steps_done: 5, step_s: 30, interrupt_on: [loud_noise, weapon_pointed, threat_seen]}
+    inventory:
+      - {item: core:item/revolver_38, slot: worn, label: revolver, props: {rounds: 6, holstered: true}}
+      - {item: core:item/claw_hammer, slot: hand_r}
+  - id: eli
+    dossier: core:actor/eli_voss
+    place: front_room
+    anchor: mattress
+    awareness: asleep
+    posture: lying
+  - id: ray
+    dossier: core:actor/ray_delgado
+    place: front_room
+    anchor: door_side
+    inventory:
+      - {item: core:item/hunting_rifle, slot: worn, props: {rounds: 4}}
+relationships:
+  - {from: mara, to: eli, kind: child, trust: 3, affection: 3}
+  - {from: mara, to: ray, kind: employer, trust: 0, respect: 1, obligation: 1}
+  - {from: ray, to: mara, kind: employee, respect: 2}
+knows:
+  - {holder: mara, subject: ray, name: Ray}
+  - {holder: mara, subject: eli, name: Eli}
+  - {holder: ray, subject: mara, name: Mara}
+households:
+  - {id: voss, members: [{actor: mara, role: head, guardian_of: [eli]}, {actor: eli, role: child}]}

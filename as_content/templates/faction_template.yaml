@@ -1,0 +1,39 @@
+# FACTION / GROUP TEMPLATE — copy into <your_pack>/factions/<id>.yaml. kind: faction = a canonical
+# mega-entity that always exists in the world (worldgen decides its local presence); kind: group =
+# a local band. Every faction needs BOTH truth_text (what the world runs on) and belief_text (what
+# people say) — CNT-07. Worked examples: core/factions/mafia_remnants.yaml, delgados_crew.yaml.
+schema: as.faction.v1
+id: <lowercase_id>
+name: <Name>
+kind: <faction | group>
+one_line: <what they are, in one sentence>
+wants: <what they actually want, beneath the stated purpose>
+stated_purpose: <what they say they're for>
+methods: <how they pursue it: violence tolerance, approach to outsiders, response to threats>
+will_not_do: ["<a line they don't cross>"]
+resources_have: ["<specific>"]
+resources_need: ["<specific>"]
+pressure: <what is squeezing them right now>
+leaders:
+  - {title: <title>, role: "<what this leader decides>"}          # actor: "<pack>:actor/<id>" optional
+how_leadership_is_contested: <how power changes hands>
+fault_lines: ["<an internal tension>"]
+relations: []                           # {faction: "<pack>:faction/<id>", stance: allied|cooperative|neutral|wary|hostile|war|unaware, history: "..."}
+doctrine:                               # how their armed people behave — by rule, never by mood
+  challenge_procedure: <how a stranger is challenged>
+  escalation_ladder: ["<first step>", "<next step>"]
+  treatment_of_unknowns: <...>
+  treatment_of_visibly_sick: <...>
+  prisoner_policy: <...>
+  intake_screening: []                  # judged by the officer's traits, never rolled (L7)
+laws: []                                # ["<pack>:law/<id>"]
+node_classes: []
+presence:
+  regional_reach: <how much ground they cover>
+  start_trust_ranges: {}                # e.g. {ally: [7, 10], neutral: [4, 6]}
+  era_exceptions: {}                    # {early: "...", established: "..."}
+  presence_conditions: []               # plausibility grammar, all must hold, e.g. "faction_density >= 3"
+  population_baseline: <members at world start>
+member_archetypes: []
+belief_text: <what ordinary survivors say about them>
+truth_text: <what is actually true — engine only>

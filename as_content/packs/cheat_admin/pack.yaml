@@ -1,0 +1,9 @@
+schema: as.pack.v1
+id: cheat_admin
+name: Authentic Suffering — cheat admin
+version: 1.0.0
+description: >-
+  Cheat-only content (CHEAT-10): compiled with every other pack, invisible to worldgen and the
+  New Life wizard, reachable only through /spawn after activation. Ships Fredrick.
+depends_on: [core]
+authors: [SomethingDum, AS build spec v1]

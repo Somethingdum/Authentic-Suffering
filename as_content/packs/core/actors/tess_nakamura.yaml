@@ -1,0 +1,166 @@
+schema: as.actor.v1
+id: tess_nakamura
+generation: authored
+days_since_fall_range: [3000, 3650]
+identity:
+  name: Tess Nakamura
+  aliases: []
+  age: 23
+  sex: female
+  cohort: fall_child
+  birthplace: Evansville, Indiana
+  occupation_before: An eighth-grader in the school band — clarinet
+  occupation_now: Runs a salvage and sundries stall in a Remnants market
+  one_line: A market trader who grew up in the Fall, buys from runners, and sells antibiotics the Clean Clinic refuses to.
+appearance:
+  height_cm: 160
+  mass_kg: 55
+  build: Small and wiry, quick hands
+  hair: Black, shaved at the sides, the top dyed an old rust red with beet juice
+  eyes: Dark brown, sharp
+  skin: Light tan, freckles across her cheeks
+  distinguishing_marks:
+    - A clarinet reed she wears on a string around her neck
+    - A row of tally tattoos inked on her left forearm, one for every year since the Fall
+  clothing_usual: A patched denim jacket covered in buttons and pins, a long skirt with deep sewn-in pockets, rubber boots
+  movement_under_stress: Gets louder and quicker, talking over people and keeping her hands on the stall's goods.
+  habit_gesture: Chews the clarinet reed when she's calculating a price.
+  relation_to_appearance: Proud of it; the pins and the rust-red hair are how runners find her stall across a crowded market.
+capability:
+  special: {S: 4, P: 6, E: 5, C: 7, I: 7, A: 6, L: 6}
+  skills:
+    - {domain: trade, rank: 2, evidence: "Five years running her own stall and buying from every runner who comes through the market."}
+    - {domain: scavenging, rank: 1, evidence: "Grew up scavenging with her uncle in the first years after the Fall."}
+    - {domain: persuasion, rank: 2, evidence: "Haggles with runners, shield men and Clean Clinic orderlies every day."}
+  tags: []
+  trained_responses:
+    - {cue: scream, verb: guard, note: "Covers the stall first."}
+  literacy: 2
+  tech_literacy: 2
+  resolve_trait_mod: 0
+motive:
+  motive: Build something that's hers — a real shop with a roof — and never go back to living off scraps.
+  method: Trades hard, pays her tribute on time, keeps Reggie charmed, and quietly sells antibiotics bought from runners to the sick the Clean Clinic turns away.
+  moral_line:
+    will: ["Sell medicine outside the Remnants' Clean Clinic", "Lie to a collector about her stock"]
+    wont: ["Sell to someone who'd hurt a child", "Cheat a runner on a fair price", "Betray a runner to the Remnants"]
+    wont_tags: [harm_dependent, betray_group]
+  inner_conflict: Her antibiotic trade saves lives and breaks the law the Remnants would kill her for, and every sale puts her stall — everything she's built — on the line.
+  past_wound: Her uncle, who raised her after the Fall, died of an infected cut the Clean Clinic would not treat because he was behind on tribute.
+  signature_behaviour: Writes every trade on the inside of her stall's awning in chalk, then wipes it at night.
+  risk_threshold: 6
+  risk_text: Takes careful risks for profit and big ones for people the Clinic turns away.
+  resource_constraints: A stall, two crates of salvage, a hidden tin of antibiotics, and a monthly tribute page that must always reconcile.
+persona:
+  public:
+    shown_traits: [cheerful, sharp, fair]
+    claimed_history: Grew up scavenging with her uncle, set up a stall when he died.
+    presented_affiliation: A paying stallholder in Reggie Tate's market
+  private:
+    true_goals: ["A shop with a roof", "Keep the antibiotics going to people who need them"]
+    concealed_history: She sells antibiotics outside the Clean Clinic to people it refuses, which is the one trade the Remnants never tolerate.
+    real_affiliation: Runners and the people the Clinic turns away
+traits:
+  - tag: haggler
+    manifests: Never takes a first price and never offers one; turns every exchange into a friendly contest.
+    triggers: Anyone with something to sell or anyone who wants something.
+    causes: She gets good deals, makes regular customers, and remembers everyone's prices.
+    costs: Some runners find her exhausting, and she can't give anything away without making it a trade.
+    example: Talked a Remnants convoy driver out of a tire pump for three cans of peaches and a joke about his mustache.
+  - tag: soft_spot_for_runners
+    manifests: Pays runners fair and fast, feeds the young ones, and warns them about bad buyers.
+    triggers: A runner coming to her stall, especially a young or hurt one.
+    causes: She takes smaller margins with runners and risks her standing to protect them.
+    costs: Other traders resent her for raising runners' prices, and Reggie teases her for it.
+    example: Hid a runner under her stall's tarp for an hour when a crew from another market came looking for him.
+contradictions:
+  - belief_a: The Remnants' market is the safest place she's ever lived, and she'd be a fool to risk it.
+    belief_b: The Remnants' Clinic let her uncle die for a debt, and she owes them nothing.
+    a_wins_when: It's market day and Reggie's shield men are keeping the peace.
+    b_wins_when: Someone sick comes to her stall who the Clinic turned away.
+decision_stack:
+  layers:
+    - Her stall and her tribute standing
+    - The runners who trade with her
+    - The sick the Clinic turned away
+    - The Remnants' rules
+  inversion_conditions:
+    - If a child is sick and the Clinic has refused them, the sick jump above her stall.
+  past_example: When a woman came to her stall with a boy whose leg was going red from a cut, Tess gave her a week of antibiotics for a promise of payment she knew would never come.
+silence:
+  goes_quiet_when:
+    - Anyone mentions her uncle.
+    - A Remnants collector lingers at her stall after collecting.
+  body_when_silent: Chewing the reed, arms folded over the tally tattoos, eyes on the collector.
+  refuses_to_discuss: ["Her uncle's death", "Where she keeps her medicine"]
+  comfortable_vs_uncomfortable: Comfortable silence is counting chalk marks after closing; uncomfortable silence is a collector who hasn't left yet.
+knowledge:
+  knows:
+    - Every runner who comes through the market and what they usually bring.
+    - Reggie Tate collects more from the stalls than the posted tribute.
+  does_not_know:
+    - That Irene Kowalski is building a case against Reggie.
+  knows_but_hides:
+    - Her tin of antibiotics and who she sells them to.
+    - That Reggie's collections are higher than the posted rate.
+  cues: [knows_headshot_rule, knows_false_death, knows_bite_is_fatal, knows_no_sharing, knows_runner_stamina]
+voice:
+  capsule: Quick, bright, teasing market patter that slows right down when a deal gets serious. Fall-child slang mixed with her uncle's old-world phrases. Talks prices in cans and rounds.
+  speech_tendencies:
+    - Prices everything in cans of beans or rounds of 9 mm.
+    - Teases before she negotiates.
+    - Says "no promises" when she's about to promise something.
+  exemplars:
+    low_stakes: "That? Three cans, and I'm robbing myself. Okay, two and a lighter. You drive a hard bargain for somebody with no shoes."
+    under_pressure: "Nope. Not selling that today. Not to you. Go ask Reggie if you don't like it."
+    at_the_limit: "You want to take my stall? Take it. You'll still owe me for the medicine, and I will find you."
+  would_never_say:
+    - "Take it, it's free."
+    - "The Clinic knows best."
+    - "Runners are all thieves."
+  profanity: frequent
+  dialect_notes: Fall-child slang — 'before-times', 'clean' for trustworthy, 'turned' for anything spoiled.
+social:
+  household_role: ""
+  relations:
+    - target: "core:actor/reggie_tate"
+      kind: acquaintance
+      axes: {trust: 0, affection: 1, fear: 1}
+      history: Reggie loves her stall and protects it; she knows he collects more than the posted rate from everyone.
+    - target: "core:actor/irene_kowalski"
+      kind: acquaintance
+      axes: {fear: 1, respect: 1}
+      history: Mrs. K has read Tess's page aloud to her twice and found nothing wrong; Tess hopes it stays that way.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/mafia_remnants", role: paying stallholder, standing: 0, since: "year five"}
+life:
+  aspiration: A real shop with a roof and a door that locks.
+  current_project: Buying enough antibiotics from runners to last the winter.
+  routine:
+    - {start_hh: 6, end_hh: 18, activity: running her stall, place_hint: market}
+    - {start_hh: 18, end_hh: 20, activity: selling medicine quietly, place_hint: market}
+    - {start_hh: 20, end_hh: 24, activity: sleep, place_hint: market}
+    - {start_hh: 0, end_hh: 6, activity: sleep, place_hint: market}
+  obligations: ["Tribute on the posted day", "Her runners"]
+  hopes: ["A shop", "The Clinic changing its rules"]
+  fears: ["The Remnants finding the antibiotics", "Dying of a cut like her uncle"]
+  secrets:
+    - content: She sells antibiotics bought from runners to people the Clean Clinic turned away.
+      who_knows: []
+      exposure_consequence: The Remnants would take her stall and probably make an example of her at a Sanction Site.
+disposition:
+  archetype_prior: survivor
+  toward_strangers: neutral
+  encounter_default: Calls out a price for whatever they're carrying, friendly and loud.
+starting_loops:
+  - {kind: goal, text: "Stock antibiotics for the winter", strength: 2}
+  - {kind: secret_kept, text: "The antibiotic trade", strength: 3}
+starting_inventory:
+  - {item: "core:item/antibiotics", qty: 3, slot: pocket, props: {note: "Hidden in a tobacco tin."}}
+  - {item: "core:item/cardboard_box", slot: pack, label: stall_box}
+  - {item: "core:item/lighter", qty: 4, slot: pack, container: stall_box}
+  - {item: "core:item/batteries_aa", qty: 6, slot: pack, container: stall_box}
+writers_notes: Tess is the kind of person Addison would trade with, and the kind of person the Remnants make examples of. She is funny and hard and never sentimental in public.
+tags: [mafia_remnants, market]

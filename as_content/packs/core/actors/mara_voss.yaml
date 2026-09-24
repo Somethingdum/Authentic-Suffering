@@ -1,0 +1,197 @@
+schema: as.actor.v1
+id: mara_voss
+generation: authored
+days_since_fall_range: [14, 1460]
+identity:
+  name: Mara Voss
+  aliases: [Voss]
+  age: 34
+  sex: female
+  cohort: pre_fall_adult
+  birthplace: Terre Haute, Indiana
+  occupation_before: Corrections officer at a state prison for eight years, mostly the night shift on a segregation block
+  occupation_now: Night watch for Delgado's crew
+  one_line: A former prison guard who holds the front window at night and sleeps in pieces so her son can sleep whole.
+appearance:
+  height_cm: 173
+  mass_kg: 68
+  build: Rangy and square-shouldered, all tendon, thinner than she was a month ago
+  hair: Dark blonde, grown out past regulation, scraped into a tight low bun
+  eyes: Gray
+  skin: Pale, freckled across the nose, windburned on the cheeks
+  distinguishing_marks:
+    - A pale crescent scar through her left eyebrow from a thrown meal tray
+    - A hard callus on the inside of her right index finger
+  clothing_usual: A navy work jacket over a gray thermal, black cargo pants, men's work boots, the revolver in a nylon holster on her right hip
+  movement_under_stress: Goes still and square instead of fast; her voice drops lower rather than louder, and her right hand is on the holster before she has decided anything.
+  habit_gesture: Runs her thumb along the eyebrow scar when she is deciding something.
+  relation_to_appearance: Does not think about it beyond keeping her hair out of grabbing range and her boots laced double.
+capability:
+  special: {S: 5, P: 7, E: 6, C: 4, I: 5, A: 5, L: 4}
+  skills:
+    - {domain: firearms, rank: 2, evidence: "Qualified on a duty revolver and pistol every year for eight years; has fired for real four times since the Fall, and hit three."}
+    - {domain: brawling, rank: 2, evidence: "Eight years of defensive-tactics refreshers and cell extractions on a segregation block."}
+    - {domain: intimidation, rank: 1, evidence: "The voice she used for count on the block — low, flat, not repeated."}
+    - {domain: childcare, rank: 1, evidence: "Has raised Eli alone since he was four, around rotating night shifts."}
+  tags: []
+  trained_responses:
+    - {cue: loud_noise, verb: guard, note: "Turns to cover the side the sound came from and waits for it to repeat before moving."}
+    - {cue: grabbed_from_behind, verb: escape, note: "Drops her weight and drives an elbow back — cell-extraction training."}
+    - {cue: weapon_pointed, verb: take_cover, note: "Gets something solid between her and the muzzle, then talks."}
+  literacy: 2
+  tech_literacy: 1
+  resolve_trait_mod: 1
+motive:
+  motive: Get Eli to an age where he can survive without her.
+  method: Makes herself the crew member Ray cannot afford to lose — the worst watches, the first one to the door — so the crew keeps protecting her son.
+  moral_line:
+    will: ["Shoot an armed stranger who comes over the back fence after dark", "Lie to Ray about how many rounds she has"]
+    wont: ["Leave Eli behind for any reason", "Shoot a living child", "Let anyone inside the store without seeing their arms in daylight"]
+    wont_tags: [abandon_dependent, kill_child]
+  inner_conflict: She knows the crew keeps her for her gun, and that the week she cannot stand watch, she and Eli become two mouths Ray will count.
+  past_wound: Eli's father, Daniel, walked out of their apartment on the second day to find his mother and never came back; she has never learned what happened to him.
+  signature_behaviour: Counts the rounds in her revolver and pockets by touch at the start of every watch, lips moving.
+  risk_threshold: 4
+  risk_text: Takes any risk for Eli without thinking; for anyone else only when the numbers are clean.
+  resource_constraints: One .38 revolver with six in the cylinder and eleven loose rounds; no rifle of her own; four hours of sleep on a good night.
+persona:
+  public:
+    shown_traits: [unbothered, by-the-book]
+    claimed_history: Worked at the state prison and came to the store with her boy on the third day.
+    presented_affiliation: Ray's crew, night watch
+  private:
+    true_goals: ["Keep Eli alive", "Find out whether Daniel is dead"]
+    concealed_history: On the second day she kept her door shut while a neighbor pounded on it and begged, because the thing behind him was already in the hallway.
+    real_affiliation: Eli, and nobody else
+traits:
+  - tag: vigilant
+    manifests: Stands at an angle to every doorway and knows where each person in the room is without looking at them.
+    triggers: A new sound, a new face, or a door she has not checked herself.
+    causes: She repositions before she answers anyone, and leaves conversations mid-sentence to go look.
+    costs: She never fully rests, and the crew reads her as cold and stops telling her things.
+    example: When June dropped a can in the storeroom, Mara was in the doorway with her hand on the revolver before it stopped rolling.
+  - tag: blunt
+    manifests: Says the conclusion first and gives the reasons only if she is asked twice.
+    triggers: Being asked for an opinion, or watching someone waste light or water.
+    causes: Short orders instead of requests; she corrects people in front of others.
+    costs: People obey her in a crisis and avoid her the rest of the day.
+    example: Told Alice "Your count's wrong. Do it again." in front of Ray instead of pulling her aside.
+  - tag: protective_mother
+    manifests: Checks on Eli every time she changes position, and keeps her body between him and the nearest door.
+    triggers: Eli out of her sight for more than a few minutes, or any adult raising their voice at him.
+    causes: She abandons tasks, overrules Ray, and takes risks she would call stupid in anyone else.
+    costs: The crew sees Eli as her weak point, and some of them resent the exceptions she takes for him.
+    example: Left the front window unwatched for a minute and a half to carry a sleeping Eli away from the office window during a storm.
+contradictions:
+  - belief_a: The crew only survives if everyone follows Ray's rules, including her.
+    belief_b: Eli comes before every rule.
+    a_wins_when: Eli is safe, fed and asleep.
+    b_wins_when: Eli is in danger, or a rule would separate them.
+decision_stack:
+  layers:
+    - Eli's immediate safety
+    - Her own ability to keep standing watch — no injury, no exile
+    - Ray's orders and the crew's rules
+    - The other crew members' safety
+    - Strangers' lives
+  inversion_conditions:
+    - If Ray orders something that puts Eli at risk, Ray's orders drop below her own standing and she refuses him openly.
+    - If a crew member is dying in front of her and Eli is safe, their safety jumps above Ray's rules.
+  past_example: On day nine Ray told her to go with Nita on a pharmacy run and leave Eli with June; she refused, and when he insisted she took Eli on the run with her.
+silence:
+  goes_quiet_when:
+    - Someone asks about Eli's father.
+    - A stranger at the barricade is talking and she is deciding whether to shoot.
+    - She has made a mistake in front of the crew.
+  body_when_silent: Weight on her back foot, thumb on the eyebrow scar, eyes on whatever she is deciding about.
+  refuses_to_discuss: ["Daniel", "The apartment hallway on the second day"]
+  comfortable_vs_uncomfortable: Comfortable silence is watching the street with June somewhere nearby; uncomfortable silence is anyone waiting for her to explain herself.
+knowledge:
+  knows:
+    - The front barricade holds against shoving but would not stop a vehicle.
+    - Ray keeps the store's only rifle within reach day and night, and sleeps with it in the office.
+    - Noise draws the dead; she has watched a car alarm pull a dozen of them up the street.
+  does_not_know:
+    - Whether Daniel is alive.
+    - That Nita has seen someone watching the back fence at night.
+  knows_but_hides:
+    - She has eleven loose rounds, not the five she told Ray.
+    - She left her neighbor at the door on the second day.
+  cues: [knows_noise_draws_dead, knows_bite_is_fatal, knows_headshot_rule]
+voice:
+  capsule: Low, flat and short. Prison-count cadence — statements, not questions — with a dry edge she only shows June. Never explains an order twice; when she is scared she gets quieter and more polite.
+  speech_tendencies:
+    - Drops subjects and articles when giving orders ("Back door. Now.").
+    - Uses people's names only when she is about to tell them something they won't like.
+    - Answers questions with the fact and nothing after it.
+  exemplars:
+    low_stakes: "Eat the peaches first. The beans'll keep."
+    under_pressure: "Quiet. Everybody down. June — doorway, not past it."
+    at_the_limit: "I'm going to ask you one time to put it on the ground. After that I'm not asking anybody anything."
+  would_never_say:
+    - "I'm sorry for your loss."
+    - "Let's all just calm down and talk about this."
+    - "I don't know what I'd do without you guys."
+    - "Trust me."
+  profanity: rare
+  dialect_notes: Southern-Indiana vowels that flatten when she is tired; says "you all" not "y'all".
+social:
+  household_role: head
+  relations:
+    - target: "core:actor/eli_voss"
+      kind: child
+      axes: {trust: 3, affection: 3}
+      history: Her son; she has raised him alone since he was four and has not let him out of her reach since the Fall.
+    - target: "core:actor/june_okafor"
+      kind: friend
+      axes: {trust: 2, affection: 2}
+      history: June was the first person in the store to talk to her like a person instead of a gun; Mara lets June tease her and nobody else.
+    - target: "core:actor/ray_delgado"
+      kind: employer
+      axes: {trust: 0, respect: 1, obligation: 1}
+      history: Ray let her and Eli in on day three because she had a gun; she knows exactly what that means.
+    - target: "core:actor/nita_reyes"
+      kind: comrade
+      axes: {trust: 1, respect: 2}
+      history: They split the dangerous jobs between them — Nita outside, Mara at the doors — and rarely talk about anything else.
+    - target: "core:actor/alice_tran"
+      kind: acquaintance
+      axes: {trust: 0, respect: 1}
+      history: Mara thinks Alice's count is careful and her silences are not.
+  dependents: ["core:actor/eli_voss"]
+  guardians: []
+  memberships:
+    - {faction: "core:faction/delgados_crew", role: night watch, standing: 2, since: "day 3"}
+life:
+  aspiration: To see Eli old enough to hold a rifle and choose his own people.
+  current_project: Talking Ray into a second barricade on the back door before the jugs run out and they have to make water runs at night.
+  routine:
+    - {start_hh: 21, end_hh: 24, activity: front window watch, place_hint: sales floor}
+    - {start_hh: 0, end_hh: 4, activity: front window watch, place_hint: sales floor}
+    - {start_hh: 4, end_hh: 9, activity: sleep beside Eli, place_hint: office}
+    - {start_hh: 9, end_hh: 12, activity: checking doors and barricades, place_hint: sales floor}
+  obligations: ["Night watch every night", "Eli's lessons from the old reading book"]
+  hopes: ["A real settlement with a wall and a school", "Daniel walking up the street"]
+  fears: ["Being the reason Eli dies", "Being too hurt to stand watch"]
+  secrets:
+    - content: She kept her door shut on a begging neighbor on the second day, and the sound of it stopping is the only thing she dreams.
+      who_knows: []
+      exposure_consequence: She would stop trusting anyone who knew, and she would believe they were right about her.
+    - content: She holds eleven loose .38 rounds and told Ray five.
+      who_knows: []
+      exposure_consequence: Ray would take them for the rifle crate and stop believing her counts.
+disposition:
+  archetype_prior: survivor
+  toward_strangers: wary
+  encounter_default: Stays out of sight, calls out once for the stranger to keep walking, and watches their hands until they are gone.
+starting_loops:
+  - {kind: goal, text: "Get a second barricade on the back door", strength: 2}
+  - {kind: question, text: "What happened to Daniel", strength: 1}
+starting_inventory:
+  - {item: "core:item/revolver_38", slot: worn, label: revolver, props: {rounds: 6, holstered: true}}
+  - {item: "core:item/ammo_38", qty: 11, slot: pocket}
+  - {item: "core:item/work_jacket", slot: worn}
+  - {item: "core:item/boots", slot: worn}
+  - {item: "core:item/flashlight", slot: pocket}
+writers_notes: Mara is not hard for the sake of it; she is holding herself together with procedure. The warmth is real and almost all of it goes to Eli and June. Never write her as a quippy action heroine.
+tags: [delgados_crew, anchor_scene]

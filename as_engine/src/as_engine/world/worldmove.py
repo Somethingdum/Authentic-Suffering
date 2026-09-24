@@ -1,0 +1,162 @@
+"""Off-screen motion (P10). Owner 'world.worldmove' (operations). Rules WORLD-02..06, OPS-01..06.
+docs/as/06_WORLD.md §3. The world moves without the player: people die, go out for supplies, walk
+patrols, trade, raid and leave, and every one of those things that could leave evidence does
+(WORLD-03). Code only, COLD, no model call. W = RulesConfig().world; rng stream 'offscreen'.
+Every function that returns an Event has committed it (at and turn_index as given).
+
+WORLD-02 Nothing here ticks by itself: WORLD_DAY (daily at W.world_hour) and OPERATION_STEP rows
+  are event_queue rows (background types, kernel.clock) that turn.timers.seed_world starts and
+  turn.timers fires, in a turn's window or the off-screen step alike. A run without a world_params
+  row (every hand-made scenario) gets none of it.
+WORLD-04 The active area: off-screen code never kills, moves or sends away a body that stands in
+  turn.select.active_area(tx, meta.pc_actor_id, turn_index) — what the player could see happen is
+  simulated by the turn, not decided here. (Infected are the exception: their steps are the same
+  physics on-screen and off, world.infected INF-12.)
+WORLD-05 Named characters are not protected during play: an off-screen death can take anyone the
+  player is not with.
+WORLD-06 The narrator never writes 'while you were gone' (narration lint); the world shows it.
+
+ensure_timers(tx, at, turn_index) -> list[str]: no pending WORLD_DAY row -> kernel.clock.schedule(
+  tx, society.settlement.next_hour(at, W.world_hour), 'WORLD_DAY', None, {}, None).
+
+day(tx, rng, row, fired, turn_index) -> list[Event]   (the WORLD_DAY handler)
+  at = row.due_at; d = at // DAY; WD = WORLD_DAY {day: d} (writer 'world.worldmove', cause fired).
+  Everything below has cause WD, in this order:
+  1 Weather: rng.chance(tx, 'offscreen', f"weather:{d}", W.weather_change_chance) -> kind =
+    rng.weighted(..., f"weather_kind:{d}", weather_weights(values)) and wind = rng.range_int(...,
+    f"wind:{d}", 1, 3) for 'wind' / 'storm' else 0 -> WEATHER_CHANGE {weather, wind_level} (writer
+    'kernel.clock') updating world_clock — only when it differs from the current weather.
+  2 Mortality (WORLD-05): per living body of kind 'human' with an actors row whose controller is
+    not 'human', outside the active area, by body_id: p = W.base_daily_mortality[difficulty] x
+    every multiplier that applies — W.mortality_mult[kind of its active operation]; 'sick' (an
+    unhealed wound of severity significant or worse, or a 'wet' infections row); 'child' (band
+    infant, child or preteen); 'elder'; rng.chance(tx, 'offscreen', f"death:{body}:{d}", min(1,
+    p)) -> OFFSCREEN_DEATH {body_id, activity: the op kind or 'daily life', place_id} (actor_id =
+    body) and physical.bodies.die(tx, rng, body, at, that id, turn_index). (Core CAS-013 turns the
+    OFFSCREEN_DEATH into a corpse trace and talk; CAS-007 into grief and a vacancy.) Unnamed people:
+    per cohort with count > 0 (by cohort_id): expected = count x p (with its band's multiplier);
+    deaths = floor(expected) + (1 when rng.chance(..., f"cohort:{cohort}:{d}", expected -
+    floor(expected))) -> society.population.adjust_cohort(tx, cohort, -deaths, 'died', ...) when
+    deaths > 0 (never below zero).
+  3 Operations (OPS-01): plan_operations(tx, rng, at, turn_index, WD).
+  4 Departures (OPS-06): depart(tx, rng, at, turn_index, WD).
+  5 world.decay.day(tx, rng, at, turn_index, WD); 6 world.infected.day(tx, rng, at, turn_index, WD).
+  7 kernel.clock.schedule(tx, at + DAY, 'WORLD_DAY', None, {}, WD).
+  Returns every event committed, in seq order.
+weather_weights(values) -> list[tuple[str, float]]   (implemented below)
+
+OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
+  At most one new operation per settlement per day, and one raid per hostile group. Per settlement
+  (by id) whose site is outside the active area, with a governing group: crew = its named members
+  (group_members 'member') who are alive, able (society.work.able for 'watcher'), not
+  human-controlled, outside the active area and in no active operation, sorted by (their daily
+  work hours, id). For kind in ('scavenge', 'patrol', 'trade_run'): chance = W.op_chance[kind] x
+  (2 when the settlement has a shortage, for scavenge) x (social_order / 5, for patrol) x
+  (faction_relations / 5, for trade_run; 0 without another settlement); the first kind whose
+  rng.chance(tx, 'offscreen', f"op:{settlement}:{kind}:{d}", chance) holds starts, with n =
+  rng.range_int(..., f"party:{settlement}:{d}", *W.op_party) people (fewer when the crew is smaller;
+  none -> no operation). Destination: scavenge -> rng.choice over building sites (not settlement
+  sites) of other zones, else of any zone; patrol -> the far hub of a route touching the
+  settlement's zone (rng.choice); trade_run -> rng.choice over the other settlements' sites. Per
+  hostile group (by id) with 2+ named living members outside the active area: rng.chance(...,
+  f"raid:{group}:{d}", W.op_chance['raid'] x hostile_human / 5) -> a raid on rng.choice(the
+  settlements) by all of them. A new operation: op_id = tx.mint('ops'); FACTION_OPERATION {op_id,
+  group_id, kind, participants, destination, status: 'active', step: 'depart'} inserting operations
+  {op_id, group_id, kind, status 'active', route [origin place, destination place], participants,
+  next_due_at = at + W.op_leg_h h, outcome NULL}; every participant MOVEs (physical.space.move_event,
+  cause the FACTION_OPERATION) to its zone's hub (leaving); kernel.clock.schedule(next_due_at,
+  'OPERATION_STEP', op_id, {'op_id': op_id, 'step': 'arrive'}, the FACTION_OPERATION id).
+OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event]   (the OPERATION_STEP handler)
+  The operation (status 'active'; otherwise []). movers = participants alive and outside the active
+  area (those in it are on-screen now: the turn moves them, they drop out of the operation's moves).
+  'arrive': movers MOVE to the destination (world.worldmove.on_arrival for each); outcome(...);
+    FACTION_OPERATION {op_id, step: 'arrive', outcome} updating operations.outcome and next_due_at =
+    at + W.op_dwell_h h; schedule 'return'.
+  'return': movers MOVE to the origin; resolve the stores (below); FACTION_OPERATION {op_id, step:
+    'return', status: 'done'} updating status 'done', next_due_at NULL.
+OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>":
+  every mover: rng.chance(zone danger 'shambler' / 20) -> physical.bodies.apply_harm (a 'minor' or
+  'significant' laceration on a CENTRE_MASS anatomy, weighted; cause the arrive event).
+  scavenge: found = rng.chance(0.6); when the destination is discovered and holds loose items, up to
+  3 of them (by item_id) are transferred to the movers' packs (physical.objects.transfer) and a
+  TRACE 'missing_stock' "Shelves pulled out; whatever was here is gone." is left; a TRACE 'tracks'
+  "Boot prints in the dust, a few people, coming and going." always; found adds {food: 2..8 x
+  movers, water: 2..8 x movers} to the outcome's haul.
+  patrol: a TRACE 'tracks' on the way ("Boot prints in a loose line, walking a route.").
+  trade_run: the haul is a swap: 10 % (rounded) of the origin's most plentiful of food / water
+  given for the same amount of the other (both settlements' stores change on 'return', reason
+  'trade'); TRADE {op_id, from, to, gave, got}; a TRACE 'tracks'.
+  raid (RAID {op_id, group_id, settlement_id, success}): success = rng.chance(0.5 + (hostile_human -
+  target defences) / 20, clamped 0.1..0.9); success -> the target loses 10..25 % (rng) of food and
+  water (society.settlement.receive, reason 'raid'), morale -1 (society.settlement.adjust), TRACEs
+  'damage' "Broken boards and a forced door." and 'blood' at the target site, and the target's
+  group gains tension +20 toward the raiders (society.group.adjust_tension); failure -> one raider
+  takes a 'significant' gunshot wound and a TRACE 'blood'.
+  On 'return' the haul goes into the origin settlement's stores (society.settlement.receive, reason
+  'scavenged' / 'trade').
+OPS-04 WORLD-03: every operation leaves at least one trace; the world's off-screen events are
+  counted by the P11 release audit (>= W.min_offscreen_trace_ratio carry a trace).
+OPS-05 on_arrival(tx, rng, body_id, place_id, at, cause_event_id, turn_index) -> list[Event]
+  (called after a MOVE into a new place by action.effects, society.routine, this module and
+  world.worldgen; not for infected bodies, and not in a run without a world_params row — every
+  hand-made scenario keeps its places exactly as written — [].) A building place not yet generated ->
+  physical.space.discover_layout(...), and when it is not held a TRACE 'damage' "Old damage: this
+  place was picked over long ago." in its entrance room (the archetype's entrance_room). Then
+  world.infected.populate(tx, rng, place_id, ...). Returns every event committed.
+OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event]   (the loyalty plan acted on)
+  Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose
+  created_at <= at - W.defect_after_days x DAY, not human-controlled, alive and outside the active
+  area, whose group (the group named in the loop: group_members of the actor with status 'member')
+  still has society.group.defection_pressure >= the dossier's motive.risk_threshold: DEFECTION
+  {actor_id, group_id, loop_id} (writer 'society.group', actor_id) updating group_members status
+  'departed'; society.household.apply_change(..., 'member_left', ...) for their household;
+  for each of their work_assignments rows (key order) ROLE_RELEASED {workplace_id, role, actor_id,
+  shift_start_hh, covering_for, reason: 'left'} (writer 'society.work') deleting it, then
+  society.settlement.add_vacancy(...) for that post; mind.mind.close_loop(tx, the loop, 'fulfilled',
+  the DEFECTION id, at, turn_index); they MOVE to the hub of the zone farthest (by route hops, ties by
+  zone id) from their settlement's zone.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..contracts.events import Event
+    from ..kernel.rng import Rng
+    from ..kernel.store import Tx
+
+
+def weather_weights(values: dict) -> list[tuple[str, float]]:
+    """Weather odds from the world's A block (implemented; 06_WORLD.md §3)."""
+    heat, wet = int(values["climate_heat"]), int(values["climate_moisture"])
+    vis, unstable = int(values["atmo_visibility"]), int(values["instability"])
+    cold = heat <= 3
+    return [("clear", 4.0), ("overcast", 3.0), ("rain", 0.0 if cold else 2.0 * wet / 5),
+            ("storm", 0.5 * wet / 5 * unstable / 5), ("fog", (10 - vis) / 5), ("wind", 1.0),
+            ("heat", 2.0 if heat >= 8 else 0.0), ("snow", 2.0 if cold else 0.0)]
+
+
+def ensure_timers(tx: "Tx", at: int, turn_index: int) -> list[str]:
+    raise NotImplementedError("P10")
+
+
+def day(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> list["Event"]:
+    raise NotImplementedError("P10")
+
+
+def plan_operations(tx: "Tx", rng: "Rng", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
+    raise NotImplementedError("P10")
+
+
+def step(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> list["Event"]:
+    raise NotImplementedError("P10")
+
+
+def on_arrival(tx: "Tx", rng: "Rng", body_id: str, place_id: str, at: int, cause_event_id: str | None,
+               turn_index: int) -> list["Event"]:
+    raise NotImplementedError("P10")
+
+
+def depart(tx: "Tx", rng: "Rng", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
+    raise NotImplementedError("P10")

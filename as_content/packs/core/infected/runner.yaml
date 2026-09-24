@@ -1,0 +1,45 @@
+# Runner — the first-rise high-integrity state (CMG §42.17), usually temporary. Downgrades to
+# Shambler or Crawler; never the reverse. Lore_and_World_Building.pdf §4 (page 6-8).
+- schema: as.infected.v1
+  id: ZOMBIE_VARIANT_ID_RUNNER01
+  name: Runner
+  rarity: semi_rare
+  special:
+    S: {lo: 5, hi: 5}
+    P: {lo: 3, hi: 3}
+    E: {lo: 5, hi: 5}
+    C: {lo: 1, hi: 1}
+    I: {lo: 2, hi: 2}
+    A: {lo: 6, hi: 6}
+    L: {lo: 2, hi: 2}
+  senses:
+    hearing_threshold_db: 40.0
+    vision_range_m: 12.0
+    vision_mode: shape
+    thermal: false
+  speed_m_s: 2.2
+  sprint_m_s: 6.5
+  grip_strength: 7
+  alive: false
+  false_death: true
+  reanimation_window_h: [8.0, 16.0]
+  true_kill: [destroy_brainstem_spinal_junction, denature_or_pulp_core_tissue]
+  quirks: [RUN_GREETING_MASK, RUN_OVERSHOOT, RUN_FULLFED_APATHY, RUN_NAME_STICKING]
+  player_facing:
+    - Sees better than a Shambler; still near-sighted and error-prone at range.
+    - Runs hard, trips often and gets overstimulated — crashes into obstacles or falls off things.
+    - If cornered or hurt it may scream, and that scream carries and draws others in.
+    - Sometimes talks, sometimes pleads. It never means anything good.
+  codex_truth:
+    - Cognition approximates a one-to-two-year-old with severe impairment — working memory exists, learning does not stick.
+    - Emotion spikes are real but shallow — embarrassment, frustration, meaningless nostalgia flashes.
+    - Retains a flawed metabolic drive — needs a moist throat for vocalization, so it eats and drinks, just far less efficiently than a living human; deprived long enough it degrades toward Shambler-like speed and coordination.
+    - Metabolism gates it — a full Runner may disengage rather than fight, while hunger reboots aggression fast.
+  tactics:
+    - Explosive approach — sprints in bursts, uses climbs and short parkour lines, misjudges distances.
+    - Name-sticking — it may remember a spoken name for roughly fifteen seconds and repeat it while stalking.
+    - Embarrassment pivot — after a bad miss it can cool off for a moment, then attack again from a new angle.
+  weaknesses:
+    - Stamina gating — a long chase burns it down into sloppy, slower attacks.
+    - Bright, chaotic environments overload it into worse choices.
+    - It cannot plan; it can only commit to the nearest urge, and has a 25-40% chance of a spectacular fall on any complex maneuver or sudden stop.

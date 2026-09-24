@@ -1,0 +1,71 @@
+- schema: as.item.v1
+  id: canned_beans
+  name: can of beans
+  plural: cans of beans
+  kind: food
+  mass_g: 450
+  bulk: 1
+  stackable: true
+  tags: [food, canned]
+  barter_value: 5
+  food: {kcal: 380}
+  description: Baked beans in a dented can.
+- schema: as.item.v1
+  id: canned_peaches
+  name: can of peaches
+  plural: cans of peaches
+  kind: food
+  mass_g: 430
+  bulk: 1
+  stackable: true
+  tags: [food, canned, treat]
+  barter_value: 7
+  food: {kcal: 300}
+  description: Sliced peaches in syrup. People fight over these.
+- schema: as.item.v1
+  id: rice_bag
+  name: bag of rice
+  plural: bags of rice
+  kind: food
+  mass_g: 2000
+  bulk: 3
+  stackable: true
+  tags: [food, staple]
+  barter_value: 12
+  food: {kcal: 7200}
+  description: Two kilos of white rice, taped shut against weevils.
+- schema: as.item.v1
+  id: jerky_pack
+  name: pack of jerky
+  plural: packs of jerky
+  kind: food
+  mass_g: 100
+  bulk: 0
+  stackable: true
+  tags: [food, trail]
+  barter_value: 6
+  food: {kcal: 300, spoil_days: 90}
+  description: Home-dried meat of uncertain origin, wrapped in wax paper.
+- schema: as.item.v1
+  id: water_bottle
+  name: bottle of water
+  plural: bottles of water
+  kind: water
+  mass_g: 1050
+  bulk: 1
+  stackable: true
+  tags: [water, drink]
+  barter_value: 4
+  water: {ml: 1000}
+  description: A one-litre plastic bottle, refilled and boiled.
+- schema: as.item.v1
+  id: water_jug
+  name: water jug
+  plural: water jugs
+  kind: water
+  mass_g: 5300
+  bulk: 6
+  tags: [water, drink]
+  barter_value: 18
+  water: {ml: 5000}
+  description: A five-litre jug with a screw cap.

@@ -1,0 +1,18 @@
+{
+  "type": "as_game",
+  "action": "dev_data",
+  "data": {
+    "what": "gate",
+    "turn_index": 1,
+    "rows": [
+      {
+        "session_bits": "111111111111",
+        "world_bits": "1111111111111111",
+        "entities_bits": "1111111111111111",
+        "global_bits": "11111111111111",
+        "passed": 1,
+        "failures": []
+      }
+    ]
+  }
+}

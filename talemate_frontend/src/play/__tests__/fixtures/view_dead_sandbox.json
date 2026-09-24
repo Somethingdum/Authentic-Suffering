@@ -1,0 +1,308 @@
+{
+  "type": "as_game",
+  "action": "view",
+  "data": {
+    "view": {
+      "run_id": "addison_flores_5c2",
+      "turn_index": 41,
+      "pc_name": "Addison Flores",
+      "alive": false,
+      "clock": {
+        "day": 212,
+        "time_text": "06:05",
+        "part_of_day": "dawn",
+        "weather_text": "Raining",
+        "light_text": "Low light"
+      },
+      "location": {
+        "place_name": "Pump house",
+        "area_name": "Mill Creek settlement",
+        "description_lines": [
+          "A small concrete room, low light.",
+          "Rain drums on the roof.",
+          "There is a workbench here.",
+          "One other person is here.",
+          "The workbench gives some cover."
+        ],
+        "can_see": [
+          {
+            "ref": "i1",
+            "name": "hand pump",
+            "detail": "rusted"
+          },
+          {
+            "ref": "i2",
+            "name": "jerrycan",
+            "detail": ""
+          }
+        ],
+        "people": [
+          {
+            "ref": "p1",
+            "label": "Tomas",
+            "status_words": [
+              "hurt"
+            ],
+            "known": true
+          },
+          {
+            "ref": "p2",
+            "label": "a figure",
+            "status_words": [],
+            "known": false
+          }
+        ],
+        "exits": [
+          {
+            "ref": "x1",
+            "label": "Steel door",
+            "state_words": [
+              "closed",
+              "locked"
+            ],
+            "leads_to": "Yard"
+          },
+          {
+            "ref": "x2",
+            "label": "Window",
+            "state_words": [
+              "open",
+              "broken"
+            ],
+            "leads_to": "unknown"
+          }
+        ],
+        "dangers": [
+          "Infected in the culvert (a rumour)"
+        ],
+        "noise_text": "some noise"
+      },
+      "inventory": {
+        "hands": [
+          {
+            "ref": "i3",
+            "name": "crowbar",
+            "qty": 1,
+            "condition_word": "worn",
+            "detail": "",
+            "mass_text": "1.5 kg",
+            "actions": [
+              "Drop",
+              "Put away"
+            ]
+          }
+        ],
+        "worn": [
+          {
+            "ref": "i4",
+            "name": "rain jacket",
+            "qty": 1,
+            "condition_word": "good",
+            "detail": "",
+            "mass_text": "0.6 kg",
+            "actions": [
+              "Take out"
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "item": {
+              "ref": "i5",
+              "name": "daypack",
+              "qty": 1,
+              "condition_word": "worn",
+              "detail": "",
+              "mass_text": "0.9 kg",
+              "actions": [
+                "Take out"
+              ]
+            },
+            "bulk_used": 18,
+            "bulk_max": 25,
+            "contents": [
+              {
+                "ref": "i6",
+                "name": "water bottle",
+                "qty": 2,
+                "condition_word": "good",
+                "detail": "",
+                "mass_text": "1.0 kg",
+                "actions": [
+                  "Take out",
+                  "Drink"
+                ]
+              },
+              {
+                "item": {
+                  "ref": "i7",
+                  "name": "first aid pouch",
+                  "qty": 1,
+                  "condition_word": "pristine",
+                  "detail": "",
+                  "mass_text": "0.3 kg",
+                  "actions": [
+                    "Take out"
+                  ]
+                },
+                "bulk_used": 2,
+                "bulk_max": 3,
+                "contents": [
+                  {
+                    "ref": "i8",
+                    "name": "bandage",
+                    "qty": 3,
+                    "condition_word": "pristine",
+                    "detail": "",
+                    "mass_text": "0.1 kg",
+                    "actions": [
+                      "Take out",
+                      "Use"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "carried_mass_kg": 9.4,
+        "load_word": "moderate"
+      },
+      "body": {
+        "wounds": [
+          {
+            "where": "left forearm",
+            "what": "cut wound",
+            "severity_word": "serious",
+            "bleeding_word": "bleeding",
+            "treated": false
+          }
+        ],
+        "needs": [
+          {
+            "name": "Thirst",
+            "level": 2,
+            "word": "noticeable"
+          },
+          {
+            "name": "Hunger",
+            "level": 1,
+            "word": "fine"
+          },
+          {
+            "name": "Tiredness",
+            "level": 3,
+            "word": "bad"
+          },
+          {
+            "name": "Pain",
+            "level": 2,
+            "word": "noticeable"
+          }
+        ],
+        "impairment_word": "slowed",
+        "resolve": {
+          "cur": 4,
+          "max": 6,
+          "word": "shaken"
+        },
+        "status_words": [
+          "crouched"
+        ],
+        "infection_known": null
+      },
+      "people": [
+        {
+          "ref": "p1",
+          "label": "Tomas",
+          "relation_words": [
+            "you trust them",
+            "you owe them"
+          ],
+          "last_seen_text": "here now",
+          "what_you_know": [
+            "Tomas keeps the pump running."
+          ],
+          "promises": [
+            "Bring Tomas a filter from the depot."
+          ],
+          "alive_known": "alive"
+        },
+        {
+          "ref": "p3",
+          "label": "the woman with the red scarf",
+          "relation_words": [],
+          "last_seen_text": "last seen day 209, 18:40, Depot road",
+          "what_you_know": [],
+          "promises": [],
+          "alive_known": "unknown"
+        }
+      ],
+      "journal": {
+        "promises_made": [
+          "Bring Tomas a filter from the depot."
+        ],
+        "promises_owed": [
+          "Rhea owes you two cans of beans."
+        ],
+        "goals": [
+          "Find a water filter."
+        ],
+        "rumours": [
+          "Infected nest in the culvert by the mill."
+        ],
+        "lessons": [
+          "Rain covers footsteps."
+        ],
+        "the_dead": [],
+        "reputation_heard": []
+      },
+      "map": {
+        "places": [
+          {
+            "ref": "m1",
+            "label": "Pump house",
+            "visited": true,
+            "here": true,
+            "exits_known": [
+              "Steel door"
+            ],
+            "travel_text": ""
+          },
+          {
+            "ref": "m2",
+            "label": "Yard",
+            "visited": true,
+            "here": false,
+            "exits_known": [
+              "Steel door",
+              "Gate"
+            ],
+            "travel_text": "a minute's walk"
+          }
+        ]
+      },
+      "suggestions": [],
+      "lanes": {
+        "A": {
+          "label": "Main model",
+          "ok": true,
+          "model": "nemotron-cascade-2-30b-a3b",
+          "detail": ""
+        },
+        "B": {
+          "label": "Second model",
+          "ok": false,
+          "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+          "detail": ""
+        }
+      },
+      "sandbox": true,
+      "mechanics": {
+        "lines": [
+          "Force the steel door: failure (needed 5 or less, rolled 8)"
+        ]
+      }
+    }
+  }
+}

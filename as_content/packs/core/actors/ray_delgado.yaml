@@ -1,0 +1,182 @@
+schema: as.actor.v1
+id: ray_delgado
+generation: authored
+days_since_fall_range: [14, 1460]
+identity:
+  name: Ray Delgado
+  aliases: [Mr. D]
+  age: 58
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: San Antonio, Texas
+  occupation_before: Owner of Delgado's Market for twenty-two years; deer hunter on weekends
+  occupation_now: Owner and boss of Delgado's crew, whether anyone voted for it or not
+  one_line: A corner-store owner who runs the crew like a shop, and keeps a second shop of his own in the office cabinet.
+appearance:
+  height_cm: 175
+  mass_kg: 88
+  build: Barrel-chested, heavy through the belly, forearms thick from decades of stocking shelves
+  hair: Iron gray, thinning, combed straight back with water every morning
+  eyes: Brown, bloodshot now
+  skin: Tan, deep lines at the eyes, liver spots on the backs of his hands
+  distinguishing_marks:
+    - A gold wedding band he turns constantly with his thumb
+    - A missing tip on his left ring finger from a meat slicer in 1998
+  clothing_usual: A short-sleeved button-down shirt tucked into work pants, a store apron over it, reading glasses on a cord
+  movement_under_stress: Plants himself in the middle of the room and gets louder, as if volume were authority; his hands go to his apron pockets.
+  habit_gesture: Turns his wedding ring with his thumb while he listens to anyone ask for anything.
+  relation_to_appearance: Still combs his hair and tucks his shirt every morning because a store owner does, and the day he stops, he knows the store is gone.
+capability:
+  special: {S: 5, P: 5, E: 4, C: 6, I: 6, A: 3, L: 4}
+  skills:
+    - {domain: trade, rank: 3, evidence: "Twenty-two years buying from distributors and selling on thin margins in a bad neighbourhood."}
+    - {domain: leadership, rank: 1, evidence: "Managed a staff of six and a family business through two recessions."}
+    - {domain: firearms, rank: 1, evidence: "Thirty seasons deer hunting with the same rifle; has never fired at a person."}
+  tags: []
+  trained_responses:
+    - {cue: door_forced, verb: guard, note: "Gets the rifle from the office before anything else."}
+  literacy: 3
+  tech_literacy: 1
+  resolve_trait_mod: 0
+motive:
+  motive: Keep the store — his life's work and the only thing of his wife's he still has — standing until the world comes back.
+  method: Rules the crew like a business — rules, counts, no credit — and quietly builds a private reserve in the office in case the business fails.
+  moral_line:
+    will: ["Refuse a starving stranger at the window", "Hide food from his own crew for a reserve"]
+    wont: ["Abandon the store while it stands", "Shoot someone who is walking away", "Throw a child out of the building"]
+    wont_tags: [attack_unarmed, harm_dependent]
+  inner_conflict: He preaches that the count keeps everyone honest while he skims it every night, and he tells himself the reserve is for all of them.
+  past_wound: His wife, Lupe, died of a stroke in the back office two years before the Fall, and he found her at closing.
+  signature_behaviour: Reads the day's ledger totals aloud to the crew every evening like a shift report.
+  risk_threshold: 3
+  risk_text: Avoids physical risk and always has; takes big risks only with other people's goods.
+  resource_constraints: One hunting rifle with nine rounds; a bad knee that keeps him off runs; everything the crew has, and they know it.
+persona:
+  public:
+    shown_traits: [fair, firm, fatherly]
+    claimed_history: Ran this store twenty-two years and never closed a day until this.
+    presented_affiliation: The store
+  private:
+    true_goals: ["Keep the store standing", "Have enough put by to walk away if it falls"]
+    concealed_history: Every few nights he moves cans and jugs into the locked office filing cabinet, and he has promised Alice a share for her silence.
+    real_affiliation: The store, and himself
+traits:
+  - tag: proprietor
+    manifests: Treats everything in the building as his stock and every person as staff or a customer.
+    triggers: Anyone taking, giving or trading anything without asking him.
+    causes: He makes every decision about goods and refuses to share authority over them.
+    costs: The crew experiences him as a landlord, not a leader, and resents every rule.
+    example: Made June write an IOU in the ledger for two painkillers she gave Nita after the run.
+  - tag: stubborn
+    manifests: Once he has said no, he says it louder instead of changing his mind.
+    triggers: Being argued with in front of others, especially by June or Mara.
+    causes: He doubles down on bad calls rather than look weak.
+    costs: He misses better ideas, and the crew stops bringing them to him.
+    example: Kept the front door rule — no trades, ever — for a week after June showed him a family with a newborn outside.
+contradictions:
+  - belief_a: Rules and an honest count are what keep people civilized.
+    belief_b: A man who doesn't look after himself first ends up like everyone out there.
+    a_wins_when: He is in front of the crew, reading the ledger.
+    b_wins_when: It is night, the store is quiet, and the jugs are running low.
+decision_stack:
+  layers:
+    - Keep the store standing
+    - Keep his reserve safe and secret
+    - Keep his authority over the crew
+    - Keep the crew fed and safe
+    - Help anyone outside
+  inversion_conditions:
+    - If the store is truly lost — fire, a breach he cannot hold — his reserve jumps to the top and he takes it and goes.
+    - If Eli is directly threatened in front of him, the crew's safety rises above his authority.
+  past_example: When Mara refused to leave Eli behind for a run, he let her take the boy rather than lose her gun, then told the crew he had allowed it.
+silence:
+  goes_quiet_when:
+    - Anyone mentions his wife.
+    - June recounts the stockroom out loud.
+    - Mara disagrees with him and waits instead of arguing.
+  body_when_silent: Arms crossed over the apron, turning the wedding ring, looking at the office door.
+  refuses_to_discuss: ["Lupe", "The office cabinet"]
+  comfortable_vs_uncomfortable: Comfortable silence is the store at opening time, lights off, shelves full; uncomfortable silence is the crew not answering his evening report.
+knowledge:
+  knows:
+    - The store's layout, every hiding place in it, and the back door's weak hinge.
+    - His reserve — eleven jugs and forty cans — in the office filing cabinet.
+  does_not_know:
+    - That Eli has watched him at the cabinet.
+    - That Nita has seen someone at the back fence.
+  knows_but_hides:
+    - The reserve in the office cabinet.
+    - That the rifle has only nine rounds.
+  cues: [knows_noise_draws_dead]
+voice:
+  capsule: Shopkeeper's patter gone sour — 'folks', 'let's be clear', 'house rules'. Talks in rules and totals. Spanish endearments for Eli, never for adults. Loud when challenged, gentle when he wants something.
+  speech_tendencies:
+    - Frames orders as house rules ("House rule, nobody at the window after dark.").
+    - Uses totals and prices from before as metaphors.
+    - Calls everyone under forty 'kid'.
+  exemplars:
+    low_stakes: "Evening totals, folks. Forty-one beans, twenty-two peaches, nineteen jugs. Same as always, we share, we don't take."
+    under_pressure: "Nobody touches that door. Nobody. Mara, you're on the back. June — down, get down."
+    at_the_limit: "This is my store. Twenty-two years. You don't get to walk in and tell me who eats in my store."
+  would_never_say:
+    - "Take what you need, it's on the house."
+    - "Maybe I was wrong about that."
+    - "Let's put it to a vote."
+  profanity: rare
+  dialect_notes: San Antonio Spanish when he's soft — 'mijo' for Eli; 'Dios mío' under his breath.
+social:
+  household_role: head
+  relations:
+    - target: "core:actor/alice_tran"
+      kind: acquaintance
+      axes: {trust: 1, obligation: 1}
+      history: Alice knows about the cabinet; he promised her a share, and he watches her more closely than anyone.
+    - target: "core:actor/mara_voss"
+      kind: employee
+      axes: {trust: 0, respect: 2, fear: 1}
+      history: He needs her gun and resents that the crew obeys her faster than him.
+    - target: "core:actor/eli_voss"
+      kind: acquaintance
+      axes: {affection: 2}
+      history: Calls him 'mijo' and gives him small jobs and candy from behind the counter; the boy reminds him of his own nephews.
+    - target: "core:actor/june_okafor"
+      kind: employee
+      axes: {respect: 1, resentment: 1}
+      history: He took her in on the first day and she has argued with him about the door every week since.
+    - target: "core:actor/nita_reyes"
+      kind: employee
+      axes: {trust: 0, respect: 1}
+      history: He depends on her runs and will not give her a gun, because he does not know what she'd do with it.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/delgados_crew", role: owner, standing: 3, since: "day 0"}
+life:
+  aspiration: To open the store's front door for business again.
+  current_project: Filling the reserve to twenty jugs before anyone notices the count.
+  routine:
+    - {start_hh: 7, end_hh: 12, activity: inspecting the barricades and stock, place_hint: sales floor}
+    - {start_hh: 12, end_hh: 20, activity: running the crew from behind the counter, place_hint: sales floor}
+    - {start_hh: 20, end_hh: 21, activity: evening totals, place_hint: sales floor}
+    - {start_hh: 21, end_hh: 24, activity: sleep, place_hint: office}
+    - {start_hh: 0, end_hh: 7, activity: sleep, place_hint: office}
+  obligations: ["The evening totals", "The rifle"]
+  hopes: ["The government coming back", "Reopening the store"]
+  fears: ["The store burning", "Being turned on by his own crew"]
+  secrets:
+    - content: He keeps a private reserve of food and water in the locked office filing cabinet, filled from the crew's stock.
+      who_knows: ["core:actor/alice_tran", "core:actor/eli_voss"]
+      exposure_consequence: The crew would stop following him, and Mara might take the store.
+disposition:
+  archetype_prior: civilized
+  toward_strangers: wary
+  encounter_default: Tells them through the barricade that the store is closed, then wakes Mara.
+starting_loops:
+  - {kind: goal, text: "Fill the reserve to twenty jugs", strength: 2}
+  - {kind: promise_owed, text: "A share of the reserve to Alice", subject: "core:actor/alice_tran", strength: 2}
+starting_inventory:
+  - {item: "core:item/hunting_rifle", slot: worn, label: rifle, props: {rounds: 4}}
+  - {item: "core:item/ammo_308", qty: 5, slot: pocket}
+  - {item: "core:item/door_key", slot: pocket, props: {opens: "office filing cabinet"}}
+writers_notes: Ray is a decent man turning into a small tyrant because he is terrified. The store is his dead wife. Let him be petty, frightened and occasionally kind; never a cartoon.
+tags: [delgados_crew, anchor_scene]

@@ -1,0 +1,57 @@
+# A local group (kind: group): the people holding Delgado's Market in the first months after the
+# Fall. The anchor scene (docs/as/04_TURN_PIPELINE.md §7) is their night.
+schema: as.faction.v1
+id: delgados_crew
+name: Delgado's crew
+kind: group
+one_line: Six people holding a barricaded corner market on its owner's rules and its dwindling stock.
+wants: To last until something better exists — a real settlement, a convoy, a government — without having to leave the only walls they trust.
+stated_purpose: Keep the store, keep each other, share what's on the shelves.
+methods: Ray Delgado's rules, a night watch rotated between whoever can hold a gun, careful scavenging runs by Nita, and a count of every can so nobody can say they were cheated.
+will_not_do:
+  - Open the door to anyone after dark.
+  - Turn out a crew member who is hurt but not bitten.
+  - Take from other survivors by force.
+resources_have:
+  - The market's remaining stock, counted to the can.
+  - A brick building with one steel back door and a barricaded front.
+  - One hunting rifle and a .38 revolver.
+  - Nita's knowledge of four blocks in every direction.
+resources_need:
+  - Water — the taps died on day six and they are down to jugs.
+  - Medicine beyond painkillers and bandages.
+  - Ammunition for anything.
+  - Sleep.
+pressure: The shelves empty a little faster than Alice's count says they should, the water jugs will not last the month, and something has been at the back fence at night.
+leaders:
+  - {title: Owner, role: "Ray Delgado owns the store and makes the rules; nobody has voted on it.", actor: "core:actor/ray_delgado"}
+how_leadership_is_contested: Nobody has challenged Ray yet. Mara could — the crew obeys her in a crisis faster than it obeys him — and both of them know it.
+fault_lines:
+  - Ray's rules against Mara's son — every exception Mara takes for Eli is an exception somebody else notices.
+  - Whether to let anyone else in; June wants to, Ray will not.
+  - The count — somebody is taking extra, and Alice knows more about it than she has said.
+relations: []
+doctrine:
+  challenge_procedure: Whoever is on watch calls out through the barricade gaps without showing themselves — "Store's closed. Keep walking." — and wakes Ray if the stranger stays.
+  escalation_ladder:
+    - Call out to keep walking.
+    - Wake Ray and Mara.
+    - Show the rifle through the gap.
+    - Fire at anyone who touches the barricade or the back fence after a warning.
+  treatment_of_unknowns: Nobody unknown comes inside. Ray will trade through the gap in daylight if the stranger stays in the street where Mara can see them.
+  treatment_of_visibly_sick: Anyone bitten or feverish is not let in, and a crew member who is bitten goes to the office with the door locked until morning, when Ray decides.
+  prisoner_policy: They have never held one and have no plan for it; a caught thief would be turned out without their shoes.
+  intake_screening:
+    - Seen in daylight from the window first.
+    - Arms and legs shown for bites before the door is touched.
+laws: ["core:law/nightfall_curfew", "core:law/firearms_discipline", "core:law/ration_law", "core:law/intake_screening", "core:law/contamination_quarantine", "core:law/theft_law"]
+node_classes: []
+presence:
+  regional_reach: One building and the four blocks around it.
+  start_trust_ranges: {neutral: [3, 5], suspicious: [1, 3]}
+  era_exceptions: {}
+  presence_conditions: ["days_since_fall <= 1460"]
+  population_baseline: 6
+member_archetypes: []
+belief_text: "There's people in Delgado's. They'll trade through the window if you come in daylight, and they'll shoot you if you don't."
+truth_text: Six people, two guns, twenty-some days of water and a store that is being quietly skimmed from inside. They are one bad week from breaking apart, and each of them would take a different road out.

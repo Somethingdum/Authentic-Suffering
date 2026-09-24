@@ -1,0 +1,66 @@
+# WILL-03 fixture (PROTECTED). Two people identical in everything except skills and Resolve stand
+# in the same room with the same items, facing the same shambler in the doorway. Their offered
+# option sets must differ because of skill and nerve (mind/affordance.py WILL-03).
+schema: as.scenario.v1
+name: two_skills
+description: Same body, same room, same kit — different training, different options.
+seed: 41
+start: {day: 200, time: "12:00:00"}
+places:
+  - id: garage
+    name: Garage
+    width_m: 8
+    depth_m: 6
+    material: concrete
+    light: 3
+    ambient_db: 30
+    anchors:
+      - {id: bench, name: workbench, kind: furniture, x: 2, y: 5, cover: 1}
+      - {id: car, name: far side of the car, kind: cover, x: 4, y: 3, cover: 2, concealment: 2}
+      - {id: side_door_in, name: side door, kind: door_side, x: 7.5, y: 3}
+      - {id: roll_door, name: roll-up door, kind: door_side, x: 4, y: 0.3}
+  - id: yard
+    name: Yard
+    kind: outdoor
+    indoor: false
+    material: open_air
+    anchors:
+      - {id: side_door_out, name: side door, kind: door_side, x: 0.5, y: 5}
+portals:
+  - {id: side_door, a: garage, b: yard, anchor_a: side_door_in, anchor_b: side_door_out, kind: door, name: side door, open: true, w: 85, h: 205, seal_db: 20}
+bodies:
+  - id: pc
+    dossier: core:pc/owen_marsh
+    controller: human
+    place: garage
+    anchor: bench
+  - id: twin_a
+    stub: {name: Sam Ortega, age: 35, sex: male, occupation: former army medic, skills: {firearms: 3, brawling: 2, medicine: 2, athletics: 2}}
+    place: garage
+    x: 3
+    y: 2
+    resolve: 6
+    cues: [knows_headshot_rule, knows_false_death]
+    inventory:
+      - {item: core:item/glock_19, slot: hand_r, label: gun_a, props: {chambered: true}}
+      - {item: core:item/magazine_9mm_15, container: gun_a, props: {rounds: 15}}
+      - {item: core:item/pocket_knife, slot: pocket}
+      - {item: core:item/bandage_roll, slot: pocket}
+  - id: twin_b
+    stub: {name: Sam Ortega, age: 35, sex: male, occupation: former army medic}
+    place: garage
+    x: 5
+    y: 2
+    resolve: 1
+    inventory:
+      - {item: core:item/glock_19, slot: hand_r, label: gun_b, props: {chambered: true}}
+      - {item: core:item/magazine_9mm_15, container: gun_b, props: {rounds: 15}}
+      - {item: core:item/pocket_knife, slot: pocket}
+      - {item: core:item/bandage_roll, slot: pocket}
+  - id: shambler
+    infected: ZOMBIE_ARCHETYPE_SHAMBLER01
+    controller: policy
+    place: garage
+    anchor: side_door_in
+notes:
+  - The twins share a name on purpose; the tests address them by local id.

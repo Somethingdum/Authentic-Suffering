@@ -1,0 +1,11 @@
+{
+  "type": "as_game",
+  "action": "turn_progress",
+  "data": {
+    "turn_index": 42,
+    "stage": 6,
+    "label": "People decide…",
+    "pct": 31.6,
+    "elapsed_s": 12.4
+  }
+}

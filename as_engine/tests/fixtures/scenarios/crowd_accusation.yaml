@@ -1,0 +1,45 @@
+# CROWD-01..05 fixture (PROTECTED). The PC speaks at the lectern at one end of a long hall; eight
+# listeners stand in a line 1, 2, 4, 6, 8, 10, 12 and 14 m away; one observer stands near the doors
+# 25 m away. Expected at normal volume (60 dB), ambient 40, indoor k = 4.5
+# (vectors/acoustics.json 'crowd_*'): 1 m margin 20.0 EXACT, 2 m 15.5 EXACT, 4 m 11.0 PARTIAL,
+# 6 m 8.37 PARTIAL, 8 m 6.5 PARTIAL, 10 m 5.05 PARTIAL, 12 m 3.87 TONE_ONLY, 14 m 2.87 TONE_ONLY,
+# 25 m -0.90 NONE (the observer can only SEE what happens: CROWD-05).
+schema: as.scenario.v1
+name: crowd_accusation
+description: An accusation in a crowded hall — who heard what, and who only saw it.
+seed: 11
+start: {day: 2000, time: "19:30:00"}   # Remnants era: Reggie and Irene fit (WG-34); the rest are stubs
+places:
+  - id: hall
+    name: Assembly hall
+    width_m: 15
+    depth_m: 30
+    material: brick
+    light: 3
+    ambient_db: 40
+    anchors:
+      - {id: lectern, name: lectern, kind: feature, x: 7.5, y: 29}
+      - {id: doors_in, name: the doors, kind: door_side, x: 7.5, y: 0.5}
+bodies:
+  - {id: pc, dossier: "core:pc/owen_marsh", controller: human, place: hall, anchor: lectern}
+  - {id: l01, stub: {name: Rosa Delane, age: 38, sex: female, occupation: cook}, place: hall, x: 7.5, y: 28}
+  - {id: l02, stub: {name: Marcus Hale, age: 51, sex: male, occupation: carpenter}, place: hall, x: 7.5, y: 27}
+  - {id: l04, stub: {name: Priya Nand, age: 29, sex: female, occupation: runner}, place: hall, x: 7.5, y: 25}
+  - {id: l06, stub: {name: Tom Birch, age: 60, sex: male, occupation: farmer}, place: hall, x: 7.5, y: 23}
+  - {id: l08, dossier: "core:actor/reggie_tate", place: hall, x: 7.5, y: 21}
+  - {id: l10, stub: {name: Wen Liu, age: 33, sex: female, occupation: clerk}, place: hall, x: 7.5, y: 19}
+  - {id: l12, dossier: "core:actor/irene_kowalski", place: hall, x: 7.5, y: 17}
+  - {id: l14, stub: {name: Abe Ferris, age: 47, sex: male, occupation: welder}, place: hall, x: 7.5, y: 15}
+  - {id: observer, stub: {name: Jo Mercer, age: 25, sex: female, occupation: guard}, place: hall, x: 7.5, y: 4}
+knows:
+  - {holder: l01, subject: l08, name: Reggie}
+  - {holder: l02, subject: l08, name: Reggie}
+  - {holder: l04, subject: l08, name: Reggie}
+  - {holder: l06, subject: l08, name: Reggie}
+  - {holder: l10, subject: l08, name: Reggie}
+  - {holder: l12, subject: l08, name: Reggie}
+  - {holder: observer, subject: pc, name: Owen}
+  - {holder: observer, subject: l08, name: Reggie}
+  - {holder: l08, subject: pc, name: Owen}
+notes:
+  - Tests script the PC's line, e.g. "Reggie's been skimming the tribute." at normal volume, and check each listener's reception and belief.

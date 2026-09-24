@@ -1,0 +1,155 @@
+# P9 society fixture (PROTECTED): ECON-01, SOC-01..03, DEMO-01. A 24-person settlement around a
+# water pump: 23 fixture-stub people plus the PC. The pump is balanced on a knife edge: two cycles a
+# day at 31 water each = 62/day, exactly the settlement's consumption at 06_WORLD.md §2.4 rates
+# (19 people at adult rates — adults, elders, the preteen and the teen — x 3, 3 children x 1,
+# 2 infants x 1 = 62), and the store holds 192 (3.1 days). One missed pump shift drops the store
+# under 3 days -> SHORTAGE -> ration cut -> household tension. The ECON-01 test injures Hal's arm
+# and lets the world run; nothing else is scripted. Everyone but the PC (a newcomer) has a household
+# and so a bunk to sleep in (P9 routines); the single adults are households of one.
+schema: as.scenario.v1
+name: pump_settlement
+description: A small settlement that lives or dies by one pump.
+seed: 51
+start: {day: 1100, time: "05:00:00"}
+weather: {kind: clear, wind_level: 0}
+places:
+  - {id: yard, name: Settlement yard, kind: outdoor, indoor: false, material: open_air, width_m: 40, depth_m: 30, ambient_db: 35, anchors: [{id: yard_centre, name: middle of the yard, x: 20, y: 15}, {id: gate, name: the gate, kind: door_side, x: 20, y: 0.5}]}
+  - {id: pump_house, name: Pump house, material: concrete, width_m: 5, depth_m: 4, held: true, anchors: [{id: pump_head, name: pump head, x: 2.5, y: 2}, {id: pump_door_in, name: steel door, kind: door_side, x: 2.5, y: 0.3}]}
+  - {id: kitchen, name: Kitchen, material: brick, width_m: 8, depth_m: 6, held: true, anchors: [{id: stove, name: stove, x: 2, y: 5}, {id: kitchen_door_in, name: kitchen door, kind: door_side, x: 4, y: 0.3}]}
+  - {id: bunk_a, name: Bunkhouse A, material: wood, width_m: 12, depth_m: 8, anchors: [{id: bunk_a_in, name: bunkhouse door, kind: door_side, x: 6, y: 0.3}]}
+  - {id: bunk_b, name: Bunkhouse B, material: wood, width_m: 12, depth_m: 8, anchors: [{id: bunk_b_in, name: bunkhouse door, kind: door_side, x: 6, y: 0.3}]}
+  - {id: tower, name: Watch tower, material: wood, width_m: 3, depth_m: 3, light: 3, anchors: [{id: tower_top, name: top of the tower, kind: vantage, x: 1.5, y: 1.5}]}
+portals:
+  - {id: pump_door, a: yard, b: pump_house, anchor_b: pump_door_in, kind: door, name: steel door, open: false, w: 90, h: 200, seal_db: 35}
+  - {id: kitchen_door, a: yard, b: kitchen, anchor_b: kitchen_door_in, kind: door, name: kitchen door, open: true, w: 90, h: 205, seal_db: 25}
+  - {id: bunk_a_door, a: yard, b: bunk_a, anchor_b: bunk_a_in, kind: door, name: bunkhouse A door, open: false, w: 90, h: 205, seal_db: 20}
+  - {id: bunk_b_door, a: yard, b: bunk_b, anchor_b: bunk_b_in, kind: door, name: bunkhouse B door, open: false, w: 90, h: 205, seal_db: 20}
+  - {id: tower_ladder, a: yard, b: tower, kind: opening, name: tower ladder, open: true, w: 60, h: 200, seal_db: 0}
+bodies:
+  - {id: pc, dossier: "core:pc/owen_marsh", controller: human, place: yard, anchor: yard_centre}
+  - {id: hal, stub: {name: Hal Brandt, age: 44, sex: male, occupation: "pump mechanic", cohort: pre_fall_adult, skills: {mechanics: 2}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: mae, stub: {name: Mae Brandt, age: 41, sex: female, occupation: "cook", cohort: pre_fall_adult, skills: {cooking: 2}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: pip, stub: {name: Pip Brandt, age: 8, sex: female, occupation: "child", cohort: fall_child, skills: {}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: rosa, stub: {name: Rosa Quintero, age: 36, sex: female, occupation: "pump operator", cohort: pre_fall_adult, skills: {mechanics: 1}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: teo, stub: {name: Teo Quintero, age: 5, sex: male, occupation: "child", cohort: fall_child, skills: {}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: ben, stub: {name: Ben Oduya, age: 29, sex: male, occupation: "pump operator", cohort: pre_fall_adult, skills: {mechanics: 1, athletics: 1}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: cora, stub: {name: Cora Oduya, age: 27, sex: female, occupation: "pump operator", cohort: pre_fall_adult, skills: {mechanics: 1}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: ada, stub: {name: Ada Oduya, age: 1, sex: female, occupation: "infant", cohort: post_fall_born, skills: {}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: wade, stub: {name: Wade Kaminski, age: 52, sex: male, occupation: "watch captain", cohort: pre_fall_adult, skills: {firearms: 2, leadership: 2}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: lena, stub: {name: Lena Kaminski, age: 50, sex: female, occupation: "quartermaster", cohort: pre_fall_adult, skills: {trade: 2}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: gus, stub: {name: Gus Kaminski, age: 15, sex: male, occupation: "watch runner", cohort: fall_child, skills: {athletics: 1}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: iris, stub: {name: Iris Vance, age: 33, sex: female, occupation: "cook", cohort: pre_fall_adult, skills: {cooking: 1}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: noah, stub: {name: Noah Vance, age: 10, sex: male, occupation: "child", cohort: fall_child, skills: {}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: june2, stub: {name: Juniper Vance, age: 0, sex: female, occupation: "infant", cohort: post_fall_born, skills: {}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: otis, stub: {name: Otis Reyes, age: 61, sex: male, occupation: "elder, gardener", cohort: pre_fall_adult, skills: {farming: 2}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: dot, stub: {name: Dot Reyes, age: 63, sex: female, occupation: "elder, seamstress", cohort: pre_fall_adult, skills: {}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: finn, stub: {name: Finn Walsh, age: 24, sex: male, occupation: "watcher", cohort: pre_fall_adult, skills: {firearms: 1}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: kit, stub: {name: Kit Salazar, age: 26, sex: female, occupation: "watcher", cohort: pre_fall_adult, skills: {firearms: 1, stealth: 1}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: amos, stub: {name: Amos Tate, age: 38, sex: male, occupation: "builder", cohort: pre_fall_adult, skills: {building: 2}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: vera, stub: {name: Vera Lindqvist, age: 45, sex: female, occupation: "medic", cohort: pre_fall_adult, skills: {medicine: 2}}, place: bunk_a, awareness: asleep, posture: lying}
+  - {id: jude, stub: {name: Jude Ramos, age: 31, sex: male, occupation: "scavenger", cohort: pre_fall_adult, skills: {scavenging: 2}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: nell, stub: {name: Nell Ramos, age: 12, sex: female, occupation: "child", cohort: fall_child, skills: {}}, place: bunk_b, awareness: asleep, posture: lying}
+  - {id: tomas, stub: {name: Tomas Farrow, age: 40, sex: male, occupation: "settlement head", cohort: pre_fall_adult, skills: {leadership: 2, persuasion: 1}}, place: bunk_a, awareness: asleep, posture: lying}
+relationships:
+  - {from: hal, to: rosa, kind: comrade, trust: 2, affection: 0, respect: 2}
+  - {from: rosa, to: hal, kind: comrade, trust: 2, affection: 0, respect: 2}
+  - {from: ben, to: cora, kind: partner, trust: 3, affection: 3, respect: 0}
+  - {from: cora, to: ben, kind: partner, trust: 3, affection: 3, respect: 0}
+  - {from: wade, to: tomas, kind: comrade, trust: 1, affection: 0, respect: 1}
+  - {from: tomas, to: wade, kind: comrade, trust: 1, affection: 0, respect: 1}
+  - {from: lena, to: tomas, kind: rival, trust: -1, affection: 0, respect: 0}
+  - {from: tomas, to: lena, kind: rival, trust: -1, affection: 0, respect: 0}
+  - {from: iris, to: mae, kind: friend, trust: 2, affection: 2, respect: 0}
+  - {from: mae, to: iris, kind: friend, trust: 2, affection: 2, respect: 0}
+  - {from: jude, to: amos, kind: rival, trust: -2, affection: -1, respect: 0}
+  - {from: amos, to: jude, kind: rival, trust: -2, affection: -1, respect: 0}
+  - {from: finn, to: kit, kind: friend, trust: 1, affection: 1, respect: 0}
+  - {from: kit, to: finn, kind: friend, trust: 1, affection: 2, respect: 0}
+  - {from: vera, to: otis, kind: friend, trust: 2, affection: 1, respect: 0}
+  - {from: otis, to: vera, kind: friend, trust: 2, affection: 1, respect: 0}
+households:
+  - {id: brandt, dwelling: bunk_a, members: [{actor: hal, role: head, guardian_of: [pip]}, {actor: mae, role: partner, guardian_of: [pip]}, {actor: pip, role: child}]}
+  - {id: quintero, dwelling: bunk_a, members: [{actor: rosa, role: head, guardian_of: [teo]}, {actor: teo, role: child}]}
+  - {id: oduya, dwelling: bunk_b, members: [{actor: ben, role: head, guardian_of: [ada]}, {actor: cora, role: partner, guardian_of: [ada]}, {actor: ada, role: child}]}
+  - {id: kaminski, dwelling: bunk_b, members: [{actor: wade, role: head, guardian_of: [gus]}, {actor: lena, role: partner, guardian_of: [gus]}, {actor: gus, role: child}]}
+  - {id: vance, dwelling: bunk_a, members: [{actor: iris, role: head, guardian_of: [noah, june2]}, {actor: noah, role: child}, {actor: june2, role: child}]}
+  - {id: reyes, dwelling: bunk_b, members: [{actor: otis, role: head}, {actor: dot, role: partner}]}
+  - {id: ramos, dwelling: bunk_b, members: [{actor: jude, role: head, guardian_of: [nell]}, {actor: nell, role: child}]}
+  - {id: walsh, dwelling: bunk_b, members: [{actor: finn, role: head}]}
+  - {id: salazar, dwelling: bunk_a, members: [{actor: kit, role: head}]}
+  - {id: tate, dwelling: bunk_b, members: [{actor: amos, role: head}]}
+  - {id: lindqvist, dwelling: bunk_a, members: [{actor: vera, role: head}]}
+  - {id: farrow, dwelling: bunk_a, members: [{actor: tomas, role: head}]}
+groups:
+  - id: settlers
+    kind: group
+    name: Pumpwell settlers
+    members:
+      - {actor: tomas, role: leader, standing: 3}
+      - {actor: hal, role: member, standing: 1}
+      - {actor: mae, role: member, standing: 1}
+      - {actor: pip, role: member, standing: 1}
+      - {actor: rosa, role: member, standing: 1}
+      - {actor: teo, role: member, standing: 1}
+      - {actor: ben, role: member, standing: 1}
+      - {actor: cora, role: member, standing: 1}
+      - {actor: ada, role: member, standing: 1}
+      - {actor: wade, role: member, standing: 1}
+      - {actor: lena, role: member, standing: 1}
+      - {actor: gus, role: member, standing: 1}
+      - {actor: iris, role: member, standing: 1}
+      - {actor: noah, role: member, standing: 1}
+      - {actor: june2, role: member, standing: 1}
+      - {actor: otis, role: member, standing: 1}
+      - {actor: dot, role: member, standing: 1}
+      - {actor: finn, role: member, standing: 1}
+      - {actor: kit, role: member, standing: 1}
+      - {actor: amos, role: member, standing: 1}
+      - {actor: vera, role: member, standing: 1}
+      - {actor: jude, role: member, standing: 1}
+      - {actor: nell, role: member, standing: 1}
+      - {actor: pc, role: newcomer, standing: 0}
+settlements:
+  - {id: pumpwell, name: Pumpwell, place: yard, group: settlers, stores: {water: 192, food: 160, medicine: 6, fuel: 40}, ration_level: 3, morale: 5, cohesion: 5, laws: ["core:law/ration_law", "core:law/nightfall_curfew", "core:law/contamination_quarantine"]}
+workplaces:
+  - id: pump
+    settlement: pumpwell
+    place: pump_house
+    site_type: water_pump
+    cycle_h: 12
+    outputs: {water: 31}
+    required_roles: [pump_operator, pump_operator]
+    machinery_condition: 70
+    first_cycle_at: "06:00"
+    assignments:
+      - {actor: hal, role: pump_operator, shift_start_hh: 6, shift_end_hh: 18}
+      - {actor: rosa, role: pump_operator, shift_start_hh: 6, shift_end_hh: 18}
+      - {actor: ben, role: pump_operator, shift_start_hh: 18, shift_end_hh: 6}
+      - {actor: cora, role: pump_operator, shift_start_hh: 18, shift_end_hh: 6}
+  - id: kitchen_work
+    settlement: pumpwell
+    place: kitchen
+    site_type: kitchen
+    cycle_h: 8
+    inputs: {water: 0}
+    outputs: {food: 14}
+    required_roles: [cook, cook]
+    first_cycle_at: "07:00"
+    assignments:
+      - {actor: mae, role: cook, shift_start_hh: 6, shift_end_hh: 20}
+      - {actor: iris, role: cook, shift_start_hh: 6, shift_end_hh: 20}
+  - id: watch
+    settlement: pumpwell
+    place: tower
+    site_type: watch
+    cycle_h: 12
+    required_roles: [watcher]
+    first_cycle_at: "06:00"
+    assignments:
+      - {actor: finn, role: watcher, shift_start_hh: 6, shift_end_hh: 18}
+      - {actor: kit, role: watcher, shift_start_hh: 18, shift_end_hh: 6}
+      - {actor: gus, role: watcher, shift_start_hh: 6, shift_end_hh: 18}
+notes:
+  - "Demographics (DEMO-01), 24 people: infants+children 5 (20.8%), preteens+teens 2 (8.3%), adults 15 incl. the PC (62.5%), elders 2 (8.3%)."
+  - "Water: consumption 62/day = production 62/day. Food: consumption 42/day (19 x 2 + 3 x 1 + 2 x 0.5) = kitchen 3 x 14 = 42/day."
+  - "Cover candidates for a missed pump shift are free people with mechanics >= 1 — Ben or Cora off-shift, or Amos from building work."

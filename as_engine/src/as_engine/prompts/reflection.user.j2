@@ -1,0 +1,10 @@
+{{ ctx.packet.identity_text }}
+{% for line in ctx.packet.motive_lines %}{{ line }}
+{% endfor %}
+Recent memories:
+{% for e in ctx.recent_episodes %}- {{ e }}
+{% endfor %}
+Things hanging over them:
+{% for l in ctx.packet.open_loops %}- {{ l.handle }} ({{ l.kind.value | replace('_',' ') }}): {{ l.text }}
+{% else %}- nothing
+{% endfor %}

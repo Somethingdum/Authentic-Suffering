@@ -1,0 +1,10 @@
+{
+  "type": "as_game",
+  "action": "models",
+  "data": {
+    "lane": "B",
+    "models": [],
+    "selected": "nvidia-nemotron-3.5-lightning-30b-a3b",
+    "reachable": false
+  }
+}

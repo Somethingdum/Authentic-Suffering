@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "error",
+  "data": {
+    "code": "busy",
+    "message": "Your last move is still being worked out. Wait for it to finish, then try again.",
+    "recoverable": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "as_game",
+  "action": "packs",
+  "data": {
+    "packs": [
+      {
+        "pack_id": "core",
+        "name": "Authentic Suffering — core",
+        "version": "1.0.0",
+        "description": "Canon infected, items, the affordance catalog and ten people.",
+        "records": 227,
+        "core": true
+      },
+      {
+        "pack_id": "my_content",
+        "name": "My content",
+        "version": "0.1.0",
+        "description": "Things I made.",
+        "records": 0,
+        "core": false
+      }
+    ]
+  }
+}

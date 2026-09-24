@@ -1,0 +1,65 @@
+# Baseline settlement law code (docs/as/06_WORLD.md §2.5 faction doctrine; §2.4 ration/shortage
+# chain). affordance_effects gate mind/affordance.py's duty gate (AFF-02): an active law forbidding
+# a tag rejects the option outright for members/visitors it applies to; 'cost' adds a cost_note
+# instead of rejecting.
+- schema: as.law.v1
+  id: nightfall_curfew
+  name: Nightfall Curfew
+  kind: curfew
+  text: No one moves outside their own dwelling or an assigned post between last light and first light without a standing watch order.
+  affordance_effects:
+    - {affordance_tag: move, effect: cost, applies_to: members, cost_note: "Caught moving after curfew without a watch order draws challenge from the nearest patrol."}
+    - {affordance_tag: move, effect: cost, applies_to: visitors, cost_note: "A visitor moving after curfew is treated as a threat until identified."}
+  enforcement: Standing watch challenges anyone moving after curfew; a second unexplained sighting in one week is reported to leadership.
+  punishment: First offense — confined to quarters for a day and a warning logged. Repeat offense — loss of a duty post and a public reprimand.
+  belief_text: "Nobody wanders after dark here. That's how you get shot by your own people, or worse, by something that isn't people."
+- schema: as.law.v1
+  id: firearms_discipline
+  name: Firearms Discipline
+  kind: weapons
+  text: A firearm is carried loaded only on watch, patrol, or an assigned task outside the wall; inside the wall it is holstered and unchambered unless an alarm is active.
+  affordance_effects:
+    - {affordance_tag: ranged, effect: cost, applies_to: members, cost_note: "Drawing and firing inside the wall outside an alarm draws immediate leadership attention."}
+  enforcement: Anyone hearing a shot inside the wall without an alarm active reports it; leadership investigates the same day.
+  punishment: Negligent or unauthorized discharge inside the wall — loss of firearm privileges for a set period and a work debt to whoever was endangered.
+  belief_text: "Guns stay slung and empty in here. One accidental bang and it's not just embarrassing, it draws them."
+- schema: as.law.v1
+  id: ration_law
+  name: Ration Law
+  kind: ration
+  text: Every household draws from the common store at the posted ration level; nobody draws early, doubles a draw, or draws for a household they are not a member of.
+  affordance_effects:
+    - {affordance_tag: steal, effect: forbid, applies_to: members, cost_note: "Taking another household's ration draw is treated as theft from the settlement, not just from a person."}
+  enforcement: The quartermaster logs every draw against the household roster; a mismatch is raised at the next council.
+  punishment: First offense — the household's next draw is docked to cover the difference. Repeat offense — the offender loses their workplace role for a period set by leadership.
+  belief_text: "Everybody's hungry. That's exactly why nobody gets to cut the line."
+- schema: as.law.v1
+  id: intake_screening
+  name: Intake Screening
+  kind: intake
+  text: Anyone requesting to join the settlement is held at the gate, questioned, and visually checked for bite marks, fresh wounds, or fever before being let past the fence.
+  affordance_effects: []
+  enforcement: Gate watch holds the arrival outside the fence and calls for whoever runs intake; nobody vouches an arrival straight through the gate.
+  punishment: A member who lets an unscreened arrival inside without authorization answers to leadership for it, regardless of the arrival's outcome.
+  belief_text: "We're not cruel about it. We're just not stupid about it either. Everyone gets checked, every time, no exceptions for a sob story."
+- schema: as.law.v1
+  id: contamination_quarantine
+  name: Contamination Quarantine
+  kind: contamination
+  text: Anyone confirmed bitten, clawed by something unidentified, or showing fever and confusion is moved to the quarantine room and is not to be handled or freed by anyone but the designated caretaker.
+  affordance_effects:
+    - {affordance_tag: protect_dependent, effect: cost, applies_to: members, cost_note: "Interfering with a quarantine placement to protect a bitten relative is understood, but it is still a violation leadership will act on."}
+  enforcement: Whoever confirms the exposure reports it immediately; the caretaker and one witness move the person to quarantine together, never one person alone.
+  punishment: Releasing or hiding a quarantined person without authorization is treated as endangering the whole settlement — the harshest punishment short of banishment.
+  belief_text: "It isn't personal. It's the one rule nobody gets to argue with, because the last time somebody did, we buried six people for it."
+- schema: as.law.v1
+  id: theft_law
+  name: Theft Law
+  kind: theft
+  text: Taking anything marked as belonging to another household, the common store, or the settlement itself without the owner's leave is theft, whatever the reason given.
+  affordance_effects:
+    - {affordance_tag: steal, effect: forbid, applies_to: members, cost_note: "A member caught taking owned property answers to leadership before the day is out."}
+    - {affordance_tag: steal, effect: cost, applies_to: visitors, cost_note: "A visitor caught taking owned property is escorted out and is unlikely to be let back in."}
+  enforcement: Whoever notices a mismatch between what's held and what's logged raises it with the quartermaster or leadership directly.
+  punishment: First offense from a member — the item is returned or its value worked off, and trust with that household takes visible damage. Repeat offense — banishment is on the table.
+  belief_text: "We don't lock much up in here, because we don't have to. Steal from your own people and you'll wish the fence had kept you out instead."

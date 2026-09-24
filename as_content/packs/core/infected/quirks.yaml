@@ -1,0 +1,102 @@
+# Authored quirks only (CNT-02 excludes the boilerplate INF_ENV_REACT_01..95 / *_VARIANT_##
+# placeholder tags in Lore_and_World_Building.pdf §5 — a content record whose body is boilerplate
+# plus an index fails the content linter). Each quirk is bound to a seeded roll (WILL/seed determinism):
+# the same world seed reproduces the same weird behaviour for the same infected instance.
+- schema: as.quirk.v1
+  id: SHAM_MUTTER_LOOP
+  applies_to: [ZOMBIE_ARCHETYPE_SHAMBLER01, ZOMBIE_ARCHETYPE_CRAWLER01]
+  text: Mutters single words or short fragments with no conversational intent — "coffee", "keys", "where", "late" — cycling on a loop under its breath.
+  trigger_cue: infected_idle
+  observable_tell: A dry, repetitive murmur audible within a few meters in a quiet room.
+  seed_weight: 1.0
+- schema: as.quirk.v1
+  id: SHAM_FRIDGE_RITUAL
+  applies_to: [ZOMBIE_ARCHETYPE_SHAMBLER01]
+  text: Runs a broken errand loop from its old life — open a door, stare, sit, repeat — with a comically high iteration count until a stimulus interrupts it.
+  trigger_cue: infected_unengaged
+  observable_tell: Watching it for more than a few seconds reveals the same three or four motions repeating.
+  seed_weight: 0.6
+- schema: as.quirk.v1
+  id: SHAM_GRIP_LOCK
+  applies_to: [ZOMBIE_ARCHETYPE_SHAMBLER01, ZOMBIE_ARCHETYPE_CRAWLER01]
+  text: Once it gets two hands on a target it will not ease the grip — it will dislocate its own fingers and wrists before letting go, with no pain response to stop it.
+  trigger_cue: grapple_landed
+  observable_tell: Joints audibly pop and the grip only tightens as the target struggles.
+  seed_weight: 1.0
+- schema: as.quirk.v1
+  id: SHAM_BULLY_RUNNER
+  applies_to: [ZOMBIE_ARCHETYPE_SHAMBLER01]
+  text: Will occasionally shove, slap or kick a nearby Runner for no discernible reason, sometimes with an involuntary grunted curse.
+  trigger_cue: infected_near_infected
+  observable_tell: A Shambler strikes another infected without any human present to explain it.
+  seed_weight: 0.3
+- schema: as.quirk.v1
+  id: CRAWL_UNDERCAR
+  applies_to: [ZOMBIE_ARCHETYPE_CRAWLER01]
+  text: Prefers concealment beneath vehicles, furniture or rubble, staying still until something passes within grabbing range.
+  trigger_cue: infected_dormant_indoor_or_debris
+  observable_tell: A limb or drag-trail visible at floor level from an angle most people never check.
+  seed_weight: 1.0
+- schema: as.quirk.v1
+  id: CRAWL_RUBBLE_WORM
+  applies_to: [ZOMBIE_ARCHETYPE_CRAWLER01]
+  text: Thrashes forward on its arms in short violent bursts across broken ground, closing distance far faster than its crawl implies.
+  trigger_cue: sound_close_range
+  observable_tell: A sudden scrape-and-lunge from ground level that looks nothing like its usual slow drag.
+  seed_weight: 0.8
+- schema: as.quirk.v1
+  id: RUN_GREETING_MASK
+  applies_to: [ZOMBIE_VARIANT_ID_RUNNER01]
+  text: Pauses in a downtime lull, stands, breathes, looks at a person and says something like "Hi... [name]..." before wandering off, with no follow-through.
+  trigger_cue: infected_overfed_or_unengaged
+  observable_tell: A half-coherent greeting delivered with a flat, wrong affect.
+  seed_weight: 0.5
+- schema: as.quirk.v1
+  id: RUN_OVERSHOOT
+  applies_to: [ZOMBIE_VARIANT_ID_RUNNER01]
+  text: Sprints hard enough that it regularly trips, stumbles or face-plants on a complex maneuver or sudden stop, leaving it briefly disoriented.
+  trigger_cue: sprint_maneuver
+  observable_tell: A spectacular, darkly comic fall mid-chase, with a beat of vulnerability before it recovers.
+  seed_weight: 1.0
+- schema: as.quirk.v1
+  id: RUN_FULLFED_APATHY
+  applies_to: [ZOMBIE_VARIANT_ID_RUNNER01]
+  text: When fully fed it may take a half-hearted swipe or bite, then get bored or embarrassed and simply walk off rather than pressing the attack.
+  trigger_cue: infected_state_overfed
+  observable_tell: It disengages from an easy kill for no tactical reason, visibly indifferent.
+  seed_weight: 0.7
+- schema: as.quirk.v1
+  id: RUN_NAME_STICKING
+  applies_to: [ZOMBIE_VARIANT_ID_RUNNER01]
+  text: May remember a name spoken near it for roughly fifteen seconds and repeat it while stalking, as if the word itself were the target.
+  trigger_cue: name_spoken_nearby
+  observable_tell: It repeats a heard name under its breath while circling toward whoever said it.
+  seed_weight: 0.6
+- schema: as.quirk.v1
+  id: LUR_THERMAL_PRIMARY
+  applies_to: [ZOMBIE_VARIANT_ID_LURKER01]
+  text: Locks onto living targets through heat contrast rather than sight, so gore camouflage that would fool a Shambler does not fool it.
+  trigger_cue: infected_hunting
+  observable_tell: An eerie, focused stare that tracks a disguised target as if it were not disguised at all.
+  seed_weight: 1.0
+- schema: as.quirk.v1
+  id: LUR_STUNT_TAUNT
+  applies_to: [ZOMBIE_VARIANT_ID_LURKER01]
+  text: Rarely leaves a deliberate sign for survivors to find — a note, a crude drawing, spraypaint — meant to taunt, not to converse.
+  trigger_cue: territory_marking
+  observable_tell: A message or symbol clearly not left by any known human hand or faction.
+  seed_weight: 0.2
+- schema: as.quirk.v1
+  id: LUR_MOCKING_CRUELTY
+  applies_to: [ZOMBIE_VARIANT_ID_LURKER01]
+  text: When it holds a clear advantage it may stage a death for humiliation rather than efficiency, drawing the act out past what feeding requires.
+  trigger_cue: incapacitation_confirmed
+  observable_tell: The kill takes far longer than survival would demand, with no clear predatory reason for the delay.
+  seed_weight: 0.4
+- schema: as.quirk.v1
+  id: LUR_MIMICRY_LURE
+  applies_to: [ZOMBIE_VARIANT_ID_LURKER01]
+  text: Reproduces human distress sounds or short learned phrases as a lure, strongest from concealment and at distance, and it degrades fast under direct conversational pressure.
+  trigger_cue: prey_out_of_reach
+  observable_tell: A voice that sounds almost right calling from somewhere unseen, and falls apart if answered directly.
+  seed_weight: 0.5

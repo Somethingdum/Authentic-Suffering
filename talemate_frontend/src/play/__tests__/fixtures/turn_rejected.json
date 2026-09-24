@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "turn_rejected",
+  "data": {
+    "reason_code": "unclear",
+    "message": "It isn't clear what you want to do.",
+    "clarify": "Do you want to force the door or pick the lock?"
+  }
+}

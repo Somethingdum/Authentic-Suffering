@@ -1,0 +1,10 @@
+{
+  "type": "as_game",
+  "action": "welcome",
+  "data": {
+    "server_version": "0.1.0",
+    "screen": "connect",
+    "has_runs": false,
+    "models_ok": false
+  }
+}

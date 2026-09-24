@@ -1,0 +1,20 @@
+{
+  "type": "as_game",
+  "action": "lanes_status",
+  "data": {
+    "lanes": {
+      "A": {
+        "label": "Main model",
+        "ok": true,
+        "model": "nemotron-cascade-2-30b-a3b",
+        "detail": ""
+      },
+      "B": {
+        "label": "Second model",
+        "ok": false,
+        "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+        "detail": ""
+      }
+    }
+  }
+}

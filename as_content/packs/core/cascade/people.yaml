@@ -1,0 +1,141 @@
+# Cascades on bodies, tasks and relationships (docs/as/06_WORLD.md §2.6 coupling matrix).
+# Same grammar as economy.yaml. CAS-014 is cited by the metal_fence worked trace (stage 10).
+- schema: as.cascade.v1
+  id: CAS-007
+  description: A death leaves the dead person's household grieving and opens a vacancy in every role they held.
+  trigger_event: DEATH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: HOUSEHOLD_CHANGE
+      target: household_of(trigger.payload.body_id)
+      payload: {change: member_died, actor_id: "$trigger.payload.body_id", grief_delta: 1}
+    - kind: emit_event
+      event_type: SHIFT_MISSED
+      target: work_assignments_of(trigger.payload.body_id)
+      payload: {reason: dead}
+  delay_s: 0
+  cites: [docs/as/06_WORLD.md#2.6]
+- schema: as.cascade.v1
+  id: CAS-008
+  description: Everyone bonded to the dead person who knows of the death loses Resolve; the closer the bond, the larger the loss.
+  trigger_event: BELIEF_FORM
+  where: {predicate: dead, subject_type: body}
+  preconditions: ["trigger.payload.confidence >= 2"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.payload.holder_id)
+      amount: 1
+      payload: {scale_by: bond_to_subject, cause: bereavement}
+  delay_s: 0
+  cites: [SKULL-01, docs/as/06_WORLD.md#2.6]
+- schema: as.cascade.v1
+  id: CAS-009
+  description: A very loud sound outdoors pulls nearby infected toward it over the following minutes.
+  trigger_event: NOISE
+  where: {}
+  preconditions: ["trigger.payload.source_db >= 120 and trigger.payload.outdoor == true"]
+  effects:
+    - kind: emit_event
+      event_type: INFECTED_DRIFT
+      target: infected_within_hearing_of(trigger.payload.place_id)
+      payload: {toward_place: "$trigger.payload.place_id", cause: noise}
+  delay_s: 60
+  cites: [docs/as/06_WORLD.md#2.6]
+- schema: as.cascade.v1
+  id: CAS-010
+  description: Catching someone in a lie costs them trust with whoever caught them.
+  trigger_event: LIE_DISCOVERED
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: actor(trigger.payload.discoverer_id)
+      payload: {toward: "$trigger.payload.liar_id", axis: trust, delta: -2, cause: lie}
+  delay_s: 0
+  cites: [docs/as/05_ACTORS.md]
+- schema: as.cascade.v1
+  id: CAS-011
+  description: A broken promise costs trust with the person it was made to and leaves them a grievance they carry.
+  trigger_event: PROMISE_BROKEN
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: actor(trigger.payload.promisee_id)
+      payload: {toward: "$trigger.payload.promiser_id", axis: trust, delta: -2, cause: promise_broken}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: actor(trigger.payload.promisee_id)
+      payload: {kind: grudge, subject: "$trigger.payload.promiser_id", text: "{subject} broke a promise to you.", strength: 2}
+  delay_s: 0
+  cites: [docs/as/05_ACTORS.md]
+- schema: as.cascade.v1
+  id: CAS-012
+  description: A theft that somebody witnessed becomes a rumour among the witness's household and crew.
+  trigger_event: ITEM_TRANSFER
+  where: {moral_tag: steal}
+  preconditions: ["trigger.payload.witness_count >= 1"]
+  effects:
+    - kind: create_rumour
+      target: witnesses_of(trigger.event_id)
+      payload: {about: "$trigger.payload.actor_id", claim: took_what_was_not_theirs}
+  delay_s: 0
+  cites: [docs/as/06_WORLD.md#2.6]
+- schema: as.cascade.v1
+  id: CAS-013
+  description: A death off-screen leaves a corpse where it happened and a rumour among the people who would hear of it.
+  trigger_event: OFFSCREEN_DEATH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: create_trace
+      target: place_of(trigger.payload.body_id)
+      payload: {kind: corpse}
+    - kind: create_rumour
+      target: who_would_hear_of(trigger.payload.body_id)
+      payload: {about: "$trigger.payload.body_id", claim: dead}
+  delay_s: 0
+  cites: [WORLD-03]
+- schema: as.cascade.v1
+  id: CAS-014
+  description: Starting a different action while in the middle of a counted task pauses the task where it stands instead of resetting it.
+  trigger_event: ACTION_START
+  where: {}
+  preconditions: ["trigger.payload.continues_task == false"]
+  effects:
+    - kind: emit_event
+      event_type: TASK_STEP
+      target: active_task_of(trigger.actor_id)
+      payload: {status: paused}
+  delay_s: 0
+  cites: [docs/as/04_TURN_PIPELINE.md#7]
+- schema: as.cascade.v1
+  id: CAS-015
+  description: A bite wound seen by a settlement member brings the contamination law into force for the bitten person.
+  trigger_event: BELIEF_FORM
+  where: {predicate: bitten}
+  preconditions: ["trigger.payload.confidence >= 2"]
+  effects:
+    - kind: emit_event
+      event_type: LAW_APPLIED
+      target: settlement_of(trigger.payload.holder_id)
+      payload: {law: contamination_quarantine, subject: "$trigger.payload.subject_id"}
+  delay_s: 0
+  cites: [docs/as/06_WORLD.md#2.5]
+- schema: as.cascade.v1
+  id: CAS-018
+  description: Hearing, from someone they believe, that a person steals costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: took_what_was_not_theirs, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: actor(trigger.payload.listener_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [SOC-03, INFO-02]

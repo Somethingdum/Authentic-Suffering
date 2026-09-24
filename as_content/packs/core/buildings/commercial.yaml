@@ -1,0 +1,101 @@
+# Commercial building archetypes. Rooms are generated on first observation (GEO-03) from these,
+# seeded by layout:<place_id>, and are permanent afterwards. Buildings that did not hold through
+# the Fall get the Fall-damage pass at discovery (GEO-04). Coordinates are metres from the room's
+# south-west corner; x across width_m, y across depth_m.
+- schema: as.building.v1
+  id: corner_market
+  name: Corner market
+  kind: shop
+  description: A single-storey brick corner grocery with a sales floor, a stockroom behind it and a small office — the shape of Delgado's Market in the anchor scene.
+  entrance_room: sales_floor
+  rooms:
+    - id: sales_floor
+      name: Sales floor
+      size_m2: 126
+      width_m: 14
+      depth_m: 9
+      material: brick
+      loot_table: core:loot/grocery_shelves
+      anchors:
+        - {name: counter, kind: cover, x_m: 6, y_m: 4, cover: 2, concealment: 2, container_item: "core:item/cash_register"}
+        - {name: front window, kind: window, x_m: 3, y_m: 0.5, cover: 0, concealment: 0}
+        - {name: shelving aisle, kind: cover, x_m: 9, y_m: 5, cover: 1, concealment: 2}
+        - {name: cooler case, kind: furniture, x_m: 13, y_m: 7, cover: 2, concealment: 1}
+        - {name: front door, kind: door_side, x_m: 7, y_m: 0.5}
+      portals:
+        - {to_room: storeroom, kind: door, name: storeroom door, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 25, starts_open: true}
+        - {to_room: office, kind: door, name: office door, lockable: true, lock_quality: 1, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 25}
+    - id: storeroom
+      name: Stockroom
+      size_m2: 40
+      width_m: 8
+      depth_m: 5
+      material: brick
+      loot_table: core:loot/stockroom_goods
+      anchors:
+        - {name: shelves, kind: furniture, x_m: 2, y_m: 2, cover: 1, concealment: 1}
+        - {name: pallet stack, kind: cover, x_m: 6, y_m: 3, cover: 2, concealment: 2, container_item: "core:item/wooden_crate"}
+        - {name: back door, kind: door_side, x_m: 7.5, y_m: 4.5}
+      portals:
+        - {to_room: office, kind: wall, name: office wall, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 35}
+    - id: office
+      name: Office
+      size_m2: 12
+      width_m: 4
+      depth_m: 3
+      material: drywall
+      loot_table: core:loot/office_desk
+      anchors:
+        - {name: desk, kind: furniture, x_m: 2, y_m: 1.5, cover: 1, concealment: 1}
+        - {name: cot, kind: furniture, x_m: 3.5, y_m: 2.5}
+        - {name: filing cabinet, kind: container, x_m: 0.5, y_m: 2.5, container_item: "core:item/metal_locker"}
+  exterior_portals:
+    - {to_room: sales_floor, kind: door, name: front door, lockable: true, lock_quality: 2, aperture_w_cm: 90, aperture_h_cm: 210, seal_db: 20, transparent: true}
+    - {to_room: sales_floor, kind: window, name: front window, aperture_w_cm: 240, aperture_h_cm: 150, seal_db: 18, transparent: true, height_cm: 60}
+    - {to_room: storeroom, kind: door, name: back door, lockable: true, lock_quality: 2, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 30}
+    - {to_room: storeroom, kind: wall, name: back wall, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 45}
+- schema: as.building.v1
+  id: gas_station
+  name: Gas station
+  kind: shop
+  description: A roadside fuel station with a glass-fronted convenience counter, a cramped back room and a separate service bay with a roll-up door.
+  entrance_room: kiosk
+  rooms:
+    - id: kiosk
+      name: Kiosk
+      size_m2: 48
+      width_m: 8
+      depth_m: 6
+      material: glass
+      loot_table: core:loot/gas_station_counter
+      anchors:
+        - {name: register counter, kind: cover, x_m: 4, y_m: 4, cover: 2, concealment: 2, container_item: "core:item/cash_register"}
+        - {name: snack racks, kind: cover, x_m: 2, y_m: 2, cover: 1, concealment: 1}
+        - {name: glass front, kind: window, x_m: 4, y_m: 0.3}
+      portals:
+        - {to_room: back_room, kind: door, name: staff door, lockable: true, lock_quality: 1, aperture_w_cm: 80, aperture_h_cm: 205, seal_db: 22}
+    - id: back_room
+      name: Back room
+      size_m2: 12
+      width_m: 4
+      depth_m: 3
+      material: drywall
+      loot_table: core:loot/stockroom_goods
+      anchors:
+        - {name: supply shelf, kind: furniture, x_m: 1, y_m: 1}
+        - {name: staff locker, kind: container, x_m: 3.5, y_m: 2.5, container_item: "core:item/metal_locker"}
+      portals:
+        - {to_room: service_bay, kind: door, name: bay door, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 25}
+    - id: service_bay
+      name: Service bay
+      size_m2: 60
+      width_m: 10
+      depth_m: 6
+      material: concrete
+      loot_table: core:loot/garage_tools
+      anchors:
+        - {name: lift pit, kind: hiding_spot, x_m: 5, y_m: 3, cover: 3, concealment: 3}
+        - {name: tool bench, kind: furniture, x_m: 9, y_m: 1, cover: 1, container_item: "core:item/metal_locker"}
+  exterior_portals:
+    - {to_room: kiosk, kind: door, name: glass door, lockable: true, lock_quality: 1, aperture_w_cm: 90, aperture_h_cm: 210, seal_db: 15, transparent: true}
+    - {to_room: service_bay, kind: gate, name: roll-up door, lockable: true, lock_quality: 2, aperture_w_cm: 300, aperture_h_cm: 280, seal_db: 20}

@@ -1,0 +1,66 @@
+# INTENT-03 / HALLUC-01 fixture (PROTECTED). Reggie holds a pistol that is NOT loaded (nothing
+# chambered, empty magazine) and faces Carl, who owes him and has a length of pipe in his hand (so
+# shooting him is not 'attacking the unarmed', a line Reggie will not cross). He also believes a crowbar lies on the workbench —
+# it was moved to the tool room this morning (true_in_world: false). He is offered the trigger (the load of
+# a gun is not visible, mind/affordance.py resource gate) and it must click, never fire; he is offered
+# the crowbar at the workbench (a believed location) and reaching for it must fail at the barrier
+# (referent_missing), never conjure one.
+schema: as.scenario.v1
+name: empty_gun
+description: A gun that clicks and a crowbar that isn't there.
+seed: 31
+start: {day: 2000, time: "10:00:00"}   # Reggie belongs to the Remnants era (WG-34: 1830..3650)
+places:
+  - id: workshop
+    name: Back workshop
+    width_m: 6
+    depth_m: 4
+    material: concrete
+    light: 3
+    ambient_db: 30
+    anchors:
+      - {id: workbench, name: workbench, kind: furniture, x: 1, y: 3.5, cover: 1}
+      - {id: middle, name: middle of the room, x: 3, y: 2}
+      - {id: doorway, name: doorway, kind: door_side, x: 5.5, y: 0.5}
+  - id: tool_room
+    name: Tool room
+    width_m: 3
+    depth_m: 3
+    material: concrete
+    light: 1
+    anchors:
+      - {id: hooks, name: tool hooks, kind: feature, x: 1, y: 2.5}
+      - {id: tool_room_door, name: door to the workshop, kind: door_side, x: 2.5, y: 0.3}
+portals:
+  - {id: tool_door, a: workshop, b: tool_room, anchor_a: doorway, anchor_b: tool_room_door, kind: door, name: tool room door, open: false, w: 80, h: 200, seal_db: 25}
+bodies:
+  - id: pc
+    dossier: core:pc/owen_marsh
+    controller: human
+    place: workshop
+    anchor: doorway
+  - id: reggie
+    dossier: core:actor/reggie_tate
+    place: workshop
+    x: 2
+    y: 2
+    inventory:
+      - {item: core:item/glock_19, slot: hand_r, label: pistol, props: {chambered: false}}
+      - {item: core:item/magazine_9mm_15, container: pistol, props: {rounds: 0}}
+  - id: carl
+    stub: {name: Carl Ames, age: 44, sex: male, occupation: mechanic, skills: {mechanics: 2}}
+    place: workshop
+    x: 4
+    y: 2
+    inventory:
+      - {item: core:item/steel_pipe, slot: hand_r}
+relationships:
+  - {from: reggie, to: carl, kind: debtor, trust: -3, resentment: 2}   # Carl is Reggie's debtor
+knows:
+  - {holder: reggie, subject: carl, name: Carl}
+  - {holder: carl, subject: reggie, name: Reggie}
+items:
+  - {id: crowbar, item: core:item/crowbar, place: tool_room, anchor: hooks}   # moved here this morning; Reggie did not see it happen
+beliefs:
+  - {holder: reggie, subject_type: object, subject: crowbar, predicate: location, value: workbench, text: "There's a crowbar on the workbench.", confidence: 3, provenance: witnessed, true_in_world: false}
+  - {holder: reggie, subject_type: object, subject: pistol, predicate: loaded, value: "true", text: "My pistol is loaded.", confidence: 3, provenance: inferred, true_in_world: false}

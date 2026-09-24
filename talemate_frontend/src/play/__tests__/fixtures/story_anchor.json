@@ -1,0 +1,38 @@
+{
+  "type": "as_game",
+  "action": "story",
+  "data": {
+    "entries": [
+      {
+        "turn_index": 1,
+        "kind": "player",
+        "text": "I watch the front window and keep quiet.",
+        "mode": "do"
+      },
+      {
+        "turn_index": 1,
+        "kind": "narration",
+        "text": "Sales floor. A loud metal crash came from the rear alley. Owen chose to stay put and watch everything you can see and hear. A woman takes cover at the end of the rear shelving. Mara says, \"Quiet.\" June says, \"What was that?\"",
+        "mode": null
+      },
+      {
+        "turn_index": 1,
+        "kind": "player",
+        "text": "What was that crash?",
+        "mode": "ask"
+      },
+      {
+        "turn_index": 1,
+        "kind": "guide",
+        "text": "You heard metal hit something hard out back. You did not see it.",
+        "mode": null
+      },
+      {
+        "turn_index": 1,
+        "kind": "notice",
+        "text": "Your second model is offline; turns will be thinner until it is back.",
+        "mode": null
+      }
+    ]
+  }
+}

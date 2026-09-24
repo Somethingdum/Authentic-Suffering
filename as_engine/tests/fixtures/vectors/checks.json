@@ -1,0 +1,188 @@
+{
+ "_why": "action/checks.py pure functions with CheckRules() defaults (07_RULES \u00a71).",
+ "compute_target": [
+  {
+   "attr": 5,
+   "skill_rank": 0,
+   "has_tag": false,
+   "situation": 0,
+   "scale": 0,
+   "impairment": 0,
+   "resistance": 0,
+   "target": 3,
+   "why": "attr_mod(5)=3 + rank 0 + tag 0 + situation 0 + scale 0 - impairment 0//2=0 - resistance 0 = 3 -> clamp 1..9"
+  },
+  {
+   "attr": 7,
+   "skill_rank": 2,
+   "has_tag": true,
+   "situation": 0,
+   "scale": 0,
+   "impairment": 0,
+   "resistance": 0,
+   "target": 8,
+   "why": "attr_mod(7)=4 + rank 2 + tag 2 + situation 0 + scale 0 - impairment 0//2=0 - resistance 0 = 8 -> clamp 1..9"
+  },
+  {
+   "attr": 10,
+   "skill_rank": 3,
+   "has_tag": true,
+   "situation": 3,
+   "scale": 2,
+   "impairment": 0,
+   "resistance": 0,
+   "target": 9,
+   "why": "attr_mod(10)=5 + rank 3 + tag 2 + situation 3 + scale 2 - impairment 0//2=0 - resistance 0 = 15 -> clamp 1..9"
+  },
+  {
+   "attr": 1,
+   "skill_rank": 0,
+   "has_tag": false,
+   "situation": -3,
+   "scale": -2,
+   "impairment": 6,
+   "resistance": 6,
+   "target": 1,
+   "why": "attr_mod(1)=1 + rank 0 + tag 0 + situation -3 + scale -2 - impairment 6//2=3 - resistance 6 = -13 -> clamp 1..9"
+  },
+  {
+   "attr": 6,
+   "skill_rank": 1,
+   "has_tag": false,
+   "situation": -2,
+   "scale": 0,
+   "impairment": 3,
+   "resistance": 1,
+   "target": 1,
+   "why": "attr_mod(6)=3 + rank 1 + tag 0 + situation -2 + scale 0 - impairment 3//2=1 - resistance 1 = 0 -> clamp 1..9"
+  },
+  {
+   "attr": 8,
+   "skill_rank": 2,
+   "has_tag": false,
+   "situation": 1,
+   "scale": 0,
+   "impairment": 1,
+   "resistance": 2,
+   "target": 5,
+   "why": "attr_mod(8)=4 + rank 2 + tag 0 + situation 1 + scale 0 - impairment 1//2=0 - resistance 2 = 5 -> clamp 1..9"
+  },
+  {
+   "attr": 9,
+   "skill_rank": 3,
+   "has_tag": true,
+   "situation": 0,
+   "scale": 0,
+   "impairment": 5,
+   "resistance": 4,
+   "target": 4,
+   "why": "attr_mod(9)=5 + rank 3 + tag 2 + situation 0 + scale 0 - impairment 5//2=2 - resistance 4 = 4 -> clamp 1..9"
+  },
+  {
+   "attr": 3,
+   "skill_rank": 0,
+   "has_tag": false,
+   "situation": 0,
+   "scale": 0,
+   "impairment": 0,
+   "resistance": 3,
+   "target": 1,
+   "why": "attr_mod(3)=2 + rank 0 + tag 0 + situation 0 + scale 0 - impairment 0//2=0 - resistance 3 = -1 -> clamp 1..9"
+  }
+ ],
+ "band_for_margin": [
+  {
+   "margin": 8,
+   "band": "clean"
+  },
+  {
+   "margin": 3,
+   "band": "clean"
+  },
+  {
+   "margin": 2,
+   "band": "cost"
+  },
+  {
+   "margin": 0,
+   "band": "cost"
+  },
+  {
+   "margin": -1,
+   "band": "fail"
+  },
+  {
+   "margin": -2,
+   "band": "fail"
+  },
+  {
+   "margin": -3,
+   "band": "break"
+  },
+  {
+   "margin": -9,
+   "band": "break"
+  }
+ ],
+ "stealth6": [
+  {
+   "margin": 7,
+   "degree": "ghost_protocol"
+  },
+  {
+   "margin": 5,
+   "degree": "ghost_protocol"
+  },
+  {
+   "margin": 4,
+   "degree": "unseen_passage"
+  },
+  {
+   "margin": 3,
+   "degree": "unseen_passage"
+  },
+  {
+   "margin": 2,
+   "degree": "fleeting_suspicion"
+  },
+  {
+   "margin": 1,
+   "degree": "fleeting_suspicion"
+  },
+  {
+   "margin": 0,
+   "degree": "heightened_suspicion"
+  },
+  {
+   "margin": -1,
+   "degree": "detected"
+  },
+  {
+   "margin": -2,
+   "degree": "detected"
+  },
+  {
+   "margin": -3,
+   "degree": "compromised_with_prejudice"
+  },
+  {
+   "margin": -8,
+   "degree": "compromised_with_prejudice"
+  }
+ ],
+ "worked_odds": {
+  "untrained_attr5_target3": {
+   "clean": 0,
+   "cost": 3,
+   "fail": 2,
+   "break": 5
+  },
+  "specialist_attr7_rank2_tag_target8": {
+   "clean": 5,
+   "cost": 3,
+   "fail": 2,
+   "break": 0
+  },
+  "_why": "Counts of d10 faces per band (07_RULES \u00a71 worked odds)."
+ }
+}

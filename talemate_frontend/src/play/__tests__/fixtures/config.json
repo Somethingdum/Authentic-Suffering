@@ -1,0 +1,31 @@
+{
+  "type": "as_game",
+  "action": "config",
+  "data": {
+    "lanes": {
+      "A": {
+        "name": "Storyteller brain (desktop) — Nemotron Cascade 2 30B-A3B",
+        "base_url": "http://localhost:1234/v1",
+        "model": "nemotron-cascade-2-30b-a3b",
+        "api_key": "lm-studio",
+        "max_concurrency": 1,
+        "request_timeout_s": 240.0,
+        "thinking_mode": "native",
+        "structured_mode": "json_schema",
+        "structured_with_thinking": "unknown"
+      },
+      "B": {
+        "name": "Fast brain (laptop) — Nemotron 3.5 Lightning 30B-A3B",
+        "base_url": "http://localhost:1234/v1",
+        "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+        "api_key": "lm-studio",
+        "max_concurrency": 1,
+        "request_timeout_s": 240.0,
+        "thinking_mode": "native",
+        "structured_mode": "json_schema",
+        "structured_with_thinking": "unknown"
+      }
+    },
+    "background_cognition": true
+  }
+}

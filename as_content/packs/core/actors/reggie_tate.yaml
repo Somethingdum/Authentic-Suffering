@@ -1,0 +1,169 @@
+schema: as.actor.v1
+id: reggie_tate
+generation: authored
+days_since_fall_range: [1830, 3650]
+identity:
+  name: Reggie Tate
+  aliases: [Reginald Tate, Shield Tate]
+  age: 38
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: Gary, Indiana
+  occupation_before: Nightclub bouncer and part-time repo man
+  occupation_now: Shield man in charge of a Remnants market — keeps the peace, collects the stalls' tribute
+  one_line: A bouncer who found his calling keeping a market's peace, and who takes a tenth off the top because he's earned it.
+appearance:
+  height_cm: 191
+  mass_kg: 112
+  build: Huge through the chest and shoulders, a weightlifter going soft at the middle
+  hair: Shaved head, a thick black beard trimmed square
+  eyes: Brown, amused
+  skin: Dark brown, a burn scar mottling the left side of his neck
+  distinguishing_marks:
+    - A burn scar down the left side of his neck from a house fire in the second year
+    - A gold front tooth he had put in by a Remnants dentist as a reward
+  clothing_usual: A leather car coat over a hooded sweatshirt, cargo pants, a shield man's red armband, a pistol openly on his hip
+  movement_under_stress: Gets slower and bigger — shoulders back, chin up, stepping into space — and smiles wider.
+  habit_gesture: Cracks his knuckles one at a time with his thumb, never all at once.
+  relation_to_appearance: Loves being looked at; the gold tooth and the armband are both there to be seen.
+capability:
+  special: {S: 8, P: 5, E: 7, C: 6, I: 5, A: 5, L: 5}
+  skills:
+    - {domain: brawling, rank: 3, evidence: "Twelve years working doors in Gary clubs, and six keeping the peace in a Remnants market."}
+    - {domain: intimidation, rank: 2, evidence: "Repossessed cars from people who did not want to give them up."}
+    - {domain: firearms, rank: 1, evidence: "Remnants range training and three real shootouts in the market's first year."}
+    - {domain: trade, rank: 1, evidence: "Knows every stall's margins because he takes his cut from them."}
+  tags: [heavy_hitter]
+  trained_responses:
+    - {cue: weapon_pointed, verb: speak, note: "Talks, grinning, while he closes the distance."}
+    - {cue: scream, verb: move, note: "Goes toward it; the market is his."}
+  literacy: 2
+  tech_literacy: 1
+  resolve_trait_mod: 1
+motive:
+  motive: Be somebody — respected, feared, and comfortable — in a world that finally rewards what he's good at.
+  method: Runs his market with a heavy hand and a big smile, keeps the stallholders loyal to him personally, and skims a tenth of the tribute he collects.
+  moral_line:
+    will: ["Break a thief's hand in front of the market", "Skim from the Remnants' tribute"]
+    wont: ["Hurt a stallholder who pays", "Let a crew from outside his market work his stalls", "Hit a woman or a kid"]
+    wont_tags: [attack_unarmed, kill_child]
+  inner_conflict: He genuinely loves his market and its people, and he is stealing from the organization that gave it to him, knowing exactly what the Remnants do to thieves.
+  past_wound: In the second year he pulled two kids out of a burning house and couldn't reach the third; the scar on his neck is from going back.
+  signature_behaviour: Walks the whole market every morning, greeting every stallholder by name and asking after their families.
+  risk_threshold: 7
+  risk_text: Loves physical risk and thinks he's untouchable; dismisses paper risks like the Audit House.
+  resource_constraints: One pistol with twelve rounds, a crew of four who are more loyal to him than to the Warden, and a skim cache that he cannot spend openly.
+persona:
+  public:
+    shown_traits: [jovial, generous, fearless]
+    claimed_history: Worked doors in Gary, joined up when the Remnants came, and earned the armband.
+    presented_affiliation: The Remnants, the Warden's shield man
+  private:
+    true_goals: ["Keep the market his", "Build enough of a stash to buy his own crew's loyalty if the Remnants turn on him"]
+    concealed_history: He takes a tenth of every tribute page before it reaches the Audit House and hides it in the market's old ice house.
+    real_affiliation: His market, and himself
+traits:
+  - tag: showman
+    manifests: Performs everything — punishment, generosity, jokes — for the crowd.
+    triggers: An audience, especially a market full of people.
+    causes: He escalates publicly, rewards publicly, and makes examples.
+    costs: He cannot back down in public, and people remember every humiliation he hands out.
+    example: Paid for a stallholder's funeral out of his own pocket and made sure everyone at the market saw him do it.
+  - tag: loyal_to_his_own
+    manifests: Protects his crew and his stallholders as though they were family, against anyone, including the Remnants.
+    triggers: Anyone from outside his market threatening his people.
+    causes: He picks fights with other crews and hides his people's mistakes from the Warden.
+    costs: The Warden trusts him less every year, and his crew owes him more than they owe the Remnants.
+    example: Told a Warden's inspector that a missing tribute was his own mistake rather than name the stallholder who was short.
+contradictions:
+  - belief_a: The Remnants gave him everything; he'd die for the armband.
+    belief_b: The Remnants would throw him away the day he stopped being useful, so he's taking his share now.
+    a_wins_when: He's in front of the market wearing the armband.
+    b_wins_when: The Audit House sends for his pages.
+decision_stack:
+  layers:
+    - His standing in his market
+    - His crew and stallholders
+    - His own skim
+    - The Warden's orders
+    - The Remnants as a whole
+  inversion_conditions:
+    - If the Warden threatens his market directly, the Remnants drop out of his stack entirely.
+  past_example: When the Warden ordered his crew to a convoy escort that would have left the market unshielded on a market day, he sent two men and kept two, and said the other two were sick.
+silence:
+  goes_quiet_when:
+    - Anyone mentions the house fire.
+    - Irene Kowalski sends for him.
+  body_when_silent: Arms folded high on his chest, cracking a knuckle, smile gone.
+  refuses_to_discuss: ["The third kid in the fire", "The ice house"]
+  comfortable_vs_uncomfortable: Comfortable silence is the market before opening; uncomfortable silence is the Audit House.
+knowledge:
+  knows:
+    - Every stallholder in his market by name, family and margin.
+    - The market's old ice house has a false back wall.
+  does_not_know:
+    - That Irene Kowalski has eleven months of evidence against him.
+  knows_but_hides:
+    - His skim cache in the ice house.
+    - That two of his crew are loyal to him over the Warden.
+  cues: [knows_headshot_rule, knows_false_death, knows_noise_draws_dead, knows_no_sharing]
+voice:
+  capsule: Big, warm, and loud, Gary cadence, a salesman's charm with a threat under it. Calls everyone 'boss' or 'baby'. Laughs before he gets angry. Every speech is for an audience.
+  speech_tendencies:
+    - Calls men "boss" and women "baby" — except the ones he fears.
+    - Laughs before he threatens.
+    - Speaks to the crowd rather than the person in front of him.
+  exemplars:
+    low_stakes: "Morning, Miss Tess! How's the stall, how's business? You tell me if anybody gives you trouble, you hear?"
+    under_pressure: "Okay, boss. Okay. Everybody look at the man. Look at him. Now, boss, you want to put that down, or you want to find out?"
+    at_the_limit: "You don't come into my market. You don't. I built this, I bled for this, and you think a piece of paper's going to take it?"
+  would_never_say:
+    - "I'm just following orders."
+    - "Please, I'm begging you."
+    - "It's not my business."
+  profanity: frequent
+  dialect_notes: Northwest Indiana, Gary Black English; 'finna', 'y'all', a lot of 'you hear me'.
+social:
+  household_role: ""
+  relations:
+    - target: "core:actor/irene_kowalski"
+      kind: acquaintance
+      axes: {fear: 2, respect: 1, resentment: 2}
+      history: She summons him every month to read his pages; he thinks she's a bean-counter who doesn't understand how the market works.
+    - target: "core:actor/tess_nakamura"
+      kind: acquaintance
+      axes: {affection: 1, trust: 1}
+      history: Tess's stall is his favourite; he likes that she's never afraid of him.
+  dependents: []
+  guardians: []
+  memberships:
+    - {faction: "core:faction/mafia_remnants", role: shield man, standing: 1, since: "year three"}
+life:
+  aspiration: To be Warden one day, or to have his own market and answer to nobody.
+  current_project: Building his skim cache big enough to buy his crew's loyalty for a year.
+  routine:
+    - {start_hh: 6, end_hh: 8, activity: walking the market, place_hint: market}
+    - {start_hh: 8, end_hh: 18, activity: keeping the market's peace, place_hint: market}
+    - {start_hh: 18, end_hh: 20, activity: collecting and counting tribute, place_hint: market}
+    - {start_hh: 20, end_hh: 24, activity: drinking with his crew, place_hint: market}
+    - {start_hh: 0, end_hh: 6, activity: sleep, place_hint: market}
+  obligations: ["Tribute pages to the Audit House every month", "The market's peace"]
+  hopes: ["The armband of a Warden", "Respect that doesn't need a gun"]
+  fears: ["Being called to the Audit House for the last time", "Another fire"]
+  secrets:
+    - content: He takes a tenth of every tribute page before it reaches the Audit House and hides it behind the false back wall of the market's old ice house.
+      who_knows: []
+      exposure_consequence: The Remnants would make him an example at a Sanction Site.
+disposition:
+  archetype_prior: predator
+  toward_strangers: neutral
+  encounter_default: Walks up smiling, asks their business in his market, and makes sure they see the armband and the pistol.
+starting_loops:
+  - {kind: goal, text: "Grow the skim cache", strength: 2}
+  - {kind: fear, text: "The Audit House", subject: "core:actor/irene_kowalski", strength: 2}
+starting_inventory:
+  - {item: "core:item/glock_19", slot: worn, label: pistol, props: {chambered: true}}
+  - {item: "core:item/magazine_9mm_15", container: pistol, props: {rounds: 11}}
+  - {item: "core:item/work_jacket", slot: worn, props: {note: "Leather car coat with a red shield man's armband."}}
+writers_notes: Reggie is charming and genuinely kind to his own people, and he will break a stranger's hand to make a point. Both are true every day. He is not stupid; he underestimates paper.
+tags: [mafia_remnants]

@@ -1,0 +1,350 @@
+{
+ "_why": "Hand-checkable expectations for sense/acoustics.py with RulesConfig() defaults (exact 12, partial 5, tone 0 dB; k 4.5 indoor / 6.0 outdoor by SOURCE place; wind +8 dB per level outdoors; asleep threshold 55 dB). Each scenario entry lists received dB, margin and fidelity, with the arithmetic in 'why'. Tolerance for dB values: 0.01.",
+ "fidelity_for_margin": [
+  {
+   "margin": 12.0,
+   "fidelity": "exact"
+  },
+  {
+   "margin": 11.99,
+   "fidelity": "partial"
+  },
+  {
+   "margin": 5.0,
+   "fidelity": "partial"
+  },
+  {
+   "margin": 4.99,
+   "fidelity": "tone_only"
+  },
+  {
+   "margin": 0.0,
+   "fidelity": "tone_only"
+  },
+  {
+   "margin": -0.01,
+   "fidelity": "none"
+  },
+  {
+   "margin": 40,
+   "fidelity": "exact"
+  },
+  {
+   "margin": -30,
+   "fidelity": "none"
+  }
+ ],
+ "scenarios": {
+  "metal_fence_gust": {
+   "source": [
+    "alley",
+    5.0,
+    5.8
+   ],
+   "source_db": 98,
+   "receptions": [
+    {
+     "listener": "pc",
+     "received_db": 66.31,
+     "margin_db": 31.31,
+     "fidelity": "exact",
+     "path_portals": [
+      "back_door",
+      "storeroom_door"
+     ],
+     "distance_m": 19.455,
+     "why": "98 - 6.0*log2(max(19.455,1)) - 6.0 = 66.31; ambient 35.0; margin 31.31"
+    },
+    {
+     "listener": "mara",
+     "received_db": 64.52,
+     "margin_db": 29.52,
+     "fidelity": "exact",
+     "path_portals": [
+      "back_door",
+      "storeroom_door"
+     ],
+     "distance_m": 23.909,
+     "why": "98 - 6.0*log2(max(23.909,1)) - 6.0 = 64.52; ambient 35.0; margin 29.52"
+    },
+    {
+     "listener": "alice",
+     "received_db": 66.61,
+     "margin_db": 31.61,
+     "fidelity": "exact",
+     "path_portals": [
+      "back_door",
+      "storeroom_door"
+     ],
+     "distance_m": 18.786,
+     "why": "98 - 6.0*log2(max(18.786,1)) - 6.0 = 66.61; ambient 35.0; margin 31.61"
+    },
+    {
+     "listener": "june",
+     "received_db": 76.38,
+     "margin_db": 46.38,
+     "fidelity": "exact",
+     "path_portals": [
+      "back_door"
+     ],
+     "distance_m": 8.595,
+     "why": "98 - 6.0*log2(max(8.595,1)) - 3.0 = 76.38; ambient 30.0; margin 46.38"
+    },
+    {
+     "listener": "eli",
+     "received_db": 60.2,
+     "margin_db": 30.2,
+     "fidelity": "tone_only",
+     "path_portals": [
+      "office_window"
+     ],
+     "distance_m": 7.819,
+     "why": "98 - 6.0*log2(max(7.819,1)) - 20.0 = 60.20; ambient 30.0; margin 30.20"
+    },
+    {
+     "listener": "nita",
+     "received_db": 84.27,
+     "margin_db": 38.27,
+     "fidelity": "exact",
+     "path_portals": [],
+     "distance_m": 4.883,
+     "why": "98 - 6.0*log2(max(4.883,1)) - 0.0 = 84.27; ambient 46.0; margin 38.27"
+    },
+    {
+     "listener": "stranger",
+     "received_db": 96.0,
+     "margin_db": 50.0,
+     "fidelity": "exact",
+     "path_portals": [
+      "rear_fence"
+     ],
+     "distance_m": 0.0,
+     "why": "98 - 6.0*log2(max(0.000,1)) - 2.0 = 96.00; ambient 46.0; margin 50.00"
+    }
+   ]
+  },
+  "metal_fence_june_call": {
+   "source": [
+    "storeroom",
+    7.5,
+    0.5
+   ],
+   "source_db": 70,
+   "receptions": [
+    {
+     "listener": "pc",
+     "received_db": 52.92,
+     "margin_db": 17.92,
+     "fidelity": "exact",
+     "path_portals": [
+      "storeroom_door"
+     ],
+     "distance_m": 8.746,
+     "why": "70 - 4.5*log2(max(8.746,1)) - 3.0 = 52.92; ambient 35.0; margin 17.92"
+    },
+    {
+     "listener": "mara",
+     "received_db": 50.25,
+     "margin_db": 15.25,
+     "fidelity": "exact",
+     "path_portals": [
+      "storeroom_door"
+     ],
+     "distance_m": 13.2,
+     "why": "70 - 4.5*log2(max(13.200,1)) - 3.0 = 50.25; ambient 35.0; margin 15.25"
+    },
+    {
+     "listener": "alice",
+     "received_db": 53.44,
+     "margin_db": 18.44,
+     "fidelity": "exact",
+     "path_portals": [
+      "storeroom_door"
+     ],
+     "distance_m": 8.078,
+     "why": "70 - 4.5*log2(max(8.078,1)) - 3.0 = 53.44; ambient 35.0; margin 18.44"
+    },
+    {
+     "listener": "eli",
+     "received_db": 31.36,
+     "margin_db": 1.36,
+     "fidelity": "none",
+     "path_portals": [
+      "back_door",
+      "office_window"
+     ],
+     "distance_m": 11.12,
+     "why": "70 - 4.5*log2(max(11.120,1)) - 23.0 = 31.36; ambient 30.0; margin 1.36"
+    },
+    {
+     "listener": "nita",
+     "received_db": 52.58,
+     "margin_db": 6.58,
+     "fidelity": "partial",
+     "path_portals": [
+      "back_door"
+     ],
+     "distance_m": 9.22,
+     "why": "70 - 4.5*log2(max(9.220,1)) - 3.0 = 52.58; ambient 46.0; margin 6.58"
+    },
+    {
+     "listener": "stranger",
+     "received_db": 49.61,
+     "margin_db": 3.61,
+     "fidelity": "tone_only",
+     "path_portals": [
+      "back_door",
+      "rear_fence"
+     ],
+     "distance_m": 10.709,
+     "why": "70 - 4.5*log2(max(10.709,1)) - 5.0 = 49.61; ambient 46.0; margin 3.61"
+    }
+   ],
+   "_note": "June's raised call (70 dB) from the storeroom doorway after she moves there; Eli is treated as asleep here only for the arithmetic — in the trace he has just woken (awake), so his row reads TONE_ONLY either way (margin 1.36)."
+  },
+  "three_rooms_gunshot": {
+   "source": [
+    "room1",
+    2.5,
+    2.5
+   ],
+   "source_db": 160,
+   "receptions": [
+    {
+     "listener": "b",
+     "received_db": 104.55,
+     "margin_db": 74.55,
+     "fidelity": "exact",
+     "path_portals": [
+      "wall_1_2"
+     ],
+     "distance_m": 5.0,
+     "why": "160 - 4.5*log2(max(5.000,1)) - 45.0 = 104.55; ambient 30.0; margin 74.55"
+    },
+    {
+     "listener": "c",
+     "received_db": 70.05,
+     "margin_db": 40.05,
+     "fidelity": "tone_only",
+     "path_portals": [
+      "wall_1_2",
+      "wall_2_3"
+     ],
+     "distance_m": 10.0,
+     "why": "160 - 4.5*log2(max(10.000,1)) - 75.0 = 70.05; ambient 30.0; margin 40.05"
+    }
+   ]
+  },
+  "crowd_normal_voice": {
+   "source": [
+    "hall",
+    7.5,
+    29.0
+   ],
+   "source_db": 60,
+   "receptions": [
+    {
+     "listener": "l01",
+     "received_db": 60.0,
+     "margin_db": 20.0,
+     "fidelity": "exact",
+     "path_portals": [],
+     "distance_m": 1.0,
+     "why": "60 - 4.5*log2(max(1.000,1)) - 0.0 = 60.00; ambient 40.0; margin 20.00"
+    },
+    {
+     "listener": "l02",
+     "received_db": 55.5,
+     "margin_db": 15.5,
+     "fidelity": "exact",
+     "path_portals": [],
+     "distance_m": 2.0,
+     "why": "60 - 4.5*log2(max(2.000,1)) - 0.0 = 55.50; ambient 40.0; margin 15.50"
+    },
+    {
+     "listener": "l04",
+     "received_db": 51.0,
+     "margin_db": 11.0,
+     "fidelity": "partial",
+     "path_portals": [],
+     "distance_m": 4.0,
+     "why": "60 - 4.5*log2(max(4.000,1)) - 0.0 = 51.00; ambient 40.0; margin 11.00"
+    },
+    {
+     "listener": "l06",
+     "received_db": 48.37,
+     "margin_db": 8.37,
+     "fidelity": "partial",
+     "path_portals": [],
+     "distance_m": 6.0,
+     "why": "60 - 4.5*log2(max(6.000,1)) - 0.0 = 48.37; ambient 40.0; margin 8.37"
+    },
+    {
+     "listener": "l08",
+     "received_db": 46.5,
+     "margin_db": 6.5,
+     "fidelity": "partial",
+     "path_portals": [],
+     "distance_m": 8.0,
+     "why": "60 - 4.5*log2(max(8.000,1)) - 0.0 = 46.50; ambient 40.0; margin 6.50"
+    },
+    {
+     "listener": "l10",
+     "received_db": 45.05,
+     "margin_db": 5.05,
+     "fidelity": "partial",
+     "path_portals": [],
+     "distance_m": 10.0,
+     "why": "60 - 4.5*log2(max(10.000,1)) - 0.0 = 45.05; ambient 40.0; margin 5.05"
+    },
+    {
+     "listener": "l12",
+     "received_db": 43.87,
+     "margin_db": 3.87,
+     "fidelity": "tone_only",
+     "path_portals": [],
+     "distance_m": 12.0,
+     "why": "60 - 4.5*log2(max(12.000,1)) - 0.0 = 43.87; ambient 40.0; margin 3.87"
+    },
+    {
+     "listener": "l14",
+     "received_db": 42.87,
+     "margin_db": 2.87,
+     "fidelity": "tone_only",
+     "path_portals": [],
+     "distance_m": 14.0,
+     "why": "60 - 4.5*log2(max(14.000,1)) - 0.0 = 42.87; ambient 40.0; margin 2.87"
+    },
+    {
+     "listener": "observer",
+     "received_db": 39.1,
+     "margin_db": -0.9,
+     "fidelity": "none",
+     "path_portals": [],
+     "distance_m": 25.0,
+     "why": "60 - 4.5*log2(max(25.000,1)) - 0.0 = 39.10; ambient 40.0; margin -0.90"
+    }
+   ]
+  }
+ },
+ "partial_words": [
+  {
+   "text": "Reggie has been skimming the tribute for months",
+   "event_id": "evt_000042",
+   "listener_id": "act_000003",
+   "expected": "… has been skimming the tribute for months"
+  },
+  {
+   "text": "Reggie has been skimming the tribute for months",
+   "event_id": "evt_000042",
+   "listener_id": "act_000004",
+   "expected": "… has been skimming … for months"
+  },
+  {
+   "text": "What was that?",
+   "event_id": "evt_000010",
+   "listener_id": "act_000006",
+   "expected": "…"
+  }
+ ]
+}
