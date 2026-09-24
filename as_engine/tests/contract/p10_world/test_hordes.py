@@ -1,5 +1,6 @@
-"""The region's dead in numbers, the hordes and the Mega Horde (P10). Rules HRD-01..17, INF-11,
-INF-13, OPS-03 (world/hordes.py, world/infected.py; fidelity E01-E03, W04, §5 LOD).
+"""The region's dead in numbers, the hordes and the Mega Horde (P10). Rules HRD-01..18, INF-11,
+INF-13, OPS-03, SEL-01's memory for loud noises (world/hordes.py, world/infected.py, turn/select.py;
+fidelity E01-E03, W04, F04, §5 LOD).
 
 The dead are counted, district by district, and they are finite: a body you meet was taken from a
 count, a crowd on the road is the same dead walking, and nothing refills by itself. A crowd that
@@ -31,7 +32,8 @@ from world_kit import (
 )
 
 from as_engine.contracts.events import Event, EventType
-from as_engine.physical import space
+from as_engine.physical import bodies, space
+from as_engine.physical.bodies import WoundSpec
 from as_engine.world import hordes, infected
 from as_engine.world.worldgen import atlas
 
@@ -241,6 +243,35 @@ def test_a_horde_walks_the_roads(gw):
                                                                                                            round(w / 0.5 * 1000))
 
 
+def test_a_body_takes_the_road_it_means_to(gw):
+    """physical.space path (its P10 line): a route enters each place at most once. A hub's roads
+    all meet at its centre, so stepping into one road and straight back out costs nothing; without
+    the rule a tie sends a walker down the road with the lowest portal id and back before it takes
+    its own. From off the centre of every hub, each road is one crossing; from one road's hub end,
+    another road is two."""
+    s = gw
+    for z in zones(s):
+        h = hub(s, z["zone_id"])
+        ways = {}
+        for r in all_rows(s, "SELECT * FROM portals WHERE place_a = ? OR place_b = ? ORDER BY portal_id", (h, h)):
+            other = r["place_b"] if r["place_a"] == h else r["place_a"]
+            if one(s, "SELECT kind FROM places WHERE place_id = ?", (other,))["kind"] == "street":
+                ways[other] = r["portal_id"]
+        roads = sorted(ways, key=ways.get)
+        assert len(roads) >= 2, h
+        with s.store.transaction() as tx:
+            walker = infected.spawn(tx, s.rng, h, SH, now(s), turn(s), None, x_m=1.0, y_m=1.0, origin="scenario")
+        for road in roads:
+            legs = space.path(s.store, walker, road)
+            assert [(leg.portal_id, leg.place_id) for leg in legs] == [(ways[road], road), (None, road)], (h, road)
+        first, last = roads[0], roads[-1]
+        x, y = space.portal_point(s.store, ways[first], first)
+        with s.store.transaction() as tx:
+            tx.commit_event(space.move_event(tx, walker, first, None, x, y, now(s), None, turn(s)))
+        legs = space.path(s.store, walker, last)
+        assert [(leg.portal_id, leg.place_id) for leg in legs] == [(ways[first], h), (ways[last], last), (None, last)]
+
+
 # =========================================================================== HRD-04..06 a drift
 def test_a_drift_walks_scatters_and_nothing_is_lost(gw):
     """HRD-04..06: formed from the district's active dead; it steps onto the road after 2 minutes,
@@ -315,6 +346,279 @@ def test_a_horde_in_sight_becomes_bodies(gw):
 def dict_write(table, key, values):
     from as_engine.contracts.events import WriteOp, WriteRecord
     return WriteRecord(op=WriteOp.UPDATE, table=table, key=key, values=values)
+
+
+# =========================================================================== HRD-07 / HRD-18 in sight and out of it
+def living_in(s, place_id) -> list[str]:
+    """The living bodies that are not infected standing in a place."""
+    return [r["body_id"] for r in all_rows(s, "SELECT b.body_id FROM bodies b JOIN positions q ON q.body_id = b.body_id "
+                                              "WHERE q.place_id = ? AND b.alive = 1 AND b.kind != 'infected' "
+                                              "ORDER BY b.body_id", (place_id,))]
+
+
+def quiet_far_hub(s) -> tuple[str, str, str]:
+    """A region district whose hub nobody alive stands in, and a neighbouring region district's
+    hub, the hub and the whole walk between them outside the PC's area: (zone_id, hub, the other
+    hub)."""
+    near = area(s)
+    for z in zones(s):
+        h = hub(s, z["zone_id"])
+        if h in near or living_in(s, h):
+            continue
+        for to in neighbour_hubs(s, h):
+            kind = one(s, "SELECT z.kind FROM places p JOIN zones z ON z.zone_id = p.zone_id WHERE p.place_id = ?",
+                       (to,))["kind"]
+            walk = hordes.path(s.store, h, to)
+            if kind != "exterior" and walk and not set(walk) & near:
+                return z["zone_id"], h, to
+    pytest.skip("every hub is in the PC's area or has somebody in it")
+
+
+def pending_steps(s, body_id) -> list[str]:
+    return [r["queue_id"] for r in all_rows(s, "SELECT queue_id FROM event_queue WHERE type = 'INFECTED_STEP' "
+                                               "AND subject_id = ? AND status = 'pending' ORDER BY queue_id", (body_id,))]
+
+
+def target_of(s, body_id) -> str | None:
+    return one(s, "SELECT target_id FROM infected_state WHERE body_id = ?", (body_id,))["target_id"]
+
+
+def test_a_milling_crowd_stands_where_it_is_shown(gw):
+    """HRD-07: the bodies shown of a moving horde follow it (attract route[0], reason 'horde');
+    a milling horde's stay where they were promoted, even when it still has a way to go (the Mega
+    Horde mills at every hub of its passage): they are the crowd that fills the street."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 3})
+    z, h, to = quiet_far_hub(s)
+    give(s, z, 20)
+    with s.store.transaction() as tx:
+        moving = hordes.form(tx, "drift", z, {SH: 5}, to, now(s), turn(s), None)
+        milling = hordes.form(tx, "drift", z, {SH: 5}, to, now(s), turn(s), None)
+        tx.commit_event(Event(type=EventType.HORDE_STATE, writer="world.hordes", at=now(s), turn_index=turn(s),
+                              payload={"horde_id": milling, "changes": {"status": "milling"}},
+                              writes=[dict_write("hordes", {"horde_id": milling}, {"status": "milling"})]))
+        walking = hordes.promote(tx, s.rng, moving, h, now(s), turn(s), None)
+        standing = hordes.promote(tx, s.rng, milling, h, now(s), turn(s), None)
+    route = horde(s, milling)["route"]
+    assert route and horde(s, moving)["route"] == route and len(walking) == len(standing) == 3
+    drifts = {r["payload"]["body_id"]: r["payload"] for r in rows(s, "INFECTED_DRIFT")}
+    for b in walking:
+        assert drifts[b]["target_id"] == route[0] and drifts[b]["reason"] == "horde"
+        assert target_of(s, b) == route[0] and len(pending_steps(s, b)) == 1
+    for b in standing:
+        assert b not in drifts and target_of(s, b) is None and not pending_steps(s, b)
+        assert one(s, "SELECT place_id FROM positions WHERE body_id = ?", (b,))["place_id"] == h
+
+
+def test_the_dead_nobody_is_near_fold_back_into_their_crowd(gw):
+    """HRD-18 (fidelity F04 demotion): a body shown of a horde that is unhurt, walks its crowd's
+    way, grips nobody and stands where nobody alive is, outside the PC's area, goes back into its
+    horde's count: HORDE_REJOINED (+1 of its type), INFECTED_STATE folded_at / target None (writer
+    'world.infected'), its pending INFECTED_STEP cancelled (reason 'folded') and DEMATERIALIZE
+    deleting its position, both caused by the INFECTED_STATE — in that order. Its row stays, it is
+    never folded twice, and the census never moves."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 4})
+    z, h, to = quiet_far_hub(s)
+    give(s, z, 30)
+    base = total(s)
+    with s.store.transaction() as tx:
+        hid = hordes.form(tx, "drift", z, {SH: 10}, to, now(s), turn(s), None)
+        ids = hordes.promote(tx, s.rng, hid, h, now(s), turn(s), None)
+    assert len(ids) == 4 and hordes.count(s.store, hid) == 6 and total(s) == base
+    shown = hordes.census(s.store)["bodies"]
+    first = ids[0]
+    pos = one(s, "SELECT * FROM positions WHERE body_id = ?", (first,))
+    [step] = pending_steps(s, first)
+    t = now(s) + 1000
+    with s.store.transaction() as tx:
+        c = cause(tx, t, "nobody is near")
+        out = hordes.fold(tx, first, t, turn(s), c.event_id)
+    assert [e.type for e in out] == [EventType.HORDE_REJOINED, EventType.INFECTED_STATE, EventType.TIMER_CANCELLED,
+                                     EventType.DEMATERIALIZE]
+    rejoined, state, cancelled, gone = out
+    assert rejoined.payload == {"horde_id": hid, "body_id": first, "type_id": SH, "composition": {SH: 7}}
+    assert rejoined.cause_event_id == c.event_id and horde(s, hid)["composition"] == {SH: 7}
+    assert state.writer == "world.infected" and state.payload["changes"] == {"folded_at": t, "target_id": None}
+    assert state.cause_event_id == c.event_id
+    assert cancelled.payload["queue_id"] == step and cancelled.payload["reason"] == "folded"
+    assert cancelled.cause_event_id == state.event_id
+    assert one(s, "SELECT status FROM event_queue WHERE queue_id = ?", (step,))["status"] == "cancelled"
+    assert gone.writer == "physical.space" and gone.cause_event_id == state.event_id
+    assert gone.payload == {"body_id": first, "place_id": h, "x_m": pos["x_m"], "y_m": pos["y_m"]}
+    assert s.store.query_one("SELECT 1 FROM positions WHERE body_id = ?", (first,)) is None
+    row = one(s, "SELECT * FROM infected_state WHERE body_id = ?", (first,))
+    assert row["folded_at"] == t and row["target_id"] is None
+    assert one(s, "SELECT alive FROM bodies WHERE body_id = ?", (first,))["alive"] == 1  # its history is whole
+    assert not infected.active(s.store, first)
+    assert hordes.census(s.store)["bodies"] == shown - 1 and total(s) == base
+    with s.store.transaction() as tx:
+        assert hordes.fold(tx, first, t, turn(s), None) == []
+        space.place_body(tx, first, h, None, 1.0, 1.0, t, None, turn(s))  # put back by hand: still folded
+        assert hordes.fold(tx, first, t, turn(s), None) == []  # a body is counted once
+        for b in ids[1:]:
+            assert hordes.fold(tx, b, t, turn(s), None)
+    assert horde(s, hid)["composition"] == {SH: 10} and total(s) == base
+
+
+def test_a_body_with_anything_of_its_own_stays_a_body(gw):
+    """HRD-18: no fold for a hurt body (F04: it keeps its wounds), one hunting a body, one that
+    grips or is gripped, one not taken from a count (a cheat's), a destroyed one, one in the PC's
+    area, or one where somebody alive stands. The same body folds once the reason is gone."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 8})
+    z, h, _ = quiet_far_hub(s)
+    near = area(s)
+    spot = next(p for p in sorted(near) if not living_in(s, p))
+    person = next(r["body_id"] for r in all_rows(s, "SELECT b.body_id FROM bodies b JOIN positions q ON q.body_id = b.body_id "
+                                                    "WHERE b.alive = 1 AND b.kind != 'infected' AND b.body_id != ? "
+                                                    "ORDER BY b.body_id", (pc(s),)))
+    give(s, z, 30)
+    with s.store.transaction() as tx:
+        hid = hordes.form(tx, "drift", z, {SH: 20}, h, now(s), turn(s), None)  # to its own hub: it mills
+        hurt, hunter, holder, held, dead, wanders, alone, control = hordes.promote(tx, s.rng, hid, h, now(s), turn(s), None)
+        c = cause(tx, now(s))
+        bodies.apply_harm(tx, hurt, WoundSpec("arm_l", "blunt", "minor", 0), now(s), c.event_id, turn(s), s.rng)
+        assert infected.attract(tx, hunter, pc(s), now(s), c.event_id, turn(s), reason="noise") is not None
+        bodies.grip_event(tx, holder, held, now(s), c.event_id, turn(s))
+        tx.commit_event(Event(type=EventType.DEATH, writer="physical.bodies", at=now(s), turn_index=turn(s), actor_id=dead,
+                              payload={"body_id": dead, "cause": "test"},
+                              writes=[dict_write("bodies", {"body_id": dead}, {"alive": 0, "core_intact": 0})]))
+        cheat = infected.spawn(tx, s.rng, h, SH, now(s), turn(s), c.event_id, origin="cheat")
+        tx.commit_event(space.move_event(tx, wanders, spot, None, 1.0, 1.0, now(s), c.event_id, turn(s)))
+    t = now(s)
+    with s.store.transaction() as tx:
+        for b in (hurt, hunter, holder, held, dead, cheat, wanders):
+            assert hordes.fold(tx, b, t, turn(s), None) == [], b
+        assert hordes.fold(tx, control, t, turn(s), None)
+        tx.commit_event(space.move_event(tx, wanders, h, None, 1.0, 1.0, t, None, turn(s)))
+        assert hordes.fold(tx, wanders, t, turn(s), None)  # out of the PC's area again
+        tx.commit_event(space.move_event(tx, person, h, None, 2.0, 2.0, t, None, turn(s)))
+        assert hordes.fold(tx, alone, t, turn(s), None) == []
+        tx.commit_event(space.move_event(tx, person, spot, None, 2.0, 2.0, t, None, turn(s)))
+        assert hordes.fold(tx, alone, t, turn(s), None)
+    for b in (hurt, hunter, holder, held, cheat):
+        assert one(s, "SELECT folded_at FROM infected_state WHERE body_id = ?", (b,))["folded_at"] is None
+        assert s.store.query_one("SELECT 1 FROM positions WHERE body_id = ?", (b,)) is not None
+
+
+def test_a_body_with_somewhere_of_its_own_to_be_keeps_walking(gw):
+    """HRD-18: a body folds only when it is going nowhere of its own — no target, or its crowd's
+    way (the horde's place or a place on its route). One of a crowd drawn somewhere else, or a
+    body of no crowd walking to a noise, keeps walking as a body: the dead drawn by a shot three
+    streets away still arrive (F04: the anonymous dead merge only with a compatible destination)."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 4})
+    z, h, to = quiet_far_hub(s)
+    give(s, z, 30)
+    with s.store.transaction() as tx:
+        hid = hordes.form(tx, "drift", z, {SH: 10}, to, now(s), turn(s), None)
+        follows, strays, back, _ = hordes.promote(tx, s.rng, hid, h, now(s), turn(s), None)
+    road = horde(s, hid)["route"][0]
+    site = one(s, "SELECT place_id FROM places WHERE zone_id = ? AND parent_id IS NULL AND kind != 'street' ORDER BY place_id",
+               (z,))["place_id"]
+    assert road not in area(s) and not living_in(s, road)
+    with s.store.transaction() as tx:
+        c = cause(tx, now(s))
+        hordes.change(tx, z, SH, -1, 0, "test", now(s), turn(s), None)
+        loner = infected.spawn(tx, s.rng, h, SH, now(s), turn(s), c.event_id)  # taken from the count; no crowd
+        assert infected.attract(tx, loner, road, now(s), c.event_id, turn(s), reason="noise") is not None
+        assert infected.attract(tx, strays, site, now(s), c.event_id, turn(s), reason="noise") is not None
+        tx.commit_event(space.move_event(tx, back, road, None, 1.0, 1.0, now(s), c.event_id, turn(s)))
+        assert infected.attract(tx, back, h, now(s), c.event_id, turn(s), reason="horde") is not None
+    assert target_of(s, follows) == road and target_of(s, back) == h == horde(s, hid)["place_id"]
+    t = now(s)
+    with s.store.transaction() as tx:
+        assert hordes.fold(tx, loner, t, turn(s), None) == []  # walking to a noise, with no crowd
+        assert hordes.fold(tx, strays, t, turn(s), None) == []  # drawn off its crowd's way
+        assert hordes.fold(tx, follows, t, turn(s), None)  # on its crowd's route
+        assert hordes.fold(tx, back, t, turn(s), None)  # heading for the place its crowd is in
+    assert horde(s, hid)["composition"] == {SH: 8}
+
+
+def test_with_its_crowd_gone_it_folds_into_the_district(gw):
+    """HRD-18: a body whose horde is gone (or that never had one) and that is going nowhere goes
+    back into the district's count where it stands: change(zone, type, +1 active — or +1 dormant
+    for a dormant one —, reason 'folded'), no HORDE_REJOINED. Nothing is lost and nothing is made.
+    The last of a crowd that was walking when it was spent walk on where it was going (HRD-07):
+    that is their own way now, and they stay bodies."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 3})
+    z, h, to = quiet_far_hub(s)
+    give(s, z, 20)
+    give(s, z, 5, CR)
+    with s.store.transaction() as tx:
+        hid = hordes.form(tx, "drift", z, {SH: 3}, h, now(s), turn(s), None)
+        ids = hordes.promote(tx, s.rng, hid, h, now(s), turn(s), None)
+        walker = hordes.form(tx, "drift", z, {SH: 3}, to, now(s), turn(s), None)
+        last = hordes.promote(tx, s.rng, walker, h, now(s), turn(s), None)
+        hordes.change(tx, z, CR, -1, 0, "test", now(s), turn(s), None)
+        sleeper = infected.spawn(tx, s.rng, h, CR, now(s), turn(s), None, dormant=True)  # taken from the count
+    assert len(ids) == 3 and horde(s, hid)["status"] == "gone"
+    assert len(last) == 3 and horde(s, walker)["status"] == "gone"
+    assert all(target_of(s, b) == horde(s, walker)["route"][0] for b in last)
+    with s.store.transaction() as tx:
+        assert hordes.fold(tx, last[0], now(s), turn(s), None) == []
+    base, before = total(s), hordes.pool(s.store, z)
+    with s.store.transaction() as tx:
+        out = hordes.fold(tx, ids[0], now(s), turn(s), None) + hordes.fold(tx, sleeper, now(s), turn(s), None)
+    assert EventType.HORDE_REJOINED not in [e.type for e in out]
+    pools = [e.payload for e in out if e.type == EventType.POOL_CHANGE]
+    assert [(p["zone_id"], p["type_id"], p["active_delta"], p["dormant_delta"], p["reason"]) for p in pools] == [
+        (z, SH, 1, 0, "folded"), (z, CR, 0, 1, "folded")]
+    after = hordes.pool(s.store, z)
+    assert after[SH] == (before[SH][0] + 1, before[SH][1]) and after[CR] == (before[CR][0], before[CR][1] + 1)
+    assert total(s) == base
+
+
+def test_the_ones_that_walk_off_unseen_go_back_into_the_count(gw):
+    """HRD-18 through INF-12: world.infected.step folds a body before it steps (the step's cause
+    is its TIMER_FIRED). Shown where nobody is and left alone, a horde's bodies are back in its
+    count at their first step, before it has walked on; the census never moves."""
+    s = gw
+    tune(s, hordes={"drift_chance": 0.0, "local_cap": 5})
+    z, h, to = quiet_far_hub(s)
+    give(s, z, 30)
+    base = total(s)
+    with s.store.transaction() as tx:
+        hid = hordes.form(tx, "drift", z, {SH: 10}, to, now(s), turn(s), None)
+        ids = hordes.promote(tx, s.rng, hid, h, now(s), turn(s), None)
+    run(s, 0.02)
+    back = [r for r in rows(s, "HORDE_REJOINED") if r["payload"]["horde_id"] == hid]
+    assert sorted(r["payload"]["body_id"] for r in back) == sorted(ids)
+    for r in back:
+        fired = one(s, "SELECT type, payload FROM events WHERE event_id = ?", (r["cause_event_id"],))
+        assert fired["type"] == "TIMER_FIRED" and json.loads(fired["payload"])["type"] == "INFECTED_STEP"
+    for b in ids:
+        assert s.store.query_one("SELECT 1 FROM positions WHERE body_id = ?", (b,)) is None
+    assert all(r["payload"]["horde_id"] != hid for r in rows(s, "HORDE_MOVED"))  # it has not walked on yet
+    assert horde(s, hid)["composition"] == {SH: 10} and total(s) == base
+
+
+def test_a_roar_long_ago_no_longer_holds_the_moment(gw):
+    """SEL-01 (P10): a loud noise of this turn brings its place and every place 1 hop from it into
+    the active area for LOUD_MEMORY_MS (10 minutes) of world time — no longer: the off-screen step
+    keeps one turn for days, and a roar hours ago must not keep a district in detail (HRD-18 folds
+    by the area)."""
+    from as_engine.turn import timers
+    from as_engine.turn.select import LOUD_MEMORY_MS
+    s = gw
+    z, h, _ = quiet_far_hub(s)
+    near = area(s)
+    t0 = now(s)
+    with s.store.transaction() as tx:
+        tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=t0, turn_index=turn(s),
+                              payload={"source_db": 95, "kind": "roar", "text": "a roar", "place_id": h, "x_m": 1.0,
+                                       "y_m": 1.0}))
+        around = {h, *space.places_near(tx, h, 1)}
+    assert LOUD_MEMORY_MS == 10 * MIN and h not in near
+    assert around <= area(s)
+    with s.store.transaction() as tx:
+        timers.run_offscreen(tx, s.rng, t0 + LOUD_MEMORY_MS, turn(s))
+    assert now(s) == t0 + LOUD_MEMORY_MS and around <= area(s)
+    with s.store.transaction() as tx:
+        timers.run_offscreen(tx, s.rng, t0 + LOUD_MEMORY_MS + 1, turn(s))
+    assert not (around - near) & area(s)
 
 
 # =========================================================================== HRD-08 pressing

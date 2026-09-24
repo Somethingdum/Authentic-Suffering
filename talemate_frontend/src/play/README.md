@@ -118,9 +118,10 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
       is on is lit, a plain label says what it is doing ("Writing the people down", with "2 of 12"
       while it waits on the models), and a line under it changes every couple of seconds — a joke
       about that step, never a hint about your world, and never one of the last three lines again.
-- [ ] The same bar during a turn ("Your move": Reading your move → … → Saving), and — after you have
-      read for a while — "Everyone else catches up" first, counting what is left. It never names
-      anyone or says how many people are thinking (Developer mode may).
+- [ ] The same bar during a turn ("Your move": Reading your move → … → Saving), and — when you answer
+      quickly, before the others have finished thinking over the last moment — "Everyone else
+      catches up" first, counting what is left. It never names anyone or says how many people are
+      thinking (Developer mode may).
 - [ ] An era your character cannot live in is greyed out in step 2 with the reason ("Addison's story
       needs a world 9-11 years after the Fall."); a days-since-the-Fall number outside the range
       is refused with the range.

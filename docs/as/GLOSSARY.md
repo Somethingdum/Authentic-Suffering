@@ -29,13 +29,13 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | world | the generated place, its people and history | "world" | — |
 | genesis | the saved state of a world before any PC was placed | "the world as it began" | BaselineWorldFile (the ruling's name) |
 | turn-0 snapshot | a run's `turn0.sqlite`: the run as it stood before its first turn (PC placed), kept so the run can be re-simulated (DET-02) — not a genesis | — | — |
-| active area | the places a turn simulates in full: the PC's place, 2 portal hops, and the neighbourhood of any loud noise this turn | — | — |
+| active area | the places a turn simulates in full: the PC's place, 2 portal hops, and the neighbourhood of any loud noise this turn in the last 10 minutes of world time (SEL-01) | — | — |
 | guide | the model that answers Ask-mode questions from what the character knows plus plain rules text (`service/guide.py`); never a turn | "Guide" | hint system, helper |
 | push | a protocol message the service sends without being asked (turn progress, the turn's result, the story) to every connected page | — | broadcast, event (for messages) |
 | busy | a turn is running; the service refuses anything that would read or change the run, except the view and the story from before the turn | "Your last move is still being worked out." | locked |
 | lane | one model on one machine (A = desktop, B = laptop) | "Storyteller brain", "Fast brain" | box, slot |
 | call class | the kind of model call (intake, narration …) | — | stage call |
-| LOD | reasoning tier: HOT (deep, thinking), WARM (fast), COLD (code continues the plan) | — | level of detail (as a competence level — never) |
+| LOD | reasoning tier of a mind: HOT (deep, thinking), WARM (fast), COLD (code continues the plan). The world's levels of detail are something else: see "levels of detail (world)" | — | level of detail (as a competence level — never) |
 | turn | one transaction from player input to committed world + prose | "a turn" | tick |
 | horizon | the world time a turn simulates to | — | — |
 | wave | one round of simultaneous decisions inside a turn | "reactions" | — |
@@ -82,6 +82,42 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | echo ledger | n-grams the model must not repeat back | — | — |
 | Sandbox | a run where a cheat changed or revealed something | "Sandbox" tag | — |
 | quarantine | cheat-origin entities excluded from balance maths | — | — |
+| levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |
+| pool | a district's counted dead by type, active or dormant (`infected_pools`) | — | encounter rating, spawn table |
+| frontage | where a building site meets its street: an anchor of the hub along one side or the other ("the front of the Yazzie house"); the next building is a walk down the street (WG1, D-64) | "the front of the Yazzie house" | — |
+| horde | a counted crowd walking hub to hub: drift (a district sends some off), drawn (a loud sound pulls them), mega | "a crowd of the dead" | — |
+| Mega Horde | the end-game event: the country's dead, tens to hundreds of thousands, through the region for days (HRD-12..16; D-57) | what people call it ("the big one coming") | — |
+| exterior | the four zones past the region's edges, each one huge finite pool (W04) | the roads out ("the North Road") | — |
+| census | pools + hordes + bodies: every infected in the world, conserved but for rising and destruction (HRD-15) | — | — |
+| fold | one of the dead going back into a count when the contact is over — anonymous, unhurt, going nowhere of its own (with its crowd, or no target), holding nobody, where nobody alive stands, outside the active area; its record stays, its position goes (HRD-18, D-67). The reverse of promotion, where a count's dead become bodies where the player is (HRD-07) | — | despawn, delete |
+| density | how thick a district's active dead are, 0–10 (the heat map; outings are hurt by it) | — | encounter rating |
+| saturated | a district the Mega Horde is passing through: never quiet (85 dB), every street full | — | — |
+| strain | the minutes a crowd has leaned on a door (`portals.strain_min`); damage 0–3 shows how near it is to giving way | "the door is splintering" | — |
+| energy | an infected body's budget, spent by time while active; 0 → dormant | — | — |
+| dormant | an infected standing still until something wakes it ("a statue") | "standing still, like a statue" | — |
+| risen | a new infected body that got up from a corpse (`risen_from`) | "what was left of <name>" | reanimated corpse (as the same body) |
+| living spreader | a wet-strain host in weeks 1–3, infective from about day 3 | — (the signs show, the name never does) | — |
+| spreader signs | what a close, clear look shows of a week-2+ host (a cue) | what you notice about them | — |
+| compulsion | a week-3 host's involuntary offer of mouth-contact food or drink (never the PC) | — | — |
+| enclave | a faction's sealed settlement: one gate, never breached (the Depot) | its name | bunker (in code) |
+| lockdown | an enclave shut: nobody goes out (`settlements.lockdown`) | "they've sealed the Depot" | — |
+| seat / seat holder | an office a faction's leader list names (Leader.seat); its holder is a real generated person | the title ("the Gray Top Hat") | — |
+| council | the seats that meet on a schedule (FAC-02) | "the Top Hats are meeting" | — |
+| route watch | a faction that sees a Mega Horde forming before any sign (FAC-03) | — | — |
+| DECON | a faction's retaliation team sent after whoever killed one of theirs (FAC-04/05) | what people whisper | — |
+| operator | a DECON team member, named out of the enclave's counted people | — | — |
+| outing | an operation: scavenge, patrol, trade run, raid, decon (OPS-01..08) | what people say ("they went out for supplies") | — |
+| world day | the world's daily clock (`WORLD_DAY`, 04:00): weather, the unseen dead, outings, wear, the infected, the hordes | — | world tick |
+| wear | what weather and time do to things (rust, pulp, rot, spoiling); nothing is deleted (C02) | the item's condition word | Memory Fade, graceful forgetting, environmental reclaim, location overhaul |
+| materialise | one unnamed person taken from a cohort becomes a named one (L11) | — | spawn (for people) |
+| quiet hours | the jobs a turn boundary owes — reflection and retelling — run while the player reads and finished before the next move (BG-01..07) | "Everyone else catches up" | idle-time cognition |
+| reflection | a person mulling what happened (goals, grudges, a lesson, a plan) | — | — |
+| retelling | a holder putting a fresh rumour into their own words (INFO-06) | — | — |
+| loading bar | the progress view of a long job: its whole plan, the step lit, a line about it (PROG-01..07) | the bar | — |
+| plan / phase / sub-phase | a long job's steps, in order (`service/progress.PLANS`) | the step's plain label | stage (on screen: never) |
+| quip | one line the bar shows about the step (`ui/*.yaml`, CNT-16) | the line under the bar | — |
+| magnet | a place worth the risk that the PC has a lead on (WG8, WG-35) | "a lead" (Journal) | — |
+| home settlement | the settlement the PC starts in or beside (WG2) | its name | — |
 | story | — | — | **sotry** (error) |
 
 ## Player-facing words (the only words play screens use for these things)
@@ -97,6 +133,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | noise | quiet · some noise · noisy · deafening |
 | need stage | fine · noticeable · bad · severe · critical |
 | turn progress | Checking the world… · Reading your move… · Everyone takes it in… · People decide… · The world moves… · Reactions… · Locking it in… · Memories settle… · Writing it down… · Saving… |
+| loading bar (P10) | titles: Making your world · Your move · Everyone else catches up · Time passes; a turn's steps: Reading your move · Everyone takes it in · People decide · The world moves · Locking it in · Writing it down · Saving (`service/progress.PLANS`) |
 
 ## Retired names registry (machine-readable, used by CNT-08 and commit bit W14)
 

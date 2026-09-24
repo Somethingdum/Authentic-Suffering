@@ -32,6 +32,9 @@ the portal's point on the far side. The final leg is the distance to the destina
 when to_anchor is None). A result is a list of PathLeg: one per portal crossed —
 PathLeg(portal_id, place_id = the place entered, distance_m = metres walked before crossing) —
 then PathLeg(None, to_place, final-leg metres). Same place: [PathLeg(None, place, d)].
+A route enters each place at most once and never goes back into the place it starts in (P10: a
+hub's roads all meet at its centre, so stepping into one road and straight back out costs nothing
+— without this rule a tie would send the walker down the wrong road and back first).
 Equal totals: the route whose portal-id sequence sorts first wins (deterministic).
 ``point_distance`` uses the same Dijkstra over EVERY portal (walls, fences, closed doors included:
 it measures how far apart two bodies are, not whether one can walk to the other).
@@ -96,6 +99,11 @@ place_body(tx, body_id, place_id, anchor_id, x_m, y_m, at, cause_event_id, turn_
   (facing 0, since_ms = at, hidden 0); a body that already has one -> ValueError (use move_event).
   ``replaces`` = a body whose positions row the same event DELETES (a corpse that got up:
   world.infected.rise) — the payload then has replaces: that id.
+remove_body(tx, body_id, at, cause_event_id, turn_index) -> Event   (P10, world.hordes HRD-18)
+  DEMATERIALIZE {body_id, place_id, x_m, y_m} (writer 'physical.space', actor_id = body_id)
+  DELETING the body's positions row: it leaves the world's detail and goes back into a count. A
+  body with no positions row -> ValueError. Nothing perceives it (propagation has no rule for it;
+  HRD-18 folds a body only where no living person is).
 change_place(tx, place_id, changes, reason, at, cause_event_id, turn_index) -> Event
   PLACE_CHANGE {place_id, changes, before, reason} (writer 'physical.space') updating places;
   ``changes`` keys limited to held, light_level, ambient_db and props (props merged key by key into
@@ -128,6 +136,10 @@ def place_body(tx: "Tx", body_id: str, place_id: str, anchor_id: str | None, x_m
 
 def change_place(tx: "Tx", place_id: str, changes: dict, reason: str, at: int, cause_event_id: str | None,
                  turn_index: int) -> Event:
+    raise NotImplementedError("P10")
+
+
+def remove_body(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> Event:
     raise NotImplementedError("P10")
 
 

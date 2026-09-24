@@ -277,3 +277,71 @@ def test_jaccard_is_over_signatures():
                                                     for d, t in sigs])
     assert jaccard(s(("a", None), ("b", "t1")), s(("a", None), ("b", "t2"))) == pytest.approx(1 / 3)
     assert jaccard(s(), s()) == 1.0
+
+
+# --------------------------------------------------------------------------- P10: ways and bodies
+def test_a_gap_has_nothing_to_close(scenario):
+    """Physical gate, requires.portal_kinds (P10): the core pack's door handling names the kinds of way
+    it fits, so an opening (the watch-tower ladder) has nothing to close; going through it is still an
+    option, and a real door in the same yard can still be closed."""
+    w = scenario("pump_settlement")
+    a = options_for(w, "pc")
+    ladder = w.id("tower_ladder")
+    physical = {(r.def_id, r.target_id) for r in a.rejected if r.gate == "physical"}
+    assert ("close_portal", ladder) in physical
+    handling = {"open_portal", "close_portal", "lock_portal", "unlock_portal", "pick_lock", "barricade_portal",
+                "unbarricade_portal", "force_portal"}
+    assert not [o.def_id for o in a.options if o.target_id == ladder and o.def_id in handling]
+    assert any(o.def_id == "move_through_portal" and o.target_id == ladder for o in a.options)
+    assert any(o.def_id == "close_portal" and o.target_id == w.id("kitchen_door") for o in a.options)
+
+
+def test_the_dead_are_not_people(scenario):
+    """requires.target_kinds on the social options, and the speech and wound bindings (P10): nobody
+    talks the dead down, signals to them, speaks to them or dresses their wounds — they can still be
+    shot, struck, shoved or followed. (The PC and the other twin wait in the yard behind the shut
+    side door, so twin_a knows no other body and every binding on the shambler shows.)"""
+    from as_engine.kernel.rng import Rng
+    from as_engine.physical import bodies, space
+    from as_engine.physical.bodies import WoundSpec
+    w = scenario("two_skills")
+    t = now(w)
+    sh = w.id("shambler")
+    cause = commit(w, type=EventType.OVERRIDE, writer="audit", at=t, payload={"what": "test"})
+    with w.store.transaction() as tx:
+        bodies.apply_harm(tx, sh, WoundSpec("arm_l", "cut", "severe"), t, cause.event_id, 0, Rng(5))
+        for k, who in enumerate(("pc", "twin_b")):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("yard"), None, 4.0 + k, 8.0, t, None, 0))
+        tx.commit_event(space.portal_change_event(tx, w.id("side_door"), {"is_open": False}, t, None, None, 0))
+        tx.commit_event(space.move_event(tx, w.id("twin_a"), w.id("garage"), None, 6.6, 3.0, t, None, 0))  # 0.9 m
+    wound = w.store.query_one("SELECT wound_id FROM wounds WHERE body_id = ?", (sh,))[0]
+    a = options_for(w, "twin_a")
+    gate = {(r.def_id, r.target_id): r.gate for r in a.rejected}
+    for d in ("calm_person", "signal"):
+        assert gate.get((d, sh)) == "physical", d
+    TREAT = {"apply_pressure", "bandage_wound", "apply_tourniquet", "suture_wound", "clean_wound"}
+    on_it = {o.def_id for o in a.options if o.target_id in (sh, wound)}
+    tried = {r.def_id for r in a.rejected if r.target_id in (sh, wound)}
+    assert not (on_it | tried) & ({"speak", "shield_dependent"} | TREAT), (on_it, tried)
+    assert {"shoot_head", "shove", "follow_body"} <= on_it
+    assert [o.target_id for o in a.options if o.def_id == "speak"] == [None], "only 'anyone who can hear'"
+
+
+def test_skull_10_nobody_is_known_before_they_are_seen(scenario):
+    """SKULL-10 (P10) in the enumerator: a body known only from a percept stamped after ``at`` is not
+    yet known at ``at`` — no option binds it, none is even tried; from the percept's moment it is."""
+    w = scenario("metal_fence")
+    t = now(w)
+    stranger = w.id("stranger")
+    run = commit(w, type=EventType.ACTION_START, writer="action.resolve", actor_id=stranger, at=t + 2000,
+                 payload={"actor_id": stranger, "def_id": "run_to_anchor", "verb": "move", "visible": True})
+    with w.store.transaction() as tx:
+        perception.grant(tx, w.id("pc"), event_id=run.event_id, channel="visual", fidelity="exact",
+                         text="A thin man runs for the weeds.", source_id=stranger, at=t + 2000, turn_index=0,
+                         detail={"level": "clear"})
+
+    def mentions(aset):
+        return [o.def_id for o in aset.options if o.target_id == stranger] + \
+               [r.def_id for r in aset.rejected if r.target_id == stranger]
+    assert mentions(options_for(w, "pc", at=t + 1000)) == [], "a second before he runs, he is not there to Owen"
+    assert mentions(options_for(w, "pc", at=t + 2000)), "once seen, he can be watched, called to or chased"

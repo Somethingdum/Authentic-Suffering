@@ -1,11 +1,14 @@
-"""Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.
+"""Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7
+and SKULL-10.
 
 CODE computes affordances -> the model chooses among them and motivates (plan §6.4).
 
 enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
   catalog = the AffordanceDefs in canon order (tx.canon.all('affordance') sorted by ref).
   Binding uses the actor's OWN knowledge (AFF-01); the truth layer is not consulted for target
-  existence (the intent barrier re-checks against T0, stage 7):
+  existence (the intent barrier re-checks against T0, stage 7). "This turn's percepts" here are
+  the actor's percept_log rows with turn_index == turn_index and at <= ``at`` (SKULL-10, P10: what
+  lands later has not reached it yet):
     KNOWN BODIES   bodies that are the source_id of this actor's percepts this turn (visual at
                    clear/partial, or named speech) — silhouettes cannot be targeted.
     KNOWN ITEMS    its own inventory exactly (every item held in any slot, and their contents);
@@ -36,8 +39,10 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
                    their gun to make a noise); reload -> held firearms.
     item_reachable known items lying in its place (seen or believed).
     container      container items (def has ``container``) lying in its place or carried.
-    speech         one option addressed to 'everyone' (target None) plus one per known body.
-    wound          its own unhealed wounds, and those of known bodies within touch seen at clear.
+    speech         one option addressed to 'everyone' (target None) plus one per known body
+                   that is not infected (P10: the dead do not listen).
+    wound          its own unhealed wounds, and those of known bodies within touch seen at clear
+                   that are not infected (P10: nobody dresses a wound on the dead).
   Ranges: self; touch <= 1.5 m (space.point_distance); reach / same_place = in the actor's place
   (the effect walks there — duration base_s + per_meter_s x distance); visible = a known body /
   portal / item (it perceived it this turn); audible = a known body or 'everyone';
@@ -47,9 +52,10 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
     physical  capacity (mobile / hands_free / conscious), range, requires.held_item_tags (ONE held
               item whose def tags contain every listed tag), requires.carried_item_tags (one
               carried-or-held item with each tag), posture_any, actor_kinds (the actor's body
-              kind), target_kinds, target_alive (PERCEIVED: a target is 'still' when its posture
-              is lying/prone and it is unconscious, dead or false-dead — what anyone can see),
-              admits() for move_through_portal
+              kind), target_kinds, portal_kinds (the bound portal's kind; P10), target_alive
+              (PERCEIVED: a target is 'still' when its posture is lying/prone and it is
+              unconscious, dead or false-dead — what anyone can see), admits() for
+              move_through_portal
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def
               with only skill_or_belief_cue needs the cue)
     belief    (every requires.belief_cues held — e.g. 'knows_headshot_rule')

@@ -59,9 +59,10 @@ build_view(tx, session) -> PlayView   (reads only)
               mode 'do', entry {'remainder', 'label'};
            2. the PC's AffordanceSet (enumerate_affordances(tx, pc, canon affordances, now,
               world_clock.turn_index)) in enumerator order, without
-              WAIT options and without 'observe_area': the first 5 (4 after a remainder) ->
-              label = ui_label, mode 'say' for SPEAK options else 'do', entry {'signature',
-              'label'};
+              WAIT options and without 'observe_area', and (P10) without an option whose ui_label
+              repeats an earlier suggestion's (three of the dead read alike; the nearest comes
+              first): the first 5 (4 after a remainder) -> label = ui_label, mode 'say' for SPEAK
+              options else 'do', entry {'signature', 'label'};
            3. last, 'Wait and watch': the 'observe_area' option (else the first WAIT option),
               mode 'do', entry {'signature', 'label': 'Wait and watch'}.
            Refs 's1', 's2', … in that order. Suggestions are only the PC's own bound options —
@@ -71,7 +72,9 @@ build_view(tx, session) -> PlayView   (reads only)
   mechanics  settings.show_mechanics 'off' -> None; else MechanicsReceipt(lines): one line per
            CHECK_RESOLVED of the PC this turn (by seq): f"{what}: {BAND_WORDS[band]}" where what =
            the ui_label of canon affordance payload.def_id up to its first '{', stripped (empty:
-           the def id with underscores as spaces); 'full' adds
+           the def id with underscores as spaces); the defender's side of an opposed check
+           (def_id f"{d}:defend", action.checks.opposed — something grabbed or shoved the PC)
+           reads f"Resisting {what of d, lower-cased}" ('Resisting grab'); 'full' adds
            f" (needed {target} or less, rolled {draw})".
   run_id, turn_index, pc_name (display name), alive, sandbox (meta.sandbox == '1').
 Word helpers (10_UI.md §5; play/words.js holds the same tables): condition_word (>=90 pristine,

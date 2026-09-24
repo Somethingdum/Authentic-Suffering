@@ -53,10 +53,14 @@ description); relationships; beliefs with provenance and age; retrieved memories
 standing refusals; commitments; dependents and obligations; what it would cost; uncertainty; the
 **options** (affordances A1…).
 
-Three absences are as load-bearing as any field:
+Four absences are as load-bearing as any field:
 - **No objective event log.** Ever.
 - **No other Actor's intent, state or reasoning.**
 - **No instruction to forget anything.** If it must not be used, it is not in the packet (L1).
+- **Nothing from later than the moment it decides** (SKULL-10, P10). A wave writes its landings
+  when it resolves, so a percept from a second later can already be in the log when an earlier
+  reaction decides; the packet, the options, recall and salience read only percepts up to the
+  mind's own moment (D-63).
 
 Handles (P#, S#, E#, L#, A#) replace internal ids; the map stays in code. The JSON schema for the
 answer restricts `choice` to the offered A-handles and `speech.to` to P-handles, so an Actor cannot
@@ -146,6 +150,14 @@ percept crosses a startle threshold and the Actor holds a matching trained respo
 blood loss, needs, intoxication, concussion, exhaustion, panic, cold) removes options and adds cost
 notes; the player sees impairment in what the body does, never as a hidden penalty.
 
+**A compulsion is involuntary too** (P10, `turn/cognition.py` decide step 3; Lore v2). A wet-strain
+host in the third week of the living-spreader phase is made, now and then (at most every
+`compulsion_cooldown_min` minutes), to offer food or drink from their own mouth to someone near —
+an `INVOLUNTARY {kind: 'compulsion'}` act built by code from the core `give_item` option, whatever
+the person would have chosen. It is never done to the player's character: the PC feels the urge in
+the story (the stage's `felt` sentence) and the player decides. The earlier weeks' pull shows only
+in what the host feels and in the packet's body lines.
+
 ## 8. The player's side
 
 - **Manner, never target/verb/refusal** (SYM-02): the PC's dossier colours how an action is done.
@@ -172,12 +184,16 @@ wrong belief by design.
 
 ### 9.2 Reflection (quiet hours, background)
 
-When both lanes are idle between turns (the player is reading or typing), `GameService` runs
-REFLECTION jobs for salient Actors (recently HOT/WARM and ≥3 new episodes since their last
-reflection): add goals/desires/grudges, abandon or fulfil loops, draw a lesson, update the plan
-(goal + ≤5 steps). One job per lane at a time; **cancelled instantly** when the player submits;
-results are committed only if the job finished before the submit (a REFLECTION event, recorded as
-an external input for replay). This is how people build their own internal state over days.
+Between turns, while the player reads (`service/background.py`, BG-01..07; Actor Spec AC12), a
+person reflects when the world gives them reason — a new memory that mattered (salience ≥
+`material_salience`, or an anchor), or a night's sleep since at least three ordinary new ones — at
+most two people a boundary, the freshest experiences first: add goals / desires / grudges, abandon
+or fulfil loops, draw a lesson, update the plan (goal + ≤ 5 steps). **Simulated time decides, never
+the player's reading speed** (BG-07): which reflections a boundary owes is fixed by the world as the
+turn left it, and the next turn first finishes whatever is still owed, so answering at once and
+waiting an hour give the same people the same thoughts. Results are REFLECTION events (recorded as
+an external input; replay re-applies them without a model call). A reference to anything the packet
+did not offer is dropped and logged. This is how people build their own internal state over days.
 
 ### 9.3 Retrieval (what a mind gets back)
 
@@ -189,8 +205,9 @@ memories (salience ≥ 90, or a bonded person's death) never decay and are alway
 
 ### 9.4 Forgetting
 
-Episodes decay by the Memory Fade score (06 §Decay); anchor memories and persistence-locked
-subjects never do. Beliefs are never deleted — they are superseded.
+A mind forgets by retrieval (§9.3): old, unremarkable episodes rank lower and stop coming back,
+while anchor memories always stay eligible. Nothing is deleted from the record — the world keeps its
+whole history (06 §4, fidelity C02) — and beliefs are never deleted either: they are superseded.
 
 ## 10. Lies, persona, conviction, rumours
 

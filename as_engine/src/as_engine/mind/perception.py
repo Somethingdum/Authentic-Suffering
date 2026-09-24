@@ -171,8 +171,11 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       {destination} -> thing_phrase(anchor name) or place_phrase(place name); {item} ->
       with_article(item name). ('Owen raises a Glock 19 toward you.') Else by
       type: MOVE f'{Ref} moves {to_phrase(to_anchor name)}' when the MOVE has a to_anchor (in any
-      place: a body seen through a doorway moving to the far side of it is seen going there),
-      else f'{Ref} moves away' when to_place is not the holder's place, else f'{Ref} moves',
+      place: a body seen through a doorway moving to the far side of it is seen going there);
+      else, with here = the holder's place (P10): from_place is here and to_place is not ->
+      f'{Ref} moves away'; to_place is here and from_place is not -> f'{Ref} arrives'; neither
+      is here (seen through a doorway or across an open way) -> f'{Ref} moves into
+      {place_phrase(to_place name)}'; else f'{Ref} moves',
       PORTAL_CHANGE f'The <portal name>
       {opens|closes|is barricaded|is unbarricaded|is damaged}', HARM f'{Ref} is hurt', DEATH /
       FALSE_DEATH f'{Ref} goes down and does not move', ITEM_TRANSFER f'{Ref} handles <item
@@ -292,12 +295,27 @@ def from_phrase(name: str) -> str:
     return f"from the {name}"
 
 
+PROPER_NAME_JOINS = frozenset({"and", "of", "on", "by", "at", "in", "upon", "over", "under", "de", "la", "le", "el"})
+
+
 def place_phrase(name: str) -> str:
-    """A place name as it reads after 'in' / 'from' / 'into' (implemented): a title-case name of
-    two or more words is a proper name and keeps no article ('Maple Street', 'Bunkhouse A');
-    anything else gets 'the' and a lower-case first letter ('Sales floor' -> 'the sales floor')."""
+    """A place name as it reads after 'in' / 'from' / 'into' (implemented): a name that already
+    starts with an article keeps it, 'The' lower-cased ('The Trujillo house' -> 'the Trujillo
+    house', 'a clearing' -> 'a clearing'); a name of two or more words whose first word is
+    capitalised and whose every word is capitalised, a number, a '(k)' or a joining word
+    (PROPER_NAME_JOINS) is a proper name and keeps no article ('Maple Street', 'Bunkhouse A', 'Main
+    and Fifth', 'Exit 14'); anything else gets 'the' and a lower-case first letter ('Sales floor'
+    -> 'the sales floor')."""
     words = name.split()
-    if len(words) >= 2 and all(w[:1].isupper() for w in words):
+    if not words:
+        return name
+    first = words[0].lower()
+    if first == "the":
+        return "the" + name[len(words[0]):]
+    if first in ("a", "an"):
+        return first + name[len(words[0]):]
+    if len(words) >= 2 and words[0][:1].isupper() and all(
+            w[:1].isupper() or w[:1].isdigit() or w[:1] == "(" or w.lower() in PROPER_NAME_JOINS for w in words):
         return name
     return "the " + name[:1].lower() + name[1:]
 

@@ -18,6 +18,7 @@
   label: "Talk {target} down: slow, steady, keep them from panicking"
   ui_label: "Try to calm {target}"
   binds: body
+  requires: {target_kinds: [human]}
   range: audible
   duration: {base_s: 8}
   noise_db: 0
@@ -31,7 +32,7 @@
   ui_label: "Signal {target}"
   binds: body
   range: visible
-  requires: {hands_free: 1}
+  requires: {hands_free: 1, target_kinds: [human]}
   duration: {base_s: 1}
   noise_db: 0
   effect: signal
@@ -54,7 +55,7 @@
   ui_label: "Shield {target}"
   binds: body
   range: same_place
-  requires: {mobile: true}
+  requires: {mobile: true, target_kinds: [human]}
   duration: {base_s: 2, per_meter_s: 0.29}
   noise_db: 30
   effect: follow_body

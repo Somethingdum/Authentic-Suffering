@@ -128,3 +128,26 @@ def test_a_suggestion_click_is_the_pcs_own_option(metal_turn):
     stale = play(m.s, "do", "", suggestion_ref="s99")
     assert (stale.ok, stale.rejected_code) == (False, "suggestion_stale")
     assert w.store.query_one("SELECT turn_index FROM world_clock")[0] == 2, "a rejected input changes nothing"
+
+
+def test_the_dice_receipt_names_a_defence_too(metal_turn):
+    """service/view mechanics (P10 wording): one line per check the PC rolled this turn, in order —
+    the defending side of an opposed check (def_id '<def>:defend') reads 'Resisting <what>'; 'full'
+    adds the numbers."""
+    from as_engine.contracts.events import Event, EventType
+    m = metal_turn
+    w = m.w
+    pc = w.id("pc")
+    T, at = w.store.query_one("SELECT turn_index, now_ms FROM world_clock")
+    with w.store.transaction() as tx:
+        for def_id, band, target, draw in (("grapple:defend", "fail", 4, 6), ("climb_obstacle", "cost", 6, 5)):
+            tx.commit_event(Event(type=EventType.CHECK_RESOLVED, writer="action.resolve", at=at, turn_index=T,
+                                  actor_id=pc, payload={"actor_id": pc, "def_id": def_id, "band": band, "target": target,
+                                                        "draw": draw}))
+        v = build_view(tx, m.s)
+    assert v.mechanics.lines == ["Resisting grab: failure", "Climb over: success with a cost"]
+    m.s.settings = m.s.settings.model_copy(update={"show_mechanics": "full"})
+    with w.store.transaction() as tx:
+        v = build_view(tx, m.s)
+    assert v.mechanics.lines == ["Resisting grab: failure (needed 4 or less, rolled 6)",
+                                 "Climb over: success with a cost (needed 6 or less, rolled 5)"]

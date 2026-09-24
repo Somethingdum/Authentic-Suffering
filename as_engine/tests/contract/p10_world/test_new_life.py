@@ -150,6 +150,63 @@ def test_a_new_life_opens_on_the_play_screen(run_cfg, tmp_path):
         close(svc)
 
 
+def test_a_generated_world_plays(made_world, world_cfg, tmp_path):
+    """The first moves in a generated world, through the service and the whole turn pipeline with
+    its 58-bit gate. Three of the dead are sent from a building up the street: the player's watch
+    ends when they come near (REACT-01, not after eight hours), and the next move is made with them
+    at hand. (Playing exactly this found four faults: a reaction shown a percept from after its own
+    moment — SKULL-10 —, a watch the dead walking up did not end, a street whose buildings all met
+    at one point, and a dice receipt that could not name a defence.)"""
+    import json
+
+    from world_kit import now
+
+    from as_engine.world import infected
+    svc, pushed = service(world_cfg, tmp_path)
+    WATCH = "Stay put and watch everything you can see and hear."
+
+    async def go():
+        await send(svc, "run_load", run_id=made_world.run_id)
+        s = svc.session
+        me = s.store.meta("pc_actor_id")
+        here = s.store.query_one("SELECT place_id FROM positions WHERE body_id = ?", (me,))[0]
+        zone = s.store.query_one("SELECT zone_id FROM places WHERE place_id = ?", (here,))[0]
+        site = s.store.query_one("SELECT place_id FROM places WHERE zone_id = ? AND kind = 'building' AND parent_id IS NULL "
+                                 "AND place_id != ? ORDER BY place_id", (zone, here))[0]
+        with s.store.transaction() as tx:
+            t = now(s)
+            for _ in range(3):
+                b = infected.spawn(tx, s.rng, site, infected.SHAMBLER, t, 0, None)
+                infected.attract(tx, b, here, t, None, 0, reason="noise")
+        marks = [now(s)]
+        turns = []
+        for _ in range(2):
+            start = len(pushed)
+            await send(svc, "turn_submit", mode="do", text=WATCH)
+            await svc.idle()
+            turns.append(pushed[start:])
+            marks.append(now(s))
+        return me, marks, turns
+    try:
+        me, marks, turns = asyncio.run(go())
+        s = svc.session
+        for msgs in turns:
+            assert "turn_result" in acts(msgs) and not {"error", "turn_rejected"} & set(acts(msgs)), acts(msgs)
+        gates = [json.loads(r[0])["gate"] for r in s.store.query("SELECT detail FROM turn_ledger WHERE stage = 12 "
+                                                                "ORDER BY turn_index")]
+        assert gates == ["all 58", "all 58"]
+        assert marks[1] - marks[0] < 10 * 60_000, "the dead coming near ended the watch long before eight hours"
+        came = s.store.query_one("SELECT COUNT(*) FROM percept_log p JOIN events e ON e.event_id = p.event_id "
+                                 "JOIN bodies b ON b.body_id = e.actor_id WHERE p.holder_id = ? AND p.turn_index = 1 "
+                                 "AND e.type = 'MOVE' AND b.kind = 'infected' AND p.channel = 'visual'", (me,))[0]
+        assert came, "the player saw them come"
+        for msgs in turns:
+            labels = [x["label"] for x in only(msgs, "turn_result")["view"]["suggestions"]]
+            assert len(labels) == len(set(labels)), f"three of the dead read alike; one chip each: {labels}"
+    finally:
+        close(svc)
+
+
 def test_the_wizard_hears_why_a_world_cannot_be_made(run_cfg, hopeless_cfg, tmp_path):
     """on_run_new: an unknown character (RunError), settings the world cannot honour
     (SettingsError -> bad_settings) and a start nobody could survive (WorldgenAborted) each end

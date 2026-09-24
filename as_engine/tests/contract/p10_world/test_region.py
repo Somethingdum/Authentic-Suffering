@@ -15,6 +15,7 @@ from as_engine.contracts.common import Difficulty, Era
 from as_engine.contracts.dossier import WorldgenBias
 from as_engine.contracts.events import Event, EventType, WriteOp, WriteRecord
 from as_engine.kernel.rng import Rng
+from as_engine.mind.perception import place_phrase
 from as_engine.world.worldgen import atlas, params, region, tables
 from as_engine.world.worldgen.pipeline import WorldgenAssertion
 
@@ -76,7 +77,8 @@ def test_region_vectors(store, canon, vectors, case):
 
 @pytest.mark.parametrize("seed, detail", [(21, "gotta_go_to_work_soon"), (8, "quick_look"), (33, "standard")])
 def test_zones_hubs_and_sites(store, canon, seed, detail):
-    """Step 1-2: n zones, each a hub street and its sites, one PLACE_DISCOVERED per zone."""
+    """Step 1-2: n zones, each a hub street and its sites, one PLACE_DISCOVERED per zone; each site
+    meets the street at its own frontage, along both sides, never all at one point."""
     T = tables.DETAIL_TIERS[detail]
     p, reg = build(store, canon, seed, detail)
     values = params.flat_values(p)
@@ -95,7 +97,9 @@ def test_zones_hubs_and_sites(store, canon, seed, detail):
         hub = row(store, "places", "place_id", z.hub_id)
         assert (hub["kind"], hub["name"], hub["zone_id"], hub["indoor"], hub["layout_generated"]) == ("street", z.name, z.zone_id, 0, 1)
         assert (hub["width_m"], hub["depth_m"]) == (60, 20)
-        assert [r["name"] for r in store.query("SELECT name FROM anchors WHERE place_id = ?", (z.hub_id,))] == ["the middle of the street"]
+        hub_anchors = [dict(r) for r in store.query("SELECT * FROM anchors WHERE place_id = ? ORDER BY rowid", (z.hub_id,))]
+        assert (hub_anchors[0]["name"], hub_anchors[0]["x_m"], hub_anchors[0]["y_m"]) == ("the middle of the street", 30, 10)
+        assert len(hub_anchors) == 1 + T["places_per_zone"], "the middle of the street, then one frontage per site"
         assert len(z.site_ids) == T["places_per_zone"]
         kinds_here = atlas.ZONE_BUILDING_KINDS[z.kind]
         names = []
@@ -114,9 +118,38 @@ def test_zones_hubs_and_sites(store, canon, seed, detail):
             (way,) = portals_between(store, z.hub_id, sid)
             assert way["kind"] == "opening" and way["is_open"] == 1 and (way["aperture_w_cm"], way["aperture_h_cm"]) == (300, 300)
             assert way["anchor_b" if way["place_b"] == sid else "anchor_a"] == anchors[0]["anchor_id"]
+            # the site's frontage on the street: its own point, along one side or the other
+            j = len(names) - 1
+            front = hub_anchors[1 + j]
+            assert way["anchor_a" if way["place_b"] == sid else "anchor_b"] == front["anchor_id"]
+            said = "the front of" if kinds_here else "the path to"
+            assert front["name"] == f"{said} {place_phrase(site['name'])}"
+            assert (front["kind"], front["cover"], front["concealment"]) == ("feature", 0, 0)
+            assert (front["x_m"], front["y_m"]) == (round(60 * (j + 0.5) / T["places_per_zone"], 1), 1 if j % 2 == 0 else 19)
             shown = site["name"][0].lower() + site["name"][1:] if site["name"].startswith("The ") else site["name"]
             assert way["name"] == f"the way to {shown}"
         assert len(set(names)) == len(names), "a repeated name gets ' (2)', ' (3)'…"
+
+
+@pytest.mark.parametrize("seed, detail", [(21, "gotta_go_to_work_soon"), (33, "standard")])
+def test_every_place_name_reads_after_in_or_from(store, canon, seed, detail):
+    """mind.perception.place_phrase over what WG1 names (P10): a name with its own article keeps it,
+    lower-cased ('the Trujillo house', 'a clearing'); a proper name keeps none, joining words and
+    numbers included ('Main and Fifth', 'Exit 14'); anything else takes 'the'. No phrase ever
+    doubles an article ("came from the the Trujillo house" was a real line)."""
+    import re
+    build(store, canon, seed, detail)
+    names = [r[0] for r in store.query("SELECT name FROM places ORDER BY place_id")]
+    names += [n for v in atlas.ZONE_NAMES.values() for n in v] + list(atlas.OUTDOOR_PLACE_NAMES)
+    for n in names:
+        ph = place_phrase(n)
+        assert not re.search(r"\b(the|a|an) (the|a|an)\b", ph, re.IGNORECASE), (n, ph)
+        assert ph == n or ph.split()[0] in ("the", "a", "an"), (n, ph)
+    got = [place_phrase(x) for x in ("The Trujillo house", "a clearing", "the old campsite", "Main and Fifth", "Exit 14",
+                                     "Route 9 Interchange", "The Exchange", "Sales floor", "Bunkhouse A",
+                                     "The Trujillo house (2)")]
+    assert got == ["the Trujillo house", "a clearing", "the old campsite", "Main and Fifth", "Exit 14",
+                   "Route 9 Interchange", "the Exchange", "the sales floor", "Bunkhouse A", "the Trujillo house (2)"]
 
 
 def test_a_region_has_buildings_enough(canon):

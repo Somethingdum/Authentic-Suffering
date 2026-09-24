@@ -410,7 +410,8 @@ CREATE TABLE infected_state (
   since        INTEGER NOT NULL DEFAULT 0,   -- P10: when it came to be here (spawn / rise)
   degrade_at   INTEGER,              -- P10: a Runner's decline into a Shambler or Crawler (INF-10)
   horde_id     TEXT,                 -- P10: the horde it was promoted from (world.hordes HRD-07)
-  charged_at   INTEGER               -- P10: when its energy was last charged (INF-03; NULL: not yet)
+  charged_at   INTEGER,              -- P10: when its energy was last charged (INF-03; NULL: not yet)
+  folded_at    INTEGER               -- P10: when it went back into a count (world.hordes HRD-18); NULL while it is a body in the world
 );
 
 -- OWNER physical.objects

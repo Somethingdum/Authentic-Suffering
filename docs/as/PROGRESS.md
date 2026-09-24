@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: P0
 - Next task: P0 task 1 — `kernel/ids.py::mint`
 - Blocked by: nothing
-- Kit status: contract tests exist for P0–P9 (P7 = the slice + the sim soak; P8 = the protocol, the Play UI specs and the plugin test; P9 = the society). After the P9 gate, stop and write "waiting for the kit update (P10+ tests)" here.
+- Kit status: contract tests exist for P0–P10 (P7 = the slice + the sim soak; P8 = the protocol, the Play UI specs and the plugin test; P9 = the society; P10 = the wide world: worldgen, the dead, hordes and the Mega Horde, the world's day, the Ghosts, the quiet hours, the loading bar, the wizard and worldgen screens). After the P10 gate, stop and write "waiting for the kit update (P11+ tests)" here.
 
 ## Phases
 
@@ -25,7 +25,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | P7 The Slice | not started | | | | | |
 | P8 Play UI | not started | | | | | |
 | P9 Society | not started | | | | | |
-| P10 Wide world | in progress — contracts + most reference done, tests/UI/docs missing (see HANDOFF.md) | | | | | |
+| P10 Wide world | not started | | | | | |
 | P11 Audits | not started | | | | | |
 | P12 Surfaces | not started | | | | | |
 
@@ -37,7 +37,13 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | acoustic fidelity margins 12/5/0 dB | `AcousticRules` | `tools/as/eval.py` belief-accuracy runs (BENCH-07) |
 | Resolve drains/recoveries | `ResolveRules` | eval refusal/compliance rates (BENCH-03) |
 | packet token budgets 3500/2200/1400 | `PacketRules.token_budget` | bench prefill times (BENCH-04) |
-| off-screen daily mortality | `WorldRules.base_daily_mortality` | 100-day fake-model soak per difficulty (BENCH-06) |
+| outings: daily chance per kind | `WorldRules.op_chance` | 100-day fake-model soak per difficulty (BENCH-06): how many go out, how many come back |
+| how long marks last under a roof | `WorldRules.sheltered_trace_mult` | play-tuning |
+| the dead past each map edge; drift chance; the Mega Horde's daily chance | `HordeRules.exterior_pool`, `drift_chance`, `mega_daily_chance` | 100-day soak per difficulty: how often a Mega Horde comes, how full the streets get |
+| how many of one crowd show in a place; how long a loud noise holds its neighbourhood in the moment | `HordeRules.local_cap` (40), `turn.select.LOUD_MEMORY_MS` (10 min) | a day of the Mega Horde next to the player: bodies shown per hour and seconds per simulated day (D-67, D-68) |
+| how long a door holds under a crowd | `InfectedRules.portal_holds_min` | play-tuning |
+| how long a spreader's bottle stays infective | `InfectedRules.saliva_hours` | the lore owner's word, then play-tuning |
+| wear by wet days | `DecayRules.rust_per_wet_day`, `pulp_per_wet_day`, `rot_per_wet_day` | play-tuning |
 | relationship drift chances 0.25 / 0.2 / 0.3 | `SocietyRules.drift_bond` / `drift_household` / `drift_friction` | play-tuning (how fast a settlement's feelings move) |
 | thirst stage interval | `NeedsRules.thirst_stage_every_h` | play-tuning |
 

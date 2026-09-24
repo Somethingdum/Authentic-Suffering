@@ -10,7 +10,7 @@ import math
 
 import pytest
 
-from as_engine.contracts.events import EventType
+from as_engine.contracts.events import Event, EventType, WriteOp, WriteRecord
 from as_engine.physical import space
 from as_engine.physical.space import PathLeg
 
@@ -128,6 +128,51 @@ def test_point_distance_goes_through_anything(scenario):
     assert space.point_distance(w.store, w.id("pc"), w.id("stranger")) == pytest.approx(via_office)
     # June (shelves) to Eli (cot) through the office wall
     assert space.point_distance(w.store, w.id("june"), w.id("eli")) == pytest.approx(d(2, 2, 0.3, 2.5) + d(3.8, 1.5, 3.2, 2.4))
+
+
+def test_a_route_never_enters_a_place_twice(scenario):
+    """GEO-00 (its P10 line): a route enters each place at most once and never goes back into the
+    place it starts in. A side room whose two doors both open at its centre (no anchor on its side)
+    joins the two ends of a 100 m street for nothing: out of the street into it and back in is not a
+    way along the street — for path and point_distance alike."""
+    w = scenario("metal_fence")
+    at = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+
+    def ins(table, **values):
+        return WriteRecord(op=WriteOp.INSERT, table=table, values=values)
+
+    door = {"kind": "door", "is_open": 1, "aperture_w_cm": 90, "aperture_h_cm": 210}
+    with w.store.transaction() as tx:
+        tx.commit_event(Event(type=EventType.PLACE_DISCOVERED, writer="physical.space", at=at, turn_index=0,
+                              payload={"test": "a long street with a side room"}, writes=[
+            ins("places", place_id="plc_t_start", kind="room", name="Start room", width_m=4, depth_m=4),
+            ins("places", place_id="plc_t_street", kind="street", name="Long street", width_m=100, depth_m=4, indoor=0),
+            ins("places", place_id="plc_t_side", kind="room", name="Side room", width_m=10, depth_m=10),
+            ins("places", place_id="plc_t_far", kind="room", name="Far room", width_m=4, depth_m=4),
+            ins("anchors", anchor_id="anc_t_west", place_id="plc_t_street", name="the west end", kind="feature", x_m=1.0,
+                y_m=2.0),
+            ins("anchors", anchor_id="anc_t_east", place_id="plc_t_street", name="the east end", kind="feature", x_m=99.0,
+                y_m=2.0),
+            ins("portals", portal_id="prt_t_1", place_a="plc_t_start", place_b="plc_t_street", anchor_b="anc_t_west",
+                name="the start door", **door),
+            ins("portals", portal_id="prt_t_2", place_a="plc_t_street", place_b="plc_t_side", anchor_a="anc_t_west",
+                name="the side room's west door", **door),
+            ins("portals", portal_id="prt_t_3", place_a="plc_t_street", place_b="plc_t_side", anchor_a="anc_t_east",
+                name="the side room's east door", **door),
+            ins("portals", portal_id="prt_t_4", place_a="plc_t_street", place_b="plc_t_far", anchor_a="anc_t_east",
+                name="the far door", **door)]))
+        tx.commit_event(space.move_event(tx, w.id("pc"), "plc_t_start", None, 2.0, 2.0, at, None, 0))
+        tx.commit_event(space.move_event(tx, w.id("mara"), "plc_t_far", None, 2.0, 2.0, at, None, 0))
+    legs = space.path(w.store, w.id("pc"), "plc_t_far")
+    assert [(l.portal_id, l.place_id) for l in legs] == [("prt_t_1", "plc_t_street"), ("prt_t_4", "plc_t_far"),
+                                                         (None, "plc_t_far")]
+    assert legs[1].distance_m == pytest.approx(98.0)
+    assert space.point_distance(w.store, w.id("pc"), w.id("mara")) == pytest.approx(98.0)
+    with w.store.transaction() as tx:  # from the street itself: not back into it either
+        tx.commit_event(space.move_event(tx, w.id("pc"), "plc_t_street", None, 1.0, 2.0, at, None, 0))
+    legs = space.path(w.store, w.id("pc"), "plc_t_far")
+    assert [(l.portal_id, l.place_id) for l in legs] == [("prt_t_4", "plc_t_far"), (None, "plc_t_far")]
+    assert legs[0].distance_m == pytest.approx(98.0)
 
 
 def test_places_near(scenario):

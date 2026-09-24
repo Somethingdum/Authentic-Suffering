@@ -54,6 +54,7 @@ authors: [SomethingDum]
 | `loot/` | `LootTable` | `<pack>:loot/<id>` | a list |
 | `names/` | `NameList` | `<pack>:names/<id>` | one |
 | `style/` | `StyleRules` | `<pack>:style/<id>` | one |
+| `ui/` | `QuipList` (P10: the loading bar's lines, §7.1) | `<pack>:quips/<id>` | one or a list |
 | `cues.yaml` | `CueRegistry` | cue id | the pack's cue list |
 
 Ids are lowercase `snake_case` (`^[a-z0-9][a-z0-9_]{1,63}$`), except infected type and quirk ids,
@@ -194,6 +195,38 @@ Every faction needs **both** `truth_text` and `belief_text` (CNT-07): the world 
 truth; people talk from the belief. Doctrine is copied into the faction's groups at world start and
 drives how their guards challenge strangers.
 
+**Seats and behaviour** (P10, `world/factions.py`). A leader may name a `seat` (a slug) and an `age`
+range: worldgen then makes a person for that office in the faction's settlement (the first leader
+always leads; each other seat gets its own generated holder, `group_members.role` = the seat), with
+names each world makes up. A faction may carry a `behaviour` block — every part optional:
+
+```yaml
+behaviour:
+  enclave:                 # the faction lives sealed: one settlement behind one locked gate
+    population: [20000, 25000]
+    zone_kinds: [industrial, highway, downtown]   # where it stands, in preference order
+    name: The Depot
+    gate: the steel gate in the depot yard
+    description: ...
+  council:                 # the seats that meet, and when
+    seats: [black_top_hat, gray_top_hat, white_top_hat, red_top_hat, blue_top_hat]
+    every_days: 7
+    hour: 20
+    hours: 2.0
+  route_watch: true        # sees a Mega Horde coming and seals the enclave for its passage
+  decon:                   # what happens to whoever kills one of theirs
+    team: 5
+    women_share: 0.35
+    occupation: ...
+    appearance: ...        # how a team member looks
+    goal: "{target} killed one of ours. Deconstruct them and leave nothing that points home."
+                           # {target} = how the team member describes the killer
+    mark: ...              # the trace left on the body
+```
+
+`core/factions/ghosts.yaml` is the worked example (Ghosts_6). CNT-15 checks that the council's seats
+are seats of the faction's leaders and that no two leaders share one.
+
 ## 6. Lore (two layers, always)
 
 ```markdown
@@ -226,7 +259,11 @@ holds it.
   duration, noise, an optional check, and the **effect handler id** that resolves it (CNT-06, the
   list in `action/effects.py`). `label` is what an Actor reads; `ui_label` is what you see as a
   suggestion. Both are templates with `{target}`, `{destination}`, `{item}`, `{distance}`,
-  `{duration}`.
+  `{duration}`. Say what an option is FOR: `requires.target_kinds` names the kinds of body it may
+  bind (`[human]` for talking someone down, signalling, shielding — the dead are not people) and
+  `requires.portal_kinds` the kinds of way (`[door, window, gate, …]` for closing, locking and
+  barring — an `opening`, a gap in a fence or a ladder hole, has nothing to close). Without them an
+  option binds any body or way in range, and the menu offers nonsense (P10, D-66).
 - **Laws** change options and their costs for people under them (`forbid` or `cost` per affordance
   tag, for members/visitors/all) and carry a `belief_text` — how locals describe the law.
 - **Buildings** are room-by-room archetypes with anchors (cover/concealment 0–3), portals (doors,
@@ -236,6 +273,33 @@ holds it.
   preconditions → effects, each with a `CAS-###` id that every resulting event cites (G10). The
   canonical chain (injured worker → missed shift → cover → efficiency → shortage → rations →
   tension) is `core/cascade/economy.yaml`.
+- **Infection pathways** list their stages in order. P10 adds two optional fields per stage: `felt`
+  (one second-person sentence: what the host feels — never the stage's name; the narrator and the
+  host's own packet use it) and `signs` (cue ids an observer who sees the host clearly and close
+  gets). A pathway's `exposure` names the ways in with their chances (`mouth_contact_item` is the
+  shared bottle).
+
+### 7.1 The loading bar's lines (`ui/*.yaml`, P10)
+
+```yaml
+schema: as.quips.v1
+id: core_quips
+lines:
+  turn:                    # the whole plan
+    - Rolling.
+  turn.minds:              # one of its phases
+    - Minds at work.
+  turn.minds.decide:       # a phase's sub-phase
+    - Choosing between bad and worse.
+```
+
+The bar (10_UI §2.10) shows one line at a time under the step the job is on — the most specific key
+first — a new one every 2.5 s, never one of the last three. Keys name a plan (`worldgen`, `turn`,
+`quiet_hours`, `time_skip`), one of its phases or a phase's sub-phase exactly (CNT-16 lists the
+valid ones from `service/progress.PLANS`). A later pack adds lines to a key; it never removes any.
+**Write jokes about the step, never hints about the world**: a line is shown whatever is happening,
+so it must not say who is near, what anyone thinks or how a roll went — and it should not just repeat
+the step's own label, which is on screen beside it. Keep each line under 80 characters.
 
 ## 8. Importing
 
@@ -292,6 +356,8 @@ field. The rules:
 | CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind |
 | CNT-13 | an infected type listing a quirk that is not written for it, or an override that changes which creature a type or quirk id means |
 | CNT-14 | a `generation: cheat` dossier outside a pack whose id starts with `cheat_` |
+| CNT-15 | a faction's `behaviour.council.seats` naming a seat none of its leaders holds, or two leaders sharing one seat |
+| CNT-16 | a quip key that names no plan, phase or sub-phase of the loading bar; a quip line that is empty or longer than 80 characters |
 
 Example report lines:
 

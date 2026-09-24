@@ -101,6 +101,27 @@ def test_handles(scenario):
     assert p.handles[h] == f"go_look:*:{w.id('back_door_in')}:*"
 
 
+# --------------------------------------------------------------------------- SKULL-10 nothing from later
+def test_nothing_later_than_the_moment_reaches_a_mind(scenario):
+    """SKULL-10 (P10): a percept stamped after the packet's moment has not happened yet for that mind.
+    A wave's landings are written when it resolves, so a later percept can already be in the log when
+    an earlier reaction decides: it is not shown, and nothing is ever 'seconds ago' below zero."""
+    w = scenario("metal_fence")
+    t = now(w)
+    gust(w, t)
+    say(w, "mara", "June, stay where you are.", ["june"], t + 3000)
+    later = packet_for(w, "june", t + 3000)                    # the call is heard at t + 3 s
+    assert [u.words for u in later.utterances] == ["June, stay where you are."]
+    heard = {later.handles[u.handle] for u in later.utterances}
+    p = packet_for(w, "june", t + 1000)                        # a reaction deciding at t + 1 s, after it was written
+    shown = {p.handles[x.handle] for x in p.perceived_now} | {p.handles[u.handle] for u in p.utterances}
+    assert p.utterances == [] and not shown & heard, "the call has not happened yet at t + 1 s"
+    assert all(x.seconds_ago >= 0 for x in p.perceived_now)
+    at_rows = {r["percept_id"]: r["at"] for r in helpers.percepts_of(w.store, w.id("june"), 0)}
+    assert shown and all(at_rows[x] <= t + 1000 for x in shown)
+    assert any(x.text.startswith("A loud metal crash") for x in p.perceived_now)
+
+
 # --------------------------------------------------------------------------- WILL-00 utterances
 def test_speech_arrives_as_a_labelled_utterance(scenario):
     w = scenario("metal_fence")

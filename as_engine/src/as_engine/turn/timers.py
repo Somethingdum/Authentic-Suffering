@@ -64,7 +64,8 @@ run_offscreen(tx, rng, until_ms, turn_index) -> list[Event]   (TIME-10, the off-
   ClockError. While now < until_ms: end = min(until_ms, now + WorldRules.offscreen_tick_h hours);
   seed_society(tx, now, turn_index); seed_world(tx, now, turn_index) (P10); fire_due(tx, rng, end,
   turn_index, end);
-  physical.bodies.progress(tx, b, end, turn_index, rng) for every living body (by body_id);
+  physical.bodies.progress(tx, b, end, turn_index, rng) for every living body with a positions row
+  (by body_id; P10: a body folded back into a count, world.hordes HRD-18, has none);
   kernel.clock.advance_event(tx, end, 'offscreen'). Returns every event committed. The turn
   pipeline plays the same rules inside its own windows (04 §Stage 0, §Stage 12); P9 tests use this
   to let a settlement run for days, and P10 uses it for the world beyond the PC.

@@ -1,4 +1,4 @@
-"""Memory retrieval for packets (P6). Rules MEM-10..17. MUST NOT import kernel.truth.
+"""Memory retrieval for packets (P6). Rules MEM-10..17, SKULL-10. MUST NOT import kernel.truth.
 docs/as/05_ACTORS.md §9.3.
 
 MEM-10 The model never decides what it receives: everything here is computed by code from
@@ -9,9 +9,10 @@ retrieve(tx, holder_id, turn_index, at, *, max_beliefs, max_memories, max_loops)
 MEM-11 Two key sets. The MOMENT set M (Retrieved.moment_keys) — what is in front of the holder now:
   * the holder's place id (positions);
   * every body that is the source_id of one of the holder's percept rows of this turn (the same
-    row selection as the packet: this turn_index, older standing views excluded);
-  * every body the holder can name that is named in perceived speech: for each speech row of this
-    turn with non-empty detail.words and each acquaintance row of the holder with a known_name,
+    row selection as the packet: this turn_index, at <= ``at`` — SKULL-10 —, older standing
+    views excluded);
+  * every body the holder can name that is named in perceived speech: for each speech row of that
+    selection with non-empty detail.words and each acquaintance row of the holder with a known_name,
     the body when the known name — or its first word, when that word has 3 or more letters —
     occurs in the words as a whole word, case-insensitive;
   * the target_ids of the holder's current task (actors.current_task, else its first 'active'

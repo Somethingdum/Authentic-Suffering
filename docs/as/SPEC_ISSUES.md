@@ -55,6 +55,36 @@ Copy the template, give it the next number, fill every line.
 - Proposed resolution: either the human pins a number (and canon_status flips to `canon`), or the pathway is left `proposed` permanently and the content linter is told to accept `proposed` pathways without hard-failing CNT-01.
 - Meanwhile: the pathway compiles and is usable in worldgen/testing, just flagged non-canon; CMG §42.19's hard rule (baseline infected never attack a true Lurker Infected victim) is unaffected by this gap and is enforced regardless.
 
+### SI-004 — The wet strain's shared-bottle numbers are not in the lore
+- Status: open (human)
+- Phase / test: P10 · tests/contract/p10_world/test_wet_strain.py; content `core:pathway/wet`
+- Rule id(s): CNT-01 (no authoritative numbers past what the sources support)
+- The spec says: CODEX lore v2 §3.2 — a living spreader's saliva infects from about day 3, and
+  "everyone knows somebody who was killed by a shared bottle"; no chance or duration is given.
+- The test/contract does: `pathways.yaml` wet `exposure.mouth_contact_item: 0.3` and
+  `InfectedRules.saliva_hours = 12.0` (how long a bottle a spreader drank from stays infective),
+  both marked `[SAND]`; `test_wet_strain.py` reads them from the rules and the pack, never as constants.
+- The problem: both numbers are this spec's choices.
+- Proposed resolution: the owner confirms or replaces them (the tests follow whatever the pack and
+  the rules say).
+- Meanwhile: the mechanic is complete and tested with these values.
+
+### SI-005 — The Ghosts' named leadership is an open decision in Ghosts_6
+- Status: open (human)
+- Phase / test: P10 · tests/contract/p10_world/test_ghosts.py; content `core:faction/ghosts`
+- Rule id(s): FAC-02, WG-27
+- The spec says: Ghosts_6 lists the five Top-Hat seats and the Front Man but marks their names as
+  undecided.
+- The test/contract does: every world generates its own seat holders (occupation = the title; the
+  Front Man about forty) — nothing canonical is named (DECISIONS D-59).
+- The problem: if the owner fixes names later, they belong in the record as pack actors
+  (`leaders[].actor`). Worldgen already lets a placed pack actor lead as the first leader and skips
+  generating any other seat whose leader names a placed pack actor (WG-27); making that actor the
+  seat's holder (`group_members.role` = the seat) needs a one-line WG-28 amendment.
+- Proposed resolution: when names exist, add them as actor dossiers in a pack, point the seats'
+  `actor` at them, and amend WG-28 so a placed pack actor takes its seat's role.
+- Meanwhile: generated per world.
+
 ## Resolved
 
 (none yet)

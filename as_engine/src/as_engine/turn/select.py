@@ -1,18 +1,20 @@
 """Who takes part in a wave, who must think, and how long the turn runs (P7, stage 4 and the
-horizon). Rules SEL-01..06, HOR-01..04. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
+horizon). Rules SEL-01..06, HOR-01..04, SKULL-10. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
 Pure reads (nothing here commits an event). May read any table: selection is scheduling, not a
 mind, so the Skull law does not apply here — but nothing here is ever shown to a mind.
 
 Constants: MANDATORY_CUES = ('weapon_pointed', 'infected_close', 'grabbed_from_behind',
-'addressed_by_name', 'dependent_in_danger'); LOUD_DB = 80; MAX_WINDOW_MS = 8 h; MIN_WINDOW_MS =
-3000; REACT_MARGIN_MS = 3000.
+'addressed_by_name', 'dependent_in_danger'); LOUD_DB = 80; LOUD_MEMORY_MS = 10 min (P10);
+MAX_WINDOW_MS = 8 h; MIN_WINDOW_MS = 3000; REACT_MARGIN_MS = 3000.
 
 SEL-01 active_area(tx, pc_id, turn_index) -> list[str]   (sorted place ids)
   The PC's place, every place within 2 portal hops of it (physical.space.places_near(place, 2):
   walls and fences count as hops), and — for every NOISE event of this turn (events.turn_index ==
-  turn_index, in seq order) whose payload.source_db >= LOUD_DB and whose payload has a place_id —
-  that place and every place 1 hop from it (a loud crash makes its neighbourhood part of the
-  moment: the gust at the alley fence brings in the lot behind it).
+  turn_index, in seq order) whose payload.source_db >= LOUD_DB, whose payload has a place_id and
+  (P10) whose at is no earlier than kernel.clock.now(tx) - LOUD_MEMORY_MS — that place and every
+  place 1 hop from it (a loud crash makes its neighbourhood part of the moment: the gust at the
+  alley fence brings in the lot behind it; a roar days ago in the off-screen step, where the turn
+  does not change, does not).
 
 SEL-01 candidates(tx, pc_id, turn_index, horizon_ms) -> list[str]   (sorted actor ids)
   Every actor (actors JOIN bodies, alive = 1) except the PC whose position is in the active area,
@@ -33,7 +35,7 @@ SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=fro
     * a trigger of one of its plans.standing_orders is among those cues (a guard told to answer
       'loud_noise' hears a loud noise);
     * it is gripped (physical.bodies.grips_on(tx, actor_id) is non-empty);
-    * it has a tactile percept this turn (it was touched or hurt);
+    * it has a tactile percept this turn up to ``at`` (it was touched or hurt; SKULL-10);
     * its first active task (tasks with status 'active', ordered (started_at, task_id)) ends by the
       horizon: started_at + steps_total x round(step_s x 1000) <= horizon_ms;
     * pc_intent is given and pc_intent.bound.target_id == actor_id (the PC acts on it).
@@ -42,8 +44,9 @@ SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=fro
   budget of lanes.scheduler.plan_cognition decides who thinks with a model).
 
 SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, bool]
-  ``cands`` = the conscious candidates of this wave. Over this turn's percept rows (percept_log,
-  turn_index == turn_index, ordered (at, percept_id)); "held" percepts are those at EXACT or PARTIAL:
+  ``cands`` = the conscious candidates of this wave. Over this turn's percept rows up to the
+  wave (percept_log, turn_index == turn_index and at <= ``at`` — SKULL-10 —, ordered (at,
+  percept_id)); "held" percepts are those at EXACT or PARTIAL:
     unique_info       the actor holds a percept of an event (event_id not 'scene:…') no other
                       candidate holds, OR holds a standing-view percept ('scene:…') of a body
                       (source id 'act_…') other than itself, the PC and the candidates that no
@@ -58,7 +61,8 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       task's interrupt_on;
     open_loop_with_pc it has an 'open' loop whose subject_ids contain pc_id;
     dependent_present a body it is guardian_of (household_members.guardian_of) is in its place;
-    visible_to_pc     the PC holds a visual percept of it this turn at EXACT or PARTIAL.
+    visible_to_pc     the PC holds a visual percept of it this turn (up to ``at``) at EXACT or
+                      PARTIAL.
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags) + weights['mandatory'] when mandatory (SchedulerRules
   .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by actor id).
@@ -93,6 +97,7 @@ if TYPE_CHECKING:
 MANDATORY_CUES: tuple[str, ...] = ("weapon_pointed", "infected_close", "grabbed_from_behind", "addressed_by_name",
                                    "dependent_in_danger")
 LOUD_DB = 80
+LOUD_MEMORY_MS = 10 * 60 * 1000
 MAX_WINDOW_MS = 8 * 3600 * 1000
 MIN_WINDOW_MS = 3000
 REACT_MARGIN_MS = 3000

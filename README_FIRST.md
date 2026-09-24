@@ -13,14 +13,15 @@ LM Studio models.
 |---|---|
 | Design and rules (`docs/as/`, 14 docs + CHEATS, GLOSSARY, DECISIONS, RULES) | Specified for all phases P0–P12 |
 | Engine skeleton (`as_engine/src/`) | Every module, function and contract docstring for P0–P12; bodies are stubs that raise `NotImplementedError("P<n>")` |
-| Contract tests P0–P6 (substrate, lanes, space/bodies/content, perception, one Actor, many Actors, memory) | **693 tests** |
-| Contract tests P7 (the slice: whole turns of the fence scene, intake, narration and its lint, the *Where you are* panel, saves, replay, the command line) and the 50-turn sim soak | **40 tests + 1 soak** |
-| Contract tests P8 (the Play UI protocol: connect, runs, turns in the background, Stop, reconnect, Ask, settings, the developer panel, packs) | **83 tests** (the reference implementation the tests were proven against is not shipped — the builder writes its own) |
-| Play UI specs (`talemate_frontend/src/play/__tests__/`, vitest) | **124 tests in 10 files**, with 26 fixture messages; all pass against a reference front end built on a real Talemate 0.39.0 frontend with the 02 §4.1 changes (not shipped) |
+| Contract tests P0–P6 (substrate, lanes, space/bodies/content, perception, one Actor, many Actors, memory) | **699 tests** (693, plus six that pin P10 lines of those phases) |
+| Contract tests P7 (the slice: whole turns of the fence scene, intake, narration and its lint, the *Where you are* panel, saves, replay, the command line) and the 50-turn sim soak | **41 tests + 1 soak** |
+| Contract tests P8 (the Play UI protocol: connect, runs, turns in the background, Stop, reconnect, Ask, settings, the developer panel, packs) | **98 tests** (83, plus one check per fixture message P10 added; the reference implementation the tests were proven against is not shipped — the builder writes its own) |
+| Play UI specs (`talemate_frontend/src/play/__tests__/`, vitest) | **161 tests in 14 files**, with 41 fixture messages. The P8 specs (124 tests) pass against a reference front end built on a real Talemate 0.39.0 frontend with the 02 §4.1 changes; the P10 specs (37 tests: the New Life wizard, the Worldgen screen, the loading bar and its lines) and the amended app spec pass against a reference of the P10 screens (neither reference is shipped) |
 | Talemate plugin test (`tests/test_as_game_plugin.py`) and the Play UI smoke checklist | In. The plugin test passes (7/7) against the reference service; checked against the real Talemate 0.39.0 source (plugin base, route table, one-connection rule, the sequential message loop, pnpm, uv) |
-| Contract tests P9 (society: households, routines, work and cover, the settlement's stores and rations, tension, drift, loyalty, standing, rumours, the off-screen step; the one-injury-reaches-morale chain) | **91 tests.** All 908 engine tests pass against the reference implementation |
-| Contract tests P10–P12, live tests | **Not in this copy yet.** The builder stops after the P9 gate; a kit update adds them |
-| Core content pack (`as_content/packs/core/`) | 230 records, all validate |
+| Contract tests P9 (society: households, routines, work and cover, the settlement's stores and rations, tension, drift, loyalty, standing, rumours, the off-screen step; the one-injury-reaches-morale chain) | **91 tests** |
+| Contract tests P10 (the wide world: worldgen from the wizard's choices to a playable run; buildings found, not pre-built; marks; the dead up close and counted by district; hordes, the exterior and the Mega Horde; the world's day with nobody deciding; outings and raids; the wet strain's living spreaders; the Ghosts; the quiet hours between turns; the loading bar) | **268 tests** (231 test functions). All 1198 engine tests (P0–P10 and the soak) pass against the reference implementation |
+| Contract tests P11–P12, live tests | **Not in this copy yet.** The builder stops after the P10 gate; a kit update adds them |
+| Core content pack (`as_content/packs/core/`) | 289 records, all validate |
 | DSH builder kit (`AGENTS.md`, `.dsh/skills/`, hooks, `tools/as/`) | In. The hook scripts are tested (59 tool-call cases); the DSH bridge-plugin wiring comes from the DSH hooks docs and has **not** been run on a real DSH install — §4 tells you how to check it in two minutes |
 
 ## 2. What is where
@@ -28,14 +29,14 @@ LM Studio models.
 ```
 README_FIRST.md            this file
 AGENTS.md                  the builder's rules (DSH loads it into every session)
-.dsh/skills/               8 on-demand builder skills        .dsh/hooks.json   harness hooks
+.dsh/skills/               9 on-demand builder skills        .dsh/hooks.json   harness hooks
 as_engine/                 the game engine (package as-engine) + tests/
 as_content/packs/core/     the core content pack
 as_config.example.yaml     install config template (setup copies it to as_config.yaml)
 docs/as/                   the spec — start with 00_README.md
 tests/test_as_game_plugin.py            Talemate-side plugin test (P8)
 talemate_frontend/src/play/README.md    your smoke checklist (P8 part §0–§6; §7 after P10, §8 after P12)
-talemate_frontend/src/play/__tests__/   the Play UI specs and their fixtures (P8)
+talemate_frontend/src/play/__tests__/   the Play UI specs and their fixtures (P8, P10)
 tools/as/                  setup, doctor, gate, protect (+ manifest), probe, bench, eval
 ```
 
@@ -106,7 +107,7 @@ Open DSH on the repo folder with the model you want as the builder and send:
 
 It reads `docs/as/PROGRESS.md` (P0, first task `kernel/ids.py::mint`), runs the phase tests, and
 implements one function at a time. Each phase ends with `python tools/as/gate.py --phase N`, which
-writes the evidence row. With this copy it should stop after the P9 gate.
+writes the evidence row. With this copy it should stop after the P10 gate.
 
 ## 6. Your part
 
@@ -116,6 +117,7 @@ writes the evidence row. With this copy it should stop after the P9 gate.
 | Approving a change | Edit the protected file(s), add a row to `docs/as/CHANGELOG_AS.md`, then in **your own** terminal set `AS_MAINTAINER=1` (cmd: `set AS_MAINTAINER=1`; PowerShell: `$env:AS_MAINTAINER=1`) and run `python tools\as\protect.py --write-manifest` — after a docstring change run `python tools\as\gate.py --write-reference` first |
 | P1 | On your machines: `python tools\as\probe.py --write` (finds each model's thinking switch and structured-output support), then `python tools\as\bench.py --n 5 --accept` |
 | P8 | The smoke checklist in `talemate_frontend/src/play/README.md` |
+| P10 | Its §7: a new life through the wizard, a world built under the loading bar, the bar during a move, and an Ironman run |
 
 The builder never runs the maintainer commands; the guard blocks them.
 
@@ -163,17 +165,64 @@ The builder never runs the maintainer commands; the guard blocks them.
 
 **Haven't started the builder yet?** Unzip this kit over the folder and commit. **Already
 building?** Don't unzip over it (that would put stubs back over finished functions) — apply the
-patch instead, from the repo root. From the P8 copy:
+patch instead, from the repo root. From the P9 copy:
 ```
-git apply --3way as_kit_update_p9.patch
-git add -A && git commit -m "Kit update: P9"
+git apply --3way as_kit_update_p10.patch
+git add -A && git commit -m "Kit update: P10"
 ```
 From an older copy, apply the earlier patches first, in order (`as_kit_update_p6.patch`,
-`as_kit_update_p7.patch`, `as_kit_update_p8.patch`), then the P9 one. Then run
-`python tools\as\protect.py --verify` (expect `protection: OK`) and tell the builder: *"The kit
-update is in. Continue with P9 (AGENTS.md §1)."* It sets its own Next task in `PROGRESS.md`.
+`as_kit_update_p7.patch`, `as_kit_update_p8.patch`, `as_kit_update_p9.patch`), then the P10 one.
+Then run `python tools\as\protect.py --verify` (expect `protection: OK`) and tell the builder:
+*"The kit update is in. Continue with P10 (AGENTS.md §1)."* It sets its own Next task in
+`PROGRESS.md`.
 
-What the P9 update changes for the builder:
+What the P10 update changes for the builder (13_BUILD_ORDER §4 P10 has the order, step by step):
+- **P10 (new)** — full contracts and 268 tests (`tests/contract/p10_world/`): worldgen from the
+  wizard's choices to a playable run (`world/worldgen/*`, `service/runs.create_run`); buildings
+  laid out the first time anyone walks in; marks and wear (`world/traces.py`, `world/decay.py`);
+  the dead up close (`world/infected.py`) and counted by district, the hordes on the roads, the
+  dead past the map's edges and the Mega Horde (`world/hordes.py`); the world's day with nobody
+  deciding, outings and raids (`world/worldmove.py`); the Ghosts' council, route watch, lockdown
+  and DECON (`world/factions.py`); the quiet hours between turns (`service/background.py`); the
+  loading bar (`service/progress.py`); the GameService handlers for the New Life wizard and
+  worldgen; `as-engine new-run`. Play UI: the wizard, the Worldgen screen and the loading bar
+  (37 new vitest tests with their fixtures). New builder skill `as-world`.
+- **Earlier modules** (each marks its P10 lines "P10"): `physical/objects`, `physical/space`
+  (`remove_body`; a route enters each place at most once — the new P2 test
+  `test_space.py::test_a_route_never_enters_a_place_twice`, so rebuild `path`), `physical/bodies`
+  (a DEATH now carries `rise_pending` and schedules the rising — the P2 test
+  `test_bodies.py::test_bleeding_out_unconscious_then_dead` changed, so rebuild `die`),
+  `mind/actor.create`, `mind/perception` (marks as percepts; "what was left of"; a move reads
+  "arrives" or "moves into <place>" for someone coming), `mind/packet`, `mind/affordance`,
+  `mind/retrieval`, `mind/memory` and `turn/select` (SKULL-10: a mind decides on what it had
+  perceived by its own moment; options name the kinds of body and way they fit; nobody speaks to
+  or dresses the wounds of the dead; a loud noise holds the active area for 10 minutes of world
+  time), `mind/cues`, `society/population` (`take_from_cohort`,
+  `materialise`), `society/routine` ('away'), `society/settlement` (lockdown), `action/reactions`
+  (one of the dead seen coming within 20 m is news), `action/propagate`, `action/effects`,
+  `action/cascade`, `turn/cognition` (the wet strain's week-3 pull, never the PC's), `turn/timers`
+  (`seed_world`, the new dispatch lines; the off-screen step skips a body folded back into a
+  count), `turn/pipeline` (stage 0 starts a generated world's
+  clocks), `narration/*`, `world/rumours` (`retell`), `service/view` (the dice receipt names a
+  defence; no two suggestions alike), `service/replay` (BG-05), `audit/commit_gate` (W12). New
+  tests in finished phases pin the lines you must amend: p02 `test_space.py` (a route never
+  enters a place twice), p03 `test_perception.py` (how a move reads), p04 `test_packet.py` and `test_affordances.py` (SKULL-10, a gap has nothing to close, the
+  dead are not people), p07 `test_location_view.py` (the receipt's defence line). A run without a
+  `world_params` row — every hand-made scenario — must otherwise run exactly as before.
+- **P0 data** — new event and queue types, `BACKGROUND_QUEUE_TYPES` grows, new schema columns (the
+  schema version is unchanged — DECISIONS D-50), the P10 rule groups in `contracts/settings.py`
+  (11 §2.1), the loading bar's protocol messages. `p08_ui_protocol/protocol_kit.py` leaves the
+  bar's messages out of `pushed_after` (the P8 tests themselves did not change).
+- **Content** — the Ghosts (`factions/ghosts.yaml`, `lore/ghosts.md`), infected states and quirks,
+  pathways with their felt lines and signs, buildings and loot tables, name lists, the loading
+  bar's lines (`ui/quips.yaml`); CAS-013 now names the body; the door-handling options name the
+  kinds of way they fit and the calming, signalling and shielding options are for people
+  (`affordances/portals.yaml`, `social_body_attention.yaml`).
+- **Docs** — 06 rewritten (worldgen, the Ghosts, the world's day, wear, the dead, hordes and the
+  Mega Horde, the quiet hours), 03, 04, 05, 09, 10, 11, 12, 13 (the P10 task list), DECISIONS
+  D-39–D-69, GLOSSARY, SPEC_ISSUES SI-004–SI-005, RULES regenerated.
+
+What the P9 update changed (for anyone still on the P8 copy):
 - **P9 (new)** — full contracts and 91 tests: population and households (`society/population.py`,
   `household.py`), routines (`routine.py`), work, cover and production (`work.py`), the
   settlement's stores, daily draw, rations, laws and trade terms (`settlement.py`), tension,
@@ -261,15 +310,16 @@ What the P6 update changed (for anyone still on the first copy):
 
 ## 9. Known gaps in this copy
 
-- P10–P12 contract tests and the live suites are still to be written (next kit updates). The New
-  Life wizard, worldgen, death and worlds screens come with P10 / P12 (their specs too).
-- P9 runs one settlement you place by hand. Materialising unnamed people, leaving a group, trade
-  runs, rumour distortion, leadership challenges and faction doctrine arrive with world motion in
-  P10 (DECISIONS D-37).
-- `docs/as/RULES.md` lists every rule id; the P6–P9 families (REL, LOOP, LESSON, MEM,
+- P11–P12 contract tests and the live suites are still to be written (next kit updates). The
+  death screen, saved worlds and the sessions browser come with P12 (their specs too).
+- Lots for settlement goods, leadership challenges, splintering, coalitions and faction doctrine in
+  play are backlog, not v1 (DECISIONS D-49). P10 brings the rest of what P9 left for world motion:
+  materialising unnamed people, leaving a group, trade runs and raids, rumour retelling, weather.
+- `docs/as/RULES.md` lists every rule id; the P6–P10 families (REL, LOOP, LESSON, MEM,
   WILL-05..11, SEL, HOR, INTAKE, CLI, PROTO, GUIDE, UI-CLARITY, DEMO, HH, ROUT, WORK, STL, GRP,
-  STAND, INFO, ECON, SOC) and the content rules (a cascade rule's own description) have their own
-  statements. Across the kit 272 of 514 ids are still named only inside a range or a sentence
+  STAND, INFO, ECON, SOC, INF, HRD, FAC, OPS, WEAR, BG, PROG and most of WG, WORLD and TRACE) and
+  the content rules (a cascade rule's own description) have their own statements. Across the kit
+  248 of 580 ids are still named only inside a range or a sentence
   (their behaviour is specified by the module docstring or doc section the registry points to, and
   pinned by tests). Writing individual statements for them is open.
 - The sim soak plays 50 turns against the fake model; it proves the pipeline holds together and

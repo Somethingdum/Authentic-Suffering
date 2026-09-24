@@ -47,21 +47,23 @@ invariant; a failing assertion reruns the stage once on a fresh sub-stream, then
 report (never a half-built world). Progress goes to the UI as `worldgen_progress` with friendly
 labels: *Rolling the world… · Carving the land… · Writing what happened… · Drawing the lines of
 power… · Building settlements… · Filling homes… · Waking the people… · Setting the laws… · Placing
-the trouble… · Checking it all holds together…*
+the trouble… · Checking it all holds together…* — and to the loading bar (`service/progress.py`,
+10_UI §2.10): the whole plan first, then each stage, with WG2 and WG6 counting their model answers
+("Writing the people down — 2 of 12") and a line about the step under it.
 
 | Stage | Builds | Key rules |
 |---|---|---|
 | WG0 | parameters, plausibility gate + hard-fail protocol | CMG §61 QC-1..3, Part XII; enforced Bitch→Realism only |
-| WG1 | zones (count by detail tier), routes with danger, building archetypes per zone kind | every zone reachable; ≥ 2 mutually exclusive routes between the start zone and one other |
+| WG1 | zones (count by detail tier; at most one 'wilds' zone, which has no buildings), each a hub street with its building sites (grounds only) or outdoor places — each meeting the street at its own frontage along one side or the other, so the next building is a walk down the street (D-64) —, roads between hubs (a ring plus chords), the four ways out — the exterior zones past each edge — and every district's counted dead (§5.1) | every place reachable; the start zone has two edge-disjoint ways to another zone (WG-15..17) |
 | WG2 | causal history: code builds an event skeleton (kind, day, subjects, cause) from params; WORLDGEN_HISTORY (lane A, thinking) writes truth + belief text per event; structure fate: buildings that were defended, sealed or lucky get `places.held = 1` | WORLD-01: every settlement, faction posture and shortage cites ≥ 1 history event; history is causal, not decorative; the history horizon equals days-since-the-Fall, never a constant (WG-31); held buildings skip the interior Fall-damage pass at discovery (WG-32) |
-| WG3 | canonical factions (presence rules, Part X) + procedural groups (`[dynamic] + [location type] + [rule or resource]`, ≤ 60 chars) | faction presence coherence (dominant needs density ≥ 6, active ≥ 3, peripheral ≥ 1) |
+| WG3 | canonical factions (presence rules, Part X) + procedural groups (`[dynamic] + [location type] + [rule or resource]`, ≤ 60 chars); an enclave faction (the Ghosts) is planned on top, never as the placement faction, with its sealed site (§2.8) | faction presence coherence (dominant needs density ≥ 6, active ≥ 3, peripheral ≥ 1) |
 | WG4 | settlements, workplaces (water pump, kitchen, garden, workshop, clinic, watch, laundry, school), stores, laws | population baseline modulated by history (Batch-3 ruling #5) |
 | WG5 | cohorts from a survivor pyramid; households | DEMO-01 bounds (§2.1); children are inhabitants (DEMO-02) |
-| WG6 | Actors: pack actors first (protected), then generated detailed actors (WORLDGEN_ACTOR on both lanes in parallel, schema + validator + one targeted repair per failing section); relationship matrix 20 % positive / 60 % strangers / 20 % rivals (SOC-01); knowledge seeds → beliefs | hand-written characters cannot die in worldgen; if history would kill one, recalculate to explain survival (Batch-3 ruling #6) |
+| WG6 | Actors: pack actors first (protected), then generated detailed actors (WORLDGEN_ACTOR on both lanes in parallel, schema + validator + one targeted repair per failing section) — posts, leaders, a faction's other seat holders (the Top Hats, the Front Man), residents — each named out of the counted cohorts; relationship matrix 20 % positive / 60 % strangers / 20 % rivals (SOC-01); knowledge seeds → beliefs | hand-written characters cannot die in worldgen; if history would kill one, recalculate to explain survival (Batch-3 ruling #6) |
 | WG7 | local laws per settlement (faction laws + params: curfew when hostile_human ≥ 6; weapons policy by social order; contamination/intake laws where factions have intake doctrine) | laws change the available options and their costs |
 | — | **genesis snapshot** of the finished world, before any PC exists (`_worlds/<world_id>/genesis.sqlite`) | a world can be reused for a new run or shared as a file (RUN-09) |
 | WG8 | PC placement (Part X), immediate contacts, opening pressure made of **real placed entities**, first objective; WORLDGEN_OPENING writes the text with citations; **PC survival history**: 3–5 history events with the PC as subject, each an anchor memory for the PC | QC-4: specific, non-trivial, reflects ≥ 1 A/B param, cites ≥ 1 placed entity; budgets 150/150/200/150 chars; WG-33: the PC starts with real memories and a reason for being alive |
-| WG9 | invariants: ≥ 3 exploration magnets with breadcrumb chains (lead → risk → reward, with timers); ≥ 1 supply bottleneck with a credible lead; ≥ 1 lethal threat with ETA ≤ 2 hops; a death path ≤ 3 decisions, telegraphed; ≥ 2 mutually exclusive routes; no-repeat locks initialised; the 58-bit gate on genesis | continuous invariants re-asserted every in-game day by `world.worldmove` |
+| WG9 | the world's checks (WG-35): three places worth the risk that the PC has leads on; a settlement short of food or water that the PC knows about; a lethal threat within two places of the start, and a mark that warns of it; two ways out of the start zone; history for every settlement and group (WORLD-01); every settlement's demographics sound (DEMO-01); the 58-bit gate | a failure means a stage was built wrong: worldgen stops with every failure named in one sentence. Not re-asserted daily in v1 (WG-37, D-45): the P11 release audit re-runs the checks on the genesis snapshot |
 
 **Worldgen does not pre-script outcomes** (WG-30): it decides who people are, what happened and
 what they face — never who betrays, dies, befriends the PC or becomes the villain.
@@ -212,8 +214,8 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Standing** — the group's memory of a person (−5..+5) — lives in `group_standing`; laws and,
   from P10, deeds move it; it feeds trade and pressure.
 - Leadership challenges, splintering, coalitions, reconciliation and **faction doctrine** (rules
-  of engagement for organised force) ride on the same tension and pressure numbers and arrive with
-  world motion (P10).
+  of engagement for organised force) would ride on the same tension and pressure numbers; they are
+  backlog, not v1 (DECISIONS D-49). P10 brings leaving a group (§3: people who meant to leave go).
 
 ### 2.6 The coupling matrix is the P9 test plan
 
@@ -243,64 +245,194 @@ they fire inside the PC's windows but never cut a condition-ended window short (
 step — 6-hour windows (`WorldRules.offscreen_tick_h`) of seed → fire due timers → progress every
 living body's needs → advance the clock — used by tests and, from P10, by travel and long waits.
 A world with no settlements (every P7 scenario) runs exactly as it did before P9.
+People away on an outing skip their timetable (ROUT-06 'away', P10) — otherwise the routine
+would walk them home in the middle of it.
 
-## 3. Off-screen motion (P10) — "the world moves without you"
+### 2.8 Factions that do more than hold ground (P10) — the Ghosts (`world/factions.py`, FAC-01..06)
+A faction record may carry a `behaviour` block (09_CONTENT_PACKS §3): an enclave, a council, a route
+watch, a DECON doctrine. The core pack's Ghosts (Ghosts_6) have all four; any pack can give another
+faction any of them.
+- **The enclave** (FAC-01): the faction lives sealed underground — the Depot, one settlement of many
+  thousands behind a single locked gate (worldgen places it in an industrial district when there is
+  one). It is never the home settlement and never a placement faction; the crowd presses its gate and
+  nothing more (a breach never happens, and the gate never gives way to a crowd, INF-13). In
+  lockdown nobody leaves on an outing.
+- **The council** (FAC-02): the seats — five Top Hats (Black, Gray, White, Red, Blue); the Black Top
+  Hat leads — meet every seven days at 20:00 for two hours in the council room. Seat holders are real
+  generated people; their names are each world's own (Ghosts_6 leaves them open). The Front Man
+  (about forty) is the face outsiders deal with and is not a seat of the council. A council does not
+  go scavenging. `in_session` says whether a meeting is under way — "in the middle of a meeting".
+- **The route watch** (FAC-03): the moment a Mega Horde forms, the watch reports it (days before the
+  first birds) and every seat holder learns it is coming; when it begins its passage through the
+  region the enclave seals (lockdown), and opens again when it is gone.
+- **DECON** (FAC-04/05): a Ghost killed by a human hand is taken to the next meeting. The council
+  sends a team (five operators, materialised from the enclave's own counted people, FAC-06) to the
+  killer. Off screen the killer dies and the body is left with the smile mark; on screen, the team
+  walks in and hunts — the player sees them coming, and every Ghost they kill is taken to the next
+  meeting too. A death by the infected orders nothing.
 
-Producers with `next_due_at`: faction operations, settlement projects, trade runs, patrols, raids,
-diplomacy, migration, scavenging trips, depletion, construction, leadership change, infrastructure
-failure, recruitment, defection, epidemic. Places outside the active area tick every
-`WorldRules.offscreen_tick_h` (6 h) at COLD fidelity (code only).
+## 3. The world's day (P10) — "the world moves without you"
 
-**Everybody dies (off-screen mortality).** Each COLD human draws a daily death risk
-`base_daily_mortality[difficulty] × activity multiplier` (scavenging ×3, patrol ×2, sick/wounded
-×5, child ×1.5, elder ×2); an `OFFSCREEN_DEATH` creates a corpse trace and a rumour seeded to the
-people who would hear. Named characters are not exempt during play.
+The contracts are `world/worldmove.py` (WORLD-02..06, OPS-01..08), `world/traces.py`
+(TRACE-01..06), `world/decay.py` (WEAR-01..04) and `world/factions.py`; the numbers are
+`WorldRules`. Nothing here ticks by itself (WORLD-02): the world's clock is one `WORLD_DAY` queue row
+a day at `world_hour` (04:00), started by `turn.timers.seed_world` and fired in a turn's window or
+by the off-screen step (`turn.timers.run_offscreen`) alike. A hand-made scenario without a
+`world_params` row gets none of it. The day, in order: the weather (and rain washing marks out in
+the open) → the deaths nobody on screen saw are noticed → operations are planned → people who meant
+to leave go → things wear → the infected's day → the hordes' day → the next WORLD_DAY.
 
-**Diegetic traces** (WORLD-03): the engine never says the world progressed — the world shows it.
-Every off-screen event that could leave evidence registers a trace with a decay clock (tracks 2 d,
-blood 7 d, corpse 30 d, graffiti 1 y, missing stock 14 d, damage 180 d). ≥ 70 % of off-screen
-events leave a discoverable trace, and the narrator never writes "while you were gone" (lint).
+**The active area is the turn's** (WORLD-04): off-screen code never kills, moves or sends away a
+body that stands where the player could see it happen — the turn simulates that. (Infected bodies
+are the exception: their steps are the same physics on screen and off, §5.)
 
-## 4. Memory Fade (log decay, P10) — carried verbatim in shape
+**Nobody dies of a lottery** (fidelity C01; WORLD-05). There is no daily death roll. People die of
+what happens to them: wounds and illness running their course, thirst and hunger when the water is
+gone (`physical.bodies.progress`, every turn and every off-screen step), what meets them on an
+outing, raids, the infected — and, for the unnamed, privation in a settlement that has run dry. A
+death nobody on screen saw is noticed once, at the next world day (`OFFSCREEN_DEATH`): a stain where
+it happened, grief among those who knew, talk among those who would hear. Named characters are not
+protected during play; worldgen's plausibility protection is a worldgen-only rule.
 
-`SS = w1·narrative_weight + w2·location_importance + w3·player_recency + w4·object_type`
-(weights 0.4/0.2/0.3/0.1). Tier 1 *graceful forgetting* (SS < 20: delete a trivial entry) · Tier 2
-*environmental reclaim* (SS < 35, unsecured item in a public or dangerous place: delete + "another
-survivor took it" event + trace) · Tier 3 *location overhaul* (unvisited 30 days, nothing active:
-purge the place's deltas + a major world event: collapse, fire, occupation). **Persistence locks**:
-a dead companion's weapon where they fell, quest-critical placements, everything inside a player
-base, the stain where someone died, the hole in the wall from the argument. Every decay emits an
-event — decay is replayable and is itself one of the world's strongest "it moved on" signals.
+**Outings** (OPS-01..08). Each day, each settlement off screen may send one party out — scavenging
+(twice as likely when it is short of something), a patrol along one of its roads, or a trade run to
+another settlement — crewed by free, able, living members (never the player, never a council's seat
+holders, never anyone already out, never from a settlement in lockdown). A hostile band with two or
+more free members may raid a settlement. The party walks to its district's hub, out along the road
+(`op_leg_h` hours), stays (`op_dwell_h`), and comes home:
+- the dead where they go hurt them in proportion to how thick they are there (a cleared district is
+  safe); a bleeding wound is packed on the spot and the party turns for home; at home a significant
+  wound is sutured while the settlement has medicine (OPS-07);
+- a scavenging party lays out a building nobody has entered yet (GEO-03), carries off up to three
+  loose things, leaves boot prints (and a gap on the shelf where it took something), and with luck
+  brings home 2–8 food and water each; a patrol leaves a loose line of boot prints; a trade run swaps
+  a tenth of what its settlement has most of for as much of the other; a raid that gets in takes a
+  tenth to a quarter of the target's food and water, leaves a forced door and blood, costs morale
+  and leaves the target's people a grudge — one that fails leaves a raider shot.
+Every mark comes from something that happened (C11): there is no quota of traces, and no clue is
+guaranteed to last.
 
-## 5. The infected (P10; canon: Lore v1.0 + CMG §42)
+**Traces** (TRACE-01..06). A trace is what someone can perceive of something that happened while
+they were not there. Each has a lifetime by kind in the open (tracks 2 days, blood 7, corpse 30,
+missing stock 14, damage 180, graffiti a year), four times as long under a roof; rain, a storm or
+snow erase exposed tracks, blood and smoke at once; a carved name or a grave is locked and never
+fades. People see the marks where they stand when there is light enough — as their own percepts,
+never by reading the table (TRACE-05) — and the narrator never writes "while you were gone"
+(WORLD-06).
 
-- Types (stable ids): `ZOMBIE_ARCHETYPE_SHAMBLER01`, `ZOMBIE_ARCHETYPE_CRAWLER01`,
-  `ZOMBIE_VARIANT_ID_RUNNER01`, `ZOMBIE_VARIANT_ID_LURKER01`. States (dormant, starved, overfed,
-  injured) apply across types.
-- Perception: Shamblers hear (threshold per type) and see only motion contrast ≤ 3 m; Runners see
-  shapes to ~15 m; Lurkers use thermal contrast in the dark.
-- Energy: activity drains; 0 → dormant ("statue"), can reboot on stimulus.
-- **"Dead" is a claim**: false death on catastrophic non-core trauma, reanimation after 6–14 h
-  (Runners 8–16 h) if the brainstem/upper-spine junction is intact; true kill = destroy that
-  junction or fully denature core tissue. Lurkers are alive and do not reanimate.
-- Infected do not attack infected (except the rare Shambler bullying quirk); **baseline infected
-  never attack a true Lurker-infected victim** (CMG §42 hard rule).
-- Lifecycle: Runner → Shambler/Crawler allowed; never upward (CMG §42.17).
-- **Infection pathways** (content `pathways/*.yaml`): air (everyone; behavioural), wet (bite/saliva:
-  living-spreader phase weeks 1–3 with saliva infectivity from ~day 3 and growing compulsion,
-  kill phase in week 4, death, rise after ~12 h), cold-start (unbitten dead with usable neural
-  structures rise in ~3 days, only as Shambler/Crawler/dormant), lurker-deep (slash-and-leave;
-  timeline marked `proposed` in the pack until you confirm it). **No cure.** Wounds from the wet
-  strain may close deceptively well.
-- Noise steering: any sound above an infected body's hearing threshold at its point sets its target
-  toward the source (`INFECTED_DRIFT`); gunfire is remembered by the dead.
-- Quirks are seeded per body (rng stream `quirks`): the same seed reproduces the same weird
-  behaviour. The pack ships **authored** quirk variants only; the ~95 boilerplate tags from the old
-  lore are not carried (CNT-02).
-- Lurkers: Actors with generated dossiers, clans (ranks: scouts, hunters, butchers, sentinels,
-  elders, rowdies), territory doctrine, learning ("every breach attempt becomes a lesson"),
-  mimicry only from concealment and degrading under close pressure, two attack branches
-  (infective slash-and-leave; paralytic capture only after winning the struggle).
+## 4. Wear, not forgetting (P10; fidelity C02 — replaces the salvaged Memory Fade)
+
+The world does not forget; minds do (`mind.retrieval`). Nothing is deleted because the player was
+away or because it seemed unimportant — there are no scores, tiers or location overhauls. Things
+change because something happened to them (WEAR-01..04, `DecayRules`): a gun left in the street
+rusts on every wet day, paper turns to pulp and falls apart, cloth and leather rot, food goes off
+after its spoil days wherever it is — in a pack or on a shelf. A mark fades on its own clock (§3).
+What a scavenger takes, a scavenger who exists took. Every change is an event, so the whole history
+of the world stays readable and replayable.
+
+## 5. The infected (P10; canon: Lore v1.0 + CMG §42, Lore v2 for the wet strain)
+
+The contracts are `world/infected.py` (INF-01..13), `world/hordes.py` (HRD-01..18) and the P10
+parts of `physical/bodies.py`; the numbers are `InfectedRules` and `HordeRules`.
+
+### 5.1 Levels of detail — the dead are counted, and they are finite (fidelity §5, E01–E03, W04)
+The dead exist in four forms and pass between them; none is made or lost on the way:
+- **Bodies** where the player is: infected bodies simulated step by step (`INFECTED_STEP` timers,
+  the same rules on screen and off, INF-12).
+- **Pools**: per district and type, how many dead are active and how many stand dormant — a
+  district's dead nobody has met yet. Worldgen fills them from the district's kind and the world's
+  parameters (a downtown holds thousands, the wilds a few dozen).
+- **Hordes**: counted crowds walking hub to hub along the roads.
+- **The exterior**: four zones past the region's edge (north, east, south, west), each one huge pool
+  — the rest of the country's dead, large but finite (W04).
+The first time someone arrives in a place, some of its district's dead become bodies there
+(INF-11, `populate`: a place's share, most of them still dormant in a mature world) — taken from the
+pool. A pool grows only from real sources: stragglers, a crowd that breaks up or passes through,
+bodies folding back, the district's own dead rising. A cleared district stays clear until dead that
+exist walk in. The **census** (`hordes.census`) adds it all up; the total changes only by the dead
+rising and by bodies destroyed (HRD-15) — the P11 release audit checks exactly that.
+
+**Back into the count** (HRD-18, fidelity F04 demotion; D-67). When the contact is over, a body
+that is nobody in particular folds back into its crowd's count — or its district's, when the crowd
+is gone: one taken from a count, unhurt, going nowhere of its own (walking with its crowd, or with
+no target at all), holding and held by nobody, where nobody alive stands and outside the active
+area. A hurt one keeps its wounds and stays a body; so do a corpse that got up, a scenario's body
+and a cheat's; and one hunting someone or drawn by a noise keeps walking until it gets there — the
+dead drawn by a shot three streets away still arrive. The body's record stays (its history is
+whole); only its place in the world goes (`DEMATERIALIZE`), and a later contact takes a new body
+from the count. A loud noise holds its neighbourhood in the moment for ten minutes of world time
+(SEL-01, D-68), not for the rest of a turn that may run off screen for days. This is what keeps a
+Mega Horde next to a living player finite in bodies: the street stays full while the player can see
+it, and the dead who walk on out of sight go back into the crowd.
+
+### 5.2 Bodies up close
+- Types (stable ids): Shambler, Crawler, Runner (driven by code, no mind) and the Lurker (alive,
+  with a dossier: an Actor, not driven here). States — dormant, starved, overfed, injured — apply
+  across types (INF-01).
+- **Senses** (INF-02): hearing threshold by type plus each state's shift. Shamblers and Crawlers see
+  only motion within 4 m (something that moved, or started an action that moves the body, in the
+  last 10 s — starting to watch, wait, keep guard, hide or talk is standing still, `STILL_VERBS`:
+  the one way past a Shambler at arm's length); Runners see any shape within 12 m. Nobody is seen
+  through a wall; a sleeper lies in plain view; the dead and the unconscious are not prey.
+- **Seen coming** (REACT-01, P10): anyone who sees one of the dead move to within 20 m reacts, and
+  the player's watch ends there — the dead walking up are always news (D-65).
+- **What draws them** (INF-09): a sound above its threshold sets it walking toward the place of the
+  sound; prey in reach beats a noise elsewhere; drawn to where it already stands, it looks around.
+- **Energy by time** (INF-03): being active costs one energy per minute for a Shambler (two minutes
+  for a Crawler, 20 s for a Runner) — an hour banging on a door tires it as much as an hour walking;
+  standing still costs nothing. At 0 it goes dormant ("a statue") and forgets its target; a
+  stimulus reboots it; a bite that lands feeds it. Starved bodies slow down and listen harder;
+  overfed ones mostly let go and walk off.
+- **Doors** (INF-13): a lone body bangs on a closed door and never breaks in. Three or more leaning
+  on it count its strain a minute at a time; a plain door holds 30 minutes (a window 10, a gate 45),
+  each barricade level another 30, each point of lock quality another 15. Damage 1–3 shows how near it
+  is to giving way; then it gives, loudly. Quiet survivors behind a strong door outlast a small
+  crowd; noise inside wakes it.
+- **The dead rise** (INF-04): a person who dies with the brain and upper spine intact gets up again
+  as a NEW body where the corpse lay, holding what it held — the plain dead through the cold start
+  (66–78 h later, as a Shambler or a Crawler), a wet host dead of the strain after 10–14 h as a
+  Runner. A destroyed head stays down. A Runner slows into a Shambler or a Crawler after 20–40 days,
+  never the reverse (INF-10). Everyone who knew the dead person sees "what was left of <name>".
+- Infected never hunt infected (INF-05); a Lurker-to-be past its first stage is never a target
+  (INF-06, CMG §42 hard rule); a wet host three weeks in is not hunted by sight (INF-07). Quirks are
+  seeded per body (INF-08): the same world makes the same body with the same quirks.
+
+### 5.3 Crowds, and the Mega Horde (HRD-03..17)
+- **Drift**: a district with enough active dead sometimes sends a crowd off to a neighbouring hub
+  (more often when the world's horde pressure is high); it mills there for hours, then scatters into
+  that district's pool.
+- **Drawn**: a sound of 130 dB or more (an explosion, an alarm) draws a share of its district's dead
+  to it, arriving after half an hour.
+- **Pressing**: where a crowd stops at a settlement, it presses on it; a crowd big enough for the
+  settlement's defences breaks in — unnamed people die, named people there may be bitten. An
+  enclave's gate is never breached (§2.8).
+- **Rallying**: at every hub a moving crowd leaves stragglers behind and picks up a share of the
+  district's active dead.
+- **In sight** (HRD-07): where the player is, a crowd shows as bodies — up to 40 of one crowd in a
+  place. A walking crowd's bodies follow it down the road; a milling crowd's stand where they are
+  and fill the street, and it fills the place up again every 5 minutes while it is in sight (D-68).
+- **The Mega Horde** — the end-game event. Rarely, and more likely the longer the run goes (the
+  chance ramps up over the first 60 days, scaled by difficulty and horde pressure), the country's
+  dead rally in one of the exterior zones: tens of thousands, up to hundreds of thousands at the
+  hardest difficulties. It is seen coming for days (3–10): a week out, whole flocks of birds go over
+  heading away; five days out, talk of it reaches the settlements nearest its road; two days out, a
+  low roar far off never stops — and a faction with a route watch reports it before any of that
+  (§2.8). When it arrives it walks through the region district by district; each district it
+  is in never goes quiet (ambient 85 dB) and every street is full — going outside is not survivable
+  while it passes. It takes days to pass (20 000 a day through one district); doors are pressed and
+  the weakest give. Then it leaves by another road, leaving stragglers and the dead it made. It
+  obeys every rule above: it is counted, finite, and made of dead that already existed.
+
+### 5.4 The wet strain's living spreaders (Lore v2; pathways content)
+A bitten host lives for about four weeks. From about the third day their saliva infects: a bottle
+they drank from carries it for 12 hours (`mouth_contact_item` exposure; everyone knows somebody who
+was killed by a shared bottle). From the second week the spreader's tells show to anyone who looks
+closely (within 3 m, a clear look), and in the fourth the fever too. In the third week the urge to pass it
+on becomes a compulsion: code — not the host's own reasoning — makes them offer food or drink from
+their mouth now and then (an involuntary act, at most every 10 minutes; never the player's
+character, whose hands stay the player's). The fourth week kills; the host rises as a Runner.
+Pathways: air (everyone; behavioural), wet (bite, saliva), cold start (the unbitten dead), lurker
+deep (slash and leave; timeline `proposed` until the owner confirms it). **No cure.**
 
 ## 6. Information spread (P9 rumours; the other channels as noted)
 
@@ -325,6 +457,23 @@ a rumour older than 14 days is no longer passed on (INFO-05). Hearing from someo
 a person steals costs that person 1 trust (CAS-018), and a trader who has heard it charges more or
 will not deal (SOC-03). The PC hears gossip like anyone, and it appears in the journal.
 
-**Distortion** (INFO-06): one optional `RUMOUR_DISTORT` call per hop may drop a detail, shift an
-attribution, sharpen an emotion or add an inference — never invent an entity. It needs background
-cognition and arrives in P10; in P9 the words pass on exactly and `rumours.distortions` stays `[]`.
+**Distortion** (INFO-06): when a holder retells a fresh rumour in the quiet hours (§7), one
+`RUMOUR_DISTORT` call may drop a detail, shift an attribution, sharpen an emotion or add an
+inference — never invent who is in it (a retelling that names a person or place the holder does not
+know is refused, and the holder passes the words on as they heard them). In P9 the words pass on exactly and `rumours.distortions` stays `[]`.
+**Horde talk** (P10): a rumour may be about a place — 'horde_coming' — seeded by the Mega Horde's
+signs and by a route watch's report (§5.3, §2.8), and passed on like any other.
+
+## 7. The quiet hours (P10; `service/background.py`, BG-01..07; Actor Spec AC12, fidelity C07)
+
+People think between moments. After a turn's result is on screen, while the player reads, the
+engine runs the jobs the turn boundary owes: **reflection** (someone who lived through something
+that mattered — a salient memory or an anchor — or who slept on an ordinary day draws a lesson,
+changes a plan, forms a goal or a grudge; at most two a boundary) and **retelling** (a fresh rumour's
+holders put it in their own words; at most four). Which jobs a boundary has is a function of the
+world as the turn left it, never of the player's reading speed (BG-07): before the next move the turn
+first finishes everything still owed ("Everyone else catches up…", with its own loading bar), so a
+player who answers at once and one who waits an hour get the same people thinking about the same
+things. A job cancelled mid-call (Load, Close, New life) leaves nothing behind and runs at the next
+catch-up; a failed one is not asked twice at one boundary. The results are ordinary recorded events
+and replay re-commits them from their payloads (BG-05), without a model call.

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-514 ids; 242 with their own statement, 272 named only in context.
+580 ids; 332 with their own statement, 248 named only in context.
 
 
 ## ABUSE
@@ -34,13 +34,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | AFF-01 | *wounds / places); an item bound with a destination anchor (a believed location, AFF-01) must* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-02 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_content/packs/core/laws/settlement_core.yaml` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-03 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7.* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-02 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_content/packs/core/laws/settlement_core.yaml` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-03 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *Belief cues (AFF-10): a cue is HELD by an actor when a lessons row for that holder carries the cue* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
 
@@ -75,6 +75,18 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | BENCH-03 | */ O5 / Resolve formula / Decided / `3 + floor((E+C)/4) + trait_mod`, drains/recoveries as in 05 §5, all in `RulesConfig.resolve`, tagged `[SAND]` and calibrated by `tools/as/eval.py` (BENCH-03). /* | DECISIONS §1 | — | — |
 
+## BG
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| BG-01 | BG-01: the terminal has no idle time, so they happen before the next move). The store is closed at the end; exit 0. | as_engine/cli.py | `as_engine/cli.py`, `as_engine/service/background.py`, `as_engine/service/game_service.py` | `contract/p10_world/test_background.py`, `contract/p10_world/test_progress.py` |
+| BG-02 | BG-02 jobs(store, turn_index) -> list[Job] (pure read; order is the run order) The boundary's plan, read from the world as turn T = turn_index left it: every REFLECTION and RUMOUR_DISTORTED event of turn T (the boundary… | as_engine/service/background.py | `as_engine/contracts/settings.py`, `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
+| BG-03 | BG-03 async run_job(session, job) -> JobResult (no store writes; the model call only) (JobResult.answer: reflection {'output': ReflectionOutput, 'handles': packet.handles}; retelling the RumourDistortion). T = world_clo… | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
+| BG-04 | BG-04 commit(tx, job, result, at, turn_index) -> list[Event] (its own transaction, between turns) First every pair of result.calls is recorded with lanes.calllog.record(tx, request, response) (turn_index T: every model… | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
+| BG-05 | BG-05 Replay: service.replay.resimulate re-commits every REFLECTION and RUMOUR_DISTORTED event of the recorded run between the same turns as they were, from their payloads (no model call; see service/replay.py). | as_engine/service/background.py | `as_engine/service/background.py`, `as_engine/service/replay.py` | `contract/p10_world/test_background.py` |
+| BG-06 | BG-06 Nothing here reads the truth layer; a reflection packet is the actor's own (Skull law). | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
+| BG-07 | BG-07 (Actor Spec AC12, fidelity C07) Simulated time decides, never the player's reading speed. Which jobs a turn boundary has is a function of the world as the turn left it (BG-02); the time the player spends reading a… | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
+
 ## BOUND
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -90,17 +102,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-001 | A worker whose arm is hurt badly enough to lose function misses their next shift at every workplace they are assigned to. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/work.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-002 | A missed shift pulls a replacement off another post to cover the role, if anyone qualified is free to be moved. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/work.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-003 | The replacement's own post runs short-handed while they cover elsewhere, so that workplace loses a quarter of its efficiency. | as_content/packs/core/cascade/economy.yaml | `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
-| CAS-004 | A water pump cycle that leaves the settlement with under three days of water declares a water shortage. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_settlement.py`, `contract/p09_society/test_timers_society.py` |
+| CAS-004 | A water pump cycle that leaves the settlement with under three days of water declares a water shortage. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_settlement.py`, `contract/p09_society/test_timers_society.py`, `contract/p10_world/test_world_day.py` |
 | CAS-005 | A water shortage cuts the settlement's ration level by one step. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-006 | A ration cut to level 2 or lower raises every dependent-holding household's tension toward the leadership, and forces the worst-hit household's head into a loyalty check. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/group.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
-| CAS-007 | A death leaves the dead person's household grieving and opens a vacancy in every role they held. | as_content/packs/core/cascade/people.yaml | `as_engine/society/household.py`, `as_engine/society/work.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_household.py` |
+| CAS-007 | A death leaves the dead person's household grieving and opens a vacancy in every role they held. | as_content/packs/core/cascade/people.yaml | `as_engine/society/household.py`, `as_engine/society/work.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_household.py` |
 | CAS-008 | Everyone bonded to the dead person who knows of the death loses Resolve; the closer the bond, the larger the loss. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-009 | A very loud sound outdoors pulls nearby infected toward it over the following minutes. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-01 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-010 | Catching someone in a lie costs them trust with whoever caught them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-011 | A broken promise costs trust with the person it was made to and leaves them a grievance they carry. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/mind.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p06_memory/test_mind.py` |
 | CAS-012 | A theft that somebody witnessed becomes a rumour among the witness's household and crew. | as_content/packs/core/cascade/people.yaml | `as_engine/world/rumours.py`, `as_content/packs/core/cascade/people.yaml` | — |
-| CAS-013 | A death off-screen leaves a corpse where it happened and a rumour among the people who would hear of it. | as_content/packs/core/cascade/people.yaml | `as_engine/world/rumours.py`, `as_content/packs/core/cascade/people.yaml` | — |
+| CAS-013 | A death off-screen leaves a corpse where it happened and a rumour among the people who would hear of it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/propagate.py`, `as_engine/world/rumours.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p10_world/test_world_day.py` |
 | CAS-014 | Starting a different action while in the middle of a counted task pauses the task where it stands instead of resetting it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/tasks.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p05_many_actors/test_tasks.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | CAS-015 | A bite wound seen by a settlement member brings the contamination law into force for the bitten person. | as_content/packs/core/cascade/people.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-016 | A kitchen cycle that leaves the settlement with under three days of food declares a food shortage. | as_content/packs/core/cascade/economy.yaml | `as_content/packs/core/cascade/economy.yaml` | — |
@@ -159,8 +171,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | CLI-01 | CLI-01 content-check [--pack DIR] (repeatable: --pack A --pack B; argparse action 'append') content.pack.load_canon([content_dir/core] + each --pack DIR as given). One line per issue in the loader's order: f"{severity.u… | as_engine/cli.py | `as_engine/cli.py` | `contract/p07_slice/test_cli.py` |
 | CLI-02 | CLI-02 new-scenario SCENARIO [--packs-root DIR] [--fake] service.runs.create_run_from_scenario(config, SCENARIO, transport, packs_root = --packs-root (None: content_dir), core_pack_dir = content_dir/core); prints f"Crea… | as_engine/cli.py | `as_engine/cli.py` | `contract/p07_slice/test_cli.py` |
-| CLI-03 | CLI-03 play RUN_ID [--fake] service.runs.load_run(config, RUN_ID, transport); a RunError prints f"[{code}] {message}" and exits 1. Prints each load notice, then the last narration (narration table, highest turn) or 'Rea… | as_engine/cli.py | `as_engine/cli.py` | `contract/p07_slice/test_cli.py` |
+| CLI-03 | CLI-03 play RUN_ID [--fake] service.runs.load_run(config, RUN_ID, transport); a RunError prints f"[{code}] {message}" and exits 1. Prints each load notice, then the last narration (narration table, highest turn) or 'Rea… | as_engine/cli.py | `as_engine/cli.py` | `contract/p07_slice/test_cli.py`, `contract/p10_world/test_background.py` |
 | CLI-04 | CLI-04 replay RUN_ID asyncio.run(service.replay.resimulate(config, RUN_ID)); a RunError prints f"[{code}] {message}" and exits 1. One line per entry: f"turn {n}: same", or f"turn {n}: DIFFERENT ({problem or 'state hash'… | as_engine/cli.py | `as_engine/cli.py` | — |
+| CLI-05 | CLI-05 new-run PC_REF [--difficulty D] [--era E] [--detail T] [--days N] [--seed S] [--fake] (P10) A generated world. --difficulty / --era / --detail take the Difficulty / Era / WorldDetail values (argparse choices, so… | as_engine/cli.py | `as_engine/cli.py` | `contract/p10_world/test_new_life.py` |
 
 ## CNT
 
@@ -171,16 +184,18 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CNT-02 | placeholder bodies: two people, factions, lore entries or quirks in one pack that become identical once digits are masked ("boilerplate plus an index") | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/core/infected/quirks.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-03 | duplicate ids across packs without an explicit `overrides:` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-04 | a ref that points at nothing (with a "Did you mean …?" when one is close) | 09_CONTENT_PACKS §9 | `as_engine/action/cascade.py`, `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-05 | a cue (trained response, knowledge cue, lore belief cue, affordance belief cue, quirk trigger) missing from every cue registry | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
+| CNT-05 | a cue (trained response, knowledge cue, lore belief cue, affordance belief cue, quirk trigger) missing from every cue registry | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_wet_strain.py` |
 | CNT-06 | an affordance whose effect id the engine does not have | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/mind/affordance.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-07 | lore without truth and belief; a faction without truth_text and belief_text | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/templates/faction_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-08 | "sotry" anywhere (error); retired names from the GLOSSARY tombstones (warning) | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-09 | a plausibility expression that does not parse | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/world/worldgen/conditions.py` | `contract/p02_space_bodies/test_conditions_parse.py`, `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
+| CNT-09 | a plausibility expression that does not parse | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/world/worldgen/conditions.py` | `contract/p02_space_bodies/test_conditions_parse.py`, `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_params.py` |
+| CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/people.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/cheats/commands.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-13 | an infected type listing a quirk that is not written for it, or an override that changes which creature a type or quirk id means | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-14 | a `generation: cheat` dossier outside a pack whose id starts with `cheat_` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/cheat_admin/actors/fredrick.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
+| CNT-15 | a faction's `behaviour.council.seats` naming a seat none of its leaders holds, or two leaders sharing one seat | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p10_world/test_ghosts.py` |
+| CNT-16 | a quip key that names no plan, phase or sub-phase of the loading bar; a quip line that is empty or longer than 80 characters | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/content.py`, `as_engine/service/progress.py`, `as_content/packs/core/ui/quips.yaml` | `contract/p10_world/test_progress.py` |
 
 ## CONFLICT
 
@@ -197,7 +212,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | CONSERVE-01 | *Conservation (CONSERVE-01, L11): a transfer never changes sum(qty) per def_ref; creation only via* | as_engine/physical/objects.py | `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py` |
 | CONSERVE-02 | *Location rule (CONSERVE-02, enforced by the items CHECK constraint): an item is held by exactly one* | as_engine/physical/objects.py | `as_engine/physical/objects.py` | — |
-| CONSERVE-04 | CONSERVE-04 — the materialise step itself is P10). | 06_WORLD §2.1 | `as_engine/society/population.py` | `contract/p09_society/test_population.py` |
+| CONSERVE-04 | CONSERVE-04 — the materialise step itself is P10). | 06_WORLD §2.1 | `as_engine/society/population.py`, `as_engine/world/factions.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/polity.py` | `contract/p09_society/test_population.py`, `contract/p10_world/test_materialise.py` |
 
 ## CROWD
 
@@ -219,15 +234,6 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DEATH-04 | *Death test (DEATH-01..05) runs whenever harm lands and at every progress step, for every body:* | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_bodies.py` |
 | DEATH-10 | *which is shown after the player explicitly clicks 'Show me everything' (DEATH-10).* | as_engine/service/death.py | `as_engine/service/death.py` | — |
 
-## DECAY
-
-| Id | Statement | Stated in | Enforced in | Tested by |
-|---|---|---|---|---|
-| DECAY-01 | *Log decay / Memory Fade (P10). [SALVAGE: verbatim shape]. Rules DECAY-01..05. Owner 'world.decay'.* | as_engine/world/decay.py | `as_engine/world/decay.py` | — |
-| DECAY-02 | *Log decay / Memory Fade (P10). [SALVAGE: verbatim shape]. Rules DECAY-01..05. Owner 'world.decay'.* | as_engine/world/decay.py | `as_engine/world/decay.py` | — |
-| DECAY-03 | *Log decay / Memory Fade (P10). [SALVAGE: verbatim shape]. Rules DECAY-01..05. Owner 'world.decay'.* | as_engine/world/decay.py | `as_engine/world/decay.py` | — |
-| DECAY-04 | *Log decay / Memory Fade (P10). [SALVAGE: verbatim shape]. Rules DECAY-01..05. Owner 'world.decay'.* | as_engine/world/decay.py | `as_engine/world/decay.py` | — |
-
 ## DEGRADE
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -238,8 +244,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| DEMO-01 | DEMO-01 demographic_issues(census, rules) -> list[str] [] when census.total <= R.demo_min_population (15). Otherwise the bands are grouped young = infant + child, youth = preteen + teen, adults = adult, elders = elder,… | as_engine/society/population.py | `as_engine/society/population.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p09_society/test_population.py` |
-| DEMO-02 | DEMO-02 Children are inhabitants: they get routines like everyone (society.routine: play in the daylight hours, sleep at night — never a day of only 'sleep'), so they are seen in ordinary, non-threat contexts. | as_engine/society/population.py | `as_engine/society/population.py`, `as_engine/society/routine.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p09_society/test_population.py`, `contract/p09_society/test_routine.py` |
+| DEMO-01 | DEMO-01 demographic_issues(census, rules) -> list[str] [] when census.total <= R.demo_min_population (15). Otherwise the bands are grouped young = infant + child, youth = preteen + teen, adults = adult, elders = elder,… | as_engine/society/population.py | `as_engine/society/population.py`, `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/polity.py` | `contract/p09_society/test_population.py` |
+| DEMO-02 | DEMO-02 Children are inhabitants: they get routines like everyone (society.routine: play in the daylight hours, sleep at night — never a day of only 'sleep'), so they are seen in ordinary, non-threat contexts. | as_engine/society/population.py | `as_engine/society/population.py`, `as_engine/society/routine.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/polity.py` | `contract/p09_society/test_population.py`, `contract/p09_society/test_routine.py` |
 | DEMO-03 | DEMO-03 A settlement of only military-age adults must cite a reason. demographic_issues does not know reasons; worldgen (P10) records the history event that excuses the issue. | as_engine/society/population.py | `as_engine/society/population.py` | `contract/p09_society/test_population.py` |
 | DEMO-04 | DEMO-04 census(store, settlement_id) -> Census Census(settlement_id, named: tuple of actor ids sorted, by_band: dict AgeBand value -> int with EVERY AgeBand value as a key (named + unnamed), unnamed: int (sum of cohort… | as_engine/society/population.py | `as_engine/society/population.py` | — |
 
@@ -251,7 +257,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DET-02 | DET-02** (re-simulation): re-running recorded turns with `ReplayTransport` reproduces | 03_DATA_MODEL §9 | `as_engine/kernel/events.py`, `as_engine/service/game_service.py`, `as_engine/service/replay.py`, `as_engine/service/runs.py`, `as_engine/turn/pipeline.py` | `contract/p00_substrate/test_hashing.py`, `contract/p08_ui_protocol/test_models_config.py`, `contract/p08_ui_protocol/test_settings_dev.py` |
 | DET-03 | *full response text so ReplayTransport can reproduce a turn byte for byte (DET-03).* | as_engine/lanes/calllog.py | `as_engine/lanes/calllog.py`, `as_engine/service/replay.py` | `contract/p01_lanes/test_calllog.py` |
 | DET-10 | *The only entropy door (L10, rule DET-10). Phase P0.* | as_engine/kernel/rng.py | `as_engine/kernel/rng.py` | `contract/p00_substrate/test_rng.py` |
-| DET-11 | *``as_engine`` (except lanes/ for HTTP timing) is forbidden (DET-11, AST-scanned).* | as_engine/kernel/rng.py | `as_engine/kernel/rng.py` | `contract/p00_substrate/test_boundaries.py`, `contract/p00_substrate/test_rng.py` |
+| DET-11 | *``as_engine`` (except lanes/ for HTTP timing) is forbidden (DET-11, AST-scanned).* | as_engine/kernel/rng.py | `as_engine/kernel/rng.py`, `as_engine/service/progress.py` | `contract/p00_substrate/test_boundaries.py`, `contract/p00_substrate/test_rng.py` |
 
 ## DISC
 
@@ -271,7 +277,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| DOS-01 | DOS-01), so a run keeps working if packs change later; on load the UI warns when the content hash | 03_DATA_MODEL §1 | `as_engine/mind/actor.py` | `contract/p02_space_bodies/test_scenario_loader.py`, `contract/p04_one_actor/test_actor.py` |
+| DOS-01 | DOS-01), so a run keeps working if packs change later; on load the UI warns when the content hash | 03_DATA_MODEL §1 | `as_engine/mind/actor.py` | `contract/p02_space_bodies/test_scenario_loader.py`, `contract/p04_one_actor/test_actor.py`, `contract/p10_world/test_materialise.py` |
 | DOS-02 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-03 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-04 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
@@ -302,6 +308,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | EFF-06 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 | EFF-07 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 
+## FAC
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| FAC-01 | FAC-01 Enclaves (B.enclave; worldgen WG-18 places one, WG-23 / WG-27 build it). enclave(store, group_id) -> str / None: the settlement_id of the group's settlement when its record has an enclave block, else None. An enc… | as_engine/world/factions.py | `as_engine/contracts/content.py`, `as_engine/society/settlement.py`, `as_engine/world/factions.py`, `as_engine/world/hordes.py`, `as_engine/world/infected.py`, `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/placement.py`, `as_engine/world/worldgen/polity.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_hordes.py` |
+| FAC-02 | FAC-02 The council (B.council). The seats of B.council.seats meet every B.council.every_days days at B.council.hour — the first meeting on the first day d >= 1 with d % every_days == 0 — for B.council.hours hours, at th… | as_engine/world/factions.py | `as_engine/contracts/content.py`, `as_engine/world/factions.py` | `contract/p10_world/test_ghosts.py` |
+| FAC-03 | FAC-03 The route watch (B.route_watch; Ghosts_6: route-watch operators see movement before movement becomes a problem). sighted(tx, horde_id, at, turn_index, cause) -> list[Event]: world.hordes | as_engine/world/factions.py | `as_engine/world/factions.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_ghosts.py` |
+| FAC-04 | FAC-04 DECON (B.decon; Ghosts_6: "If any Ghost is confirmed killed by human action, DECON retaliation triggers ... Full DECON requires Black Top Hat approval and typically Council awareness" — so the council orders it).… | as_engine/world/factions.py | `as_engine/contracts/content.py`, `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py` |
+| FAC-05 | FAC-05 Where the decon team goes (world.worldmove OPS-02 for kind 'decon'; the killer = operations.target_id): at 'arrive' the team goes where the killer IS now (world.hordes.target(its place)); the killer outside the a… | as_engine/world/factions.py | `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py` |
+| FAC-06 | FAC-06 Nothing here makes a Ghost appear where nobody could be: teams are materialised at the enclave (from its counted people, CONSERVE-04) and walk there like any operation. | as_engine/world/factions.py | `as_engine/world/factions.py` | — |
+
 ## GATE
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -330,11 +347,11 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| GEO-00 | *Geometry model (one authority, rule GEO-00): the store. Places form a graph; portals are the edges.* | as_engine/physical/space.py | `as_engine/physical/space.py` | `contract/p02_space_bodies/test_space.py` |
+| GEO-00 | *Geometry model (one authority, rule GEO-00): the store. Places form a graph; portals are the edges.* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/region.py` | `contract/p02_space_bodies/test_space.py`, `contract/p10_world/test_region.py` |
 | GEO-01 | *'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact/damaged}.'* | as_engine/mind/perception.py | `as_engine/mind/perception.py`, `as_engine/narration/location.py`, `as_engine/physical/space.py`, `as_content/packs/core/affordances/portals.yaml` | `contract/p02_space_bodies/test_space.py`, `contract/p07_slice/test_location_view.py` |
 | GEO-02 | *Body clearance (GEO-02, used by ``admits``):* | as_engine/physical/space.py | `as_engine/physical/space.py` | — |
-| GEO-03 | *Discovery (PLMP carried, rule GEO-03; built in P10 with worldgen — scenario fixtures already* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_content/packs/core/buildings/commercial.yaml` | — |
-| GEO-04 | *Fall damage at discovery (GEO-04, WG-32): when places.held = 0, after creating rooms: every* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_content/packs/core/buildings/commercial.yaml`, `as_content/packs/core/loot/tables.yaml` | — |
+| GEO-03 | GEO-03/04 (P10): the building's rooms, portals, containers and loot, the first time (see the | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/region.py`, `as_content/packs/core/buildings/commercial.yaml` | `contract/p10_world/test_discovery.py`, `contract/p10_world/test_region.py` |
+| GEO-04 | *3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_content/packs/core/buildings/commercial.yaml`, `as_content/packs/core/loot/tables.yaml` | `contract/p10_world/test_discovery.py` |
 
 ## GRP
 
@@ -397,8 +414,31 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | HOR-01 | HOR-01 horizon(tx, pc_intent, t0) -> int (the end of the simulation window, ms) The PC's def is looked up in canon (tx.canon.find('affordance', def_id)). condition-ended (duration.condition_ended: watch, wait, guard…):… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
 | HOR-02 | HOR-02..04 pull(horizon_ms, trigger_at, last_event_at) -> int min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at)). When the PC holds a MATERIAL percept (action.reactions.material_holders) at trigger_at, th… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| HOR-03 | *horizon). Rules SEL-01..06, HOR-01..04. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| HOR-03 | *horizon). Rules SEL-01..06, HOR-01..04, SKULL-10. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | HOR-04 | *(HOR-03: G04 must hold), and a pull never lengthens the window (HOR-04). The pipeline applies* | as_engine/turn/select.py | `as_engine/turn/select.py` | — |
+
+## HRD
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| HRD-01 | HRD-01..17; fidelity E01-E03, W04). Per-difficulty / per-era keys are Difficulty / Era values. | as_engine/contracts/settings.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-02 | HRD-02 seed_pools(tx, params, at) -> list[Event] (worldgen WG1 step 5; origin 'worldgen', turn 0) v = world.worldgen.params.flat_values(params). Per zone (by zone_id): a region zone: base = atlas.ZONE_INFECTED[kind], sc… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_hordes.py` |
+| HRD-03 | HRD-03 Hordes: hordes {horde_id (kind 'hrd'), kind 'drift' / 'drawn' / 'mega', composition, zone_id (the zone of its place), place_id (the hub, road or site it is in), route (JSON list: the places still to walk, in orde… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-04 | HRD-04 form(tx, kind, zone_id, composition, to_place, at, turn_index, cause, *, props=None, first_leg_ms=None) -> str Takes the composition from zone_id's ACTIVE dead (change(..., -n, 0, 'horde') per type; too few -> Va… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-05 | HRD-05 step(tx, rng, row, fired, turn_index) -> list[Event] (the HORDE_STEP handler) h = the horde; missing or 'gone' -> []. at = row.due_at, cause = fired.event_id; area = turn.select.active_area(tx, meta.pc_actor_id,… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-06 | HRD-06 Straggle and rally at a hub: per type (TYPES order) k = floor(its count x H.straggle) fall behind into the hub zone's pool (change(..., +k, 0, 'straggled')); then a 'drift' or 'mega' horde gathers r = floor(the h… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-07 | HRD-07 promote(tx, rng, horde_id, place_id, at, turn_index, cause) -> list[str] (contact: counts become bodies where the player is) present = living infected bodies positioned in place_id whose infected_state.horde_id i… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py`, `as_engine/world/infected.py` | `contract/p10_world/test_hordes.py` |
+| HRD-08 | HRD-08 press(tx, rng, horde_id, settlement_id, at, turn_index, cause) -> Event (fidelity C01: the dead kill the living who are there) N = count; D = settlements.defences; pressure = N / (H.breach_scale x (1 + D)); p = m… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/factions.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_hordes.py` |
+| HRD-09 | HRD-09 draw(tx, place_id, source_db, at, turn_index, cause) -> str / None (E01: a loud noise draws a district's finite dead; action.propagate calls it for every NOISE whose source_db >= H.draw_db) z = the zone of place_… | as_engine/world/hordes.py | `as_engine/action/propagate.py`, `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-10 | HRD-10 day(tx, rng, at, turn_index, cause) -> list[Event] (world.worldmove.day step 6, after world.infected.day) 1 Lifecycle (E03; a Runner becomes a Shambler, never the reverse): per pool row holding runners (by zone_i… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-11 | HRD-11 census(store) -> dict (the LOD view: the developer panel and the cheats read it) {'pools': {zone_id: {type_id: [active, dormant]}} (zones with any dead), 'hordes': [{horde_id, kind, count, zone_id, place_id, stat… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-12 | HRD-12 calls it right after a Mega Horde forms. Per faction group (by group_id) with route_watch and an enclave: ROUTE_WATCH_REPORT {group_id, horde_id, gateway_hub, eta_at} (gateway_hub = the hub of the region zone its… | as_engine/world/factions.py | `as_engine/contracts/settings.py`, `as_engine/world/factions.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-13 | HRD-13 The signs, every WORLD_DAY while the mega horde is still at its entry hub: left = ceil((eta_at - at) / DAY); each sign once, in this order, recorded in props.signs (HORDE_SIGN {horde_id, sign} updating props): le… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/factions.py`, `as_engine/world/hordes.py`, `as_engine/world/rumours.py` | `contract/p10_world/test_hordes.py` |
+| HRD-14 | HRD-14 Passage. A mega horde arriving at a REGION zone's hub mills there for ceil(count / H.mega_throughput_per_day x 24) hours (props.until) and the zone is SATURATED: every place of the zone with parent_id NULL and in… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/factions.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-15 | HRD-15 Conservation (fidelity F04, tests check it): census(store)['total'] changes only by: the dead that rise (POOL_CHANGE reason 'risen'; world.infected.rise), cheat spawns (P12) and infected bodies destroyed. Every o… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-16 | HRD-16 The dead of the unnamed rise (E03). Whoever makes unnamed people die of something that leaves bodies (society.settlement privation: pathway 'cold_start'; HRD-08: 'wet') calls schedule_rise(tx, rng, zone_id, count… | as_engine/world/hordes.py | `as_engine/contracts/settings.py`, `as_engine/society/settlement.py`, `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-17 | HRD-17 Nothing here reads a mind or what the player knows. People learn of a horde by hearing it, seeing it or being told (NOISE, bodies in sight, rumours). | as_engine/world/hordes.py | `as_engine/world/hordes.py` | `contract/p10_world/test_hordes.py` |
+| HRD-18 | HRD-18 folds a body only where no living person is). | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/turn/timers.py`, `as_engine/world/hordes.py`, `as_engine/world/infected.py` | `contract/p10_world/test_hordes.py` |
 
 ## I-AS
 
@@ -432,16 +472,19 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| INF-01 | INF-01 types vs states are orthogonal (Shambler/Crawler/Runner/Lurker x dormant/starved/overfed/injured) | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-02 | INF-02 perception: shamblers hear (threshold from type def), near-blind (motion contrast <= 3 m); runners see shapes to 15 m; lurkers thermal in dark/enclosed spaces | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-03 | INF-03 energy: activity drains energy; energy 0 -> dormant; feeding restores energy, not mind | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-04 | INF-04 false death & reanimation window; true kill = brainstem/upper-spine junction or denaturing | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-05 | INF-05 infected do not attack other infected (except SHAM_BULLY_RUNNER quirk episodes) | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-06 | INF-06 lurker-infected victims are ignored by baseline infected (CMG §42 hard rule) | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-07 | INF-07 infection pathways from content (air/wet/lurker_deep/cold_start); no cure (CMG §42.2); wet-strain hosts become lower-salience to baseline infected after ~week 3 | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-08 | INF-08 quirks are seeded per body (rng stream 'quirks'): same seed -> same quirks | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-09 | INF-09 noise steering: INFECTED_DRIFT toward sources above hearing threshold | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
-| INF-10 | INF-10 lifecycle: Runner -> Shambler/Crawler allowed; never upward (CMG §42.17) | as_engine/world/infected.py | `as_engine/world/infected.py` | — |
+| INF-01 | INF-01 Types and states are orthogonal: states is a JSON list over dormant / starved / overfed / injured; the type is infected_state.type_id. | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-02 | INF-02 Senses: hearing = the type's hearing_threshold_db plus every state's hearing_threshold_delta_db (threshold()); sight = sees(). | as_engine/world/infected.py | `as_engine/action/propagate.py`, `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-03 | INF-03 Energy, the metabolic budget (P10: by time, not by step): being active costs 1 energy per R.energy_period_s[type] seconds (60 when unlisted) — an hour banging on a door tires a body as much as an hour walking; st… | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_infected.py` |
+| INF-04 | INF-04 False death and reanimation are physical.bodies' (a false-dead body is 'unconscious' and takes no steps); the dead that RISE are this module's (rise). | as_engine/world/infected.py | `as_engine/physical/bodies.py`, `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-05 | INF-05 An infected never targets an infected body. | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-06 | INF-06 A body with a 'lurker_deep' infections row past its first stage is never a target. | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-07 | INF-07 A body with a 'wet' infection at least R.wet_ignore_after_h hours old is not SEEN as prey (sound still draws infected to where it is). | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-08 | INF-08 Quirks are seeded per body (seed_quirks, stream 'quirks'): the same seed gives the same quirks to the same body. | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-09 | INF-09 Noise steers: a sound above a body's threshold makes it walk toward the sound's place (attract, called by action.propagate). | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-10 | INF-10 Lifecycle: a Runner becomes a Shambler or a Crawler after R.runner_degrade_days; never the reverse (CMG §42.17). | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_infected.py` |
+| INF-11 | INF-11 Infected in a place come from its zone's danger the first time a person arrives (populate). | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_infected.py` |
+| INF-12 | INF-12 The same rules run everywhere: an INFECTED_STEP timer moves a body one leg at a time, in a turn's window or off-screen alike. | as_engine/world/infected.py | `as_engine/physical/space.py`, `as_engine/world/infected.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/infected/states.yaml` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_infected.py` |
+| INF-13 | INF-13 (P10) A crowd breaks what one body only bangs on. After a bang (step 1): when at least R.push_min living infected bodies (b included) stand in b's place within 2 m of the portal's point on this side, and the port… | as_engine/world/infected.py | `as_engine/action/propagate.py`, `as_engine/physical/space.py`, `as_engine/world/infected.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_hordes.py` |
 
 ## INFO
 
@@ -452,8 +495,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INFO-03 | *Rumours (P9). Owner 'world.rumours' (rumours). Rules INFO-01..07. docs/as/06_WORLD.md §6.* | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-04 | INFO-04 holders(store, rumour_id) -> list[tuple[str, int]]: (holder_id, confidence) of every live believed holding on the rumour's (subject_type, subject_id, predicate), sorted by holder_id. | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-05 | INFO-05 spread_day(tx, group_id, at, turn_index, cause_event_id) -> list[Event] (society.group.day calls it.) For each rumours row (by rumour_id) with created_at > at - R.rumour_quiet_days * DAY: tellers = the living me… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
-| INFO-06 | INFO-06 Distortion (the RUMOUR_DISTORT model call: drop a detail, shift an attribution, sharpen an emotion, add an inference — never invent an entity) needs background cognition and arrives in P10; P9 hops pass the word… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
-| INFO-07 | INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3) -> str (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed theft, CAS-013 for an off-screen death — and anythin… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | — |
+| INFO-06 | INFO-06 Retelling (P10; service/background.py runs the RUMOUR_DISTORT calls between turns): what a holder passes on is their own version. retell(tx, rumour_id, holder_id, answer, at, turn_index) -> Event / None: answer… | as_engine/world/rumours.py | `as_engine/service/background.py`, `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py`, `contract/p10_world/test_background.py` |
+| INFO-07 | INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type='body') -> str (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed theft, CAS-013 for an off-sc… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | — |
 
 ## INT
 
@@ -524,7 +567,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..14, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
+| LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..16, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 
 ## MEM
 
@@ -535,7 +578,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | MEM-03 | MEM-03 writeback_groups(packets: dict[holder_id, AftermathPacket]) -> list[list[holder_id]] Holders may share ONE writeback call only when nothing in their packets is private (own_action_text None, no open_loops, no rel… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | MEM-04 | MEM-04 episode always (even when every other item was dropped): EPISODE_WRITTEN (writer 'mind.memory', actor_id = holder, cause_event_id = the event of the first percept row in handle order whose event_id is a committed… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | MEM-05 | MEM-05 beliefs per belief, in order: perception.infer(holder, about = ('body', the entity's id) / ('self', None) / ('place', None), text = claim, confidence, because = the cited percept ids). | as_engine/mind/memory.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| MEM-06 | MEM-06 anchor 1 when salience >= 90, or when a percept of the packet is of a DEATH or FALSE_DEATH event (the holder cannot tell them apart) whose source is a body the holder is bonded to: a relationships row from the ho… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| MEM-06 | MEM-06 anchor 1 when salience >= 90, or when a percept of the packet is of a DEATH or FALSE_DEATH event (the holder cannot tell them apart) whose source is a body the holder is bonded to: a relationships row from the ho… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_background.py` |
 | MEM-07 | MEM-07 relationships mind.mind.relate(holder, the entity's id, axis, delta, cause = the cited percept's event_id — percept_log.event_id, which may be a 'scene:N' reference). new_loops mind.mind.open_loop(holder, kind, t… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | MEM-08 | MEM-08 The PC gets writeback exactly like everyone else (L12): its episodes feed the Journal and the recap. | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py` |
 | MEM-09 | MEM-09 Nothing here reads another mind or the truth layer: every id apply_writeback uses comes from this holder's packet handles, and build_aftermath reads only this holder's rows plus its own ACTION_START / SPEECH even… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
@@ -579,6 +622,19 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | OBJ-05 | *Firearms (OBJ-05): a magazine-fed firearm item's props = {"chambered": bool}; its magazine is an* | as_engine/physical/objects.py | `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py` |
 | OBJ-06 | *Carried mass (OBJ-06): sum(mass_g x qty) / 1000 over everything held by the body in any slot,* | as_engine/physical/objects.py | `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py` |
 
+## OPS
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| OPS-01 | OPS-01) — lockdown(...) below sets it. lockdown(tx, settlement_id, on, reason, at, turn_index, cause) -> Event / None: society.settlement. set_lockdown (STL-13) — the one door shut, or open again. | as_engine/world/factions.py | `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_operations.py` |
+| OPS-02 | OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event] (the OPERATION_STEP handler) The operation (status 'active'; otherwise []). movers = participants alive and outside the active area (those in it are on-screen… | as_engine/world/worldmove.py | `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_operations.py` |
+| OPS-03 | OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>": every mover: rng.chance(world.hordes.density(the destination's zone) / 20) (P10: how thick the district's dead actually are — a cleare… | as_engine/world/worldmove.py | `as_engine/world/decay.py`, `as_engine/world/hordes.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_operations.py` |
+| OPS-04 | OPS-04 WORLD-03 (fidelity C11): evidence comes from what happened. An operation leaves the traces its own steps make (OPS-03) and nothing else; no share of off-screen events is required to leave one, and no clue is guar… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
+| OPS-05 | OPS-05 on_arrival(tx, rng, body_id, place_id, at, cause_event_id, turn_index) -> list[Event] (called after a MOVE into a new place by action.effects, society.routine, this module and world.worldgen; not for infected bod… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_discovery.py` |
+| OPS-06 | OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event] (the loyalty plan acted on) Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose created_at <= at - W.defect_after_day… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
+| OPS-07 | OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs (by wound_id) that i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
+| OPS-08 | OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *, target_id=None) -> str (OPS-01's daily plan and world.factions FAC-04 DECON) op_id = tx.mint('ops'); FACTION_OPERATION {op_i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_operations.py` |
+
 ## PARSE
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -596,6 +652,18 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | PORT-01 | *Portrayal audit (Stage 15, P11). Rules AUDIT-01, PORT-01..03, L13.* | as_engine/audit/portrayal.py | `as_engine/audit/portrayal.py` | — |
 | PORT-02 | *Portrayal audit (Stage 15, P11). Rules AUDIT-01, PORT-01..03, L13.* | as_engine/audit/portrayal.py | `as_engine/audit/portrayal.py` | — |
 
+## PROG
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| PROG-01 | PROG-01 Jobs: 'worldgen' (service.runs.create_run), 'turn' (turn.pipeline.run_turn), 'quiet_hours' (service.background.catch_up before a move) and 'time_skip' (sleeping or waiting a long while — P12 wires it). One Track… | as_engine/service/progress.py | `as_engine/contracts/protocol.py`, `as_engine/service/progress.py` | `contract/p10_world/test_progress.py` |
+| PROG-02 | PROG-02 Plans are fixed (PLANS below): kind -> tuple[Phase]; Phase(id, label, weight, subs: tuple[Sub(id, label)]). Weights of a plan sum to 100. Labels are plain words (UI-CLARITY-01: never an engine term). A turn's su… | as_engine/service/progress.py | `as_engine/contracts/protocol.py`, `as_engine/service/progress.py` | `contract/p10_world/test_progress.py` |
+| PROG-03 | PROG-03 Tracker(kind, job_id, push, *, dev=False, clock=None) (clock: seconds, a zero-argument callable; None -> the running asyncio loop's time(), read when a message is made — the clock turn_progress's elapsed_s alrea… | as_engine/service/progress.py | `as_engine/contracts/protocol.py`, `as_engine/service/progress.py` | `contract/p10_world/test_progress.py` |
+| PROG-04 | PROG-04 pct = the weights of the phases before this one + this phase's weight x f, where f = done / total when both are given (total > 0), else the sub's position (index / number of subs; 0 without subs); rounded to 1 d… | as_engine/service/progress.py | `as_engine/contracts/protocol.py`, `as_engine/service/progress.py` | `contract/p10_world/test_progress.py` |
+| PROG-05 | PROG-05 No leaks (normal mode). A progress message's detail is None unless dev is True (the run's dev_mode): step() drops it otherwise. No message says who is thinking, how many minds are, where anything is or what a ro… | as_engine/service/progress.py | `as_engine/contracts/protocol.py`, `as_engine/service/progress.py`, `as_content/packs/core/ui/quips.yaml` | `contract/p10_world/test_progress.py` |
+| PROG-06 | PROG-06 quips_for(canon, kind) -> dict[str, list[str]]: every canon 'quips' record's lines whose key starts with kind (keys: kind, f"{kind}.{phase}", f"{kind}.{phase}.{sub}"), merged over the packs in load order (a late… | as_engine/service/progress.py | `as_engine/contracts/content.py`, `as_engine/contracts/protocol.py`, `as_engine/service/progress.py`, `as_content/packs/core/ui/quips.yaml` | `contract/p10_world/test_progress.py` |
+| PROG-07 | PROG-07 (the UI's side, 10_UI.md) The bar shows every phase of the plan in order with the current one lit, the sub-phase label under it, and one quip: the most specific non-empty list for (kind, phase, sub), then (kind,… | as_engine/service/progress.py | `as_engine/service/progress.py` | — |
+
 ## PROMPT
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -610,7 +678,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | PROP-01 | *they carry no table writes). Rules PROP-01..04.* | as_engine/action/propagate.py | `as_engine/action/propagate.py` | — |
 | PROP-02 | *they carry no table writes). Rules PROP-01..04.* | as_engine/action/propagate.py | `as_engine/action/propagate.py` | — |
 | PROP-03 | *they carry no table writes). Rules PROP-01..04.* | as_engine/action/propagate.py | `as_engine/action/propagate.py` | — |
-| PROP-04 | * Infected attraction (PROP-04, P10): every NOISE among ``outcome_events`` whose received dB at* | as_engine/action/propagate.py | `as_engine/action/propagate.py` | — |
+| PROP-04 | * Infected attraction (PROP-04, P10): for every NOISE and SPEECH among ``outcome_events`` (seq* | as_engine/action/propagate.py | `as_engine/action/propagate.py` | — |
 
 ## PROTO
 
@@ -631,7 +699,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| REACT-01 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_content/packs/core/cues.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| REACT-01 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_content/packs/core/cues.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_infected.py`, `contract/p10_world/test_new_life.py` |
 | REACT-02 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | REACT-03 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 
@@ -680,16 +748,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RUN-01 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
-| RUN-02 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-03 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-04 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-01 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-02 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-03 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-04 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
 | RUN-05 | *service.runs.load_run, RUN-05). episodes_fts is a derived index kept by schema triggers,* | as_engine/kernel/store.py | `as_engine/kernel/store.py`, `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p07_slice/test_slice_refusal.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-06 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
+| RUN-06 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
 | RUN-07 | *P12: RUN-07.* | as_engine/service/game_service.py | `as_engine/service/game_service.py`, `as_engine/service/runs.py` | — |
-| RUN-08 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..10.* | as_engine/service/runs.py | `as_engine/service/runs.py` | — |
-| RUN-09 | *A reusable world: the genesis snapshot of a generated (or imported) world (RUN-09).* | as_engine/contracts/view.py | `as_engine/contracts/view.py`, `as_engine/service/game_service.py`, `as_engine/service/runs.py`, `as_engine/world/worldgen/pipeline.py` | — |
-| RUN-10 | *session with ``pack_dirs`` or the manifest's. RUN-10: every content ref the run uses* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
+| RUN-08 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | — |
+| RUN-09 | *A reusable world: the genesis snapshot of a generated (or imported) world (RUN-09).* | as_engine/contracts/view.py | `as_engine/contracts/view.py`, `as_engine/service/game_service.py`, `as_engine/service/runs.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-10 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
+| RUN-11 | *Worldgen path (P10, RUN-11); world_id reuse path (P12, RUN-09).* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p10_world/test_worldgen_pipeline.py` |
 
 ## SCENE
 
@@ -722,9 +791,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SEL-01 | SEL-01 active_area(tx, pc_id, turn_index) -> list[str] (sorted place ids) The PC's place, every place within 2 portal hops of it (physical.space.places_near(place, 2): walls and fences count as hops), and — for every NO… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| SEL-01 | SEL-01 active_area(tx, pc_id, turn_index) -> list[str] (sorted place ids) The PC's place, every place within 2 portal hops of it (physical.space.places_near(place, 2): walls and fences count as hops), and — for every NO… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_hordes.py` |
 | SEL-02 | SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=frozenset()) -> bool True when ANY of (a mandatory mind always gets a model call, even past the budget): * actor_id in ``forced`` (a pending r… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| SEL-03 | SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, bool] ``cands`` = the conscious candidates of this wave. Over this turn's percept rows (percept_log, turn_index == turn_index, ordered (at,… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| SEL-03 | SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, bool] ``cands`` = the conscious candidates of this wave. Over this turn's percept rows up to the wave (percept_log, turn_index == turn_index… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-04 | SEL-04 salience(flags, is_mandatory, weights) -> float sum(weights[flag] for true flags) + weights['mandatory'] when mandatory (SchedulerRules .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by act… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-05 | SEL-05 conscious(tx, actor_id) -> bool bodies.alive = 1 and awareness in ('awake', 'drowsy'). Only conscious candidates are planned, offered options, or asked to decide. | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-06 | SEL-06 The PC is never a candidate, never planned and never reacts: the player decides for the PC (the pipeline passes exclude={pc} to action.reactions.next_wave). | as_engine/turn/select.py | `as_engine/society/group.py`, `as_engine/society/routine.py`, `as_engine/turn/select.py` | `contract/p09_society/test_routine.py`, `contract/p09_society/test_work.py` |
@@ -748,23 +817,24 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SKULL-01 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p05_many_actors/test_telepathy.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_rumours.py` |
+| SKULL-01 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p05_many_actors/test_telepathy.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_rumours.py` |
 | SKULL-02 | *Import boundary (SKULL-02, BOUND-02): only these modules may import ``as_engine.kernel.truth``:* | as_engine/kernel/truth.py | `as_engine/kernel/truth.py`, `as_engine/mind/cues.py`, `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p00_substrate/test_boundaries.py`, `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-03 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-04 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-05 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p09_society/test_rumours.py` |
-| SKULL-06 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-07 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
-| SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
-| SKULL-09 | *Budget (SKULL-09): tokens = estimate_tokens(system + '* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_retrieval.py` |
+| SKULL-03 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-04 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-05 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p09_society/test_rumours.py` |
+| SKULL-06 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-07 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
+| SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
+| SKULL-09 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_retrieval.py` |
+| SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
 
 ## SOC
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SOC-01 | Worldgen seeds each settlement's relationship matrix about 20 % positive, 60 % strangers and 20 % rivals (P10, WG6). | 06_WORLD §2.6 | `as_engine/society/group.py`, `as_engine/world/worldgen/pipeline.py` | — |
+| SOC-01 | Worldgen seeds each settlement's relationship matrix about 20 % positive, 60 % strangers and 20 % rivals (P10, WG6). | 06_WORLD §2.6 | `as_engine/society/group.py`, `as_engine/world/worldgen/people.py` | — |
 | SOC-02 | Relationships between non-player people change while the PC is nowhere near: daily drift along households, crews and friendships, grudges souring, strain under short rations (§2.5). | 06_WORLD §2.6 | `as_engine/society/__init__.py`, `as_engine/society/group.py` | `contract/p09_society/test_group.py` |
-| SOC-03 | A rumour reaches trade: what a settlement's trader has heard and believes about a buyer changes the price or ends the deal (`trade_terms`, §2.4, §6). | 06_WORLD §2.6 | `as_engine/mind/mind.py`, `as_engine/society/__init__.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_rumours.py`, `contract/p09_society/test_settlement.py` |
+| SOC-03 | A rumour reaches trade: what a settlement's trader has heard and believes about a buyer changes the price or ends the deal (`trade_terms`, §2.4, §6). | 06_WORLD §2.6 | `as_engine/mind/mind.py`, `as_engine/society/__init__.py`, `as_engine/society/settlement.py`, `as_engine/world/worldgen/people.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_rumours.py`, `contract/p09_society/test_settlement.py` |
 
 ## STAND
 
@@ -779,7 +849,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | STL-01 | STL-01 daily_need(store, settlement_id) -> dict[str, float]: society.population.consumption( census, R) with every value multiplied by R.ration_mult[ration_level]. days_of(store, settlement_id, resource) -> float: store… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
 | STL-02 | STL-02 receive(tx, settlement_id, changes, reason, at, turn_index, cause_event_id) -> Event changes = {resource: amount} (amount may be negative). STORES_CHANGE {settlement_id, changes, after, reason}: each new value =… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
-| STL-03 | STL-03 day(tx, rng, row, fired, turn_index) -> list[Event] (the SETTLEMENT_DAY handler, daily at R.draw_hour). s = row['subject_id'], at = row['due_at']; everything below has cause = the SETTLEMENT_DAY event (SD) unless… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_settlement.py` |
+| STL-03 | STL-03 day(tx, rng, row, fired, turn_index) -> list[Event] (the SETTLEMENT_DAY handler, daily at R.draw_hour). s = row['subject_id'], at = row['due_at']; everything below has cause = the SETTLEMENT_DAY event (SD) unless… | as_engine/society/settlement.py | `as_engine/society/settlement.py`, `as_engine/world/worldmove.py` | `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_settlement.py`, `contract/p10_world/test_world_day.py` |
 | STL-04 | STL-04 declare_shortage(tx, settlement_id, resource, at, turn_index, cause_event_id) -> Event / None (cascade dispatch of SHORTAGE — core CAS-004.) Already short of it -> None. Else SHORTAGE {settlement_id, resource, da… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_settlement.py` |
 | STL-05 | STL-05 change_ration(tx, settlement_id, delta, reason, at, turn_index, cause_event_id) -> Event / None (cascade dispatch of RATION_CHANGE — core CAS-005.) new = clamp(level + delta, 0, 4); new == level -> None. RATION_C… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
 | STL-06 | STL-06 adjust(tx, settlement_id, field, amount, at, turn_index, cause_event_id, reason='cascade') -> Event / None: field in {'morale', 'cohesion', 'defences', 'sanitation', 'power'} (ValueError otherwise), new = clamp(o… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
@@ -789,6 +859,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | STL-10 | STL-10 settlement_of(store, entity_id) -> str / None: an id of kind 'stl' -> itself when it exists; 'wkp' -> workplaces.settlement_id; 'plc' -> the settlement whose place_id it is; 'hh' -> households.settlement_id, else… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
 | STL-11 | STL-11 trade_terms(store, settlement_id, buyer_id) -> TradeTerms (SOC-03: a rumour reaches trade) trader = the named member, not the buyer, whose controller is not 'human', with the highest fused-dossier 'trade' rank >=… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | `contract/p09_society/test_settlement.py` |
 | STL-12 | STL-12 ensure_timers(tx, settlement_id, at, turn_index) -> list[str]: no pending SETTLEMENT_DAY row for the settlement -> kernel.clock.schedule(tx, next_hour(at, R.draw_hour), 'SETTLEMENT_DAY', settlement_id, {'settleme… | as_engine/society/settlement.py | `as_engine/society/settlement.py` | — |
+| STL-13 | STL-13 set_lockdown(tx, settlement_id, on, reason, at, turn_index, cause_event_id) -> Event / None (P10, world.factions FAC-01) new = 1 when on else 0; new == settlements.lockdown -> None. Else SETTLEMENT_CHANGE {settle… | as_engine/society/settlement.py | `as_engine/society/settlement.py`, `as_engine/world/factions.py` | `contract/p10_world/test_ghosts.py` |
 
 ## STORE
 
@@ -851,12 +922,24 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | TIME-08 | *Rules TIME-06..10, CAS-06.* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | `contract/p09_society/test_timers_society.py` |
 | TIME-09 | *Rules TIME-06..10, CAS-06.* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | `contract/p09_society/test_timers_society.py` |
 | TIME-10 | *run_offscreen(tx, rng, until_ms, turn_index) -> list[Event] (TIME-10, the off-screen step)* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | — |
+| TIME-11 | *seed_world(tx, at, turn_index) -> list[str] (P10, TIME-11)* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | — |
+
+## TRACE
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| TRACE-01 | TRACE-01 create(tx, place_id, kind, text, source_event_id, at, turn_index, *, locked=False, decay_days=None) -> str trace_id = tx.mint('trc'); days = decay_days, else W.trace_decay_days[kind] when the kind is listed the… | as_engine/world/traces.py | `as_engine/world/traces.py` | `contract/p10_world/test_traces.py`, `contract/p10_world/test_world_day.py` |
+| TRACE-02 | TRACE-02 decay(tx, rng, row, fired, turn_index) -> list[Event] (the TRACE_DECAY handler) The trace named by the payload; gone already, or locked -> []. Else TRACE_DECAYED {trace_id, place_id, kind, reason: 'time'} (caus… | as_engine/world/traces.py | `as_engine/world/traces.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_traces.py`, `contract/p10_world/test_world_day.py` |
+| TRACE-03 | *Diegetic traces (P10). Owner 'world.traces' (traces). Rules WORLD-03, TRACE-01..06.* | as_engine/world/traces.py | `as_engine/world/traces.py` | `contract/p10_world/test_world_day.py` |
+| TRACE-04 | TRACE-04 traces_in(store, place_id) -> list[dict]: the place's traces, ordered (created_at, trace_id), as row dicts. | as_engine/world/traces.py | `as_engine/world/traces.py` | `contract/p10_world/test_traces.py`, `contract/p10_world/test_world_day.py` |
+| TRACE-05 | TRACE-05 What people perceive: mind.perception.compile_scene gives a holder in a place with light above 'dark' one visual percept per trace there (text = the trace text, source_id = the trace id) — the narrator and the… | as_engine/world/traces.py | `as_engine/mind/perception.py`, `as_engine/world/traces.py` | `contract/p10_world/test_traces.py`, `contract/p10_world/test_world_day.py` |
+| TRACE-06 | TRACE-06 washout(tx, at, turn_index, cause_event_id) -> list[Event] (world.worldmove.day step 1, after the day's weather) Only when world.decay.wet(tx): every trace (by trace_id) that is not locked, whose kind is in W.w… | as_engine/world/traces.py | `as_engine/world/traces.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
 
 ## UI-CLARITY
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| UI-CLARITY-01 | No engine vocabulary on any play screen: `packet, affordance, percept, LOD, claim, intent, handle, lane, schema, token, stage, event, actor, dossier` (whole words, any case, plural too). Exceptions: the Developer panel,… | 10_UI §1 | `as_engine/contracts/view.py`, `as_engine/service/view.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_location_view.py` |
+| UI-CLARITY-01 | No engine vocabulary on any play screen: `packet, affordance, percept, LOD, claim, intent, handle, lane, schema, token, stage, event, actor, dossier` (whole words, any case, plural too). Exceptions: the Developer panel,… | 10_UI §1 | `as_engine/contracts/view.py`, `as_engine/service/progress.py`, `as_engine/service/view.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_location_view.py`, `contract/p10_world/test_progress.py` |
 | UI-CLARITY-02 | No internal ids on screen (regex `\b(act | 10_UI §1 | — | `contract/p08_ui_protocol/test_protocol.py`, `contract/p08_ui_protocol/test_ui_fixtures.py` |
 | UI-CLARITY-03 | Every control has words: its text, or an `aria-label` (an icon-only button has an aria-label; a tooltip may repeat it) | 10_UI §1 | — | — |
 | UI-CLARITY-04 | Status is never colour-only (every coloured state also has a word) | 10_UI §1 | — | — |
@@ -897,49 +980,61 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | VIS-03 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 | VIS-04 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 
+## WEAR
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| WEAR-01 | WEAR-01 exposed(store, place_id) -> bool: places.indoor is 0 — a street, a road, an outdoor place, a building site's outside. An indoor place (a room, a building's inside) shelters what is in it. An unknown place -> Val… | as_engine/world/decay.py | `as_engine/contracts/settings.py`, `as_engine/world/decay.py` | `contract/p10_world/test_world_day.py` |
+| WEAR-02 | WEAR-02 wet(store) -> bool: world_clock.weather is 'rain', 'storm' or 'snow'. | as_engine/world/decay.py | `as_engine/contracts/settings.py`, `as_engine/world/decay.py` | `contract/p10_world/test_world_day.py` |
+| WEAR-03 | WEAR-03 day(tx, rng, at, turn_index, cause_event_id) -> list[Event] (world.worldmove.day calls it once the day's weather is set; ``rng`` is not drawn) 1 Weather, only when wet(tx): per item (by item_id) lying loose (ite… | as_engine/world/decay.py | `as_engine/contracts/settings.py`, `as_engine/world/decay.py` | `contract/p10_world/test_world_day.py` |
+| WEAR-04 | WEAR-04 made_at: physical.objects.create (P10 amendment) gives a food item whose def has food.spoil_days props.made_at = at, unless the props it was given already carry made_at (loot, production and cheats create throug… | as_engine/world/decay.py | `as_engine/physical/objects.py`, `as_engine/world/decay.py` | — |
+
 ## WG
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| WG-01 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-02 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-03 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-04 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-05 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-06 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-07 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-08 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
-| WG-10 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-11 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-12 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-13 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-14 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-15 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-16 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-17 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-18 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-19 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-20 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-21 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-22 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-23 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-24 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-25 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-26 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-27 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-28 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-29 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §Pipeline. Rules WG-10..30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-30 | *Worldgen never pre-scripts outcomes (who betrays, dies, befriends) — WG-30.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-31 | *(WG-31, carries the "730-day pin" bug ruling). Structure fate (WG-32): every building* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-32 | *Fall damage at discovery (GEO-04, WG-32): when places.held = 0, after creating rooms: every* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/pipeline.py` | — |
-| WG-33 | *PC survival history (WG-33, Batch-3 ruling #6): 3-5 history_events name the PC as subject* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WG-34 | *ValueError (WG-34: the fixture would put a person in a world they cannot be in).* | as_engine/testing/scenario.py | `as_engine/testing/scenario.py`, `as_engine/world/worldgen/params.py`, `as_engine/world/worldgen/pipeline.py`, `as_content/templates/actor_template.yaml` | — |
+| WG-01 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-02 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-03 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-04 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-05 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-06 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-07 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-08 | *Parameter generation WG0 (P10). Rules WG-01..09 (CMG §61 Parts III-VIII carried).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | `contract/p10_world/test_params.py` |
+| WG-10 | WG-10 eligible_factions(canon, values) -> list[tuple[str, FactionDossier]] (ref, record) for every canon faction record whose kind is 'faction', that has no behaviour.enclave, and whose presence.presence_conditions ALL… | as_engine/world/worldgen/placement.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_placement.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-11 | WG-11 place(rng, tx, values, pc, canon) -> Placement (Part X steps 1-4) t = pc.faction_start_type; E = eligible_factions(canon, values); density = values['faction_density']; pref = pc.start_constraints.faction_present_p… | as_engine/world/worldgen/placement.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_placement.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-12 | WG-12 descriptor(rng, tx, hostile) -> str (Part X step 3: [dynamic] + [location type] + [rule]) Three rng.choice draws on 'worldgen:placement' (purposes 'dynamic', 'location', 'rule') from atlas.GROUP_DYNAMICS / GROUP_L… | as_engine/world/worldgen/placement.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_placement.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-13 | WG-13 plausibility(values, placement, pc) -> 'pass' / 'fail' / 'hard_fail' (QC-2, sub-question 1) v = values + {'entity_type': placement.entity_type, 'start_trust': placement.start_trust or 0}. 'hard_fail' when pc.plaus… | as_engine/world/worldgen/placement.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_placement.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-14 | WG-14 qc(rng, tx, params, placement, pc, canon, difficulty) -> QCResult (Part XII + hard-fail protocol) QCResult(params, placement, result 'pass' / 'patched' / 'aborted', patches: list[str]). patches starts with generat… | as_engine/world/worldgen/placement.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-15 | WG-15 assert_region(store, region) -> None (raises WorldgenAssertion(stage 'WG1', ...)) Checks what was WRITTEN (the store), not the Region it was handed: every place of the region (hubs, sites, roads) is reachable from… | as_engine/world/worldgen/region.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-16 | WG-16 Every building site has layout_generated 0 and an archetype_ref; no room exists yet. | as_engine/world/worldgen/region.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-17 | *Gated worldgen pipeline (P10). docs/as/06_WORLD.md §1. Rules WG-10..37, WG-DET-01, RUN-09.* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-18 | WG-18 plan_polity(rng, tx, params, placement, region, canon) -> PolityPlan Ids are minted here (groups 'grp', settlements 'stl') so history can name them before WG3/WG4 write their rows. 1 Factions: E = placement.eligib… | as_engine/world/worldgen/history.py | `as_engine/world/factions.py`, `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/placement.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-19 | WG-19 skeleton(rng, tx, params, plan, region, tier) -> list[PlannedEvent] PlannedEvent(key, day, kind, subject_ids, cause_key, text). Mandatory events, in this order: the Fall: 'disaster', day 0, subjects [start zone id… | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-20 | WG-20 async write_history(client, tx, events, plan, region, params, at, progress=None) -> list[str] (P10: await progress(done, total) after each batch's answer — or failure — in batch order.) hist ids (kind 'his') minte… | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-21 | WG-21 mark_held(tx, plan, at) -> list[Event] (WG-32): every settlement site that is a building gets places.held = 1 — one PLACE_CHANGE {place_id, changes: {held: 1}, reason: 'history'} (writer 'physical.space') per site… | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-22 | WG-22 write_groups(tx, plan, params, canon, at) -> list[Event] (WG3) Per planned group (plan order) a MATERIALIZE (writer 'society.group') inserting groups {group_id, kind, name, content_ref, descriptor, presence, doctr… | as_engine/world/worldgen/polity.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/polity.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-23 | WG-23 write_settlements(rng, tx, plan, params, region, at) -> list[Event] (WG4) Per planned settlement s (plan order), P = s.population: stores: water = round(3 x P x (3 + water)), food = round(2 x P x (3 + food)) (days… | as_engine/world/worldgen/polity.py | `as_engine/world/factions.py`, `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/polity.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-24 | WG-24 write_cohorts(rng, tx, plan, params, at) -> list[Event] (WG5, DEMO-01/02) Per planned settlement (plan order), P = its population; shares young 0.20, youth 0.14, elders 0.11, each + rng.range_int(-3, 3, purpose f"… | as_engine/world/worldgen/polity.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/polity.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-25 | WG-25 write_laws(tx, plan, params, canon, at) -> list[Event] (WG7) Per settlement one MATERIALIZE (writer 'society.settlement', payload {settlement_id, laws: n}) inserting laws_active {settlement_id, law_ref, since = at… | as_engine/world/worldgen/polity.py | `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/polity.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-26 | WG-26 Pack actors. The canon actor records (not PCs), by ref. Skipped, and listed in the worldgen report with the reason, when: days_since_fall_range excludes dsf ("needs a world <a>-<b> years after the Fall", WG-34); o… | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-27 | WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actors, the home posts below + the leaders slot 2 needs) — the home's work and every settlement's leader always have someone. Slots are filled i… | as_engine/world/worldgen/people.py | `as_engine/world/factions.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py`, `as_content/packs/core/factions/ghosts.yaml` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-28 | WG-28 Writing (per person, slot order; pack actors first in placement order): the body, needs, a position at the settlement site's anchor, the dossier (source 'pack' with its content ref, or 'generated') and the actor (… | as_engine/world/worldgen/people.py | `as_engine/world/factions.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-29 | WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acquaintance of every other named person there (known_name = display name, description = mind.perception. describe_dossier) and known_places for… | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-30 | *the player is never decided here or anywhere in worldgen (WG-30).* | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/opening.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-31 | *them (P10). Rules WG-18..21, WORLD-01, WG-31, WG-32. docs/as/06_WORLD.md §1.3.* | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-32 | *3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-33 | *them right now, what they have heard, and what they remember (P10). Rules WG-30, WG-33, QC-4, QC-5.* | as_engine/world/worldgen/opening.py | `as_engine/world/worldgen/opening.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-34 | *A run setting, or a combination of settings, the world cannot honour (P10: WG-34).* | as_engine/kernel/errors.py | `as_engine/kernel/errors.py`, `as_engine/service/game_service.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/params.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py`, `as_content/templates/actor_template.yaml` | `contract/p10_world/test_params.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-35 | WG-35 assert_world(store, region, plan, opening) -> list[str] (plain sentences; [] = it holds) 1 "Fewer than three places worth the risk." unless len(opening.magnets) >= 3 and the PC holds a live, believed 'lead' propos… | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-36 | WG-36 The seven world checks name nothing from the story: which people will betray, die or befriend the player is never decided here or anywhere in worldgen (WG-30). | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-37 | WG-37 The continuous re-assertion of these invariants every in-game day is not built in v1 (P11's release audit re-runs assert_world on the genesis snapshot instead; DECISIONS D-45). | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py` | — |
 
 ## WG-DET
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| WG-DET-01 | *exactly once even if the value is later patched (determinism, WG-DET-01).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py` | — |
+| WG-DET-01 | *exactly once even if the value is later patched (determinism, WG-DET-01).* | as_engine/world/worldgen/params.py | `as_engine/world/worldgen/params.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_params.py`, `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
 
 ## WILL
 
@@ -979,8 +1074,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| WORLD-01 | *dual-layer text (truth + belief) per event; WORLD-01 every settlement/posture/shortage cites* | as_engine/world/worldgen/pipeline.py | `as_engine/world/worldgen/pipeline.py` | — |
-| WORLD-02 | *Off-screen motion (P10). Rules WORLD-02..06. Owner 'world.worldmove'.* | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
-| WORLD-03 | WORLD-03: >= 70% of off-screen events leave a discoverable TRACE; the narrator never writes | as_engine/world/worldmove.py | `as_engine/world/traces.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | — |
-| WORLD-04 | *Off-screen motion (P10). Rules WORLD-02..06. Owner 'world.worldmove'.* | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
-| WORLD-05 | *Off-screen motion (P10). Rules WORLD-02..06. Owner 'world.worldmove'.* | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
+| WORLD-01 | WORLD-01: every settlement and every placed group is a subject of at least one history event. | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/history.py` | — |
+| WORLD-02 | WORLD-02 Nothing here ticks by itself: WORLD_DAY (daily at W.world_hour) and OPERATION_STEP rows are event_queue rows (background types, kernel.clock) that turn.timers.seed_world starts and turn.timers fires, in a turn'… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
+| WORLD-03 | *Diegetic traces (P10). Owner 'world.traces' (traces). Rules WORLD-03, TRACE-01..06.* | as_engine/world/traces.py | `as_engine/world/traces.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p10_world/test_world_day.py` |
+| WORLD-04 | WORLD-04 The active area: off-screen code never kills, moves or sends away a body that stands in turn.select.active_area(tx, meta.pc_actor_id, turn_index) — what the player could see happen is simulated by the turn, not… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_world_day.py` |
+| WORLD-05 | WORLD-05 Named characters are not protected during play: an off-screen death can take anyone the player is not with. | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
+| WORLD-06 | WORLD-06 The narrator never writes 'while you were gone' (narration lint); the world shows it. | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |

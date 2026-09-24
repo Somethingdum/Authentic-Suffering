@@ -1,6 +1,7 @@
 """The region's dead in numbers, and the hordes (P10; fidelity E01 finite infected, E02 hordes as
-moving populations, E03 lifecycle accounting, W04 bounded exterior; the owner's Mega Horde). Owner
-'world.hordes' (infected_pools, hordes). Rules HRD-01..17. docs/as/06_WORLD.md §5.
+moving populations, E03 lifecycle accounting, W04 bounded exterior, F04 conserved promotion and
+demotion; the owner's Mega Horde). Owner 'world.hordes' (infected_pools, hordes). Rules HRD-01..18.
+docs/as/06_WORLD.md §5.
 
 Levels of detail (fidelity §5) — the dead exist in these forms and pass between them, never made
 or lost:
@@ -10,9 +11,11 @@ or lost:
   MOVING    HORDES: counted crowds walking hub to hub along the roads.
   EXTERIOR  four zones of kind 'exterior' past the region's edge (W04), each with one huge pool —
             the rest of the country's dead: large, but finite.
-A body is taken from a pool or a horde (its count goes down by one); a pool grows only from real
-sources — stragglers, a horde that breaks up or passes through, the district's own dead rising
-(E03). Nothing refills by itself: a cleared district stays clear until dead that exist walk in.
+A body is taken from a pool or a horde (its count goes down by one), and when the contact is over
+an anonymous, unhurt body folds back into its horde or its district's count (HRD-18); a pool grows
+only from real sources — stragglers, a horde that breaks up or passes through, bodies folding back,
+the district's own dead rising (E03). Nothing refills by itself: a cleared district stays clear
+until dead that exist walk in.
 
 H = RulesConfig().hordes (HordeRules); DAY = 86_400_000 ms, HOUR = 3_600_000, MIN = 60_000. TYPES =
 (world.infected.SHAMBLER, CRAWLER, RUNNER), in that order; a composition is a dict type_id -> count
@@ -99,9 +102,12 @@ HRD-07 promote(tx, rng, horde_id, place_id, at, turn_index, cause) -> list[str] 
   horde_id). HORDE_PROMOTED {horde_id, place_id, bodies: [the new ids], composition: what is left}
   updating the composition (nothing left -> status 'gone' and HORDE_GONE {reason: 'spent'}). Then
   per new body (in order): the first living, non-infected body in the place it sees
-  (world.infected.sees) -> world.infected.attract(reason 'sight'); else, when the horde still has
-  a route, attract(target = route[0], reason 'horde'). A body is never merged back into a count
-  (fidelity §5: it keeps its wounds and what it did). Returns the new body ids.
+  (world.infected.sees) -> world.infected.attract(reason 'sight'); else, when the horde was
+  'moving' as this call began (the last of a spent crowd walk on too) and has a route,
+  attract(target = route[0], reason 'horde') — a milling horde's bodies stay where they were
+  promoted: they are the crowd that fills the street, not an advance party. A body goes back into the count only by HRD-18 — anonymous, unhurt and out of
+  contact; a hurt one never does (fidelity F04: it keeps its wounds and what it did). Returns the
+  new body ids.
 HRD-08 press(tx, rng, horde_id, settlement_id, at, turn_index, cause) -> Event   (fidelity C01: the
   dead kill the living who are there)
   N = count; D = settlements.defences; pressure = N / (H.breach_scale x (1 + D)); p = min(0.95,
@@ -148,7 +154,8 @@ HRD-10 day(tx, rng, at, turn_index, cause) -> list[Event]   (world.worldmove.day
 HRD-11 census(store) -> dict   (the LOD view: the developer panel and the cheats read it)
   {'pools': {zone_id: {type_id: [active, dormant]}} (zones with any dead), 'hordes': [{horde_id,
   kind, count, zone_id, place_id, status, target_place}] (not gone, by horde_id), 'bodies': living
-  infected bodies, 'total': the dead in pools + hordes + bodies}.
+  infected bodies in the world (infected_state.folded_at NULL: a folded body is counted in the
+  count it went back to), 'total': the dead in pools + hordes + bodies}.
   density(store, zone_id) -> int: min(10, round(10 x the zone's active dead / H.density_full)) —
   the heat map of a district (it replaces the old encounter ratings wherever the world asks how
   thick the dead are: world.worldmove OPS-03).
@@ -200,8 +207,8 @@ HRD-14 Passage. A mega horde arriving at a REGION zone's hub mills there for cei
   HORDE_GONE — however it ends — calls passage(..., False, ..., the HORDE_GONE id).
 HRD-15 Conservation (fidelity F04, tests check it): census(store)['total'] changes only by: the dead
   that rise (POOL_CHANGE reason 'risen'; world.infected.rise), cheat spawns (P12) and infected
-  bodies destroyed. Every other move — populate, promote, draw, drift, disperse, straggle, rally,
-  pass — takes from one form exactly what it gives to another.
+  bodies destroyed. Every other move — populate, promote, fold, draw, drift, disperse, straggle,
+  rally, pass — takes from one form exactly what it gives to another.
 HRD-16 The dead of the unnamed rise (E03). Whoever makes unnamed people die of something that leaves
   bodies (society.settlement privation: pathway 'cold_start'; HRD-08: 'wet') calls
   schedule_rise(tx, rng, zone_id, count, pathway, at, turn_index, cause) -> str:
@@ -213,6 +220,34 @@ HRD-16 The dead of the unnamed rise (E03). Whoever makes unnamed people die of s
   'risen') each, cause fired.
 HRD-17 Nothing here reads a mind or what the player knows. People learn of a horde by hearing it,
   seeing it or being told (NOISE, bodies in sight, rumours).
+HRD-18 fold(tx, body_id, at, turn_index, cause) -> list[Event]   (fidelity F04 demotion: "demote
+  the survivors after the contact ends"; world.infected.step calls it before a step)
+  One of the dead goes back into a count when nothing about it is its own any more. [] — it stays a
+  body — unless ALL of: bodies.kind 'infected', alive 1, core_intact 1 and origin 'materialize'
+  (taken from a count by world.infected.populate or promote — never a risen corpse, a scenario's
+  body or a cheat's); infected_state.folded_at NULL and a positions row; no wounds row at all (a
+  hurt body is distinctive and keeps its wounds, F04); it grips nobody and nobody grips it
+  (physical.bodies.grips_on); it has nowhere of its own to be: its target_id is NULL, or its
+  horde_id names a horde that is not gone and the target is that horde's place_id or a place on
+  its route (it is walking with its crowd) — one hunting someone or drawn by a noise keeps walking
+  as a body until it gets there (F04 merges the anonymous dead only with a compatible
+  destination: the dead drawn by a shot three streets away must still arrive); no living body
+  that is not infected is in its place; and its place is not in turn.select.active_area(tx,
+  meta.pc_actor_id, turn_index) (where the player is keeps its detail; no PC, no active area).
+  Then, with type = infected_state.type_id and dormant = 'dormant' in its states:
+    its horde_id names a horde that is not gone -> HORDE_REJOINED {horde_id, body_id, type_id,
+      composition: the new one} (cause as given) updating the horde's composition (+1 of that
+      type);
+    else change(tx, zone, type, 0 if dormant else 1, 1 if dormant else 0, 'folded', at,
+      turn_index, cause) (zone = the zone of its place, up the parent chain);
+    then INFECTED_STATE {body_id, changes: {folded_at: at, target_id: None}, before} (writer
+    'world.infected', cause as given); kernel.clock.cancel of every pending INFECTED_STEP row of
+    the body (reason 'folded', cause the INFECTED_STATE id); physical.space.remove_body(tx,
+    body_id, at, the INFECTED_STATE id, turn_index).
+  Returns every event committed, in seq order. The body's row stays (its history is whole) and it
+  is never unfolded: a later contact takes a new body from the count (promote, populate). This is
+  what keeps a Mega Horde next to a living player finite in bodies: the street stays full while
+  the player can see it, and the dead who walk on out of sight go back into the crowd.
 """
 
 from __future__ import annotations
@@ -294,6 +329,10 @@ def density(store: "Store | Tx", zone_id: str) -> int:
 
 def schedule_rise(tx: "Tx", rng: "Rng", zone_id: str, count: int, pathway: str, at: int, turn_index: int,
                  cause: str | None) -> str:
+    raise NotImplementedError("P10")
+
+
+def fold(tx: "Tx", body_id: str, at: int, turn_index: int, cause: str | None) -> list["Event"]:
     raise NotImplementedError("P10")
 
 

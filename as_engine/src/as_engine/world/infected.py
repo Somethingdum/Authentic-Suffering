@@ -48,16 +48,19 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     body never breaks in; a crowd that knows someone is inside does, in time.
 
 active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, awareness not
-  'unconscious' (false-dead), an infected_state row, and 'dormant' not in states.
+  'unconscious' (false-dead), an infected_state row with folded_at NULL (P10: a body folded back
+  into a count is no longer in the world, world.hordes HRD-18), and 'dormant' not in states.
 threshold(store, body_id) -> float; speed(store, body_id) -> float: the type's speed_m_s x every
   state's speed_mult (0 when dormant).
 sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07)
   False unless the target is a living body whose awareness is not 'unconscious' (a sleeper lies in
   plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-07. Then the
   type's senses: distance (straight line, physical.space.point_distance) <= vision_range_m and
-  vision_mode 'motion_contrast' -> the target MOVEd or started an action (MOVE / ACTION_START with
-  actor_id = the target) in (at - R.motion_window_s s, at]; 'shape' and 'full' -> True; 'thermal' ->
-  the place's light_level <= 1 or it is indoor.
+  vision_mode 'motion_contrast' -> the target moved in (at - R.motion_window_s s, at]: a MOVE with
+  actor_id = the target, or an ACTION_START with actor_id = the target whose payload verb is not in
+  STILL_VERBS (standing still to watch, wait, keep guard, hide or talk is not movement — the one
+  way past a Shambler at arm's length); 'shape' and 'full' -> True; 'thermal' -> the place's
+  light_level <= 1 or it is indoor.
 
 attract(tx, body_id, target_id, at, cause_event_id, turn_index, *, reason) -> Event | None   (INF-03/09)
   ``target_id`` is a body id or a place id; reason in 'noise' | 'sight' | 'opening' | 'feed' |
@@ -77,7 +80,9 @@ attract(tx, body_id, target_id, at, cause_event_id, turn_index, *, reason) -> Ev
   body_id, 'leg': None}, the drift id).
 
 step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handler, INF-12)
-  b = payload.body_id, at = row.due_at, cause = fired. Not active -> [] (no new row).
+  b = payload.body_id, at = row.due_at, cause = fired. Not active -> [] (no new row). Then
+  world.hordes.fold(tx, b, at, turn_index, fired.event_id) (HRD-18): not empty -> the body went
+  back into its count; those events are returned and nothing else happens (no new row).
   1 Arrive: payload.leg {to_place, x_m, y_m, portal_id} (None -> skip): the portal (when there is
     one) must be open and admit the body (physical.space.admits) -> commit physical.space.move_event(
     tx, b, to_place, None, x_m, y_m, at, cause, turn_index); otherwise it has walked up to the portal
@@ -167,13 +172,13 @@ rise(tx, rng, row, fired, turn_index) -> list[Event]   (the REANIMATION handler 
   dead.)
 
 day(tx, rng, at, turn_index, cause_event_id) -> list[Event]   (world.worldmove.day calls it)
-  Every body with an infected_state row (by body_id): dormant -> energy + R.idle_recover_per_day
-  (cap 100); a Runner whose degrade_at <= at -> type_id = rng.choice(tx, 'infected',
-  f"degrade:{body}:type", [SHAMBLER, CRAWLER]) and degrade_at NULL (INF-10). One INFECTED_STATE per
-  body that changed.
+  Every body with an infected_state row whose folded_at is NULL (by body_id): dormant -> energy +
+  R.idle_recover_per_day (cap 100); a Runner whose degrade_at <= at -> type_id = rng.choice(tx,
+  'infected', f"degrade:{body}:type", [SHAMBLER, CRAWLER]) and degrade_at NULL (INF-10). One
+  INFECTED_STATE per body that changed.
 
 INFECTED_STATE {body_id, changes, before} updates infected_state columns states / energy /
-target_id / type_id / degrade_at / charged_at only.
+target_id / type_id / degrade_at / charged_at and (P10, world.hordes HRD-18) folded_at only.
 """
 
 from __future__ import annotations
@@ -185,6 +190,8 @@ if TYPE_CHECKING:
     from ..kernel.rng import Rng
     from ..kernel.store import Store, Tx
 
+# INF-02: actions that do not move the body, so motion-contrast eyes do not catch them (Verb values)
+STILL_VERBS: frozenset[str] = frozenset({"observe", "wait", "guard", "hide", "speak"})
 SHAMBLER = "ZOMBIE_ARCHETYPE_SHAMBLER01"
 CRAWLER = "ZOMBIE_ARCHETYPE_CRAWLER01"
 RUNNER = "ZOMBIE_VARIANT_ID_RUNNER01"

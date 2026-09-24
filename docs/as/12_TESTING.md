@@ -10,7 +10,7 @@ report it in `SPEC_ISSUES.md` (§9) — do not "fix" either side on your own.
 | **Contract** | `as_engine/tests/contract/pNN_*/` | the spec (protected) | every gate, every session | the spec, executable |
 | **Unit** | `as_engine/tests/unit/` | the builder | freely | your own finer-grained tests; add them generously |
 | **Sim** | `as_engine/tests/sim/` | the spec (protected) | P7+ gates, `-m slow` | multi-turn soak runs with the fake model (50–200 turns) and their re-simulation (DET-02) |
-| **UI** | `talemate_frontend/src/play/__tests__/` | the spec (protected) | P8+ gates | vitest + @vue/test-utils + jsdom: the store, the socket, the words and every P8 screen, fed protocol messages from `fixtures/*.json` (10 §7) |
+| **UI** | `talemate_frontend/src/play/__tests__/` | the spec (protected) | P8+ gates | vitest + @vue/test-utils + jsdom: the store, the socket, the words, every P8 screen and (P10) the New Life wizard, the Worldgen screen and the loading bar, fed protocol messages from `fixtures/*.json` (10 §7) |
 | **Plugin** | `tests/test_as_game_plugin.py` (fork root) | the spec (protected) | P8 gate | the route is registered; replies and pushes reach the socket; `hello` round-trips through the real service |
 | **Live** | `as_engine/tests/live/` | the spec | you, on your machines (`AS_LIVE=1`) | real models: probe, JSON compliance, latency, eval |
 
@@ -85,6 +85,50 @@ HARM plus the suture that stops the bleeding, then the cascade sweep), `heal`, `
 injury. `test_timers_society.py::test_det_01_*` runs the same settlement twice and compares
 every event and the world hash, so drift and animosity draws must come from the `society` rng
 stream in the documented order.
+
+### 3.3 The world tests (P10)
+
+`p10_world` has two kinds of world. Most tests use a **generated** one: `conftest.py` runs
+`service.runs.create_run` once per test session (Owen Marsh, Established, Normal, the smallest
+detail tier, seed 7, the fake model) and gives every test a private copy — `gw` is that run loaded
+(`runs.load_run`) as a `Session` with a fresh `FakeTransport` in `gw.extras['fake']`; `made_world`
+has the run and world ids and the `WorldgenReport`; `run_cfg` is an empty runs folder for tests
+that make their own runs. No test depends on WHICH world seed 7 makes, only on what every
+generated world must be. Where a test needs a small, exactly known place — the dead up close,
+a crowd on a door, the quiet hours' people and their memories, marks and the wet strain's signs —
+it uses the hand-made `metal_fence` scenario instead (the shared `scenario` fixture).
+
+`world_kit.py` (protected) holds the read helpers: `now`, `turn`, `one`, `all_rows`, `rows(s, type)`
+(committed events as dicts), `params`, `commit_json`, `place_of`, `place`, `settlement`, `holds`,
+`pc`, `area` (the PC's active area as `turn.select` sees it), `cause(tx, at)` (an OVERRIDE event to
+stand as a cause), `run(s, hours)` (the off-screen step, `turn.timers.run_offscreen`) and
+`tune(s, group={...})` (the run's rules with some numbers changed — e.g. a drift chance of 1.0 so a
+horde leaves today). Nothing in it scripts an outcome: a test sets up a cause (a noise, a death, a
+day passing) and reads what the world did.
+
+| File | What it proves |
+|---|---|
+| `test_params.py`, `test_placement.py`, `test_region.py` | WG0 draw for draw against `vectors/params.json`; faction placement, QC-2/3 and the hard-fail protocol; WG1 zones, roads and reachability against `vectors/region.json` |
+| `test_worldgen_pipeline.py` | the stages and their transactions, retries, fallbacks with both lanes down, the WG9 invariants, same seed → same world hash, cancel and refusal leave no folders, the run `create_run` makes; the fixture pack `packs/p10_hopeless` is a start no world can save |
+| `test_new_life.py` | `pcs_list`, `run_new` → the Worldgen screen → `run_loaded`, `worldgen_cancel`, the refusals, `as-engine new-run` (CLI-05), and moves played in the generated world through the 58-bit gate while the dead walk up the street |
+| `test_progress.py` | the loading bar: fixed plans, percent that never drops, estimates, no counts for a turn, developer detail only in developer mode, the quips (CNT-16) and the bars the service sends |
+| `test_discovery.py`, `test_traces.py`, `test_materialise.py` | a building's rooms laid out once when someone first arrives; marks and who can see them; a person taken from a cohort, never made from nothing (CONSERVE-04) |
+| `test_infected.py` | the dead up close: sight and hearing by kind, energy by time, feeding, a Runner's decline, rising (a NEW body, "what was left of"), one step at a time on screen and off |
+| `test_hordes.py` | the census and its conservation (HRD-15), pools, drifts, noise draws, bodies in sight and folding back out of it (HRD-07, HRD-18), a crowd on a door, breaches, the exterior pools and the Mega Horde from its first sign to its leaving |
+| `test_world_day.py`, `test_operations.py` | the world's day with nobody deciding: deaths from causes and noticed once, wear, marks fading; outings — who goes, where, what they bring back, what a raid leaves |
+| `test_wet_strain.py`, `test_ghosts.py` | the wet strain's living spreaders (saliva, signs, the week-3 compulsion, never for the PC); the Ghosts' enclave, council, route watch, lockdown and DECON |
+| `test_background.py` | the quiet hours: who reflects and why, retelling, every job of a boundary done before the next move whatever the player's reading speed, nothing thought twice, replay re-commits them (BG-01..07) |
+
+Earlier protected files changed in P10: `p02_space_bodies/test_bodies.py` (a DEATH now carries
+`rise_pending` and schedules the rising), `p02_space_bodies/test_space.py` (a route never enters a
+place twice, D-69), `p08_ui_protocol/protocol_kit.py` (`pushed_after` leaves
+the loading bar's messages out; `bar_after` reads them), and — from playing generated worlds
+(DECISIONS D-63..D-66) — new tests in `p03_perception/test_perception.py` (how a move reads from
+where you are), `p04_one_actor/test_packet.py` (SKULL-10), `p04_one_actor/test_affordances.py` (a gap
+has nothing to close; the dead are not people; SKULL-10) and `p07_slice/test_location_view.py` (the
+receipt names a defence). Each pins a P10 line of an earlier module: a fresh build meets it at its
+own phase (13 §1 rule 4); a builder updating from the P9 kit meets it as a failing test of a
+finished phase and amends that function in P10.
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
@@ -181,7 +225,7 @@ Shipped scenarios (`tests/fixtures/scenarios/`):
 
 | File | Used by | What it sets up |
 |---|---|---|
-| `metal_fence.yaml` | P3–P7, P11, sim | the anchor scene: store, storeroom, office, alley, street; PC, Mara, Alice, June, Eli, Nita, the stranger; the gust timer |
+| `metal_fence.yaml` | P3–P7, P10, P11, sim | the anchor scene: store, storeroom, office, alley, street; PC, Mara, Alice, June, Eli, Nita, the stranger; the gust timer |
 | `fence_climb.yaml` | P7 ("Actions fail") | a yard, a 250 cm fence (obstacle class 5), Owen at its foot, a neighbour (stub) watching from the porch; the seed fails the first check |
 | `three_rooms_gunshot.yaml` | SKULL-01/04 | Room 1 (A with a pistol), Room 2 behind brick (B), Room 3 two walls away (C asleep) |
 | `crowd_accusation.yaml` | CROWD-01..05 | one open hall, PC + 8 listeners at varied distances, one observer 25 m away |
@@ -189,6 +233,10 @@ Shipped scenarios (`tests/fixtures/scenarios/`):
 | `empty_gun.yaml` | INTENT-03, HALLUC-01 | Reggie with an unloaded pistol facing Carl (a stub debtor); a believed-but-gone crowbar |
 | `pump_settlement.yaml` | P9 ECON-01, SOC-02, SOC-03 | a 24-person settlement (Pumpwell) with a water pump on two 12-hour shifts, a kitchen, a watch rota, twelve households with children and elders, laws, a quartermaster, and a feud (Jude and Amos) |
 | `two_skills.yaml` | WILL-03 | two identical Actors differing only in skills and Resolve, same room, same items |
+
+Fixture packs (`tests/fixtures/packs/`): `p10_hopeless` holds one character, Hal Brandt, whose
+hard-fail condition every world meets, so wherever the plausibility check applies (Bitch Mode
+through Realism) his start is refused plainly, and above it the world is made (WG-14, D-47).
 
 ## 6. The fake model (`testing/fake_lm.py`, implemented, protected)
 
@@ -217,8 +265,10 @@ to find the A-handle of an option in a packet, `percepts_of(store, holder_id, tu
   generator is implemented; the vectors were produced from it and checked against the reference
   xoshiro256** algorithm).
 - `tests/fixtures/vectors/jsoncanon.json`: inputs and exact canonical strings.
-- `tests/fixtures/vectors/acoustics.json`, `checks.json`, `optics.json`, `params.json`: hand-computed
-  expected values for the pure formulas (each entry shows its arithmetic in a `why` field).
+- `tests/fixtures/vectors/acoustics.json`, `checks.json`, `optics.json`: hand-computed expected
+  values for the pure formulas (each entry shows its arithmetic in a `why` field).
+- `tests/fixtures/vectors/params.json`, `region.json` (P10): WG0 and WG1 draw for draw for fixed
+  seeds, so a mismatch names the first wrong draw.
 - **DET-01** event-apply replay and **DET-02** re-simulation replay are contract tests in P0 and P7.
   DET-02 is `tests/sim/test_soak_metal_fence.py`: fifty turns, then `service.replay.resimulate`
   plays every recorded input again from the run's `turn0.sqlite` with the recorded model answers

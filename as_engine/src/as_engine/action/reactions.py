@@ -15,7 +15,11 @@ material_holders(tx, new_events, turn_index) -> list[tuple[str, int]]
     a TACTILE percept (the holder's own wound);
     a visual percept of a MOVE by a body the holder has no acquaintance known_name for, made by a
       run_to_anchor / flee / leave_place action (the MOVE's cause is an ACTION_START with that
-      def), ending within 20 m of the holder (a sentinel noticing a stranger).
+      def), ending within 20 m of the holder (a sentinel noticing a stranger);
+    (P10) a visual percept of a MOVE by an infected body (bodies.kind 'infected'), however made,
+      ending within 20 m of the holder (physical.space.distance_to_point): the dead coming near
+      are always news, and a watch ends when they do.
+  (Visual percepts count at level clear or partial, as the detail records them.)
   Returns (holder_id, trigger_at) pairs sorted by (trigger_at, holder_id), trigger_at = the
   earliest material percept's ``at`` for that holder. A holder whose own event is the trigger is
   never included (it knows what it did).

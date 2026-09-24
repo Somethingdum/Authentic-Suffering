@@ -6,9 +6,10 @@ audit.log.repair. docs/as/05_ACTORS.md §9.
 MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stage 13, gate G13)
   Exactly what the holder perceived this turn and nothing else — the same selection and handles as
   the Skull Packet (mind.packet; reuse its helpers, the two must agree):
-  percept rows  the holder's percept_log rows with this turn_index, except standing-view rows
-                (event_id 'scene:…') older than the holder's latest standing view of this turn,
-                ordered (at, percept_id).
+  percept rows  the holder's percept_log rows with this turn_index and at <= ``at`` (SKULL-10; at
+                stage 13 ``at`` is the end of the window, so every row of the turn), except
+                standing-view rows (event_id 'scene:…') older than the latest standing view among
+                them, ordered (at, percept_id).
   handles       S1..Sn over percepts and utterances together, in that order (one numbering);
                 P1..Pn bodies, each once, never the holder: the source_id of those rows when it is
                 a body, in row order, then bodies the holder has relationships rows toward (by

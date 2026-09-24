@@ -88,8 +88,9 @@ WORK-12 ensure_timers(tx, settlement_id, at, turn_index) -> list[str]
   For each workplace of the settlement (by workplace_id) with a non-NULL next_due_at and no
   pending PRODUCTION_CYCLE row: kernel.clock.schedule(tx, max(next_due_at, at),
   'PRODUCTION_CYCLE', workplace_id, {'workplace_id': workplace_id}, None). Returns the queue ids.
-Lots for settlement goods (provenance, theft, adulteration) arrive with trade (P10); P9 stores are
-  counted units in settlements.stores.
+Lots for settlement goods (provenance, theft, adulteration) are backlog, not v1 (DECISIONS D-49):
+  settlement stores are counted units in settlements.stores, and P10's trade runs and raids move
+  those counts.
 """
 
 from __future__ import annotations

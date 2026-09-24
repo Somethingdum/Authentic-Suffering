@@ -89,8 +89,9 @@ GRP-11 Standing — the world's memory of you — lives in group_standing (this 
 GRP-12 ensure_timers(tx, group_id, at, turn_index) -> list[str]: no pending GROUP_DAY row for the
   group -> kernel.clock.schedule(tx, society.settlement.next_hour(at, R.group_hour), 'GROUP_DAY',
   group_id, {'group_id': group_id}, None). Returns the new queue ids.
-Leadership challenges, splintering and coalitions ride on the same tension and pressure numbers
-and arrive with world motion (P10).
+Leadership challenges, splintering and coalitions would ride on the same tension and pressure
+numbers; they are backlog, not v1 (DECISIONS D-49). P10 brings leaving a group (world.worldmove,
+DEFECTION).
 """
 
 from __future__ import annotations

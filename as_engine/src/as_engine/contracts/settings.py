@@ -231,8 +231,9 @@ class WorldRules(Strict):
     })  # in the open; under a roof x sheltered_trace_mult (TRACE-01)
     sheltered_trace_mult: float = 4.0     # [SAND] a mark indoors lasts this many times longer
     washes_out: tuple[str, ...] = ("tracks", "blood", "smoke")   # rain, storm or snow erases outdoors
-    # Retired by the P10 fidelity revision (C01 no death lottery, C11 no trace quota): nothing reads
-    # these; they stay only so a run made before it still loads its frozen rules.
+    # Retired by the P10 fidelity revision (C01 no death lottery, C11 no trace quota; DECISIONS D-52):
+    # nothing reads these — not even the P11 release audit; they stay only so a run made before it
+    # still loads its frozen rules.
     base_daily_mortality: dict[str, float] = Field(default_factory=lambda: {
         "bitch_mode": 0.0005, "easy": 0.001, "normal": 0.002, "realism": 0.004,
         "actually_hell": 0.008, "fuck_you": 0.016,

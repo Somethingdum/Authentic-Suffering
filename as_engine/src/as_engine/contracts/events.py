@@ -131,6 +131,7 @@ class EventType(StrEnum):
     TRACE_DECAYED = "TRACE_DECAYED"
     POPULATION_CHANGE = "POPULATION_CHANGE"
     MATERIALIZE = "MATERIALIZE"
+    DEMATERIALIZE = "DEMATERIALIZE"          # P10: a body folded back into a count leaves the world (physical.space.remove_body)
     INFECTED_DRIFT = "INFECTED_DRIFT"
     OFFSCREEN_DEATH = "OFFSCREEN_DEATH"
     INFECTED_STATE = "INFECTED_STATE"        # P10: world.infected changes an infected body's state / energy / target
@@ -138,6 +139,7 @@ class EventType(StrEnum):
     POOL_CHANGE = "POOL_CHANGE"              # P10: world.hordes changes a district's count of the dead
     HORDE_FORMED = "HORDE_FORMED"            # P10: world.hordes — a crowd of the dead sets off
     HORDE_MOVED = "HORDE_MOVED"
+    HORDE_REJOINED = "HORDE_REJOINED"        # P10: one of a horde's bodies folds back into its count (world.hordes HRD-18)
     HORDE_PROMOTED = "HORDE_PROMOTED"        # P10: counted dead become bodies where the player is
     HORDE_PRESSED = "HORDE_PRESSED"          # P10: a horde against a settlement's defences
     HORDE_SIGN = "HORDE_SIGN"                # P10: a sign of the Mega Horde, recorded once
@@ -193,8 +195,9 @@ _groups: dict[EventClass, list[str]] = {
                          "SHORTAGE_ENDED", "ROUTINE_STEP", "GROUP_DAY"],
     EventClass.WORLD: ["FACTION_OPERATION", "MIGRATION", "TRADE", "RAID", "CONSTRUCTION",
                        "INFRASTRUCTURE_FAIL", "TRACE_CREATED", "TRACE_DECAYED", "POPULATION_CHANGE",
-                       "MATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE", "WORLD_DAY",
-                       "POOL_CHANGE", "HORDE_FORMED", "HORDE_MOVED", "HORDE_PROMOTED", "HORDE_PRESSED",
+                       "MATERIALIZE", "DEMATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE",
+                       "WORLD_DAY", "POOL_CHANGE", "HORDE_FORMED", "HORDE_MOVED", "HORDE_REJOINED",
+                       "HORDE_PROMOTED", "HORDE_PRESSED",
                        "HORDE_SIGN", "HORDE_STATE", "HORDE_GONE", "COUNCIL_MEETING", "COUNCIL_ADJOURNED",
                        "ROUTE_WATCH_REPORT"],
     EventClass.SYSTEM: ["WORLDGEN_STAGE", "SCENE_START", "SCENE_END", "CLOCK_ADVANCE", "TIMER_SET", "TIMER_FIRED", "TIMER_CANCELLED",

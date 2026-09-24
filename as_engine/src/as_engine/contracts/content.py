@@ -123,6 +123,7 @@ class AffordanceRequires(Strict):
     posture_any: list[Posture] | None = None
     target_alive: bool | None = None
     target_kinds: list[str] | None = None
+    portal_kinds: list[str] | None = Field(default=None, description="Portal kinds this may bind to (physical gate), e.g. ['door', 'window', 'gate'] for closing; None = any portal the binding offers. An 'opening' has nothing to close, lock or bar (P10).")
     actor_kinds: list[str] | None = Field(default=None, description="Body kinds that may attempt this (physical gate), e.g. ['infected'] for bite; None = any kind that has hands for the option.")
 
 

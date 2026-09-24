@@ -1,4 +1,4 @@
-"""Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..09, WILL-00, WILL-C.
+"""Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.
 MUST NOT import as_engine.kernel.truth (SKULL-02, import-graph test). Reads only: the actor's
 own body, wounds, needs and inventory, its actors row and fused dossier, percept_log rows for
 this holder, its claim_holdings + propositions, its relationships / acquaintance / households /
@@ -11,10 +11,19 @@ build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=False) 
   (the affordance floor makes that impossible; failing loudly beats an empty menu).
   Budget key: 'reaction' when reaction=True, else lod.value ('hot' | 'warm').
 
+SKULL-10 (P10) Nothing later than the moment reaches a mind: a mind deciding at ``at`` knows only
+  its percepts with at <= ``at``. A wave's landings are written when the wave resolves (and a
+  timer's action with its landing, P10), so a later percept can be in the log before an earlier
+  reaction decides. Every reader of "this turn's percepts" for a decision at ``at`` reads the
+  percept_log rows with turn_index == turn_index AND at <= ``at``: this packet, mind.affordance
+  (known bodies and items, threats, the attention point), mind.retrieval (the moment set) and
+  turn.select (salience; mind.cues always did).
+
 Handles (never an internal id in anything rendered — SKULL-06 is tested over the rendered prompt):
-  S1..Sn  this holder's percept_log rows with turn_index == turn_index, ordered (at, percept_id),
-          EXCEPT standing-view rows (event_id starting 'scene:') older than the holder's latest
-          standing view of this turn (only the rows with the greatest ``at`` among them count: a
+  S1..Sn  this holder's percept_log rows with turn_index == turn_index and at <= ``at`` (SKULL-10),
+          ordered (at, percept_id),
+          EXCEPT standing-view rows (event_id starting 'scene:') older than the latest standing
+          view among those rows (only the rows with the greatest ``at`` among them count: a
           room described twice is shown once, as it is now); ONE numbering over perceived_now
           and utterances together.
   P1..Pn  bodies, each once, never the holder: (1) the source_id of those percepts, in percept

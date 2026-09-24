@@ -69,6 +69,15 @@ def spawn(w, place: str, type_id=SH, *, x=None, y=None, dormant=False) -> str:
         return infected.spawn(tx, w.rng, w.id(place), type_id, now(w), 0, None, x_m=x, y_m=y, dormant=dormant)
 
 
+def start(w, who: str, verb: str) -> None:
+    """Test setup: an ACTION_START by ``who`` with that verb (as action.resolve writes it)."""
+    with w.store.transaction() as tx:
+        tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", actor_id=w.id(who), at=now(w),
+                              turn_index=0, payload={"actor_id": w.id(who), "def_id": f"test_{verb}", "verb": verb,
+                                                     "target_id": None, "destination_id": None, "item_id": None,
+                                                     "est_duration_s": 0.0, "visible": True}))
+
+
 def state(w, b) -> dict:
     r = one(w, "SELECT * FROM infected_state WHERE body_id = ?", (b,))
     r["states"], r["quirks"] = json.loads(r["states"]), json.loads(r["quirks"])
@@ -209,6 +218,12 @@ def test_what_the_dead_see(scenario):
     assert not infected.sees(w.store, near, pc, now(w)), "still again"
     assert not infected.sees(w.store, run, w.id("june"), now(w)), "not through a wall"
     assert not infected.sees(w.store, run, near, now(w)), "INF-05: never its own kind"
+    # starting to watch, wait, keep guard, hide or talk moves nothing; reaching for something does
+    for verb in sorted(infected.STILL_VERBS):
+        start(w, "pc", verb)
+        assert not infected.sees(w.store, near, pc, now(w)), f"a {verb} action is standing still"
+    start(w, "pc", "manipulate")
+    assert infected.sees(w.store, near, pc, now(w)), "reaching for something is movement"
 
 
 def test_the_dead_and_the_senseless_are_not_prey(scenario):
@@ -229,6 +244,30 @@ def test_the_dead_and_the_senseless_are_not_prey(scenario):
         bodies.die(tx, w.rng, w.id("pc"), now(w), None, 0)
     assert not infected.sees(w.store, run, w.id("mara"), now(w))
     assert not infected.sees(w.store, run, w.id("pc"), now(w))
+
+
+def test_the_dead_coming_near_are_news(scenario):
+    """REACT-01 (P10): one of the dead moving to within 20 m, seen clearly or in part, is material to
+    whoever sees it, however it moved — a mind reacts and the PC's watch ends; the same move by a
+    living body with no run, flight or leaving behind it is not."""
+    from as_engine.action import reactions
+    from as_engine.mind import perception
+    w = stage(scenario, keep=("pc", "mara"))
+    put(w, "pc", "sales_floor", 2.0, 4.0)
+    put(w, "mara", "sales_floor", 3.0, 4.0)
+    b = spawn(w, "storeroom", SH, x=3.0, y=3.0)          # out of sight
+    later(w, 1)
+    with w.store.transaction() as tx:
+        dead = tx.commit_event(space.move_event(tx, b, w.id("sales_floor"), None, 10.0, 4.0, now(w), None, 0))
+        alice = tx.commit_event(space.move_event(tx, w.id("alice"), w.id("sales_floor"), None, 9.0, 5.0, now(w), None, 0))
+        for who in ("pc", "mara"):
+            perception.compile_aftermath(tx, w.id(who), [dead, alice], now(w), 0)
+        seen = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id = ? AND channel = 'visual'",
+                                       (dead.event_id,))}
+        assert seen == {w.id("pc"), w.id("mara")}, "both see it walk in"
+        assert reactions.material_holders(tx, [alice], 0) == [], "a walk that is no run, flight or leaving is not news"
+        got = reactions.material_holders(tx, [dead, alice], 0)
+    assert got == sorted([(w.id("mara"), dead.at), (w.id("pc"), dead.at)], key=lambda x: (x[1], x[0]))
 
 
 def test_the_infected_leave_their_own_alone(scenario):

@@ -96,7 +96,7 @@ check; when you stop, a check that **Next task** is filled and protected files a
 `as-build-loop` (the task loop in detail) · `as-failing-test` (triage) · `as-spec-issue` (how to
 report) · `as-store-events` (events, ownership, replay) · `as-content` (content packs and CNT
 codes) · `as-phase-gate` (gate report, evidence, PROGRESS.md) · `as-play-ui` (P8 only) ·
-`as-society` (P9 only).
+`as-society` (P9 only) · `as-world` (P10 only).
 
 ## 7. The human
 

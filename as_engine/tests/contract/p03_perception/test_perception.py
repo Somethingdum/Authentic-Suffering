@@ -294,6 +294,24 @@ def test_visible_events(scenario, rules):
     assert got == ["A figure ducks behind the shelving."]
 
 
+def test_how_a_move_reads_from_where_you_are(scenario):
+    """render MOVE without an anchor (P10 wording): leaving the watcher's place reads 'moves away',
+    coming into it 'arrives', and going between two other places the watcher can see into 'moves
+    into <place>' — never 'moves away' for someone who is coming."""
+    w = scenario("metal_fence")
+    t = now(w)
+
+    def seen(holder, ev):
+        return [w.store.query_one("SELECT text FROM percept_log WHERE percept_id = ?", (p,))[0] for p in after(w, holder, [ev])]
+    with w.store.transaction() as tx:
+        out = tx.commit_event(space.move_event(tx, w.id("june"), w.id("alley"), None, 3.0, 1.0, t, None, 0))
+    assert seen("nita", out) == ["June arrives."]
+    assert seen("stranger", out) == ["A woman moves into the rear alley."]
+    with w.store.transaction() as tx:
+        back = tx.commit_event(space.move_event(tx, w.id("mara"), w.id("storeroom"), None, 6.0, 1.0, t, None, 0))
+    assert seen("pc", back) == ["A woman moves away."]
+
+
 def test_harm_is_seen_by_others_and_felt_by_the_victim(scenario):
     from as_engine.contracts.common import Anatomy, WoundSeverity, WoundType
     from as_engine.physical import bodies

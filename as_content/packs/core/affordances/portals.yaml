@@ -6,7 +6,7 @@
   ui_label: "Open {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 1}
+  requires: {hands_free: 1, portal_kinds: [door, window, gate, vent, drain, curtain]}
   duration: {base_s: 1.5, per_meter_s: 0.71}
   noise_db: 40
   effect: open_portal
@@ -18,7 +18,7 @@
   ui_label: "Close {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 1}
+  requires: {hands_free: 1, portal_kinds: [door, window, gate, vent, drain, curtain]}
   duration: {base_s: 1.5, per_meter_s: 0.71}
   noise_db: 40
   effect: close_portal
@@ -30,7 +30,7 @@
   ui_label: "Lock {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 1, carried_item_tags: [key]}
+  requires: {hands_free: 1, carried_item_tags: [key], portal_kinds: [door, window, gate]}
   duration: {base_s: 3, per_meter_s: 0.71}
   noise_db: 35
   effect: lock_portal
@@ -42,7 +42,7 @@
   ui_label: "Unlock {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 1, carried_item_tags: [key]}
+  requires: {hands_free: 1, carried_item_tags: [key], portal_kinds: [door, window, gate]}
   duration: {base_s: 3, per_meter_s: 0.71}
   noise_db: 35
   effect: unlock_portal
@@ -54,7 +54,7 @@
   ui_label: "Pick the lock on {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 2, carried_item_tags: [lockpick], skill: {domain: mechanics, min_rank: 1}, skill_or_belief_cue: knows_lock_picking}
+  requires: {hands_free: 2, carried_item_tags: [lockpick], skill: {domain: mechanics, min_rank: 1}, skill_or_belief_cue: knows_lock_picking, portal_kinds: [door, window, gate]}
   duration: {base_s: 45, per_meter_s: 0.71}
   noise_db: 20
   check: {attribute: A, skill: mechanics, tags: [locksmith], resistance: portal.lock_quality}
@@ -67,7 +67,7 @@
   ui_label: "Barricade {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 2, mobile: true}
+  requires: {hands_free: 2, mobile: true, portal_kinds: [door, window, gate, hole, vent]}
   duration: {base_s: 30, per_meter_s: 0.71}
   noise_db: 55
   effect: barricade_portal
@@ -79,7 +79,7 @@
   ui_label: "Unblock {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 2, mobile: true}
+  requires: {hands_free: 2, mobile: true, portal_kinds: [door, window, gate, hole, vent]}
   duration: {base_s: 30, per_meter_s: 0.71}
   noise_db: 55
   effect: unbarricade_portal
@@ -91,7 +91,7 @@
   ui_label: "Force {target}"
   binds: portal
   range: reach
-  requires: {hands_free: 2, mobile: true, fear_exposure: true}
+  requires: {hands_free: 2, mobile: true, fear_exposure: true, portal_kinds: [door, window, gate, vent, drain]}
   duration: {base_s: 5, per_meter_s: 0.71}
   noise_db: 85
   check: {attribute: S, tags: [breacher], resistance: portal.lock_and_barricade}

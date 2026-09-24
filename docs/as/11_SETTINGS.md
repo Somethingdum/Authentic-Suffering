@@ -17,10 +17,10 @@ is created: editing `rules:` in `as_config.yaml` later changes **new** runs only
 
 | Setting (UI label) | Field | Values (default **bold**) | What it does |
 |---|---|---|---|
-| **Difficulty** | `difficulty` | Bitch Mode · Easy · **Normal** · Realism · Actually Hell · Fuck You | Sets the "what hunts you" and "what still exists" bands, the simulation mechanics (snowball, warning slack, recovery slack) and daily off-screen mortality. Plausibility protection for your character applies from Bitch Mode through Realism only (CMG §61 QC-2). |
+| **Difficulty** | `difficulty` | Bitch Mode · Easy · **Normal** · Realism · Actually Hell · Fuck You | Sets the "what hunts you" and "what still exists" bands, the simulation mechanics (snowball, warning slack, recovery slack), how many dead wait past the map's edges, and how likely and how big a Mega Horde is (`HordeRules`, 06 §5). Nobody dies by lottery: off-screen deaths come from what happens to people (D-52). Plausibility protection for your character applies from Bitch Mode through Realism only (CMG §61 QC-2). |
 | **Era** | `era` | Early (weeks – ~1 year) · Established (1–4 years) · **Mature** (5+ years) | Constrains factions and social order; decides who exists (post-Fall-born people only in Mature) and what still works. |
 | **Days since the Fall** | `days_since_fall` | blank = drawn inside the era's range; or a number | Exact world age. The history horizon equals this number (WG-31). It must fit your character's `days_since_fall_range` (WG-34); eras and values that cannot are not offered. |
-| **World detail** | `world_detail` | Gotta go to work soon (~3 min) · Quick look (~7) · **Standard** (~15) · Settle in (~30) · I don't intend to use my laptop much today (~60) | Zones, places, detailed people, model-written dossiers and history events (`tables.DETAIL_TIERS`). Minutes are estimates until `bench` measures your machines; the wizard then shows measured values. |
+| **World detail** | `world_detail` | Gotta go to work soon (~3 min) · Quick look (~7) · **Standard** (~15) · Settle in (~30) · I don't intend to use my laptop much today (~60) | Zones, places, detailed people, model-written dossiers and history events (`tables.DETAIL_TIERS`). The minutes are fixed estimates (`est_minutes`); the real time depends on your machines, and the loading bar shows the time left while the world is built (10 §2.4). |
 | **Seed** | `seed` | blank = random | Fixes every code-side draw. It does **not** reproduce model-written text, so it cannot rebuild a world — use a world file for that (RUN-09). |
 | **Save mode** | `save_mode` | **Free** · Ironman | Free: named saves, load, "new life here" after death. Ironman: only autosave and Continue; death ends the run (RUN-08). |
 | **Packs** | `pack_ids` | **[core]** + any you add | Which content packs this world is built from. |
@@ -89,6 +89,11 @@ background_cognition: true         # quiet-hours reflection between turns (05 §
 # rules:                           # RulesConfig overrides — new runs only (SET-03)
 #   scheduler: {turn_budget_s: {quick: 40, balanced: 75, deep: 150}}
 #   society: {draw_hour: 7, group_hour: 20, shortage_days: 3, drift_friction: 0.3}   # P9 (06 §2)
+#   world: {world_hour: 4, op_party: [2, 3], weather_change_chance: 0.35}            # P10 (06 §3)
+#   infected: {bang_db: 70, push_min: 3, saliva_hours: 12}                           # P10 (06 §5)
+#   hordes: {drift_chance: 0.15, draw_db: 130, mega_ramp_days: 60}                   # P10 (06 §5)
+#   background: {max_reflections: 2, max_retellings: 4}                              # P10 (05 §9.2)
+#   decay: {rust_per_wet_day: 1, rot_per_wet_day: 2}                                 # P10 (06 §4)
 ```
 
 | Key | Meaning | Who changes it |
@@ -98,11 +103,27 @@ background_cognition: true         # quiet-hours reflection between turns (05 §
 | `lanes.*.max_concurrency` | parallel requests per machine | you, after `bench` shows the machine copes |
 | `regimes.<call_class>` | lane, sampling, token cap, deadline per call class (08 §4) | you (advanced; edit the file — the Play UI never changes regimes, because a regime change alters every later request and so breaks re-simulation, DET-02) |
 | `hot_cognition` | the regime for deep-thinking people | you (advanced) |
-| `rules` | every tunable number (`RulesConfig`; P9 adds `society`: daily needs by age band, ration multipliers, shortage and recovery days, draw and group hours, role skills, sleep windows, tension and drift numbers, rumour pace — `contracts/settings.py::SocietyRules`) | you (advanced; new runs only) |
+| `rules` | every tunable number (`RulesConfig`; P9 adds `society`: daily needs by age band, ration multipliers, shortage and recovery days, draw and group hours, role skills, sleep windows, tension and drift numbers, rumour pace — `contracts/settings.py::SocietyRules`; P10 adds the table below). A group you name keeps its defaults for the numbers you leave out, but a table keyed by difficulty or era (for example `hordes.mega_daily_chance`) replaces the default table whole: give every key | you (advanced; new runs only) |
 | `background_cognition` | allow reflection jobs while you read | Settings → Advanced (`config_set`) |
 
 Unknown keys are errors with a plain message naming the key (CFG-02); a missing file means all
 defaults (CFG-01).
+
+### 2.1 The P10 rule groups (`contracts/settings.py`)
+
+| Group | What it tunes | Read by |
+|---|---|---|
+| `world` (`WorldRules`) | the off-screen step's tick; how long marks last in the open and under a roof, and what rain washes out; the clock hour a generated world starts at and its daily tick (`world_hour`); the daily chance of each kind of outing, the crew's size, travel and dwell times; how long a plan to leave is carried before it is acted on; the daily chance the weather turns | `world.traces`, `world.worldmove`, `turn.timers` (06 §3–4) |
+| `infected` (`InfectedRules`) | energy by time per type, feeding, starving and overfed thresholds, a dormant body's recovery; what counts as moving to their eyes; the step interval; banging on a door; a Runner's decline; when a week-3 wet host stops being hunted by sight; how many dead one place shows and how much each kind of place draws; quirks; a crowd pushing on a door (how many, how long each portal, barricade and lock hold); the wet strain's saliva window, how close its signs show, and the compulsion's cooldown | `world.infected` (06 §5) |
+| `hordes` (`HordeRules`) | the dead past each map edge (per difficulty), the dormant, Runner and Crawler shares (per era), district density and how many a place shows; horde pace, milling, straggling and rallying; drift and noise-draw chances and sizes; breaches; the Mega Horde's chance (ramping over the run's first days), size, warning time, speed, throughput and noise | `world.hordes` (06 §5.3–5.4) |
+| `background` (`BackgroundRules`) | what makes an experience material, how many ordinary ones a night's sleep needs, and how many reflections and retellings one turn boundary may hold | `service.background` (05 §9.2, 06 §7) |
+| `decay` (`DecayRules`) | which kinds rust and rot, and how much condition a wet day in the open costs | `world.decay` (06 §4) |
+
+Numbers marked `[SAND]` in the source are placeholders until play-testing or `bench`/`eval`
+settles them (PROGRESS.md). Retired fields, read by nothing: `world.base_daily_mortality`,
+`world.min_offscreen_trace_ratio` and `world.mortality_mult` (no death lottery and no trace quota,
+D-52), and `decay.weights`, `decay.tier1_below`, `decay.tier2_below`, `decay.tier3_unvisited_days`
+(no Memory Fade, D-53); they stay only so an older run's frozen rules still load.
 
 ## 3. Settings rules
 

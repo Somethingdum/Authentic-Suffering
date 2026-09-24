@@ -98,6 +98,23 @@ be an actor or a group). `rumours` records a rumour's origin and furthest hop; w
 `claim_holdings` like any other belief. A settlement's clocks are `event_queue` rows, and the
 `next_due_at` columns of `settlements`, `workplaces`, `groups` and `routines` mirror them.
 
+P10 notes. `infected_pools` {zone_id, type_id, active, dormant} counts a district's dead by type
+(regional detail), `hordes` {horde_id, kind drift | drawn | mega, composition, zone_id, place_id,
+route, target_place, status moving | milling | gone, origin, since, props} the crowds on the roads;
+the bodies in the world, pools and hordes together are the census, which changes only by rising and
+destruction (06 §5.1). `infected_state` gains risen_from, since, degrade_at, horde_id, charged_at
+(energy is charged by time) and folded_at (when the body went back into a count, HRD-18: its row
+stays, its `positions` row goes). `settlements.lockdown` (0 / 1) seals an enclave;
+`operations.target_id` names a DECON team's target; `portals.strain_min` counts the minutes a crowd
+has leaned on a door while `damage` (0–3) shows how near it is to giving way; `traces.locked` marks
+a permanent trace (no decay clock). New event types: WORLD_DAY, OFFSCREEN_DEATH, FACTION_OPERATION,
+TRADE, RAID, DEFECTION, POOL_CHANGE, HORDE_FORMED / HORDE_MOVED / HORDE_STATE / HORDE_PROMOTED /
+HORDE_REJOINED / HORDE_PRESSED / HORDE_SIGN / HORDE_GONE, INFECTED_STATE, INFECTED_DRIFT,
+DEMATERIALIZE, TRACE_CREATED / TRACE_DECAYED, ITEM_WEAR, ITEM_CONTAMINATED, REFLECTION,
+RUMOUR_DISTORTED, COUNCIL_MEETING / COUNCIL_ADJOURNED, ROUTE_WATCH_REPORT, PLACE_CHANGE.
+`SCHEMA_VERSION` was not raised for these columns (owner's rule; DECISIONS D-50, D-67), and no run
+from an earlier build exists that would need migrating.
+
 ## 8. Narration and UI state
 
 `narration` (the committed prose per turn + lint result; written by a `NARRATION` event) ·

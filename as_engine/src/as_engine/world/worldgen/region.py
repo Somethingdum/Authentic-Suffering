@@ -34,8 +34,17 @@ build_region(rng, tx, params, detail, canon, at) -> Region
         house", 'apartment' -> f"The {family} apartment" (family = rng.choice(the family names of the
         first canon names record by id, purpose f"family:{i}:{j}")), else the archetype's name; a name
         already used in this zone gets f" ({k})" with k = 2, 3, …;
+      per site its FRONTAGE, an anchor of the hub (kind 'feature', cover 0, concealment 0, x =
+        round(60 x (j + 0.5) / T['places_per_zone'], 1), y = 1 when j is even, else 19) named
+        f"the front of {perception.place_phrase(site name)}" for a building site, f"the path to
+        {place_phrase(site name)}" for an outdoor site: the sites stand along both sides of the
+        street, so going from one to the next means walking the street between them (without it
+        every site met the street at its centre and a neighbour was no distance away);
       per site one portal hub <-> site: kind 'opening', name f"the way to {site name}" (a leading 'The'
-        lower-cased), aperture 300 x 300, seal_db 0, anchor_a NULL, anchor_b = the site's anchor.
+        lower-cased), aperture 300 x 300, seal_db 0, anchor_a = the site's frontage, anchor_b = the
+        site's anchor.
+      Row order per site: the site place, its anchor, its frontage, the portal (the hub and 'the
+        middle of the street' come first).
   3 Routes: the ring pairs (i, (i + 1) % n) for i in 0..n-1, each written smaller index first (the
     last one is (0, n-1)), then chords (i, j) for i < j that are not ring neighbours, each when rng.chance(atlas.CHORD_CHANCE, purpose f"chord:{i}:{j}"); per route (ring
     first, then chords, each in (i, j) order) distance = rng.range_int(*atlas.ROUTE_DISTANCE_M,

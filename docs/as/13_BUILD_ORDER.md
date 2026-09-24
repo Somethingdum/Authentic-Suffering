@@ -17,7 +17,11 @@ right after the slice (P8) so the human can play and judge it early.
 3. Every `[SAND]` number a phase depends on is either replaced by a measured value or listed in
    `PROGRESS.md` under "SAND remaining" with the benchmark that will replace it (D-04: numbers that
    need your real hardware are measured by you with `tools/as/bench.py`).
-4. **No phase may build a later phase's systems.** Stubs for later phases stay stubs.
+4. **No phase may build a later phase's systems.** Stubs for later phases stay stubs. A line
+   marked with a later phase ("P10: …") inside a function this phase builds only says when the kit
+   added it: when this phase's tests pin that line (a DEATH's `rise_pending` in `bodies.die`, P2;
+   SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an
+   earlier kit meets the same lines as failing tests of a finished phase and amends the function.
 5. A contradiction between this spec, the Rebuild Plan and the Codex Master Guide is **recorded** in
    `SPEC_ISSUES.md`, never silently resolved.
 6. Protected files (contract tests, fixtures, `testing/fake_lm.py`, `testing/scenario.py`'s
@@ -57,7 +61,7 @@ right after the slice (P8) so the human can play and judge it early.
 | **P7** | **The Slice** | `turn/*`, `lanes/requests.py`, `narration/*` (not style), `service/session.py`, `service/runs.py` (scenario path), `service/view.py`, `service/replay.py`, `cli.py` | `p07_slice` + `sim` | the pivot list (§5.7) |
 | P8 | Play UI | `service/game_service.py`, `service/guide.py`, Talemate plugin + patches, `talemate_frontend/src/play/*` | `p08_ui_protocol` + vitest + plugin test | the human smoke checklist (P8 part) |
 | P9 | Society | `society/*`, `world/rumours.py`, `mind/mind` group standing, the P9 parts of `turn/timers.py`, `turn/select.py`, `turn/pipeline.py`, `action/cascade.py` | `p09_society` | — (P7 fixtures must run exactly as before) |
-| P10 | Wide world | `world/worldgen/*`, `world/infected.py`, `world/worldmove.py`, `world/traces.py`, `world/decay.py`, `service/runs.create_run` | `p10_world` | a full worldgen run with the fake model |
+| P10 | Wide world | `world/worldgen/*`, `world/traces.py`, `world/decay.py`, `world/hordes.py`, `world/infected.py`, `world/worldmove.py`, `world/factions.py`, `service/runs.create_run`, `service/background.py`, `service/progress.py`, the P10 GameService handlers, the wizard / worldgen screens and the loading bar | `p10_world` + the P10 vitest specs | a full worldgen run with the fake model |
 | P11 | Audits | `audit/*`, `narration/style.py`, ablation in `tools/as/eval.py` | `p11_audits` | all 58 bits drop under their faults |
 | P12 | Surfaces | `cheats/*`, `content/importers.py`, `service/death.py`, worlds (`service/runs`), migrations, read-aloud | `p12_surfaces` | — |
 
@@ -219,10 +223,72 @@ cover, drift, loyalty check or animosity roll for the PC. Build against the hand
 `pump_settlement` scenario.
 
 ### P10 — Wide world
-Read: 06 §1, §3–5, `world/worldgen/*`, `world/*`, CMG §61 (carried in tables.py).
-1. `worldgen/conditions.evaluate`. 2. `worldgen/params.py`. 3. `world/traces.py` (then `physical/space.discover_layout`, which creates the Fall-damage trace through it). 4. `world/decay.py`. 5. `world/infected.py`. 6. `world/worldmove.py`. 7. `worldgen/pipeline.py` WG0–WG9 + genesis snapshot. 8. `service/runs.create_run` (worldgen path).
-Gate: `p10_world` green; `gate.py` runs a full worldgen at `gotta_go_to_work_soon` with the fake model and asserts WG9's invariants and the 58-bit gate on genesis.
-**Forbidden:** rendering changes. The world can be wrong in the store, where it is cheap to see.
+Read: 06 (all of it: §1 worldgen, §2.8 the Ghosts, §3 the world's day, §4 wear, §5 the infected, §7
+the quiet hours), 05 §3, §7 and §9.2, 09 §5 and §7, 10 §2.3, §2.4, §2.10 and §4, DECISIONS D-39..D-69,
+CMG §61 (carried in `world/worldgen/tables.py`); then the docstrings as you reach them. Each earlier
+module marks its P10 lines ("P10"). The contract data is already written: the new event types, the
+queue types (`INFECTED_STEP`, `WORLD_DAY`, `OPERATION_STEP`, `REANIMATION`, `TRACE_DECAY`,
+`HORDE_STEP`, `POOL_RISE`, `COUNCIL`), `WorldRules` / `InfectedRules` / `HordeRules` /
+`BackgroundRules` / `DecayRules`, the schema columns, `service/progress.PLANS`, the core content.
+0. Lower layers amended for P10, smallest first: `physical/objects.py` (`condition`, `made_at`,
+   `contaminate` / `contaminated`); `physical/space.py` (`place_body`, `remove_body`, `change_place`,
+   `discover_layout`, `path(allow_closed, allow_locked)` — a route enters each place at most once,
+   p02 `test_a_route_never_enters_a_place_twice` —, `portal_change_event` with `strain_min`);
+   `physical/bodies.py` (`create`, `expose`, `die`, `rise`, `stages`; DEATH carries `rise_pending`
+   and schedules the REANIMATION row — `p02_space_bodies/test_bodies.py` was amended for it);
+   `mind/actor.create`; `mind/perception` (trace percepts, "what was left of"; a move reads
+   "arrives" / "moves into <place>" — p03 `test_how_a_move_reads_from_where_you_are`); `mind/packet`
+   (a host's felt lines); `society/population.take_from_cohort` / `materialise`
+   (`test_materialise.py`).
+   Then SKULL-10, one rule in four readers (D-63): `mind/packet`, `mind/affordance`, `mind/retrieval`
+   / `mind/memory` and `turn/select` read percepts only up to the moment they decide for (p04
+   `test_nothing_later_than_the_moment_reaches_a_mind`, `test_skull_10_nobody_is_known_before_they_are_seen`);
+   and `mind/affordance`'s P10 gates — `requires.portal_kinds`, the speech and wound bindings that skip
+   the dead (`test_a_gap_has_nothing_to_close`, `test_the_dead_are_not_people`); and
+   `turn/select.active_area`'s memory for loud noises, `LOUD_MEMORY_MS` (D-68).
+1. `world/worldgen/conditions.evaluate`, `params.py` (`test_params.py`), `placement.py`
+   (`test_placement.py`).
+2. `world/traces.py` (`test_traces.py`), `world/decay.py`.
+3. `world/hordes.py`, the counting half: `pool`, `total`, `change`, `seed_pools`, `target`, `path`,
+   `leg_ms`, `census`, `density`, `fold` — the region needs `seed_pools`, and `world.infected.step`
+   calls `fold` before every step (HRD-18, D-67).
+4. `world/worldgen/region.py` (`test_region.py`).
+5. `world/infected.py` (`test_infected.py`; `populate` takes from the pools).
+6. `world/worldgen/history.py`, `polity.py`, `people.py`, `opening.py`, `checks.py`, `pipeline.py`,
+   then `service/runs.create_run` (`test_worldgen_pipeline.py`; the conftest's session world needs
+   all of it — `world.factions.enclave_factions` / `enclave` included, for WG-10 and WG-18).
+7. `world/worldmove.py`: `ensure_timers`, `day`, `plan_operations`, `launch`, `step`, `on_arrival`,
+   `depart` (`test_world_day.py`, `test_operations.py`, `test_discovery.py`).
+8. `world/hordes.py`, the moving half: `form`, `step`, `promote`, `press`, `draw`, `day`,
+   `schedule_rise`, `rise` — drift, drawn crowds, breaches, the Mega Horde (`test_hordes.py`).
+9. `world/factions.py`, with `society/settlement.set_lockdown` (STL-13), `society/routine` 'away'
+   (ROUT-06) and worldmove's 'decon' steps (`test_ghosts.py`).
+10. The P5 / P7 amendments: `action/reactions` (REACT-01: one of the dead seen moving to within 20 m is
+    news), `service/view` (the receipt's "Resisting grab"; no two suggestions alike — p07
+    `test_the_dice_receipt_names_a_defence_too`), `action/propagate` (infected hear and are drawn),
+    `action/effects` (a bite exposes and feeds; a drink is mouth contact; on_arrival after a MOVE), `action/cascade`
+    (INFECTED_DRIFT, create_trace), `mind/cues` (a bite seen, a host's signs), `turn/cognition`
+    (the week-3 compulsion, never the PC), `narration/narrator` and `narration/location`,
+    `world/rumours.retell` / `spread_one` (`test_wet_strain.py`, the rest of `test_hordes.py`).
+11. `turn/timers.py` (the P10 dispatch lines, `seed_world`; `run_offscreen` brings only bodies with
+    a position up to date, TIME-10) and `turn/pipeline` stage 0 (it seeds the world); a run without a
+    `world_params` row must run exactly as before.
+12. `service/background.py` (`test_background.py`), `service/progress.py` (`test_progress.py`), the
+    P10 GameService handlers (`pcs_list`, `run_new`, `worldgen_cancel`, the quiet hours and the
+    bars), `cli.py` `new-run` (`test_new_life.py`), `service/replay` BG-05.
+13. The Play UI: `quips.js`, `LoadingBar.vue`, `PCCard.vue`, `WizardScreen.vue`,
+    `WorldgenScreen.vue`, the store's P10 state and messages, PlayApp's routes (vitest
+    `quips.spec.js`, `loading_bar.spec.js`, `wizard.spec.js`, `worldgen.spec.js`; `app.spec.js` was
+    amended: the wizard and worldgen screens are built). Then the smoke checklist §7.
+Gate: `p10_world` green with P0–P9, the sim soak and every vitest spec. The session world in
+`p10_world/conftest.py` is a full worldgen at `gotta_go_to_work_soon` with the fake model (WG9 must
+hold or worldgen aborts), and `test_new_life.py::test_a_generated_world_plays` plays moves in it
+through the 58-bit gate. The P7 and P9 scenarios (no `world_params`) run exactly as before.
+**Forbidden:** P11 audits (portrayal, abuse, narrator style, the release audit) and P12 surfaces
+(cheats, imports, the death screen, reusing a saved world — `create_run(world_id=…)` stays
+`NotImplementedError("P12")` —, migrations, read-aloud, the time-skip bar). Worldgen never decides
+who betrays, dies or befriends the PC (WG-30). Code never acts for the PC: no routine, no outing,
+no compulsion. Nothing is deleted for being unimportant (C02); nobody dies of a roll (C01).
 
 ### P11 — Audits
 Read: 04 §3.3, §5, `audit/*`, `narration/style.py`.

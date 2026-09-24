@@ -9,7 +9,7 @@ player are in `STAGE_LABELS` (never engine words).
 
 | # | Stage | Owner | Output | Gate (fails → see §4) |
 |---|---|---|---|---|
-| 0 | wake | CODE | turn number begins (`clock.begin_turn`), a settlement's clocks started once (`turn.timers.seed_society`, P9), due timers fired and cascade-swept (`turn.timers.fire_due`), pending reactions loaded, lanes probed, model-swap guard | **G0** state loads; `check_models` passes; at least one lane up |
+| 0 | wake | CODE | turn number begins (`clock.begin_turn`), a settlement's clocks started once (`turn.timers.seed_society`, P9), a generated world's clocks started once — its day and the faction councils (`turn.timers.seed_world`, P10; nothing in a hand-made scenario), due timers fired and cascade-swept (`turn.timers.fire_due`), pending reactions loaded, lanes probed, model-swap guard | **G0** state loads; `check_models` passes; at least one lane up |
 | 1 | intake | LM(B) or CODE | the PC's `Intent` (see §2; `turn/intake.py`) | **G1** choice is a PC affordance; referents in the PC's believed set; no outcome fields |
 | 2 | t0 freeze | CODE | `full_state_hash` recorded in `turn_ledger.detail` | **G2** hash recorded |
 | 3 | perceive | CODE | `perception.compile_scene` for every candidate actor | **G3** every percept row granted by `perception.grant` |
@@ -35,6 +35,33 @@ transaction; **the writeback calls (14) run concurrently with narration and its 
 (independent given committed state — free width across the two lanes, plan §4.5). Their results
 are applied in a fixed order (14, 15, then the narration row), so the order the answers arrive in
 never changes the world. The whole contract is the `turn/pipeline.py` docstring.
+
+### 1.1 What the player sees while a move runs (P10, the loading bar)
+
+The pipeline reports each stage as it begins (`progress(stage, STAGE_LABELS[stage], stage / 19)`:
+0, 1, 2; per wave 3, 4, 5, 6, 7, 8, 11; then 12, 13, 16, 17, 14, 15, 19 — 9, 10 and 18 are
+instant and never announced). P8 turns each call into `turn_progress` (the line under the input
+box). P10 adds the loading bar (`service/progress.py`, PROG-01..07; 10 §2.10): just before
+`run_turn` the service sends the turn's whole **plan**, and each announced stage lights its
+sub-phase through `TURN_STAGES`:
+
+| Phase (weight) | Sub-phases, in order (the stage that lights each) |
+|---|---|
+| Reading your move (8) | Checking the world (0) · Reading your move (1) · Weighing your words (2) |
+| Everyone takes it in (12) | Eyes and ears (3) · Who noticed what (4) · What it means to them (5) |
+| People decide (30) | People decide (6) |
+| The world moves (15) | Everyone acts (7) · It lands (8) · Reactions (11) |
+| Locking it in (3) | Locking it in (12) |
+| Writing it down (30) | What they will remember (13) · Writing it down (16) · Choosing the words (17) · What it changes between them (14) · Loose ends (15) |
+| Saving (2) | Saving (19) |
+
+A reaction wave or a strict retry announces its stages again; the bar holds rather than going back
+(PROG-04: the percentage never drops). A turn's bar never counts anything and never names who is
+thinking (PROG-05). Before that bar, when the last boundary's quiet-hours jobs are not all done, a
+second bar, *Everyone else catches up*, counts the jobs still to run ("1 of 3") while
+`background.catch_up` finishes them (§5); its calls to the P8 callback are stage 0 and light
+nothing on the turn's bar. Under each bar, one rotating line about the step (content
+`ui/quips.yaml`, CNT-16; which line and when is the UI's, PROG-07).
 
 ## 2. How the player's input becomes an intent (stage 1)
 
@@ -67,8 +94,11 @@ if PC intent is condition-ended (watch, wait, guard):
                                            # a colleague's task step is not news
               # P9: queue rows of kernel.clock.BACKGROUND_QUEUE_TYPES (ROUTINE_STEP,
               # PRODUCTION_CYCLE, SETTLEMENT_DAY, GROUP_DAY, LOYALTY_CHECK, CASCADE_EFFECT,
-              # TRACE_DECAY) do not end the window: a settlement's life is not news. They still
-              # fire inside it, and anything they make the PC perceive pulls the horizon.
+              # TRACE_DECAY) do not end the window: a settlement's life is not news. P10 adds the
+              # world's own clocks (WORLD_DAY, OPERATION_STEP, INFECTED_STEP, REANIMATION,
+              # HORDE_STEP, POOL_RISE, COUNCIL): a horde matters when it is heard or seen. They
+              # still fire inside the window, and anything they make the PC perceive pulls the
+              # horizon.
 else:
     horizon = max(t0 + 3 s, the PC action's landing time)
 pull: whenever the PC holds a MATERIAL percept at m (a timer at stage 0, any wave, any timer inside
@@ -86,7 +116,8 @@ something else interrupts it (P5 resolver rules).
 
 ```
 active area = the PC's place + places within 2 portal hops (walls and fences count) + for every
-              NOISE of this turn of 80 dB or more, its place and the places 1 hop from it
+              NOISE of this turn of 80 dB or more in the last 10 minutes of world time (P10), its
+              place and the places 1 hop from it
 wave 0 at t0: candidates = living actors in the active area except the PC + actors elsewhere whose
               next_due_at <= horizon; perceivers = candidates + the PC
 for each wave w (0..cap; cap 3, 1 in the strict retry):
@@ -104,6 +135,12 @@ for each wave w (0..cap; cap 3, 1 in the strict retry):
 
 The reaction limit is **time-bounded, not count-bounded** (plan §10.4): every wave advances the
 clock. The cap exists for cost only, and nothing is dropped.
+
+A wave writes its landings when it resolves, and a timer's action lands with it, so the log can
+hold a percept from a second after a reaction that comes before it. Every mind decides on what it
+had perceived **by its own moment** — the packet, the options, recall and salience read only
+percepts with `at <= at` (SKULL-10, D-63). What is material also covers the dead: one of them seen
+moving to within 20 m is news to whoever sees it, and it ends the player's watch (REACT-01, D-65).
 
 ### 3.3 Cognition (stage 6)
 
@@ -191,6 +228,14 @@ A degraded turn is honest and recorded; a guessed turn is corruption (plan §5.3
 - **Autosave** (19): ring file + manifest (`service/runs.py`); in-memory test sessions skip it.
   The service stays `busy` until 19 finishes (a submit meanwhile gets
   `error {code:'busy', message:'Still settling the last moment…'}`).
+- **The quiet hours** (P10, `service/background.py`, BG-01..07; 05 §9.2, 06 §7): after the result
+  is pushed, people with something to think over reflect, and rumour holders choose the words they
+  will pass a story on in — one model call at a time, each committed in its own transaction, while
+  the player reads. Which jobs a boundary has is fixed by the world as the turn left it (BG-02);
+  the next turn first awaits `background.catch_up`, which finishes every one of them, so the
+  player's reading speed never changes who thinks about what (BG-07, AC12). Jobs never run inside
+  a turn's transaction; loading, closing or starting a run cancels the runner, and the next
+  `catch_up` finishes what is left. Replay re-commits the recorded answers (BG-05).
 - **Re-simulation** (`service/replay.py`, `as-engine replay`): every run keeps `turn0.sqlite`
   (the run at turn 0); replaying its `player_inputs` with the recorded model answers (found by request hash)
   must reproduce `full_state_hash` after every turn (DET-02) — the sim soak proves it every gate.
