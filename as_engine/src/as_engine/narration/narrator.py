@@ -37,7 +37,9 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
   pc_state_lines   per unhealed wound of the PC (created_at, wound_id): f"{SEVERITY_WORDS[severity]
                    capitalised} {type} wound to the {ANATOMY_WORDS[anatomy]}" + ', bleeding' when
                    physical.bodies.effective_bleed > 0 + '.'; then, when impairment > 0,
-                   f"{pc} is {location.impairment_word(impairment)}.".
+                   f"{pc} is {location.impairment_word(impairment)}."; then (P10) the non-empty
+                   ``felt`` sentence of each stage physical.bodies.stages(pc) returns, in pathway
+                   order (second person, as written: the prose puts it in the PC's body).
   comprehension    'low' when attr_mod(P) + attr_mod(I) <= 4, 'high' when >= 8, else 'average'
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of

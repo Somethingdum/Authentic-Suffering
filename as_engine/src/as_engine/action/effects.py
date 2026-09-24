@@ -185,6 +185,12 @@ Per effect (result strings in quotes; 'done' unless noted):
   apply_tourniquet   bodies.treat(..., 'tourniquet').
   eat / drink        objects.destroy(item, qty=1) (cause = the start event), then
                      bodies.refresh_need(actor, 'hunger' | 'thirst'); result 'ate' / 'drank'.
+                     P10, drink is mouth contact (lore §3.2), BEFORE the destroy: c =
+                     objects.contaminated(item, land_at); c with c.by != actor ->
+                     bodies.expose(tx, rng, actor, c.pathway, 'mouth_contact_item', land_at, the
+                     start event, turn_index); then, when a stage physical.bodies.stages(actor)
+                     returns for 'wet' has saliva_infectious -> objects.contaminate(item, 'wet',
+                     actor, land_at, the start event, turn_index).
   throw_distraction  objects.transfer to the destination anchor; NOISE 70 dB 'something clattering'
                      at the LANDING POINT (not the thrower).
 

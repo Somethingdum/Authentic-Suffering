@@ -67,7 +67,7 @@ Validation (CNT-*), each error names file + field in plain language:
          cutoff 0.8) when there is one.
   CNT-05 every cue referenced exists in some pack's cues.yaml: capability.trained_responses[].cue,
          knowledge.cues, lore beliefs[].cues, affordance requires.belief_cues and
-         requires.skill_or_belief_cue, quirk trigger_cue.
+         requires.skill_or_belief_cue, quirk trigger_cue, pathway stages[].signs (P10).
   CNT-06 affordance.effect is in action.effects.EFFECT_IDS, and its label / ui_label use only the
          placeholders {target} {destination} {item} {distance} {duration}.
   CNT-07 LORE-01: lore needs truth AND >= 1 belief; factions need truth_text AND belief_text

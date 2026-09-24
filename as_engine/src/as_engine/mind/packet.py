@@ -64,6 +64,8 @@ Fields (second person, plain English):
                       thirsty.' / 'You are starving.' / 'You are exhausted.';
                     * impairment: 1-2 'Everything is harder than it should be.', 3-4 'You are
                       struggling to function.', 5-6 'You can barely function.';
+                    * P10: per physical.bodies.stages(actor) (pathway order), the stage's ``felt``
+                      sentence when it is not empty — what the host feels, never what it has;
                     nothing to say -> ['Unhurt.'].
   capability_lines  per dossier skill, in dossier order: f'{Domain capitalised}: {trained|skilled|
                     expert}.' (rank 1/2/3); then f'You are good at: {", ".join(tags with _ as

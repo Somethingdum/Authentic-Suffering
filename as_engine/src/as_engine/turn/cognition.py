@@ -38,6 +38,22 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction) -> dict[actor_id, I
        (dataclasses.replace(intent, speech=None)) — or, when the chosen verb is SPEAK (the words
        were the action), the actor falls back to plan_continuation with source 'fallback'. The
        echo path commits NO DEGRADED_FALLBACK event: the echo_reject row is its record.
+  3. P10 — the wet strain's compulsion (lore §3.2: by week three "training, discipline, morality
+     and force of will no longer stop compliance"; 05_ACTORS §7: an involuntary act is caused,
+     timed and owned by code). Actors in sorted order, never the PC (the player's hand on their
+     character is never taken; the PC feels the urge in the narration instead): a stage from
+     physical.bodies.stages(actor) with compulsion 3; an item of kind 'water' in one of its hands
+     (holder_slot hand_l, then hand_r); no INVOLUNTARY event with actor_id = actor and payload kind
+     'compulsion' less than RulesConfig.infected.compulsion_cooldown_min minutes before ``at``;
+     the nearest living human body in its place within 1.5 m (space.point_distance; ties by
+     body_id) -> INVOLUNTARY {actor_id, kind: 'compulsion', pathway: 'wet', item_id, target_id}
+     (writer 'turn.pipeline', actor_id, at) and the actor's intent becomes a give_item built from
+     the core affordance def (not from its menu: the act is code's, like a reflex): BoundAffordance(
+     def_id 'give_item', its verb, label / ui_label with {item} = the item's canon name and
+     {target} = 'someone', target_id, item_id, est_duration_s = duration.base_s, noise_db, check,
+     tags from the def), source 'reflex', speech None, manner '', goal '', private_reason '', the
+     same lod — what it had decided is dropped. Nothing in hand, nobody that close, or a cooldown
+     -> its intent stands (its packet already told it how much it wants to).
   Every call is logged by the pipeline through LaneClient.on_call; nothing here writes lm_calls.
 
 cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMRequest

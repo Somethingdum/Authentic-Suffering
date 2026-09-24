@@ -28,6 +28,7 @@ cues:
   - {id: sudden_silence, description: "A busy place going quiet all at once."}
   - {id: bite_wound_seen, description: "A bite wound on a living person."}
   - {id: fever_seen, description: "Someone sweating and shaking with fever."}
+  - {id: spreader_signs, description: "Spreader signs: too eager to share a drink, lips cracked and wet, a closed bite that looks too clean."}
   - {id: shift_change, description: "A work shift starting or ending."}
   - {id: ration_cut, description: "Rations reduced."}
   - {id: promise_broken, description: "A promise made to the holder was broken."}

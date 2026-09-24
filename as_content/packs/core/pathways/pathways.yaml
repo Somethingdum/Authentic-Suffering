@@ -7,6 +7,10 @@
   exposure:
     bite: 0.9
     deep_scratch_with_saliva_contact: 0.35
+    mouth_contact_item: 0.3        # [SAND] drinking after a spreader (action.effects drink, P10)
+  # felt: what the host feels (second person, never the stage's name); signs: cues an observer who
+  # sees the host clearly and close gets (mind.cues). Compulsion 3 = the involuntary offer
+  # (turn.cognition, P10).
   stages:
     - name: incubation
       starts_at_h: 0.0
@@ -14,30 +18,45 @@
       saliva_infectious: false
       compulsion: 0
       impairment: 0
+      felt: "You feel a little feverish, and the wound throbs."
     - name: living_spreader_week1
       starts_at_h: 24.0
       effects: [territorial_takeover_in_host, competing_infection_suppressed, wound_closes_deceptively_well]
       saliva_infectious: false
       compulsion: 0
       impairment: 1
-    - name: living_spreader_week2
-      starts_at_h: 168.0
-      effects: [saliva_infectious_from_day3, growing_compulsion_toward_mouth_contact_sharing, will_progressively_weakening]
+      felt: "You feel oddly well, better than you have any right to."
+    - name: living_spreader_saliva
+      starts_at_h: 72.0
+      effects: [saliva_infectious_from_day3, first_pull_toward_sharing]
       saliva_infectious: true
       compulsion: 1
+      impairment: 1
+      felt: "You keep wanting to share: your water, your food, a drink from your bottle. It feels like kindness."
+    - name: living_spreader_week2
+      starts_at_h: 168.0
+      effects: [growing_compulsion_toward_mouth_contact_sharing, will_progressively_weakening]
+      saliva_infectious: true
+      compulsion: 2
       impairment: 2
+      felt: "The urge to share what has touched your mouth keeps coming back, and it is harder to push away every time."
+      signs: [spreader_signs]
     - name: living_spreader_week3
       starts_at_h: 336.0
       effects: [training_discipline_morality_no_longer_stop_compliance, escalating_consequences_for_resistance, lower_salience_to_baseline_infected]
       saliva_infectious: true
       compulsion: 3
       impairment: 3
+      felt: "You need to share what has touched your mouth. Not wanting to changes nothing."
+      signs: [spreader_signs]
     - name: terminal_kill_phase_week4
       starts_at_h: 504.0
       effects: [fever, mucus, escalating_pain, bodily_collapse]
       saliva_infectious: true
       compulsion: 3
       impairment: 6
+      felt: "You are burning with fever and choking on mucus, and the pain keeps climbing."
+      signs: [fever_seen, spreader_signs]
   death_at_h: 672.0
   rise_after_death_h: [10.0, 14.0]
   rise_as: [ZOMBIE_VARIANT_ID_RUNNER01]

@@ -61,6 +61,15 @@ inventory_tree: one dict per item held by the body — {item_id, def_ref, name, 
   contents: [same dicts, recursively, slot None]} — ordered by slot in the order hand_l, hand_r,
   worn, pocket, pack, then item_id; contents ordered by item_id. name = ItemDef.name (plural when
   qty > 1). props are the parsed JSON.
+
+P10 — mouth contact (lore §3.2: "everyone knows somebody who was killed by a shared bottle"; used
+by action.effects drink):
+  ITEM_CONTAMINATED {item_id, pathway, by}   (contaminate) updating items.props.contaminated =
+                                              {pathway, by, at} (a newer mark replaces the older)
+contaminate(tx, item_id, pathway, body_id, at, cause_event_id, turn_index) -> Event
+contaminated(store, item_id, at) -> dict | None: the item's props.contaminated while at - its at <=
+  RulesConfig.infected.saliva_hours hours (saliva dries out; [SAND]), else None (no mark, too old,
+  or no such item).
 """
 
 from __future__ import annotations
@@ -150,3 +159,12 @@ def inventory_tree(store: "Store | Tx", body_id: str) -> list[dict]:
 
 def total_qty(store: "Store | Tx", def_ref: str) -> int:
     raise NotImplementedError("P2")
+
+
+def contaminate(tx: "Tx", item_id: str, pathway: str, body_id: str, at: int, cause_event_id: str | None,
+                turn_index: int) -> Event:
+    raise NotImplementedError("P10")
+
+
+def contaminated(store: "Store | Tx", item_id: str, at: int) -> dict | None:
+    raise NotImplementedError("P10")

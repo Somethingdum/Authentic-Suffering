@@ -236,6 +236,11 @@ class InfectionStage(Strict):
     saliva_infectious: bool = False
     compulsion: int = Field(default=0, ge=0, le=3)
     impairment: int = Field(default=0, ge=0, le=6)
+    felt: str = Field(default="", description="P10: what the host feels at this stage, one full "
+                      "sentence in the second person — a feeling, never the stage's name (packet "
+                      "body_lines, the narrator's pc_state_lines). Empty: nothing felt.")
+    signs: list[str] = Field(default_factory=list, description="P10: registry cue ids an observer "
+                             "who sees the host clearly and close gets (mind.cues; CNT-05).")
 
 
 class InfectionPathwayDef(Strict):

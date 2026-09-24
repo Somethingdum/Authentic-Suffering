@@ -281,6 +281,10 @@ class InfectedRules(Strict):
         "door": 30, "window": 10, "gate": 45, "hatch": 30, "opening": 0})   # [SAND] minutes of pressure
     barricade_min: int = 30        # every barricade level holds this much longer
     lock_min: int = 15             # every point of lock quality holds this much longer
+    # The wet strain's living spreaders (lore §3.2; physical.objects / mind.cues / turn.cognition)
+    saliva_hours: float = 12.0     # [SAND] a spreader's mouth on a bottle stays infective this long
+    sign_range_m: float = 3.0      # a host's stage signs (fever, spreader signs, a bite) are seen this close
+    compulsion_cooldown_min: int = 10   # a week-3 spreader's involuntary offer, at most once per this
 
 
 class SocietyRules(Strict):

@@ -48,10 +48,16 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
                     than its from_anchor's point (no from_anchor -> not detected)
   promise_broken (P6) a PROMISE_BROKEN event of this turn with payload.promisee_id = the holder
                     (its own conclusion, mind.mind.close_loop, LOOP-04 — no percept needed)
-  Not detected before their phase (never present until then): scream, fire_seen, smoke_smell,
-  bite_wound_seen, fever_seen (P10 — infected, fire, infection signs); whisper_seen, sudden_silence
-  (P7 observed_social); shift_change, ration_cut (P9). Belief cues
-  ('knows_*') are HELD, not present: mind.affordance reads them from lessons (AFF-10).
+  P10 — what an infection shows (lore §3.2, the intake doctrine's "inspect wounds and mouth"). A
+  SIGHTING = a VISUAL percept at CLEAR of a body B (its source) that is alive, of kind 'human', not
+  the holder, and within RulesConfig.infected.sign_range_m of the holder now:
+  bite_wound_seen   a sighting of a B with an unhealed wound of type 'bite';
+  (stage signs)     every cue id in the ``signs`` of each stage physical.bodies.stages(B) returns
+                    (content: fever_seen, spreader_signs, ...), for a sighting of that B.
+  Not detected before their phase (never present until then): scream, fire_seen, smoke_smell (no
+  fire or scream model yet); whisper_seen, sudden_silence (P7 observed_social); shift_change,
+  ration_cut (P9). Belief cues ('knows_*') are HELD, not present: mind.affordance reads them from
+  lessons (AFF-10).
 Returns the set; pure (reads only).
 """
 

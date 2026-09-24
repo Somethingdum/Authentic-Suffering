@@ -143,6 +143,11 @@ rise(tx, corpse_id, type_id, at, cause_event_id, turn_index) -> str   (world.inf
   cause_event_id) — the corpse stays a dead body (its history is its own); the new body is what got
   up. Returns the new body id. (world.infected moves it into the corpse's place and gives it the
   corpse's things.)
+stages(store, body_id) -> list[tuple[str, InfectionStage]]   (what each infection is doing to the
+  host now: mind.cues signs, the packet's and the narrator's felt lines, action.effects mouth
+  contact, turn.cognition compulsion)
+  Per infections row of the body, by pathway: (pathway, the canon pathway record's stage whose name
+  is the row's stage — as ``progress`` last left it). No rows -> [].
 """
 
 from __future__ import annotations
@@ -154,6 +159,7 @@ from ..contracts.common import Anatomy, WoundSeverity, WoundType
 from ..contracts.events import Event
 
 if TYPE_CHECKING:
+    from ..contracts.content import InfectionStage
     from ..kernel.rng import Rng
     from ..kernel.store import Store, Tx
 
@@ -184,6 +190,10 @@ def create(tx: "Tx", *, kind: str, sex: str | None, age_years: int | None, heigh
 
 def expose(tx: "Tx", rng: "Rng", body_id: str, pathway: str, exposure: str, at: int, cause_event_id: str | None,
            turn_index: int) -> Event | None:
+    raise NotImplementedError("P10")
+
+
+def stages(store: "Store | Tx", body_id: str) -> list[tuple[str, "InfectionStage"]]:
     raise NotImplementedError("P10")
 
 

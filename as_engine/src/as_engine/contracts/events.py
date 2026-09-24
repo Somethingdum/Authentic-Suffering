@@ -42,6 +42,7 @@ class EventType(StrEnum):
     PLACE_DISCOVERED = "PLACE_DISCOVERED"
     PLACE_CHANGE = "PLACE_CHANGE"            # P10: physical.space changes a place (held, props, light)
     ITEM_WEAR = "ITEM_WEAR"                  # P10: world.decay's weather and spoilage (writer physical.objects)
+    ITEM_CONTAMINATED = "ITEM_CONTAMINATED"  # P10: a spreader's mouth on a bottle (physical.objects.contaminate)
     # body
     HARM = "HARM"
     WOUND_PROGRESS = "WOUND_PROGRESS"
@@ -168,7 +169,8 @@ EVENT_CLASS: dict[EventType, EventClass] = {}
 _groups: dict[EventClass, list[str]] = {
     EventClass.PHYSICAL: ["MOVE", "PORTAL_CHANGE", "ITEM_TRANSFER", "ITEM_CONDITION", "ITEM_CREATED",
                           "ITEM_DESTROYED", "STRUCTURE_DAMAGE", "NOISE", "LIGHT_CHANGE", "FIRE_STEP",
-                          "WEATHER_CHANGE", "PLACE_DISCOVERED", "PLACE_CHANGE", "ITEM_WEAR"],
+                          "WEATHER_CHANGE", "PLACE_DISCOVERED", "PLACE_CHANGE", "ITEM_WEAR",
+                          "ITEM_CONTAMINATED"],
     EventClass.BODY: ["HARM", "WOUND_PROGRESS", "TREATMENT", "NEED_STAGE", "INFECTION_EXPOSURE",
                       "INFECTION_STAGE", "DEATH", "FALSE_DEATH", "REANIMATION", "AWARENESS_CHANGE",
                       "IMPAIRMENT_CHANGE", "RESOLVE_CHANGE", "POSTURE_CHANGE"],
