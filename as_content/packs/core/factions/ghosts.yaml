@@ -1,0 +1,106 @@
+# The Ghosts — canonical major faction (Ghosts_6: Grounded Clandestine Civilization, Major Faction
+# Dossier v5.0). Preserved canon is kept as written; expansions yield to it. Named leadership is an
+# OPEN DECISION in the source: the five Top-Hat seats and the Front Man are generated for every
+# world (worldgen WG-27 seats) and never have canonical names. The behaviour block switches on what
+# world/factions.py does for them: the enclave, the weekly council, the route watch and DECON.
+schema: as.faction.v1
+id: ghosts
+name: The Ghosts
+kind: faction
+one_line: A hidden civilization of twenty-odd thousand people sealed under an old industrial depot, kept alive by masked operators in vans who watch every road and never announce themselves.
+wants: Strategic independence — hidden autonomy through secure infrastructure, controlled routes, stockpiles, their own production and force held in reserve — and a way of life inside worth preserving. The outside can do as it likes until it touches Ghost continuity.
+stated_purpose: They do not state one. In the field it is "Keep moving." or "This isn't your stop."
+methods: Route watch on every road that matters; vans of five that arrive, solve a problem and are gone before anyone understands what happened; planned material recovery, never scavenging; covert trade through shell fronts; intake that seals, washes, scans and bite-checks everything that comes in; one warning, short; and, when a Ghost is killed by human hands, DECON — the deniable deconstruction of whoever did it.
+will_not_do:
+  - Kill people merely for knowing they exist, or roughly where the depot is.
+  - Announce themselves theatrically, or expose the bunker for ego.
+  - Release confirmed wet-strain infected under any circumstances.
+  - Let a dead Ghost become an acceptable cost to the one responsible.
+  - Let a trade partner become a leash, or let outsiders dictate access to their infrastructure.
+  - Torture anyone; it produces bad information, broken people and institutional rot.
+  - Spend operators like ammunition, or casually abandon a crew or a prized vehicle.
+resources_have:
+  - A bunker of at least four known levels under an industrial cover facility — intake crown, command, living levels, deep storage — and more below that no single person has walked.
+  - A dam they quietly linked into decades ago, buried power lines, and fuel generators as a backup to the backup.
+  - Hydroponic, fungal and soil grow levels, sealed seed banks and hidden external farms.
+  - Water treatment that is excessive by design, tested at every stage and segmented at distribution.
+  - A fleet of about two hundred and ninety vehicles, most of them vans, and four VRVs.
+  - Seven thousand operators, about five hundred of them out in the city at any time.
+resources_need:
+  - Medicines they cannot make — complex antibiotics, insulin, surgical anaesthetics — which can only be found or traded for.
+  - Machine parts, electronics and chemical precursors their workshops cannot manufacture.
+  - Seed diversity, and technical knowledge preserved outside their own archive.
+  - Routes nobody has mapped; every exposed route has to be burned and replaced.
+pressure: Almost everyone lives in one very large, very well-built place, so anything that gets deep enough matters too much; and a generation born underground has started asking why the machine is still as strict as it is.
+leaders:
+  - {title: The Black Top Hat, seat: black_top_hat, role: "Strategy and major field operations: operator posture, retaliation thresholds, field-risk budgets, serious external force; approves DECON."}
+  - {title: The Gray Top Hat, seat: gray_top_hat, role: "Logistics, procurement, stockpiles and route sustainment: food reserve mathematics, trade policy, fuel, crop failure response."}
+  - {title: The White Top Hat, seat: white_top_hat, role: "Facilities, maintenance, fleet readiness and sanitation: the bunker's structure, power, water, repair culture; facility lockdown and power-shedding."}
+  - {title: The Red Top Hat, seat: red_top_hat, role: "Internal security, discipline, counterintelligence and custody: betrayal cases, correction, lockdown enforcement."}
+  - {title: The Blue Top Hat, seat: blue_top_hat, role: "Intelligence, rumour management and external handling: outside dossiers, source networks, the Front Man's briefings."}
+  - {title: The Front Man, seat: front_man, age: [38, 44], role: "Not the leader: the face outsiders deal with. Every serious negotiation runs through him; he answers to the Council, and if he dies the Ghosts lose a face, not a government."}
+how_leadership_is_contested: The Council decides by consensus where it can and by vote where it cannot. A Top Hat can be voted out — difficult, but possible — and succession is elected, tested and judged aggressively. Seats outlive their holders; when a holder dies or is removed, succession fires, and no seat may become a dynasty.
+fault_lines:
+  - Old-family Ghosts, whose grandparents were inside before the Fall, against post-Fall recruits who earned their place and find the old networks exclusionary.
+  - Operators, who carry the prestige, against the maintenance crews, water technicians, farmers and cooks who actually keep twenty-five thousand people alive.
+  - Medical ethics against security doctrine — the most common argument in the Council, and one that will never be settled.
+  - The generation born underground, who find the machine oppressive, against the founders' doctrine they never lived through.
+  - Hardliners who want no outside contact against pragmatists who want more trade; expansionists who think they could rule the city against isolationists.
+  - People who think the Front Man is becoming too important against those who think that is exactly his job.
+relations:
+  - faction: "core:faction/mafia_remnants"
+    stance: wary
+    history: Before the Fall the Mafia hired a handful of operators and the Front Man and never saw the machine behind them. After the Fall the Ghosts vanished from Mafia radar; their return looks to the Remnants like an old deniable crew that turned out to be a surviving civilization. The peace holds through mutual caution, not trust.
+  - faction: "core:faction/delgados_crew"
+    stance: neutral
+    history: A small crew the route watch logged years ago and classified as loud but harmless; they have never touched Ghost continuity, so the Ghosts have never touched them.
+doctrine:
+  challenge_procedure: They rarely challenge; they watch. When they must, a masked operator says it once and short — "Keep moving." "This isn't your stop." "Mind your business." — and does not explain. The visible Ghost is never the whole team.
+  escalation_ladder:
+    - Watch, log and classify.
+    - One short warning, face to face or through an intermediary; the last one is "Last warning."
+    - Intercept — restrain, blindfold, move in a custody van, question, classify, warn, release.
+    - Lethal force, only for attacking or killing a Ghost, mapping their access, sabotaging routes or vehicles, planting trackers, organising against them, bypassing intake, or probing again after the warning.
+    - DECON of the responsible network, ordered by the Council on the Black Top Hat's approval.
+  treatment_of_unknowns: Classified before contact — irrelevant, watched, useful, tradeable, hostile or a continuity threat — and handled by class. An unknown who approaches the depot is allowed to; the approach tells them who sent them and what they think they know.
+  treatment_of_visibly_sick: A bitten Ghost is policy-dead unless Medical allows containment for debrief, farewell or hospice; a bitten or feverish outsider is kept at distance and never brought inside. Nobody confirmed infected is ever released. A downed Ghost gets true kill from their own team, as respect.
+  prisoner_policy: Custody, not cruelty — clean, bright, procedural rooms near the top of the complex, far from anyone's family. Prisoners are blindfolded in transit, questioned, classified, and released under monitoring, kept, or — as a concrete threat to continuity — removed. They do not torture.
+  intake_screening:
+    - The vehicle seals in the blast chamber; a corrosive wash, then a clean-water blast.
+    - Sensor scan for radio signals, explosives, chemicals, heat and magnetic anomalies.
+    - The crew leaves through its own decontamination path; a bite check at the exit, every crew member's health logged.
+    - Cargo is separated from people and screened on its own path.
+    - Outsiders only ever reach the reception layer — holding bays, interview rooms, quarantine and decontamination — built to look like the inside.
+laws: ["core:law/intake_screening", "core:law/contamination_quarantine"]
+node_classes: [cover_depot, blast_chamber, council_room, route_watch_post, crop_site, dam, repair_bay, custody_crown]
+presence:
+  regional_reach: One city — its transit corridors, chokepoints, salvage zones, water and fuel corridors and the approaches to the depot. They do not claim territory; they control movement.
+  start_trust_ranges: {ally: [7, 9], neutral: [4, 6], suspicious: [2, 4], enemy: [1, 1]}
+  era_exceptions:
+    early: Already built before the Fall — the bunker, the fleet and the families were inside when it came, and the vans were out within weeks.
+  presence_conditions: ["faction_density >= 2"]
+  population_baseline: 22500
+member_archetypes: [baseline_field_operator, route_watch_operator, recon_operator, salvage_operator, quick_response_operator, custody_operator, enforcement_operator, intelligence_field_agent, fleet_driver, mechanic_recovery_operator, hot_zone_operator, lurker_track_operator, medical_field_operator, dispatch_operator, training_operator]
+belief_text: "Ghosts. Masked people in clean vans who are there and then aren't. Leave them alone and they leave you alone — and if you find a body with a smile cut into it, somebody didn't."
+truth_text: Under an industrial depot the Ghosts built, over fifty years before the Fall, a sealed underground town of twenty to twenty-five thousand people — schools, family quarters, clinics, grow levels under full-spectrum light — protected by seven thousand operators, a fleet of vans and a Top-Hat Council of five seats whose holders can be voted out. Finding the depot tells nobody how to get in; the protected secret is how far, how deep, through what process and under whose permission. Their weakness is that nearly everyone lives in that one place.
+depth_reference: "Ghosts_6 (Major Faction Dossier v5.0)"
+behaviour:
+  enclave:
+    population: [20000, 25000]
+    zone_kinds: [industrial, highway, downtown]
+    name: The Depot
+    gate: the steel gate in the depot yard
+    description: An old industrial depot — loading bays, a maintenance yard, dead signage and surplus concrete — that looks boring and expensive to challenge. Under it, the Ghosts.
+  council:
+    seats: [black_top_hat, gray_top_hat, white_top_hat, red_top_hat, blue_top_hat]
+    every_days: 7
+    hour: 20
+    hours: 2.0
+  route_watch: true
+  decon:
+    team: 5
+    women_share: 0.35
+    occupation: Ghost operator
+    appearance: Masked, in clean interchangeable camo with a small smile stitched at the left chest; nothing about them is meant to be remembered.
+    goal: "{target} killed one of ours. Deconstruct them and leave nothing that points home."
+    mark: A small, neat smile has been cut into the body — deliberate, a signature, a warning.

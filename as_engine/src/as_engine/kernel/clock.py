@@ -83,6 +83,7 @@ QUEUE_TYPES: dict[str, str] = {
     "OPERATION_STEP": "world.worldmove",  # payload {op_id, step} (P10)
     "HORDE_STEP": "world.hordes",         # payload {horde_id} (P10: a horde walks on, mills, or keeps a street full)
     "POOL_RISE": "world.hordes",          # payload {zone_id, count, pathway} (P10: the unnamed dead rise)
+    "COUNCIL": "world.factions",          # payload {group_id, step, meeting?} (P10: a faction council convenes / adjourns)
     "ROUTINE_STEP": "society.routine",    # payload {actor_id}
     "PRODUCTION_CYCLE": "society.work",   # payload {workplace_id}
     "SETTLEMENT_DAY": "society.settlement",  # payload {settlement_id} (the daily draw, P9)
@@ -102,6 +103,7 @@ BACKGROUND_QUEUE_TYPES: frozenset[str] = frozenset({
     "ROUTINE_STEP", "PRODUCTION_CYCLE", "SETTLEMENT_DAY", "GROUP_DAY", "LOYALTY_CHECK",
     "CASCADE_EFFECT", "TRACE_DECAY",
     "WORLD_DAY", "OPERATION_STEP", "INFECTED_STEP", "REANIMATION", "HORDE_STEP", "POOL_RISE",
+    "COUNCIL",
 })
 
 

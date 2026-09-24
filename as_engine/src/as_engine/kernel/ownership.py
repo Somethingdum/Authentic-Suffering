@@ -101,5 +101,5 @@ MODULES: tuple[str, ...] = tuple(sorted(set(TABLE_OWNERS.values())))
 # Modules that write EVENTS but own no table (their events carry no WriteRecords): the resolver's
 # ACTION_* / CHECK_RESOLVED events and propagation's NOISE / SPEECH / LIGHT events. A valid
 # events.writer is any of these or a table owner (commit-gate bit G08).
-WRITER_ONLY_MODULES: tuple[str, ...] = ("action.propagate", "action.resolve")
+WRITER_ONLY_MODULES: tuple[str, ...] = ("action.propagate", "action.resolve", "world.factions")
 EVENT_WRITERS: tuple[str, ...] = tuple(sorted(set(MODULES) | set(WRITER_ONLY_MODULES)))

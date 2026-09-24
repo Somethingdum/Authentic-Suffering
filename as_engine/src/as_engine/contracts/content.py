@@ -399,6 +399,48 @@ class Leader(Strict):
     title: str
     role: str
     actor: ContentRef | None = None
+    seat: str | None = Field(default=None, pattern=SLUG_PATTERN, description="P10: a SEAT — an office "
+                             "worldgen fills with a person of its own in the faction's settlement (WG-27; "
+                             "group_members.role = the seat). The first leader always leads.")
+    age: tuple[int, int] | None = Field(default=None, description="P10: the seat holder's age range "
+                                        "(the Front Man is about forty by design).")
+
+
+class EnclaveDef(Strict):
+    """P10 (world.factions FAC-01): the faction lives sealed underground — one settlement of many
+    thousands behind one locked gate."""
+    population: tuple[int, int]
+    zone_kinds: list[str] = Field(min_length=1, description="Where it stands, in preference order.")
+    name: str = Field(min_length=2, description="The place's name as outsiders know it.")
+    gate: str = Field(min_length=2, description="The one way in, as a portal name.")
+    description: str = Field(min_length=10)
+
+
+class CouncilDef(Strict):
+    """P10 (FAC-02): the seats that meet, and when — every ``every_days`` days at ``hour``."""
+    seats: list[str] = Field(min_length=1)
+    every_days: int = Field(default=7, ge=1)
+    hour: int = Field(default=20, ge=0, le=23)
+    hours: float = Field(default=2.0, gt=0)
+
+
+class DeconDef(Strict):
+    """P10 (FAC-04): what the faction does when one of its own is killed by a human hand."""
+    team: int = Field(default=5, ge=1, description="Five Ghosts fit in a van.")
+    women_share: float = Field(default=0.35, ge=0, le=1)
+    occupation: str = Field(min_length=2)
+    appearance: str = Field(min_length=10, description="How a team member looks (their dossier).")
+    goal: str = Field(min_length=10, description="The team's goal on screen; {target} = how the killer is described.")
+    mark: str = Field(min_length=10, description="The trace left on a body they leave as a warning.")
+
+
+class FactionBehaviour(Strict):
+    """P10 (world.factions): what the faction DOES beyond its settlements and operations. Every block
+    is optional; the Ghosts have all four."""
+    enclave: EnclaveDef | None = None
+    council: CouncilDef | None = None
+    route_watch: bool = False
+    decon: DeconDef | None = None
 
 
 class FactionDossier(Strict):
@@ -426,6 +468,7 @@ class FactionDossier(Strict):
     belief_text: str = Field(min_length=10, description="What ordinary survivors say about them.")
     truth_text: str = Field(min_length=10, description="What is actually true (engine-only).")
     depth_reference: str | None = None
+    behaviour: FactionBehaviour = Field(default_factory=FactionBehaviour)
     model_config = Strict.model_config | {"populate_by_name": True}
 
 

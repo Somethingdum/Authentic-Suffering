@@ -31,6 +31,7 @@ dispatch(tx, rng, row, fired, turn_index, horizon_ms) -> list[Event]
     TRACE_DECAY     world.traces.decay(tx, rng, row, fired, turn_index)                    (P10)
     HORDE_STEP      world.hordes.step(tx, rng, row, fired, turn_index)                     (P10)
     POOL_RISE       world.hordes.rise(tx, rng, row, fired, turn_index)                     (P10)
+    COUNCIL         world.factions.step(tx, rng, row, fired, turn_index)                   (P10)
     any other type  (a type whose owner is not built) -> audit.log.record(tx, 'G0-timers', 'turn.pipeline', 'warn',
                     [{kind: 'timer_unbuilt', type, queue_id}], turn_index) and nothing else. The row
                     has already been fired, so the gate's S08 still holds; the P11 release audit
@@ -56,7 +57,8 @@ seed_society(tx, at, turn_index) -> list[str]   (TIME-09)
   with (tx, id, at, turn_index). Returns every new queue id in that order.
 seed_world(tx, at, turn_index) -> list[str]   (P10, TIME-11)
   A run with a world_params row (a generated world) -> world.worldmove.ensure_timers(tx, at,
-  turn_index); a run without one (every hand-made scenario) -> [] (nothing changes for them).
+  turn_index), then world.factions.ensure_timers(tx, at, turn_index) (the councils); a run without
+  one (every hand-made scenario) -> [] (nothing changes for them).
 run_offscreen(tx, rng, until_ms, turn_index) -> list[Event]   (TIME-10, the off-screen step)
   The world with nobody deciding: COLD fidelity, code only, no model call. until_ms < now ->
   ClockError. While now < until_ms: end = min(until_ms, now + WorldRules.offscreen_tick_h hours);

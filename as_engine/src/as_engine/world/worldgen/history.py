@@ -15,6 +15,8 @@ WG-18 plan_polity(rng, tx, params, placement, region, canon) -> PolityPlan
     presence: the placement's faction keeps placement.faction_presence; each other: 'dominant' when
     faction_density >= 6 and faction_fragmentation <= 4 and no planned faction is dominant yet, else
     'active' when faction_density >= 3, else 'peripheral'. name = the record's name.
+    P10 — then every ENCLAVE faction (placement.enclave_factions(canon, values), ref order; world.
+    factions FAC-01) is planned too, after the k (it takes no one's place), presence 'active'.
   2 Procedural groups: g = max(0, faction_density // 3 - k); when placement.entity_type is 'group',
     the PC's group is the first of them (descriptor = placement.group_descriptor) and g = max(g, 1).
     Every other one: descriptor = placement.descriptor(rng, tx, hostile=False). Hostile groups:
@@ -30,6 +32,19 @@ WG-18 plan_polity(rng, tx, params, placement, region, canon) -> PolityPlan
     (suffix: the first atlas.SETTLEMENT_SUFFIX entry whose key >= social_order), with f" ({group
     name})" appended when that name is taken. population = rng.range_int(18, 30, purpose
     f"population:{s}") + 6 x (2 dominant, 1 active, 0 otherwise).
+    P10 — an enclave faction's settlement takes no turn in that zone cycle: its zone is the first
+    region zone (index order) whose kind is the earliest of enclave.zone_kinds that any region zone
+    has (none -> the last region zone); its site is the ENCLAVE PLACE written here (a new place id
+    minted for it): one PLACE_DISCOVERED {zone_id, places: [site], source: 'worldgen'} (writer
+    'physical.space', origin 'worldgen') inserting the place {kind 'tunnel', name = enclave.name,
+    zone_id, parent_id NULL, width 200, depth 100, indoor 1, material 'concrete', light 3,
+    ambient_db 40, layout_generated 1, held 1, props {'enclave': the faction ref, 'description':
+    enclave.description}}, the anchors 'the intake crown' (feature, x 5, y 50) and 'the council
+    room' (feature, x 150, y 50) (capacity 4, cover 0, concealment 0), and one portal zone hub <->
+    site {kind 'door', name enclave.gate, is_open 0, is_locked 1, lock_quality 4, barricade 0,
+    aperture 400 x 400, seal_db 45, anchor_a NULL, anchor_b = the intake crown}; name =
+    enclave.name; population = rng.range_int(*enclave.population, purpose f"population:{s}"). It
+    is never the HOME settlement (no character is placed inside one).
   4 Home zones: a settlement's group -> its settlement's zone; a hostile group -> the first zone of
     kind 'highway', else 'industrial', else the last zone; a peripheral faction -> None.
   PolityPlan(groups: [PlannedGroup(group_id, kind 'faction'|'group', name, content_ref, descriptor,

@@ -319,8 +319,10 @@ def dict_write(table, key, values):
 
 # =========================================================================== HRD-08 pressing
 def _stl_with_people(s):
+    """A settlement with unnamed people that is not a sealed enclave (world.factions FAC-01)."""
     return next(r for r in all_rows(s, "SELECT * FROM settlements ORDER BY settlement_id")
-                if s.store.query_one("SELECT SUM(count) FROM cohorts WHERE settlement_id = ?", (r["settlement_id"],))[0])
+                if s.store.query_one("SELECT SUM(count) FROM cohorts WHERE settlement_id = ?", (r["settlement_id"],))[0]
+                and not json.loads(one(s, "SELECT props FROM places WHERE place_id = ?", (r["place_id"],))["props"]).get("enclave"))
 
 
 def test_a_small_crowd_only_scratches_the_walls(gw):
@@ -637,16 +639,53 @@ def test_a_crowd_breaks_down_a_door(scenario):
         walked = [json.loads(e["payload"]) for e in w.store.query(
             "SELECT payload FROM events WHERE type = 'MOVE' AND actor_id = ? ORDER BY seq", (b,))]
         assert walked and walked[0]["to_place"] == w.id("sales_floor"), "it walks up to the door first"
-    changes = [json.loads(x["payload"]) for x in w.store.query("SELECT payload FROM events WHERE type = 'PORTAL_CHANGE' ORDER BY seq")
+    changes = [(x["at"], json.loads(x["payload"])) for x in w.store.query("SELECT at, payload FROM events WHERE type = 'PORTAL_CHANGE' "
+                                                                          "ORDER BY seq")
                if json.loads(x["payload"])["portal_id"] == w.id("office_door")]
-    dmg = [c for c in changes if "damage" in c["changes"]]
-    assert [c["changes"]["damage"] for c in dmg][:3] == [1, 2, 3]
-    ats = [x["at"] for x in (dict(r) for r in w.store.query("SELECT at, payload FROM events WHERE type = 'PORTAL_CHANGE' ORDER BY seq"))
-           if json.loads(x["payload"])["portal_id"] == w.id("office_door") and "damage" in json.loads(x["payload"])["changes"]]
-    assert all(b - a >= MIN for a, b in zip(ats, ats[1:], strict=False))
+    strain = [(at, c["changes"]) for at, c in changes if "strain_min" in c["changes"]]
+    assert [c["strain_min"] for _at, c in strain] == [1, 2, 3], "a minute of pressure at a time (holds 3 here)"
+    assert [c.get("damage") for _at, c in strain] == [1, 2, 3], "damage (0..3) shows how near it is to giving way"
+    assert all(b[0] - a[0] >= MIN for a, b in zip(strain, strain[1:], strict=False))
     door = one_w(w, "SELECT * FROM portals WHERE portal_id = ?", (w.id("office_door"),))
-    assert (door["is_open"], door["is_locked"], door["barricade"]) == (1, 0, 0)
+    assert (door["is_open"], door["is_locked"], door["barricade"], door["damage"]) == (1, 0, 0, 3)
     assert any(json.loads(x["payload"]).get("kind") == "breaking" for x in w.store.query("SELECT payload FROM events WHERE type = 'NOISE'"))
+
+
+def test_a_locked_door_is_still_a_door(scenario):
+    """INF-12 (allow_locked) + INF-13: the dead find a locked door and lean on it like any other;
+    lock quality only makes it hold longer (here 3 + 15 x 1 minutes)."""
+    w, _made, _pt = _door_scene(scenario, 3)
+    with w.store.transaction() as tx:
+        tx.commit_event(space.portal_change_event(tx, w.id("office_door"), {"is_locked": 1}, now_w(w), None, None, 0))
+    from as_engine.contracts.settings import RulesConfig
+    r = w.store.rules.model_dump()
+    r["infected"]["lock_min"] = 2
+    w.store.attach(rules=RulesConfig.model_validate(r))
+    with w.store.transaction() as tx:
+        w.store.query_one("SELECT 1")
+    door = one_w(w, "SELECT * FROM portals WHERE portal_id = ?", (w.id("office_door"),))
+    holds = 3 + 2 * door["lock_quality"]
+    _run_w(w, holds + 3)
+    door = one_w(w, "SELECT * FROM portals WHERE portal_id = ?", (w.id("office_door"),))
+    assert (door["is_open"], door["is_locked"], door["strain_min"]) == (1, 0, holds)
+
+
+def test_the_strain_counts_minutes_the_damage_shows_how_near(scenario):
+    """INF-13: strain_min counts every minute of pressure; damage (0..3) rises in thirds of what the
+    door holds; it gives way when the strain reaches the hold — here 7 minutes."""
+    from as_engine.contracts.settings import RulesConfig
+    w, _made, _pt = _door_scene(scenario, 3)
+    r = w.store.rules.model_dump()
+    r["infected"]["portal_holds_min"] = {"door": 7}
+    w.store.attach(rules=RulesConfig.model_validate(r))
+    _run_w(w, 10)
+    got = [json.loads(x["payload"])["changes"] for x in w.store.query("SELECT payload FROM events WHERE type = 'PORTAL_CHANGE' "
+                                                                       "ORDER BY seq")
+           if json.loads(x["payload"])["portal_id"] == w.id("office_door") and "strain_min" in json.loads(x["payload"])["changes"]]
+    assert [c["strain_min"] for c in got] == [1, 2, 3, 4, 5, 6, 7]
+    assert [c.get("damage") for c in got] == [None, None, 1, None, 2, None, 3]
+    door = one_w(w, "SELECT * FROM portals WHERE portal_id = ?", (w.id("office_door"),))
+    assert (door["is_open"], door["damage"], door["strain_min"]) == (1, 3, 7)
 
 
 def test_one_body_only_bangs_and_tires_by_the_minute(scenario):
@@ -656,7 +695,7 @@ def test_one_body_only_bangs_and_tires_by_the_minute(scenario):
     t0 = now_w(w)
     _run_w(w, 6)
     door = one_w(w, "SELECT * FROM portals WHERE portal_id = ?", (w.id("office_door"),))
-    assert (door["is_open"], door["damage"]) == (0, 0)
+    assert (door["is_open"], door["damage"], door["strain_min"]) == (0, 0, 0)
     bangs = [json.loads(x["payload"]) for x in w.store.query("SELECT payload FROM events WHERE type = 'NOISE' ORDER BY seq")
              if json.loads(x["payload"]).get("kind") == "banging"]
     assert len(bangs) > 20

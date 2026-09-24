@@ -38,7 +38,9 @@ ROUT-06 step(tx, rng, row, fired, turn_index) -> list[Event]   (the ROUTINE_STEP
               when the body is dead, else 'no routine';
     'skipped' reason 'unable' when awareness is 'unconscious' or bodies.restrained = 1; reason
               'busy' when the actor has an active tasks row or a pending ACTION_LAND row
-              (kernel.clock.pending_for) — a routine yields to what someone is doing;
+              (kernel.clock.pending_for) — a routine yields to what someone is doing; (P10)
+              reason 'away' when the actor is a participant of an operation whose status is
+              'active' (world.worldmove) — nobody is walked home from a job by their timetable;
     otherwise st = step_for(hour of at) — except that a 'work' step whose worker is not able for
     the role (society.work.able) is spent as a 'free' step at the settlement's place (reason
     'cannot work'; an injured pump hand does not stand in the pump house) — and, in this order,

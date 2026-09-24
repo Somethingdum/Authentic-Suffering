@@ -44,6 +44,9 @@ relations:
   - faction: "core:faction/delgados_crew"
     stance: unaware
     history: Delgado's crew held a single store in the first months after the Fall; by the time the Remnants had a tribute network, that store's people were dead, scattered or paying somewhere under other names.
+  - faction: "core:faction/ghosts"
+    stance: wary
+    history: An old deniable crew the family used before the Fall — a few operators and one man who did the talking — who vanished after it and came back as something far bigger than anyone who dealt with them remembers. Ghost matters go straight to the Steward; nobody below him provokes them, probes them or runs a convoy near where they are thought to be (Ghosts_6).
 doctrine:
   challenge_procedure: A stranger at a gate or on a Remnants road is halted at a distance with a raised hand and a called question — "Who do you pay?" — and kept at that distance until a name, a ledger entry or a shield token is produced.
   escalation_ladder:

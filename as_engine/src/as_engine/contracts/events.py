@@ -143,6 +143,9 @@ class EventType(StrEnum):
     HORDE_SIGN = "HORDE_SIGN"                # P10: a sign of the Mega Horde, recorded once
     HORDE_STATE = "HORDE_STATE"              # P10: a horde's status / route / props change
     HORDE_GONE = "HORDE_GONE"
+    COUNCIL_MEETING = "COUNCIL_MEETING"      # P10: a faction council convenes (world.factions FAC-02)
+    COUNCIL_ADJOURNED = "COUNCIL_ADJOURNED"
+    ROUTE_WATCH_REPORT = "ROUTE_WATCH_REPORT"  # P10: a faction's route watch sees the Mega Horde form (FAC-03)
     # system
     WORLDGEN_STAGE = "WORLDGEN_STAGE"
     SCENE_START = "SCENE_START"
@@ -192,7 +195,8 @@ _groups: dict[EventClass, list[str]] = {
                        "INFRASTRUCTURE_FAIL", "TRACE_CREATED", "TRACE_DECAYED", "POPULATION_CHANGE",
                        "MATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE", "WORLD_DAY",
                        "POOL_CHANGE", "HORDE_FORMED", "HORDE_MOVED", "HORDE_PROMOTED", "HORDE_PRESSED",
-                       "HORDE_SIGN", "HORDE_STATE", "HORDE_GONE"],
+                       "HORDE_SIGN", "HORDE_STATE", "HORDE_GONE", "COUNCIL_MEETING", "COUNCIL_ADJOURNED",
+                       "ROUTE_WATCH_REPORT"],
     EventClass.SYSTEM: ["WORLDGEN_STAGE", "SCENE_START", "SCENE_END", "CLOCK_ADVANCE", "TIMER_SET", "TIMER_FIRED", "TIMER_CANCELLED",
                         "OVERRIDE", "MIGRATION_BACKFILL",
                         "DEGRADED_FALLBACK", "CHEAT_ACTIVATED", "CHEAT_OVERRIDE", "CHEAT_DEACTIVATED",

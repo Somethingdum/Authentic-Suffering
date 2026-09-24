@@ -113,6 +113,9 @@ STL-12 ensure_timers(tx, settlement_id, at, turn_index) -> list[str]: no pending
   for the settlement -> kernel.clock.schedule(tx, next_hour(at, R.draw_hour), 'SETTLEMENT_DAY',
   settlement_id, {'settlement_id': settlement_id}, None). next_hour(ms, hh) = the smallest t > ms
   with hour hh, minute 0, second 0. Returns the new queue ids.
+STL-13 set_lockdown(tx, settlement_id, on, reason, at, turn_index, cause_event_id) -> Event | None
+  (P10, world.factions FAC-01) new = 1 when on else 0; new == settlements.lockdown -> None. Else
+  SETTLEMENT_CHANGE {settlement_id, field: 'lockdown', old, new, reason} writing it.
 """
 
 from __future__ import annotations
@@ -218,3 +221,8 @@ def trade_terms(store: "Store | Tx", settlement_id: str, buyer_id: str) -> Trade
 
 def ensure_timers(tx: "Tx", settlement_id: str, at: int, turn_index: int) -> list[str]:
     raise NotImplementedError("P9")
+
+
+def set_lockdown(tx: "Tx", settlement_id: str, on: bool, reason: str, at: int, turn_index: int,
+                 cause_event_id: str | None) -> "Event | None":
+    raise NotImplementedError("P10")

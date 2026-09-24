@@ -50,10 +50,13 @@ weather_weights(values) -> list[tuple[str, float]]   (implemented below)
 
 OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
   At most one new operation per settlement per day, and one raid per hostile group. Per settlement
-  (by id) whose site is outside the active area, with a governing group: crew = its named members
-  (group_members 'member') who are alive, able (society.work.able for 'watcher'), not
-  human-controlled, outside the active area and in no active operation, sorted by (their daily
-  work hours, id). For kind in ('scavenge', 'patrol', 'trade_run'): chance = W.op_chance[kind] x
+  (by id) whose site is outside the active area, with a governing group, and not in lockdown
+  (settlements.lockdown 0; P10, world.factions FAC-01: a sealed enclave sends nobody out): crew =
+  its named members (group_members status 'member') who are alive, able (society.work.able for
+  'watcher'), not human-controlled, not seat holders (P10: role = the ``seat`` of one of the
+  group's record's leaders — a council does not go scavenging), outside the active area and in
+  no active operation, sorted by (their daily work hours, id). For kind in ('scavenge', 'patrol',
+  'trade_run'): chance = W.op_chance[kind] x
   (2 when the settlement has a shortage, for scavenge) x (social_order / 5, for patrol) x
   (faction_relations / 5, for trade_run; 0 without another settlement); the first kind whose
   rng.chance(tx, 'offscreen', f"op:{settlement}:{kind}:{d}", chance) holds starts, with n =
@@ -65,12 +68,16 @@ OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
   Per
   hostile group (by id) with 2+ named living members outside the active area: rng.chance(...,
   f"raid:{group}:{d}", W.op_chance['raid'] x hostile_human / 5) -> a raid on rng.choice(the
-  settlements) by all of them. A new operation: op_id = tx.mint('ops'); FACTION_OPERATION {op_id,
-  group_id, kind, participants, destination, status: 'active', step: 'depart'} inserting operations
-  {op_id, group_id, kind, status 'active', route [origin place, destination place], participants,
-  next_due_at = at + W.op_leg_h h, outcome NULL}; every participant MOVEs (physical.space.move_event,
-  cause the FACTION_OPERATION) to its zone's hub (leaving); kernel.clock.schedule(next_due_at,
-  'OPERATION_STEP', op_id, {'op_id': op_id, 'step': 'arrive'}, the FACTION_OPERATION id).
+  settlements) by all of them. A new operation is launch(...) (OPS-08).
+OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *,
+       target_id=None) -> str   (OPS-01's daily plan and world.factions FAC-04 DECON)
+  op_id = tx.mint('ops'); FACTION_OPERATION {op_id, group_id, kind, participants, destination,
+  status: 'active', step: 'depart'} (plus target_id when given) inserting operations {op_id,
+  group_id, kind, status 'active', route [origin place, destination place], participants,
+  next_due_at = at + W.op_leg_h h, outcome NULL, target_id}; every participant MOVEs
+  (physical.space.move_event, cause the FACTION_OPERATION) to its zone's hub (leaving);
+  kernel.clock.schedule(next_due_at, 'OPERATION_STEP', op_id, {'op_id': op_id, 'step': 'arrive'},
+  the FACTION_OPERATION id). Returns op_id.
 OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event]   (the OPERATION_STEP handler)
   The operation (status 'active'; otherwise []). movers = participants alive and outside the active
   area (those in it are on-screen now: the turn moves them, they drop out of the operation's moves).
@@ -81,6 +88,17 @@ OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event]   (the OPERATION_STE
   'return': movers MOVE to the origin; resolve the stores (below); the hurt are sutured (OPS-07);
     FACTION_OPERATION {op_id, step: 'return', status: 'done'} updating status 'done', next_due_at
     NULL.
+  Kind 'decon' (P10, world.factions FAC-05) replaces 'arrive' with: the killer = operations.
+    target_id; dest = world.hordes.target(the killer's place); the killer outside the active area
+    -> movers MOVE to dest, physical.bodies.die(tx, rng, killer, at, the step's event, turn_index,
+    cause='decon'), TRACE 'mark' (the faction's decon.mark) at dest (source = that DEATH),
+    FACTION_OPERATION {op_id, step: 'arrive', outcome: {'killed': killer}} and 'return' at at +
+    W.op_leg_h h; the killer in the active area -> movers MOVE to dest (on screen now), each gets
+    the PLAN_CHANGE of FAC-05, FACTION_OPERATION {op_id, step: 'hunt'} and 'hunt' at at +
+    W.op_leg_h h; the killer dead or gone -> 'return' at once. 'hunt': the killer dead, or no
+    participant alive -> FACTION_OPERATION {op_id, step: 'hunt', outcome: {'killer_dead': bool}}
+    and 'return' now; else 'hunt' again at at + W.op_leg_h h. A decon party finds no haul and
+    leaves no other trace; its OPS-03 harm roll does not apply (it moves in a van).
 OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>":
   every mover: rng.chance(world.hordes.density(the destination's zone) / 20) (P10: how thick the
   district's dead actually are — a cleared district is safe) -> physical.bodies.apply_harm (a
@@ -181,4 +199,9 @@ def on_arrival(tx: "Tx", rng: "Rng", body_id: str, place_id: str, at: int, cause
 
 
 def depart(tx: "Tx", rng: "Rng", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
+    raise NotImplementedError("P10")
+
+
+def launch(tx: "Tx", group_id: str, kind: str, participants: list[str], origin: str, destination: str, at: int,
+           turn_index: int, cause: str | None, *, target_id: str | None = None) -> str:
     raise NotImplementedError("P10")

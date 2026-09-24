@@ -6,8 +6,12 @@ docs/as/06_WORLD.md §1.3. Pure code: no model call. rng stream 'worldgen:placem
 PCDossier. A faction's ``ref`` is its content ref ('core:faction/mafia_remnants').
 
 WG-10 eligible_factions(canon, values) -> list[tuple[str, FactionDossier]]
-  (ref, record) for every canon faction record whose kind is 'faction' and whose
-  presence.presence_conditions ALL evaluate true (conditions.evaluate(expr, values)), sorted by ref.
+  (ref, record) for every canon faction record whose kind is 'faction', that has no
+  behaviour.enclave, and whose presence.presence_conditions ALL evaluate true
+  (conditions.evaluate(expr, values)), sorted by ref.
+  enclave_factions(canon, values) -> the same list for the records WITH behaviour.enclave (P10,
+  world.factions FAC-01): never a character's placement faction (Ghosts_6: membership is its own
+  way to play) and never one of WG-18's k — WG-18 plans them on top.
 
 WG-11 place(rng, tx, values, pc, canon) -> Placement   (Part X steps 1-4)
   t = pc.faction_start_type; E = eligible_factions(canon, values); density = values['faction_density'];
@@ -91,6 +95,10 @@ class QCResult:
 
 
 def eligible_factions(canon, values: dict) -> list[tuple[str, "FactionDossier"]]:
+    raise NotImplementedError("P10")
+
+
+def enclave_factions(canon, values: dict) -> list[tuple[str, "FactionDossier"]]:
     raise NotImplementedError("P10")
 
 

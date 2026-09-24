@@ -25,7 +25,9 @@ WG-23 write_settlements(rng, tx, plan, params, region, at) -> list[Event]   (WG4
     MATERIALIZE (society.settlement) inserting settlements {settlement_id, name, place_id = s.site_id,
       group_id, stores (keys sorted), morale 5, cohesion = the group's cohesion, defences =
       clamp(social_order // 2 + 1, 0, 10), sanitation = clamp(tech_preservation // 2, 0, 10), power =
-      1 when tech_baseline >= 6 else 0, ration_level 3, shortages [], vacancies [], next_due_at NULL}.
+      1 when tech_baseline >= 6 else 0, ration_level 3, shortages [], vacancies [], next_due_at NULL,
+      lockdown 0}. P10 — an enclave (world.factions FAC-01) is built to outlast the world around it:
+      defences 10, sanitation 10, power 1 (its own supply; Ghosts_6: the dam).
     Workplaces, in this order, each its own MATERIALIZE (society.work): water_pump, kitchen, watch
       always; clinic when meds >= 4; garden when the settlement's zone kind is 'rural' or
       'riverside'. From atlas.WORKPLACE_PLANS[site]: cycle_h, the output resource and the first cycle

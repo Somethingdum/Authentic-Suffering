@@ -46,9 +46,10 @@ Events built here (callers commit them; writer 'physical.space'):
     point (the caller passes them; ValueError when the anchor is not in to_place). A MOVE may
     keep the body where it is (from == to): that is how a body hides where it stands.
   PORTAL_CHANGE {portal_id, changes, before} — ``changes`` keys limited to is_open, is_locked,
-    barricade, damage (ValueError otherwise; ValueError when the result would be open AND
-    barricaded — W08 — so a barricade comes down before the door opens; wall/fence portals can
-    change only damage). ``before`` holds the previous values of the changed keys.
+    barricade, damage and (P10, world.infected INF-13) strain_min (ValueError otherwise;
+    ValueError when the result would be open AND barricaded — W08 — so a barricade comes down
+    before the door opens; wall/fence portals can change only damage and strain_min). ``before``
+    holds the previous values of the changed keys.
 
 Discovery (PLMP carried, rule GEO-03; built in P10 with worldgen — scenario fixtures already
 contain their rooms, so nothing before P10 needs it): a building's rooms are generated from its
@@ -149,10 +150,12 @@ def admits(store: "Store | Tx", portal_id: str, body_id: str) -> tuple[bool, str
 
 
 def path(store: "Store | Tx", body_id: str, to_place: str, to_anchor: str | None = None,
-         *, allow_closed: bool = False) -> list[PathLeg] | None:
+         *, allow_closed: bool = False, allow_locked: bool = False) -> list[PathLeg] | None:
     """Shortest traversable route by distance (Dijkstra, ties broken by portal_id). With
     allow_closed=True closed-but-unlocked, unbarricaded portals count as traversable (the mover
-    will have to open them). Returns None when unreachable."""
+    will have to open them). P10: with allow_locked=True every closed portal counts, locked or
+    barricaded — never a wall or a fence — (world.infected INF-12: to something that bangs, a door
+    is a door). The body must still fit through. Returns None when unreachable."""
     raise NotImplementedError("P2")
 
 
@@ -184,7 +187,8 @@ def move_event(tx: "Tx", body_id: str, to_place: str, to_anchor: str | None, x_m
 
 def portal_change_event(tx: "Tx", portal_id: str, changes: dict, at: int, actor_id: str | None,
                         cause_event_id: str | None, turn_index: int) -> Event:
-    """PORTAL_CHANGE event. ``changes`` keys limited to is_open, is_locked, barricade, damage."""
+    """PORTAL_CHANGE event. ``changes`` keys limited to is_open, is_locked, barricade, damage and
+    (P10) strain_min."""
     raise NotImplementedError("P2")
 
 

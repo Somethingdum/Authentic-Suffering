@@ -23,7 +23,11 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
       is one);
     2 a leader for each settlement's group, home first then plan order (role 'leader') — except a
       faction whose record's first leader names a pack actor placed in that settlement: that actor
-      leads and no one is generated for it;
+      leads and no one is generated for it; P10: then, for that settlement, one person per OTHER
+      leader of the record that has a ``seat`` and names no placed pack actor (record order):
+      occupation = the leader's title, skill ('leadership', 2), age = rng.range_int(*leader.age,
+      purpose f"seat_age:{n}") when the leader gives one, group_members role = the seat (the
+      Top-Hat Council and the Front Man; Ghosts_6 leaves their names to each world);
     3 residents: the home settlement, then the others in plan order, cycling, one at a time.
   A post or leader is an adult (band 'adult'); a resident's band = rng.weighted over the
   settlement's cohort counts by band (purpose f"band:{n}"), and its sex likewise over that band's
@@ -56,7 +60,8 @@ WG-28 Writing (per person, slot order; pack actors first in placement order): th
   controller 'model') — society.population.materialise for generated people (which also takes them
   from the cohort), physical.bodies.create + physical.space.place_body + mind.actor.create for pack
   actors after society.population.take_from_cohort of their band and sex (skipped when that cohort is
-  empty). Then, per settlement: group_members {role 'leader' for the leader else 'member', standing
+  empty). Then, per settlement: group_members {role 'leader' for the leader, the seat for a seat
+  holder (P10), else 'member', standing
   0 — a pack actor's own membership standing for that faction when it has one —, since = at,
   status 'member'} (MATERIALIZE society.group) and groups.leader_id; households, in slot order: a
   named teen, adult or elder gets their own household (dwelling_place = the settlement site,
@@ -87,8 +92,8 @@ WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acqua
 
 async write_people(client, rng, tx, plan, region, params, canon, detail, at) -> People
   People(pack_placed: [actor ids], generated: [actor ids], skipped: [(ref, reason)], home_settlement_id,
-  leaders: {group_id: actor_id}, roles: {actor_id: post role or 'leader'} for the generated posts
-  and leaders).
+  leaders: {group_id: actor_id}, roles: {actor_id: post role, 'leader' or the seat} for the
+  generated posts, leaders and seat holders).
 """
 
 from __future__ import annotations

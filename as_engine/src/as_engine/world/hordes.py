@@ -105,8 +105,9 @@ HRD-07 promote(tx, rng, horde_id, place_id, at, turn_index, cause) -> list[str] 
 HRD-08 press(tx, rng, horde_id, settlement_id, at, turn_index, cause) -> Event   (fidelity C01: the
   dead kill the living who are there)
   N = count; D = settlements.defences; pressure = N / (H.breach_scale x (1 + D)); p = min(0.95,
-  max(0, pressure - 0.5)); breached = rng.chance(tx, 'hordes', f"breach:{horde}:{settlement}:{at}",
-  p); breached -> killed (below) and one bite draw per named member there (below), in member id
+  max(0, pressure - 0.5)) — 0 for an enclave (world.factions FAC-01: sealed underground, it is
+  never broken into; its gate is pressed and nothing more); breached = rng.chance(tx, 'hordes',
+  f"breach:{horde}:{settlement}:{at}", p); breached -> killed (below) and one bite draw per named member there (below), in member id
   order — all drawn before anything is written. HORDE_PRESSED {horde_id, settlement_id, count: N,
   pressure: round(pressure, 2), breached, killed, bitten} (place_id = the settlement's site), then,
   each caused by it:
@@ -167,7 +168,8 @@ HRD-12 The Mega Horde forms (the end-game event). At most one exists at a time (
     turn_index, cause, props = {exit_zone, eta_at: at + eta x DAY, signs: [], speed_m_s:
     H.mega_speed_m_s, passage: {}}, first_leg_ms = eta x DAY) — it sets foot on the road into
     the region at eta_at exactly (the long walk in from the country is its first leg) and reaches
-    the gateway's hub when that road has been walked.
+    the gateway's hub when that road has been walked. Then world.factions.sighted(tx, horde_id, at,
+    turn_index, the HORDE_FORMED id) (FAC-03: a faction with a route watch knows at once).
 HRD-13 The signs, every WORLD_DAY while the mega horde is still at its entry hub: left =
   ceil((eta_at - at) / DAY); each sign once, in this order, recorded in props.signs (HORDE_SIGN
   {horde_id, sign} updating props):
@@ -193,6 +195,9 @@ HRD-14 Passage. A mega horde arriving at a REGION zone's hub mills there for cei
   the rest of its route, or — at the target — path(here, the exit zone's hub).
   At the exit zone's hub it is gone: its composition joins that zone's pool (change, reason
   'passed') and HORDE_GONE {horde_id, reason: 'left', zone_id}.
+  Its FIRST region passage (props.passage empty before it) also calls world.factions.passage(tx,
+  horde_id, True, at, turn_index, the HORDE_MOVED id) (FAC-03: the enclaves seal), and its
+  HORDE_GONE — however it ends — calls passage(..., False, ..., the HORDE_GONE id).
 HRD-15 Conservation (fidelity F04, tests check it): census(store)['total'] changes only by: the dead
   that rise (POOL_CHANGE reason 'risen'; world.infected.rise), cheat spawns (P12) and infected
   bodies destroyed. Every other move — populate, promote, draw, drift, disperse, straggle, rally,

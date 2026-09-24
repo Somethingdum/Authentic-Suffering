@@ -35,15 +35,17 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     turn's window or off-screen alike.
   INF-13 (P10) A crowd breaks what one body only bangs on. After a bang (step 1): when at least
     R.push_min living infected bodies (b included) stand in b's place within 2 m of the portal's
-    point on this side, and the portal's newest PORTAL_CHANGE event whose changes hold 'damage' is
-    at least 60 s older than at (or there is none): commit physical.space.portal_change_event(tx,
-    portal, {damage: damage + 1}, at, None, the NOISE id, turn_index) — damage counts the minutes
-    a crowd has leaned on it. When damage reaches R.portal_holds_min[the portal's kind] (a kind not
-    listed: 20) + R.barricade_min x barricade + R.lock_min x lock_quality, it gives way: one more
-    PORTAL_CHANGE {barricade: 0, is_locked: 0, is_open: 1} and NOISE {source_db: 95, kind:
-    'breaking', text: 'Wood splits and something gives way.', place_id: b's place} (writer
-    'action.propagate', actor_id b). A lone body never breaks in; a crowd that knows someone is
-    inside does, in time.
+    point on this side, and the portal's newest PORTAL_CHANGE event whose changes hold 'strain_min'
+    is at least 60 s older than at (or there is none): strain = portals.strain_min + 1 (the minutes
+    a crowd has leaned on it); holds = R.portal_holds_min[the portal's kind] (a kind not listed:
+    20) + R.barricade_min x barricade + R.lock_min x lock_quality; commit physical.space.
+    portal_change_event(tx, portal, {strain_min: strain} plus {damage: min(3, strain x 3 //
+    holds)} when that is above its damage, at, None, the NOISE id, turn_index). When strain >=
+    holds it gives way: one more PORTAL_CHANGE {barricade: 0, is_locked: 0, is_open: 1, damage: 3}
+    and NOISE {source_db: 95, kind: 'breaking', text: 'Wood splits and something gives way.',
+    place_id: b's place} (writer 'action.propagate', actor_id b) — except a portal into an enclave
+    place (places.props.enclave; world.factions FAC-01), which holds whatever the strain. A lone
+    body never breaks in; a crowd that knows someone is inside does, in time.
 
 active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, awareness not
   'unconscious' (false-dead), an infected_state row, and 'dormant' not in states.
@@ -106,8 +108,9 @@ step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handle
       a body elsewhere or a place: dest = its place; b already in dest and it is a place (it has
         arrived) -> the first living body there (by body_id) that sees(b, it) holds becomes the
         target (attract, reason 'sight' — it schedules the next step), else target None; stop; else path = physical.space.path(tx, b, dest) (open ways only), and when
-        None physical.space.path(..., allow_closed=True) (it will stand at the door and bang); no
-        path at all -> target None, stop; the first leg: to_place = that leg's place, x/y =
+        None physical.space.path(..., allow_closed=True), and when still None path(...,
+        allow_locked=True) (P10: it will stand at the door and bang, locked or barricaded — INF-13
+        is how a crowd gets through one); no path at all -> target None, stop; the first leg: to_place = that leg's place, x/y =
         physical.space.portal_point(tx, leg.portal_id, leg.place_id), portal_id = leg.portal_id;
         delay = (distance from b to the portal point on its side) / speed(b) + 1 s.
   4 kernel.clock.schedule(tx, at + round(max(R.step_min_s, delay) x 1000), 'INFECTED_STEP', b,

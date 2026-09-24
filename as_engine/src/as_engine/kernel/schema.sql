@@ -273,6 +273,7 @@ CREATE TABLE portals (
   lock_quality  INTEGER NOT NULL DEFAULT 0 CHECK (lock_quality BETWEEN 0 AND 4),
   barricade     INTEGER NOT NULL DEFAULT 0 CHECK (barricade BETWEEN 0 AND 3),
   damage        INTEGER NOT NULL DEFAULT 0 CHECK (damage BETWEEN 0 AND 3),
+  strain_min    INTEGER NOT NULL DEFAULT 0 CHECK (strain_min >= 0),   -- P10: minutes a crowd leaned on it (INF-13)
   aperture_w_cm INTEGER NOT NULL,
   aperture_h_cm INTEGER NOT NULL,
   seal_db       REAL NOT NULL DEFAULT 25,
@@ -766,7 +767,8 @@ CREATE TABLE settlements (
   ration_level INTEGER NOT NULL DEFAULT 3 CHECK (ration_level BETWEEN 0 AND 4),
   shortages   TEXT NOT NULL DEFAULT '[]',
   vacancies   TEXT NOT NULL DEFAULT '[]',
-  next_due_at INTEGER
+  next_due_at INTEGER,
+  lockdown    INTEGER NOT NULL DEFAULT 0 CHECK (lockdown IN (0, 1))   -- P10: sealed (world.factions FAC-01)
 );
 
 -- OWNER society.settlement
@@ -844,7 +846,8 @@ CREATE TABLE operations (
   route      TEXT NOT NULL DEFAULT '[]',
   participants TEXT NOT NULL DEFAULT '[]',
   next_due_at INTEGER,
-  outcome    TEXT
+  outcome    TEXT,
+  target_id  TEXT                    -- P10: whom a 'decon' operation is for (world.factions FAC-04)
 );
 
 -- OWNER world.hordes   (P10: a district's dead nobody has met yet, counted — fidelity E01)

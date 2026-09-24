@@ -1,4 +1,4 @@
-"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..14, LORE-01.
+"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..15, LORE-01.
 docs/as/09_CONTENT_PACKS.md is the authoring guide; this docstring is the machine contract.
 
 Folder layout (every folder optional except pack.yaml):
@@ -91,6 +91,8 @@ Validation (CNT-*), each error names file + field in plain language:
          keep its applies_to / inherits unchanged.
   CNT-14 generation 'cheat' dossiers, and any dossier tagged 'standing_brief' (CHEAT-11), may only
          live in packs whose manifest id starts with 'cheat_'.
+  CNT-15 (P10) a faction's behaviour.council.seats each name the ``seat`` of one of its leaders, and
+         no two leaders share a seat.
 Severity: every code is 'error' except the CNT-08 retired-name case and the unknown-folder case
   (code CNT-00, 'warning'). load_canon's Canon contains only records that loaded; callers treat
   any error as fatal (the conftest canon fixture asserts there are none for core).
