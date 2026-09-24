@@ -46,7 +46,9 @@ handle(message) -> list[dict]   (never raises, PROTO-03)
      service.runs.RunError -> [error {code: its code, message: its message}]; NotImplementedError
      (an action whose phase is not built yet: the P10 / P12 handlers below are stubs until then,
      PROTO-09) -> [error not_built_yet, NOT_BUILT]; any other Exception -> logged with its
-     traceback (logging.getLogger('as_engine.service')) and [error internal, INTERNAL].
+     traceback (logging.getLogger('as_engine.service')) and [error internal, INTERNAL]. Logs
+     name no session (RUN-13): the action, the error code and the exception type — never a
+     run_id, a character's name or the message's text.
   Error data is OutError(code, message, recoverable=True) (PROTO-08).
 
 State kept by the service: config, transport, config_path, client (a LaneClient(config, transport)
@@ -121,8 +123,9 @@ Handlers (P8):
   on_run_save(InRunSave): no session -> NO_RUN; busy -> BUSY. path =
     service.runs.save_run(session, slot_name) (RunError 'ironman' passes through) -> [saved {slot =
     path.stem, label = slot_name, turn_index = world_clock.turn_index}].
-  on_run_delete(InRunDelete): run_id is the loaded run -> ServiceError('run_open', RUN_OPEN);
-    service.runs.delete_run(config, run_id) -> [runs].
+  on_run_delete(InRunDelete) (RUN-12): busy -> BUSY. The loaded run is closed first (its store
+    closed, session None, last_view and last_story cleared); then service.runs.delete_run(config,
+    run_id) (a RunError -> [error {code, message}]) -> [run_deleted {run_id}, runs].
   on_view_get: no session -> NO_RUN; busy -> [view {last_view}] (BUSY when there is none); else
     [view {view()}].
   on_story_get: no session -> NO_RUN; busy -> [story {last_story}] (BUSY when there is none); else

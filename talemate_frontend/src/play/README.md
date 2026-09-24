@@ -32,7 +32,7 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
       and **Continue** still works with only the Storyteller brain. Start it again. [UI-CLARITY-06]
 - [ ] Open a second tab on the same address. It shows "The game is already open in another tab or
       window…" and does not keep reconnecting. Close it; the first tab still works.
-- [ ] Home shows Continue (naming Owen Marsh, day 18, alive), New life, Load, Worlds, Your characters &
+- [ ] Home shows Continue (naming Owen Marsh, day 18, alive), New life, Your lives, Worlds, Your characters &
       world, Settings. Every button has words, not just an icon. [UI-CLARITY-03]
 - [ ] New life and Worlds open a plain "not built yet" page with a Back button (P10 / P12 build them).
 
@@ -81,7 +81,9 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
       brings you back to the same moment.
 - [ ] Reload the page in the middle of a long turn: the game reconnects to the running turn and
       shows its result. [PROTO-02]
-- [ ] Load (Home) lists the run; Delete asks for a second click before it deletes.
+- [ ] **Your lives** (Home) lists every life; Delete asks once ("Delete … story? This can't be undone.")
+      and **Keep it** changes nothing. After a delete the run's folder is gone from `as_runs/` and the
+      Play UI shows nothing of it. [RUN-12]
 
 ## 5. Settings, content, developer mode
 

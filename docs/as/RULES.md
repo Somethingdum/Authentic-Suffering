@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-601 ids; 351 with their own statement, 250 named only in context.
+606 ids; 353 with their own statement, 253 named only in context.
 
 
 ## ABUSE
@@ -788,17 +788,19 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RUN-01 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p10_world/test_worldgen_pipeline.py` |
-| RUN-02 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-03 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-04 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-01 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-02 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-03 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
+| RUN-04 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
 | RUN-05 | *service.runs.load_run, RUN-05). episodes_fts is a derived index kept by schema triggers,* | as_engine/kernel/store.py | `as_engine/kernel/store.py`, `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p07_slice/test_slice_refusal.py`, `contract/p08_ui_protocol/test_runs_protocol.py` |
-| RUN-06 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
+| RUN-06 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py`, `contract/p08_ui_protocol/test_sessions.py` |
 | RUN-07 | *P12: RUN-07.* | as_engine/service/game_service.py | `as_engine/service/game_service.py`, `as_engine/service/runs.py` | — |
-| RUN-08 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | — |
-| RUN-09 | *A reusable world: the genesis snapshot of a generated (or imported) world (RUN-09).* | as_engine/contracts/view.py | `as_engine/contracts/view.py`, `as_engine/service/game_service.py`, `as_engine/service/runs.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
-| RUN-10 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
-| RUN-11 | *Worldgen path (P10, RUN-11); world_id reuse path (P12, RUN-09).* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-08 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | — |
+| RUN-09 | *A reusable world: the genesis snapshot of a generated (or imported) world (RUN-09).* | as_engine/contracts/view.py | `as_engine/contracts/view.py`, `as_engine/kernel/store.py`, `as_engine/service/game_service.py`, `as_engine/service/runs.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_world_names_no_run.py`, `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-10 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p07_slice/test_save_load.py` |
+| RUN-11 | *Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.* | as_engine/service/runs.py | `as_engine/service/runs.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| RUN-12 | RUN-12 a deleted session leaves nothing of it: one step for the player, no soft delete, every file the game wrote for the run wiped (wipe_tree); the world it was played in stays and names no run. | as_engine/service/runs.py | `as_engine/contracts/protocol.py`, `as_engine/service/game_service.py`, `as_engine/service/runs.py` | `contract/p08_ui_protocol/test_runs_protocol.py`, `contract/p08_ui_protocol/test_sessions.py`, `contract/p10_world/test_world_names_no_run.py` |
+| RUN-13 | RUN-13 process-wide logs name no session: the engine and the service log action names, error codes and exception types only — never a run_id, a character's name, or anything said, typed or written in a run. What a run n… | as_engine/service/runs.py | `as_engine/service/game_service.py`, `as_engine/service/runs.py` | `contract/p08_ui_protocol/test_sessions.py` |
 
 ## SCENE
 
@@ -827,6 +829,14 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | SCOPE-01 | *Table ownership (rule STORE-02 / SCOPE-01).* | as_engine/kernel/ownership.py | `as_engine/kernel/ownership.py` | `contract/p00_substrate/test_ownership.py` |
+
+## SEG
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| SEG-01 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
+| SEG-02 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
+| SEG-03 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
 
 ## SEL
 

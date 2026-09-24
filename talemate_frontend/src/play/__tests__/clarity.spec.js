@@ -8,6 +8,7 @@ import ConnectScreen from '../screens/ConnectScreen.vue'
 import ContentScreen from '../screens/ContentScreen.vue'
 import HomeScreen from '../screens/HomeScreen.vue'
 import PlayScreen from '../screens/PlayScreen.vue'
+import SessionsScreen from '../screens/SessionsScreen.vue'
 import { BANNED_WORDS, ID_PATTERN, PANEL_TITLES } from '../words.js'
 import { byId, flush, mountWith, one, readable, storeWith } from './helpers.js'
 
@@ -27,9 +28,9 @@ async function screens() {
   let s = storeWith('welcome_connect', 'config', 'models_a', 'models_b', 'test_a_ok', 'test_b_down')
   out.push(['Connect', mountWith(ConnectScreen, { store: s.store }), false])
   s = storeWith('welcome_home', 'runs')
-  const home = mountWith(HomeScreen, { store: s.store })
-  await one(home, 'home-load').trigger('click')
-  out.push(['Home with the run list', home, false])
+  out.push(['Home', mountWith(HomeScreen, { store: s.store }), false])
+  s = storeWith('welcome_home', 'runs')
+  out.push(['Your lives', mountWith(SessionsScreen, { store: s.store }), false])
   s = storeWith('welcome_home', 'packs', 'content_report_bad')
   out.push(['Your characters & world', mountWith(ContentScreen, { store: s.store }), true])
   for (const tab of ['models', 'gameplay', 'advanced']) {

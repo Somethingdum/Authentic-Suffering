@@ -39,7 +39,7 @@ INBOUND_ACTIONS = (
 OUTBOUND_ACTIONS = (
     "welcome", "state", "models", "model_test_result", "config", "packs", "pcs", "content_report",
     "import_result", "intake_progress", "intake_result", "quickmake_result", "worldgen_progress",
-    "runs", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
+    "runs", "run_deleted", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
     "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done",
 )
@@ -254,6 +254,12 @@ class OutRuns(Strict):
     runs: list[RunSummaryView]
 
 
+class OutRunDeleted(Strict):
+    """A session was deleted; the Play UI forgets everything it held for it (RUN-12)."""
+
+    run_id: str
+
+
 class OutPCs(Strict):
     cards: list[PCCardView]
 
@@ -356,7 +362,7 @@ IN_MODELS: dict[str, type[Strict] | None] = {
 OUT_MODELS: dict[str, type[Strict] | None] = {
     "welcome": OutWelcome, "state": OutState, "models": OutModels, "model_test_result": OutModelTest, "config": OutConfig,
     "packs": OutPacks, "pcs": OutPCs, "content_report": OutContentReport, "import_result": None, "intake_progress": None,
-    "intake_result": None, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns,
+    "intake_result": None, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns, "run_deleted": OutRunDeleted,
     "run_loaded": OutRunLoaded, "saved": OutSaved, "turn_progress": OutTurnProgress, "turn_result": OutTurnResult,
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,
     "death": OutDeath, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,

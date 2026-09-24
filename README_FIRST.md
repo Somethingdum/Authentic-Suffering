@@ -346,6 +346,10 @@ What the P6 update changed (for anyone still on the first copy):
   install` then `corepack pnpm run test:play` should behave the same, but it has not been run there.
 - Voice pinning in the People panel (DOS-05, "Pin a line") has no protocol action yet; it is left
   out of P8.
+- Deleting a life (Your lives) overwrites every file the game wrote for it with zeros and removes it
+  (RUN-12, D-76). Two things no program can reach: an SSD's own spare blocks, and backups your
+  operating system or a sync service made of the `as_runs` folder. For those, full-disk encryption
+  and leaving `as_runs` out of backups are the answer.
 - The DSH bridge configuration in §4 is from DSH's documentation, not from a run on your DSH.
 - Timing and tuning numbers marked `[SAND]` are placeholders until you run `bench.py`/`eval.py` on
   your machines (listed under "SAND remaining" in `PROGRESS.md`).

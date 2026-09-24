@@ -70,7 +70,10 @@ fake model with a gate: a call of a class in `transport.hold` waits until `trans
 so a test can act in the middle of a turn (Stop before stage 12, `too_late` after it, a reloaded page
 reaching the running turn, busy answers). `protocol_kit.check` asserts every envelope (PROTO-01) and
 every error message (PROTO-08); `svc.idle()` waits for the turn to finish. `test_ui_fixtures.py`
-validates the vitest fixtures against `OUT_MODELS`.
+validates the vitest fixtures against `OUT_MODELS`. `test_sessions.py` (the owner's sessions
+browser, RUN-12/13) sees the hard delete through hard links: a second name for a file shows its
+bytes after the first name is gone, so the overwrite with zeros is visible; the vitest
+`sessions.spec.js` pins the Your lives screen.
 
 ### 3.2 The society tests (P9)
 
@@ -110,6 +113,7 @@ day passing) and reads what the world did.
 |---|---|
 | `test_params.py`, `test_placement.py`, `test_region.py` | WG0 draw for draw against `vectors/params.json`; faction placement, QC-2/3 and the hard-fail protocol; WG1 zones, roads and reachability against `vectors/region.json` |
 | `test_worldgen_pipeline.py` | the stages and their transactions, retries, fallbacks with both lanes down, the WG9 invariants, same seed → same world hash, cancel and refusal leave no folders, the run `create_run` makes; the fixture pack `packs/p10_hopeless` is a start no world can save |
+| `test_world_names_no_run.py` | a world's genesis names no run and keeps no model traffic (`Store.backup_to(..., as_world=)`), the live store is untouched, and deleting the run leaves the world (RUN-09, RUN-12) |
 | `test_new_life.py` | `pcs_list`, `run_new` → the Worldgen screen → `run_loaded`, `worldgen_cancel`, the refusals, `as-engine new-run` (CLI-05), and moves played in the generated world through the 58-bit gate while the dead walk up the street |
 | `test_progress.py` | the loading bar: fixed plans, percent that never drops, estimates, no counts for a turn, developer detail only in developer mode, the quips (CNT-16) and the bars the service sends |
 | `test_discovery.py`, `test_traces.py`, `test_materialise.py` | a building's rooms laid out once when someone first arrives; marks and who can see them; a person taken from a cohort, never made from nothing (CONSERVE-04) |

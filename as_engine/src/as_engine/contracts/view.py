@@ -218,6 +218,8 @@ class RunSummaryView(Strict):
     sandbox: bool
     ironman: bool
     world_id: str | None = None
+    final: bool = Field(default=False, description="An Ironman life that has ended (RUN-08): it can be "
+                        "deleted, not played on.")
 
 
 class WorldSummaryView(Strict):

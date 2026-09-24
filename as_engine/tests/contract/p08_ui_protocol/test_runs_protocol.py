@@ -1,4 +1,4 @@
-"""Home, Continue, Load, Save, Close, Delete (P8). Rules PROTO-01, RUN-02..06 through the protocol
+"""Home, Continue, Load, Save, Close, Delete (P8). Rules PROTO-01, RUN-02..06, RUN-12 through the protocol
 (service/game_service.py: on_runs_list, on_run_load, on_run_save, on_run_close, on_run_delete,
 on_view_get, on_story_get).
 """
@@ -84,14 +84,15 @@ async def test_ironman_has_no_named_saves(svc, make_run):
 
 
 async def test_delete(svc, make_run, cfg):
-    """The open run cannot be deleted; a closed one can, and the list updates."""
+    """RUN-12: deleting is one step for the player — the open run is closed first — and the list
+    updates (test_sessions.py has the rest)."""
     rid = make_run()
     await send(svc, "run_load", run_id=rid)
     r = await send(svc, "run_delete", run_id=rid)
-    assert only(r, "error") == {"code": "run_open", "message": game_service.RUN_OPEN, "recoverable": True}
-    await send(svc, "run_close")
-    r = await send(svc, "run_delete", run_id=rid)
-    assert only(r, "runs") == {"runs": []} and not (Path(cfg.runs_dir) / rid).exists()
+    assert actions(r) == ["run_deleted", "runs"]
+    assert only(r, "run_deleted") == {"run_id": rid} and only(r, "runs") == {"runs": []}
+    assert svc.session is None and svc.last_view is None and svc.last_story is None
+    assert not (Path(cfg.runs_dir) / rid).exists()
     assert error_code(await send(svc, "run_delete", run_id=rid)) == "not_found"
 
 

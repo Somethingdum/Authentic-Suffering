@@ -25,10 +25,14 @@ DeepSeek's to build. The kit-maker writes contracts, tests, docs and instruction
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).
-4. **The sessions browser and the hard delete** (P12, amends RUN-06): one simple screen listing
-   every session ever played, one easy delete, and a delete that leaves nothing — every log, every
-   line of dialogue — as the normal mode, not an option.
+4. **The sessions browser and the hard delete** — SPECIFIED (D-76, RUN-12, RUN-13): the Your lives
+   screen (P8), `service/runs.wipe_tree`, the one-step delete, a world that names no run (P10), logs
+   that name no session; tests in p08 `test_sessions.py`, p10 `test_world_names_no_run.py`, vitest
+   `sessions.spec.js`.
 5. **The final pass** — docs coherence, RULES regenerated, the manifest, the handoff.
+Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo
+(git stash / scratch patch) — the content filter kept stopping replies while its tests were being
+written; resume it with neutral wording (a speaker who faints, not one who dies).
 Known fault for step 6 (B6): CAS-012 (a witnessed theft becomes a rumour) can never fire — an
 ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a contract change.
 

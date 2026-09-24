@@ -34,6 +34,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | event log | the append-only `events` table | — | EVENT_STREAM, EVENT_HISTORY, RECENT EVENTS |
 | store | the run's SQLite database | "your save" | MEMORY_LOG, save file, world state, the logs |
 | run | one life in one world | "a life" / run card | campaign (in code) |
+| sessions browser | the Your lives screen: every run, ended ones too, with a one-step delete that wipes the run (RUN-12) | "Your lives" | Load list |
 | world | the generated place, its people and history | "world" | — |
 | genesis | the saved state of a world before any PC was placed | "the world as it began" | BaselineWorldFile (the ruling's name) |
 | turn-0 snapshot | a run's `turn0.sqlite`: the run as it stood before its first turn (PC placed), kept so the run can be re-simulated (DET-02) — not a genesis | — | — |

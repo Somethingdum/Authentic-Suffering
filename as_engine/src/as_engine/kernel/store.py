@@ -186,8 +186,13 @@ class Store:
         r = self.query_one("SELECT value FROM meta WHERE key = ?", (key,))
         return None if r is None else r[0]
 
-    def backup_to(self, path: str | Path) -> None:
-        """Consistent copy via sqlite3 backup API (used by saves)."""
+    def backup_to(self, path: str | Path, *, as_world: str | None = None) -> None:
+        """Consistent copy via sqlite3 backup API (used by saves). P10 (RUN-09): ``as_world`` given ->
+        the copy is a world's genesis: in the copy only, meta run_id becomes ``as_world`` and every
+        lm_calls row is removed (a world names no run and keeps no model traffic; the live store
+        is not changed)."""
+        if as_world is not None:
+            raise NotImplementedError("P10")
         dst = sqlite3.connect(str(path))
         self.conn.backup(dst)
         dst.close()

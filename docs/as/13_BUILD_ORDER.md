@@ -76,15 +76,19 @@ machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
    it like any failing test (skill `as-failing-test`) — the fix goes where AGENTS.md §4 says.
-2. P8: steps 1–3 are built; build steps 4–6 (the plugin and the upstream patches, the frontend
-   toolchain, the Play UI). In `talemate_frontend/src/play/` the P10 parts exist already —
+2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
+   `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
+   `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
+   Then build steps 4–6 (the plugin and the upstream patches, the frontend toolchain, the Play UI). In `talemate_frontend/src/play/` the P10 parts exist already —
    `PlayApp.vue`, `WizardScreen.vue`, `WorldgenScreen.vue`, `LaterScreen.vue`, `LoadingBar.vue`,
    `PCCard.vue`, `quips.js` and the P10 parts of `store.js` / `words.js`. Files whose first line says
    *Placeholder* or *Partial* are yours to write. Extend `store.js`, `words.js` and `socket.js`; do
    not replace them: the P10 specs (wizard, worldgen, loading_bar, quips, app) must stay green.
    Then `gate.py --phase 8`.
 3. `gate.py --phase 9`, then `--phase 10` (from P8 on every gate also runs the plugin test, the
-   Play UI tests and the upstream check).
+   Play UI tests and the upstream check). P10 first needs `kernel/store.Store.backup_to(...,
+   as_world=)` and the GENESIS step of `world/worldgen/pipeline` using it (D-76) —
+   `test_world_names_no_run.py`.
 4. Then stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" in PROGRESS.
 
 The phase lists below stay as the map of what each module does and which tests pin it.
@@ -213,7 +217,7 @@ Steps 1–3 are built in this copy (§4.0): start at step 4.
 3. `service/game_service.py`: `out`, `handle` (validation, errors, not_built_yet), `push`, `idle`, `get_service`, then the `on_<action>` handlers of the module docstring in the order of the test files: `test_protocol.py`, `test_models_config.py`, `test_runs_protocol.py`, `test_packs_content.py`, `test_settings_dev.py`, `test_turns_protocol.py` (the background turn task, busy, Stop, reconnect, Ask). Leave the P10 / P12 handlers as stubs.
 4. `src/talemate/server/as_game_plugin.py` (02 §6 gives the whole file) + the upstream patch list (02 §4.1) — nothing else upstream changes. Then `python -m pytest tests/test_as_game_plugin.py -q -o addopts=""` from the fork root.
 5. The frontend toolchain (02 §4.1): devDependencies, the `test:play` script, the `test` block of `vite.config.mjs`, `corepack pnpm install` (commit the lockfile), `App.vue`.
-6. `talemate_frontend/src/play/`: `words.js` (`words.spec.js`), `socket.js` (`socket.spec.js`), `store.js` (`store.spec.js`), `PlayApp.vue` + `LaterScreen.vue` (`app.spec.js`), the Connect / Home / Content screens (`connect_home.spec.js`), the panels (`panels.spec.js`), `PlayScreen.vue` with the top bar, Where, story, progress and input (`play.spec.js`), settings and the developer panel (`settings_dev.spec.js`), then `clarity.spec.js` over all of it. The test ids are exactly those of 10 §2; `__tests__/helpers.js` shows how every spec mounts.
+6. `talemate_frontend/src/play/`: `words.js` (`words.spec.js`), `socket.js` (`socket.spec.js`), `store.js` (`store.spec.js`), `PlayApp.vue` + `LaterScreen.vue` (`app.spec.js`), the Connect / Home / Content screens (`connect_home.spec.js`), Your lives (`SessionsScreen.vue`, `sessions.spec.js`), the panels (`panels.spec.js`), `PlayScreen.vue` with the top bar, Where, story, progress and input (`play.spec.js`), settings and the developer panel (`settings_dev.spec.js`), then `clarity.spec.js` over all of it. The test ids are exactly those of 10 §2; `__tests__/helpers.js` shows how every spec mounts.
 Gate: `p08_ui_protocol` green (with P0–P7 and the sim soak), vitest green, the plugin test green, `gate.py --upstream-diff` clean. The human then makes a run with `as-engine new-scenario` and goes through the smoke checklist in `talemate_frontend/src/play/README.md` (its P8 part) and ticks it in PROGRESS.
 **Forbidden:** new engine features. The UI shows what the engine already does: the wizard, worldgen, death and worlds screens wait for P10 / P12 (PlayApp shows LaterScreen for them).
 

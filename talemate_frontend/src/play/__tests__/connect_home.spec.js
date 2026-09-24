@@ -66,7 +66,7 @@ describe('Home', () => {
     const { store, sock } = storeWith('welcome_home', 'runs')
     const w = mountWith(HomeScreen, { store })
     await flush()
-    for (const id of ['home-continue', 'home-new-life', 'home-load', 'home-worlds', 'home-content', 'home-settings']) {
+    for (const id of ['home-continue', 'home-new-life', 'home-sessions', 'home-worlds', 'home-content', 'home-settings']) {
       expect(one(w, id).text().trim().length, id).toBeGreaterThan(2)
     }
     expect(one(w, 'home-continue').text()).toContain('Owen Marsh')
@@ -85,27 +85,13 @@ describe('Home', () => {
     expect(has(w, 'home-continue')).toBe(false)
   })
 
-  test('Load lists every run as a card; delete needs a confirmation', async () => {
-    const { store, sock } = storeWith('welcome_home', 'runs')
+  test('Your lives opens the list of every session (sessions.spec.js)', async () => {
+    const { store } = storeWith('welcome_home', 'runs')
     const w = mountWith(HomeScreen, { store })
     await flush()
     expect(has(w, 'run-card')).toBe(false)
-    await one(w, 'home-load').trigger('click')
-    const cards = byId(w, 'run-card')
-    expect(cards.length).toBe(2)
-    const second = cards[1].text()
-    for (const word of ['Addison Flores', 'day 212', 'dead', 'Realism', 'Sandbox', 'Ironman', '2026-09-20 19:02']) {
-      expect(second).toContain(word)
-    }
-    expect(cards[0].text()).not.toContain('Sandbox')
-    sock.sent.length = 0
-    await cards[1].get('[data-testid="run-card-load"]').trigger('click')
-    expect(sock.sent).toEqual([{ action: 'run_load', run_id: 'addison_flores_5c2', save_slot: null }])
-    sock.sent.length = 0
-    await cards[0].get('[data-testid="run-card-delete"]').trigger('click')
-    expect(sock.sent).toEqual([])
-    await one(w, 'run-card-delete-confirm').trigger('click')
-    expect(sock.sent).toEqual([{ action: 'run_delete', run_id: 'owen_marsh_71a' }])
+    await one(w, 'home-sessions').trigger('click')
+    expect(store.screen).toBe('sessions')
   })
 
   test('the other buttons go where they say', async () => {

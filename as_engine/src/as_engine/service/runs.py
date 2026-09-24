@@ -1,4 +1,4 @@
-"""Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..11.
+"""Run library (P7 create-from-scenario, P10 create-from-worldgen, P12 worlds). Rules RUN-01..13.
 
 Layout (RUN-01): <runs_dir>/<run_id>/ world.sqlite (the live run), turn0.sqlite (the run at
   turn 0, before any turn: service.replay re-simulates from it, DET-02; not a world's genesis), manifest.json,
@@ -72,9 +72,25 @@ load_run(config, run_id, transport, save_slot=None, *, pack_dirs=None) -> Sessio
 list_runs(config) -> list[RunSummaryView]
   Every non-'_' folder with a manifest: RunSummaryView(run_id, title, pc_name, day, alive,
   difficulty, last_played_text = last_played_real[:16] with 'T' -> ' ', sandbox, ironman,
-  world_id), newest last_played_real first (then run_id descending).
-delete_run(config, run_id)   (RUN-06): no manifest -> RunError('not_found'); else the folder is
-  removed (hard delete).
+  world_id, final = the manifest's final), newest last_played_real first (then run_id
+  descending). Every session there is, ended ones included (the Sessions screen, 10_UI §2.2.1).
+RUN-12 a deleted session leaves nothing of it: one step for the player, no soft delete, every file
+  the game wrote for the run wiped (wipe_tree); the world it was played in stays and names no run.
+delete_run(config, run_id)   (RUN-06, RUN-12): no manifest -> RunError('not_found'); else
+  wipe_tree(the run folder). Nothing of the session is left: its live store and every copy of it
+  (turn0, the saves, the autosave ring, SQLite's -wal / -shm / -journal files), its logs, reports
+  and manifest. There is no soft delete and no recycle bin. The world it was played in stays in
+  the Worlds library (a world is not a session: its genesis names no run and holds nothing of
+  any PC, RUN-09) and simply has one run fewer using it.
+wipe_tree(path)   (RUN-12, P8)
+  Every file under ``path``, at any depth, is overwritten in place with zero bytes of its own
+  length — written, flushed and fsynced — and then unlinked; then the folders, deepest first, and
+  ``path`` itself. A path that does not exist -> nothing. (What a program cannot reach — a drive's
+  own spare blocks, backups the operating system made — is said plainly in README_FIRST; the
+  game removes everything it wrote.)
+RUN-13 process-wide logs name no session: the engine and the service log action names, error
+  codes and exception types only — never a run_id, a character's name, or anything said, typed
+  or written in a run. What a run needs to record goes to its own logs/ folder, which delete wipes.
 Ironman (RUN-04): the run keeps only the autosave ring and world.sqlite; save_run and loading a
   named save are refused (code 'ironman'); "Continue" = load_run without a slot.
 New life in the same world (RUN-07, free save mode only, P12): after the PC dies, a new PC dossier is
@@ -88,7 +104,10 @@ Ironman death (RUN-08): death ends the run. The run folder is kept read-only (ma
   loading and new-life-here. See DECISIONS.md D-12.)
 Worlds (RUN-09): every worldgen run writes <runs_dir>/_worlds/<world_id>/genesis.sqlite — a backup
   of the store taken after stage WG7 (world built, laws set) and BEFORE WG8 places a PC — plus
-  world.json (WorldSummaryView fields + params + content_hash). world_id = the creating run_id.
+  world.json (WorldSummaryView fields + params + content_hash). world_id = the id create_run gave
+  it (w_<seed in hex>). The genesis names no run and keeps no model traffic: it is written with
+  kernel.store.Store.backup_to(..., as_world=world_id) — its meta run_id is the world_id and it
+  holds no lm_calls rows (P10) — so deleting the run that made a world leaves no trace in it.
   create_run(..., world_id=X) copies X's genesis.sqlite into the new run and runs only WG8-WG9 for
   the new PC (the PC's worldgen_bias is ignored because the world already exists; its plausibility
   gate is evaluated against the stored WorldParams and a hard fail at Bitch..Realism refuses the
@@ -201,6 +220,10 @@ def save_run(session: "Session", slot_name: str) -> Path:
 
 def autosave(session: "Session") -> Path:
     raise NotImplementedError("P7")
+
+
+def wipe_tree(path: str | Path) -> None:
+    raise NotImplementedError("P8")
 
 
 def delete_run(config: "EngineConfig", run_id: str) -> None:

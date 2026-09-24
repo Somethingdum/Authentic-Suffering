@@ -36,7 +36,8 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
          done / total (rounded to 1), eta_s as above, sub = 'history' | 'dossiers', done, total)).
          With no model calls to make (total 0) nothing is reported.
     GENESIS (after WG7, before WG8; no progress message of its own): world_dir is made; store.backup_to(world_dir /
-         'genesis.sqlite') — the finished world before any PC exists (RUN-09) — and world.json =
+         'genesis.sqlite', as_world=world_id) — the finished world before any PC exists, naming no
+         run (RUN-09) — and world.json =
          {world_id, title = f"{climate_descriptor capitalised} — {atlas.ERA_LABELS[era]}, day {dsf}", difficulty,
          era, day_at_genesis: dsf, climate_text, factions: [planned faction names], created_real:
          kernel.store.wall_clock_iso(), source 'generated', seed, detail} (sorted keys, 2-space indent).

@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine side of P0–P10 is built and every contract test of P0–P10 and the sim soak passes (1299 tests; the bodies are in `_impl_*.py` files, AGENTS.md §4), Actor v2 steps 1–3 included. Not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built). After the P10 gate, stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" here.
+- Kit status: the engine side of P0–P10 is built and every contract test of P0–P10 and the sim soak passes (1299 tests; the bodies are in `_impl_*.py` files, AGENTS.md §4), Actor v2 steps 1–3 included. Not built: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, the Your lives screen; a P10 genesis that names no run), P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" here.
 
 ## Phases
 
