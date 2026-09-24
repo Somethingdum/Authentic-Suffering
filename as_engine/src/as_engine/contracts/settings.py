@@ -305,6 +305,15 @@ class SocietyRules(Strict):
     grief_ease_days: int = 7
 
 
+class BackgroundRules(Strict):
+    """P10 quiet-hours numbers (service.background BG-02; Actor Spec AC12, fidelity C07)."""
+    material_salience: int = Field(default=60, ge=0, le=100)  # this salient (or an anchor): material
+    rest_min_episodes: int = 3     # a night's sleep needs at least this many new episodes to mull
+    max_reflections: int = 2       # per turn boundary
+    max_retellings: int = 4        # per turn boundary
+    max_episodes: int = 8          # the newest new episodes a reflection is shown
+
+
 class RulesConfig(Strict):
     checks: CheckRules = Field(default_factory=CheckRules)
     acoustics: AcousticRules = Field(default_factory=AcousticRules)
@@ -318,6 +327,7 @@ class RulesConfig(Strict):
     world: WorldRules = Field(default_factory=WorldRules)
     society: SocietyRules = Field(default_factory=SocietyRules)
     infected: InfectedRules = Field(default_factory=InfectedRules)
+    background: BackgroundRules = Field(default_factory=BackgroundRules)
 
 
 class EngineConfig(Strict):

@@ -15,11 +15,14 @@ resimulate(config, run_id, *, pack_dirs=None) -> list[dict]
   and run_dir set to None (a replay never autosaves). Its run_id is the working folder's name,
   'replay'.
   For each player_inputs row of the original, in turn_index order (T = its turn_index):
-    first (P8, SET-01) every original SETTINGS_CHANGE event whose payload has a 'field' key (a
-      mid-run change made by service.session.change_settings — not the {source: 'run_start'} one)
-      with turn_index < T that has not been re-applied yet, in seq order: in its own transaction,
+    first every original between-turns event with turn_index < T that has not been re-applied yet,
+      in seq order (so they interleave as they happened), each in its own transaction:
+      (P8, SET-01) a SETTINGS_CHANGE whose payload has a 'field' key (a mid-run change made by
+      service.session.change_settings — not the {source: 'run_start'} one):
       service.session.change_settings(tx, session, {field: payload.new}). A replay therefore makes
       the same settings change at the same moment the player did;
+      (P10, BG-05) a REFLECTION or RUMOUR_DISTORTED (the quiet hours, whose effects the ledger's
+      hash of the turn before does not include; those of turn 0 come before turn 1): below;
     mode 'suggestion' -> session.extras['suggestions'] = {'r1': {'signature': mapped.signature,
       'label': raw_text}} and InTurnSubmit(mode='do', suggestion_ref='r1');
     otherwise -> session.extras['forced_addressee'] = mapped.addressee (None allowed) and
@@ -29,10 +32,9 @@ resimulate(config, run_id, *, pack_dirs=None) -> list[dict]
     kernel.hashing.full_state_hash(working store).
     Report entry {turn_index, ok: out.ok and got == expected, expected, got, problem: None when
     out.ok else (out.rejected_code or 'failed')}; the first entry that is not ok ends the replay.
-    Then (P10, BG-05: the quiet hours after turn T, whose hash the ledger does not include) every
-    original REFLECTION and RUMOUR_DISTORTED event with turn_index T, in seq order, is re-committed
-    in its own transaction through service.background.commit(tx, job, result, at = the original
-    event's at, turn_index = T), from its payload (no model call):
+  A quiet-hours event is re-committed through service.background.commit(tx, job, result, at = the
+    original event's at, turn_index = the original event's turn_index), from its payload (no model
+    call):
       REFLECTION -> Job('reflection', payload.actor_id, None, payload.request_key) and
         JobResult(answer = {'output': ReflectionOutput.model_validate(payload.output), 'handles':
         payload.handles});

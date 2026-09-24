@@ -1,29 +1,54 @@
-"""Quiet-hours work between turns (P10): reflection and rumour retelling. Rules BG-01..06, INFO-06.
-docs/as/05_ACTORS.md §9.2, 06_WORLD.md §6. People build their own inner lives while the player
-reads: new goals and grudges, a lesson drawn, a plan changed; and the words a rumour will be passed
-on in.
+"""Quiet-hours work between turns (P10): reflection and rumour retelling. Rules BG-01..07, INFO-06.
+docs/as/05_ACTORS.md §9.2, 06_WORLD.md §6. People build their own inner lives between moments:
+new goals and grudges, a lesson drawn, a plan changed; and the words a rumour will be passed on in.
 
-BG-01 When: GameService starts a background task after it has pushed a turn's result and the lanes
-  are idle, only when EngineConfig.background_cognition is true and the run has a PC who is alive.
-  It runs the jobs of jobs(store, turn_index) one at a time (never more than one model call in
-  flight per lane; a builder may overlap a lane A job with a lane B job). A turn_submit (or
-  run_close, run_load, run_new) CANCELS it first (task.cancel(), then awaited); a job whose answer
-  arrived before the cancel is committed, a job cancelled mid-call leaves nothing behind. Jobs
-  never run during a turn, so a turn's transaction never sees half of one.
+BG-07 (Actor Spec AC12, fidelity C07) Simulated time decides, never the player's reading speed.
+  Which jobs a turn boundary has is a function of the world as the turn left it (BG-02); the time
+  the player spends reading and typing only lets their model calls happen early. Every job of a
+  boundary is committed (or has failed) before the next turn begins, so a player who answers at
+  once and one who waits an hour get the same people thinking about the same things.
+BG-01 When: after a turn's result has been pushed, when EngineConfig.background_cognition is true
+  and the PC is alive, GameService starts the runner (BackgroundRunner.start). It runs the jobs of
+  pending(store, T) (T = world_clock.turn_index) in order, one at a time — run_job, then commit
+  in its own transaction — while the player reads (a builder may overlap a lane A job with a lane
+  B job; never more than one model call in flight per lane). Before the next turn begins, the turn
+  task awaits catch_up(session, progress) first: a running task is awaited (never cancelled),
+  then every job of pending(store, T) the runner has not tried at this boundary is run and
+  committed the same way, in order. run_close, run_load and run_new cancel the runner instead
+  (cancel(): task.cancel(), then awaited): a job whose answer arrived before the cancel is
+  committed, a job cancelled mid-call leaves nothing behind, and the run's next catch_up (the
+  next turn, after a load) finishes the boundary's remaining jobs. Jobs never run during a turn,
+  so a turn's transaction never sees half of one.
 BG-02 jobs(store, turn_index) -> list[Job]   (pure read; order is the run order)
-  Eligible people: bodies.alive 1 and actors.controller not 'human'.
-  Reflection: eligible actors whose lod was 'hot' or 'warm' in any wave of turns turn_index - 2 ..
-  turn_index (turn_ledger stage 4 detail 'waves', each wave's 'lod' map) and who have at least 3
-  NEW episodes — episodes whose turn_index is greater than that of their newest REFLECTION event
-  (all their episodes when they never reflected) — sorted by (the newest new episode's at,
-  descending; actor id); at most 2 per idle period.
+  The boundary's plan, read from the world as turn T = turn_index left it: every REFLECTION and
+  RUMOUR_DISTORTED event of turn T (the boundary's own commits) is ignored, so the list is the
+  same before, while and after the boundary's jobs are committed.
+  R = RulesConfig.background (BackgroundRules). Eligible people: bodies.alive 1 and
+  actors.controller not 'human'.
+  Reflection (AC12: after a material experience or a night's sleep, once per eligibility key),
+  for each eligible actor holding an episode: prev = the actor's newest REFLECTION event (by seq)
+  of a turn before T, or none. NEW episodes = the actor's episodes (holder_id) whose turn_index is
+  greater than prev's turn_index (all of them when there is no prev), by (at, episode_id). The
+  actor reflects when
+    material: a new episode has salience >= R.material_salience or anchor 1 -> eligibility key
+      'm:' + the episode_id of the newest such episode (by (at, episode_id)); else
+    rest: there are at least R.rest_min_episodes new episodes, and needs.last_sleep_ms is later
+      than the oldest new episode's at and, when there is a prev, than prev's at — a night's
+      sleep (society.routine's waking refreshes fatigue) since the new experiences began ->
+      key 's:' + str(needs.last_sleep_ms).
+  Reflecting actors are sorted by (the newest new episode's at, descending; actor id); at most
+  R.max_reflections.
   Retelling: for each rumours row (by rumour_id) with created_at >= kernel.clock.now -
-  SocietyRules.rumour_quiet_days days, each holder (world.rumours.holders, confidence >= 1) who is
-  eligible and has no entry in the row's distortions yet, by holder id; at most 4 per idle period
-  (the first 4 in that order). Reflections come first in the list, then retellings.
+  SocietyRules.rumour_quiet_days days, each holder (world.rumours.holders, confidence >= 1) who
+  is eligible and has no entry in the row's distortions — an entry whose RUMOUR_DISTORTED event
+  (rumour_id, holder_id) is of turn T does not count — by holder id; at most R.max_retellings (the
+  first in that order). Reflections come first in the list, then retellings.
   Job(kind 'reflection' | 'retelling', subject_id (actor id / holder id), rumour_id (retelling),
-  request_key = kind + ':' + subject + ':' + (the rumour id, or the id of the newest new episode by
-  (at, episode_id))).
+  request_key = 'reflection:' + actor + ':' + the eligibility key, or 'retelling:' + holder +
+  ':' + rumour id).
+pending(store, turn_index) -> list[Job]: jobs(store, turn_index) without the jobs already
+  committed: a reflection whose request_key is the payload.request_key of a REFLECTION event of
+  turn T, a retelling with a RUMOUR_DISTORTED event of turn T for its (rumour_id, holder_id).
 BG-03 async run_job(session, job) -> JobResult   (no store writes; the model call only)
   (JobResult.answer: reflection {'output': ReflectionOutput, 'handles': packet.handles};
   retelling the RumourDistortion). T = world_clock.turn_index. Every call goes through its own
@@ -32,8 +57,8 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   reflection: in one read transaction, at = kernel.clock.now, affordances =
   mind.affordance.enumerate_affordances(tx, actor, canon affordances, at, T), packet =
   mind.packet.build_packet(tx, actor, LOD.WARM, affordances, T, at), and the new episodes (BG-02;
-  the newest 8 of them, oldest first). The call happens after that transaction has ended:
-  ReflectionContext(packet, recent_episodes = those summaries); request =
+  the newest R.max_episodes of them, oldest first). The call happens after that transaction has
+  ended: ReflectionContext(packet, recent_episodes = those summaries); request =
   lanes.requests.build_request(config, REFLECTION, turn_index=T, actor_id, context=ctx,
   json_schema = lanes.schemas.to_lm_schema(ReflectionOutput), ctx=ctx); resp = await
   lanes.repair.call_with_repair(client, request, ReflectionOutput, repair_builder = a function
@@ -77,12 +102,21 @@ BG-05 Replay: service.replay.resimulate re-commits every REFLECTION and RUMOUR_D
   service/replay.py).
 BG-06 Nothing here reads the truth layer; a reflection packet is the actor's own (Skull law).
 
-class BackgroundRunner — GameService's handle on the task: start(session), cancel() (async; awaits
-  the task), running (bool). Implemented by the builder with asyncio; the contract is BG-01. The
-  task: T = world_clock.turn_index; for each job of jobs(store, T) in order: result = await
-  run_job(session, job) (an exception other than cancellation: logged, the job skipped), then in
-  its own transaction commit(tx, job, result, kernel.clock.now(tx), T). start while running does
-  nothing; cancel when nothing runs returns at once.
+class BackgroundRunner — GameService's handle on the quiet hours (BG-01), built with asyncio.
+  running (bool: a task exists and is not done).
+  start(session): running -> nothing; else a task running each job of pending(store, T) in
+    order, where T = world_clock.turn_index when the task starts.
+  async catch_up(session, progress=None): awaits the running task (its exceptions logged and
+    swallowed), then T = world_clock.turn_index and, for each job of pending(store, T) not tried
+    at this boundary, in order: progress(done, total) (awaited when it returns an awaitable;
+    total = those jobs, done = how many already finished) before it, then the job.
+  async cancel(): cancels the task and awaits it (CancelledError swallowed; nothing running ->
+    returns at once), then empties the tried set.
+  A job (both paths): result = await run_job(session, job) — an exception other than cancellation
+  is logged and the job skipped — then in its own transaction commit(tx, job, result,
+  kernel.clock.now(tx), T). Tried = the request_keys whose run_job finished (answered, failed or
+  raised) at boundary T under this runner, so a failed job is not asked twice at one boundary; a
+  job cancelled mid-call is not tried; a different T empties the set first.
 """
 
 from __future__ import annotations
@@ -93,6 +127,9 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from ..contracts.events import Event
     from ..kernel.store import Store, Tx
+
+
+QUIET_HOURS = "Everyone else catches up…"   # the progress label while a turn waits on them (BG-01)
 
 
 @dataclass(frozen=True)
@@ -115,6 +152,10 @@ def jobs(store: "Store | Tx", turn_index: int) -> list[Job]:
     raise NotImplementedError("P10")
 
 
+def pending(store: "Store | Tx", turn_index: int) -> list[Job]:
+    raise NotImplementedError("P10")
+
+
 async def run_job(session, job: Job) -> JobResult:
     raise NotImplementedError("P10")
 
@@ -124,11 +165,15 @@ def commit(tx: "Tx", job: Job, result: JobResult, at: int, turn_index: int) -> l
 
 
 class BackgroundRunner:
-    """BG-01. start(session) begins the job loop as an asyncio task; cancel() stops it and waits."""
+    """BG-01. start(session) runs the boundary's jobs as an asyncio task; catch_up(session,
+    progress) finishes them before a turn; cancel() stops the task and waits."""
 
     running: bool = False
 
     def start(self, session) -> None:
+        raise NotImplementedError("P10")
+
+    async def catch_up(self, session, progress=None) -> None:
         raise NotImplementedError("P10")
 
     async def cancel(self) -> None:

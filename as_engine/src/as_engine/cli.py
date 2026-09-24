@@ -27,7 +27,11 @@ CLI-03 play RUN_ID [--fake]
   starting 'say ' plays mode 'say' with the rest stripped; anything else (a bare 'say' or 'ask'
   included) plays mode 'do' with the whole line. Each turn
   is asyncio.run(turn.pipeline.run_turn(session, InTurnSubmit(mode, text))) and prints the
-  narration, or f"[{rejected_code}] {rejected_message}". The store is closed at the end; exit 0.
+  narration, or f"[{rejected_code}] {rejected_message}". P10: when config.background_cognition
+  is true and the PC's body is alive, each turn first runs asyncio.run(runner.catch_up(
+  session)) with one service.background.BackgroundRunner for the whole loop (the quiet hours,
+  BG-01: the terminal has no idle time, so they happen before the next move). The store is
+  closed at the end; exit 0.
 CLI-04 replay RUN_ID
   asyncio.run(service.replay.resimulate(config, RUN_ID)); a RunError prints f"[{code}] {message}"
   and exits 1. One line per entry: f"turn {n}: same", or f"turn {n}: DIFFERENT ({problem or 'state

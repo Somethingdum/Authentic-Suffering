@@ -165,6 +165,10 @@ Handlers (P8):
         progress(stage, label, frac) (passed to run_turn, awaited): turn_stage = stage; push
           turn_progress {turn_index T, stage, label, pct = round(frac * 100, 1), elapsed_s =
           round(loop time - start, 1)}.
+        P10: config.background_cognition true -> first await background.catch_up(session,
+          progress = (done, total) -> progress(0, background.QUIET_HOURS, 0.0)) (BG-01: the
+          quiet hours end before the move; a turn_cancel meanwhile cancels the job in flight,
+          which leaves nothing behind and runs again at the next catch_up).
         outcome = await turn.pipeline.run_turn(session, msg, progress).
         ok -> push turn_result {turn_index, narration, view = view(), notices, degraded}; push
           story {story()}; outcome.died -> await self.on_death() — a P12 stub: its
@@ -206,8 +210,9 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     worldgen_task.cancel() and await it (CancelledError swallowed; create_run removed every partial
     folder) -> [state {screen 'wizard', run_id None, busy False}].
   Quiet hours (BG-01, service/background.py): after a turn's result has been pushed, when
-    config.background_cognition is true and the PC is alive, background.start(session); every
-    handler that starts a turn, loads, closes or makes a run first awaits background.cancel().
+    config.background_cognition is true and the PC is alive, background.start(session). A turn
+    first awaits background.catch_up (on_turn_submit, above); on_run_load, on_run_close and
+    on_run_new first await background.cancel().
 
 Later phases (PROTO-09; stubs raising NotImplementedError until then, so handle() answers
 not_built_yet): on_content_import, on_intake_start, on_quickmake_pc, on_death_reveal, on_new_life_here,
