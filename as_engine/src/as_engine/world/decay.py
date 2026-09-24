@@ -1,46 +1,36 @@
-"""Log decay / Memory Fade (P10). [SALVAGE: verbatim shape]. Rules DECAY-01..05. Owner 'world.decay'
-(persistence_locks). docs/as/06_WORLD.md §4. The world forgets what nobody cares about — and every
-forgetting is an event, so decay replays and is itself one of the strongest "it moved on" signals.
-D = RulesConfig().decay; rng stream 'offscreen'. You = meta.pc_actor_id. Every function that returns an
-Event has committed it (at and turn_index as given).
+"""Physical wear (P10; fidelity C02 — replaces the salvaged Memory Fade). Rules WEAR-01..04.
+docs/as/06_WORLD.md §4. Things change because something happened to them: rain rusts a gun left in
+the street, paper turns to pulp, food goes off. Nothing is deleted because the player was away or
+because it seemed unimportant — there are no scores, tiers or overhauls — and what a scavenger
+takes, a scavenger who exists took (world.worldmove OPS-03). A mind forgets (mind.retrieval); the
+world does not: every change is an event, so the history stays whole. D = RulesConfig().decay; no
+rng is drawn (wear is arithmetic). Every function that returns an Event has committed it (at and
+turn_index as given).
 
-DECAY-01 Score. For a loose item (items.place_id set — lying somewhere, not held and not inside
-  anything): SS = D.weights[0] x narrative + D.weights[1] x location + D.weights[2] x recency +
-  D.weights[3] x object, each 0..100:
-    narrative  80 when You hold a percept whose source_id is the item, else 20;
-    location   100 in a settlement's place or inside one, 60 in a place You have visited, else 30;
-    recency    from You's known_places.last_seen of the item's place (the place itself, or for a
-               room its building): within 1 day 100, 7 days 60, 30 days 20, else (or never) 0;
-    object     by the item def's kind: firearm, magazine, ammo, melee, medical, key 80; food, water,
-               fuel, valuable, document 50; tool, light 40; anything else 10.
-  score(store, item_id, at) -> float (rounded to 1 decimal).
-DECAY-02 Tier 1, graceful forgetting: SS < D.tier1_below -> DECAY_TIER_1 {item_id, place_id, ss}
-  (writer 'world.decay') then physical.objects.destroy(tx, item, at, that id, turn_index).
-DECAY-03 Tier 2, environmental reclaim: D.tier1_below <= SS < D.tier2_below and the place is public
-  or dangerous (a street, outdoor place or road; a room of a building that did not hold; or a zone
-  whose danger 'shambler' >= 5), never a settlement's place or one inside it -> DECAY_TIER_2
-  {item_id, place_id, ss}, destroy, and — once per
-  place per day — a TRACE 'missing_stock' "Someone has been through here and taken things."
-DECAY-04 Tier 3, location overhaul: at most ONE place a day — the non-settlement place with a
-  generated layout (and every room under it), with no living body and no pending queue row whose
-  subject is there, whose last visit by You (known_places.last_seen; never visited -> its discovery
-  time, the PLACE_DISCOVERED event) is at least D.tier3_unvisited_days days ago; the oldest first,
-  ties by place id. Everything loose in it and its rooms is destroyed (DECAY_TIER_3 {place_id,
-  change: kind, items: n} first), its unlocked traces are removed (TRACE_DECAYED), and one new TRACE
-  'damage' tells what happened: kind = rng.weighted(tx, 'offscreen', f"overhaul:{place}", (('collapse',
-  1), ('fire', 1), ('occupation', 1))) with texts "The roof has come down since anyone last looked.",
-  "Everything here is burnt black.", "Someone has moved in: bedding, a cold fire, a warning
-  scratched on the door."
-DECAY-05 Persistence locks: a subject id in persistence_locks never decays (items, places, traces).
-  lock(tx, subject_id, reason, at, turn_index, cause_event_id) -> Event | None: already locked ->
-  None; else MATERIALIZE {subject_id, reason} (writer 'world.decay') inserting persistence_locks, and
-  for a trace world.traces.lock(...). Automatic locks, at the start of day(): the 'corpse' trace of
-  every dead body You have an acquaintance row with (the stain where someone you knew died, reason
-  'where they died').
-
-day(tx, rng, at, turn_index, cause_event_id) -> list[Event]   (world.worldmove.day calls it)
-  Automatic locks; then tiers 1 and 2 over the loose items (by item_id) that are not locked and not
-  in a place inside the active area (turn.select.active_area); then tier 3. Returns every event.
+WEAR-01 exposed(store, place_id) -> bool: places.indoor is 0 — a street, a road, an outdoor place, a
+  building site's outside. An indoor place (a room, a building's inside) shelters what is in it.
+  An unknown place -> ValueError.
+WEAR-02 wet(store) -> bool: world_clock.weather is 'rain', 'storm' or 'snow'.
+WEAR-03 day(tx, rng, at, turn_index, cause_event_id) -> list[Event]   (world.worldmove.day calls it
+  once the day's weather is set; ``rng`` is not drawn)
+  1 Weather, only when wet(tx): per item (by item_id) lying loose (items.place_id set) in an
+    exposed place with condition > 0, by its def's kind: in D.rust_kinds -> loss D.rust_per_wet_day
+    ('rust'); 'document' -> D.pulp_per_wet_day ('pulp'); in D.rot_kinds -> D.rot_per_wet_day
+    ('rot'); any other kind -> nothing.
+  2 Spoilage, every day: per food item anywhere — held, packed or loose — (by item_id) whose def
+    has food.spoil_days, whose props.made_at is set and whose props.spoiled is not true: at -
+    made_at >= spoil_days x DAY -> spoiled ('spoiled').
+  Each change is ITEM_WEAR {item_id, cause: 'rust' | 'pulp' | 'rot' | 'spoiled', condition_before,
+  condition} (writer 'physical.objects', cause = cause_event_id, place_id = the item's place when it
+  lies loose, else NULL) updating items.condition = max(0, condition_before - loss) — spoiled: 0,
+  and props gains spoiled: true. A document whose condition reaches 0 has fallen apart:
+  physical.objects.destroy(tx, it, at, that ITEM_WEAR id, turn_index). The active area is no
+  exception (a gun rusts whether or not anyone is looking). Returns every event committed, in seq
+  order.
+WEAR-04 made_at: physical.objects.create (P10 amendment) gives a food item whose def has
+  food.spoil_days props.made_at = at, unless the props it was given already carry made_at (loot,
+  production and cheats create through it; the tinned food of a worldgen larder has no spoil_days
+  and never goes off).
 """
 
 from __future__ import annotations
@@ -53,11 +43,11 @@ if TYPE_CHECKING:
     from ..kernel.store import Store, Tx
 
 
-def score(store: "Store | Tx", item_id: str, at: int) -> float:
+def exposed(store: "Store | Tx", place_id: str) -> bool:
     raise NotImplementedError("P10")
 
 
-def lock(tx: "Tx", subject_id: str, reason: str, at: int, turn_index: int, cause_event_id: str | None) -> "Event | None":
+def wet(store: "Store | Tx") -> bool:
     raise NotImplementedError("P10")
 
 

@@ -22,7 +22,9 @@ Events (writer 'physical.objects'; the functions commit them and return the comm
 Rules:
   * create: qty > 1 needs ItemDef.stackable (ValueError); origin outside the set -> ValueError;
     the destination obeys the same checks as a transfer. P10: the keyword ``condition`` (0..100,
-    default 100) sets items.condition (loot rolls it, physical.space.discover_layout).
+    default 100) sets items.condition (loot rolls it, physical.space.discover_layout). P10
+    (world.decay WEAR-04): a food def with food.spoil_days gets props.made_at = at unless the
+    given props carry made_at (the ITEM_CREATED payload's props include it).
   * transfer (OBJ-02): a hand slot (hand_l / hand_r) holds at most ONE item -> ValueError when it
     is taken; a container item (its def has a ``container`` block) accepts contents while
     sum(bulk x qty of contents) + moved bulk x qty <= container.capacity_bulk, else ValueError;

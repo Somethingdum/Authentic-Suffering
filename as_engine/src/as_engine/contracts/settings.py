@@ -210,6 +210,14 @@ class StyleRulesNumbers(Strict):
 
 
 class DecayRules(Strict):
+    """P10 physical wear (world.decay WEAR-01..04; fidelity C02: things wear, none is forgotten)."""
+    rust_kinds: tuple[str, ...] = ("firearm", "magazine", "ammo", "melee", "tool", "key")
+    rot_kinds: tuple[str, ...] = ("clothing", "container", "food")
+    rust_per_wet_day: int = 1      # [SAND] condition lost per wet day by metal lying in the open
+    pulp_per_wet_day: int = 25     # [SAND] paper in the rain
+    rot_per_wet_day: int = 2       # [SAND] cloth, packs and food left out in the rain
+    # Retired by the P10 fidelity revision (the salvaged Memory Fade): nothing reads these; they
+    # stay only so a run made before it still loads its frozen rules.
     weights: tuple[float, float, float, float] = (0.4, 0.2, 0.3, 0.1)
     tier1_below: int = 20
     tier2_below: int = 35
@@ -218,12 +226,16 @@ class DecayRules(Strict):
 
 class WorldRules(Strict):
     offscreen_tick_h: float = 6.0
+    trace_decay_days: dict[str, float] = Field(default_factory=lambda: {
+        "tracks": 2, "blood": 7, "corpse": 30, "graffiti": 365, "missing_stock": 14, "damage": 180,
+    })  # in the open; under a roof x sheltered_trace_mult (TRACE-01)
+    sheltered_trace_mult: float = 4.0     # [SAND] a mark indoors lasts this many times longer
+    washes_out: tuple[str, ...] = ("tracks", "blood", "smoke")   # rain, storm or snow erases outdoors
+    # Retired by the P10 fidelity revision (C01 no death lottery, C11 no trace quota): nothing reads
+    # these; they stay only so a run made before it still loads its frozen rules.
     base_daily_mortality: dict[str, float] = Field(default_factory=lambda: {
         "bitch_mode": 0.0005, "easy": 0.001, "normal": 0.002, "realism": 0.004,
         "actually_hell": 0.008, "fuck_you": 0.016,
-    })  # [SAND] BENCH-06: probability a COLD adult dies on a given day with no other risk
-    trace_decay_days: dict[str, float] = Field(default_factory=lambda: {
-        "tracks": 2, "blood": 7, "corpse": 30, "graffiti": 365, "missing_stock": 14, "damage": 180,
     })
     min_offscreen_trace_ratio: float = 0.7
     # P10 — world motion (world.worldmove) and worldgen numbers; docs/as/06_WORLD.md §1, §3
@@ -232,7 +244,7 @@ class WorldRules(Strict):
     mortality_mult: dict[str, float] = Field(default_factory=lambda: {
         "scavenge": 3.0, "patrol": 2.0, "raid": 3.0, "trade_run": 2.0, "sick": 5.0, "child": 1.5,
         "elder": 2.0,
-    })
+    })  # retired with base_daily_mortality (nothing reads it)
     op_chance: dict[str, float] = Field(default_factory=lambda: {
         "scavenge": 0.3, "patrol": 0.25, "trade_run": 0.15, "raid": 0.1,
     })  # [SAND] daily chance a settlement (a hostile group for 'raid') starts an operation of that kind
@@ -299,6 +311,8 @@ class SocietyRules(Strict):
     drift_household: float = 0.2       # [SAND] daily chance housemates gain affection
     drift_friction: float = 0.3        # [SAND] daily chance a sour tie gains resentment
     drift_cap: int = 2                 # drift never pushes trust or affection above this
+    privation_days: dict[str, int] = Field(default_factory=lambda: {"water": 3, "food": 21})
+    # P10 (C01): unnamed people short of a resource on this many daily draws in a row die of it
     rumour_tells_per_day: int = 2
     rumour_quiet_days: int = 14        # a rumour older than this is no longer passed on
     loyalty_recheck_days: int = 3

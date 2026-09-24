@@ -1,8 +1,9 @@
-"""Off-screen motion (P10). Owner 'world.worldmove' (operations). Rules WORLD-02..06, OPS-01..06.
-docs/as/06_WORLD.md §3. The world moves without the player: people die, go out for supplies, walk
-patrols, trade, raid and leave, and every one of those things that could leave evidence does
-(WORLD-03). Code only, COLD, no model call. W = RulesConfig().world; rng stream 'offscreen'.
-Every function that returns an Event has committed it (at and turn_index as given).
+"""Off-screen motion (P10). Owner 'world.worldmove' (operations). Rules WORLD-02..06, OPS-01..07.
+docs/as/06_WORLD.md §3. The world moves without the player: people go out for supplies, walk
+patrols, trade, raid and leave; they are hurt, go hungry and die of what happens to them; and what
+they do leaves the marks it leaves (WORLD-03). Code only, COLD, no model call. W =
+RulesConfig().world; rng stream 'offscreen'. Every function that returns an Event has committed it
+(at and turn_index as given).
 
 WORLD-02 Nothing here ticks by itself: WORLD_DAY (daily at W.world_hour) and OPERATION_STEP rows
   are event_queue rows (background types, kernel.clock) that turn.timers.seed_world starts and
@@ -25,22 +26,23 @@ day(tx, rng, row, fired, turn_index) -> list[Event]   (the WORLD_DAY handler)
   1 Weather: rng.chance(tx, 'offscreen', f"weather:{d}", W.weather_change_chance) -> kind =
     rng.weighted(..., f"weather_kind:{d}", weather_weights(values)) and wind = rng.range_int(...,
     f"wind:{d}", 1, 3) for 'wind' / 'storm' else 0 -> WEATHER_CHANGE {weather, wind_level} (writer
-    'kernel.clock') updating world_clock — only when it differs from the current weather.
-  2 Mortality (WORLD-05): per living body of kind 'human' with an actors row whose controller is
-    not 'human', outside the active area, by body_id: p = W.base_daily_mortality[difficulty] x
-    every multiplier that applies — W.mortality_mult[kind of its active operation]; 'sick' (an
-    unhealed wound of severity significant or worse, or a 'wet' infections row); 'child' (band
-    infant, child or preteen); 'elder'; rng.chance(tx, 'offscreen', f"death:{body}:{d}", min(1,
-    p)) -> OFFSCREEN_DEATH {body_id, activity: the op kind or 'daily life', place_id} (actor_id =
-    body) and physical.bodies.die(tx, rng, body, at, that id, turn_index). (Core CAS-013 turns the
-    OFFSCREEN_DEATH into a corpse trace and talk; CAS-007 into grief and a vacancy.) Unnamed people:
-    per cohort with count > 0 (by cohort_id): expected = count x p (with its band's multiplier);
-    deaths = floor(expected) + (1 when rng.chance(..., f"cohort:{cohort}:{d}", expected -
-    floor(expected))) -> society.population.adjust_cohort(tx, cohort, -deaths, 'died', ...) when
-    deaths > 0 (never below zero).
+    'kernel.clock') updating world_clock — only when it differs from the current weather. Then
+    world.traces.washout(tx, at, turn_index, WD) (rain, storm or snow erase exposed tracks and
+    blood).
+  2 The unseen dead (C01 — there is no death lottery: people die of what happens to them, wounds
+    and illness running their course and thirst and hunger in physical.bodies.progress (every turn
+    and every off-screen step), what meets them on an operation (OPS-03), raids, the infected, and
+    — for the unnamed — privation (society.settlement STL-03 step 2b)): every DEATH event (by
+    seq) committed after the previous WORLD_DAY event (every one before the first), of a body of
+    kind 'human' that has an actors row and whose positions place is outside the active area ->
+    OFFSCREEN_DEATH {body_id, place_id, cause: the DEATH payload's cause} (actor_id = the body,
+    place_id, cause_event_id = that DEATH event) — the world's notice that nobody on screen saw it
+    (core CAS-013: a stain where it happened, and talk among those who would hear of it; CAS-007
+    already turned the DEATH into grief and a vacancy).
   3 Operations (OPS-01): plan_operations(tx, rng, at, turn_index, WD).
   4 Departures (OPS-06): depart(tx, rng, at, turn_index, WD).
-  5 world.decay.day(tx, rng, at, turn_index, WD); 6 world.infected.day(tx, rng, at, turn_index, WD).
+  5 world.decay.day(tx, rng, at, turn_index, WD) (physical wear); 6 world.infected.day(tx, rng, at,
+    turn_index, WD).
   7 kernel.clock.schedule(tx, at + DAY, 'WORLD_DAY', None, {}, WD).
   Returns every event committed, in seq order.
 weather_weights(values) -> list[tuple[str, float]]   (implemented below)
@@ -70,10 +72,12 @@ OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event]   (the OPERATION_STE
   The operation (status 'active'; otherwise []). movers = participants alive and outside the active
   area (those in it are on-screen now: the turn moves them, they drop out of the operation's moves).
   'arrive': movers MOVE to the destination (world.worldmove.on_arrival for each); outcome(...);
-    FACTION_OPERATION {op_id, step: 'arrive', outcome} updating operations.outcome and next_due_at =
-    at + W.op_dwell_h h; schedule 'return'.
-  'return': movers MOVE to the origin; resolve the stores (below); FACTION_OPERATION {op_id, step:
-    'return', status: 'done'} updating status 'done', next_due_at NULL.
+    the hurt are packed (OPS-07); FACTION_OPERATION {op_id, step: 'arrive', outcome} updating
+    operations.outcome and next_due_at = at + W.op_dwell_h h (+ W.op_leg_h h instead when anyone
+    was packed); schedule 'return'.
+  'return': movers MOVE to the origin; resolve the stores (below); the hurt are sutured (OPS-07);
+    FACTION_OPERATION {op_id, step: 'return', status: 'done'} updating status 'done', next_due_at
+    NULL.
 OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>":
   every mover: rng.chance(zone danger 'shambler' / 20) -> physical.bodies.apply_harm (a 'minor' or
   'significant' laceration on a CENTRE_MASS anatomy, weighted; cause the arrive event).
@@ -94,8 +98,22 @@ OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<wha
   takes a 'significant' gunshot wound and a TRACE 'blood'.
   On 'return' the haul goes into the origin settlement's stores (society.settlement.receive, reason
   'scavenged' / 'trade').
-OPS-04 WORLD-03: every operation leaves at least one trace; the world's off-screen events are
-  counted by the P11 release audit (>= W.min_offscreen_trace_ratio carry a trace).
+OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was
+  off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs
+  (by wound_id) that is not minor and still bleeds (physical.bodies.effective_bleed > 0):
+  physical.bodies.treat(tx, mover, wound, 'packing', by_actor = the first other living mover by
+  id, else the mover, at, cause, turn_index). When anyone was packed the party heads home now:
+  the 'return' step is due at at + W.op_leg_h h instead of at + W.op_dwell_h h (the haul is what
+  outcome() found). On 'return', after the MOVEs and the haul: per mover and per wound as above
+  whose severity is 'significant' (a suture holds only minor and significant wounds, and a minor
+  one clots by itself), while the origin settlement's stores hold medicine >= 1:
+  society.settlement.receive(tx, s, {'medicine': -1}, 'treatment', at, turn_index, cause) and
+  treat(..., 'suture', by_actor as for packing, ...). Without medicine the wound stays packed and
+  bleeds slowly; a severe or catastrophic wound cannot be sutured. physical.bodies.progress
+  decides the rest.
+OPS-04 WORLD-03 (fidelity C11): evidence comes from what happened. An operation leaves the traces
+  its own steps make (OPS-03) and nothing else; no share of off-screen events is required to leave
+  one, and no clue is guaranteed to last (tracks fade and wash out, TRACE-02 / TRACE-06).
 OPS-05 on_arrival(tx, rng, body_id, place_id, at, cause_event_id, turn_index) -> list[Event]
   (called after a MOVE into a new place by action.effects, society.routine, this module and
   world.worldgen; not for infected bodies, and not in a run without a world_params row — every

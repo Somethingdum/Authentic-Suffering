@@ -67,8 +67,10 @@ WG-28 Writing (per person, slot order; pack actors first in placement order): th
   child yet (else the first household), role 'child', and that household's head lists them in
   guardian_of (MATERIALIZE society.household per household); work_assignments for posts {workplace_id,
   actor_id, role, shift_start_hh, shift_end_hh, covering_for NULL} and each staffed workplace's
-  required_roles = [role] (MATERIALIZE society.work per workplace; a workplace nobody staffs keeps
-  required_roles [] and runs on its unnamed people).
+  required_roles = its posts' roles, each role ONCE in post order (one person at a time works a
+  post, whichever shift is on: the day and the night pump operator make ['pump_operator'], so a
+  cycle with its operator on shift is fully staffed) (MATERIALIZE society.work per workplace; a
+  workplace nobody staffs keeps required_roles [] and runs on its unnamed people).
 WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acquaintance of every
   other named person there (known_name = display name, description = mind.perception.
   describe_dossier) and known_places for every place of their zone and every road touching it

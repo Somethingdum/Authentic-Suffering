@@ -7,12 +7,17 @@ what the world did about it.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from as_engine.contracts.events import Event, EventType
 from as_engine.turn import timers
 
 H = 3_600_000
 DAY = 24 * H
+TESTS = Path(__file__).resolve().parents[2]
+REPO_PACKS = TESTS.parent.parent / "as_content" / "packs"
+FIXTURE_PACKS = TESTS / "fixtures" / "packs"
+WORLD_PC = "core:pc/owen_marsh"
 
 
 def now(s) -> int:

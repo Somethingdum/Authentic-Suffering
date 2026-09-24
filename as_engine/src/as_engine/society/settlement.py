@@ -26,9 +26,22 @@ STL-03 day(tx, rng, row, fired, turn_index) -> list[Event]   (the SETTLEMENT_DAY
     available -= share), else they go on short[resource] and the next person is tried. Then the
     unnamed people's share (sum over cohorts of count * rate[band] * mult) comes out of what is
     left, down to 0. drawn[resource] = stores[resource] - available.
+    P10 (C01): unnamed_short[resource] = how many unnamed people that left without a whole
+    share: serve them one person at a time, cohorts in (band rank, cohort_id) order, each share
+    = R.<resource>_per_day[band] * mult out of what the named left; the first person whose
+    share does not fit and everyone after them are short. At level 0 every unnamed person is
+    short of both; at level 1, of food (as the named: they drink but go hungry).
   2 SD = SETTLEMENT_DAY {settlement_id, ration_level: level, drawn, short: {resource: [ids]},
-    min_days} writing settlements.next_due_at = at + DAY, where min_days = min over RESOURCES of
-    (stores[resource] - drawn[resource]) / daily_need[resource] rounded to 2 (inf -> 999.0).
+    unnamed_short: {resource: n} (P10), min_days} writing settlements.next_due_at = at + DAY,
+    where min_days = min over RESOURCES of (stores[resource] - drawn[resource]) /
+    daily_need[resource] rounded to 2 (inf -> 999.0).
+  2b P10 (C01) The unfed unnamed — after SD: for resource in ('water', 'food'): k =
+    R.privation_days[resource]; when the newest k SETTLEMENT_DAY events of this settlement (SD
+    included) all have unnamed_short[resource] > 0, n = the smallest of those k values: n people
+    die of it, the last in line first — cohorts in reverse serving order (highest band rank, then
+    highest cohort_id), each giving min(its count, the rest) — each through
+    society.population.adjust_cohort(tx, cohort, -m, 'thirst' | 'hunger', at, turn_index, SD).
+    (Named people die of the same thing through their own needs, physical.bodies.)
   3 receive(tx, s, {resource: -drawn}, 'consumption', ...) when anything was drawn.
   4 The fed: for each named person covered for water and level >= 1: physical.bodies.
     refresh_need(tx, p, 'thirst', at, SD, turn_index); covered for food and level >= 2:
@@ -36,7 +49,8 @@ STL-03 day(tx, rng, row, fired, turn_index) -> list[Event]   (the SETTLEMENT_DAY
   5 Morale (SETTLEMENT_CHANGE, field 'morale', clamp 0..10): level <= 2 -> -1 (reason 'rations');
     else when there is no shortage and morale < R.morale_baseline -> +1 (reason 'recovering').
   6 Shortages end: for each resource in shortages (in list order) whose days_of after the draw is
-    >= R.shortage_days: SHORTAGE_ENDED {settlement_id, resource, days} removing it.
+    >= R.shortage_days: SHORTAGE_ENDED {settlement_id, resource, days} removing it (days rounded
+    to 2; inf -> 999.0, as for min_days: a settlement with no one left to feed).
   7 Rations recover: level < 3, and the newest R.recovery_streak SETTLEMENT_DAY events of this
     settlement (this one included) all have min_days >= R.recovery_days, and no RATION_CHANGE
     event of this settlement is newer than the oldest of them -> change_ration(+1, 'recovered').
@@ -45,7 +59,8 @@ STL-03 day(tx, rng, row, fired, turn_index) -> list[Event]   (the SETTLEMENT_DAY
   Returns every event committed, in seq order.
 STL-04 declare_shortage(tx, settlement_id, resource, at, turn_index, cause_event_id) -> Event | None
   (cascade dispatch of SHORTAGE — core CAS-004.) Already short of it -> None. Else SHORTAGE
-  {settlement_id, resource, days: days_of rounded to 2} appending resource to shortages.
+  {settlement_id, resource, days: days_of rounded to 2 (inf -> 999.0)} appending resource to
+  shortages.
 STL-05 change_ration(tx, settlement_id, delta, reason, at, turn_index, cause_event_id) -> Event | None
   (cascade dispatch of RATION_CHANGE — core CAS-005.) new = clamp(level + delta, 0, 4); new ==
   level -> None. RATION_CHANGE {settlement_id, delta: new - level, level_before, level_after,

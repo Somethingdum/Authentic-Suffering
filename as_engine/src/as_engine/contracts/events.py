@@ -41,6 +41,7 @@ class EventType(StrEnum):
     WEATHER_CHANGE = "WEATHER_CHANGE"
     PLACE_DISCOVERED = "PLACE_DISCOVERED"
     PLACE_CHANGE = "PLACE_CHANGE"            # P10: physical.space changes a place (held, props, light)
+    ITEM_WEAR = "ITEM_WEAR"                  # P10: world.decay's weather and spoilage (writer physical.objects)
     # body
     HARM = "HARM"
     WOUND_PROGRESS = "WOUND_PROGRESS"
@@ -141,9 +142,6 @@ class EventType(StrEnum):
     TIMER_SET = "TIMER_SET"
     TIMER_FIRED = "TIMER_FIRED"
     TIMER_CANCELLED = "TIMER_CANCELLED"
-    DECAY_TIER_1 = "DECAY_TIER_1"
-    DECAY_TIER_2 = "DECAY_TIER_2"
-    DECAY_TIER_3 = "DECAY_TIER_3"
     OVERRIDE = "OVERRIDE"
     MIGRATION_BACKFILL = "MIGRATION_BACKFILL"
     DEGRADED_FALLBACK = "DEGRADED_FALLBACK"
@@ -162,7 +160,7 @@ EVENT_CLASS: dict[EventType, EventClass] = {}
 _groups: dict[EventClass, list[str]] = {
     EventClass.PHYSICAL: ["MOVE", "PORTAL_CHANGE", "ITEM_TRANSFER", "ITEM_CONDITION", "ITEM_CREATED",
                           "ITEM_DESTROYED", "STRUCTURE_DAMAGE", "NOISE", "LIGHT_CHANGE", "FIRE_STEP",
-                          "WEATHER_CHANGE", "PLACE_DISCOVERED", "PLACE_CHANGE"],
+                          "WEATHER_CHANGE", "PLACE_DISCOVERED", "PLACE_CHANGE", "ITEM_WEAR"],
     EventClass.BODY: ["HARM", "WOUND_PROGRESS", "TREATMENT", "NEED_STAGE", "INFECTION_EXPOSURE",
                       "INFECTION_STAGE", "DEATH", "FALSE_DEATH", "REANIMATION", "AWARENESS_CHANGE",
                       "IMPAIRMENT_CHANGE", "RESOLVE_CHANGE", "POSTURE_CHANGE"],
@@ -183,8 +181,8 @@ _groups: dict[EventClass, list[str]] = {
     EventClass.WORLD: ["FACTION_OPERATION", "MIGRATION", "TRADE", "RAID", "CONSTRUCTION",
                        "INFRASTRUCTURE_FAIL", "TRACE_CREATED", "TRACE_DECAYED", "POPULATION_CHANGE",
                        "MATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE", "WORLD_DAY"],
-    EventClass.SYSTEM: ["WORLDGEN_STAGE", "SCENE_START", "SCENE_END", "CLOCK_ADVANCE", "TIMER_SET", "TIMER_FIRED", "TIMER_CANCELLED", "DECAY_TIER_1",
-                        "DECAY_TIER_2", "DECAY_TIER_3", "OVERRIDE", "MIGRATION_BACKFILL",
+    EventClass.SYSTEM: ["WORLDGEN_STAGE", "SCENE_START", "SCENE_END", "CLOCK_ADVANCE", "TIMER_SET", "TIMER_FIRED", "TIMER_CANCELLED",
+                        "OVERRIDE", "MIGRATION_BACKFILL",
                         "DEGRADED_FALLBACK", "CHEAT_ACTIVATED", "CHEAT_OVERRIDE", "CHEAT_DEACTIVATED",
                         "PLAYER_INPUT", "PC_CONTROL_CHANGE", "SETTINGS_CHANGE", "NARRATION",
                         "ECHO_RECORD", "PENDING_REACTION"],

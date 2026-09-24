@@ -854,7 +854,7 @@ CREATE TABLE traces (
   source_event TEXT NOT NULL,
   created_at INTEGER NOT NULL,
   decays_at  INTEGER,
-  locked     INTEGER NOT NULL DEFAULT 0   -- PERSISTENCE_LOCK
+  locked     INTEGER NOT NULL DEFAULT 0   -- a permanent mark: no decay clock (TRACE-01)
 );
 
 -- OWNER world.rumours
@@ -865,12 +865,6 @@ CREATE TABLE rumours (
   hops       INTEGER NOT NULL DEFAULT 0,
   distortions TEXT NOT NULL DEFAULT '[]',
   created_at INTEGER NOT NULL
-);
-
--- OWNER world.decay
-CREATE TABLE persistence_locks (
-  subject_id TEXT PRIMARY KEY,
-  reason     TEXT NOT NULL
 );
 
 -- ===================================================================== narration
