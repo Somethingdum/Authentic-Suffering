@@ -192,6 +192,7 @@ class PacketRules(Strict):
     max_recent_lines: int = 5
     max_affordances: int = 18
     min_affordances: int = 3
+    max_heard_chars: int = 800     # [SAND] Actor Spec §5: heard words past this are cut, ' …' (packet, aftermath)
 
 
 class StyleRulesNumbers(Strict):

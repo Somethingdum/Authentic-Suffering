@@ -211,9 +211,14 @@ What the P10 update changes for the builder (13_BUILD_ORDER §4 P10 has the orde
   `world_params` row — every hand-made scenario — must otherwise run exactly as before.
 - **Actor v2** (the Actor Specification, in place in finished phases): a person's own prompt and
   the identity card — `mind/identity.py` is new and implemented (do not rewrite it); rebuild
-  `mind/packet.build_packet` (the card replaces the identity lines) and `mind/memory.build_aftermath`
-  (the aftermath carries the card); the actor templates are the kit's. Tests: p04
-  `test_identity.py`, the amended `test_packet.py` and p06 `test_memory.py`.
+  `mind/packet.build_packet` (the card replaces the identity lines; whereabouts, the hour only
+  with a timepiece, cut floods of words, the budget's pins and `omitted`) and
+  `mind/memory.build_aftermath` (the aftermath carries the card and cuts words the same way); the
+  actor templates are the kit's. Rebuild `mind/affordance.enumerate_affordances` for AFF-11: a
+  menu from what the person knows — the duty gate never rejects, known laws are costs, 'owned' is
+  a belief, a weapon in a hand counts only when seen clearly; `turn/cognition.record_responses` blocks on
+  the moral gate only. Tests: p04 `test_identity.py`, `test_knowledge_menus.py` (new), the amended
+  `test_packet.py`, p06 `test_memory.py` and `test_retrieval.py`.
 - **P0 data** — new event and queue types, `BACKGROUND_QUEUE_TYPES` grows, new schema columns (the
   schema version is unchanged — DECISIONS D-50), the P10 rule groups in `contracts/settings.py`
   (11 §2.1), the loading bar's protocol messages. `p08_ui_protocol/protocol_kit.py` leaves the

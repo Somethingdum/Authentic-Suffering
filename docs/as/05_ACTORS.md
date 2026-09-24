@@ -73,12 +73,17 @@ Built only by `mind.packet.build_packet` (contract `SkullPacket`, rendered by
 in this order — identity first, then memory, then the moment (§6 of the spec): **Who you are** (the
 card, §2.1, and the lines they said lately); **What you remember** (beliefs with provenance and
 age, retrieved memories, lessons); **What matters to you now** (commitments, dependents and
-obligations, what it would cost, open loops, standing refusals); the time; **Your body** (with
-Resolve and what they carry); where they are; **What reaches you** (percepts with fidelity words:
-*clearly / only partly, some words lost / only the tone, no words*); **What you heard** (utterances
-with form and the receiver's standing); **People you can account for** (by name if known, else
-description); **Your understanding of them**; **What remains uncertain**; and the **Possibilities
-you notice** (affordances A1…).
+obligations, what it would cost, open loops, standing refusals); the time (the hour only for
+someone with a timepiece on them — anyone else knows the day and the part of it); **Your body**
+(with Resolve and what they carry); where they are; **What reaches you** (percepts with fidelity
+words: *clearly / only partly, some words lost / only the tone, no words*); **What you heard**
+(utterances with form and the receiver's standing; a flood of words past 800 characters is cut
+where a word ends, with " …" — heard, not obeyed, and never crowding the person out of their own
+context); **People you can account for** (by name if known, else description, and where they are
+as far as this mind knows: *here* — seen now —, *heard, not seen*, *last seen in the office 2 hours
+ago*, or *not seen*: being someone's son never puts him in the room, Actor Spec AC14); **Your
+understanding of them**; **What remains uncertain**; and the **Possibilities you notice**
+(affordances A1…).
 
 The instructions around it are a person's own (Actor Spec §6, AC01): *"You are the person described
 under Who you are. The current moment is yours to respond to…"* — cooperate, refuse, hesitate, keep
@@ -96,6 +101,13 @@ Four absences are as load-bearing as any field:
   reaction decides; the packet, the options, recall and salience read only percepts up to the
   mind's own moment (D-63).
 
+**What the budget may cut** (SKULL-09, Actor Spec AC16). Over its token budget the packet drops
+memories, lessons, beliefs, the lines about people who are not here, old refusals and uncertainty
+lines, in that order — never the card, the moment, the body, the options, what they are in the
+middle of, their open loops, or a standing refusal of someone who is here or speaking now: what
+bears on this decision is pinned. Every line it cut is kept, in order, in the packet's `omitted`
+list (never rendered), so what a person was not shown can be audited.
+
 Handles (P#, S#, E#, L#, A#) replace internal ids; the map stays in code. The JSON schema for the
 answer restricts `choice` to the offered A-handles and `speech.to` to P-handles, so an Actor cannot
 pick an option or a person that was not offered (INTENT-02).
@@ -103,7 +115,8 @@ pick an option or a person that was not offered (INTENT-02).
 ## 4. Will formation: affordances before choice
 
 **CODE computes what this body could attempt → the model chooses among them and motivates**
-(plan §6.4 LAW). An option exists only if every gate passes, in order:
+(plan §6.4 LAW). An option exists only if every gate passes, in order — except duty, which only
+says what an option would cost:
 
 | Gate | Question | Data |
 |---|---|---|
@@ -112,8 +125,20 @@ pick an option or a person that was not offered (INTENT-02).
 | belief | Does this person think it would work? | belief cues (e.g. `knows_headshot_rule`, `knows_false_death`) — held as lessons rows, seeded from `knowledge.cues` and held lore beliefs, learned in play (AFF-10) |
 | resolve | Can this person bring themselves to choose it now? | Resolve table (§5) |
 | resource | Can they pay for it? | ammo, bandage uses, keys, tools in reach |
-| duty | Does a post, standing order, law or dependent forbid it? | duty anchor, active laws, guardianship |
+| duty | What would keeping a post or a law they know cost them? (a note; it removes nothing) | duty anchor, the laws of the place they know, guardianship |
 | moral | Does it cross their own line? | affordance moral tags ∩ dossier `wont_tags` |
+
+**A menu built from what the person knows** (AFF-11; Actor Spec AC06, AC07; fidelity C05). Two
+worlds that differ only in something a person has not seen or been told offer them the same options
+in the same words: whether a closed door is locked (opening it is offered; the attempt finds the
+lock), whose an item is on record ('owned', and so stealing, is what they *believe* about it), a
+law nobody told them, what someone carries out of sight (a weapon in a hand counts only when seen
+clearly: in the dark, anyone may be unarmed), an infection that shows nothing yet. What they do know is a
+cost next to the option, never a missing option: a member of a settlement's group knows its laws;
+anyone else only the ones they were told; a law's `forbid` and `cost` both add its note, and the
+world answers when it is broken. Only their own immutable lines (the moral gate) and their body take
+options away. When several costs apply they are all said: the post's, then the laws', then the
+nerve's.
 
 Consequences: two people with different stats want different things because different things were
 on their menus; a weak Actor never selects a strong Actor's plan; incompetence is portrayable
@@ -157,8 +182,8 @@ fear and an open loop, never consent (WILL-08).
    stakes and resources sections are mandatory (WILL-C).
 4. **The response ladder** is computed *after* the choice by comparing the chosen option with the
    request's signature: ready compliance · reluctant compliance · counter-offer · refusal ·
-   entrenched refusal (the requested option was removed by the duty or moral gate — unmovable by
-   persuasion; only a change in the world can move it) · false compliance (says yes, does something
+   entrenched refusal (the requested option was removed by the moral gate — one of their own
+   immutable lines, unmovable by persuasion; only a change in the world can move it) · false compliance (says yes, does something
    else — logged as a lie) · coerced compliance.
 5. **Threats are not persuasion.** Coercion never routes through a social check; it drains
    Resolve, raises fear and resentment, and the fear-response options (comply-and-resent,

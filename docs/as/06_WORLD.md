@@ -60,7 +60,7 @@ the trouble… · Checking it all holds together…* — and to the loading bar 
 | WG4 | settlements, workplaces (water pump, kitchen, garden, workshop, clinic, watch, laundry, school), stores, laws | population baseline modulated by history (Batch-3 ruling #5) |
 | WG5 | cohorts from a survivor pyramid; households | DEMO-01 bounds (§2.1); children are inhabitants (DEMO-02) |
 | WG6 | Actors: pack actors first (protected), then generated detailed actors (WORLDGEN_ACTOR on both lanes in parallel, schema + validator + one targeted repair per failing section) — posts, leaders, a faction's other seat holders (the Top Hats, the Front Man), residents — each named out of the counted cohorts; relationship matrix 20 % positive / 60 % strangers / 20 % rivals (SOC-01); knowledge seeds → beliefs | hand-written characters cannot die in worldgen; if history would kill one, recalculate to explain survival (Batch-3 ruling #6) |
-| WG7 | local laws per settlement (faction laws + params: curfew when hostile_human ≥ 6; weapons policy by social order; contamination/intake laws where factions have intake doctrine) | laws change the available options and their costs |
+| WG7 | local laws per settlement (faction laws + params: curfew when hostile_human ≥ 6; weapons policy by social order; contamination/intake laws where factions have intake doctrine) | laws are costs on the options of the people who know them (members; anyone told) — never a missing option (05 §4, AFF-11) |
 | — | **genesis snapshot** of the finished world, before any PC exists (`_worlds/<world_id>/genesis.sqlite`) | a world can be reused for a new run or shared as a file (RUN-09) |
 | WG8 | PC placement (Part X), immediate contacts, opening pressure made of **real placed entities**, first objective; WORLDGEN_OPENING writes the text with citations; **PC survival history**: 3–5 history events with the PC as subject, each an anchor memory for the PC | QC-4: specific, non-trivial, reflects ≥ 1 A/B param, cites ≥ 1 placed entity; budgets 150/150/200/150 chars; WG-33: the PC starts with real memories and a reason for being alive |
 | WG9 | the world's checks (WG-35): three places worth the risk that the PC has leads on; a settlement short of food or water that the PC knows about; a lethal threat within two places of the start, and a mark that warns of it; two ways out of the start zone; history for every settlement and group (WORLD-01); every settlement's demographics sound (DEMO-01); the 58-bit gate | a failure means a stage was built wrong: worldgen stops with every failure named in one sentence. Not re-asserted daily in v1 (WG-37, D-45): the P11 release audit re-runs the checks on the genesis snapshot |
@@ -227,7 +227,7 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 | SOC-03 | A rumour reaches trade: what a settlement's trader has heard and believes about a buyer changes the price or ends the deal (`trade_terms`, §2.4, §6). |
 
 A body's condition → shifts → stores → rations → morale → loyalty; a death → household, grief,
-vacancy (CAS-007); a law → options and standing for everyone under it; a rumour → trust,
+vacancy (CAS-007); a law → costs on the options of whoever knows it, and standing for everyone under it; a rumour → trust,
 trade willingness, who is believed later (CAS-018, SOC-03). Weather's couplings (travel time,
 noise floor, visibility, work stalls, infected activity) arrive with weather in P10. **P9 is done
 when one injured worker demonstrably reaches morale (`test_econ_chain.py`), relationships drift

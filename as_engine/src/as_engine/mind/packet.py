@@ -38,8 +38,11 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
   episode_id) and is never rendered. tests/helpers.handle_for finds an option by def and referent.
 
 Fields (second person, plain English):
-  world_time_text   f'{format_clock(at)}, day {world_time(at).day} since the Fall ({part_of_day})'
-                    e.g. '23:14, day 18 since the Fall (night)'.
+  world_time_text   time as the person knows it (Actor Spec §5): the clock only for someone who has
+                    a timepiece — an item held, worn or carried (inventory_tree) whose def tags
+                    contain 'timepiece' — f'{format_clock(at)}, day {world_time(at).day} since the
+                    Fall ({part_of_day})', e.g. '23:14, day 18 since the Fall (night)'; anyone else
+                    f'Day {world_time(at).day} since the Fall ({part_of_day})'.
   identity          mind.identity.compile_identity(mind.actor.fused(tx, actor_id), minimum=reaction)
                     (IDN-01..05; Actor Spec AC02 / AC04): the whole card for a deliberation, the
                     reaction card for a reaction. What the card keeps out — writers_notes,
@@ -71,17 +74,29 @@ Fields (second person, plain English):
                     fidelity, text = percept text, source_handle = the P-handle of source_id or
                     None, seconds_ago = (at - percept.at) / 1000).
   utterances        every speech percept as UtteranceView: words / volume / addressed_to_me from
-                    percept_log.detail; speaker_handle = P-handle of source_id (None when the
-                    source is unknown); standing = firewall.classify_standing(tx, source_id,
-                    actor_id, words) (STRANGER when source_id is None); form = firewall
-                    .effective_form(firewall.classify_form(words, weapon_pointed_at_receiver =
-                    detail.armed_at_me), standing) (TONE_ONLY words '' classify as STATEMENT).
+                    percept_log.detail; words longer than PacketRules.max_heard_chars are cut to
+                    their first max_heard_chars characters, then back to the last space among
+                    them when there is one after the first character, and end ' …' (Actor Spec
+                    §5: a flood of words is heard, not obeyed, and never crowds the person out of
+                    their own context);
+                    speaker_handle = P-handle of source_id (None when the source is unknown);
+                    standing = firewall.classify_standing(tx, source_id, actor_id, words) (STRANGER
+                    when source_id is None); form = firewall.effective_form(firewall.classify_form(
+                    words, weapon_pointed_at_receiver = detail.armed_at_me), standing) (TONE_ONLY
+                    words '' classify as STATEMENT) — standing and form read the whole words.
                     The words appear ONLY inside UtteranceView — never in a field or sentence
                     named request, order, task or ask (WILL-00).
   entities          PacketEntity per P-handle: known_name = acquaintance.known_name (or None);
                     description = known_name or with_article(perception.describe(tx, actor_id,
                     body)); relation_summary = f'your {kind with _ as spaces}' from the holder's
-                    relationships row when its kind is not 'acquaintance', else None.
+                    relationships row when its kind is not 'acquaintance', else None;
+                    whereabouts (Actor Spec AC14: present, heard, remembered and last known are
+                    different things, and being related to someone never puts them here):
+                    'here' when a percept of this turn (the S rows above) with that source_id is
+                    VISUAL at clear or partial; else 'heard, not seen' when one is auditory or
+                    speech; else, from the holder's acquaintance row, f'last seen in
+                    {place_phrase(last_seen_place name)} {age}' (age worded as for beliefs, from
+                    at - last_seen) when last_seen and last_seen_place are set; else 'not seen'.
   relationships     RelationshipLine(handle, text) per entity with a relationships row from the
                     holder, in entity order. text = the non-zero axes, in the order trust, fear,
                     respect, affection, resentment, obligation, joined with '; ', first letter
@@ -145,11 +160,18 @@ Fields (second person, plain English):
 Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   prompts.render(CallClass.ACTOR_COGNITION, p=packet) (ACTOR_REACTION when reaction=True). While
   over PacketRules.token_budget[key], drop ONE item and re-render, in this order: memories (last
-  first), lessons (last first), beliefs (last first), relationship lines whose entity is not a source of this turn's
-  percepts (last first), refusals created more than 7 days before ``at`` (oldest first),
-  uncertainty lines (last first). Never dropped: identity (the card), recent_lines, body,
-  position, perceived_now, utterances, entities, affordances, commitments, stakes, resources.
-  When nothing droppable is left the packet is returned over budget (the scheduler logs it).
+  first), lessons (last first), beliefs (last first), relationship lines whose entity is not a
+  source of this turn's percepts (last first), refusals created more than 7 days before ``at``
+  whose requester is not a source of this turn's percepts (oldest first), uncertainty lines (last
+  first). Never dropped (Actor Spec AC16: what bears on this decision is pinned, never cut for
+  age or length): identity (the card), recent_lines, body, position, perceived_now, utterances,
+  entities, affordances, commitments, stakes, resources, open loops, and every refusal whose
+  requester is a source of this turn's percepts (someone here or speaking now). Every item
+  dropped is recorded, in drop order, in ``omitted`` (never rendered: an audit of what was cut):
+  'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
+  text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'uncertainty: ' + the
+  line — e.g. 'refusal: You refused: hand me the revolver.' When nothing droppable is left the
+  packet is returned over budget (the scheduler logs it).
 No instruction to forget anything is ever added (L1): what must not be used is absent.
 """
 

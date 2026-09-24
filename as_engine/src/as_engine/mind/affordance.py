@@ -1,5 +1,5 @@
-"""Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7
-and SKULL-10.
+"""Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,
+SKULL-10 and AFF-11 (Actor v2: what the menu may know).
 
 CODE computes affordances -> the model chooses among them and motivates (plan §6.4).
 
@@ -66,22 +66,40 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
               trigger until it learns otherwise: INTENT-03 depends on this); reload_firearm: a
               carried magazine or ammo item whose tags carry the firearm's caliber tag; medical
               defs: the carried item's props.uses is absent or > 0
-    duty      movement farther than 5 m from actors.duty_anchor adds MoralTag abandon_post and
-              cost_note "It means leaving your post at the <anchor name>."; an active law
-              (laws_active of the settlement whose place is the actor's place, or a group law of a
-              group the actor belongs to) whose LawEffect.effect is 'forbid', applies to this
-              actor (members / visitors / all) and whose affordance_tag matches EITHER the def's
-              tags OR the bound option's moral tags rejects the option (so a theft law naming
-              'steal' catches pick_up_item on an owned item even though 'steal' is a moral tag
-              computed per binding); 'cost' laws do not reject, they set cost_note = cost_note.
+    duty      never rejects (Actor v2, fidelity C05 / Actor Spec AC07: duty and law are costs a
+              person weighs, not walls; only the moral gate's immutable lines remove an option).
+              It adds cost notes: movement farther than 5 m from actors.duty_anchor adds MoralTag
+              abandon_post and the note "It means leaving your post at the <anchor name>."; a law
+              the actor KNOWS adds its note. The laws: the active laws (laws_active) of each
+              settlement whose place is the actor's place, by settlement_id then law_ref. The
+              actor is a MEMBER of such a settlement when it has a group_members row in the
+              settlement's group with status 'member' or 'probation', and a member knows every
+              law there; anyone else knows a law only through a live, believed claim_holding
+              whose proposition has subject_type 'place', subject_id = the settlement's place,
+              predicate 'law' and object_value = the law's ref (it was told, it read a sign). Per
+              known law, each LawEffect in the law's order that applies to this actor
+              ('members' when a member, 'visitors' when not, 'all') and whose affordance_tag
+              matches EITHER the def's tags OR the bound option's moral tags adds the effect's
+              cost_note, or — when that is empty — mind.identity.end(the law's belief_text) (how
+              locals put it). 'forbid' and 'cost' effects both add a note and neither removes
+              the option: 'forbid' says the law forbids it, the world answers when it is done.
+              A law the actor does not know changes nothing it is offered (AFF-11); what follows
+              from breaking it is what witnesses and the settlement actually learn.
+              The option's cost_note = every note that applies, each once, in this order — the
+              post's, the laws', then the resolve gate's (mind.resolve.gate) — joined with one
+              space; None when there is none.
     moral     option moral tags = def.moral_tags + moral_tags_if_target[every target kind] + the
               COMPUTED tags below; if they intersect the dossier motive.moral_line.wont_tags the
-              option is rejected: an Actor never even sees options that cross its own line; the
-              PC is gated the same way, only by the tags in its own dossier (L12).
+              option is rejected: an Actor never even sees options that cross its own line — its
+              explicit, immutable boundaries, the only thing besides the body that removes an
+              option (C05); the PC is gated the same way, only by the tags in its own dossier (L12).
   Computed moral tags (per binding):
     harm_dependent    an attack-verb option on a body the actor is guardian_of, or a member of its
                       household;
-    attack_unarmed    an attack-verb option on a human holding no firearm or melee item in hand;
+    attack_unarmed    an attack-verb option on a human the actor has not seen clearly this turn (a
+                      visual percept at clear: what shows what a hand holds, sense.optics VIS-03)
+                      holding a firearm or melee item in a hand — in the dark or dimly seen,
+                      anyone may be unarmed; never read off the record (AFF-11);
     abandon_post      see duty;
     abandon_dependent an option that takes the actor out of its place (move_through_portal,
                       leave_place, flee_threat, climb_obstacle) while a KNOWN body (above) it is
@@ -167,8 +185,20 @@ enumerate it too, one option per combination (then capped by the selection rules
                        has a relationships row with affection >= 1 toward
 Target kinds for moral_tags_if_target: bodies -> body kind ('human','infected','lurker','animal')
 and, for humans, ALSO the age band ('infant','child','preteen','teen','adult','elder'), so a child
-target yields both 'human' and 'child' tags; items -> 'owned' when props.owner names a body,
-household or group that is not the actor, the actor's household or a group the actor belongs to.
+target yields both 'human' and 'child' tags (what anyone who sees the body can tell; a Lurker seen
+at all is plainly not a person, lore §6.7); items -> 'owned' when the actor KNOWS whose it is and it
+is not theirs: a live, believed claim_holding of the actor with subject_type 'object', subject_id =
+the item and predicate 'owner' whose object_value names a body, household or group that is not the
+actor, its household or a group it belongs to. props.owner alone — a record the actor never
+learned — tags nothing (AFF-11): whether a taking is theft to anyone is for those who see it and
+what they know, not for the taker's menu.
+AFF-11 (Actor v2, Actor Spec AC06: a menu built from what the person knows) Two worlds that differ
+only in something the actor has not perceived or been told — whether a closed door is locked,
+whose an item is on record, an active law it does not know, what another body carries out of
+sight, whether someone is infected — offer that actor the same options in the same order with the
+same words. What it cannot see fails when it tries (a locked door does not open; the attempt says
+so), never by vanishing from the menu. The body's own limits and what it perceives (an open or
+barricaded door in the standing view, a weapon seen in someone's hand) may shape the menu.
 Duty gate details: see 'duty' and the computed moral tags above (abandon_post, abandon_dependent).
 Label placeholders: {target} {destination} {item} {distance} (e.g. '4 m') {duration} (e.g.
 '3 seconds', '2 minutes'). A label using any other placeholder is a content error reported under

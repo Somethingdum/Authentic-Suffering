@@ -19,7 +19,7 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                 the P-handle of source_id or None, seconds_ago = (at - row.at) / 1000).
   utterances    speech rows as UtteranceView, built exactly as mind.packet builds them.
   entities      PacketEntity per P-handle, as mind.packet (known_name, description,
-                relation_summary).
+                relation_summary, whereabouts).
   identity      the holder's whole card, mind.identity.compile_identity(mind.actor.fused(tx,
                 holder_id)) (IDN-01): what happened is read by this person, as this person.
   own_action_text   what the holder did itself this turn (it never perceives its own actions):

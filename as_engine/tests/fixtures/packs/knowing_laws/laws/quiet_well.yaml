@@ -1,0 +1,10 @@
+- schema: as.law.v1
+  id: quiet_well
+  name: Quiet Well
+  kind: noise
+  text: Nobody runs or hurries within sight of the well; water is drawn at a walk and the yard is crossed at a walk.
+  affordance_effects:
+    - {affordance_tag: rushed, effect: forbid, applies_to: all}
+  enforcement: Whoever draws water that hour tells a runner to stop, and names them at the evening count.
+  punishment: A day hauling water for the households nearest the well.
+  belief_text: "Nobody runs near the well here; running feet carry, and the dead come to the sound"

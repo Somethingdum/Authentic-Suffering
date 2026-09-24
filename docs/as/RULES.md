@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-585 ids; 337 with their own statement, 248 named only in context.
+586 ids; 338 with their own statement, 248 named only in context.
 
 
 ## ABUSE
@@ -34,15 +34,16 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | AFF-01 | *wounds / places); an item bound with a destination anchor (a believed location, AFF-01) must* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-02 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_content/packs/core/laws/settlement_core.yaml` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-03 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-02 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-03 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
+| AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *Belief cues (AFF-10): a cue is HELD by an actor when a lessons row for that holder carries the cue* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
+| AFF-11 | AFF-11 (Actor v2, Actor Spec AC06: a menu built from what the person knows) Two worlds that differ | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_content/packs/core/affordances/items.yaml` | `contract/p04_one_actor/test_knowledge_menus.py` |
 
 ## AUD
 
@@ -641,7 +642,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | OPS-03 | OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>": every mover: rng.chance(world.hordes.density(the destination's zone) / 20) (P10: how thick the district's dead actually are — a cleare… | as_engine/world/worldmove.py | `as_engine/world/decay.py`, `as_engine/world/hordes.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_operations.py` |
 | OPS-04 | OPS-04 WORLD-03 (fidelity C11): evidence comes from what happened. An operation leaves the traces its own steps make (OPS-03) and nothing else; no share of off-screen events is required to leave one, and no clue is guar… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
 | OPS-05 | OPS-05 on_arrival(tx, rng, body_id, place_id, at, cause_event_id, turn_index) -> list[Event] (called after a MOVE into a new place by action.effects, society.routine, this module and world.worldgen; not for infected bod… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_discovery.py` |
-| OPS-06 | OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event] (the loyalty plan acted on) Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose created_at <= at - W.defect_after_day… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | — |
+| OPS-06 | OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event] (the loyalty plan acted on) Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose created_at <= at - W.defect_after_day… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p04_one_actor/test_knowledge_menus.py` |
 | OPS-07 | OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs (by wound_id) that i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
 | OPS-08 | OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *, target_id=None) -> str (OPS-01's daily plan and world.factions FAC-04 DECON) op_id = tx.mint('ops'); FACTION_OPERATION {op_i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_operations.py` |
 
@@ -987,7 +988,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | VIS-01 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 | VIS-02 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
-| VIS-03 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
+| VIS-03 | *visual percept at clear: what shows what a hand holds, sense.optics VIS-03)* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py`, `contract/p04_one_actor/test_knowledge_menus.py` |
 | VIS-04 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 
 ## WEAR
@@ -1056,7 +1057,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | WILL-03 | WILL-03: two Actors differing only in skills[] and Resolve (tests/fixtures/scenarios/two_skills.yaml) | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/firewall.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_firewall.py` |
 | WILL-04 | *The Request Firewall (P4). Rules WILL-00..11, L6, L7. docs/as/05_ACTORS.md §Firewall.* | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p07_slice/test_slice_refusal.py` |
 | WILL-05 | WILL-05 negotiable_target_penalty(times_asked) = -(times_asked - 1) for times_asked >= 1 (else ValueError): asking again is never better. action.effects.situation applies it to the check of a 'negotiable' def (calm_pers… | as_engine/mind/firewall.py | `as_engine/action/effects.py`, `as_engine/mind/firewall.py`, `as_engine/mind/retrieval.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p06_memory/test_refusals.py`, `contract/p06_memory/test_retrieval.py`, `contract/p07_slice/test_slice_refusal.py` |
-| WILL-06 | WILL-06 Asking has consequences even when refused: a NEW refusal with entrenched = true (the ask needed something the duty or moral gate forbids — abandon a dependent, leave a post, betray one's own) also commits mind.m… | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p06_memory/test_refusals.py`, `contract/p07_slice/test_slice_refusal.py` |
+| WILL-06 | WILL-06 Asking has consequences even when refused: a NEW refusal with entrenched = true (the ask needed something the moral gate removes — one of the refuser's own immutable lines, such as abandoning a dependent, leavin… | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p06_memory/test_refusals.py`, `contract/p07_slice/test_slice_refusal.py` |
 | WILL-07 | WILL-07 record_refusal(tx, actor_id, requester_id, signature, summary, reason_code, reason_event_ids, cost_cited, entrenched, at, turn_index, cause_event_id) -> refusal_id reason_code must be one of REASON_CODES, else V… | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p06_memory/test_refusals.py`, `contract/p07_slice/test_slice_refusal.py` |
 | WILL-08 | *The Request Firewall (P4). Rules WILL-00..11, L6, L7. docs/as/05_ACTORS.md §Firewall.* | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py`, `contract/p07_slice/test_slice_refusal.py` |
 | WILL-09 | *The Request Firewall (P4). Rules WILL-00..11, L6, L7. docs/as/05_ACTORS.md §Firewall.* | as_engine/mind/firewall.py | `as_engine/mind/firewall.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_firewall.py` |

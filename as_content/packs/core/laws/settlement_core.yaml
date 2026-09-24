@@ -1,7 +1,7 @@
 # Baseline settlement law code (docs/as/06_WORLD.md §2.5 faction doctrine; §2.4 ration/shortage
-# chain). affordance_effects gate mind/affordance.py's duty gate (AFF-02): an active law forbidding
-# a tag rejects the option outright for members/visitors it applies to; 'cost' adds a cost_note
-# instead of rejecting.
+# chain). affordance_effects feed mind/affordance.py's duty gate: to a person who KNOWS the law (a
+# member of the settlement's group, or someone told), an option carrying the tag shows the
+# cost_note. 'forbid' and 'cost' both add the note; neither removes the option (Actor v2, C05).
 - schema: as.law.v1
   id: nightfall_curfew
   name: Nightfall Curfew

@@ -16,6 +16,8 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | Skull Packet | everything one mind receives for one decision | — | actor packet, perception packet, context bundle |
 | identity card | who a person is as their decision calls show it: the whole dossier's person in plain lines, each traceable to its fields; the minimum card in a reaction (`mind.identity`, IDN-01..05) | — | character summary, persona prompt |
 | affordance | one thing a body could attempt now, computed by code | "option" / a suggestion | action menu item |
+| whereabouts | where one mind can account for a person being: here (seen now), heard not seen, last seen somewhere, or not seen (`PacketEntity.whereabouts`, Actor Spec AC14) | — | location (for a person in a mind) |
+| known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | percept | one thing that reached one mind, with fidelity | "you heard / saw / felt" | — |
 | fidelity | exact / partial / tone only / visual only | "clearly", "partly", "only the tone" | — |

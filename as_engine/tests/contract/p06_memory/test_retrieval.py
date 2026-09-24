@@ -292,6 +292,46 @@ def test_the_packet_carries_what_retrieval_found(scenario, canon):
     assert "- E1 (1 hour ago): Nita said she'd walk the fence." in text
 
 
+def test_what_bears_on_the_moment_is_never_cut(scenario, canon):
+    """Actor Spec AC16 (SKULL-09): Owen asks Mara for the revolver again; her nine-day-old refusal
+    of him stays in the packet whatever the budget, because he is the one asking now. June's
+    eight-day-old refusal comes back only because she is named, and goes like any old line. Every
+    line the budget cut is on record in ``omitted``, in drop order — never in the prompt."""
+    DAY = 24 * HOUR
+
+    def world(rules=None):
+        w = scenario("metal_fence", rules=rules)
+        t = moment(w, "Mara, give me the revolver. June wants to leave too.", speaker="pc", to="mara")
+        with w.store.transaction() as tx:
+            firewall.record_refusal(tx, w.id("mara"), w.id("pc"), f"give_item:{w.id('pc')}", "hand over the revolver",
+                                    "loyalty", [], "", False, t - 9 * DAY, 0, None)
+            firewall.record_refusal(tx, w.id("mara"), w.id("june"), f"leave_place:{w.id('sales_floor')}",
+                                    "leave the store", "duty", [], "", False, t - 8 * DAY, 0, None)
+        return w, t
+
+    w, t = world()
+    full = packet(w, canon, "mara", t + 2000)
+    assert full.refusals == ["You refused: hand over the revolver.", "You refused: leave the store."]
+    assert full.omitted == []
+    w2, t2 = world(RulesConfig(packet=PacketRules(token_budget={"hot": 10, "warm": 10, "reaction": 10})))
+    p = packet(w2, canon, "mara", t2 + 2000)
+    assert p.refusals == ["You refused: hand over the revolver."], "the one asking now"
+    sources = {full.handles[x.source_handle] for x in full.perceived_now if x.source_handle} | \
+              {full.handles[u.speaker_handle] for u in full.utterances if u.speaker_handle}
+    assert w.id("pc") in sources and w.id("june") not in sources
+    assert p.omitted == ([f"memory: {m.text}" for m in reversed(full.memories)]
+                         + [f"lesson: {x}" for x in reversed(full.lessons)]
+                         + [f"belief: {b.text}" for b in reversed(full.beliefs)]
+                         + [f"relationship: {r.handle}: {r.text}" for r in reversed(full.relationships)
+                            if full.handles[r.handle] not in sources]
+                         + ["refusal: You refused: leave the store."]
+                         + [f"uncertainty: {x}" for x in reversed(full.uncertainty)])
+    assert "belief: Nita walks the alley at eleven; it's clear." in p.omitted
+    text = "\n".join(m.content for m in render(CallClass.ACTOR_COGNITION, p=p))
+    assert "hand over the revolver" in text and "leave the store" not in text
+    assert "omitted" not in text and "belief: " not in text
+
+
 def test_the_budget_drops_memories_then_lessons_then_beliefs(scenario, canon):
     """SKULL-09 from P6: memories (last first), then lessons (last first), then beliefs."""
 
@@ -335,3 +375,6 @@ def test_the_budget_drops_memories_then_lessons_then_beliefs(scenario, canon):
     assert seen_lesson_drop and seen_belief_drop
     bare = cut(10)
     assert bare.memories == [] and bare.lessons == [] and bare.beliefs == []
+    assert bare.omitted[:5] == ([f"memory: {m.text}" for m in reversed(full.memories)]
+                                + [f"lesson: {x}" for x in reversed(full.lessons)]
+                                + [f"belief: {b.text}" for b in reversed(full.beliefs)]), "last first, kind by kind"

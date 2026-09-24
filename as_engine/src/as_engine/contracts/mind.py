@@ -84,6 +84,8 @@ class PacketEntity(Strict):
     description: str = Field(description="How THIS mind perceives/knows them: name if known, else a description.")
     known_name: str | None = None
     relation_summary: str | None = None
+    whereabouts: str = Field(description="'here', 'heard, not seen', 'last seen in <place> <age>' or 'not seen' "
+                             "(mind.packet; Actor Spec AC14).")
 
 
 class PerceivedItem(Strict):
@@ -183,6 +185,8 @@ class SkullPacket(Strict):
     affordances: list[AffordanceOption] = Field(min_length=1)
     uncertainty: list[str] = Field(default_factory=list)
     handles: dict[str, str] = Field(default_factory=dict, description="handle -> internal id. NEVER rendered.")
+    omitted: list[str] = Field(default_factory=list, description="What the budget dropped, in drop order "
+                               "(SKULL-09, Actor Spec AC16). NEVER rendered: an audit of what was cut.")
 
 
 # ---------------------------------------------------------------------------

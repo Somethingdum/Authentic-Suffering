@@ -1,4 +1,5 @@
-"""The Skull Packet (P4). Rules SKULL-01..09, WILL-00, WILL-C, IDN (mind/packet.py).
+"""The Skull Packet (P4). Rules SKULL-01..10, WILL-00, WILL-C, IDN, Actor Spec §5 / AC14
+(mind/packet.py).
 
 A packet is everything one mind may know right now, and nothing else. It is built only from that
 mind's own body, inventory, records and percepts; handles replace every internal id.
@@ -19,8 +20,9 @@ from as_engine.kernel.rng import Rng
 from as_engine.mind import actor, identity, perception
 from as_engine.mind.affordance import AffordanceSet, enumerate_affordances
 from as_engine.mind.packet import build_packet, estimate_tokens
-from as_engine.physical import bodies, space
+from as_engine.physical import bodies, objects, space
 from as_engine.physical.bodies import WoundSpec
+from as_engine.physical.objects import Holder
 from as_engine.prompts.render import render
 
 pytestmark = pytest.mark.phase(4)
@@ -198,8 +200,62 @@ def test_identity_time_and_place(scenario):
     fused = actor.fused(w.store, w.id("june"))
     assert p.identity == identity.compile_identity(fused) and not p.identity.minimum
     assert packet_for(w, "june", at, reaction=True).identity == identity.compile_identity(fused, minimum=True)
-    assert p.world_time_text == "23:14, day 18 since the Fall (night)"
+    assert p.world_time_text == "Day 18 since the Fall (night)", "June has no watch (Actor Spec §5)"
     assert p.position_text == "at the shelves in the stockroom"
+
+
+def test_only_a_timepiece_tells_the_hour(scenario):
+    """Time as the person knows it (Actor Spec §5): the clock only for someone who has a timepiece
+    on them — held, worn, carried, even inside something carried; one on the shelf tells her nothing."""
+    w = scenario("metal_fence")
+    t = now(w)
+    assert packet_for(w, "june", t).world_time_text == "Day 18 since the Fall (night)"
+    with w.store.transaction() as tx:
+        objects.create(tx, "core:item/wristwatch", 1, Holder("place", w.id("storeroom"), anchor_id=w.id("shelves")),
+                       "scenario", {}, t, None, 0)
+    assert packet_for(w, "june", t).world_time_text == "Day 18 since the Fall (night)", "a watch on the shelf is not hers"
+    with w.store.transaction() as tx:
+        box = objects.create(tx, "core:item/cardboard_box", 1, Holder("body", w.id("june"), "pack"), "scenario", {}, t,
+                             None, 0).payload["item_id"]
+        objects.create(tx, "core:item/wristwatch", 1, Holder("container", box), "scenario", {}, t, None, 0)
+    p = packet_for(w, "june", t)
+    assert p.world_time_text == "23:14, day 18 since the Fall (night)", "a watch in the box in her pack"
+    assert "Right now: 23:14, day 18 since the Fall (night)" in rendered(p)
+    assert packet_for(w, "alice", t).world_time_text == "Day 18 since the Fall (night)", "June's watch tells Alice nothing"
+
+
+def test_present_heard_and_last_seen_are_different_things(scenario):
+    """Actor Spec AC14: 'here' is seen now; a voice from another room is 'heard, not seen'; anyone
+    else is where this mind last saw them, however close the tie — Mara's son asleep behind a
+    shut door is not in the room with her."""
+    w = scenario("metal_fence")
+    at = crash_and_call(w)
+    j = packet_for(w, "june", at)
+    where = {j.handles[e.handle]: e.whereabouts for e in j.entities}
+    assert where == {w.id("mara"): "heard, not seen", w.id("pc"): "last seen in the sales floor just now"}
+    owen = packet_for(w, "pc", at)
+    assert {owen.handles[e.handle]: e.whereabouts for e in owen.entities}[w.id("mara")] == "here"
+    m = packet_for(w, "mara", at + 2 * 3_600_000)
+    eli = next(e for e in m.entities if m.handles[e.handle] == w.id("eli"))
+    assert eli.whereabouts == "last seen in the office 2 hours ago"
+    assert f"- {eli.handle}: Eli (your child) — last seen in the office 2 hours ago" in rendered(m)
+
+
+def test_a_flood_of_words_is_cut_where_a_word_ends(scenario):
+    """Actor Spec §5: words past PacketRules.max_heard_chars are cut before the last space inside
+    the limit and end ' …'; a run with no space is cut at the limit. What the words came across as
+    is read from all of them — this flood ends in a question."""
+    w = scenario("metal_fence")
+    t = now(w)
+    limit = PacketRules().max_heard_chars
+    assert limit == 800
+    flood = " ".join(["sorry"] * 150) + " where did the shelf go?"
+    say(w, "mara", flood, ["june"], t + 500)
+    say(w, "mara", "a" * 900, ["june"], t + 20_000)
+    say(w, "mara", "b" * 800, ["june"], t + 40_000)
+    p = packet_for(w, "june", t + 41_000)
+    assert [u.words for u in p.utterances] == [" ".join(["sorry"] * 133) + " …", "a" * 800 + " …", "b" * 800]
+    assert p.utterances[0].form == UtteranceForm.QUESTION
 
 
 def test_body_lines(scenario):
@@ -311,6 +367,28 @@ def test_the_budget_never_drops_the_protected_fields(scenario):
     for f in ("identity", "recent_lines", "body_lines", "position_text", "perceived_now", "utterances", "entities",
               "affordances", "commitments", "stakes", "resources"):
         assert getattr(p, f) == getattr(full, f), f
+    assert full.omitted == [] and full.uncertainty, "Nita caught only part of something"
+    assert p.omitted == ([f"belief: {b.text}" for b in reversed(full.beliefs)]
+                         + [f"relationship: {r.handle}: {r.text}" for r in reversed(full.relationships)
+                            if full.handles[r.handle] not in present]
+                         + [f"uncertainty: {x}" for x in reversed(full.uncertainty)]), "what went, in the order it went"
+
+
+def test_what_was_missed_goes_last_and_the_last_first(scenario):
+    """SKULL-09: the uncertainty lines are the last thing a budget cuts, the last line first, and
+    each goes into ``omitted`` as it went."""
+    def nita_hears(w):
+        t = now(w)
+        with w.store.transaction() as tx:
+            tx.commit_event(space.move_event(tx, w.id("june"), w.id("storeroom"), w.id("doorway"), 7.5, 0.5, t + 800, None, 0))
+        say(w, "june", "What was that?", [], t + 900)
+        say(w, "june", "Nita, is that you?", [], t + 1200)
+        return packet_for(w, "nita", t + 1500)
+    full = nita_hears(scenario("metal_fence"))
+    k = len(full.uncertainty)
+    assert k >= 2
+    p = nita_hears(_budget_world(scenario, 10))
+    assert p.uncertainty == [] and p.omitted[-k:] == [f"uncertainty: {x}" for x in reversed(full.uncertainty)]
 
 
 def test_reaction_packets_use_the_reaction_budget(scenario):

@@ -285,6 +285,11 @@ class CascadeRuleDef(Strict):
 
 
 class LawEffect(Strict):
+    """What a law means to a person who KNOWS it (mind/affordance.py, the duty gate; Actor v2, C05):
+    options tagged ``affordance_tag`` carry ``cost_note`` (or the law's belief_text when it is
+    empty). 'forbid' and 'cost' both add the note and neither removes an option — a law is a cost
+    a person weighs; the world answers when it is broken."""
+
     affordance_tag: str
     effect: Literal["forbid", "cost"]
     applies_to: Literal["members", "visitors", "all"] = "all"

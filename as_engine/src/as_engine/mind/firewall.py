@@ -56,7 +56,8 @@ classify_response(signature, chosen: BoundAffordance, speech_text, resolve_cur, 
      READY_COMPLIANCE   if resolve was not drained this turn and no cost_note,
      else RELUCTANT_COMPLIANCE
   not matching:
-     ENTRENCHED_REFUSAL if the requested def was removed by the duty/moral gate (entrenched_block)
+     ENTRENCHED_REFUSAL if the requested def was removed by the moral gate (entrenched_block;
+                        the duty gate removes nothing, C05)
      FALSE_COMPLIANCE   if speech_text contains an ASSENT_TOKENS entry as a whole word or phrase
                         (case-insensitive, regex word boundaries: 'yes' matches "Yes, sure." but
                         not "yesterday") — deception is logged (LIE_TOLD, P6)
@@ -79,9 +80,9 @@ WILL-07 record_refusal(tx, actor_id, requester_id, signature, summary, reason_co
     entrenched (the row's, after this call), repeat: true}; refusals UPDATE times_asked + 1 and
     entrenched = old OR new (once entrenched, always entrenched). Returns the existing id.
 WILL-06 Asking has consequences even when refused: a NEW refusal with entrenched = true (the ask
-  needed something the duty or moral gate forbids — abandon a dependent, leave a post, betray
-  one's own) also commits mind.mind.relate(actor_id, requester_id, TRUST, -1, cause = the REFUSAL
-  event id).
+  needed something the moral gate removes — one of the refuser's own immutable lines, such as
+  abandoning a dependent, leaving a post or betraying its own when those are on its wont list)
+  also commits mind.mind.relate(actor_id, requester_id, TRUST, -1, cause = the REFUSAL event id).
 WILL-07 Friction: the repeat that brings times_asked to 3, and every later one, also commits
   mind.mind.relate(actor_id, requester_id, RESENTMENT, +1, cause = the REFUSAL event id).
 WILL-05 negotiable_target_penalty(times_asked) = -(times_asked - 1) for times_asked >= 1 (else

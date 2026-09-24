@@ -94,11 +94,12 @@ record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> lis
   standing). Not one of ASK_FORMS ('request', 'order', 'demand', 'threat') -> (actor, event_id,
   'not_an_ask'). Otherwise signature = firewall.request_signature(words, speaker, actor,
   perceived_entities(...)); entrenched_block = an affs[actor].rejected entry whose def_id is the
-  signature's def id (its text before the first ':') and whose gate is 'duty' or 'moral' (False
-  when the actor has no AffordanceSet); response = firewall.classify_response(signature,
-  intent.bound, the intent's speech text or None, actors.resolve_cur, effective,
-  entrenched_block=…, resolve_drained_this_turn = a RESOLVE_CHANGE event of this turn by the actor
-  with payload.delta < 0) -> (actor, event_id, response.value), and:
+  signature's def id (its text before the first ':') and whose gate is 'moral' — an immutable
+  line; the duty gate rejects nothing, C05 — (False when the actor has no AffordanceSet);
+  response = firewall.classify_response(signature, intent.bound, the intent's speech text or
+  None, actors.resolve_cur, effective, entrenched_block=…, resolve_drained_this_turn = a
+  RESOLVE_CHANGE event of this turn by the actor with payload.delta < 0) -> (actor, event_id,
+  response.value), and:
     REFUSAL / ENTRENCHED_REFUSAL -> firewall.record_refusal(tx, actor, speaker, signature,
       perception.norm_text(words) (the summary: 'hand me the revolver'), reason, [event_id],
       intent.private_reason[:200] (the cost it cites), entrenched = ENTRENCHED_REFUSAL, wave_at,

@@ -1,0 +1,10 @@
+schema: as.pack.v1
+id: knowing_laws
+name: Actor v2 test pack — laws people know
+version: 1.0.0
+description: >-
+  Test fixture (PROTECTED). A law whose effect carries no note of its own (a person who knows it
+  weighs it in the locals' words, the law's belief_text) and an option that goes against the people
+  in charge, so the duty gate's notes can be seen together (mind/affordance.py, AFF-11, C05).
+depends_on: [core]
+authors: [AS build spec v1]

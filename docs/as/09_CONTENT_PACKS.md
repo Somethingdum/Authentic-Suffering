@@ -272,8 +272,12 @@ holds it.
   `requires.portal_kinds` the kinds of way (`[door, window, gate, …]` for closing, locking and
   barring — an `opening`, a gap in a fence or a ladder hole, has nothing to close). Without them an
   option binds any body or way in range, and the menu offers nonsense (P10, D-66).
-- **Laws** change options and their costs for people under them (`forbid` or `cost` per affordance
-  tag, for members/visitors/all) and carry a `belief_text` — how locals describe the law.
+- **Laws** put a price on options for the people who know them (per affordance tag, for
+  members/visitors/all, with a `cost_note`) and carry a `belief_text` — how locals describe the
+  law, and the note a person weighs when an effect has none of its own. A member of the
+  settlement's group knows its laws; anyone else only the laws they were told. `forbid` and `cost`
+  both add the note and neither removes the option (Actor v2, AFF-11): the world answers when a law
+  is broken, the menu never pretends it cannot be.
 - **Buildings** are room-by-room archetypes with anchors (cover/concealment 0–3), portals (doors,
   windows, walls — a wall is a portal with aperture 0 that only carries sound) and loot tables.
   Rooms are generated the first time anyone sees inside.

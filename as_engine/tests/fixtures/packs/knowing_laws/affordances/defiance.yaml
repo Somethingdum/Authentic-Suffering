@@ -1,0 +1,12 @@
+- schema: as.affordance.v1
+  id: slip_off
+  verb: move
+  label: "Slip away to {destination} ({distance}, about {duration})"
+  ui_label: "Slip away to {destination}"
+  binds: anchor
+  range: same_place
+  requires: {mobile: true}
+  duration: {base_s: 1, per_meter_s: 1.0}
+  noise_db: 20
+  effect: move_to_anchor
+  tags: [move, opposes_authority]

@@ -1,6 +1,6 @@
 # Picking up, carrying, giving, searching, reloading, eating, drinking.
-# Item target kinds for moral_tags_if_target: 'owned' = the item's props.owner names another body,
-# household or group than the actor's own (mind/affordance.py).
+# Item target kinds for moral_tags_if_target: 'owned' = the actor BELIEVES the item belongs to
+# another body, household or group than its own (an 'owner' belief; mind/affordance.py, AFF-11).
 - schema: as.affordance.v1
   id: pick_up_item
   verb: manipulate

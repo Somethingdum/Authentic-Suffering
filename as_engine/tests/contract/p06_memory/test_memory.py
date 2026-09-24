@@ -132,6 +132,20 @@ def test_the_aftermath_and_the_packet_agree(scenario, canon):
     assert a.identity == p.identity and not a.identity.minimum  # the whole card: this person reads what happened
 
 
+def test_a_flood_of_words_is_remembered_as_it_was_heard(scenario):
+    """MEM-01 with Actor Spec §5: the aftermath cuts a flood of words exactly as the packet does."""
+    w = scenario("metal_fence")
+    t = now(w)
+    flood = " ".join(["sorry"] * 150) + " where did the shelf go?"
+    with w.store.transaction() as tx:
+        tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=t + 500, turn_index=0,
+                              actor_id=w.id("mara"),
+                              payload={"words": flood, "volume": "raised", "to": [w.id("june")], "source_db": 70}))
+        perception.compile_scene(tx, w.id("june"), t + 1000, 0)
+    (u,) = aftermath(w, "june", t + 1000).utterances
+    assert u.words == " ".join(["sorry"] * 133) + " …"
+
+
 def test_what_the_holder_did_itself_comes_from_its_own_record(scenario):
     """MEM-01: own_action_text from its own ACTION_START / SPEECH (label without the cost part),
     own_expectation_text from the start's goal. A mind never perceives its own actions."""

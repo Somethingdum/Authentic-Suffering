@@ -78,6 +78,16 @@
   container: {capacity_bulk: 12, access_time_s: 2}
   description: A soft, water-stained box.
 - schema: as.item.v1
+  id: wristwatch
+  name: wristwatch
+  plural: wristwatches
+  kind: tool
+  mass_g: 50
+  bulk: 0
+  tags: [timepiece]
+  barter_value: 8
+  description: A wind-up steel watch. It loses a few minutes a day, and somebody has to remember to wind it.
+- schema: as.item.v1
   id: flashlight
   name: flashlight
   plural: flashlights
