@@ -1,0 +1,205 @@
+# The loading bar's lines (service.progress PROG-06/07). The UI shows one at a time under the step
+# the job is on, the most specific key first (turn.minds.decide, then turn.minds, then turn), a new
+# one every 2.5 s, never one of the last three. They are jokes about the STEP, never hints about the
+# world: nothing here may say who is near, what anyone thinks or how a roll went (PROG-05). The
+# step's own label is always on screen, so no line repeats it.
+# Keys: a plan (turn / worldgen / quiet_hours / time_skip), a phase, or a phase's sub-phase (CNT-16).
+schema: as.quips.v1
+id: core_quips
+lines:
+  turn:
+    - Rolling.
+    - Considering the consequences.
+    - The world is thinking about it.
+    - Nothing happens for free.
+    - Somewhere, a clock ticks.
+    - Weighing everything twice.
+    - Cause is warming up. Effect is stretching.
+  turn.read:
+    - Reading between the lines.
+    - Taking you at your word.
+    - Making sense of it before anyone else does.
+  turn.read.check:
+    - Counting the living.
+    - Checking the doors are where we left them.
+    - Making sure the floor still exists.
+    - Dusting off the clock.
+  turn.read.read:
+    - Squinting at your handwriting.
+    - Deciding what you meant.
+    - Taking you literally. Carefully.
+    - Reading it twice, just in case.
+  turn.read.weigh:
+    - Can your body actually do that?
+    - Checking your hands are free.
+    - Measuring the distance twice.
+    - Your ambition, meet your reach.
+  turn.senses:
+    - Ears up.
+    - The room notices.
+    - Every eye in the room gets a vote.
+  turn.senses.see:
+    - Light, sound, line of sight.
+    - Sound travels. So does trouble.
+    - How far does a whisper carry?
+    - Walls are thinner than they look.
+  turn.senses.notice:
+    - Not everyone was looking.
+    - Some of it was missed. Some of it always is.
+    - Peripheral vision is doing its best.
+    - Did anyone catch that?
+  turn.senses.think:
+    - Memories get consulted.
+    - Old grudges are being checked.
+    - Somebody is connecting dots.
+    - First impressions, being made.
+  turn.minds:
+    - Minds at work.
+    - Nobody here is an extra.
+    - Everyone has their reasons.
+    - Weighing loyalty against thirst.
+  turn.minds.decide:
+    - Thinking it over.
+    - Choosing between bad and worse.
+    - Somebody is trying to be brave.
+    - Somebody is trying not to be.
+    - Motives are being consulted.
+    - Second thoughts, third thoughts.
+    - It is harder to say no than you would think.
+  turn.world:
+    - Things happen at the same time.
+    - Cause, then effect.
+    - Gravity checks in.
+  turn.world.act:
+    - Hands move. Feet move.
+    - It all happens at once.
+    - Nobody waits their turn.
+    - Plans meet elbows.
+  turn.world.land:
+    - Physics has the final word.
+    - The dice have opinions.
+    - Bodies are soft; floors are not.
+    - Where it hits is where it hits.
+  turn.world.react:
+    - Flinches, shouts, second chances.
+    - And then someone answers that.
+    - Consequences have consequences.
+    - Everybody gets a say. Briefly.
+  turn.commit:
+    - Signing the ledger.
+    - Setting the past in concrete.
+    - Last chance to blink. Too late.
+  turn.commit.lock:
+    - No take-backs from here.
+    - Writing it in ink.
+    - It happened. It stays happened.
+    - Sealing the envelope.
+  turn.after:
+    - The dust settles. Slowly.
+    - Aftermath, itemised.
+    - Everyone catches their breath.
+  turn.after.remember:
+    - Filing it under "never again".
+    - Some of this will keep them up tonight.
+    - Memory is being very selective.
+  turn.after.write:
+    - Finding the words.
+    - Telling it the way you saw it.
+    - Sharpening the pencil.
+  turn.after.choose:
+    - Cutting the adjectives.
+    - Making sure nobody says your lines.
+    - Picking the verb that hurts right.
+  turn.after.ties:
+    - Trust, adjusted.
+    - Somebody owes somebody now.
+    - Friendships, audited.
+  turn.after.loose:
+    - Promises, noted.
+    - Unfinished business gets a folder.
+    - Tying off what can be tied.
+  turn.save:
+    - Committing it to memory. The disk kind.
+    - Tucking the world in.
+    - Pressing it between the pages.
+  worldgen:
+    - Building a world that does not care about you.
+    - Somewhere, something already went wrong.
+    - Making the numbers mean it.
+    - Nothing here is placeholder.
+  worldgen.WG0:
+    - Deciding how bad it got.
+    - Picking a year to be unlucky in.
+    - Checking you can survive it. Probably.
+  worldgen.WG1:
+    - Laying roads nobody maintains.
+    - Putting the dead where the living used to be.
+    - Drawing a map nobody will fold right.
+  worldgen.WG2:
+    - Deciding who held on and who did not.
+    - History is written by the survivors.
+    - The first winter, remembered badly.
+  worldgen.WG2.history:
+    - Every settlement has a reason to exist.
+    - Somebody lost a battle here.
+    - The bad winter, the good harvest, the betrayal.
+    - Nobody agrees on how it started.
+  worldgen.WG3:
+    - Deciding who answers to whom.
+    - Old grudges, fresh paint.
+    - Somebody always wants the bigger chair.
+  worldgen.WG4:
+    - Stocking shelves that will empty.
+    - Giving the pumps something to pump.
+    - Nailing boards over the ground floor.
+  worldgen.WG5:
+    - Counting everyone who never gets a name.
+    - Babies, elders, and everyone between.
+    - Setting a place at every table.
+  worldgen.WG6:
+    - Giving everyone a past.
+    - Nobody is an extra.
+    - Handing out bad habits.
+  worldgen.WG6.dossiers:
+    - Giving someone a fear and a habit.
+    - Deciding what they will never say.
+    - Everyone gets a scar with a story.
+    - Some of them are lying about their past.
+  worldgen.WG7:
+    - Deciding what gets you thrown out.
+    - Rules written in someone's blood.
+    - Every rule has a story. None of them are nice.
+  worldgen.WG8:
+    - Your first bad day is being arranged.
+    - Something is already on its way to you.
+    - Scheduling your first mistake.
+  worldgen.WG9:
+    - Counting heads twice.
+    - Making sure nobody was born dead by accident.
+    - Tightening the last bolts.
+  quiet_hours:
+    - Other people had a long day too.
+    - The world does not wait for you.
+    - Lives in the next room, going on.
+  quiet_hours.quiet:
+    - Letting the day sink in.
+    - Other lives, going on.
+    - Nobody pauses when you look away.
+  quiet_hours.quiet.jobs:
+    - Sleeping on it.
+    - Old conversations, replayed.
+    - Somebody is changing their mind.
+    - Rehearsing what they should have said.
+  time_skip:
+    - The world keeps going without you.
+    - Hours you will not get back.
+    - Watching the shadows move.
+  time_skip.world:
+    - Waiting it out.
+    - The long quiet stretch.
+    - Nothing to do but get older.
+  time_skip.world.hours:
+    - The sun moves. So does everything else.
+    - Water runs down. Supplies run out.
+    - Somewhere, someone is busy.
+    - Tick. Tock. Tick.

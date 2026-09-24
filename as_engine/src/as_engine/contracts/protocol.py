@@ -12,6 +12,10 @@ IN_MODELS maps every inbound action to the model its fields must validate agains
 action takes no fields; extra fields are then ignored). OUT_MODELS maps every outbound action to the
 model its ``data`` validates against (None: defined by the phase that builds it — P10 worldgen,
 P12 intake / import / quick-make). docs/as/10_UI.md §4 is the client side.
+
+P10 adds the loading bar (service.progress, PROG-01..07): progress_plan, then progress while the
+job runs, then progress_done — pushed for worldgen, a turn and the quiet hours (P12: a time skip)
+alongside the older turn_progress / worldgen_progress, which stay as they are.
 """
 
 from __future__ import annotations
@@ -37,7 +41,7 @@ OUTBOUND_ACTIONS = (
     "import_result", "intake_progress", "intake_result", "quickmake_result", "worldgen_progress",
     "runs", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
-    "worlds", "world_file", "settings",
+    "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done",
 )
 
 Screen = Literal["connect", "home", "wizard", "worldgen", "play", "dead"]
@@ -177,6 +181,51 @@ class OutTurnProgress(Strict):
     elapsed_s: float = Field(ge=0)
 
 
+class ProgressSubView(Strict):
+    id: str
+    label: str
+
+
+class ProgressPhaseView(Strict):
+    id: str
+    label: str
+    weight: int = Field(ge=0, le=100)
+    subs: list[ProgressSubView] = Field(default_factory=list)
+
+
+class OutProgressPlan(Strict):
+    """P10 (service.progress PROG-03): a long job's phases and sub-phases, in order, and the quips
+    the UI may show for them."""
+    job_id: str
+    kind: Literal["worldgen", "turn", "quiet_hours", "time_skip"]
+    title: str
+    phases: list[ProgressPhaseView]
+    quips: dict[str, list[str]] = Field(default_factory=dict)
+
+
+class OutProgress(Strict):
+    """P10 (PROG-03/04/05): where the job is now."""
+    job_id: str
+    kind: Literal["worldgen", "turn", "quiet_hours", "time_skip"]
+    phase: str
+    phase_index: int = Field(ge=0)
+    sub: str | None = None
+    sub_label: str | None = None
+    done: int | None = Field(default=None, ge=0)
+    total: int | None = Field(default=None, ge=0)
+    pct: float = Field(ge=0, le=100)
+    elapsed_s: float = Field(ge=0)
+    eta_s: float | None = None
+    detail: str | None = Field(default=None, description="Developer mode only (PROG-05).")
+
+
+class OutProgressDone(Strict):
+    job_id: str
+    kind: Literal["worldgen", "turn", "quiet_hours", "time_skip"]
+    ok: bool
+    elapsed_s: float = Field(ge=0)
+
+
 class OutTurnResult(Strict):
     turn_index: int
     narration: str
@@ -311,4 +360,5 @@ OUT_MODELS: dict[str, type[Strict] | None] = {
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,
     "death": OutDeath, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
     "dev_data": OutDevData, "error": OutError, "worlds": OutWorlds, "world_file": OutWorldFile, "settings": OutSettings,
+    "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone,
 }

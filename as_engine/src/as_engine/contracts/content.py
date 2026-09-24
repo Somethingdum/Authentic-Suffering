@@ -508,6 +508,16 @@ class CueDef(Strict):
     description: str
 
 
+class QuipList(Strict):
+    """P10: the loading bar's lines (service.progress PROG-06/07; CNT-16). Keys: a progress plan
+    ('turn'), a phase ('turn.minds') or a sub-phase ('turn.minds.decide'); several packs' lists
+    for one key are added together."""
+    schema_id: Literal["as.quips.v1"] = Field(alias="schema", default="as.quips.v1")
+    id: str = Field(pattern=SLUG_PATTERN)
+    lines: dict[str, list[str]] = Field(min_length=1)
+    model_config = Strict.model_config | {"populate_by_name": True}
+
+
 class CueRegistry(Strict):
     schema_id: Literal["as.cues.v1"] = Field(alias="schema", default="as.cues.v1")
     cues: list[CueDef] = Field(min_length=1)

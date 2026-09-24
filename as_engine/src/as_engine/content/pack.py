@@ -1,4 +1,4 @@
-"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..15, LORE-01.
+"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..16, LORE-01.
 docs/as/09_CONTENT_PACKS.md is the authoring guide; this docstring is the machine contract.
 
 Folder layout (every folder optional except pack.yaml):
@@ -20,6 +20,7 @@ Folder layout (every folder optional except pack.yaml):
   <pack>/loot/*.yaml               list[LootTable]       -> '<pack>:loot/<id>'
   <pack>/names/*.yaml              NameList              -> '<pack>:names/<id>'
   <pack>/style/*.yaml              StyleRules            -> '<pack>:style/<id>'
+  <pack>/ui/*.yaml                 QuipList              -> '<pack>:quips/<id>'   (P10: the loading bar's lines)
   <pack>/lore/*.md                 LoreEntry             -> '<pack>:lore/<id>'
   <pack>/cues.yaml                 CueRegistry           (cue ids are global and bare)
 A YAML file may hold one record (mapping) or a list of records of the folder's type.
@@ -30,7 +31,7 @@ and the markdown body is stored as ``depth_reference``.
 
 Record kinds (the ``kind`` part of a ref, and the key of Canon.by_kind):
   actor pc faction lore item affordance infected infected_state quirk pathway cascade law building
-  loot names style cue.  Cues get refs '<pack>:cue/<id>' in by_kind['cue'] but are looked up by
+  loot names style quips cue.  Cues get refs '<pack>:cue/<id>' in by_kind['cue'] but are looked up by
   bare id (Canon.find('cue', id)); infected types, states, quirks and pathways are also referenced
   by bare id inside content (quirks:, applies_to:, rise_as:, inherits:, BodySpec.infected).
   Bare ids are unique per kind across all packs (CNT-03), so Canon.find(kind, bare_id) is exact.
@@ -93,6 +94,9 @@ Validation (CNT-*), each error names file + field in plain language:
          live in packs whose manifest id starts with 'cheat_'.
   CNT-15 (P10) a faction's behaviour.council.seats each name the ``seat`` of one of its leaders, and
          no two leaders share a seat.
+  CNT-16 (P10) a QuipList's keys each name a progress plan (service.progress.PLANS: kind), one of
+         its phases (f"{kind}.{phase}") or a sub-phase of that phase (f"{kind}.{phase}.{sub}"); no
+         line is empty or longer than 80 characters.
 Severity: every code is 'error' except the CNT-08 retired-name case and the unknown-folder case
   (code CNT-00, 'warning'). load_canon's Canon contains only records that loaded; callers treat
   any error as fatal (the conftest canon fixture asserts there are none for core).

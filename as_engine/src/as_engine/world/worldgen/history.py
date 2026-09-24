@@ -75,7 +75,8 @@ WG-19 skeleton(rng, tx, params, plan, region, tier) -> list[PlannedEvent]
   text = atlas.HISTORY_SKELETON[kind] filled with day, a / b (group names), zone (zone name) and
   resource (atlas.SHORTAGE_RESOURCE_WORDS).
 
-WG-20 async write_history(client, tx, events, plan, region, params, at) -> list[str]
+WG-20 async write_history(client, tx, events, plan, region, params, at, progress=None) -> list[str]
+  (P10: await progress(done, total) after each batch's answer — or failure — in batch order.)
   hist ids (kind 'his') minted in the returned order. Text: WORLDGEN_HISTORY calls, one per batch of
   up to 8 events in order — client.call(lanes.requests.build_request(config, WORLDGEN_HISTORY,
   turn_index=0, context=ctx, json_schema=lanes.schemas.to_lm_schema(HistoryAnswer), ctx=ctx),
@@ -187,7 +188,7 @@ def skeleton(rng: "Rng", tx: "Tx", params: "WorldParams", plan: PolityPlan, regi
 
 
 async def write_history(client, tx: "Tx", events: list[PlannedEvent], plan: PolityPlan, region: "Region",
-                        params: "WorldParams", at: int) -> list[str]:
+                        params: "WorldParams", at: int, progress=None) -> list[str]:
     raise NotImplementedError("P10")
 
 

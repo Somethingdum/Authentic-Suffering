@@ -45,8 +45,10 @@ CLI-05 new-run PC_REF [--difficulty D] [--era E] [--detail T] [--days N] [--seed
   given; the rest are the defaults); a value RunSettings refuses (a pydantic ValidationError, e.g.
   --days 0) prints f"[bad_settings] {its first error's msg}" and exits 1. session =
   asyncio.run(service.runs.create_run(config, PC_REF, settings, transport, progress = a callable
-  printing f"{pct:.0f}% {label}" per stage)); prints f"Created run {run_id} in {run_dir}"; closes
-  the store; exit 0. A WorldgenAborted prints f"[{code}] {message}" (message = str(error)), a
+  printing f"{pct:.0f}% {label}" per call — P10 progress v2: a call with a sub-phase (WG2 / WG6
+  counting their model answers) prints f"{pct:.0f}% {label} ({done}/{total})")); prints
+  f"Created run {run_id} in {run_dir}"; closes the store; exit 0. A WorldgenAborted prints
+  f"[{code}] {message}" (message = str(error)), a
   kernel.errors.SettingsError f"[bad_settings] {message}", a RunError f"[{code}] {message}"; each
   exits 1. transport as for new-scenario.
 probe | bench | doctor

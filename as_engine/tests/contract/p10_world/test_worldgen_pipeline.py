@@ -74,30 +74,49 @@ def test_stages_and_report(made_world, canon):
 
 
 async def test_progress_is_announced_stage_by_stage(run_cfg):
-    """Before each stage: its label, the share of the bar already done, and a time estimate."""
+    """Before each stage: its label, the share of the bar already done, and a time estimate. P10
+    progress v2: the two stages that wait on the model (WG2's history batches, WG6's dossiers) also
+    say how many answers are in, one message per answer, inside their own share of the bar."""
     seen = []
 
     async def progress(p):          # an async callback is awaited
         seen.append(p)
     s = await make(run_cfg, progress=progress)
+    n_history = s.store.query_one("SELECT COUNT(*) FROM history_events WHERE kind != 'personal'")[0]  # WG8's are not WG2's
     s.store.close()
     assert all(isinstance(p, WorldgenProgress) for p in seen)
-    assert [p.stage for p in seen] == list(atlas.STAGES)
+    stages = [p for p in seen if p.sub is None]
+    assert [p.stage for p in stages] == list(atlas.STAGES)
     est = tables.DETAIL_TIERS["gotta_go_to_work_soon"]["est_minutes"]
-    done = 0
-    for p in seen:
+    start, done = {}, 0
+    for p in stages:
         assert p.label == atlas.STAGE_LABELS[p.stage]
-        assert p.pct == done
+        assert p.pct == done and (p.done, p.total) == (None, None)
         assert p.eta_s == pytest.approx((100 - done) * est * 60 / 100)
+        start[p.stage] = done
         done += atlas.STAGE_SHARE[p.stage]
-    assert seen[-1].pct == 100
+    assert stages[-1].pct == 100
+    subs = [p for p in seen if p.sub is not None]
+    assert {p.stage: p.sub for p in subs} == {"WG2": "history", "WG6": "dossiers"}
+    for stage in ("WG2", "WG6"):
+        mine = [p for p in subs if p.stage == stage]
+        total = mine[0].total
+        assert [(p.done, p.total) for p in mine] == [(k, total) for k in range(1, total + 1)]
+        for p in mine:
+            pct = round(start[stage] + atlas.STAGE_SHARE[stage] * p.done / total, 1)
+            assert (p.label, p.pct) == (atlas.STAGE_LABELS[stage], pct)
+            assert p.eta_s == pytest.approx((100 - pct) * est * 60 / 100)
+        after = seen.index(mine[-1]) + 1
+        assert seen[after].sub is None and seen[after].stage != stage, "a stage's counts end before the next stage"
+    assert len([p for p in subs if p.stage == "WG6"]) == tables.DETAIL_TIERS["gotta_go_to_work_soon"]["llm_dossiers"]
+    assert len([p for p in subs if p.stage == "WG2"]) == math.ceil(n_history / 8), "one per batch of up to 8"
 
 
 async def test_a_plain_callback_works_too(run_cfg):
     seen = []
     s = await make(run_cfg, progress=seen.append)
     s.store.close()
-    assert len(seen) == len(atlas.STAGES)
+    assert [p.stage for p in seen if p.sub is None] == list(atlas.STAGES)
 
 
 def _stage_order(stages):

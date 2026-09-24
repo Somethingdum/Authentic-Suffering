@@ -45,7 +45,8 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   younger ones; special = 3 + rng.range_int(0, 4) per letter in 'SPECIAL' order; variant =
   rng.range_int(0, 999). Dossier = skeleton_dossier(seed) (implemented below).
   The FIRST T['llm_dossiers'] generated people (slot order) get a WORLDGEN_ACTOR call each, all
-  started together (asyncio.gather) and applied in slot order: context WorldgenContext(stage='WG6',
+  started together (asyncio.gather) and applied in slot order (P10: await progress(done, total) as each
+  answer arrives, whatever its outcome): context WorldgenContext(stage='WG6',
   brief = plain English about the person, their settlement, group and history, fields={'skeleton':
   the skeleton dict, 'settlement': name, 'group': name, 'role': occupation, 'history': [the belief
   texts of the history events whose subjects include their group]}), json_schema = the
@@ -90,7 +91,7 @@ WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acqua
   provenance 'common', fidelity 'exact') — the propositions in their PERCEIVE, the holdings in a
   second PERCEIVE citing it (acquired_via), as the scenario loader does.
 
-async write_people(client, rng, tx, plan, region, params, canon, detail, at) -> People
+async write_people(client, rng, tx, plan, region, params, canon, detail, at, progress=None) -> People
   People(pack_placed: [actor ids], generated: [actor ids], skipped: [(ref, reason)], home_settlement_id,
   leaders: {group_id: actor_id}, roles: {actor_id: post role, 'leader' or the seat} for the
   generated posts, leaders and seat holders).
@@ -134,7 +135,7 @@ class People:
 
 
 async def write_people(client, rng: "Rng", tx: "Tx", plan: "PolityPlan", region: "Region",
-                       params: "WorldParams", canon, detail: str, at: int) -> People:
+                       params: "WorldParams", canon, detail: str, at: int, progress=None) -> People:
     raise NotImplementedError("P10")
 
 

@@ -169,6 +169,19 @@ Handlers (P8):
           progress = (done, total) -> progress(0, background.QUIET_HOURS, 0.0)) (BG-01: the
           quiet hours end before the move; a turn_cancel meanwhile cancels the job in flight,
           which leaves nothing behind and runs again at the next catch_up).
+          Progress v2 (service.progress; every Tracker here pushes through push2(action, data) =
+          self.push(out(action, OUT_MODELS[action] validating data)), dev = the session's
+          settings.dev_mode): when background.pending(store, T - 1) is not empty (the boundary
+          catch_up finishes, world_clock.turn_index), a Tracker('quiet_hours', f"quiet_hours-{T}")
+          pushes its plan (quips_for(store.canon, 'quiet_hours')) before catch_up, step('quiet',
+          'jobs', done=done, total=total) on each catch_up progress call, and done(True) after it
+          (done(False) when it raised or was cancelled).
+        Progress v2: tr = Tracker('turn', f"turn-{T}"); await tr.plan(quips_for(store.canon,
+          'turn')) just before run_turn; from then on the progress callback above also awaits
+          tr.step(*service.progress.TURN_STAGES[stage]) for every stage in TURN_STAGES (the quiet
+          hours' stage-0 calls come before the plan and step nothing; no detail: the pipeline's
+          callback has none to give); tr.done(outcome.ok) as soon as run_turn returns (before
+          turn_result / turn_rejected); on an exception or a cancel tr.done(False).
         outcome = await turn.pipeline.run_turn(session, msg, progress).
         ok -> push turn_result {turn_index, narration, view = view(), notices, degraded}; push
           story {story()}; outcome.died -> await self.on_death() — a P12 stub: its
@@ -198,14 +211,20 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     loaded session closed (as on_run_close). worldgen_task = asyncio.create_task(the worldgen job)
     -> [state {screen 'worldgen', run_id None, busy True}]. The worldgen job: session = await
     service.runs.create_run(config, pc_ref, settings, transport, progress = a callback pushing
-    worldgen_progress {stage, label, pct, eta_s}); then push run_loaded (as on_run_load), view,
+    worldgen_progress {stage, label, pct, eta_s} for every call — and, progress v2, tr.step(stage,
+    sub, done=done, total=total) for every stage but COMMIT, where tr = Tracker('worldgen',
+    f"worldgen-{n}" (n counts the service's worldgen jobs from 1), push2 as above, dev =
+    settings.dev_mode) whose plan (quips_for(content.pack.load_canon([content_dir / 'core'] +
+    [content_dir / p for p in settings.pack_ids if p != 'core']) — the canon create_run loads —,
+    'worldgen')) is pushed before create_run starts and whose done(ok) follows it (False on any
+    failure or cancel)); then push run_loaded (as on_run_load), view,
     story and state {screen 'play', run_id, busy False}. A WorldgenAborted -> push error {code
     'worldgen_aborted', message: its message} then state {screen 'wizard', run_id None, busy
     False}; a RunError -> push error {its code, message} then the same state; a
     kernel.errors.SettingsError (WG-34: settings the world cannot honour) -> push error {code
     'bad_settings', message: its message} then the same state; any other exception ->
-    logged, error {internal, INTERNAL}, the same state; cancelled -> nothing is pushed (on_
-    worldgen_cancel answers). Finally worldgen_task = None.
+    logged, error {internal, INTERNAL}, the same state; cancelled -> nothing is pushed but the
+    bar's progress_done {ok False} (on_worldgen_cancel answers). Finally worldgen_task = None.
   on_worldgen_cancel: no worldgen_task -> ServiceError('nothing_to_cancel', NO_WORLDGEN).
     worldgen_task.cancel() and await it (CancelledError swallowed; create_run removed every partial
     folder) -> [state {screen 'wizard', run_id None, busy False}].

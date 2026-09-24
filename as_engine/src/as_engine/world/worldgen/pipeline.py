@@ -28,6 +28,13 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
          history.write_history(...); history.mark_held(...).
     WG3  polity.write_groups.   WG4 polity.write_settlements.   WG5 polity.write_cohorts.
     WG6  people = await people.write_people(...).   WG7 polity.write_laws.
+    P10 (progress v2, service.progress): WG2's history.write_history and WG6's people.write_people
+         are passed progress=sub, an async callable(done, total) that they await after each
+         history batch and after each WORLDGEN_ACTOR answer (completion order; done counts
+         1..total); sub turns each call into
+         progress(WorldgenProgress(stage, label, pct = the stage's start pct + STAGE_SHARE[stage] x
+         done / total (rounded to 1), eta_s as above, sub = 'history' | 'dossiers', done, total)).
+         With no model calls to make (total 0) nothing is reported.
     GENESIS (after WG7, before WG8; no progress message of its own): world_dir is made; store.backup_to(world_dir /
          'genesis.sqlite') — the finished world before any PC exists (RUN-09) — and world.json =
          {world_id, title = f"{climate_descriptor capitalised} — {atlas.ERA_LABELS[era]}, day {dsf}", difficulty,

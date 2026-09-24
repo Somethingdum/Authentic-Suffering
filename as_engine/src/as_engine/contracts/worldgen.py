@@ -117,3 +117,6 @@ class WorldgenProgress(Strict):
     label: str
     pct: float = Field(ge=0, le=100)
     eta_s: float | None = None
+    sub: str | None = None           # P10 progress v2: 'history' (WG2) / 'dossiers' (WG6)
+    done: int | None = None
+    total: int | None = None

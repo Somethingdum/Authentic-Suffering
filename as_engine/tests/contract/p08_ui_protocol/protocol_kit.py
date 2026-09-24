@@ -55,7 +55,20 @@ async def wait_for(pred, timeout: float = 30.0):
     await asyncio.wait_for(loop(), timeout)
 
 
+# P10 added the loading bar's pushes (service.progress): P8's sequence checks read the pushes
+# without them; the bar's own tests read them with bar_after().
+BAR_ACTIONS = frozenset({"progress_plan", "progress", "progress_done"})
+
+
 def pushed_after(svc, start: int) -> list[dict]:
+    """Every push since ``start``, each checked (PROTO-01) — the loading bar's left out."""
     for m in svc.pushed[start:]:
         check(m)
-    return svc.pushed[start:]
+    return [m for m in svc.pushed[start:] if m["action"] not in BAR_ACTIONS]
+
+
+def bar_after(svc, start: int) -> list[dict]:
+    """The loading bar's pushes since ``start`` (P10), each checked."""
+    for m in svc.pushed[start:]:
+        check(m)
+    return [m for m in svc.pushed[start:] if m["action"] in BAR_ACTIONS]
