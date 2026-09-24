@@ -62,7 +62,9 @@ With the P10 scratch reference (delivered separately as `AS_p10_scratch_referenc
 `ref2/`) every engine test passes: P0–P10 and the sim soak (the count is in README_FIRST §1).
 Without a reference every body raises NotImplementedError, as intended. The UI specs run with
 vitest (`corepack pnpm run test:play`); the P10 specs were proven against a scratch reference of
-the P10 screens, the P8 specs against the P8 reference.
+the P10 screens (the same zip's `ui/` folder: the P10 screens only, so the P8 specs do not run
+there — `npm install`, then `npx vitest run src/play/__tests__/wizard.spec.js` and the worldgen,
+loading_bar, quips and app specs), the P8 specs against the P8 reference.
 
 The reference is kept in sync by `sync_ref.sh`: it copies the kit's source over `ref2/` except the
 hand-written files listed in `ref_impl_files.txt`, then appends `from ._ref_x import …` lines that
@@ -105,10 +107,13 @@ Playing moves in generated worlds through `GameService` found what the contract 
 the 58-bit gate. Keep doing this for every phase: build a world, play it, read what the screen says.
 
 ### 3.3 Delivery (R9)
-- Full kit: ready (the repo at the P10 commit). The zip also carries the kit's
-  `.claude/settings.json` (the hooks for the per-workspace bridge, README_FIRST §4); it is added from
-  the kit copy when zipping and never committed here (its hooks would block the maintainer's own
-  session).
+- Full kit: `AS_build_kit_p10.zip` (folder `as-kit/`), made from the committed kit files only. The
+  zip also carries the kit's `.claude/settings.json` (the hooks for the per-workspace bridge,
+  README_FIRST §4); it is added from the kit copy when zipping and never committed here (its hooks
+  would block the maintainer's own session). Checked unzipped: `protect.py --verify`, `gate.py
+  --docstrings` and `--scan` pass, and the tests pass against the unzipped reference.
+- Reference: `AS_p10_scratch_reference.zip` (`ref2/`, `sync_ref.sh`, `ref_impl_files.txt`,
+  `promises.md`, `ui/`) — for the owner and whoever writes the kit, never for the builder.
 - **Update patch vs the P9 delivery: needs the P9 delivery zip**, which is not in this environment.
   With it: diff the P9 kit against this one, simulate the merge (§1), unzip-test. Ask the owner.
 
