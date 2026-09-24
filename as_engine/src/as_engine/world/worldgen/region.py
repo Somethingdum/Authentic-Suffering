@@ -11,6 +11,10 @@ build_region(rng, tx, params, detail, canon, at) -> Region
   open_loss_db 0, transparent 1, height_cm 0).
   1 Zone kinds (n = T['zones']): zone 0 — the start zone — rng.weighted(atlas.START_ZONE_WEIGHTS,
     purpose 'start_kind'); zones 1..n-1 rng.weighted(atlas.ZONE_WEIGHTS, purpose f"kind:{i}").
+    A region holds at most ONE 'wilds' zone (it has no buildings; two would leave too few places
+    worth the risk for the opening's leads, WG-35 1): a 'wilds' draw after an earlier one is drawn
+    again, once, with rng.weighted over atlas.ZONE_WEIGHTS without 'wilds' (purpose
+    f"kind:{i}:again").
     Names: for i in order, rng.choice (purpose f"name:{i}") among atlas.ZONE_NAMES[kind] not used by
     an earlier zone of the run.
   2 Per zone i (in order), one PLACE_DISCOVERED {zone_id, places: [place ids], source: 'worldgen'}

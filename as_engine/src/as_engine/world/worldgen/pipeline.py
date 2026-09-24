@@ -42,7 +42,7 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
          kernel.store.wall_clock_iso(), source 'generated', seed, detail} (sorted keys, 2-space indent).
     WG8  opening = await opening.place_pc(...).
     WG9  failures = checks.assert_world(...); any -> WorldgenAborted('invariant', "The world did not
-         hold together: " + "; ".join(failures) + ".").
+         hold together: " + "; ".join(each failure without its final full stop) + ".").
     COMMIT WORLDGEN_STAGE {stage 'COMMIT', world_id}.
   Origins: every event a worldgen stage commits itself, and every one it commits through a
   function that takes an origin (physical.bodies.create, physical.objects.create, mind.actor.create,

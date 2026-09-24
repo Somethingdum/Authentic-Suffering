@@ -67,7 +67,8 @@ discover_layout(tx, rng, building_place_id, at, turn_index) -> list[Event]   (P1
     kind, x_m, y_m, cover, concealment, capacity 4); the room-to-room portals of each template's
     ``portals`` (to_room within the building; is_open = starts_open, is_locked 0, lock_quality, the
     aperture / seal / open_loss / transparent / height fields as given); the EXTERIOR portals
-    (a.exterior_portals: building grounds <-> to_room, anchor_a = the grounds' first anchor), where
+    (a.exterior_portals: building grounds <-> to_room, anchor_a = the grounds' first anchor by
+    anchor_id, anchor_b NULL; room-to-room portals have no anchors), where
     held = 1 -> is_open = starts_open, is_locked = 1 when lockable, damage 0; held = 0 -> damage =
     rng.range_int(tx, f"layout:{place_id}", f"damage:{i}", 0, 2), is_open = rng.chance(...,
     f"open:{i}", 0.3), is_locked 0 (i = the exterior portal's index); and updating the building's
@@ -75,11 +76,14 @@ discover_layout(tx, rng, building_place_id, at, turn_index) -> list[Event]   (P1
   2 Per room with an anchor whose template names a container_item (anchor order): that container is
     created lying at the anchor (physical.objects.create, origin 'loot').
   3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room
-    id}": n = range_int(lo, hi) of the table's rolls (held = 0: (0, max(0, hi - 2)), the place was
-    picked over); per roll: entry = weighted by weight, qty = range_int(qty), condition =
-    range_int(condition); the item is created (origin 'loot', ITEM_CREATED, that condition) inside the
-    room's first container with room for it (capacity_bulk), else lying at the room's first anchor;
-    a def that is not stackable with qty > 1 becomes qty separate items of 1, each placed the same way.
+    id}": n = range_int(purpose 'rolls', lo, hi) of the table's rolls (held = 0: (0, max(0, hi -
+    2)), the place was picked over); per roll k (from 0): entry = weighted by weight (purpose
+    f"entry:{k}"), qty = range_int(f"qty:{k}", *entry.qty), condition = range_int(f"condition:{k}",
+    *entry.condition) — so the stream draws exactly 1 + 3 x n times; the item is created (origin
+    'loot', ITEM_CREATED, that condition) inside the room's first container (anchor order) with room
+    for it (the bulk already inside + this item's bulk x qty <= capacity_bulk), else lying at the
+    room's first anchor; a def that is not stackable with qty > 1 becomes qty separate items of 1,
+    each placed the same way.
   Returns every event committed, in seq order. The Fall-damage TRACE of an unheld building ("Old
   damage: this place was picked over long ago.", kind 'damage', in the entrance room) is created by
   the caller, world.worldmove.on_arrival (physical does not write world tables).

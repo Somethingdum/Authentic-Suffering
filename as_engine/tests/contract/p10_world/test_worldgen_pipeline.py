@@ -398,6 +398,19 @@ async def test_a_stage_that_fails_twice_ends_worldgen(run_cfg, monkeypatch):
     assert leftovers(run_cfg) == [] and runs.list_runs(run_cfg) == []
 
 
+async def test_a_world_that_does_not_hold_is_refused_in_plain_words(run_cfg, monkeypatch):
+    """WG9: any world check failing ends worldgen ('invariant'), every failure named in one sentence."""
+    from as_engine.world.worldgen import checks
+    monkeypatch.setattr(checks, "assert_world", lambda *a, **k: ["Fewer than three places worth the risk.",
+                                                                 "Nothing warns of the danger."])
+    with pytest.raises(WorldgenAborted) as e:
+        await make(run_cfg)
+    assert e.value.code == "invariant"
+    assert str(e.value) == ("The world did not hold together: Fewer than three places worth the risk; Nothing warns "
+                            "of the danger.")
+    assert leftovers(run_cfg) == []
+
+
 async def test_cancel_leaves_nothing_behind(run_cfg):
     """create_run cancelled mid-worldgen: the partial run and world folders are removed."""
     class Held(FakeTransport):

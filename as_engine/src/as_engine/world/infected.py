@@ -52,8 +52,9 @@ active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, 
 threshold(store, body_id) -> float; speed(store, body_id) -> float: the type's speed_m_s x every
   state's speed_mult (0 when dormant).
 sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07)
-  False unless the target is a living, conscious body in the same place, not of kind 'infected', not
-  excluded by INF-06 / INF-07. Then the type's senses: distance (straight line) <= vision_range_m and
+  False unless the target is a living body whose awareness is not 'unconscious' (a sleeper lies in
+  plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-07. Then the
+  type's senses: distance (straight line, physical.space.point_distance) <= vision_range_m and
   vision_mode 'motion_contrast' -> the target MOVEd or started an action (MOVE / ACTION_START with
   actor_id = the target) in (at - R.motion_window_s s, at]; 'shape' and 'full' -> True; 'thermal' ->
   the place's light_level <= 1 or it is indoor.

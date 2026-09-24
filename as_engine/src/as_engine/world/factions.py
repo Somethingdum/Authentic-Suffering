@@ -9,8 +9,10 @@ code, from the record and the world, and people learn of it the way they learn o
 seeing, hearing, being told. rng stream 'factions'. DAY = 86_400_000 ms, HOUR = 3_600_000. Every
 function that returns an Event has committed it (at and turn_index as given; writer
 'world.factions' unless said otherwise). A faction GROUP = a groups row whose content_ref is the
-faction's ref; its SEAT HOLDERS = its group_members rows whose role is a seat of the record's
-leaders (Leader.seat), living (bodies.alive 1), by (the seat's position among the leaders, actor_id).
+faction's ref; its SEAT HOLDERS = for each of the record's leaders with a ``seat`` (Leader.seat), in
+the leaders' order: the first leader's seat is held by the group's leader (groups.leader_id — the
+first leader always leads, worldgen WG-27 / WG-28 give that person role 'leader'), every other seat
+by the group_members rows whose role is that seat (by actor_id); only the living (bodies.alive 1).
 
 FAC-01 Enclaves (B.enclave; worldgen WG-18 places one, WG-23 / WG-27 build it). enclave(store,
   group_id) -> str | None: the settlement_id of the group's settlement when its record has an

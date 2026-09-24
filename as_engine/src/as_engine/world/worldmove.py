@@ -53,9 +53,10 @@ OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
   (by id) whose site is outside the active area, with a governing group, and not in lockdown
   (settlements.lockdown 0; P10, world.factions FAC-01: a sealed enclave sends nobody out): crew =
   its named members (group_members status 'member') who are alive, able (society.work.able for
-  'watcher'), not human-controlled, not seat holders (P10: role = the ``seat`` of one of the
-  group's record's leaders — a council does not go scavenging), outside the active area and in
-  no active operation, sorted by (their daily work hours, id). For kind in ('scavenge', 'patrol',
+  'watcher'), not human-controlled, not the group's seat holders (P10: world.factions' SEAT
+  HOLDERS, the leader included when the record's first leader has a seat — a council does not go
+  scavenging), outside the active area and in no active operation, sorted by (their daily work
+  hours, id). For kind in ('scavenge', 'patrol',
   'trade_run'): chance = W.op_chance[kind] x
   (2 when the settlement has a shortage, for scavenge) x (social_order / 5, for patrol) x
   (faction_relations / 5, for trade_run; 0 without another settlement); the first kind whose
@@ -66,9 +67,11 @@ OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
   settlement's zone (rng.choice); trade_run -> rng.choice over the other settlements' sites.
   (P10: an exterior zone is never a destination: no site stands there and no patrol walks to one.)
   Per
-  hostile group (by id) with 2+ named living members outside the active area: rng.chance(...,
-  f"raid:{group}:{d}", W.op_chance['raid'] x hostile_human / 5) -> a raid on rng.choice(the
-  settlements) by all of them. A new operation is launch(...) (OPS-08).
+  hostile group (by id; a group with no settlement whose unnamed are a cohort carrying its id as
+  archetype, WG-24) with 2+ named living members outside the active area and in no operation:
+  rng.chance(..., f"raid:{group}:{d}", W.op_chance['raid'] x hostile_human / 5) -> a raid on
+  rng.choice(the settlements, purpose f"raid_target:{group}:{d}") by all of them, from the hub of
+  the zone its first member (by id) stands in. A new operation is launch(...) (OPS-08).
 OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *,
        target_id=None) -> str   (OPS-01's daily plan and world.factions FAC-04 DECON)
   op_id = tx.mint('ops'); FACTION_OPERATION {op_id, group_id, kind, participants, destination,
@@ -103,23 +106,33 @@ OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<wha
   every mover: rng.chance(world.hordes.density(the destination's zone) / 20) (P10: how thick the
   district's dead actually are — a cleared district is safe) -> physical.bodies.apply_harm (a
   'minor' or 'significant' laceration on a CENTRE_MASS anatomy, weighted; cause the arrive event).
-  scavenge: found = rng.chance(0.6); when the destination is discovered and holds loose items, up to
-  3 of them (by item_id) are transferred to the movers' packs (physical.objects.transfer) and a
-  TRACE 'missing_stock' "Shelves pulled out; whatever was here is gone." is left; a TRACE 'tracks'
-  "Boot prints in the dust, a few people, coming and going." always; found adds {food: 2..8 x
-  movers, water: 2..8 x movers} to the outcome's haul.
+  scavenge: found = rng.chance(f"{op}:found", 0.6); when the destination is discovered, the loose
+  items lying in it or in its rooms (items.place_id = the destination or a room of it), the first 3
+  by item_id, go to the living movers' packs in turn (item k -> mover k mod n, by participants
+  order; physical.objects.transfer — one the pack cannot take stays where it is) and, when there
+  were any, a TRACE 'missing_stock' "Shelves pulled out; whatever was here is gone." is left; a
+  TRACE 'tracks' "Boot prints in the dust, a few people, coming and going." always; found adds
+  {food: range_int(f"{op}:food", 2, 8) x movers, water: range_int(f"{op}:water", 2, 8) x movers}
+  to the outcome's haul.
   patrol: a TRACE 'tracks' on the way ("Boot prints in a loose line, walking a route.").
-  trade_run: the haul is a swap: 10 % (rounded) of the origin's most plentiful of food / water
-  given for the same amount of the other (both settlements' stores change on 'return', reason
-  'trade'); TRADE {op_id, from, to, gave, got}; a TRACE 'tracks'.
-  raid (RAID {op_id, group_id, settlement_id, success}): success = rng.chance(0.5 + (hostile_human -
-  target defences) / 20, clamped 0.1..0.9); success -> the target loses 10..25 % (rng) of food and
-  water (society.settlement.receive, reason 'raid'), morale -1 (society.settlement.adjust), TRACEs
-  'damage' "Broken boards and a forced door." and 'blood' at the target site, and the target's
-  group gains tension +20 toward the raiders (society.group.adjust_tension); failure -> one raider
-  takes a 'significant' gunshot wound and a TRACE 'blood'.
-  On 'return' the haul goes into the origin settlement's stores (society.settlement.receive, reason
-  'scavenged' / 'trade').
+  trade_run: the haul is a swap: give = the origin's more plentiful of food and water (food on a
+  tie), get = the other, amount = floor(0.1 x the origin's store of it + 0.5); haul = {give:
+  -amount, get: amount}; TRADE {op_id, from: the origin settlement, to: the destination's (or
+  None), gave: {give: amount}, got: {get: amount}} (writer 'world.worldmove', no writes); a TRACE
+  'tracks' as for a scavenge.
+  raid (RAID {op_id, group_id, settlement_id, success}, writer 'world.worldmove', no writes):
+  success = rng.chance(f"{op}:success", 0.5 + (hostile_human - target defences) / 20, clamped
+  0.1..0.9); success -> loss = range_int(f"{op}:loss", 10, 25) / 100 and the target
+  society.settlement.receive({food: -round(food x loss, 2), water: -round(water x loss, 2)},
+  'raid'), morale -1 (society.settlement.adjust, reason 'raid'), TRACEs 'damage' "Broken boards
+  and a forced door." and 'blood' "Blood on the ground, still wet." at the target site, and the
+  target's group gains tension +20 toward the raiders (society.group.adjust_tension, cause text
+  'raid'); failure -> the first living mover (participants order) takes a 'significant' gunshot
+  wound (anatomy rng.weighted over CENTRE_MASS, purpose f"{op}:shot") and a TRACE 'blood' as above
+  is left at the target site.
+  On 'return' the haul's non-zero amounts go into the origin settlement's stores (society.
+  settlement.receive, reason 'scavenged', or 'trade' for a trade run — and then the destination
+  settlement receives the opposite amounts, reason 'trade').
 OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was
   off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs
   (by wound_id) that is not minor and still bleeds (physical.bodies.effective_bleed > 0):

@@ -42,12 +42,14 @@ take_from_cohort(tx, settlement_id, zone_id, band, sex, at, turn_index, cause_ev
   ...). None when there is no such cohort left (nothing changes).
 materialise(tx, rng, *, settlement_id, zone_id, band, sex, dossier, place_id, at, turn_index,
             cause_event_id, archetype=None, event_origin='sim') -> str
-  One unnamed person becomes a named one: take_from_cohort(...) — no cohort left -> ValueError
-  (nobody is made who is not there); then physical.bodies.create(kind 'human', sex, age_years =
-  dossier identity age, height_cm / mass_kg / special from the dossier, origin 'worldgen' when
-  event_origin is 'worldgen' else 'materialize'), physical.space.place_body at ``place_id``'s first
-  anchor (the place centre without one), mind.actor.create(source 'generated', mind_kind 'model',
-  event_origin) and a known_places row for that place (mind.perception, one PERCEIVE {seed: true}).
+  One unnamed person becomes a named one: ev = take_from_cohort(...) — no cohort left -> ValueError
+  (nobody is made who is not there); then, each caused by ev: physical.bodies.create(kind 'human',
+  sex, age_years = dossier identity age, height_cm / mass_kg / special from the dossier, origin
+  'worldgen' when event_origin is 'worldgen' else 'materialize'), physical.space.place_body at
+  ``place_id``'s first anchor by anchor_id (its point; without one, the place centre (width_m / 2,
+  depth_m / 2) and no anchor), mind.actor.create(source 'generated', mind_kind 'model',
+  event_origin) and a known_places row {first_seen = last_seen = at, visited 1} for that place
+  (one PERCEIVE {holder_id, seed: true}, writer 'mind.perception', actor_id = the new body).
   Returns the new actor id.
 """
 

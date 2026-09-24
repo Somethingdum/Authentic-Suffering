@@ -119,6 +119,31 @@ def test_zones_hubs_and_sites(store, canon, seed, detail):
         assert len(set(names)) == len(names), "a repeated name gets ' (2)', ' (3)'…"
 
 
+def test_a_region_has_buildings_enough(canon):
+    """Step 1: at most one 'wilds' zone (no buildings) per region — a second 'wilds' draw is drawn
+    again without it — so every region has places worth the risk (WG-35 1)."""
+    from as_engine.kernel.store import Store
+    redrawn = 0
+    for seed in range(1, 41):
+        for detail in ("gotta_go_to_work_soon", "standard"):
+            st = Store.memory(run_id="t", seed=1, start_ms=0)
+            try:
+                st.attach(canon=canon)
+                _p, reg = build(st, canon, seed, detail)
+                kinds = [z.kind for z in reg.zones]
+                assert kinds.count("wilds") <= 1, (seed, detail, kinds)
+                again = [r[0] for r in st.query("SELECT purpose FROM prng_ledger WHERE stream = 'worldgen:region' "
+                                                "AND purpose LIKE 'kind:%:again'")]
+                redrawn += len(again)
+                assert all(kinds[int(x.split(":")[1])] != "wilds" for x in again)
+                buildings = [s for z in reg.zones for s in z.site_ids
+                             if row(st, "places", "place_id", s)["kind"] == "building"]
+                assert len(buildings) >= (tables.DETAIL_TIERS[detail]["zones"] - 1) * tables.DETAIL_TIERS[detail]["places_per_zone"]
+            finally:
+                st.close()
+    assert redrawn, "forty seeds and a second wilds zone was never drawn: the rule was not exercised"
+
+
 def test_wg16_buildings_wait_to_be_found(store, canon):
     """WG-16: a building site has an archetype and no rooms until someone arrives."""
     _p, reg = build(store, canon, 33, "standard")
