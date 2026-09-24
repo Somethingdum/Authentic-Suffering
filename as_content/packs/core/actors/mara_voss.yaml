@@ -26,6 +26,20 @@ appearance:
   movement_under_stress: Goes still and square instead of fast; her voice drops lower rather than louder, and her right hand is on the holster before she has decided anything.
   habit_gesture: Runs her thumb along the eyebrow scar when she is deciding something.
   relation_to_appearance: Does not think about it beyond keeping her hair out of grabbing range and her boots laced double.
+  looks:
+    hair_colour: dark blonde
+    hair_length: shoulder
+    hair_style: in a tight low bun
+    eye_colour: gray
+    complexion: "pale skin freckled across the nose and windburned on the cheeks"
+    marks:
+      - {what: "a pale crescent scar", where: "through the left eyebrow", shows: near}
+      - {what: "a hard callus", where: "on the inside of the right index finger", shows: close}
+    outfit:
+      - {item: "core:item/work_jacket", colour: navy}
+      - {item: "core:item/thermal_top"}
+      - {item: "core:item/cargo_pants", colour: black}
+      - {item: "core:item/boots"}
 capability:
   special: {S: 5, P: 7, E: 6, C: 4, I: 5, A: 5, L: 4}
   skills:
@@ -190,8 +204,6 @@ starting_loops:
 starting_inventory:
   - {item: "core:item/revolver_38", slot: worn, label: revolver, props: {rounds: 6, holstered: true}}
   - {item: "core:item/ammo_38", qty: 11, slot: pocket}
-  - {item: "core:item/work_jacket", slot: worn}
-  - {item: "core:item/boots", slot: worn}
   - {item: "core:item/flashlight", slot: pocket}
 writers_notes: Mara is not hard for the sake of it; she is holding herself together with procedure. The warmth is real and almost all of it goes to Eli and June. Never write her as a quippy action heroine.
 tags: [delgados_crew, anchor_scene]

@@ -150,6 +150,19 @@ They change finished phases in place, so their tests live in those phases' folde
 | `p06_memory/test_recall.py` | recall brings back the holder's own episodes and beliefs the packet did not show — by their words or by whom they are about — saying how they know and when; memories first, at most three; nothing found is only that; never anyone else's records (CONSULT-05) |
 | `p07_slice/test_decision_v2.py` | a V1 and a V2 answer both read; a lookup, then the decision on the same snapshot; more of one kind added after the menu and chosen; a consultation where none is offered repaired into a decision; a failed answer goes on with what they took on, or no attempt at all; a timeout gets no repair; an unanswered ask holds the decision, and in a whole turn nothing happens and the player is told (REPLY-01..02, HOLD-01..02) |
 
+### 3.5 The owner's appearance work (F1a, D-82)
+
+Each part lives in the phase that owns the function it pins; every world is a small dict scenario
+(bodies with `dress: true` and, for a stub, its own `looks`).
+
+| File | What it proves |
+|---|---|
+| `p02_space_bodies/test_looks.py` | the thirteen core people all have looks and an outfit that covers them, and list no worn clothing twice; every clothing item's block (CNT-12); CNT-17 — no looks is a warning, an outfit that leaves the torso or groin bare, a piece that is not clothing and a worn clothing grant are errors; `bodies.looks` is the looks without the outfit, NULL when never recorded; the dead start filthy and caked in gore, however they came to be; `soil` clamps, says what changed and writes nothing when nothing does; the loader dresses after every fixture item so no fixture id moves; `worn` reads outside in; a body already in clothes is not dressed again; `visible_gear` — hands, then belt gear, a handgun hidden under a long parka until it comes off (LOOK-01, -02, -04) |
+| `p03_perception/test_appearance.py` | what the looker sees at each distance (hair and clothes across the room, skin and near marks within 5 m, eyes within 1.5 m, the boundaries exactly), in poor light (the outline of the coat) and not at all; a beard across a room, stubble only close; naked and bare to the waist in plain words; only the outer layer and a badge only when it shows; a coat taken off shows what it hid; no looks on record, no claim about clothes; the dead; every step of blood, gore, grime and rain; the cues a glance gives, clear and partial (LOOK-03, LOOK-05) |
+| `p04_one_actor/test_appearance_in_packet.py` | a person present comes with what the holder sees of them, on its own line under theirs; someone out of sight, nothing (LOOK-06) |
+| `p05_many_actors/test_appearance_cues.py` | `cues_of` adds a glance's cues only for someone seen this turn: a gun on a hip in view, not in a pocket; blood behind a closed door is no cue; your own look is none (LOOK-05) |
+| `p10_world/test_dressed.py` | the player starts in their own clothes: their looks on record, their outfit worn, their gear on top (worldgen opening, LOOK-01, -02) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

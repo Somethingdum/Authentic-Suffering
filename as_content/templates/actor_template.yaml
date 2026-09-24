@@ -28,6 +28,20 @@ appearance:
   movement_under_stress: <how they move when scared or angry>
   habit_gesture: <one repeated physical habit>
   relation_to_appearance: <how they feel about how they look>
+  looks:                                # what ANYONE can see (F1a, 09 §3.1): visible facts only, no history
+    hair_colour: <dark blonde>          # '' when bald or shaved
+    hair_length: <bald|shaved|cropped|short|collar|shoulder|long>
+    hair_style: <in a tight low bun>    # optional
+    facial_hair: <none|stubble|mustache|beard|full_beard>
+    facial_hair_words: <a scraggly three-week beard>   # optional
+    eye_colour: <gray>
+    complexion: <pale skin freckled across the nose>   # a phrase that names the skin
+    marks:                              # where (with its preposition) and what; shows close (1.5 m) | near (5 m) | far
+      - {what: "<a pale crescent scar>", where: "<through the left eyebrow>", shows: near}
+    outfit:                             # clothing items (items/clothing.yaml); must cover torso and groin (CNT-17)
+      - {item: "core:item/<work_jacket>", colour: <navy>}
+      - {item: "core:item/<cargo_pants>", state: <clean|worn|soiled|torn>}
+      - {item: "core:item/<boots>", insignia: "<a mark anyone can see on it>"}
 capability:
   special: {S: <1-10>, P: <1-10>, E: <1-10>, C: <1-10>, I: <1-10>, A: <1-10>, L: <1-10>}
   skills:                               # rank 1 trained, 2 skilled, 3 expert; absent = untrained
@@ -113,6 +127,6 @@ disposition:
   toward_strangers: <hostile | wary | neutral | warm>
   encounter_default: <what they do when they first spot a stranger>
 starting_loops: []                      # {kind: goal|grudge|promise_made|..., text: "...", strength: 0-3}
-starting_inventory: []                  # {item: "<pack>:item/<id>", qty: 1, slot: hand_r|hand_l|worn|pack|pocket, label?, container?, props?}
+starting_inventory: []                  # {item: "<pack>:item/<id>", qty: 1, slot: hand_r|hand_l|worn|pack|pocket, label?, container?, props?} — gear only: worn clothing is appearance.looks.outfit (CNT-17)
 writers_notes: <human-only notes; the model reads them and never writes them>
 tags: []

@@ -104,7 +104,33 @@ Voice lines are the most important craft element. Rules that make them work:
   (ECHO-01) will fight it every turn.
 
 Starting state: `starting_inventory` (item grants with slots and nesting labels) and
-`starting_loops` (goals, grudges, promises they begin with).
+`starting_loops` (goals, grudges, promises they begin with). Clothing they wear is not in
+`starting_inventory` — it is the outfit in `appearance.looks` (below); gear worn on the body (a
+holstered pistol, a pack) stays in `starting_inventory` with slot `worn`.
+
+### 3.1 How they look (`appearance.looks`, F1a)
+
+The prose appearance fields are the person's own card. `appearance.looks` is what **anyone else
+can see** — people judge each other by it, so write it as visible facts only, never history or
+feelings: `hair_colour`, `hair_length` (bald, shaved, cropped, short, collar, shoulder, long),
+`hair_style`, `facial_hair` (+ `facial_hair_words` for a particular one), `eye_colour`,
+`complexion` (a phrase that names the skin: `pale skin freckled across the nose`), `marks`
+(`{what: "a pale crescent scar", where: "through the left eyebrow", shows: near}` — `where` keeps
+its preposition; `shows`: close within 1.5 m, near within 5 m, far at any distance) and `outfit`
+(clothing items, each with an optional `colour`, `state` clean / worn / soiled / torn and
+`insignia`, a mark anyone can see on it: `a red armband on the left arm`). The outfit must cover
+the torso and the groin (CNT-17: nobody is made naked by accident); a person without looks is a
+warning — others will see only their height and build. What others read: "Shoulder-length dark
+blonde hair in a tight low bun; in a navy work jacket, black cargo pants and brown work boots;
+carrying a .38 revolver." (`mind/perception.appearance_text`).
+
+**Clothing items** (`items/clothing.yaml`) are kind `clothing` with a `clothing` block: `slot`
+(head, face, neck, torso, body — one piece over torso and legs — legs, hands, feet), `layer`
+(under, mid, outer: only the outermost layer at a slot shows), `covers`, `words` (how it reads,
+without colour: `work jacket`), a default `colour`, `plural` for words that take no article
+(`cargo pants`), `style` (work, casual, formal, uniform, tactical, medical, outdoor, night, rags —
+uniform and tactical read as uniformed, formal as formally dressed), `warmth`, `protection`, and
+`conceals` for a long outer layer that hides a handgun or knife on the belt (bulk 2 or less).
 
 **Capability tags** give +2 on any check that lists them (07_RULES §1; one tag, never stacking).
 The core pack's checks use: `parkour`, `climber` (climbing), `quiet_mover` (sneaking, hiding),

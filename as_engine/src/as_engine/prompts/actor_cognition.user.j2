@@ -100,7 +100,8 @@ What you heard
 People you can account for
 {% for e in p.entities %}
 - {{ e.handle }}: {{ e.description }}{{ (" (" ~ e.relation_summary ~ ")") if e.relation_summary else "" }} — {{ e.whereabouts }}
-{% else %}
+{% if e.appearance %}  {{ e.appearance }}
+{% endif %}{% else %}
 - No one else.
 {% endfor %}
 {% if p.relationships %}

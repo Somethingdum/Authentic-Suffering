@@ -22,7 +22,9 @@ load_scenario(path_or_dict, *, packs_root, core_pack_dir, rules=None, transport=
        places + anchors + portals     (physical.space, PLACE_DISCOVERED per place; places get
                                        layout_generated = 1 — fixture rooms are already known)
        bodies + needs + wounds        (physical.bodies, MATERIALIZE per body; bodies.origin 'scenario';
-                                       needs last_* = start - stage * stage_hours)
+                                       needs last_* = start - stage * stage_hours; F1a: bodies.looks
+                                       as below, and an ``infected:`` body's grime / blood / gore
+                                       5 / 3 / 5 as physical.bodies.create writes them)
        positions                      (physical.space, MOVE per body)
        infected_state                 (world.infected, MATERIALIZE; for bodies with `infected:`)
        actors + dossiers + plans      (mind.actor, MATERIALIZE per actor; dossiers.baseline_json =
@@ -50,6 +52,15 @@ load_scenario(path_or_dict, *, packs_root, core_pack_dir, rules=None, transport=
        narrator_state                 (narration.narrator)
   Stub bodies (``stub:``) get dossiers.baseline_json = stub_dossier(local_id, stub) (source
   'fixture', ActorDossier-valid; the loader validates it) and no content ref.
+  F1a (LOOK-01/02): a body with ``dress: true`` is created with looks = its ``looks`` (a
+  contracts.dossier.Looks mapping) when given, else its dossier's appearance.looks (neither ->
+  ValueError: nothing to dress it in); after every fixture item exists, physical.objects.dress
+  (origin 'scenario') puts the looks' outfit on it — unless its inventory already has worn
+  clothing — body by body in the order listed (so every fixture id stays as it was). ``looks``
+  without ``dress`` sets the looks and dresses nobody: with nothing worn that covers them, that
+  body is naked to anyone who sees it. A body with neither has bodies.looks NULL: others see
+  height and build only, and no claim is made about its clothes (every scenario written before
+  F1a stays exactly as it was).
   4. meta.pc_actor_id = the body with controller 'human' (exactly one; else ValueError), written by
      a kernel.meta PC_CONTROL_CHANGE event {pc_actor_id} — the last event of the load.
   The loaded world passes the 58-bit commit gate at turn 0 (audit.commit_gate.compute(store, 0)).
@@ -330,6 +341,9 @@ class BodySpec(Strict):
     inventory: list[ItemSpec] = Field(default_factory=list)
     cues: list[str] = Field(default_factory=list, description="belief cues held in addition to the dossier's knowledge.cues (AFF-10)")
     focus: bool = Field(default=False, description="doing a focused task (divided-attention penalty)")
+    looks: dict[str, Any] | None = Field(default=None, description="F1a: a contracts.dossier.Looks mapping that "
+                                         "replaces the dossier's (stubs have none)")
+    dress: bool = Field(default=False, description="F1a: dress the body in its looks' outfit")
 
     @model_validator(mode="after")
     def _kind(self) -> "BodySpec":

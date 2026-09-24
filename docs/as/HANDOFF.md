@@ -42,6 +42,13 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   Gore camouflage works on ordinary infected (CODEX: not on Lurkers, by heat) at an infection-exposure cost,
   and people avoid you until you wash. Nakedness: exposure and no protection, and a shock to most people —
   strictly non-sexual.
+  **F1a is SPECIFIED** (D-82, LOOK-01..06, CNT-17; 13 §4.0 step 1 says where the builder builds it; tests
+  12 §3.5): looks, clothing items and the outfit, condition columns and `soil`, what a look shows at each
+  distance and light, the glance cues, the packet line, the PC dressed at the opening; the thirteen core
+  people and Fredrick have looks. Left of this item: **F1a-2** generated people (worldgen people and
+  `society.population.materialise`) get looks and outfits, and the narrator and the Play UI show how people
+  look; **F1b** smell; **F1c** washing, changing, smearing gore (with the D-77 exposure), rain, grime that
+  builds, nakedness's consequences and people's reactions (group dynamics).
 - **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own
@@ -59,9 +66,9 @@ ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a cont
 
 Per phase: design → contract docstrings in `as_engine/src/as_engine/**` (the docstring IS the spec;
 function bodies stay `raise NotImplementedError("P<n>")`) → protected contract tests in
-`as_engine/tests/contract/p<nn>_<name>/` → (until P10: a scratch reference implementation proved
-them; from now on no implementation is written — review each test against its docstring line by
-line instead, and let the builder file SPEC_ISSUES) → docs (`docs/as/*`) →
+`as_engine/tests/contract/p<nn>_<name>/` → a scratch reference implementation, kept out of the repo
+and thrown away afterwards, proves the new tests and that the whole built suite still passes with
+the change in (the repo gets contracts, tests and docs only) → docs (`docs/as/*`) →
 `tools/as/gate.py --docstrings --write-rules --scan`, `tools/as/protect.py --write-manifest` →
 full suite green on the reference → full-kit zip + patch zip vs the previous delivery. Then **play
 it**: a generated world played through the service found faults no contract test had (§3.2).

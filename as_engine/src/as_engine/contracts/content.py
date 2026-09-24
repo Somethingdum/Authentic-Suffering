@@ -74,6 +74,26 @@ class MedicalProps(Strict):
     skill_min: int = Field(default=0, ge=0, le=3)
 
 
+class ClothingProps(Strict):
+    """What a piece of clothing is to the eye and to the body (F1a, LOOK-02)."""
+
+    slot: Literal["head", "face", "neck", "torso", "body", "legs", "hands", "feet"] = Field(
+        description="Where it is worn; 'body' is one piece over torso and legs (a dress, overalls).")
+    layer: Literal["under", "mid", "outer"] = "mid"
+    covers: list[Literal["head", "face", "neck", "torso", "arms", "groin", "legs", "hands", "feet"]] = Field(
+        min_length=1)
+    words: str = Field(min_length=3, description="How it reads to the eye, without colour: 'work jacket', "
+                       "'thermal top', 'cargo pants'.")
+    colour: str = Field(default="", description="Its usual colour word ('navy'); an item's props.colour overrides it.")
+    plural: bool = Field(default=False, description="Words that take no article: 'cargo pants', 'work boots'.")
+    style: list[Literal["work", "casual", "formal", "uniform", "tactical", "medical", "outdoor", "night",
+                        "rags"]] = Field(default_factory=list)
+    warmth: int = Field(default=0, ge=0, le=3)
+    protection: int = Field(default=0, ge=0, le=3, description="Against cuts, scratches and bites to what it covers.")
+    conceals: bool = Field(default=False, description="An outer layer that hides what is worn beneath it at the "
+                           "torso and waist (a holstered pistol under a long coat).")
+
+
 class ItemDef(Strict):
     schema_id: Literal["as.item.v1"] = Field(alias="schema", default="as.item.v1")
     id: str = Field(pattern=SLUG_PATTERN)
@@ -94,6 +114,7 @@ class ItemDef(Strict):
     food: FoodProps | None = None
     water: WaterProps | None = None
     medical: MedicalProps | None = None
+    clothing: ClothingProps | None = None
     description: str = Field(min_length=5)
     model_config = Strict.model_config | {"populate_by_name": True}
 

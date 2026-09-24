@@ -26,6 +26,19 @@ appearance:
   movement_under_stress: Becomes more still and more polite; she sits down when others stand, and folds her hands on the table.
   habit_gesture: Uncaps and recaps the fountain pen, slowly, while she listens.
   relation_to_appearance: Dresses exactly as she did at the firm because the suit tells every collector that the old world's rules still apply to them.
+  looks:
+    hair_colour: silver
+    hair_length: short
+    hair_style: in a neat bob
+    eye_colour: pale blue
+    complexion: "fair, lined skin, lightly powdered"
+    marks:
+      - {what: "a capped steel fountain pen on a chain", where: "around the neck", shows: near}
+      - {what: "ink stains", where: "on the second finger of the right hand", shows: close}
+    outfit:
+      - {item: "core:item/reading_glasses", colour: half-moon}
+      - {item: "core:item/skirt_suit"}
+      - {item: "core:item/pumps"}
 capability:
   special: {S: 3, P: 7, E: 5, C: 6, I: 9, A: 3, L: 6}
   skills:
@@ -166,6 +179,5 @@ starting_loops:
   - {kind: secret_kept, text: "The fuel projection", strength: 3}
 starting_inventory:
   - {item: "core:item/ledger_book", slot: hand_l, props: {note: "This month's collectors' pages."}}
-  - {item: "core:item/work_jacket", slot: worn, props: {note: "A mended gray wool suit jacket."}}
 writers_notes: Irene is frightening because she is fair, and because she is right about almost everything. Never make her cackle or threaten; her power is that she only ever reads the numbers aloud.
 tags: [mafia_remnants, leader]

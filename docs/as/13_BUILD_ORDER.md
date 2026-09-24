@@ -76,6 +76,20 @@ machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
    it like any failing test (skill `as-failing-test`) — the fix goes where AGENTS.md §4 says.
+   The owner's appearance work (F1a: LOOK-01..06, CNT-17; DECISIONS D-82) is not built yet and its
+   tests sit in these phases, so build each part before recording that phase's gate:
+   - P2: `physical/bodies.py` — `create`'s looks and the dead's grime / blood / gore, `looks_of`,
+     `condition_of`, `soil`, `rise` copying the corpse's looks (remove the `raise
+     NotImplementedError("P2")` guard at the top of `create`); `physical/objects.py` — `worn`,
+     `coverage`, `visible_gear`, `dress`; the scenario loader (`testing/_impl_loader.py`: `looks`,
+     `dress`, the scenario's dead); `content/pack.py` — CNT-12's clothing block and CNT-17.
+     Tests: `p02_space_bodies/test_looks.py`.
+   - P3: `mind/perception.appearance_text`, `mind/cues.appearance_cues` — `p03_perception/test_appearance.py`.
+   - P4: `PacketEntity.appearance` in `mind/_impl_packet.py`, and the same in the aftermath
+     (`mind/_impl_p6.py`, MEM-01) — `p04_one_actor/test_appearance_in_packet.py`.
+   - P5: `cues_of` adds the appearance cues (`action/_impl_p5a.py`) — `p05_many_actors/test_appearance_cues.py`.
+   - P10 (step 3): `world/worldgen/opening` step 2 — the PC is created with their looks and
+     dressed in their outfit (`_impl_wg.place_pc`) — `p10_world/test_dressed.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
@@ -129,6 +143,7 @@ Read: 07 §2, §5, §6, §7; 09; `physical/*`, `content/pack.py`, `testing/scena
 5. `physical/bodies.py`: all (the death test included; infected false death reads the type from `infected_state` and keeps its timers on `bodies`).
 6. `mind/actor.py::resolve_max` (a formula; the loader needs it — the rest of mind.actor is P4).
 7. `testing/scenario.py::load_scenario` — its docstring's "Row details" are the contract; every fixture must load and pass the 58-bit gate at turn 0.
+8. F1a (the owner's appearance work, D-82): looks, condition and `soil` in `physical/bodies.py`; `worn`, `coverage`, `visible_gear`, `dress` in `physical/objects.py`; the loader's `looks` / `dress`; CNT-17 (`test_looks.py`).
 Gate: `p02_space_bodies` green (its `test_core_pack_is_clean` is the content check; the `as-engine content-check` command itself arrives with the CLI in P7).
 **Forbidden:** perception. Bodies exist and move; nobody notices yet.
 
@@ -138,6 +153,7 @@ Read: 05 §3, 07 §3–4, `sense/*`, `mind/perception.py`, `kernel/truth.py`.
 2. `sense/optics.py` (`visibility_score`, `band`, `visibility`) + `physical/space.line_of_sight`.
 3. `kernel/truth.py::current_facts`.
 4. `mind/perception.py`: `grant` (the single writer), `render_visual`, `compile_scene`, `compile_aftermath`.
+5. F1a: `mind/perception.appearance_text` and `mind/cues.appearance_cues` — what someone looks like, and what that tells you at a glance (`test_appearance.py`).
 Gate: `p03_perception` green.
 **Forbidden:** decisions. Minds receive; they do not yet choose.
 

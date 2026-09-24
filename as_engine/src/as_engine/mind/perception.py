@@ -1,4 +1,4 @@
-"""Perception compiler and THE single knowledge writer (P3). Rules SKULL-01..06, L1.
+"""Perception compiler and THE single knowledge writer (P3). Rules SKULL-01..06, L1, LOOK-03.
 Owner 'mind.perception'. May import kernel.truth, sense.*, physical.*.
 
 grant(tx, holder_id, *, event_id, channel, fidelity, text, source_id, at, turn_index,
@@ -184,6 +184,52 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       {ANATOMY_WORDS[anatomy]}.' (contracts.common; e.g. 'Pain: a deep stab wound to the left arm.').
   render_portal(portal): f'The {name} is {open|closed}{, barricaded}{, damaged}.' — never
       'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact|damaged}.'
+
+F1a — what someone looks like to this holder (the owner: appearance helps you judge the situation
+and people).
+LOOK-03 appearance_text(tx, holder_id, subject_id, level, distance_m) -> str: what the holder sees of
+  the subject beyond describe()'s Ref, never naming what cannot be seen; built from L =
+  physical.bodies.looks_of(subject), C = condition_of(subject), W = physical.objects.worn, cov =
+  coverage, G = visible_gear. level 'silhouette' or 'none' -> ''.
+  features  (level 'clear' and L not None), in this order:
+            hair — hair_length 'bald' -> 'bald'; 'shaved' -> 'a shaved head'; else
+              f"{LENGTH} {hair_colour} hair" + (' ' + hair_style when set), LENGTH = cropped
+              'cropped', short 'short', collar 'collar-length', shoulder 'shoulder-length', long
+              'long';
+            facial hair — facial_hair_words, else mustache 'a mustache', beard 'a beard',
+              full_beard 'a full beard', stubble 'stubble' (none: nothing); stubble only within
+              5 m, the others at any distance;
+            within 5 m: complexion, as written ('pale skin freckled across the nose');
+            each mark whose shows is 'far', or 'near' within 5 m, or 'close' within 1.5 m, in the
+              order given: f"{what} {where}";
+            within 1.5 m: f"{eye_colour} eyes".
+            Joined with ', '. 'Within d m' is distance_m <= d.
+  clothes   (L not None — a body whose looks are not recorded makes no claim about its clothes;
+            levels 'clear' and 'partial'). naked = 'torso' and 'groin' both not in cov; half =
+            'torso' not in cov and 'groin' in cov. A piece reads f"{state }{colour }{words}" with
+            state 'torn ' / 'soiled ' for those states (else nothing) and colour as worn() gives it
+            (nothing when ''), with_article unless the clothing block's plural is true ('cargo
+            pants', 'work boots': no article).
+            SHOWN = per slot of CLOTHING_SLOT_ORDER, the worn clothing piece of the outermost
+              layer at that slot (a tie: the first in worn() order) — except that a 'body' piece
+              fills 'torso' and 'legs' too: a torso or legs piece is SHOWN only when its layer is
+              outer to (before, in CLOTHING_LAYER_ORDER) the SHOWN 'body' piece's layer.
+            clear: naked -> 'naked' + (' but for ' + the
+              SHOWN pieces joined as a list when any); else (half -> 'bare to the waist, ') +
+              'in ' + the SHOWN pieces as a list. A list: 'a'; 'a and b'; 'a, b and c' (no
+              comma before 'and').
+            partial: naked -> 'naked'; half -> 'bare to the waist'; else 'in ' + the SHOWN piece
+              at 'torso', else the SHOWN 'body' piece (neither: nothing), and nothing more.
+  insignia  (level 'clear'): the insignia of the SHOWN pieces that carry one, in SHOWN order,
+            joined with ', '.
+  gear      (level 'clear'): 'carrying ' + with_article(ItemDef.name) of each item in G that is
+            not in a hand (hands are render_visual's), as a list.
+  condition (level 'clear'; at 'partial' only the gore and blood words for values >= 4): gore
+            2-3 'smeared with gore', 4-5 'caked in gore'; blood 3-4 'bloodied', 5 'soaked in blood';
+            grime 3 'grimy', 4-5 'filthy'; wet 2-3 'soaked through'; in that order, joined ', '.
+  The non-empty parts, in the order features, clothes, insignia, gear, condition, joined with '; ',
+  the first letter capitalised, ending with '.'; nothing to say -> ''. Deterministic: the same world
+  and the same arguments give the same text.
 """
 
 from __future__ import annotations
@@ -837,3 +883,7 @@ def infer(tx: "Tx", holder_id: str, *, about: tuple[str, str | None], text: str,
                            cause_event_id=committed_or_none(tx, created), writes=writes,
                            payload={"prop_id": prp, "holder_id": holder_id, "because": list(because), "superseded": sorted(sup)}))
     return prp
+
+
+def appearance_text(tx: "Tx", holder_id: str, subject_id: str, level: str, distance_m: float) -> str:
+    raise NotImplementedError("P3")

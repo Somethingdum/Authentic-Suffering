@@ -67,7 +67,9 @@ with provenance `told_by:X`), never Y.
 
 ## 6. People
 
-`bodies` (physical: kind, size, SPECIAL, blood loss, pain, impairment, awareness, posture) ·
+`bodies` (physical: kind, size, SPECIAL, blood loss, pain, impairment, awareness, posture; F1a: `looks`
+— what anyone can see, without the outfit — and the condition `grime`, `blood`, `gore`, `wet`,
+`washed_at`; what is worn is items with slot `worn`) ·
 `positions` · `wounds` · `needs` · `infections` · `actors` (the mind wrapper: dossier, controller,
 Resolve, stress, goal, duty post, accepted authority, quarantine) · `dossiers` (full baseline JSON)
 · `dossier_deltas` · `voice_lines` · `plans` · `tasks` · `relationships` (6 axes, per-axis cause) ·

@@ -43,6 +43,43 @@ class Identity(Strict):
     one_line: str = Field(min_length=10, max_length=140)
 
 
+class VisibleMark(Strict):
+    """Something anyone can see on them: where and what — never how it came to be there (LOOK-01)."""
+
+    where: str = Field(min_length=3, description="With its preposition: 'through the left eyebrow', 'across the "
+                       "backs of both hands', 'behind the right ear'.")
+    what: str = Field(min_length=3, description="'a pale crescent scar', 'a faded anchor tattoo'.")
+    shows: Literal["close", "near", "far"] = Field(default="near", description="close: within 1.5 m; near: within "
+                                                   "5 m; far: at any distance, when seen clearly.")
+
+
+class OutfitPiece(Strict):
+    """One piece of what they wear when they are first placed in the world (LOOK-02)."""
+
+    item: ContentRef = Field(description="An item with a clothing block ('core:item/work_jacket'). Gear that is "
+                             "worn — a holster, a pack — is starting_inventory's (CNT-17).")
+    colour: str | None = Field(default=None, description="Overrides the item's colour word.")
+    state: Literal["clean", "worn", "soiled", "torn"] = "worn"
+    insignia: str | None = Field(default=None, description="A mark on it anyone can see: 'a painted white smile on "
+                                 "the left shoulder'.")
+
+
+class Looks(Strict):
+    """What anyone can see of a person: visible facts only, no history and no inner life (LOOK-01).
+    The prose fields of Appearance stay for the person's own identity card."""
+
+    hair_colour: str = Field(description="'dark blonde', 'grey'; '' when bald or shaved.")
+    hair_length: Literal["bald", "shaved", "cropped", "short", "collar", "shoulder", "long"]
+    hair_style: str = Field(default="", description="'in a tight low bun', 'matted', 'slicked back'.")
+    facial_hair: Literal["none", "stubble", "mustache", "beard", "full_beard"] = "none"
+    facial_hair_words: str = Field(default="", description="'a waxed, curled mustache'; '' = the plain word.")
+    eye_colour: str
+    complexion: str = Field(pattern=r"\bskin\b", description="What the skin looks like, as a phrase that names "
+                            "it: 'pale skin freckled across the nose', 'deep brown skin'.")
+    marks: list[VisibleMark] = Field(default_factory=list)
+    outfit: list[OutfitPiece] = Field(default_factory=list)
+
+
 class Appearance(Strict):
     height_cm: int = Field(ge=45, le=230)
     mass_kg: int = Field(ge=3, le=250)
@@ -55,6 +92,8 @@ class Appearance(Strict):
     movement_under_stress: str = Field(min_length=10)
     habit_gesture: str = Field(min_length=5)
     relation_to_appearance: str = Field(min_length=5)
+    looks: Looks | None = Field(default=None, description="F1a: the structured, visible version of the fields above "
+                                "(what OTHER people see; LOOK-01). None: others see height and build only (CNT-17 warns).")
 
 
 class Skill(Strict):

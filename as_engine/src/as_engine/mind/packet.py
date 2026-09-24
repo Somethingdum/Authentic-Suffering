@@ -1,5 +1,5 @@
 """Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,
-IDN (the card).
+IDN (the card), LOOK-06.
 MUST NOT import as_engine.kernel.truth (SKULL-02, import-graph test). Reads only: the actor's
 own body, wounds, needs and inventory, its actors row and fused dossier, percept_log rows for
 this holder, its claim_holdings + propositions, its relationships / acquaintance / households /
@@ -23,6 +23,11 @@ SKULL-10 (P10) Nothing later than the moment reaches a mind: a mind deciding at 
   percept_log rows with turn_index == turn_index AND at <= ``at``: this packet, mind.affordance
   (known bodies and items, threats, the attention point), mind.retrieval (the moment set) and
   turn.select (salience; mind.cues always did).
+
+LOOK-06 (F1a) Everyone the holder sees now comes with what the holder sees of them: each entity
+  'here' carries PacketEntity.appearance (entities below — mind.perception.appearance_text at the
+  best level and the distance), and the prompt shows it on its own line under the entity's line;
+  nobody out of sight gets one.
 
 Handles (never an internal id in anything rendered — SKULL-06 is tested over the rendered prompt):
   S1..Sn  this holder's percept_log rows with turn_index == turn_index and at <= ``at`` (SKULL-10),
@@ -103,6 +108,10 @@ Fields (second person, plain English):
                     speech; else, from the holder's acquaintance row, f'last seen in
                     {place_phrase(last_seen_place name)} {age}' (age worded as for beliefs, from
                     at - last_seen) when last_seen and last_seen_place are set; else 'not seen'.
+                    appearance (LOOK-06): for an entity 'here', mind.perception.appearance_text(
+                    tx, actor_id, the body, the best level of those VISUAL percepts ('clear' over
+                    'partial'), space.point_distance(actor, body)); else ''. The prompt shows it on
+                    its own line under the entity's line.
   relationships     RelationshipLine(handle, text) per entity with a relationships row from the
                     holder, in entity order. text = the non-zero axes, in the order trust, fear,
                     respect, affection, resentment, obligation, joined with '; ', first letter

@@ -13,10 +13,13 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     start zone, the first building site by place id that is not a settlement site; none -> the first
     outdoor site; none -> the start zone's hub.
   2 The PC: physical.bodies.create (from the dossier as the scenario loader does: sex, age, height,
-    mass, special; origin 'worldgen'), physical.space.place_body at the start place's anchor,
+    mass, special, looks = appearance.looks (F1a, LOOK-01); origin 'worldgen'),
+    physical.space.place_body at the start place's anchor,
     mind.actor.create (source 'pack', content_ref = pc_ref, controller 'human'), the dossier's
     starting_inventory through physical.objects.create (origin 'worldgen'; labels / containers as the
-    loader), known_places for every place of the start zone and every road touching it (visited 1 for
+    loader), then, when looks is set, physical.objects.dress(tx, body, looks.outfit, at, None, 0,
+    'worldgen') (LOOK-02: the PC starts in their own clothes),
+    known_places for every place of the start zone and every road touching it (visited 1 for
     the start place), then PC_CONTROL_CHANGE {pc_actor_id} (writer 'kernel.meta'). A start place that
     is an ungenerated building gets its rooms now (physical.space.discover_layout); the start place
     is marked populated (physical.space.change_place props {populated: true}, reason 'populated')

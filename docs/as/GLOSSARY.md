@@ -17,6 +17,12 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | identity card | who a person is as their decision calls show it: the whole dossier's person in plain lines, each traceable to its fields; the minimum card in a reaction (`mind.identity`, IDN-01..05) | — | character summary, persona prompt |
 | affordance | one thing a body could attempt now, computed by code | "option" / a suggestion | action menu item |
 | whereabouts | where one mind can account for a person being: here (seen now), heard not seen, last seen somewhere, or not seen (`PacketEntity.whereabouts`, Actor Spec AC14) | — | location (for a person in a mind) |
+| looks | what anyone can see of a person: hair, facial hair, eyes, complexion, visible marks, and the outfit they are first dressed in (`contracts.dossier.Looks`; `bodies.looks` without the outfit; LOOK-01). Visible facts only, never history | how someone looks | — |
+| outfit | the clothing items a person is dressed in when placed in the world (`Looks.outfit`, `physical.objects.dress`); afterwards what they wear is items with slot `worn` | what they're wearing | — |
+| clothing block | an item's `clothing` properties: slot, layer, covers, words, colour, style, warmth, protection, conceals (`ClothingProps`, LOOK-02) | — | — |
+| SHOWN | the pieces of clothing someone looking can see: the outermost layer at each slot (a one-piece suit hides a shirt of its own layer), in slot order (`mind.perception.appearance_text`) | — | — |
+| condition (of a body) | grime, blood, gore (0–5) and wet (0–3) on a body and its clothes (`bodies.grime / blood / gore / wet`, `physical.bodies.soil`, LOOK-04); the dead start at grime 5, blood 3, gore 5 | filthy, bloodied, caked in gore, soaked through | — |
+| appearance (of a person, to a mind) | what one mind sees of someone at this moment, from their looks, clothes, visible gear and condition at that distance and light (`appearance_text`, `PacketEntity.appearance`, LOOK-03, LOOK-06) | — | — |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | decision | an Actor's answer that attempts something: one offered option, its pace, speech, goal, private reason (`ActorReplyV2` kind decision) | what they do | — |

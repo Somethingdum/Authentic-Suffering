@@ -26,6 +26,21 @@ appearance:
   movement_under_stress: Gets slower and bigger — shoulders back, chin up, stepping into space — and smiles wider.
   habit_gesture: Cracks his knuckles one at a time with his thumb, never all at once.
   relation_to_appearance: Loves being looked at; the gold tooth and the armband are both there to be seen.
+  looks:
+    hair_colour: ""
+    hair_length: shaved
+    facial_hair: full_beard
+    facial_hair_words: "a thick black beard trimmed square"
+    eye_colour: brown
+    complexion: dark brown skin
+    marks:
+      - {what: "a mottled burn scar", where: "down the left side of the neck", shows: near}
+      - {what: "a gold tooth", where: "at the front of the mouth", shows: close}
+    outfit:
+      - {item: "core:item/car_coat", insignia: "a red armband on the left arm"}
+      - {item: "core:item/hooded_sweatshirt", colour: black}
+      - {item: "core:item/cargo_pants", colour: olive}
+      - {item: "core:item/boots", colour: black}
 capability:
   special: {S: 8, P: 5, E: 7, C: 6, I: 5, A: 5, L: 5}
   skills:
@@ -164,6 +179,5 @@ starting_loops:
 starting_inventory:
   - {item: "core:item/glock_19", slot: worn, label: pistol, props: {chambered: true}}
   - {item: "core:item/magazine_9mm_15", container: pistol, props: {rounds: 11}}
-  - {item: "core:item/work_jacket", slot: worn, props: {note: "Leather car coat with a red shield man's armband."}}
 writers_notes: Reggie is charming and genuinely kind to his own people, and he will break a stranger's hand to make a point. Both are true every day. He is not stupid; he underestimates paper.
 tags: [mafia_remnants]

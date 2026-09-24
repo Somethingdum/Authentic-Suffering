@@ -26,6 +26,20 @@ appearance:
   movement_under_stress: Goes low and slow, pauses mid-step to listen, and moves along walls instead of across open ground.
   habit_gesture: Turns the stud in her ear with two fingers when she is deciding whether to say something.
   relation_to_appearance: Cut the reflective strips off her jacket the first week and has thought about her hair as a liability ever since.
+  looks:
+    hair_colour: black
+    hair_length: long
+    hair_style: in a tight braid down the back
+    eye_colour: dark brown
+    complexion: "warm brown skin sun-darkened across the nose"
+    marks:
+      - {what: "a fresh pink scar", where: "down the left forearm", shows: near}
+      - {what: "a silver stud", where: "in the left ear", shows: close}
+    outfit:
+      - {item: "core:item/running_jacket"}
+      - {item: "core:item/leggings", colour: dark gray}
+      - {item: "core:item/cargo_shorts"}
+      - {item: "core:item/running_shoes", colour: taped-up}
 capability:
   special: {S: 5, P: 8, E: 7, C: 4, I: 6, A: 7, L: 5}
   skills:
@@ -169,7 +183,6 @@ starting_loops:
   - {kind: secret_kept, text: "The man at the fence", strength: 2}
 starting_inventory:
   - {item: "core:item/kitchen_knife", slot: worn}
-  - {item: "core:item/running_shoes", slot: worn}
   - {item: "core:item/shoulder_bag", slot: worn, label: bag}
   - {item: "core:item/water_bottle", slot: pack, container: bag}
 writers_notes: Nita's secrecy is judgment, not scheming — she has watched Mara shoot and she is trying to keep a starving man alive. Her humour is dry and aimed at herself first.

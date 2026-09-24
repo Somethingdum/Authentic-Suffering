@@ -26,6 +26,21 @@ appearance:
   movement_under_stress: Slows down and tidies — squares a stack, caps a pen — as if order in her hands could put order in the room.
   habit_gesture: Taps the pencil against her teeth twice before writing a number down.
   relation_to_appearance: Keeps the cardigan buttoned because being neat is the last thing she controls.
+  looks:
+    hair_colour: black
+    hair_length: short
+    hair_style: "with a gray streak at the left temple, cut blunt at the jaw"
+    eye_colour: dark brown
+    complexion: light olive skin
+    marks:
+      - {what: "a pencil", where: "behind the right ear", shows: near}
+      - {what: "sunspots", where: "across the backs of both hands", shows: close}
+      - {what: "a thin white scar", where: "across the base of the left thumb", shows: close}
+    outfit:
+      - {item: "core:item/cardigan", colour: oatmeal}
+      - {item: "core:item/turtleneck"}
+      - {item: "core:item/slacks"}
+      - {item: "core:item/loafers"}
 capability:
   special: {S: 3, P: 6, E: 5, C: 4, I: 8, A: 4, L: 5}
   skills:

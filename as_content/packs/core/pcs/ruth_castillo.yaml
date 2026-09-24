@@ -29,6 +29,20 @@ appearance:
   movement_under_stress: Moves faster and gets calmer; her voice drops to a flat, clear triage register and her hands never shake.
   habit_gesture: Pushes the reading glasses up into her hair when she's about to give bad news.
   relation_to_appearance: Wears the scrubs on purpose; people stop arguing with a woman in scrubs.
+  looks:
+    hair_colour: gray-black
+    hair_length: long
+    hair_style: in a tight braid wound into a bun
+    eye_colour: dark brown
+    complexion: "brown, lined skin"
+    marks:
+      - {what: "reading glasses", where: "pushed up on the head", shows: near}
+      - {what: "a mole", where: "beneath the left eye", shows: near}
+      - {what: "old nicks and small scars", where: "across the fingers", shows: close}
+    outfit:
+      - {item: "core:item/cardigan", colour: brown}
+      - {item: "core:item/scrubs", colour: faded blue}
+      - {item: "core:item/clogs"}
 capability:
   special: {S: 4, P: 7, E: 6, C: 6, I: 8, A: 5, L: 5}
   skills:

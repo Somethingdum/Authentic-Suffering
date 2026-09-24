@@ -169,7 +169,8 @@ rise(tx, rng, row, fired, turn_index) -> list[Event]   (the REANIMATION handler 
   slot; MATERIALIZE inserting infected_state as spawn does, with risen_from = corpse; then attract(
   new, every living non-infected body it sees(...) in that place — the first by id, reason 'sight').
   (mind.perception.word_for gives it the words "what was left of <name>" for anyone who knew the
-  dead.)
+  dead; F1a: it has the corpse's looks and wears the clothes it died in, filthy and caked in gore —
+  physical.bodies.rise / create.)
 
 day(tx, rng, at, turn_index, cause_event_id) -> list[Event]   (world.worldmove.day calls it)
   Every body with an infected_state row whose folded_at is NULL (by body_id): dormant -> energy +

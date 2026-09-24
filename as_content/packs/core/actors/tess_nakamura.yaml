@@ -26,6 +26,19 @@ appearance:
   movement_under_stress: Gets louder and quicker, talking over people and keeping her hands on the stall's goods.
   habit_gesture: Chews the clarinet reed when she's calculating a price.
   relation_to_appearance: Proud of it; the pins and the rust-red hair are how runners find her stall across a crowded market.
+  looks:
+    hair_colour: rust-red
+    hair_length: short
+    hair_style: shaved at the sides
+    eye_colour: dark brown
+    complexion: "light tan skin freckled across the cheeks"
+    marks:
+      - {what: "a clarinet reed on a string", where: "around the neck", shows: near}
+      - {what: "a row of small tally tattoos", where: "on the left forearm", shows: near}
+    outfit:
+      - {item: "core:item/denim_jacket", insignia: "buttons and pins all over the denim jacket"}
+      - {item: "core:item/long_skirt"}
+      - {item: "core:item/rubber_boots"}
 capability:
   special: {S: 4, P: 6, E: 5, C: 7, I: 7, A: 6, L: 6}
   skills:

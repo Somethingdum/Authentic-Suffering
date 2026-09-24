@@ -1,0 +1,797 @@
+# Clothing (F1a, LOOK-02): what people wear, as items with a clothing block
+# (contracts/content.py ClothingProps). Colours here are defaults; an outfit piece or an item's
+# props.colour overrides them.
+- schema: as.item.v1
+  id: cardigan
+  name: cardigan
+  plural: cardigans
+  kind: clothing
+  mass_g: 450
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 4
+  description: A knitted wool cardigan with a button front.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    words: cardigan
+    colour: gray
+    style:
+    - casual
+    warmth: 1
+- schema: as.item.v1
+  id: turtleneck
+  name: turtleneck
+  plural: turtlenecks
+  kind: clothing
+  mass_g: 300
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: A fitted knit turtleneck.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    - arms
+    - neck
+    words: turtleneck
+    colour: black
+    style:
+    - casual
+    warmth: 1
+- schema: as.item.v1
+  id: slacks
+  name: pair of slacks
+  plural: pairs of slacks
+  kind: clothing
+  mass_g: 450
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 4
+  description: Pleated dress trousers, shiny at the knees.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: pleated slacks
+    colour: charcoal
+    plural: true
+    style:
+    - formal
+    - work
+- schema: as.item.v1
+  id: loafers
+  name: pair of loafers
+  plural: pairs of loafers
+  kind: clothing
+  mass_g: 700
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 4
+  description: Slip-on leather shoes.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: leather loafers
+    colour: brown
+    plural: true
+    style:
+    - formal
+    - casual
+- schema: as.item.v1
+  id: polo_shirt
+  name: polo shirt
+  plural: polo shirts
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 2
+  description: A short-sleeved knit shirt with a collar.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: polo shirt
+    colour: gray
+    style:
+    - work
+    - casual
+- schema: as.item.v1
+  id: jeans
+  name: pair of jeans
+  plural: pairs of jeans
+  kind: clothing
+  mass_g: 700
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 5
+  description: Heavy denim trousers.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: jeans
+    colour: blue
+    plural: true
+    style:
+    - casual
+    - work
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: hooded_sweatshirt
+  name: hooded sweatshirt
+  plural: hooded sweatshirts
+  kind: clothing
+  mass_g: 600
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 4
+  description: A cotton pullover with a hood and a front pocket.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    - arms
+    words: hooded sweatshirt
+    colour: gray
+    style:
+    - casual
+    warmth: 1
+- schema: as.item.v1
+  id: sneakers
+  name: pair of sneakers
+  plural: pairs of sneakers
+  kind: clothing
+  mass_g: 700
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 5
+  description: Canvas and rubber athletic shoes.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: sneakers
+    colour: white
+    plural: true
+    style:
+    - casual
+- schema: as.item.v1
+  id: skirt_suit
+  name: skirt suit
+  plural: skirt suits
+  kind: clothing
+  mass_g: 1100
+  bulk: 2
+  tags:
+  - clothing
+  barter_value: 8
+  description: A wool jacket and knee-length skirt cut to match.
+  clothing:
+    slot: body
+    layer: mid
+    covers:
+    - torso
+    - arms
+    - groin
+    - legs
+    words: skirt suit
+    colour: gray
+    style:
+    - formal
+    - work
+    warmth: 1
+- schema: as.item.v1
+  id: pumps
+  name: pair of pumps
+  plural: pairs of pumps
+  kind: clothing
+  mass_g: 600
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: Low-heeled leather court shoes.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: low-heeled pumps
+    colour: black
+    plural: true
+    style:
+    - formal
+- schema: as.item.v1
+  id: fleece_jacket
+  name: fleece jacket
+  plural: fleece jackets
+  kind: clothing
+  mass_g: 500
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 8
+  description: A zip-front polar fleece jacket.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    words: fleece jacket
+    colour: navy
+    style:
+    - work
+    - outdoor
+    warmth: 2
+- schema: as.item.v1
+  id: t_shirt
+  name: T-shirt
+  plural: T-shirts
+  kind: clothing
+  mass_g: 180
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 2
+  description: A plain cotton T-shirt.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: T-shirt
+    colour: white
+    style:
+    - casual
+- schema: as.item.v1
+  id: leggings
+  name: pair of leggings
+  plural: pairs of leggings
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: Close-fitting stretch leggings.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: leggings
+    colour: black
+    plural: true
+    style:
+    - casual
+    - outdoor
+    warmth: 1
+- schema: as.item.v1
+  id: thermal_top
+  name: thermal top
+  plural: thermal tops
+  kind: clothing
+  mass_g: 300
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 5
+  description: A waffle-knit long-sleeved thermal.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    - arms
+    words: thermal top
+    colour: gray
+    style:
+    - outdoor
+    - work
+    warmth: 1
+- schema: as.item.v1
+  id: cargo_pants
+  name: pair of cargo pants
+  plural: pairs of cargo pants
+  kind: clothing
+  mass_g: 800
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 6
+  description: Heavy cotton trousers with thigh pockets.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: cargo pants
+    colour: khaki
+    plural: true
+    style:
+    - work
+    - tactical
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: running_jacket
+  name: running jacket
+  plural: running jackets
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 6
+  description: A light, close-cut shell for running in the cold.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    words: running jacket
+    colour: black
+    style:
+    - outdoor
+    warmth: 1
+- schema: as.item.v1
+  id: cargo_shorts
+  name: pair of cargo shorts
+  plural: pairs of cargo shorts
+  kind: clothing
+  mass_g: 350
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: Knee-length shorts with pockets.
+  clothing:
+    slot: legs
+    layer: outer
+    covers:
+    - groin
+    words: cargo shorts
+    colour: tan
+    plural: true
+    style:
+    - casual
+- schema: as.item.v1
+  id: button_down_shirt
+  name: button-down shirt
+  plural: button-down shirts
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: A pressed cotton shirt with short sleeves.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: short-sleeved button-down shirt
+    colour: white
+    style:
+    - work
+- schema: as.item.v1
+  id: work_pants
+  name: pair of work pants
+  plural: pairs of work pants
+  kind: clothing
+  mass_g: 700
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 5
+  description: Heavy twill trousers.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: work pants
+    colour: khaki
+    plural: true
+    style:
+    - work
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: apron
+  name: apron
+  plural: aprons
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 1
+  description: A canvas shop apron with a front pocket.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    words: store apron
+    colour: green
+    style:
+    - work
+- schema: as.item.v1
+  id: reading_glasses
+  name: pair of reading glasses
+  plural: pairs of reading glasses
+  kind: clothing
+  mass_g: 30
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 6
+  description: Half-moon reading glasses.
+  clothing:
+    slot: face
+    layer: mid
+    covers:
+    - face
+    words: reading glasses
+    plural: true
+- schema: as.item.v1
+  id: glasses
+  name: pair of glasses
+  plural: pairs of glasses
+  kind: clothing
+  mass_g: 30
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 12
+  description: Prescription glasses.
+  clothing:
+    slot: face
+    layer: mid
+    covers:
+    - face
+    words: glasses
+    plural: true
+- schema: as.item.v1
+  id: bandana
+  name: bandana
+  plural: bandanas
+  kind: clothing
+  mass_g: 40
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 1
+  description: A square of printed cotton tied over the hair.
+  clothing:
+    slot: head
+    layer: mid
+    covers:
+    - head
+    words: bandana
+    colour: red
+    style:
+    - casual
+- schema: as.item.v1
+  id: car_coat
+  name: car coat
+  plural: car coats
+  kind: clothing
+  mass_g: 1600
+  bulk: 2
+  tags:
+  - clothing
+  barter_value: 14
+  description: A hip-length leather coat.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    words: leather car coat
+    colour: brown
+    style:
+    - casual
+    warmth: 2
+    protection: 1
+- schema: as.item.v1
+  id: denim_jacket
+  name: denim jacket
+  plural: denim jackets
+  kind: clothing
+  mass_g: 900
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 6
+  description: A heavy denim jacket.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    words: denim jacket
+    colour: blue
+    style:
+    - casual
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: long_skirt
+  name: long skirt
+  plural: long skirts
+  kind: clothing
+  mass_g: 500
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: An ankle-length cotton skirt with sewn-in pockets.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: long skirt
+    colour: green
+    style:
+    - casual
+    warmth: 1
+- schema: as.item.v1
+  id: rubber_boots
+  name: pair of rubber boots
+  plural: pairs of rubber boots
+  kind: clothing
+  mass_g: 1400
+  bulk: 2
+  tags:
+  - clothing
+  barter_value: 6
+  description: Calf-high waterproof boots.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: rubber boots
+    colour: black
+    plural: true
+    style:
+    - outdoor
+    - work
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: skort
+  name: skort
+  plural: skorts
+  kind: clothing
+  mass_g: 200
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 2
+  description: A short athletic skirt with shorts sewn in.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    words: skort
+    colour: teal
+    style:
+    - casual
+- schema: as.item.v1
+  id: athletic_top
+  name: sports top
+  plural: sports tops
+  kind: clothing
+  mass_g: 120
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 2
+  description: A close-fitting athletic top.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: sports top
+    colour: pink
+    style:
+    - casual
+- schema: as.item.v1
+  id: scrubs
+  name: set of scrubs
+  plural: sets of scrubs
+  kind: clothing
+  mass_g: 500
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: A loose top and drawstring trousers in hospital cotton.
+  clothing:
+    slot: body
+    layer: mid
+    covers:
+    - torso
+    - groin
+    - legs
+    words: scrubs
+    colour: blue
+    plural: true
+    style:
+    - medical
+- schema: as.item.v1
+  id: clogs
+  name: pair of clogs
+  plural: pairs of clogs
+  kind: clothing
+  mass_g: 800
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: Molded rubber work clogs.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: clogs
+    colour: white
+    plural: true
+    style:
+    - medical
+    - work
+- schema: as.item.v1
+  id: parka
+  name: parka
+  plural: parkas
+  kind: clothing
+  mass_g: 1900
+  bulk: 3
+  tags:
+  - clothing
+  - outer
+  barter_value: 18
+  description: A long insulated parka with a fur-trimmed hood, hanging to mid-thigh.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    - arms
+    - groin
+    words: long parka
+    colour: olive
+    style:
+    - outdoor
+    warmth: 3
+    protection: 1
+    conceals: true
+- schema: as.item.v1
+  id: tank_top
+  name: tank top
+  plural: tank tops
+  kind: clothing
+  mass_g: 150
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 1
+  description: A sleeveless ribbed cotton undershirt.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: tank top
+    colour: white
+    style:
+    - casual
+- schema: as.item.v1
+  id: combat_boots
+  name: pair of combat boots
+  plural: pairs of combat boots
+  kind: clothing
+  mass_g: 1700
+  bulk: 2
+  tags:
+  - clothing
+  - footwear
+  barter_value: 18
+  description: Laced leather combat boots with thick lug soles.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: combat boots
+    colour: black
+    plural: true
+    style:
+    - tactical
+    - outdoor
+    warmth: 1
+    protection: 1
+- schema: as.item.v1
+  id: uniform_shirt
+  name: uniform shirt
+  plural: uniform shirts
+  kind: clothing
+  mass_g: 300
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 3
+  description: A pressed long-sleeved uniform shirt with epaulettes and a patch on each shoulder.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    - arms
+    words: uniform shirt
+    colour: navy
+    style:
+    - uniform
+- schema: as.item.v1
+  id: tactical_vest
+  name: tactical vest
+  plural: tactical vests
+  kind: clothing
+  mass_g: 2600
+  bulk: 4
+  tags:
+  - clothing
+  - outer
+  barter_value: 30
+  description: A nylon load-bearing vest with rows of magazine pouches and a padded collar.
+  clothing:
+    slot: torso
+    layer: outer
+    covers:
+    - torso
+    words: tactical vest
+    colour: black
+    style:
+    - tactical
+    protection: 2

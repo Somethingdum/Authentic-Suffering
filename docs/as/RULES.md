@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-606 ids; 353 with their own statement, 253 named only in context.
+613 ids; 360 with their own statement, 253 named only in context.
 
 
 ## ABUSE
@@ -184,7 +184,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CNT-01 | tooling exhaust or placeholders anywhere (`IGNORE_WHEN_COPYING`, `content_copy`, `Use code with caution`, `As an AI`, `[INSERT`, `TODO`, `lorem ipsum`) | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-02 | placeholder bodies: two people, factions, lore entries or quirks in one pack that become identical once digits are masked ("boilerplate plus an index") | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/core/infected/quirks.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-03 | duplicate ids across packs without an explicit `overrides:` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-04 | a ref that points at nothing (with a "Did you mean …?" when one is close) | 09_CONTENT_PACKS §9 | `as_engine/action/cascade.py`, `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
+| CNT-04 | a ref that points at nothing (with a "Did you mean …?" when one is close) | 09_CONTENT_PACKS §9 | `as_engine/action/cascade.py`, `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p02_space_bodies/test_looks.py` |
 | CNT-05 | a cue (trained response, knowledge cue, lore belief cue, affordance belief cue, quirk trigger) missing from every cue registry | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_wet_strain.py` |
 | CNT-06 | an affordance whose effect id the engine does not have | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/mind/affordance.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-07 | lore without truth and belief; a faction without truth_text and belief_text | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/templates/faction_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
@@ -192,11 +192,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CNT-09 | a plausibility expression that does not parse | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/world/worldgen/conditions.py` | `contract/p02_space_bodies/test_conditions_parse.py`, `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_params.py` |
 | CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/people.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/cheats/commands.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
+| CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p02_space_bodies/test_looks.py` |
 | CNT-13 | an infected type listing a quirk that is not written for it, or an override that changes which creature a type or quirk id means | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-14 | a `generation: cheat` dossier outside a pack whose id starts with `cheat_` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/cheat_admin/actors/fredrick.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-15 | a faction's `behaviour.council.seats` naming a seat none of its leaders holds, or two leaders sharing one seat | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p10_world/test_ghosts.py` |
 | CNT-16 | a quip key that names no plan, phase or sub-phase of the loading bar; a quip line that is empty or longer than 80 characters | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/content.py`, `as_engine/service/progress.py`, `as_content/packs/core/ui/quips.yaml` | `contract/p10_world/test_progress.py` |
+| CNT-17 | CNT-17 (F1a) looks: an actor or pc dossier without appearance.looks is a warning (others will see its height and build only). With looks, each an error on field 'appearance.looks.outfit[i]' / 'appearance.looks.outfit' /… | as_engine/content/pack.py | `as_engine/content/pack.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_looks.py` |
 
 ## CONFLICT
 
@@ -585,6 +586,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | LOD-01 | *est_wall_s = the final estimate. LOD never changes competence, knowledge or morality (LOD-01);* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/turn/cognition.py` | `contract/p05_many_actors/test_cues_and_continuation.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | LOD-02 | *(COLD, LOD-02) The same decision the actor made last time, still running. First match wins; the* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | — |
 
+## LOOK
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| LOOK-01 | LOOK-01 bodies.looks holds the body's contracts.dossier.Looks WITHOUT its outfit (JSON; NULL = height and build are all anyone sees): what anyone can see — hair, facial hair, eyes, complexion, visible marks (where and w… | as_engine/physical/bodies.py | `as_engine/contracts/dossier.py`, `as_engine/physical/bodies.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/opening.py` | `contract/p02_space_bodies/test_looks.py`, `contract/p10_world/test_dressed.py` |
+| LOOK-02 | LOOK-02 A worn item is an items row with holder_slot 'worn'; clothing is an item whose ItemDef has a ``clothing`` block (contracts.content.ClothingProps); its props may carry colour (overrides the block's colour), state… | as_engine/physical/objects.py | `as_engine/contracts/content.py`, `as_engine/contracts/dossier.py`, `as_engine/physical/objects.py`, `as_engine/world/worldgen/opening.py`, `as_content/packs/core/items/clothing.yaml` | `contract/p02_space_bodies/test_looks.py`, `contract/p10_world/test_dressed.py` |
+| LOOK-03 | LOOK-03 appearance_text(tx, holder_id, subject_id, level, distance_m) -> str: what the holder sees of the subject beyond describe()'s Ref, never naming what cannot be seen; built from L = physical.bodies.looks_of(subjec… | as_engine/mind/perception.py | `as_engine/mind/perception.py` | `contract/p03_perception/test_appearance.py` |
+| LOOK-04 | LOOK-04 Condition: bodies.grime / blood / gore (0..5) and wet (0..3) — what is on the body and its clothes; washed_at = when it was last washed (F1c). condition_of(store, body_id) -> BodyCondition(grime, blood, gore, we… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_looks.py` |
+| LOOK-05 | LOOK-05 appearance_cues(tx, holder_id, subject_id, level, distance_m) -> list[str] (F1a) What the subject's appearance tells the holder at a glance, sorted, from the same facts as mind.perception.appearance_text (level… | as_engine/mind/cues.py | `as_engine/mind/cues.py`, `as_content/packs/core/cues.yaml` | `contract/p03_perception/test_appearance.py`, `contract/p05_many_actors/test_appearance_cues.py` |
+| LOOK-06 | LOOK-06 (F1a) Everyone the holder sees now comes with what the holder sees of them: each entity 'here' carries PacketEntity.appearance (entities below — mind.perception.appearance_text at the best level and the distance… | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_appearance_in_packet.py` |
+
 ## LOOP
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -600,7 +612,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..16, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
+| LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..17, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 
 ## MEM
 
@@ -1028,7 +1040,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | VIS-01 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 | VIS-02 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
-| VIS-03 | *visual percept at clear: what shows what a hand holds, sense.optics VIS-03)* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py`, `contract/p04_one_actor/test_knowledge_menus.py` |
+| VIS-03 | *visual percept at clear: what shows what a hand holds, sense.optics VIS-03)* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py`, `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py`, `contract/p04_one_actor/test_knowledge_menus.py` |
 | VIS-04 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 
 ## WEAR

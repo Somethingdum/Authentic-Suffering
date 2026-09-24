@@ -116,13 +116,16 @@ Treatment (``treat``): method in {'pressure','packing','tourniquet','bandage','s
 
 P10 — bodies made during play, exposure, deaths nobody saw, and the dead that rise:
 create(tx, *, kind, sex, age_years, height_cm, mass_kg, special, at, turn_index, origin,
-       cause_event_id=None, awareness='awake', posture='standing', content_ref=None) -> str
+       cause_event_id=None, awareness='awake', posture='standing', content_ref=None, looks=None) -> str
   body_id = tx.mint('act'). One MATERIALIZE {body_id, kind, source: origin} (writer
   'physical.bodies', event origin 'worldgen' when ``origin`` (the bodies.origin value) is
   'worldgen', else 'sim'; actor_id = body_id) inserting bodies {body_id, kind, content_ref, sex, age_years, age_band =
   contracts.common.age_band_for(age_years) (NULL without an age), height_cm, mass_kg, alive 1, awareness,
   posture, blood_loss_pct 0, pain 0, impairment 0, restrained 0, special (JSON), progressed_at = at,
-  core_intact 1, origin} and, for kinds human, lurker and animal, needs {body_id, all stages 0,
+  core_intact 1, origin} — and (F1a) looks = ``looks`` (a contracts.dossier.Looks) as canonical JSON
+  of its model_dump(mode='json') with outfit [] (NULL when None; the outfit is items, dressed by
+  physical.objects.dress), and for kind 'infected' grime 5, blood 3, gore 5 (the dead are filthy
+  and caked in gore, LOOK-04; every other kind starts at 0) — and, for kinds human, lurker and animal, needs {body_id, all stages 0,
   last_drink_ms = last_meal_ms = last_sleep_ms = at}. origin in bodies.origin's CHECK values
   (ValueError otherwise). Returns body_id.
 expose(tx, rng, body_id, pathway, exposure, at, cause_event_id, turn_index) -> Event | None
@@ -140,14 +143,35 @@ die(tx, rng, body_id, at, cause_event_id, turn_index, *, cause='offscreen') -> E
 rise(tx, corpse_id, type_id, at, cause_event_id, turn_index) -> str   (world.infected.rise)
   A new body: create(kind 'infected', sex / age_years / height_cm / mass_kg from the corpse,
   special = {letter: (lo + hi) // 2} of the canon infected type, origin 'reanimation',
-  cause_event_id) — the corpse stays a dead body (its history is its own); the new body is what got
-  up. Returns the new body id. (world.infected moves it into the corpse's place and gives it the
-  corpse's things.)
+  cause_event_id, looks = looks_of(corpse) (F1a: the face people knew)) — the corpse stays a dead
+  body (its history is its own); the new body is what got up. Returns the new body id.
+  (world.infected moves it into the corpse's place and gives it the corpse's things.)
 stages(store, body_id) -> list[tuple[str, InfectionStage]]   (what each infection is doing to the
   host now: mind.cues signs, the packet's and the narrator's felt lines, action.effects mouth
   contact, turn.cognition compulsion)
   Per infections row of the body, by pathway: (pathway, the canon pathway record's stage whose name
   is the row's stage — as ``progress`` last left it). No rows -> [].
+
+F1a — how a body looks and what is on it (the owner: "never judge a book by its cover is a bold-faced
+lie"; everyone and everything has a visual identity, and it helps people judge each other):
+LOOK-01 bodies.looks holds the body's contracts.dossier.Looks WITHOUT its outfit (JSON; NULL = height
+  and build are all anyone sees): what anyone can see — hair, facial hair, eyes, complexion, visible
+  marks (where and what, never how). create(..., looks=None) writes it (the dossier's
+  appearance.looks, or a scenario body's looks); rise copies the corpse's; the
+  dossier's prose appearance fields are the person's own (mind.identity) and never describe them to
+  anyone else.
+  looks_of(store, body_id) -> Looks | None: the parsed column (outfit empty — what is worn is items,
+  physical.objects.worn).
+LOOK-04 Condition: bodies.grime / blood / gore (0..5) and wet (0..3) — what is on the body and its
+  clothes; washed_at = when it was last washed (F1c).
+  condition_of(store, body_id) -> BodyCondition(grime, blood, gore, wet, washed_at).
+  soil(tx, body_id, *, grime=0, blood=0, gore=0, wet=0, source, at, cause_event_id, turn_index)
+    -> Event | None: each value += its argument, clamped to its range (arguments may be negative);
+    nothing changes -> None. Else BODY_CONDITION {body_id, grime, blood, gore, wet, source} (the new
+    values; writer 'physical.bodies', actor_id = body_id, cause as given) updating bodies. ``source``
+    is a short reason ('harm', 'rain', 'smeared', 'washed'). A new body starts at 0 everywhere, an
+    infected one at grime 5, blood 3, gore 5 (create).
+  (Who gets bloodied by what, grime that builds while unwashed, rain, washing and changing: F1c.)
 """
 
 from __future__ import annotations
@@ -159,6 +183,7 @@ from ..contracts.common import Anatomy, WoundSeverity, WoundType
 from ..contracts.events import Event
 
 if TYPE_CHECKING:
+    from ..contracts.dossier import Looks
     from ..kernel.rng import Rng
     from ..kernel.store import Store, Tx
 
@@ -709,7 +734,10 @@ def refresh_need(tx: "Tx", body_id: str, need: str, at: int, cause_event_id: str
 # ------------------------------------------------------------------------------------------ P10
 def create(tx: "Tx", *, kind: str, sex: str | None, age_years: int | None, height_cm: int, mass_kg: int,
            special: dict, at: int, turn_index: int, origin: str, cause_event_id: str | None = None,
-           awareness: str = "awake", posture: str = "standing", content_ref: str | None = None) -> str:
+           awareness: str = "awake", posture: str = "standing", content_ref: str | None = None,
+           looks: "Looks | None" = None) -> str:
+    if looks is not None:
+        raise NotImplementedError("P2")      # F1a LOOK-01: write bodies.looks
     from ..contracts.common import age_band_for
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     if origin not in ("worldgen", "birth", "materialize", "cheat", "reanimation", "scenario"):
@@ -778,3 +806,25 @@ def stages(store: "Store | Tx", body_id: str) -> list[tuple[str, "InfectionStage
         if st is not None:
             out.append((r[0], st))
     return out
+
+
+@dataclass(frozen=True)
+class BodyCondition:
+    grime: int
+    blood: int
+    gore: int
+    wet: int
+    washed_at: int
+
+
+def looks_of(store: "Store | Tx", body_id: str) -> "Looks | None":
+    raise NotImplementedError("P2")
+
+
+def condition_of(store: "Store | Tx", body_id: str) -> BodyCondition:
+    raise NotImplementedError("P2")
+
+
+def soil(tx: "Tx", body_id: str, *, grime: int = 0, blood: int = 0, gore: int = 0, wet: int = 0, source: str,
+         at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
+    raise NotImplementedError("P2")

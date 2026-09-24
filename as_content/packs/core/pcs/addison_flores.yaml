@@ -30,6 +30,19 @@ appearance:
   movement_under_stress: Goes up and away — to a ledge, a fence, a roof — before she has decided anything; her feet decide first.
   habit_gesture: Taps out routes on her thigh with two fingers while she listens, as if tracing a map.
   relation_to_appearance: Likes looking cute and keeps the perfume for days that matter; mostly she dresses for heat and climbing.
+  looks:
+    hair_colour: dark brown
+    hair_length: long
+    hair_style: tied up in a high messy knot
+    eye_colour: brown
+    complexion: "warm tan, sun-browned skin"
+    marks:
+      - {what: "fresh scrapes", where: "across the knees and knuckles", shows: near}
+      - {what: "callused palms and fingertips", where: "on both hands", shows: close}
+    outfit:
+      - {item: "core:item/athletic_top"}
+      - {item: "core:item/skort"}
+      - {item: "core:item/running_shoes"}
 capability:
   special: {S: 5, P: 7, E: 7, C: 7, I: 5, A: 9, L: 6}
   skills:
@@ -173,11 +186,9 @@ starting_inventory:
   - {item: "core:item/medkit", slot: pack, container: pack, props: {note: "Scavenged."}}
   - {item: "core:item/perfume", slot: pack, container: pack, props: {note: "Real, intact, kept carefully."}}
   - {item: "core:item/toiletries", slot: pack, container: pack, props: {note: "Travel-size deodorant, soap and shampoo."}}
-  - {item: "core:item/summer_clothes", slot: worn, props: {note: "Teal skort and pink sports bra."}}
   - {item: "core:item/windbreaker", slot: pack, container: pack, props: {note: "Oversized."}}
   - {item: "core:item/spare_clothes", slot: pack, container: pack, props: {note: "A short skirt, a spare sports bra, spare underwear."}}
   - {item: "core:item/lighter", slot: pocket, props: {note: "Needs replacing often."}}
-  - {item: "core:item/running_shoes", slot: worn}
 writers_notes: She acts on impulse and habit, never on strategy — never write her as robotic or calculating. The Glock came off a body near a gun store on the first day; she has read the manual and nothing else, is not a marksman, and would rather not use it.
 tags: [pc, canon_cmg_61]
 card:

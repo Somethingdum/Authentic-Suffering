@@ -26,6 +26,19 @@ appearance:
   movement_under_stress: Freezes first, then goes small and still wherever he is — under a desk, behind his mother's legs — and holds his breath.
   habit_gesture: Rubs the dinosaur on his hand with his thumb, the same way his mother rubs her eyebrow.
   relation_to_appearance: Proud of the missing tooth; wants his hair long like Nita's.
+  looks:
+    hair_colour: dirty blond
+    hair_length: short
+    hair_style: cut unevenly
+    eye_colour: gray
+    complexion: pale skin
+    marks:
+      - {what: "a gap in the upper teeth", where: "on the left side", shows: close}
+      - {what: "a faded dinosaur temporary tattoo", where: "on the back of the right hand", shows: close}
+    outfit:
+      - {item: "core:item/hooded_sweatshirt", colour: gray}
+      - {item: "core:item/jeans"}
+      - {item: "core:item/sneakers"}
 capability:
   special: {S: 2, P: 7, E: 4, C: 5, I: 6, A: 6, L: 5}
   skills:

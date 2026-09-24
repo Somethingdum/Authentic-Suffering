@@ -58,7 +58,29 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
   fire or scream model yet); whisper_seen, sudden_silence (P7 observed_social); shift_change,
   ration_cut (P9). Belief cues ('knows_*') are HELD, not present: mind.affordance reads them from
   lessons (AFF-10).
+  F1a: plus appearance_cues(tx, holder_id, B, level, physical.space.point_distance(holder, B))
+  for every other body B that is the source_id of one of the holder's visual percept_log rows of
+  this turn (turn_index, at <= ``at``) at level clear or partial — level = the best of them
+  ('clear' over 'partial').
 Returns the set; pure (reads only).
+
+LOOK-05 appearance_cues(tx, holder_id, subject_id, level, distance_m) -> list[str]   (F1a)
+  What the subject's appearance tells the holder at a glance, sorted, from the same facts as
+  mind.perception.appearance_text (level 'silhouette' / 'none' -> []). KEY = the SHOWN piece at
+  'torso', else the SHOWN 'body' piece (appearance_text's SHOWN; None without looks):
+  visibly_armed      clear only (a partial look shows no hands, VIS-03): an item of
+                     physical.objects.visible_gear whose ItemDef has a firearm or melee block
+  uniformed          clear or partial: KEY's style has 'uniform' or 'tactical'
+  formally_dressed   clear or partial: KEY's style has 'formal'
+  wearing_insignia   clear only: a SHOWN piece carries an insignia
+  bloodied           blood >= 3 at clear, >= 4 at partial
+  gore_covered       gore >= 2 at clear, >= 4 at partial
+  filthy             clear only: grime >= 4
+  soaked             clear only: wet >= 2
+  half_dressed       clear or partial: looks recorded, 'torso' not covered, 'groin' covered
+  naked              clear or partial: looks recorded, neither 'torso' nor 'groin' covered
+  (A body whose looks are not recorded is never half_dressed or naked.) The cue ids are in the
+  core registry (as_content/packs/core/cues.yaml).
 """
 
 from __future__ import annotations
@@ -76,6 +98,16 @@ SENSORY_CUES_P5: frozenset[str] = frozenset({
 })
 
 
+APPEARANCE_CUES: frozenset[str] = frozenset({
+    "visibly_armed", "uniformed", "formally_dressed", "wearing_insignia", "bloodied", "gore_covered",
+    "filthy", "soaked", "half_dressed", "naked",
+})
+
+
 def cues_of(tx: "Tx", holder_id: str, turn_index: int, at: int) -> set[str]:
     raise NotImplementedError("P5")
+
+
+def appearance_cues(tx: "Tx", holder_id: str, subject_id: str, level: str, distance_m: float) -> list[str]:
+    raise NotImplementedError("P3")
 from ..action._impl_p5a import cues_of  # noqa

@@ -26,6 +26,22 @@ appearance:
   movement_under_stress: Hunches and backs away with his hands half up, apologising before anyone accuses him of anything.
   habit_gesture: Pulls the lanyard out from under his shirt and runs it through his fingers.
   relation_to_appearance: Ashamed of it; he thinks he looks like a bum and that anyone who sees him will assume the worst.
+  looks:
+    hair_colour: brown
+    hair_length: collar
+    hair_style: grown out and matted
+    facial_hair: beard
+    facial_hair_words: "a scraggly three-week beard"
+    eye_colour: red-rimmed pale blue
+    complexion: "white skin sunburned across the back of the neck"
+    marks:
+      - {what: "a faded lanyard cord", where: "at the collar", shows: near}
+      - {what: "a black thumbnail", where: "on the right hand", shows: close}
+    outfit:
+      - {item: "core:item/work_jacket", colour: brown}
+      - {item: "core:item/polo_shirt"}
+      - {item: "core:item/jeans", state: torn}
+      - {item: "core:item/boots"}
 capability:
   special: {S: 6, P: 5, E: 5, C: 4, I: 5, A: 4, L: 3}
   skills:
@@ -151,7 +167,5 @@ starting_loops:
   - {kind: plan, text: "Get into Delgado's store", strength: 2}
 starting_inventory:
   - {item: "core:item/steel_pipe", slot: hand_r}
-  - {item: "core:item/work_jacket", slot: worn}
-  - {item: "core:item/boots", slot: worn}
 writers_notes: The anchor scene's stranger. He is not a threat by nature; he becomes one only if every door is shut in his face. What the crew does with him is the scene's real question.
 tags: [anchor_scene, stranger]

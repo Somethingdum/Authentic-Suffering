@@ -209,6 +209,7 @@
   tags: [clothing, outer]
   barter_value: 5
   description: An oversized nylon windbreaker.
+  clothing: {slot: torso, layer: outer, covers: [torso, arms], words: windbreaker, style: [outdoor], warmth: 1}
 - schema: as.item.v1
   id: work_jacket
   name: canvas work jacket
@@ -219,6 +220,7 @@
   tags: [clothing, outer, bite_resistant]
   barter_value: 14
   description: Heavy duck canvas, stiff enough to turn a scratch.
+  clothing: {slot: torso, layer: outer, covers: [torso, arms], words: work jacket, colour: tan, style: [work], warmth: 2, protection: 1}
 - schema: as.item.v1
   id: boots
   name: pair of boots
@@ -229,6 +231,7 @@
   tags: [clothing, footwear]
   barter_value: 16
   description: Work boots resoled with tyre rubber.
+  clothing: {slot: feet, layer: mid, covers: [feet], words: work boots, colour: brown, plural: true, style: [work, outdoor], warmth: 1, protection: 1}
 - schema: as.item.v1
   id: running_shoes
   name: pair of running shoes
@@ -239,6 +242,7 @@
   tags: [clothing, footwear, quiet]
   barter_value: 10
   description: Trail runners, patched at the toes.
+  clothing: {slot: feet, layer: mid, covers: [feet], words: running shoes, plural: true, style: [casual, outdoor]}
 - schema: as.item.v1
   id: summer_clothes
   name: set of summer clothes
@@ -249,6 +253,7 @@
   tags: [clothing]
   barter_value: 3
   description: Light athletic clothes for heat — a skort and a sports top, or shorts and a tank.
+  clothing: {slot: body, layer: mid, covers: [torso, groin], words: light summer clothes, plural: true, style: [casual]}
 - schema: as.item.v1
   id: spare_clothes
   name: bundle of spare clothes
@@ -259,6 +264,7 @@
   tags: [clothing]
   barter_value: 3
   description: A change of clothes rolled tight.
+  clothing: {slot: body, layer: mid, covers: [torso, arms, groin, legs], words: plain spare clothes, plural: true, style: [casual], warmth: 1}
 - schema: as.item.v1
   id: perfume
   name: bottle of perfume

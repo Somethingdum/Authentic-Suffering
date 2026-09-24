@@ -70,6 +70,33 @@ contaminate(tx, item_id, pathway, body_id, at, cause_event_id, turn_index) -> Ev
 contaminated(store, item_id, at) -> dict | None: the item's props.contaminated while at - its at <=
   RulesConfig.infected.saliva_hours hours (saliva dries out; [SAND]), else None (no mark, too old,
   or no such item).
+
+F1a — clothing.
+LOOK-02 A worn item is an items row with holder_slot 'worn'; clothing is an item whose ItemDef has a
+  ``clothing`` block (contracts.content.ClothingProps); its props may carry colour (overrides the
+  block's colour), state ('clean' | 'worn' | 'soiled' | 'torn'; 'worn' when absent) and insignia (a
+  mark anyone can see). A person placed in the world is dressed in their looks' outfit (dress).
+CLOTHING_SLOT_ORDER = ('head', 'face', 'neck', 'torso', 'body', 'legs', 'hands', 'feet');
+  CLOTHING_LAYER_ORDER = ('outer', 'mid', 'under').
+worn(store, body_id) -> list[dict]: the body's worn items as {item_id, def_ref, name (ItemDef.name),
+  clothing (the ClothingProps' model_dump(mode='json'), or None), colour, state, insignia} —
+  clothing first, by (CLOTHING_SLOT_ORDER index, CLOTHING_LAYER_ORDER index, item_id); then the
+  worn items without a clothing block (a holster, a pack), by item_id. colour = props.colour,
+  else the block's colour, else ''; state = props.state, else 'worn'; insignia = props.insignia,
+  else None.
+coverage(store, body_id) -> set[str]: the union of ``covers`` of the worn clothing (a torn piece
+  still covers).
+visible_gear(store, body_id) -> list[str]: the item ids anyone looking at the body can see, in
+  this order — the items in hand_l, then hand_r; then the worn items without a clothing block,
+  by item_id, except that one whose ItemDef.bulk <= 2 (a holstered handgun, a knife on a belt)
+  is hidden while the body wears clothing with conceals true at layer 'outer' covering 'torso'
+  (a long parka). Pockets and what is inside a container are never seen.
+dress(tx, body_id, outfit, at, cause_event_id, turn_index, origin) -> list[str]
+  For each OutfitPiece in order: create(tx, piece.item, 1, Holder('body', body_id, 'worn'), origin,
+  props = {colour, state, insignia} with the None ones left out, at, cause_event_id, turn_index,
+  event_origin = 'worldgen' when origin is 'worldgen', 'system' when it is 'scenario', else 'sim').
+  Returns the new items' ids (each ITEM_CREATED's item), in order. (The scenario loader dresses a
+  body given ``dress: true``; world.worldgen.opening dresses the PC.)
 """
 
 from __future__ import annotations
@@ -439,3 +466,24 @@ def contaminated(store: "Store | Tx", item_id: str, at: int) -> dict | None:
     if at - c["at"] > rules.infected.saliva_hours * 3_600_000:
         return None
     return c
+
+
+CLOTHING_SLOT_ORDER = ("head", "face", "neck", "torso", "body", "legs", "hands", "feet")
+CLOTHING_LAYER_ORDER = ("outer", "mid", "under")
+
+
+def worn(store: "Store | Tx", body_id: str) -> list[dict]:
+    raise NotImplementedError("P2")
+
+
+def coverage(store: "Store | Tx", body_id: str) -> set[str]:
+    raise NotImplementedError("P2")
+
+
+def visible_gear(store: "Store | Tx", body_id: str) -> list[str]:
+    raise NotImplementedError("P2")
+
+
+def dress(tx: "Tx", body_id: str, outfit: list, at: int, cause_event_id: str | None, turn_index: int,
+          origin: str) -> list[str]:
+    raise NotImplementedError("P2")

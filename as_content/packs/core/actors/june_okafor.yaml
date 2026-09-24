@@ -26,6 +26,19 @@ appearance:
   movement_under_stress: Talks faster and louder, then catches herself and whispers; her hands keep doing whatever they were doing, counting or folding.
   habit_gesture: Taps the corner of her glasses twice before she says something she is not sure of.
   relation_to_appearance: Wears the badge on purpose; it is the only thing left that says what she was.
+  looks:
+    hair_colour: black
+    hair_length: short
+    hair_style: in natural coils
+    eye_colour: dark brown
+    complexion: deep brown skin
+    outfit:
+      - {item: "core:item/bandana", colour: faded purple}
+      - {item: "core:item/glasses", colour: cracked tortoiseshell}
+      - {item: "core:item/fleece_jacket", insignia: "a pharmacy name badge reading JUNE — HERE TO HELP"}
+      - {item: "core:item/t_shirt"}
+      - {item: "core:item/leggings"}
+      - {item: "core:item/sneakers"}
 capability:
   special: {S: 4, P: 5, E: 4, C: 6, I: 6, A: 4, L: 5}
   skills:

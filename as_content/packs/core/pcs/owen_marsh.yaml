@@ -27,6 +27,21 @@ appearance:
   movement_under_stress: Slows down and gets methodical — checks the door, the ceiling, the floor — the way he was taught on fire calls; his breathing gets loud through his nose.
   habit_gesture: Thumbs the edge of the axe head to check it, whether or not it needs checking.
   relation_to_appearance: Doesn't care; the scars on his hands are the only thing he's proud of.
+  looks:
+    hair_colour: graying red
+    hair_length: cropped
+    facial_hair: mustache
+    facial_hair_words: "a thick mustache"
+    eye_colour: green
+    complexion: "pale skin weathered red across the face and neck"
+    marks:
+      - {what: "burn scars", where: "across the backs of both hands", shows: near}
+      - {what: "a half-faded trucking company tattoo", where: "on the right forearm", shows: near}
+    outfit:
+      - {item: "core:item/work_jacket"}
+      - {item: "core:item/t_shirt", colour: gray, insignia: "a volunteer fire department crest, washed gray"}
+      - {item: "core:item/jeans"}
+      - {item: "core:item/boots"}
 capability:
   special: {S: 8, P: 5, E: 7, C: 4, I: 5, A: 4, L: 4}
   skills:
@@ -154,8 +169,6 @@ starting_inventory:
   - {item: "core:item/fire_axe", slot: hand_r, label: axe}
   - {item: "core:item/pocket_knife", slot: pocket}
   - {item: "core:item/hiking_pack", slot: worn, label: pack}
-  - {item: "core:item/work_jacket", slot: worn}
-  - {item: "core:item/boots", slot: worn}
   - {item: "core:item/duct_tape", slot: pack, container: pack}
   - {item: "core:item/bandage_roll", qty: 2, slot: pack, container: pack}
   - {item: "core:item/water_bottle", slot: pack, container: pack}

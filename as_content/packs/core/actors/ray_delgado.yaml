@@ -26,6 +26,21 @@ appearance:
   movement_under_stress: Plants himself in the middle of the room and gets louder, as if volume were authority; his hands go to his apron pockets.
   habit_gesture: Turns his wedding ring with his thumb while he listens to anyone ask for anything.
   relation_to_appearance: Still combs his hair and tucks his shirt every morning because a store owner does, and the day he stops, he knows the store is gone.
+  looks:
+    hair_colour: iron gray
+    hair_length: short
+    hair_style: combed straight back
+    eye_colour: bloodshot brown
+    complexion: "tan skin deeply lined at the eyes"
+    marks:
+      - {what: "a gold wedding band", where: "on the left hand", shows: close}
+      - {what: "a missing fingertip", where: "on the left ring finger", shows: close}
+      - {what: "liver spots", where: "on the backs of both hands", shows: close}
+    outfit:
+      - {item: "core:item/reading_glasses"}
+      - {item: "core:item/apron"}
+      - {item: "core:item/button_down_shirt"}
+      - {item: "core:item/work_pants"}
 capability:
   special: {S: 5, P: 5, E: 4, C: 6, I: 6, A: 3, L: 4}
   skills:

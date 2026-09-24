@@ -329,6 +329,12 @@ CREATE TABLE bodies (
   progressed_at INTEGER NOT NULL DEFAULT 0,   -- world time up to which bodies.progress() has run this body's clocks
   false_dead_until INTEGER,          -- infected only: lies still until this time (FALSE_DEATH), then REANIMATION
   core_intact  INTEGER NOT NULL DEFAULT 1,   -- infected only: 0 once the brainstem/upper spine is destroyed (true death)
+  looks        TEXT,                          -- F1a: JSON contracts.dossier.Looks without outfit (what anyone can see); NULL = height and build only
+  grime        INTEGER NOT NULL DEFAULT 0 CHECK (grime BETWEEN 0 AND 5),   -- F1a condition (LOOK-04)
+  blood        INTEGER NOT NULL DEFAULT 0 CHECK (blood BETWEEN 0 AND 5),
+  gore         INTEGER NOT NULL DEFAULT 0 CHECK (gore BETWEEN 0 AND 5),    -- the fluids of the dead on skin and clothes
+  wet          INTEGER NOT NULL DEFAULT 0 CHECK (wet BETWEEN 0 AND 3),
+  washed_at    INTEGER NOT NULL DEFAULT 0,
   origin       TEXT NOT NULL DEFAULT 'worldgen' CHECK (origin IN ('worldgen','birth','materialize','cheat','reanimation','scenario'))
 );
 

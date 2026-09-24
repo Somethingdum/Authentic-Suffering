@@ -1,4 +1,4 @@
-"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..16, LORE-01.
+"""Content packs: load, validate, lint, compile (P2). Rules CNT-00..17, LORE-01.
 docs/as/09_CONTENT_PACKS.md is the authoring guide; this docstring is the machine contract.
 
 Folder layout (every folder optional except pack.yaml):
@@ -85,8 +85,8 @@ Validation (CNT-*), each error names file + field in plain language:
          understood; see that module). It runs on the raw YAML mapping, so a record that also
          fails its contract is still checked.
   CNT-12 items: kind firearm requires `firearm`, melee requires `melee`, container requires
-         `container`, food `food`, water `water`, medical `medical`; a block that does not belong
-         to the kind (e.g. `firearm` on a tool) is an error too.
+         `container`, food `food`, water `water`, medical `medical`, clothing `clothing` (F1a);
+         a block that does not belong to the kind (e.g. `firearm` on a tool) is an error too.
   CNT-13 infected ids are stable: an InfectedTypeDef may list only quirks whose applies_to names
          it or a type it inherits from, and a quirk or type id redefined through `overrides:` must
          keep its applies_to / inherits unchanged.
@@ -97,6 +97,14 @@ Validation (CNT-*), each error names file + field in plain language:
   CNT-16 (P10) a QuipList's keys each name a progress plan (service.progress.PLANS: kind), one of
          its phases (f"{kind}.{phase}") or a sub-phase of that phase (f"{kind}.{phase}.{sub}"); no
          line is empty or longer than 80 characters.
+  CNT-17 (F1a) looks: an actor or pc dossier without appearance.looks is a warning (others will
+         see its height and build only). With looks, each an error on field
+         'appearance.looks.outfit[i]' / 'appearance.looks.outfit' / 'starting_inventory[i]':
+         an outfit item that resolves (CNT-04 reports one that does not) but has no clothing
+         block; an outfit whose clothing does not cover both 'torso' and 'groin' (the message
+         names what is uncovered: a person is never created naked by accident); a
+         starting_inventory grant in slot 'worn' whose item has a clothing block (the outfit is
+         what they wear — one list; clothing carried in a pack is fine).
 Severity: every code is 'error' except the CNT-08 retired-name case and the unknown-folder case
   (code CNT-00, 'warning'). load_canon's Canon contains only records that loaded; callers treat
   any error as fatal (the conftest canon fixture asserts there are none for core).

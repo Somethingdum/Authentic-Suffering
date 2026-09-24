@@ -29,6 +29,19 @@ appearance:
   movement_under_stress: Gets happier and slower — plants his feet, rolls his shoulders, grins — and walks toward the problem.
   habit_gesture: Flexes one bicep absently while thinking, then pats it as if thanking it.
   relation_to_appearance: Adores it; considers his body a public service.
+  looks:
+    hair_colour: blond
+    hair_length: short
+    hair_style: shaved at the sides into a flat top
+    eye_colour: pale blue
+    complexion: "fair skin tanned orange and freckled across the shoulders"
+    marks:
+      - {what: "a crowned white eagle tattoo", where: "across the shoulders and back", shows: near}
+      - {what: "a gap", where: "between the front teeth", shows: close}
+    outfit:
+      - {item: "core:item/tank_top", state: worn}
+      - {item: "core:item/cargo_shorts", colour: olive}
+      - {item: "core:item/combat_boots"}
 capability:
   special: {S: 10, P: 10, E: 10, C: 8, I: 9, A: 8, L: 10}
   skills:
