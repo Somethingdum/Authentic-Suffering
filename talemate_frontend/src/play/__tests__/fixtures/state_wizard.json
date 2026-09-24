@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "state",
+  "data": {
+    "screen": "wizard",
+    "run_id": null,
+    "busy": false
+  }
+}

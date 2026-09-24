@@ -1,0 +1,10 @@
+{
+  "type": "as_game",
+  "action": "progress_done",
+  "data": {
+    "job_id": "worldgen-1",
+    "kind": "worldgen",
+    "ok": true,
+    "elapsed_s": 129.2
+  }
+}

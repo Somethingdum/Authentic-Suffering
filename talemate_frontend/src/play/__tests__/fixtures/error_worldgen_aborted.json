@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "error",
+  "data": {
+    "code": "worldgen_aborted",
+    "message": "Hal Brandt cannot survive the start this world gives them at Normal. Try one difficulty lower, another character, or another era.",
+    "recoverable": true
+  }
+}

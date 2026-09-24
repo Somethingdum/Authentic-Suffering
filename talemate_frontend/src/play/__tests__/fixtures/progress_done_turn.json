@@ -1,0 +1,10 @@
+{
+  "type": "as_game",
+  "action": "progress_done",
+  "data": {
+    "job_id": "turn-42",
+    "kind": "turn",
+    "ok": true,
+    "elapsed_s": 31.6
+  }
+}

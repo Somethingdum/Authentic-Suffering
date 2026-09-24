@@ -112,7 +112,18 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
       An era that cannot fit the chosen character is disabled *with the reason shown*.
 - [ ] Step 3: the house rules read as plain choices; "More options" shows the rest.
 - [ ] Step 4 → **Build the world**: the progress screen shows a friendly label, a percentage and a
-      time estimate that moves. Cancel returns to the wizard without leaving a half-made run.
+      time estimate that moves. Cancel returns to the wizard — with every choice you made still
+      there — without leaving a half-made run.
+- [ ] The loading bar while the world builds: every step of the plan is listed in order, the one it
+      is on is lit, a plain label says what it is doing ("Writing the people down", with "2 of 12"
+      while it waits on the models), and a line under it changes every couple of seconds — a joke
+      about that step, never a hint about your world, and never one of the last three lines again.
+- [ ] The same bar during a turn ("Your move": Reading your move → … → Saving), and — after you have
+      read for a while — "Everyone else catches up" first, counting what is left. It never names
+      anyone or says how many people are thinking (Developer mode may).
+- [ ] An era your character cannot live in is greyed out in step 2 with the reason ("Addison's story
+      needs a world 9-11 years after the Fall."); a days-since-the-Fall number outside the range
+      is refused with the range.
 - [ ] Build it for real (Standard detail). It finishes and opens Play.
 - [ ] Make a run in **Ironman**: there is no Save button and no Load; closing the tab and choosing
       Continue picks up at the latest autosave.

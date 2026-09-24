@@ -1,0 +1,18 @@
+{
+  "type": "as_game",
+  "action": "progress",
+  "data": {
+    "job_id": "turn-42",
+    "kind": "turn",
+    "phase": "minds",
+    "phase_index": 2,
+    "sub": "decide",
+    "sub_label": "People decide",
+    "done": null,
+    "total": null,
+    "pct": 20.0,
+    "elapsed_s": 6.5,
+    "eta_s": 26,
+    "detail": null
+  }
+}

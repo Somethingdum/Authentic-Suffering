@@ -1,0 +1,53 @@
+{
+  "type": "as_game",
+  "action": "pcs",
+  "data": {
+    "cards": [
+      {
+        "ref": "core:pc/addison_flores",
+        "display_name": "Addison Flores",
+        "one_line_identity": "Small, warm, physically competent runner-scavenger",
+        "survives_by": "Gets to places others can't reach, trades what she finds",
+        "starts_as": "Adjacent — known and valued by local groups, not embedded",
+        "note": "Her trade economy requires someone to trade with. Extreme isolation breaks her.",
+        "source": "pack",
+        "warnings": [],
+        "world_age_days": [
+          3287,
+          4018
+        ],
+        "world_age_note": "Addison's story needs a world 9-11 years after the Fall."
+      },
+      {
+        "ref": "core:pc/owen_marsh",
+        "display_name": "Owen Marsh",
+        "one_line_identity": "Big, slow, steady ex-trucker and firefighter with an axe",
+        "survives_by": "Breaks into buildings and clears them for food and a floor",
+        "starts_as": "Alone — nobody is expecting them",
+        "note": "Strong and hard to kill up close. Slow on his feet, and lonely by habit.",
+        "source": "pack",
+        "warnings": [],
+        "world_age_days": [
+          14,
+          3650
+        ],
+        "world_age_note": "Owen's story needs a world 0-10 years after the Fall."
+      },
+      {
+        "ref": "core:pc/ruth_castillo",
+        "display_name": "Ruth Castillo",
+        "one_line_identity": "Veteran ER nurse inside a faction's clinic",
+        "survives_by": "Saves the ones who can be saved; the faction protects her because of it",
+        "starts_as": "Inside — a sworn member of a faction",
+        "note": "She needs the faction's medicine and its walls. Alone, she is a slow old woman.",
+        "source": "pack",
+        "warnings": [],
+        "world_age_days": [
+          400,
+          3650
+        ],
+        "world_age_note": "Ruth's story needs a world 1-10 years after the Fall."
+      }
+    ]
+  }
+}

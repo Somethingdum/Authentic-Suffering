@@ -1,0 +1,40 @@
+{
+  "type": "as_game",
+  "action": "progress_plan",
+  "data": {
+    "job_id": "quiet_hours-42",
+    "kind": "quiet_hours",
+    "title": "Everyone else catches up",
+    "phases": [
+      {
+        "id": "quiet",
+        "label": "Everyone else catches up",
+        "weight": 100,
+        "subs": [
+          {
+            "id": "jobs",
+            "label": "Thinking it over"
+          }
+        ]
+      }
+    ],
+    "quips": {
+      "quiet_hours": [
+        "Other people had a long day too.",
+        "The world does not wait for you.",
+        "Lives in the next room, going on."
+      ],
+      "quiet_hours.quiet": [
+        "Letting the day sink in.",
+        "Other lives, going on.",
+        "Nobody pauses when you look away."
+      ],
+      "quiet_hours.quiet.jobs": [
+        "Sleeping on it.",
+        "Old conversations, replayed.",
+        "Somebody is changing their mind.",
+        "Rehearsing what they should have said."
+      ]
+    }
+  }
+}

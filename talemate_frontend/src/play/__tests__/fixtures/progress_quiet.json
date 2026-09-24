@@ -1,0 +1,18 @@
+{
+  "type": "as_game",
+  "action": "progress",
+  "data": {
+    "job_id": "quiet_hours-42",
+    "kind": "quiet_hours",
+    "phase": "quiet",
+    "phase_index": 0,
+    "sub": "jobs",
+    "sub_label": "Thinking it over",
+    "done": 1,
+    "total": 3,
+    "pct": 33.3,
+    "elapsed_s": 1.5,
+    "eta_s": 3,
+    "detail": null
+  }
+}

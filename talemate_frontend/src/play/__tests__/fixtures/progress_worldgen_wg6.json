@@ -1,0 +1,18 @@
+{
+  "type": "as_game",
+  "action": "progress",
+  "data": {
+    "job_id": "worldgen-1",
+    "kind": "worldgen",
+    "phase": "WG6",
+    "phase_index": 6,
+    "sub": "dossiers",
+    "sub_label": "Writing the people down",
+    "done": 2,
+    "total": 3,
+    "pct": 66.7,
+    "elapsed_s": 99.2,
+    "eta_s": 50,
+    "detail": null
+  }
+}

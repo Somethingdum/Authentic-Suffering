@@ -1,0 +1,18 @@
+{
+  "type": "as_game",
+  "action": "progress",
+  "data": {
+    "job_id": "worldgen-1",
+    "kind": "worldgen",
+    "phase": "WG2",
+    "phase_index": 2,
+    "sub": null,
+    "sub_label": null,
+    "done": null,
+    "total": null,
+    "pct": 7.0,
+    "elapsed_s": 17.8,
+    "eta_s": 236,
+    "detail": null
+  }
+}

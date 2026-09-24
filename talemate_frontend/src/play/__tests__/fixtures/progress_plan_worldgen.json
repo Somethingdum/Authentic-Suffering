@@ -1,0 +1,151 @@
+{
+  "type": "as_game",
+  "action": "progress_plan",
+  "data": {
+    "job_id": "worldgen-1",
+    "kind": "worldgen",
+    "title": "Making your world",
+    "phases": [
+      {
+        "id": "WG0",
+        "label": "Rolling the world…",
+        "weight": 2,
+        "subs": []
+      },
+      {
+        "id": "WG1",
+        "label": "Carving the land…",
+        "weight": 5,
+        "subs": []
+      },
+      {
+        "id": "WG2",
+        "label": "Writing what happened…",
+        "weight": 22,
+        "subs": [
+          {
+            "id": "history",
+            "label": "Remembering what happened"
+          }
+        ]
+      },
+      {
+        "id": "WG3",
+        "label": "Drawing the lines of power…",
+        "weight": 3,
+        "subs": []
+      },
+      {
+        "id": "WG4",
+        "label": "Building settlements…",
+        "weight": 5,
+        "subs": []
+      },
+      {
+        "id": "WG5",
+        "label": "Filling homes…",
+        "weight": 3,
+        "subs": []
+      },
+      {
+        "id": "WG6",
+        "label": "Waking the people…",
+        "weight": 40,
+        "subs": [
+          {
+            "id": "dossiers",
+            "label": "Writing the people down"
+          }
+        ]
+      },
+      {
+        "id": "WG7",
+        "label": "Setting the laws…",
+        "weight": 2,
+        "subs": []
+      },
+      {
+        "id": "WG8",
+        "label": "Placing the trouble…",
+        "weight": 13,
+        "subs": []
+      },
+      {
+        "id": "WG9",
+        "label": "Checking it all holds together…",
+        "weight": 5,
+        "subs": []
+      }
+    ],
+    "quips": {
+      "worldgen": [
+        "Building a world that does not care about you.",
+        "Somewhere, something already went wrong.",
+        "Making the numbers mean it.",
+        "Nothing here is placeholder."
+      ],
+      "worldgen.WG0": [
+        "Deciding how bad it got.",
+        "Picking a year to be unlucky in.",
+        "Checking you can survive it. Probably."
+      ],
+      "worldgen.WG1": [
+        "Laying roads nobody maintains.",
+        "Putting the dead where the living used to be.",
+        "Drawing a map nobody will fold right."
+      ],
+      "worldgen.WG2": [
+        "Deciding who held on and who did not.",
+        "History is written by the survivors.",
+        "The first winter, remembered badly."
+      ],
+      "worldgen.WG2.history": [
+        "Every settlement has a reason to exist.",
+        "Somebody lost a battle here.",
+        "The bad winter, the good harvest, the betrayal.",
+        "Nobody agrees on how it started."
+      ],
+      "worldgen.WG3": [
+        "Deciding who answers to whom.",
+        "Old grudges, fresh paint.",
+        "Somebody always wants the bigger chair."
+      ],
+      "worldgen.WG4": [
+        "Stocking shelves that will empty.",
+        "Giving the pumps something to pump.",
+        "Nailing boards over the ground floor."
+      ],
+      "worldgen.WG5": [
+        "Counting everyone who never gets a name.",
+        "Babies, elders, and everyone between.",
+        "Setting a place at every table."
+      ],
+      "worldgen.WG6": [
+        "Giving everyone a past.",
+        "Nobody is an extra.",
+        "Handing out bad habits."
+      ],
+      "worldgen.WG6.dossiers": [
+        "Giving someone a fear and a habit.",
+        "Deciding what they will never say.",
+        "Everyone gets a scar with a story.",
+        "Some of them are lying about their past."
+      ],
+      "worldgen.WG7": [
+        "Deciding what gets you thrown out.",
+        "Rules written in someone's blood.",
+        "Every rule has a story. None of them are nice."
+      ],
+      "worldgen.WG8": [
+        "Your first bad day is being arranged.",
+        "Something is already on its way to you.",
+        "Scheduling your first mistake."
+      ],
+      "worldgen.WG9": [
+        "Counting heads twice.",
+        "Making sure nobody was born dead by accident.",
+        "Tightening the last bolts."
+      ]
+    }
+  }
+}

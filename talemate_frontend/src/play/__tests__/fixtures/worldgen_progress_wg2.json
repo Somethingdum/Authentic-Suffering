@@ -1,0 +1,10 @@
+{
+  "type": "as_game",
+  "action": "worldgen_progress",
+  "data": {
+    "stage": "WG2",
+    "label": "Writing what happened…",
+    "pct": 7.0,
+    "eta_s": 167.4
+  }
+}

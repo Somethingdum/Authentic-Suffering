@@ -1,0 +1,9 @@
+{
+  "type": "as_game",
+  "action": "state",
+  "data": {
+    "screen": "worldgen",
+    "run_id": null,
+    "busy": true
+  }
+}
