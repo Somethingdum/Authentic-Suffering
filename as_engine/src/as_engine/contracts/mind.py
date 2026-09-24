@@ -12,9 +12,9 @@ affordance or target that code did not offer (L3, rule INTENT-02).
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .common import (
     LOD,
@@ -187,6 +187,14 @@ class SkullPacket(Strict):
     handles: dict[str, str] = Field(default_factory=dict, description="handle -> internal id. NEVER rendered.")
     omitted: list[str] = Field(default_factory=list, description="What the budget dropped, in drop order "
                                "(SKULL-09, Actor Spec AC16). NEVER rendered: an audit of what was cut.")
+    families: list[str] = Field(default_factory=list, description="The kinds of thing this person could also "
+                                "try that the menu does not show (mind.consult.FAMILIES keys, in that order; "
+                                "Actor Spec §8: the visible list of supported families).")
+    consult_kinds: list[Literal["recall", "more_actions", "compose"]] = Field(
+        default_factory=list, description="What this call may consult (mind.consult, CONSULT-01); empty in a "
+        "reaction and once a consultation has been answered.")
+    looked_up: list[str] = Field(default_factory=list, description="What a consultation brought back "
+                                 "(mind.consult), shown under 'What you looked up'.")
 
 
 # ---------------------------------------------------------------------------
@@ -194,15 +202,99 @@ class SkullPacket(Strict):
 # ---------------------------------------------------------------------------
 
 
+# The answer models below reach the model as JSON-schema descriptions (lanes.schemas keeps
+# "description"): their docstrings and Field descriptions are written TO the person answering.
+# Engineering notes stay in comments.
+
+
 class SpeechOut(Strict):
-    text: str = Field(min_length=1, max_length=400)
-    to: list[str] = Field(default_factory=list, description="Entity handles, or ['everyone'].")
+    """What you say: exactly these words. Who hears them depends on where everyone is."""
+
+    # At most 800 characters here; 100 words (12 in a reaction) — action.intent.to_intent INTENT-08.
+    text: str = Field(min_length=1, max_length=800, description="Exactly the words, at most 100 words "
+                      "(at most 12 when something just reached you).")
+    to: list[str] = Field(default_factory=list, description="Person handles, or ['everyone'].")
     volume: Volume = Volume.NORMAL
+    delivery: Literal["ordinary", "hesitant", "clipped", "soothing", "strained"] = Field(
+        default="ordinary", description="How you say it. It cannot make anyone feel anything.")
+    timing: Literal["before", "alongside", "after"] = Field(
+        default="alongside", description="Before, alongside or after your attempt.")
+
+
+class Inscription(Strict):
+    """A short note you write, only when your attempt is writing one."""
+
+    text: str = Field(min_length=1, max_length=200, description="At most 200 characters and 35 words.")
+    quotation_source: str | None = Field(default=None, description="An S or E handle when you copy that "
+                                         "word for word.")
+
+
+class ActionPayload(Strict):
+    """Your decision: one attempt, and what goes with it. It says what you try, never how it turns out."""
+
+    # Actor Spec §7, AC05. It cannot express results, damage, success, another body's state, or any
+    # comply/accept/agree/refuse field (L2, L6). gesture / attention / inscription are null-only in
+    # the schema until a packet offers G / F handles or a writing attempt (lanes.schemas SCHEMA-04).
+    choice: str = Field(description="The handle of one offered attempt.")
+    pace: Literal["normal", "careful", "rushed"] = Field(
+        default="normal", description="Careful or rushed only where that attempt allows it.")
+    speech: SpeechOut | None = None
+    gesture: str | None = None
+    attention: str | None = None
+    inscription: Inscription | None = None
+    goal: str = Field(min_length=1, max_length=200, description="What you want to come of it.")
+    private_reason: str | None = Field(default=None, max_length=240, description="Why, briefly. Never spoken.")
+
+
+class Consultation(Strict):
+    """One thing you look up in your own head before you decide."""
+
+    # mind.consult: a lookup in the person's own records and menu, never a look through a drawer.
+    kind: Literal["recall", "more_actions", "compose"]
+    query: str | None = Field(default=None, max_length=160, description="For recall: what you try to remember.")
+    family: str | None = Field(default=None, description="For more_actions: one of the kinds offered.")
+    template: str | None = None
+    subjects: list[str] = Field(default_factory=list, max_length=4,
+                                description="Person or perception handles it is about.")
+
+
+class ActorReplyV2(Strict):
+    """Your answer: a decision, or — only when it is offered — one consultation first."""
+
+    # ACTOR_COGNITION / ACTOR_REACTION / INTENT_REPAIR output (Actor Spec §7, AC05). A decision
+    # carries exactly one action payload, a consultation exactly one consultation payload — checked
+    # here whatever the provider's grammar enforced (_one_payload).
+    # V1 adapter (the spec's temporary adapter; turn.cognition REPLY-01): a JSON object without
+    # ``kind`` but with ``choice`` is a V1 CognitionOutput and is read as {kind: 'decision', action:
+    # {choice, speech, goal, private_reason}} — pace normal, no gesture, attention or inscription,
+    # the speech with ordinary delivery alongside; its ``manner`` is dropped (a legacy manner
+    # string is never read as a mechanical command).
+    kind: Literal["decision", "consultation"]
+    action: ActionPayload | None = None
+    consultation: Consultation | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _v1(cls, data: Any) -> Any:
+        """The V1 adapter (implemented)."""
+        if isinstance(data, dict) and "kind" not in data and "choice" in data:
+            action = {k: data[k] for k in ("choice", "speech", "goal", "private_reason") if k in data}
+            return {"kind": "decision", "action": action}
+        return data
+
+    @model_validator(mode="after")
+    def _one_payload(self) -> "ActorReplyV2":
+        """Exclusivity (implemented)."""
+        if self.kind == "decision" and (self.action is None or self.consultation is not None):
+            raise ValueError("a decision carries exactly one action payload and no consultation")
+        if self.kind == "consultation" and (self.consultation is None or self.action is not None):
+            raise ValueError("a consultation carries exactly one consultation payload and no action")
+        return self
 
 
 class CognitionOutput(Strict):
-    """ACTOR_COGNITION / ACTOR_REACTION output. Note what it cannot express: results, damage,
-    success, another body's state, or any comply/accept/agree/refuse field (L2, L6)."""
+    """The V1 actor answer — read only through ActorReplyV2's adapter and by tests that script V1
+    answers (the fake model's scripts). New answers are ActorReplyV2."""
 
     choice: str = Field(description="Affordance handle, restricted by enum in the dynamic schema.")
     speech: SpeechOut | None = None
@@ -212,12 +304,16 @@ class CognitionOutput(Strict):
 
 
 class IntakeOutput(Strict):
-    """INTAKE output for the player's Do-mode text (05_ACTORS.md §PC side of the firewall)."""
+    """INTAKE output for the player's Do-mode text (05_ACTORS.md §PC side of the firewall). The
+    player's words reach the same action vocabulary as an actor's: ``pace`` is the mechanical mode
+    ('carefully', 'quietly' -> careful; 'quickly', 'in a hurry' -> rushed) where the option supports
+    it; ``manner`` is colour only."""
 
     choice: str = Field(description="Affordance handle or 'NONE'.")
     none_reason: Literal[
         "impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action"
     ] | None = None
+    pace: Literal["normal", "careful", "rushed"] = "normal"
     manner: str = Field(default="", max_length=120)
     remainder: str | None = Field(default=None, max_length=200, description="Rest of a multi-step instruction, queued as a suggestion.")
     clarify: str | None = Field(default=None, max_length=200)

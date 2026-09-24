@@ -28,10 +28,10 @@ from as_engine.contracts.calls import (
 )
 from as_engine.contracts.common import LOD, CallClass, Channel, Fidelity, OpenLoopKind, Standing, UtteranceForm, Verb, Volume
 from as_engine.contracts.mind import (
+    ActionPayload,
     AffordanceOption,
     AftermathPacket,
     BeliefLine,
-    CognitionOutput,
     Commitments,
     LoopLine,
     MemoryLine,
@@ -120,7 +120,7 @@ def render_kwargs() -> dict[CallClass, dict]:
         CallClass.INTAKE: {"ctx": IntakeContext(packet=p, player_text="I watch the front window and keep quiet.")},
         CallClass.INTENT_REPAIR: {"ctx": RepairContext(packet=p, raw_text="I think I'll go look {not json", error="no JSON object found")},
         CallClass.WRITEBACK: {"a": aftermath(), "cue_ids": ["loud_noise", "metal_crash", "knows_noise_draws_dead"]},
-        CallClass.PORTRAYAL_AUDIT: {"ctx": AuditContext(packet=p, output=CognitionOutput(choice="A1", speech=SpeechOut(text="Quiet.", to=["everyone"], volume=Volume.NORMAL), goal="cover the back", private_reason="That was the fence."), chosen_label=p.affordances[0].label)},
+        CallClass.PORTRAYAL_AUDIT: {"ctx": AuditContext(packet=p, output=ActionPayload(choice="A1", speech=SpeechOut(text="Quiet.", to=["everyone"], volume=Volume.NORMAL), goal="cover the back", private_reason="That was the fence."), chosen_label=p.affordances[0].label)},
         CallClass.NARRATION: {"k": k, "words": (90, 160), "fix": []},
         CallClass.RENDER_LINT: {"ctx": LintContext(packet=k, prose="A crash came from out back. Mara said, \"Quiet.\"", sentences=["A crash came from out back.", "Mara said, \"Quiet.\""])},
         CallClass.RUMOUR_DISTORT: {"ctx": RumourContext(teller_identity="June, a pharmacy tech who talks when she's nervous", claim_text="Something crashed out back at Delgado's last night.", teller_confidence=2)},

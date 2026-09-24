@@ -113,11 +113,13 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
   A THREAT this turn = a known body that is infected (bodies.kind 'infected': its shape and gait
   show it, though not its type), or the actor of an event this actor perceived this turn that was
   a HARM, an ACTION_START with payload verb 'attack', or a SPEECH whose percept detail has
-  armed_at_me (a weapon in hand while it spoke to this actor).
+  armed_at_me (a weapon in hand while it spoke to this actor). The set's ``threats`` lists them
+  (body ids, in known-body order; turn.cognition HOLD-02 reads it).
   Survivors become BoundAffordance(def_id, verb, target_id, destination_id, item_id, label,
-  ui_label, est_duration_s, noise_db, cost_note, risk_note, check, tags). est_duration_s =
+  ui_label, est_duration_s, noise_db, cost_note, risk_note, check, tags, paces). est_duration_s =
   duration.base_s + duration.per_meter_s x the walking distance to the referent (0 for self /
-  touch); tags = the def tags + the option's moral tags. Placeholders (label AND ui_label):
+  touch); tags = the def tags + the option's moral tags; paces = the def's paces (Actor Spec §7,
+  action.intent INTENT-07). Placeholders (label AND ui_label):
     {target}      a body: its known name or with_article(describe(...)); an item, container or
                   portal: thing_phrase(name) ('the office door'); a wound: f'the wound on your
                   <anatomy words>' (own) or f'the wound on <ref>'s <anatomy words>'; keep_working:
@@ -165,6 +167,9 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
   room full of anchors must not crowd out 'keep counting' or 'freeze'). The chosen options are
   finally listed in sort-key order, which is the A1.. order. If fewer than
   PacketRules.min_affordances survive, WAIT and OBSERVE options are added.
+  Every survivor of the gates, in sort-key order and before the per-def cap, is the set's ``pool``
+  (never rendered): what a person could also try, which mind.consult lists as families and hands
+  out on request (Actor Spec §8, CONSULT-03/04). ``options`` is always a subset of ``pool``.
 Binding (AFF-02): `binds` is the PRIMARY referent; defs whose effect needs a second referent
 enumerate it too, one option per combination (then capped by the selection rules):
   give_item            item_held x each other body within touch range (target)
@@ -249,6 +254,7 @@ class BoundAffordance:
     risk_note: str | None = None
     check: "CheckSpec | None" = None
     tags: tuple[str, ...] = ()
+    paces: tuple[str, ...] = ()   # AffordanceDef.paces: 'careful' / 'rushed' besides normal
 
     @property
     def signature(self) -> str:
@@ -268,6 +274,8 @@ class AffordanceSet:
     actor_id: str
     options: list[BoundAffordance] = field(default_factory=list)
     rejected: list[Rejection] = field(default_factory=list)
+    pool: list[BoundAffordance] = field(default_factory=list)   # every survivor, sort-key order
+    threats: list[str] = field(default_factory=list)             # A THREAT this turn: body ids, known-body order
 
 
 def enumerate_affordances(tx: "Tx", actor_id: str, catalog: list["AffordanceDef"], at: int,

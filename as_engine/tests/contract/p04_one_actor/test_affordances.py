@@ -61,7 +61,7 @@ def test_june_is_offered_her_task_first_and_a_look(scenario):
     a = options_for(w, "june")
     assert a.options[0].def_id == "keep_working"
     assert a.options[0].label == "Keep doing what you were doing (counting cans)"
-    (look,) = by_def(a, "go_look")
+    look = by_def(a, "go_look")[0]           # the one toward the sound comes first
     # shelves (2, 2) -> back door (4, 4.5): 3.20 m; go_look 1 s + 1.0 s/m -> 4.2 s
     assert look.destination_id == w.id("back_door_in")
     assert look.label == "Go and look toward the back door (3 m, about 4 seconds)"
@@ -80,7 +80,7 @@ def test_anchors_toward_the_sound_come_first(scenario):
     walks = by_def(a, "move_to_anchor")
     assert walks and walks[0].destination_id == w.id("back_door_in")
     m = options_for(w, "mara")
-    (look,) = by_def(m, "go_look")
+    look = by_def(m, "go_look")[0]
     assert look.destination_id == w.id("storeroom_door_front"), "the crash reached Mara through the storeroom door"
 
 
@@ -96,7 +96,7 @@ def test_leaving_a_post_costs_something(scenario):
         if o.def_id in ("wait_here", "observe_area", "close_portal", "speak"):
             assert o.cost_note is None, o.def_id
     # (13.5, 8.5) is 13.2 m from the front window (3, 0.5)
-    (look,) = by_def(m, "go_look")
+    look = by_def(m, "go_look")[0]
     assert look.label == "Go and look toward the storeroom doorway (13 m, about 14 seconds)"
 
 
@@ -121,7 +121,7 @@ def test_selection_caps_and_order(scenario):
     gust(w)
     for local in ("june", "mara", "pc"):
         a = options_for(w, local)
-        assert 3 <= len(a.options) <= 18
+        assert 3 <= len(a.options) <= PacketRules().max_affordances == 24
         counts = {}
         for o in a.options:
             counts[o.def_id] = counts.get(o.def_id, 0) + 1

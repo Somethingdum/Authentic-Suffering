@@ -8,7 +8,8 @@ Usage in tests::
 
     fake = FakeTransport()
     fake.script(CallClass.ACTOR_COGNITION, actor_id="act_000002",
-                response={"choice": "A3", "goal": "check the noise", "private_reason": "I heard glass"})
+                response={"kind": "decision", "action": {"choice": "A3", "goal": "check the noise",
+                                                         "private_reason": "I heard glass"}})
     fake.fail(CallClass.WRITEBACK, "timeout", times=1)
     fake.down(Lane.B)
     ... run the engine with LaneClient(config, fake) ...
@@ -65,7 +66,9 @@ def _content_words(text: str) -> set[str]:
 
 
 def default_cognition(packet: SkullPacket) -> dict:
-    """Deterministic policy: keep doing the current task; else wait/observe; else the first option."""
+    """Deterministic policy: keep doing the current task; else wait/observe; else the first option.
+    Answers an ActorReplyV2 decision (scripts may still hand V1 answers: the reply's adapter reads
+    them)."""
     order = [Verb.CONTINUE_TASK, Verb.WAIT, Verb.OBSERVE, Verb.GUARD]
     chosen = None
     for verb in order:
@@ -77,8 +80,10 @@ def default_cognition(packet: SkullPacket) -> dict:
             break
     if chosen is None:
         chosen = packet.affordances[0]
-    return {"choice": chosen.handle, "speech": None, "manner": "", "goal": "carry on as before",
-            "private_reason": "Nothing here changes what I was doing."}
+    return {"kind": "decision", "consultation": None,
+            "action": {"choice": chosen.handle, "pace": "normal", "speech": None, "gesture": None, "attention": None,
+                       "inscription": None, "goal": "carry on as before",
+                       "private_reason": "Nothing here changes what I was doing."}}
 
 
 def default_intake(ctx: IntakeContext) -> dict:
@@ -91,7 +96,8 @@ def default_intake(ctx: IntakeContext) -> dict:
     if best is None:
         return {"choice": "NONE", "none_reason": "unclear", "manner": "", "remainder": None,
                 "clarify": "What do you want to do?"}
-    return {"choice": best.handle, "none_reason": None, "manner": "", "remainder": None, "clarify": None}
+    return {"choice": best.handle, "none_reason": None, "pace": "normal", "manner": "", "remainder": None,
+            "clarify": None}
 
 
 def default_writeback(ctx: WritebackContext) -> dict:

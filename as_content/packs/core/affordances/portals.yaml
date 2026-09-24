@@ -10,6 +10,7 @@
   duration: {base_s: 1.5, per_meter_s: 0.71}
   noise_db: 40
   effect: open_portal
+  paces: [careful, rushed]
   tags: [portal]
 - schema: as.affordance.v1
   id: close_portal
@@ -22,6 +23,7 @@
   duration: {base_s: 1.5, per_meter_s: 0.71}
   noise_db: 40
   effect: close_portal
+  paces: [careful, rushed]
   tags: [portal]
 - schema: as.affordance.v1
   id: lock_portal
@@ -34,6 +36,7 @@
   duration: {base_s: 3, per_meter_s: 0.71}
   noise_db: 35
   effect: lock_portal
+  paces: [careful, rushed]
   tags: [portal, lock]
 - schema: as.affordance.v1
   id: unlock_portal
@@ -46,6 +49,7 @@
   duration: {base_s: 3, per_meter_s: 0.71}
   noise_db: 35
   effect: unlock_portal
+  paces: [careful, rushed]
   tags: [portal, lock]
 - schema: as.affordance.v1
   id: pick_lock
@@ -59,6 +63,7 @@
   noise_db: 20
   check: {attribute: A, skill: mechanics, tags: [locksmith], resistance: portal.lock_quality}
   effect: unlock_portal
+  paces: [careful, rushed]
   tags: [portal, lock, lockpick]
 - schema: as.affordance.v1
   id: barricade_portal
@@ -71,6 +76,7 @@
   duration: {base_s: 30, per_meter_s: 0.71}
   noise_db: 55
   effect: barricade_portal
+  paces: [rushed]
   tags: [portal, barricade]
 - schema: as.affordance.v1
   id: unbarricade_portal
@@ -83,6 +89,7 @@
   duration: {base_s: 30, per_meter_s: 0.71}
   noise_db: 55
   effect: unbarricade_portal
+  paces: [careful, rushed]
   tags: [portal, barricade]
 - schema: as.affordance.v1
   id: force_portal
@@ -108,4 +115,5 @@
   duration: {base_s: 3, per_meter_s: 0.71}
   noise_db: 10
   effect: peek_portal
+  paces: [careful]
   tags: [observe, investigate]

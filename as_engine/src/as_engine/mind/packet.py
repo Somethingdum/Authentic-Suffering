@@ -7,10 +7,14 @@ open_loops / refusals / plans / tasks rows, voice_lines, episodes (via mind.retr
 and the AffordanceSet passed in. Never another body's state: 'here' and 'near you' come from
 this holder's percepts.
 
-build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=False) -> SkullPacket
+build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=False, consulted=None)
+    -> SkullPacket
   lod COLD -> ValueError (COLD actors get no packet, LOD-02). An empty AffordanceSet -> ValueError
   (the affordance floor makes that impossible; failing loudly beats an empty menu).
   Budget key: 'reaction' when reaction=True, else lod.value ('hot' | 'warm').
+  ``consulted`` (a mind.consult.Consulted) rebuilds the packet of a decision after its one
+  consultation, from the same snapshot (the same ``at`` and AffordanceSet): its options are
+  appended to the menu, its lines are the looked_up field, and nothing more may be consulted.
 
 SKULL-10 (P10) Nothing later than the moment reaches a mind: a mind deciding at ``at`` knows only
   its percepts with at <= ``at``. A wave's landings are written when the wave resolves (and a
@@ -31,8 +35,10 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
           order, when source_id is a body (items and portals are sources too — they are not
           entities); (2) bodies the holder has relationships rows toward, by to_id; (3) the other
           members of the holder's households, by actor_id.
-  A1..An  affordances.options in AffordanceSet order; the handle map value is the option's
-          BoundAffordance.signature 'def_id:target:destination:item' ('*' for an empty slot).
+  A1..An  affordances.options in AffordanceSet order, then consulted.options (so a consultation
+          appends handles and never renumbers one already offered); the handle map value is the
+          option's BoundAffordance.signature 'def_id:target:destination:item' ('*' for an empty
+          slot).
   L1..Ln  open loops (below) in packet order.   E1..En  memories (P6).
   ``handles`` maps every handle to its internal id (percept_id, body id, signature, loop_id,
   episode_id) and is never rendered. tests/helpers.handle_for finds an option by def and referent.
@@ -156,6 +162,11 @@ Fields (second person, plain English):
   affordances       AffordanceOption(A#, verb, label, cost_note, risk_note) per option.
   uncertainty       one line per PARTIAL or TONE_ONLY percept, in S order: f'You did not catch all
                     of {S#}.'
+  families          [] when reaction or consulted; else mind.consult.families(affordances, the
+                    canon affordance defs by id) — CONSULT-03.
+  consult_kinds     [] when reaction or consulted; else ['recall'] + ['more_actions'] when
+                    families is not empty — CONSULT-01.
+  looked_up         consulted.lines, or [].
 
 Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   prompts.render(CallClass.ACTOR_COGNITION, p=packet) (ACTOR_REACTION when reaction=True). While
@@ -165,8 +176,9 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   whose requester is not a source of this turn's percepts (oldest first), uncertainty lines (last
   first). Never dropped (Actor Spec AC16: what bears on this decision is pinned, never cut for
   age or length): identity (the card), recent_lines, body, position, perceived_now, utterances,
-  entities, affordances, commitments, stakes, resources, open loops, and every refusal whose
-  requester is a source of this turn's percepts (someone here or speaking now). Every item
+  entities, affordances, commitments, stakes, resources, open loops, what a consultation brought
+  back (looked_up), and every refusal whose requester is a source of this turn's percepts
+  (someone here or speaking now). Every item
   dropped is recorded, in drop order, in ``omitted`` (never rendered: an audit of what was cut):
   'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
   text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'uncertainty: ' + the
@@ -185,10 +197,11 @@ from ..contracts.mind import SkullPacket
 if TYPE_CHECKING:
     from ..kernel.store import Tx
     from .affordance import AffordanceSet
+    from .consult import Consulted
 
 
 def build_packet(tx: "Tx", actor_id: str, lod: LOD, affordances: "AffordanceSet", turn_index: int,
-                 at: int, *, reaction: bool = False) -> SkullPacket:
+                 at: int, *, reaction: bool = False, consulted: "Consulted | None" = None) -> SkullPacket:
     raise NotImplementedError("P4")
 
 

@@ -12,7 +12,7 @@ from typing import Literal
 from pydantic import Field
 
 from .common import Strict
-from .mind import AftermathPacket, CognitionOutput, SkullPacket
+from .mind import ActionPayload, AftermathPacket, SkullPacket
 from .narration import NarratorPacket
 
 
@@ -30,7 +30,7 @@ class RepairContext(Strict):
 
 class AuditContext(Strict):
     packet: SkullPacket
-    output: CognitionOutput
+    output: ActionPayload = Field(description="The decision under audit (an ActorReplyV2's action).")
     chosen_label: str
 
 

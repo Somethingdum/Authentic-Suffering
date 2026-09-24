@@ -113,7 +113,7 @@ EXHAUST_STRINGS: tuple[str, ...] = ("IGNORE_WHEN_COPYING", "content_copy", "Use 
                                     "As an AI", "[INSERT", "TODO", "lorem ipsum")
 ERROR_KINDS: tuple[str, ...] = ("grammar_fail", "schema_fail", "hallucinated_ref", "lane_down", "timeout",
                                 "lint_fail", "rollback", "degraded", "migration", "budget_overrun",
-                                "echo_reject", "portrayal_fail")
+                                "echo_reject", "portrayal_fail", "decision_held")
 REQUIRED_META_KEYS: tuple[str, ...] = ("run_id", "seed", "schema_version", "created_at_real",
                                        "content_hash", "settings_json", "rules_json", "pc_actor_id",
                                        "sandbox", "cheat_active", "world_epoch_text")

@@ -2,8 +2,11 @@
 L12, S03, ECHO-01. docs/as/04_TURN_PIPELINE.md §2.
 
 The PC's intent is built exactly like an Actor's: from the PC's own packet and AffordanceSet
-(mind.packet.build_packet at LOD WARM), through action.intent.to_intent (source 'human'). The
-player chooses; code binds. Translation may change manner, never the verb, the target or a refusal.
+(mind.packet.build_packet at LOD WARM), through action.intent.to_intent (source 'human'), from the
+same decision payload an Actor answers with (contracts.mind.ActionPayload; Actor Spec §17 A6: the
+player's words reach the same action vocabulary). The player chooses; code binds. Translation may
+change manner (colour only) and pace (where the option supports it), never the verb, the target or
+a refusal.
 
 intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejected
   INTAKE-01 (1) perception.compile_scene(tx, pc, t0, turn_index); aff =
@@ -22,7 +25,7 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
        empty text -> Rejected('empty', "Type what you want to say."); otherwise a speech intent to
        the option's target (below), info['addressee'] = that target, record_pc_input(text),
        record_input(mode 'say', text, {signature, words: text, addressee: target}). Any other
-       option -> to_intent(packet, aff, CognitionOutput(choice = its handle, goal = its label,
+       option -> to_intent(packet, aff, ActionPayload(choice = its handle, goal = its label,
        private_reason = PLAYER_REASON), lod WARM, source 'human') (an IntentError ->
        'suggestion_stale'); record_input(mode 'suggestion', raw_text = the entry's label (else the
        option's ui_label), {signature}); no echo record (the player typed nothing).
@@ -48,10 +51,12 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
          saying it another way.");
        choice 'NONE' -> Rejected(none_reason or 'unclear', NONE_MESSAGES[that code],
          clarify = output.clarify) — no time passes, the input is not consumed;
-       with quotes -> to_intent(packet, aff, CognitionOutput(choice, speech {text: the joined
-         quotes, to: [the addressee's entity handle] or ['everyone'], volume 'normal'}, manner,
-         goal = manner or the label of the packet affordance with that handle (else the handle),
-         private_reason = PLAYER_REASON), WARM, 'human') and info['addressee'] = addressee;
+       with quotes -> to_intent(packet, aff, ActionPayload(choice, pace = output.pace when the
+         chosen option's paces contain it, else 'normal', speech {text: the joined quotes, to:
+         [the addressee's entity handle] or ['everyone'], volume 'normal'}, goal = manner or the
+         label of the packet affordance with that handle (else the handle), private_reason =
+         PLAYER_REASON), WARM, 'human') with its manner set to output.manner
+         (dataclasses.replace), and info['addressee'] = addressee;
        without -> to_intent(packet, aff, the IntakeOutput, WARM, 'human');
        an IntentError -> Rejected('unclear', NONE_MESSAGES['unclear'], output.clarify).
      info['remainder'] = output.remainder (the pipeline offers it as the first chip next turn:
@@ -63,7 +68,7 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
 
 Speech intent (a helper): the 'speak' option bound to the addressee, else the target-less 'speak'
   option (none -> Rejected('impossible', NONE_MESSAGES['impossible'])); to_intent(packet, aff,
-  CognitionOutput(choice = its handle, speech {text: words, to: [addressee's entity handle] or
+  ActionPayload(choice = its handle, speech {text: words, to: [addressee's entity handle] or
   ['everyone'], volume 'normal'}, goal = the option's label, private_reason = PLAYER_REASON),
   WARM, 'human'); an IntentError -> Rejected('unclear', NONE_MESSAGES['unclear']).
 addressee_for(session, packet, submit) -> body id | None

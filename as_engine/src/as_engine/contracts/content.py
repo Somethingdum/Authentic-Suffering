@@ -144,6 +144,26 @@ class CheckSpec(Strict):
     consequence_ladder: Literal["standard", "stealth6"] = "standard"
 
 
+# The families of attempt a person can ask to see more of (Actor Spec §8; mind.consult CONSULT-03):
+# key -> the words a prompt shows. Order is the order a packet lists them in.
+AFFORDANCE_FAMILIES: dict[str, str] = {
+    "attention": "watching, listening, looking closer",
+    "conversation": "talking",
+    "expression": "signs and gestures",
+    "movement": "moving, taking cover, how you stand",
+    "access": "doors, locks and ways through",
+    "possessions": "picking up, handing over, searching, putting away",
+    "cooperation": "working with someone",
+    "care": "tending wounds, eating, drinking, resting",
+    "work": "the work in hand",
+    "conflict": "fighting, struggling, giving up",
+    "communication": "notes, signs and radios",
+    "commitments": "promises",
+}
+AffordanceFamily = Literal["attention", "conversation", "expression", "movement", "access", "possessions",
+                           "cooperation", "care", "work", "conflict", "communication", "commitments"]
+
+
 class AffordanceDef(Strict):
     schema_id: Literal["as.affordance.v1"] = Field(alias="schema", default="as.affordance.v1")
     id: str = Field(pattern=SLUG_PATTERN)
@@ -166,6 +186,13 @@ class AffordanceDef(Strict):
     check: CheckSpec | None = None
     effect: str = Field(description="Resolver effect handler id (07_RULES.md §Effect handlers).")
     tags: list[str] = Field(default_factory=list)
+    paces: list[Literal["careful", "rushed"]] = Field(
+        default_factory=list, description="The paces this attempt supports besides normal (Actor Spec §7; "
+        "action.intent INTENT-07): careful takes 1.5 times as long and is 6 dB quieter, rushed takes 0.6 "
+        "times as long and is 6 dB louder. Moves have their own careful, sneaking and running options.")
+    family: AffordanceFamily | None = Field(
+        default=None, description="Its family (AFFORDANCE_FAMILIES); None = the family mind.consult.family_of "
+        "derives from its verb, effect, binds and tags.")
     model_config = Strict.model_config | {"populate_by_name": True}
 
 

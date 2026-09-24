@@ -11,9 +11,21 @@ LM-Studio-safe schema (SCHEMA-01): ``to_lm_schema(model)`` returns
   * "anyOf": [X, {"type": "null"}] is kept as-is (nullable).
 
 Dynamic enums (SCHEMA-02):
-  cognition_schema(affordance_handles, entity_handles):
-      to_lm_schema(CognitionOutput) with properties.choice = {"type": "string", "enum": affordance_handles}
-      and the speech.to items = {"type": "string", "enum": entity_handles + ["everyone"]}.
+  cognition_schema(affordance_handles, entity_handles, *, consult_kinds=(), families=(),
+                   subject_handles=()) -> dict   (Actor Spec §7; SCHEMA-04)
+      to_lm_schema(ActorReplyV2), then:
+        kind          enum ["decision"], plus "consultation" when consult_kinds is not empty;
+        action        (nullable object) choice = {"type": "string", "enum": affordance_handles};
+                      speech.to items = {"type": "string", "enum": entity_handles + ["everyone"]};
+                      gesture, attention and inscription = {"type": "null"} (no packet offers
+                      gestures, attention points or a writing attempt yet);
+        consultation  {"type": "null"} when consult_kinds is empty; else nullable, with kind =
+                      {"type": "string", "enum": consult_kinds}; family = the enum of families
+                      (nullable), or {"type": "null"} when families is empty; template =
+                      {"type": "null"} (no templates are offered yet); subjects items = the enum
+                      of subject_handles (the packet's P# and S# handles), or "maxItems": 0 when
+                      there are none.
+      A reaction passes no consult_kinds: its answer can only be a decision.
   intake_schema(affordance_handles): IntakeOutput with choice enum = affordance_handles + ["NONE"].
   writeback_schema(percept_handles, entity_handles, loop_handles): every "because" field
       (string or list items) restricted to percept_handles; "about" to entity_handles + ["self","place"];
@@ -26,6 +38,8 @@ Dynamic enums (SCHEMA-02):
 SCHEMA-03: affordance_handles (cognition, intake) and percept_handles (writeback) must be
 non-empty — empty -> ValueError, because the packet builder should never offer a mind nothing to
 choose or nothing to cite (the WAIT affordance and the actor's own-state percept always exist).
+SCHEMA-04: a schema offers only what the engine can do: a field whose handles or attempt the
+packet does not offer is null-only, never an enum over nothing and never a free string.
 """
 
 from __future__ import annotations
@@ -36,8 +50,8 @@ from pydantic import BaseModel
 
 from ..contracts.common import CallClass
 from ..contracts.mind import (
+    ActorReplyV2,
     CascadeSuggestion,
-    CognitionOutput,
     IntakeOutput,
     PortrayalVerdict,
     ReflectionOutput,
@@ -49,9 +63,9 @@ from ..contracts.narration import RenderLintJudgement
 
 OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.INTAKE: IntakeOutput,
-    CallClass.ACTOR_COGNITION: CognitionOutput,
-    CallClass.ACTOR_REACTION: CognitionOutput,
-    CallClass.INTENT_REPAIR: CognitionOutput,
+    CallClass.ACTOR_COGNITION: ActorReplyV2,
+    CallClass.ACTOR_REACTION: ActorReplyV2,
+    CallClass.INTENT_REPAIR: ActorReplyV2,
     CallClass.WRITEBACK: WritebackOutput,
     CallClass.PORTRAYAL_AUDIT: PortrayalVerdict,
     CallClass.NARRATION: None,
@@ -77,7 +91,9 @@ def to_lm_schema(model: type[BaseModel]) -> dict[str, Any]:
     raise NotImplementedError("P1")
 
 
-def cognition_schema(affordance_handles: list[str], entity_handles: list[str]) -> dict[str, Any]:
+def cognition_schema(affordance_handles: list[str], entity_handles: list[str], *,
+                     consult_kinds: tuple[str, ...] | list[str] = (), families: tuple[str, ...] | list[str] = (),
+                     subject_handles: tuple[str, ...] | list[str] = ()) -> dict[str, Any]:
     raise NotImplementedError("P1")
 
 

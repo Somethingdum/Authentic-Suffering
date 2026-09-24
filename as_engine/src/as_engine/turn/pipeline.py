@@ -27,7 +27,12 @@ run_turn(session, submit, progress=None) -> TurnOutcome
     returns LMResponse(call_class, lane = request.lane, text, model 'reused') (the client parses
     it again); no cached text -> inner.send. list_models and health forward to ``inner``.
     Rejected -> TurnOutcome(ok=False, turn_index=cur, rejected_code, rejected_message, clarify):
-      nothing is kept, no time passes, the input is not consumed.
+      nothing is kept, no time passes, the input is not consumed. A turn.cognition.DecisionHeld
+      (HOLD-01: a consequential decision whose answer could not be used) is a Rejected: the same
+      outcome (rejected_code 'decision_held', HELD_MESSAGE), and in a NEW transaction
+      audit.log.repair(tx, 'decision_held', 6, 'HOLD-01', {actor_id, reason: kind}, T, now) keeps
+      who and why (the turn's calls roll back with it). It is never retried: a second attempt
+      would ask the same model the same thing.
     asyncio.CancelledError (the Play UI's Stop, P8: GameService cancels the task running this
       coroutine before stage 12) is a BaseException, not an Exception: it is never caught here and
       is not a rollback-law failure (no retry, nothing logged). The store transaction rolls it back
@@ -77,7 +82,7 @@ simulate — stages 0-12 in ONE store transaction:
     S5 afford: affs = {a: enumerate_affordances(tx, a, canon affordances, wave_at, T) for a in
        plan.lod}.
     S6 cognition: intents = await turn.cognition.decide(tx, session, plan, affs, T, wave_at,
-       reaction = wave > 0); wave 0 adds intents[pc] = pc_intent (the PC's intent goes through the
+       reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = pc_intent (the PC's intent goes through the
        same barrier and resolver as everyone's, L12). asks = {a: turn.cognition.asks_for(tx, a, T,
        answered) for a in sorted(intents)}.
     S7 barrier: action.intent.barrier(tx, [intents[a] for a in sorted(intents)]).

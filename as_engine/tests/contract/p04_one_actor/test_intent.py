@@ -65,10 +65,12 @@ def test_anything_not_offered_is_a_hallucinated_choice(june, choice):
 
 
 def test_a_handle_whose_option_is_gone_is_hallucinated(june):
-    """The handle exists in the packet but its signature is not in THIS AffordanceSet."""
+    """The handle exists in the packet but its signature is not in THIS AffordanceSet (neither its
+    menu nor its pool — the pool is what a consultation may add from)."""
     w, pkt, aff = june
     h = helpers.handle_for(pkt, "go_look", "back_door_in", w)
     aff.options = [o for o in aff.options if o.def_id != "go_look"]
+    aff.pool = [o for o in aff.pool if o.def_id != "go_look"]
     assert to_intent(pkt, aff, cog(h), lod=LOD.HOT, source="model").kind == "hallucinated_choice"
 
 

@@ -1,7 +1,10 @@
 The response object
-Answer with one JSON object and nothing else:
+Answer with one JSON object and nothing else. It is a decision or, only when the message offers one, a consultation.
+A decision is {"kind": "decision", "action": {...}, "consultation": null}. The action holds:
 - "choice": the handle of one offered attempt, such as "A3".
-- "speech": null, or the words you say with it: "text" (exactly what you say), "to" (a list of person handles such as ["P2"], or ["everyone"]) and "volume" (whisper, low, normal, raised or shout).
-- "manner": a few words on how you do it, or "" for none. It changes nothing about what happens.
-- "goal": what you want next, in one short sentence.
-- "private_reason": why, briefly, in your own words. It is private and not spoken.
+- "pace": "normal", or "careful" or "rushed" where that attempt allows it.
+- "speech": null, or what you say with it: "text" (exactly the words, at most 100 words; at most 12 when something just reached you), "to" (a list of person handles such as ["P2"], or ["everyone"]), "volume" (whisper, low, normal, raised or shout), "delivery" (ordinary, hesitant, clipped, soothing or strained) and "timing" (before, alongside or after the attempt).
+- "gesture", "attention" and "inscription": null.
+- "goal": what you want to come of it, in one short sentence.
+- "private_reason": null, or why, briefly, in your own words. It is private and not spoken.
+A consultation is {"kind": "consultation", "action": null, "consultation": {...}}, holding "kind" ("recall" to try to remember something, or "more_actions" to see more attempts of one kind), "query" (for recall: what you try to remember), "family" (for more_actions: one of the kinds offered), "template": null and "subjects" (up to four person or perception handles it is about, or []). You then get what it brings back and decide. You can consult once.

@@ -12,4 +12,5 @@ THE CHOICE
 They chose: {{ ctx.chosen_label }}
 {% if ctx.output.speech %}They said: "{{ ctx.output.speech.text }}"
 {% endif %}Their goal: {{ ctx.output.goal }}
-Their reason: {{ ctx.output.private_reason }}
+{% if ctx.output.private_reason %}Their reason: {{ ctx.output.private_reason }}
+{% endif %}

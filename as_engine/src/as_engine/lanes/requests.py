@@ -18,8 +18,9 @@ repair_request(config, failed, error, packet, json_schema) -> LMRequest   (LANE-
   The one repair call a failed actor decision gets: INTENT_REPAIR (regime and lane from
   config.regimes[INTENT_REPAIR], not the failed call's lane),
   context = ctx = RepairContext(packet=packet, raw_text=error.get('raw') or '', error=error.get
-  ('error') or ''), json_schema = the same cognition schema, turn_index and actor_id copied from
-  ``failed`` (the request that failed). ``error`` is a dict {raw, error}.
+  ('error') or ''), json_schema = the ``json_schema`` given (turn.cognition passes the failed
+  call's cognition schema without its consultation: a repair answers with a decision), turn_index
+  and actor_id copied from ``failed`` (the request that failed). ``error`` is a dict {raw, error}.
 """
 
 from __future__ import annotations

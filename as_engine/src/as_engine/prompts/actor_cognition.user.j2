@@ -122,3 +122,23 @@ Possibilities you notice (choose one)
 {% for a in p.affordances %}
 - {{ a.handle }}: {{ a.label }}{{ (" (" ~ a.cost_note ~ ")") if a.cost_note else "" }}{{ (" [risk: " ~ a.risk_note ~ "]") if a.risk_note else "" }}
 {% endfor %}
+{% if p.looked_up %}
+
+What you looked up
+{% for l in p.looked_up %}
+- {{ l }}
+{% endfor %}
+{% endif %}
+{% if p.consult_kinds %}
+
+Before you decide you may look up one thing (a consultation):
+{% if "recall" in p.consult_kinds %}
+- recall: try to remember something that is not written above.
+{% endif %}
+{% if "more_actions" in p.consult_kinds %}
+- more_actions: see more attempts of one of these kinds:
+{% for f in p.families %}
+  - {{ f }} ({{ family_words[f] }})
+{% endfor %}
+{% endif %}
+{% endif %}

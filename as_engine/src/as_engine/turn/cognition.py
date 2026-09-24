@@ -1,43 +1,73 @@
 """Stage 6 (cognition) and the stage-8 reading of answers (P7). Rules LOD-01/02, LANE-06, INTENT-02,
-ECHO-02, WILL-04..11, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
+ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
 
-decide(tx, session, plan, affs, turn_index, at, *, reaction) -> dict[actor_id, Intent]
-  One intent for EVERY actor in plan.lod (lanes.scheduler.CognitionPlan), keyed by actor id.
+decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset()) -> dict[actor_id, Intent]
+  ``answered`` = the pipeline's set of (actor, speech event) pairs already answered this turn (HOLD-02
+  reads it).
+  One intent for every actor in plan.lod, keyed by actor id — except an actor held in place by
+  HOLD-01, which has none this wave (nothing is attempted for it).
   1. Requests, actors in sorted order: COLD -> none. HOT / WARM -> packet = mind.packet.build_packet(
      tx, actor, lod, affs[actor], turn_index, at, reaction=reaction); request =
      cognition_request(session.config, packet, lod, plan.lane[actor], reaction=reaction,
      turn_index=turn_index); a lanes.scheduler.Job(job_id=actor, call_class=request.call_class,
-     request, output_model=CognitionOutput, lane_pref=plan.lane[actor], est_s=SchedulerRules
+     request, output_model=ActorReplyV2, lane_pref=plan.lane[actor], est_s=SchedulerRules
      .estimated_call_s['actor_cognition_hot' | 'actor_cognition_warm']). All jobs go to ONE
      lanes.scheduler.run_jobs call (both lanes fill at once; LOD changes who thinks with a model,
      never what anyone can do or knows — LOD-01).
-  2. Answers, actors in sorted order (the order the answers arrived in never matters):
-     COLD -> action.intent.plan_continuation(tx, actor, affs[actor], at, turn_index).
-     HOT / WARM -> "parse": parse_status 'ok' -> action.intent.to_intent(packet, affs[actor],
-       CognitionOutput(**parsed), lod=lod, source='model'); an IntentError is a failure whose
-       kind is 'empty_speech' for IntentError 'empty', else the IntentError kind; any other
-       parse_status is a failure of that kind.
-       A failure of kind grammar_fail / schema_fail / empty / hallucinated_choice /
-       hallucinated_target / empty_speech gets ONE repair (LANE-06): await session.client.call(
-       lanes.requests.repair_request(config, the failed request, {raw: resp.raw or resp.text,
-       error: resp.error or kind}, packet, the cognition schema), CognitionOutput), parsed the same
-       way. Repaired -> audit.log.repair(tx, FALLBACK_KIND[kind], 6, 'LANE-06', {actor_id,
-       reason: kind}, turn_index, at, repaired=True). Still failing -> FALLBACK(the FIRST kind:
-       the repair's own failure is not recorded separately). A timeout / lane_error / cancelled
-       first time gets no repair (the lane is the problem) -> FALLBACK(that kind).
-     FALLBACK(kind): plan_continuation(...) with source 'fallback'; commit DEGRADED_FALLBACK
-       {actor_id, reason: kind} (writer 'turn.pipeline', actor_id, at); audit.log.repair(tx,
-       FALLBACK_KIND.get(kind, 'degraded'), 6, 'LANE-06', {actor_id, reason: kind}, turn_index, at).
-     ECHO-02, for every model intent (repaired included) that carries speech: hits =
-       narration.lint.check_line(tx, speech.text, RulesConfig.style); non-empty -> one repair call
-       (as above; raw = the speech text, error = 'Do not repeat these phrases the other person
-       used: ' + '; '.join(sorted(hits))). The new intent is kept when it has no speech or its
-       speech is clean (audit.log.repair(..., 'echo_reject', 6, 'ECHO-02', {actor_id, ngrams},
-       ..., repaired=True)); otherwise — including a repair answer that does not parse —
-       ('echo_reject', not repaired) the speech is dropped and the action kept
-       (dataclasses.replace(intent, speech=None)) — or, when the chosen verb is SPEAK (the words
-       were the action), the actor falls back to plan_continuation with source 'fallback'. The
-       echo path commits NO DEGRADED_FALLBACK event: the echo_reject row is its record.
+  REPLY-01 reading an answer (Actor Spec §7): parse_status 'ok' -> ActorReplyV2.model_validate(
+     parsed) (its V1 adapter reads a V1 answer; a validation error is a failure of kind
+     'schema_fail'). A decision -> action.intent.to_intent(packet, affs[actor], reply.action,
+     lod=lod, source='model', reaction=reaction); an IntentError is a failure whose kind is
+     'empty_speech' for IntentError 'empty', else the IntentError kind. A consultation ->
+     mind.consult.check(packet, reply.consultation); a reason is a failure of kind
+     'bad_consultation', None means it is answered (REPLY-02). Any other parse_status is a failure
+     of that kind.
+  REPLY-02 at most two decision calls and one repair per decision (Actor Spec §7): an actor whose
+     first answer is a valid consultation gets it answered — consulted = mind.consult.answer(tx,
+     packet, affs[actor], reply.consultation, the canon affordance defs by id, turn_index, at) —
+     and a SECOND request, cognition_request(... build_packet(tx, actor, lod, affs[actor],
+     turn_index, at, reaction=reaction, consulted=consulted) ...): the same snapshot (the same
+     ``at`` and AffordanceSet), whose schema offers no consultation. All second requests go to one
+     more run_jobs call, actors in sorted order. The second answer is read as above (a
+     consultation there is a failure of kind 'bad_consultation').
+     A failure of kind grammar_fail / schema_fail / empty / hallucinated_choice /
+     hallucinated_target / empty_speech / speech_too_long / unsupported_pace /
+     hallucinated_expression / bad_inscription / bad_consultation gets ONE repair per decision
+     (LANE-06), of whichever call failed: await session.client.call(lanes.requests.repair_request(
+     config, the failed request, {raw: resp.raw or resp.text, error: resp.error or kind}, the
+     packet of that call, that call's schema without the consultation — the schema
+     cognition_schema builds with no consult_kinds), ActorReplyV2), read like a second answer: a
+     repair always answers with a decision (Actor Spec §14: it keeps a clearly recoverable choice
+     and words and never picks a safer, kinder or more obedient act; the repair prompt says so).
+     Repaired ->
+     audit.log.repair(tx, FALLBACK_KIND[kind], 6, 'LANE-06', {actor_id, reason: kind},
+     turn_index, at, repaired=True). Still failing, a second failure after the repair was spent,
+     or a timeout / lane_error / cancelled (no repair: the lane is the problem) -> HOLD-01 with the
+     FIRST failure's kind.
+  HOLD-01 a failed answer never becomes a choice (Actor Spec AC15, §14; AR10). When the decision is
+     consequential (HOLD-02) -> raise DecisionHeld(actor, kind): turn.pipeline rolls the turn back
+     — nothing happens, no time passes, the input is not consumed — and tells the player it was not
+     played. Otherwise continuation = action.intent.plan_continuation(tx, actor, affs[actor], at,
+     turn_index, accepted_only=True): an Intent -> that intent with source 'fallback' and
+     DEGRADED_FALLBACK {actor_id, reason: kind, path: 'continued'} (what they already took on goes
+     on); None -> NO intent for the actor this wave and DEGRADED_FALLBACK {actor_id, reason: kind,
+     path: 'held'} (the body stays as it is; nothing is attempted, perceived or narrated as a
+     choice); either way (writer 'turn.pipeline', actor_id, at) and audit.log.repair(tx,
+     FALLBACK_KIND.get(kind, 'degraded'), 6, 'LANE-06', {actor_id, reason: kind, path},
+     turn_index, at).
+  HOLD-02 consequential(tx, actor_id, affs[actor], turn_index, answered) -> bool: someone asked it
+     something it has not answered (asks_for(tx, actor_id, turn_index, answered) is not empty) or
+     it perceived a threat this turn (affs[actor].threats is not empty) — a new moment where
+     consent, refusal, surrender or violence could be at stake, which only the person may decide.
+  2. ECHO-02, for every model intent (repaired included) that carries speech: hits =
+     narration.lint.check_line(tx, speech.text, RulesConfig.style); non-empty and the decision's
+     repair not yet spent -> one repair call (as above; raw = the speech text, error = 'Do not
+     repeat these phrases the other person used: ' + '; '.join(sorted(hits))). The new intent is
+     kept when it has no speech or its speech is clean (audit.log.repair(..., 'echo_reject', 6,
+     'ECHO-02', {actor_id, ngrams}, ..., repaired=True)); otherwise — the repair spent, a repair
+     answer that does not read, or one that still echoes — the ORIGINAL intent stands, speech and
+     all ('echo_reject', not repaired: a quality issue on record; Actor Spec §11 — a repair that
+     fails is not a reason to silence a person, and no committed speech is rewritten).
   3. P10 — the wet strain's compulsion (lore §3.2: by week three "training, discipline, morality
      and force of will no longer stop compliance"; 05_ACTORS §7: an involuntary act is caused,
      timed and owned by code). Actors in sorted order, never the PC (the player's hand on their
@@ -58,7 +88,10 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction) -> dict[actor_id, I
 
 cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMRequest
   call class ACTOR_REACTION when reaction else ACTOR_COGNITION; json_schema =
-  lanes.schemas.cognition_schema(affordance handles, entity handles). HOT: regime =
+  lanes.schemas.cognition_schema(affordance handles, entity handles, consult_kinds =
+  packet.consult_kinds, families = packet.families, subject_handles = the packet's P# handles then
+  its S# handles, each in number order (none when it offers no consultation)) — a reaction's packet
+  offers no consultation. HOT: regime =
   config.hot_cognition and the schema is attached only when config.lanes[Lane.A]
   .structured_with_thinking == 'supported' or the regime has thinking off (otherwise the JSON is
   extracted from the text and a failure is repaired, LANE-06); WARM: regime = config.regimes[call
@@ -69,8 +102,14 @@ cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMReque
 
 FALLBACK_KIND: {grammar_fail: grammar_fail, schema_fail: schema_fail, empty: grammar_fail,
   timeout: timeout, lane_error: lane_down, cancelled: timeout, hallucinated_choice:
-  hallucinated_ref, hallucinated_target: hallucinated_ref, empty_speech: schema_fail} — the
+  hallucinated_ref, hallucinated_target: hallucinated_ref, empty_speech: schema_fail,
+  speech_too_long: schema_fail, unsupported_pace: schema_fail, hallucinated_expression:
+  hallucinated_ref, bad_inscription: schema_fail, bad_consultation: schema_fail} — the
   error_repair_log kind for each failure (commit gate S11 checks kinds against ERROR_KINDS).
+
+DecisionHeld(actor_id, kind)   (HOLD-01) a turn.intake.Rejected with code 'decision_held' and message
+  HELD_MESSAGE (out of the world: it names nobody — who it was is in the audit row the pipeline
+  writes).
 
 --- Answers to asks (the firewall at work; L6: a request never becomes an action) ---
 asks_for(tx, actor_id, turn_index, answered) -> list[dict]
@@ -117,6 +156,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from .intake import Rejected
+
 if TYPE_CHECKING:
     from ..action.intent import Intent
     from ..contracts.common import LOD, Lane
@@ -125,23 +166,42 @@ if TYPE_CHECKING:
     from ..contracts.settings import EngineConfig
     from ..kernel.store import Tx
     from ..lanes.scheduler import CognitionPlan
+    from ..mind.affordance import AffordanceSet
     from ..service.session import Session
+
+HELD_MESSAGE = ("Someone's decision at a moment that matters could not be read (the model's answer was unusable "
+                "twice), so this turn was not played. Nothing has happened. Send it again to try once more.")
 
 FALLBACK_KIND: dict[str, str] = {
     "grammar_fail": "grammar_fail", "schema_fail": "schema_fail", "empty": "grammar_fail", "timeout": "timeout",
     "lane_error": "lane_down", "cancelled": "timeout", "hallucinated_choice": "hallucinated_ref",
-    "hallucinated_target": "hallucinated_ref", "empty_speech": "schema_fail",
+    "hallucinated_target": "hallucinated_ref", "empty_speech": "schema_fail", "speech_too_long": "schema_fail",
+    "unsupported_pace": "schema_fail", "hallucinated_expression": "hallucinated_ref", "bad_inscription": "schema_fail",
+    "bad_consultation": "schema_fail",
 }
 ASK_FORMS: tuple[str, ...] = ("request", "order", "demand", "threat")
 
 
+class DecisionHeld(Rejected):
+    """HOLD-01 (implemented): a consequential decision whose answer could not be used. The turn is
+    not played; the player is told, out of the world."""
+
+    def __init__(self, actor_id: str, kind: str):
+        super().__init__("decision_held", HELD_MESSAGE)
+        self.actor_id, self.kind = actor_id, kind
+
+
 async def decide(tx: "Tx", session: "Session", plan: "CognitionPlan", affs: dict, turn_index: int, at: int, *,
-                 reaction: bool) -> dict[str, "Intent"]:
+                 reaction: bool, answered: set | frozenset = frozenset()) -> dict[str, "Intent"]:
     raise NotImplementedError("P7")
 
 
 def cognition_request(config: "EngineConfig", packet: "SkullPacket", lod: "LOD", lane: "Lane", *, reaction: bool,
                       turn_index: int) -> "LMRequest":
+    raise NotImplementedError("P7")
+
+
+def consequential(tx: "Tx", actor_id: str, affordances: "AffordanceSet", turn_index: int, answered: set) -> bool:
     raise NotImplementedError("P7")
 
 

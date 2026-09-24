@@ -61,9 +61,9 @@ Walking to the referent (range 'reach'; the est_duration_s already paid for it):
 Checks (action.checks.roll at land_at; CHECK_RESOLVED committed before the state change). The
   situation modifier (07_RULES.md §1.1) is computed by ``situation(tx, intent, land_at)``: light
   of the target's (or, with no target, the actor's) place via sense.optics.light_at for defs whose
-  check attribute is P or whose tags include 'ranged' (light 0 -3, 1 -2, 2 -1); careful manner
-  (intent.manner contains 'careful' or 'slow') +1, rushed (contains 'rush', 'fast', 'quick' or the
-  def is run_to_anchor) -1; the right tool +1 (force_portal with a held item tagged 'pry';
+  check attribute is P or whose tags include 'ranged' (light 0 -3, 1 -2, 2 -1); intent.pace
+  'careful' +1, 'rushed' (or the def is run_to_anchor) -1 — the explicit pace, never words in
+  intent.manner (Actor Spec §14: a manner has no mechanical channel); the right tool +1 (force_portal with a held item tagged 'pry';
   pick_lock with a carried item tagged 'lockpick'); a def tagged 'negotiable' with a body target
   that has refused the actor: + mind.firewall.negotiable_target_penalty(n), n = the largest
   times_asked among that body's refusals with requester_id = the actor and status 'standing' or

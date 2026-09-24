@@ -10,7 +10,8 @@ async def call_with_repair(client, request, output_model, *, repair_builder) -> 
         return (resp2, True)
   3. return (resp, False)
 Never salvages free text. The caller decides the fallback when the repaired response still fails
-(Actors: plan continuation + DEGRADED_FALLBACK event; narration: keep best passing draft).
+(Actors: turn.cognition HOLD-01 — a held turn, an accepted task going on, or nothing attempted;
+narration: keep best passing draft).
 """
 
 from __future__ import annotations

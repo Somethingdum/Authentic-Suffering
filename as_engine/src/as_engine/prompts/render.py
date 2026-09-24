@@ -22,6 +22,7 @@ from typing import Any
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from ..contracts.common import CallClass
+from ..contracts.content import AFFORDANCE_FAMILIES
 from ..contracts.lanes import ChatMessage
 
 PROMPT_DIR = Path(__file__).parent
@@ -45,8 +46,9 @@ FIDELITY_WORDS = {
 
 def render(call_class: CallClass, **ctx: Any) -> list[ChatMessage]:
     name = call_class.value
-    system = _env.get_template(f"{name}.system.j2").render(fidelity_words=FIDELITY_WORDS, **ctx).strip()
-    user = _env.get_template(f"{name}.user.j2").render(fidelity_words=FIDELITY_WORDS, **ctx).strip()
+    words = {"fidelity_words": FIDELITY_WORDS, "family_words": AFFORDANCE_FAMILIES}
+    system = _env.get_template(f"{name}.system.j2").render(**words, **ctx).strip()
+    user = _env.get_template(f"{name}.user.j2").render(**words, **ctx).strip()
     return [ChatMessage(role="system", content=system), ChatMessage(role="user", content=user)]
 
 
