@@ -36,9 +36,9 @@ class LaneConfig(Strict):
 
 def default_lanes() -> dict[Lane, LaneConfig]:
     return {
-        Lane.A: LaneConfig(name="Storyteller brain (desktop) — Nemotron Cascade 2 30B-A3B",
+        Lane.A: LaneConfig(name="Main model — Nemotron Cascade 2 30B-A3B",
                            model="nemotron-cascade-2-30b-a3b"),
-        Lane.B: LaneConfig(name="Fast brain (laptop) — Nemotron 3.5 Lightning 30B-A3B",
+        Lane.B: LaneConfig(name="Second model — Nemotron 3.5 Lightning 30B-A3B",
                            model="nvidia-nemotron-3.5-lightning-30b-a3b"),
     }
 

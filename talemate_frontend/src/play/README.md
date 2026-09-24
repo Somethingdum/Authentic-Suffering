@@ -29,7 +29,7 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
       Talemate editor anywhere.
 - [ ] On Connect, **Test** on each card reports "Working — answered in … s." or a plain reason.
       Stop the laptop's LM Studio server and test again: the card says it is not answering, in words,
-      and **Continue** still works with only the Storyteller brain. Start it again. [UI-CLARITY-06]
+      and **Continue** still works with only the Main model. Start it again. [UI-CLARITY-06]
 - [ ] Open a second tab on the same address. It shows "The game is already open in another tab or
       window…" and does not keep reconnecting. Close it; the first tab still works.
 - [ ] Home shows Continue (naming Owen Marsh, day 18, alive), New life, Your lives, Worlds, Your characters &

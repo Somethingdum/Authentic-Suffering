@@ -21,12 +21,18 @@ conservation, cascade application, scoring, selection, commit, save and replay a
    partial GPU offload on the 8 GB card), context 16384.
 3. Link the machines with **LM Link** (`lms link enable` on both). Both models now appear in the
    desktop's `http://localhost:1234/v1/models`.
-4. In the game's **Models** screen pick the Lane A and Lane B model ids from the dropdowns and press
-   **Test** on each. The test runs PROBE calls (below) and records whether structured output and
-   thinking control work for that model.
+4. In the game's Connect screen (and Settings → Models) pick the **Main model** and the **Second
+   model** from the one list LM Studio shows — no typing, no addresses — and press **Test** on each.
+   The test runs PROBE calls (below) and records whether structured output and thinking control
+   work for that model.
 
-(If LM Link is not used, give Lane B the laptop's own URL, e.g. `http://192.168.1.50:1234/v1`,
-with LM Studio's "Serve on local network" enabled.)
+The two models are equals (the owner's pair runs at about the same speed and is about as capable;
+Cascade may be a little faster). Lane A is simply the one marked main: it takes the thinking
+decisions of the people who matter most and the narration; every other call fills whichever lane
+is free. The scheduler plans by `SchedulerRules.estimated_call_s`, placeholders until
+`tools/as/bench.py` measures your machines. (Without LM Link, open Advanced on the Second model's
+card and give that machine's own address, e.g. `http://192.168.1.50:1234/v1`, with LM Studio's
+"Serve on local network" enabled.)
 
 ## 3. Adapter boundary
 

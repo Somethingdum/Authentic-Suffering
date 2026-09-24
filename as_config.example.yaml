@@ -7,10 +7,13 @@ runs_dir: as_runs                  # saves, reports, logs (relative to this file
 content_dir: as_content/packs      # content packs
 compiled_dir: as_content/_compiled # compiled canon cache
 
+# Both models are picked from ONE list: the LM Studio server on this machine. With LM Link on, the
+# other machine's models are in that list too, so both lanes use the same address. The easy way to
+# choose is the game's Connect / Settings → Models screen; you should not need to edit this block.
 lanes:
-  A:   # the storyteller brain: HOT cognition (thinking) + narration. Desktop.
-    name: Storyteller brain (desktop) — Nemotron Cascade 2 30B-A3B
-    base_url: http://localhost:1234/v1        # LM Studio server on the desktop (LM Link address if remote)
+  A:   # the main model: the thinking decisions of the people who matter most, and the narration
+    name: Main model — Nemotron Cascade 2 30B-A3B
+    base_url: http://localhost:1234/v1        # the LM Studio server on this machine
     model: nemotron-cascade-2-30b-a3b         # the exact model id LM Studio lists (tools/as/doctor.py --lanes shows them)
     api_key: lm-studio
     max_concurrency: 1
@@ -18,9 +21,9 @@ lanes:
     thinking_mode: native                     # tools/as/probe.py picks: native | system_no_think | chat_template_kwargs | prefill_empty_think | none
     structured_mode: json_schema              # json_schema | prompt_only
     structured_with_thinking: unknown         # probe writes supported | unsupported
-  B:   # the fast brain: intake, WARM cognition, reactions, writeback, audits, lint. Laptop.
-    name: Fast brain (laptop) — Nemotron 3.5 Lightning 30B-A3B
-    base_url: http://laptop-address:1234/v1   # CHANGE ME: the laptop's LM Studio address
+  B:   # the second model: everything else, in parallel with the main one (both are equals)
+    name: Second model — Nemotron 3.5 Lightning 30B-A3B
+    base_url: http://localhost:1234/v1        # the same list, via LM Link (without LM Link: that machine's own address)
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     api_key: lm-studio
     max_concurrency: 1

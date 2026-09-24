@@ -42,7 +42,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | guide | the model that answers Ask-mode questions from what the character knows plus plain rules text (`service/guide.py`); never a turn | "Guide" | hint system, helper |
 | push | a protocol message the service sends without being asked (turn progress, the turn's result, the story) to every connected page | — | broadcast, event (for messages) |
 | busy | a turn is running; the service refuses anything that would read or change the run, except the view and the story from before the turn | "Your last move is still being worked out." | locked |
-| lane | one model on one machine (A = desktop, B = laptop) | "Storyteller brain", "Fast brain" | box, slot |
+| lane | one model the game uses (A = the main model, B = the second; both picked from one LM Studio list) | "Main model", "Second model" | box, slot, Storyteller brain, Fast brain |
 | call class | the kind of model call (intake, narration …) | — | stage call |
 | LOD | reasoning tier of a mind: HOT (deep, thinking), WARM (fast), COLD (code continues the plan). The world's levels of detail are something else: see "levels of detail (world)" | — | level of detail (as a competence level — never) |
 | turn | one transaction from player input to committed world + prose | "a turn" | tick |

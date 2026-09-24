@@ -6,7 +6,7 @@ import HomeScreen from '../screens/HomeScreen.vue'
 import { byId, field, fixture, flush, has, mountWith, one, storeWith } from './helpers.js'
 
 describe('Connect', () => {
-  test('asks for the models and the config; shows both brains with their addresses and models', async () => {
+  test('asks for the models and the config; both models are picked from the one LM Studio list', async () => {
     const { store, sock } = storeWith('welcome_connect')
     sock.sent.length = 0
     const w = mountWith(ConnectScreen, { store })
@@ -19,17 +19,37 @@ describe('Connect', () => {
       expect(has(w, `lane-${lane}-card`)).toBe(true)
       expect(has(w, `lane-${lane}-test`)).toBe(true)
     }
-    expect(field(w, 'lane-A-url').element.value).toBe('http://localhost:1234/v1')
-    expect(field(w, 'lane-A-model').element.value).toBe('nemotron-cascade-2-30b-a3b')
+    expect(one(w, 'lane-A-card').text()).toContain('Main model')
+    expect(one(w, 'lane-B-card').text()).toContain('Second model')
+    expect(one(w, 'lane-A-model').text()).toContain('nemotron-cascade-2-30b-a3b')
+    expect(one(w, 'lane-A-model').find('input').exists()).toBe(false)
     expect(byId(w, 'lane-A-model-option').map((o) => o.text())).toEqual(['nemotron-cascade-2-30b-a3b', 'qwen3-32b'])
     expect(byId(w, 'lane-B-model-option')).toEqual([])
+    expect(has(w, 'lane-A-url')).toBe(false)
+    await one(w, 'lane-A-advanced').trigger('click')
+    expect(field(w, 'lane-A-url').element.value).toBe('http://localhost:1234/v1')
   })
 
-  test('Test saves what was typed, then tests; the result is shown in words', async () => {
+  test('a model that is no longer loaded is replaced from the list, never typed', async () => {
+    const { store, sock } = storeWith('welcome_connect', 'config')
+    const w = mountWith(ConnectScreen, { store })
+    const listed = ['nemotron-cascade-2-30b-a3b', 'nvidia-nemotron-3.5-lightning-30b-a3b']
+    sock.emit({ type: 'as_game', action: 'models', data: { lane: 'B', models: listed, selected: listed[1], reachable: true } })
+    sock.emit({ type: 'as_game', action: 'models', data: { lane: 'A', models: listed, selected: 'an-old-model', reachable: true } })
+    await flush()
+    expect(one(w, 'lane-A-model').text()).toContain(listed[0])
+    expect(one(w, 'lane-A-model').text()).toContain('not saved yet')
+    expect(one(w, 'lane-B-model').text()).toContain(listed[1])
+    expect(one(w, 'lane-B-model').text()).not.toContain('not saved yet')
+  })
+
+  test('Test saves the picked model, then tests; the result is shown in words', async () => {
     const { store, sock } = storeWith('welcome_connect', 'config', 'models_a', 'models_b')
     const w = mountWith(ConnectScreen, { store })
     await flush()
     await byId(w, 'lane-A-model-option')[1].trigger('click')
+    expect(one(w, 'lane-A-model').text()).toContain('qwen3-32b')
+    await one(w, 'lane-A-advanced').trigger('click')
     await field(w, 'lane-A-url').setValue('http://127.0.0.1:1234/v1')
     sock.sent.length = 0
     await one(w, 'lane-A-test').trigger('click')
@@ -44,7 +64,7 @@ describe('Connect', () => {
     expect(one(w, 'lane-B-status').text()).toContain('Not answering at http://localhost:1234/v1.')
   })
 
-  test('Continue needs at least the storyteller brain; it asks the server where to go', async () => {
+  test('Continue needs at least the main model; it asks the server where to go', async () => {
     const { store, sock } = storeWith('welcome_connect', 'config', 'models_a', 'models_b')
     const w = mountWith(ConnectScreen, { store })
     await flush()

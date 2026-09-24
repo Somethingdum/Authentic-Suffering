@@ -69,7 +69,7 @@ content_dir: as_content/packs
 compiled_dir: as_content/_compiled
 lanes:
   A:
-    name: Storyteller brain (desktop) — Nemotron Cascade 2 30B-A3B
+    name: Main model — Nemotron Cascade 2 30B-A3B
     base_url: http://localhost:1234/v1
     model: nemotron-cascade-2-30b-a3b
     max_concurrency: 1
@@ -78,7 +78,7 @@ lanes:
     structured_mode: json_schema   # json_schema | prompt_only
     structured_with_thinking: unknown   # set by the probe
   B:
-    name: Fast brain (laptop) — Nemotron 3.5 Lightning 30B-A3B
+    name: Second model — Nemotron 3.5 Lightning 30B-A3B
     base_url: http://localhost:1234/v1   # via LM Link; or the laptop's own address
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     max_concurrency: 1
