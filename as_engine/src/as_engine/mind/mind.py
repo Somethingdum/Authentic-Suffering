@@ -49,6 +49,11 @@ LOOP-05 close_loop writes nothing but the loop row. What a broken promise costs 
   content (core CAS-011: the promisee's trust drops and it opens a grudge), applied by the
   cascade sweep to the promisee only.
 LOOP-06 Loops are never deleted; only their status changes.
+LOOP-07 (H1) strengthen_loop(tx, loop_id, delta, cause, at, turn_index) -> Event | None: an OPEN
+  loop's strength moves by ``delta``, clamped to 1..3 (a grudge that deepens each time someone is
+  pushed too far, mind.temper TEMPER-07). A missing or closed loop -> ValueError. No change (at the
+  bound) -> None, nothing committed. Else LOOP_STRENGTH {loop_id, holder_id, old, new} (writer
+  'mind.mind', actor_id = the holder, cause) updating open_loops.strength.
 
 Lessons (what experience taught a mind; retrieved by the cues present, mind.retrieval)
 LESSON-01 learn(tx, holder_id, cue_tags, text, expectation, outcome, cause, at, turn_index) ->
@@ -101,6 +106,11 @@ def open_loop(tx: "Tx", holder_id: str, kind: OpenLoopKind, text: str, subject_i
 def close_loop(tx: "Tx", loop_id: str, status: str, cause: str | None, at: int,
                turn_index: int) -> Event:
     raise NotImplementedError("P6")
+
+
+def strengthen_loop(tx: "Tx", loop_id: str, delta: int, cause: str | None, at: int,
+                    turn_index: int) -> Event | None:
+    raise NotImplementedError("P5")
 
 
 def learn(tx: "Tx", holder_id: str, cue_tags: list[str], text: str, expectation: str, outcome: str,

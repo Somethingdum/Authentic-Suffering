@@ -84,6 +84,34 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
      tags from the def), source 'reflex', speech None, manner '', goal '', private_reason '', the
      same lod — what it had decided is dropped. Nothing in hand, nobody that close, or a cooldown
      -> its intent stands (its packet already told it how much it wants to).
+  4. H1 — breaking points (mind.temper TEMPER-06). Actors of plan.lod in sorted order with an
+     INVOLUNTARY event of this turn at ``at`` whose actor_id is the actor and payload kind is
+     'outburst' (never the PC: take_in never snaps it); T = its toward_id. A snap is code's act, like the
+     compulsion: the intent is built from a core affordance def, not picked from the menu —
+     BoundAffordance(def_id, its verb, label / ui_label = the def's own (unfilled: a reflex is
+     never shown as an option), target_id, destination_id, item_id None, est_duration_s,
+     noise_db, check, tags from the def) — with source 'reflex', speech None, manner '', goal '',
+     private_reason '', lod = plan.lod[actor], and it replaces whatever the actor had decided (a
+     snap is not a choice). Neither the resolve gate nor the menu applies: a snap is the moment
+     nerve runs out. By payload outlet:
+       fists   'punch' at T (est_duration_s = duration.base_s) when the actor is conscious with a
+               hand free (physical.bodies.capacity hands_free >= 1), T is within
+               RulesConfig.temper.fists_reach_m (space.point_distance), and T is not a child
+               (bodies.age_band infant, child or preteen) nor a body the actor is guardian_of
+               (household_members.guardian_of) — else as 'words'.
+       words   the intent the model gave must carry speech whose ``to`` contains T at volume
+               'raised' or 'shout' — then it stands; when it does not and the decision's repair is
+               not spent -> one repair (error: "You have snapped at <P#>: say what you say to them,
+               raised or shouted.", P# = T's handle in its packet); still not — or no model
+               decided for it this wave — -> as 'flight'.
+       cold    only when the actor is mobile (capacity): a portal of its place that is open and
+       flight  admits it (space.admits) -> 'leave_place' (no referent; est_duration_s =
+               duration.base_s; effects leave_place takes the nearest way out); else the anchor of
+               its place whose point is farthest from T's point (ties by anchor_id) ->
+               'move_to_anchor' to it (est_duration_s = duration.base_s + duration.per_meter_s x
+               the straight-line distance from the actor to the anchor); else, or not mobile, no
+               intent this wave (it stays, seething).
+       tears   'rest' (est_duration_s = duration.base_s): it sits down and breaks down.
   Every call is logged by the pipeline through LaneClient.on_call; nothing here writes lm_calls.
 
 cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMRequest

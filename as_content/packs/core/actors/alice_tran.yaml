@@ -59,7 +59,7 @@ motive:
   moral_line:
     will: ["Keep a secret that benefits her", "Shade a number in a report"]
     wont: ["Take food from Eli", "Hurt anyone with her own hands"]
-    wont_tags: [harm_dependent, attack_unarmed]
+    wont_tags: [harm_dependent, attack_unarmed, feed_to_dead]
   inner_conflict: She has accepted Ray's promise of a share of his hidden reserve, and every time June recounts the stockroom out loud Alice has to decide again whether to let her.
   past_wound: Her husband gambled away their house two years before the Fall; she was still paying the debt the day the world ended, and she has never let anyone near her money since.
   signature_behaviour: Writes every number twice — once in the crew's ledger and once in a small notebook in her cardigan pocket.
@@ -136,6 +136,12 @@ voice:
     - "Numbers aren't everything."
   profanity: none
   dialect_notes: Texas vowels surface when she is angry; otherwise careful, office English.
+temper:
+  fuse: 4
+  outlet: cold
+  grudge: 3
+  pet_peeves: ["anyone touching her ledger", "counts rounded up", "being corrected in front of other people"]
+  cools_down_by: "recounting the stock alone"
 social:
   household_role: ""
   relations:

@@ -1,0 +1,73 @@
+# Stress (H1): what wears a person down, and what takes the edge off (actors.stress 0..10; mind.temper
+# reads it: the more strained, the shorter the fuse). Numbers are small on purpose — it adds up.
+- schema: as.cascade.v1
+  id: CAS-019
+  description: Seeing someone die strains everyone who saw it, and more the closer they were to the dead.
+  trigger_event: DEATH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: adjust_stress
+      target: witnesses_of(trigger.event_id)
+      amount: 2
+      payload: {scale_by: bond_to_subject}
+  delay_s: 0
+  cites: [TEMPER-02, docs/as/05_ACTORS.md#7.1]
+- schema: as.cascade.v1
+  id: CAS-020
+  description: Hunger and thirst past the first pangs wear a person down.
+  trigger_event: NEED_STAGE
+  where: {}
+  preconditions: ["trigger.payload.stage >= 2"]
+  effects:
+    - kind: adjust_stress
+      target: actor(trigger.payload.body_id)
+      amount: 1
+  delay_s: 0
+  cites: [TEMPER-02]
+- schema: as.cascade.v1
+  id: CAS-021
+  description: A night's sleep takes the edge off.
+  trigger_event: ACTION_COMPLETE
+  where: {def_id: sleep}
+  preconditions: []
+  effects:
+    - kind: adjust_stress
+      target: actor(trigger.actor_id)
+      amount: -2
+  delay_s: 0
+  cites: [TEMPER-02]
+# --- H1 consequences: not always violence, and they last.
+- schema: as.cascade.v1
+  id: CAS-022
+  description: Shoving someone to the dead costs the one who did it the trust of everyone who saw it, and the story travels.
+  trigger_event: ACTION_START
+  where: {def_id: shove_toward_dead}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: witnesses_of(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -3, cause: fed_someone_to_the_dead}
+    - kind: create_rumour
+      target: witnesses_of(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: fed_someone_to_the_dead}
+  delay_s: 0
+  cites: [TEMPER-06, docs/as/05_ACTORS.md#7.1]
+- schema: as.cascade.v1
+  id: CAS-023
+  description: Whoever was shoved to the dead, if they live, never forgets it.
+  trigger_event: ACTION_START
+  where: {def_id: shove_toward_dead}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: actor(trigger.payload.target_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} shoved you to the dead.", strength: 3}
+    - kind: drain_resolve
+      target: actor(trigger.payload.target_id)
+      amount: 1
+      payload: {cause: betrayed}
+  delay_s: 0
+  cites: [TEMPER-07]

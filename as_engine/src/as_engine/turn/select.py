@@ -1,5 +1,5 @@
 """Who takes part in a wave, who must think, and how long the turn runs (P7, stage 4 and the
-horizon). Rules SEL-01..06, HOR-01..04, SKULL-10. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
+horizon). Rules SEL-01..06, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
 Pure reads (nothing here commits an event). May read any table: selection is scheduling, not a
 mind, so the Skull law does not apply here — but nothing here is ever shown to a mind.
 
@@ -38,7 +38,9 @@ SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=fro
     * it has a tactile percept this turn up to ``at`` (it was touched or hurt; SKULL-10);
     * its first active task (tasks with status 'active', ordered (started_at, task_id)) ends by the
       horizon: started_at + steps_total x round(step_s x 1000) <= horizon_ms;
-    * pc_intent is given and pc_intent.bound.target_id == actor_id (the PC acts on it).
+    * pc_intent is given and pc_intent.bound.target_id == actor_id (the PC acts on it);
+    * (H1) it snapped this wave: an INVOLUNTARY event with actor_id = actor_id, payload kind
+      'outburst' and at == ``at`` (mind.temper TEMPER-05) — the person decides what they say.
   The pipeline passes pc_intent and ``forced`` at wave 0 only (a reaction wave passes None and an
   empty set: its minds are there because what they perceived was material, and the reaction
   budget of lanes.scheduler.plan_cognition decides who thinks with a model).
@@ -62,7 +64,10 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     open_loop_with_pc it has an 'open' loop whose subject_ids contain pc_id;
     dependent_present a body it is guardian_of (household_members.guardian_of) is in its place;
     visible_to_pc     the PC holds a visual percept of it this turn (up to ``at``) at EXACT or
-                      PARTIAL.
+                      PARTIAL;
+    grievance_near    (H1) another living body in its place toward which mind.temper.heat(tx, actor,
+                      it, at) >= max(1, mind.temper.threshold(tx, actor) // 2), or about which it has
+                      an open 'grudge' loop (subject_ids) — someone it can hardly stand is right there.
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags) + weights['mandatory'] when mandatory (SchedulerRules
   .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by actor id).

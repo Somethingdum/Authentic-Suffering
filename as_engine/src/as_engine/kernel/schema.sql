@@ -611,6 +611,16 @@ CREATE TABLE relationships (
   PRIMARY KEY (from_id, to_id)
 );
 
+-- OWNER mind.temper
+CREATE TABLE tempers (                  -- H1: anger one person carries toward another, now (mind.temper TEMPER-02)
+  holder_id  TEXT NOT NULL,
+  toward_id  TEXT NOT NULL,
+  heat       INTEGER NOT NULL DEFAULT 0 CHECK (heat BETWEEN 0 AND 20),
+  updated_at INTEGER NOT NULL,
+  last_kind  TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (holder_id, toward_id)
+);
+
 -- OWNER mind.mind
 CREATE TABLE refusals (
   refusal_id      TEXT PRIMARY KEY,

@@ -53,6 +53,16 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   look and smell; **F1c** washing, changing, smearing gore (with the D-77 exposure; a belief cue for it),
   rain, grime that builds, nakedness's consequences and people's reactions — keeping away from someone who
   reeks is group dynamics.
+- **Human people** (the owner: smart, but human smart; everybody has a breaking point; bickering,
+  brawls, betrayal). **H1 is SPECIFIED** (D-84, TEMPER-01..08, LOOP-07, STL-15; 05 §7.1; 13 §4.0 step
+  1; tests 12 §3.6): stress that deaths, hunger and blows build and sleep eases; a temper per person on
+  their card; heat toward whoever provoked them, fading, kept warm by grudges; the packet says how close
+  they are and how they feel about each person; the snap by outlet (a punch past their own nerve, having
+  it out out loud, walking out, breaking down) with a grudge after; rows and fights in settlements
+  off-screen; shoving someone to the dead and the leg shot, with the trust, the talk and the grudge they
+  cost; all fourteen people have tempers. Left: **I1** the dead feed on the living (eaten alive, crowds
+  feeding, animals as prey, tainted meat and water, the narrator's horror — graphic, cutting away from
+  children), then the queue below.
 - **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own

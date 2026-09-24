@@ -140,6 +140,12 @@ voice:
     - "Let me think about whether it's worth it."
   profanity: frequent
   dialect_notes: Polish; 'kurwa', 'tak', 'dobra'; drops articles and the verb 'to be'.
+temper:
+  fuse: 5
+  outlet: fists
+  grudge: 0
+  pet_peeves: ["people who skip leg day"]
+  cools_down_by: "flexing"
 social:
   household_role: ""
   relations: []

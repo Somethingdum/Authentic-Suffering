@@ -138,6 +138,12 @@ voice:
     - "It's not my business."
   profanity: frequent
   dialect_notes: Northwest Indiana, Gary Black English; 'finna', 'y'all', a lot of 'you hear me'.
+temper:
+  fuse: 3
+  outlet: fists
+  grudge: 2
+  pet_peeves: ["being laughed at", "people who won't look him in the eye", "anyone touching his armband"]
+  cools_down_by: "hitting something that isn't a person"
 social:
   household_role: ""
   relations:

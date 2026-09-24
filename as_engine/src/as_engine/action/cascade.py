@@ -111,6 +111,12 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   drain_resolve                              mind.resolve.drain(target, reason = payload.cause or
                                              'coerced', ...) — payload.scale_by 'bond_to_subject' drains
                                              once per affection step >= 1 toward the dead (max 3)
+  adjust_stress                              (H1) mind.actor.adjust_stress(tx, target, int(effect.amount)
+                                             + bond, E, at, turn_index) — bond = 0, or with payload.scale_by
+                                             'bond_to_subject' the target's affection toward
+                                             trigger.payload.body_id when it is >= 1 (max 3); a target that
+                                             is not an actor (no actors row: the dead, the infected) or the
+                                             subject itself -> no-op
   A dispatch whose owner function raises NotImplementedError (its phase is not built yet) is
   recorded with audit.log.record(tx, 'G10-cascade', 'action.cascade', 'warn', [{kind:
   'cascade_unbuilt', rule_id, what: event_type or kind}], turn_index) and skipped, so an

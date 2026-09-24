@@ -44,7 +44,7 @@
   ui_label: "Run to {destination}"
   binds: anchor
   range: same_place
-  requires: {mobile: true}
+  requires: {mobile: true, can_run: true}
   duration: {base_s: 0.3, per_meter_s: 0.29}
   noise_db: 55
   effect: move_to_anchor
@@ -92,7 +92,7 @@
   ui_label: "Run from {target}"
   binds: body
   range: visible
-  requires: {mobile: true}
+  requires: {mobile: true, can_run: true}
   duration: {base_s: 1, per_meter_s: 0.29}
   noise_db: 55
   effect: flee

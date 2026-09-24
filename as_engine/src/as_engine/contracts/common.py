@@ -185,6 +185,7 @@ class MoralTag(StrEnum):
     BREAK_PROMISE = "break_promise"
     EAT_HUMAN = "eat_human"
     LIE_TO_FAMILY = "lie_to_family"
+    FEED_TO_DEAD = "feed_to_dead"   # H1: shove someone to the dead, or leave them for them, to save yourself
 
 
 # ---------------------------------------------------------------------------

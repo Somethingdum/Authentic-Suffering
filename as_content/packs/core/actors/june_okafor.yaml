@@ -57,7 +57,7 @@ motive:
   moral_line:
     will: ["Give away part of her own ration", "Treat a stranger's wound through the barricade"]
     wont: ["Shoot anyone", "Leave a wounded person where she could reach them", "Hurt a child"]
-    wont_tags: [kill_human, leave_wounded, kill_child, harm_dependent]
+    wont_tags: [kill_human, leave_wounded, kill_child, harm_dependent, feed_to_dead]
   inner_conflict: She believes every person turned away from the door is someone she let die, and she also knows she cannot tell a bitten person from a scared one through a gap in a barricade.
   past_wound: On the first day she handed out the pharmacy's insulin to a line of customers until a man in the line started biting, and she ran and left the rest of them.
   signature_behaviour: Counts under her breath when she is frightened — cans, steps, breaths — and loses her place when anyone speaks to her.
@@ -135,6 +135,12 @@ voice:
     - "I'll shoot, I swear to God."
   profanity: rare
   dialect_notes: Indianapolis flat vowels; her mother's Nigerian English comes out in 'abeg' and 'ehn' when she is very tired.
+temper:
+  fuse: 4
+  outlet: words
+  grudge: 1
+  pet_peeves: ["anyone hoarding medicine", "being called sweetheart", "anyone mocking Eli"]
+  cools_down_by: "sorting pill bottles by date"
 social:
   household_role: ""
   relations:
@@ -148,7 +154,7 @@ social:
       history: She lets Eli help count and gives him part of her dinner; she would not be able to say which of them it helps more.
     - target: "core:actor/ray_delgado"
       kind: acquaintance
-      axes: {trust: 1, respect: 1, resentment: 1}
+      axes: {trust: 1, respect: 1, resentment: 2}
       history: Ray took her in on the first day and has refused every stranger since; she is grateful and she argues with him every week.
     - target: "core:actor/alice_tran"
       kind: acquaintance

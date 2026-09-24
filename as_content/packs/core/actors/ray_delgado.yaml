@@ -139,6 +139,12 @@ voice:
     - "Let's put it to a vote."
   profanity: rare
   dialect_notes: San Antonio Spanish when he's soft — 'mijo' for Eli; 'Dios mío' under his breath.
+temper:
+  fuse: 3
+  outlet: words
+  grudge: 2
+  pet_peeves: ["waste", "people helping themselves to stock", "being second-guessed in front of the crew"]
+  cools_down_by: "a cigarette on the loading dock"
 social:
   household_role: head
   relations:
@@ -148,7 +154,7 @@ social:
       history: Alice knows about the cabinet; he promised her a share, and he watches her more closely than anyone.
     - target: "core:actor/mara_voss"
       kind: employee
-      axes: {trust: 0, respect: 2, fear: 1}
+      axes: {trust: 0, respect: 2, fear: 1, resentment: 1}
       history: He needs her gun and resents that the crew obeys her faster than him.
     - target: "core:actor/eli_voss"
       kind: acquaintance
@@ -156,7 +162,7 @@ social:
       history: Calls him 'mijo' and gives him small jobs and candy from behind the counter; the boy reminds him of his own nephews.
     - target: "core:actor/june_okafor"
       kind: employee
-      axes: {respect: 1, resentment: 1}
+      axes: {respect: 1, resentment: 2}
       history: He took her in on the first day and she has argued with him about the door every week since.
     - target: "core:actor/nita_reyes"
       kind: employee

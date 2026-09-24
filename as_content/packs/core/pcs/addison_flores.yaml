@@ -148,6 +148,12 @@ voice:
     - "Take the gun, I don't need it."
   profanity: frequent
   dialect_notes: Southern Mississippi; 'y'all', 'fixing to', 'might could'.
+temper:
+  fuse: 2
+  outlet: words
+  grudge: 1
+  pet_peeves: ["being underestimated", "people touching her pack"]
+  cools_down_by: "climbing something high"
 social:
   household_role: ""
   relations: []

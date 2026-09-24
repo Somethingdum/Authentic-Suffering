@@ -149,6 +149,12 @@ voice:
     - "Trust me."
   profanity: rare
   dialect_notes: Southern-Indiana vowels that flatten when she is tired; says "you all" not "y'all".
+temper:
+  fuse: 3
+  outlet: cold
+  grudge: 2
+  pet_peeves: ["people wandering off without saying where", "anyone raising their voice near Eli", "being told how to stand a watch"]
+  cools_down_by: "checking on Eli while he sleeps"
 social:
   household_role: head
   relations:

@@ -42,7 +42,7 @@ class CardLine(Strict):
 
 
 class CardSection(Strict):
-    key: Literal["who", "priorities", "values", "contradictions", "private_life", "habits", "voice", "silence",
+    key: Literal["who", "priorities", "values", "contradictions", "private_life", "habits", "temper", "voice", "silence",
                  "competence"]
     heading: str | None = Field(description="None only for 'who', the card's opening.")
     lines: list[CardLine] = Field(min_length=1)
@@ -88,6 +88,9 @@ class PacketEntity(Strict):
                              "(mind.packet; Actor Spec AC14).")
     appearance: str = Field(default="", description="What you see and smell of them right now (F1a/F1b, LOOK-06); "
                             "'' when you do not see them now.")
+    feeling: str = Field(default="", description="How you feel about them right now (H1, TEMPER-08): 'you are "
+                         "furious with them', 'they are getting under your skin', 'you hold a grudge against "
+                         "them' or ''.")
 
 
 class PerceivedItem(Strict):
@@ -197,6 +200,8 @@ class SkullPacket(Strict):
         "reaction and once a consultation has been answered.")
     looked_up: list[str] = Field(default_factory=list, description="What a consultation brought back "
                                  "(mind.consult), shown under 'What you looked up'.")
+    outburst: str | None = Field(default=None, description="H1 (TEMPER-08): you have snapped at someone this "
+                                 "moment and are going to have it out with them; None otherwise.")
 
 
 # ---------------------------------------------------------------------------

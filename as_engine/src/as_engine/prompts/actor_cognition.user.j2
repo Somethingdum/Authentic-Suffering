@@ -82,6 +82,10 @@ Your body
 {% endfor %}
 
 Where you are: {{ p.position_text }}
+{% if p.outburst %}
+
+{{ p.outburst }}
+{% endif %}
 
 What reaches you
 {% for s in p.perceived_now %}
@@ -99,7 +103,7 @@ What you heard
 
 People you can account for
 {% for e in p.entities %}
-- {{ e.handle }}: {{ e.description }}{{ (" (" ~ e.relation_summary ~ ")") if e.relation_summary else "" }} — {{ e.whereabouts }}
+{% set rel = [e.relation_summary, e.feeling] | select | join("; ") %}- {{ e.handle }}: {{ e.description }}{{ (" (" ~ rel ~ ")") if rel else "" }} — {{ e.whereabouts }}
 {% if e.appearance %}  {{ e.appearance }}
 {% endif %}{% else %}
 - No one else.

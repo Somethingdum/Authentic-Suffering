@@ -168,6 +168,20 @@ Each part lives in the phase that owns the function it pins; every world is a sm
 `test_appearance_in_packet.py` and `test_appearance_cues.py` also pin the smell on the packet line
 (SMELL-04) and the smell cues, seen and unseen (SMELL-06).
 
+### 3.6 The owner's human people (H1; D-84)
+
+Dict scenarios again: a bar room at day 3100 (Reggie, Irene, Tess, a stranger), a back lot and a
+street at noon with one of the dead close, Pumpwell for the rows.
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_identity.py` | the card gains "What sets you off" between habits and voice — the fuse, the outlet and the grudge in words, the pet peeves, what settles them — and keeps all of it in a reaction (IDN-01, IDN-05) |
+| `p05_many_actors/test_temper.py` | a temper comes from the dossier (the middle of the road without one); strain shortens the fuse; heat fades by the hour and a grudge keeps it warm; what is said to you (an insult, being ordered about, a threat — never words meant for someone else) and done to you and yours (shoved, struck — the blow is felt and who threw it seen —, your people hurt by someone you saw) provokes, each thing once; past his breaking point a man with no nerve left swings, lets some of it out, and holds a grudge and resentment; swallowing it costs Resolve; an old grudge makes it quicker and deepens; the player's anger is on record and never takes their hand (TEMPER-01..05, -07, LOOP-07) |
+| `p05_many_actors/test_temper_in_packet.py` | how close to breaking, and how they feel about each person, in the packet and the prompt; a snap is said first and belongs to its moment; the actor core's humanity paragraph; shoving someone to the dead offered only with the dead right there — and shown, not buried — and taken away by a person's own line; a gun can be aimed at a leg (TEMPER-08, AFF-07) |
+| `p05_many_actors/test_betrayal.py` | shoved into the dead: pushed at most 2 m, never through it, toward the one nearest him, on his back, and it turns on him by sight; keeping your feet; with no dead near it is a shove; shot in the leg you go down and cannot run, a graze in the leg still hobbles, the body shot is unchanged; a hurt leg or foot stops running, never walking, and running leaves the menu; everyone who saw the shove stops trusting him and word travels; the one shoved never forgets; seeing someone die wears you down more if you loved them; hunger past the first pangs; a night's sleep (CAS-019..023) |
+| `p07_slice/test_breaking_point.py` | a snap makes the person think this wave; someone you can hardly stand in the room raises salience; fists become a punch whatever was decided and whatever nerve is left — never at a child, and words when out of reach; a snap in words must be said out loud, one repair, then they walk out; cold walks out, or to the far end with the door shut; tears sit down; in a whole turn, insult him twice and he swings (TEMPER-06, SEL-02, SEL-03, S3b) |
+| `p09_society/test_quarrels.py` | nobody sore, no rows; a row between two who resent each other, more likely the more strained, started by the more strained, heard about by the settlement; blows (bruises, standing lost); a grudge is enough; never the player; the settlement day has its rows (STL-15, STL-03 step 8b) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

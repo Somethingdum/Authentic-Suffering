@@ -160,3 +160,64 @@
   noise_db: 40
   effect: strike_melee
   tags: [attack, bite, infected_only]
+# --- H1: when it is them or you (the owner: "Somebody pushing the person who's been pissing them off
+# into a horde of oncoming shamblers as a distraction is not unheard of. Shot in the leg and left to
+# feed the crowd.") Offered like any option; a person's own line (wont_tags feed_to_dead, kill_child)
+# is what takes them away.
+- schema: as.affordance.v1
+  id: shove_toward_dead
+  verb: attack
+  label: Shove {target} toward the dead
+  ui_label: Shove {target} at the dead
+  binds: body
+  range: touch
+  requires:
+    hands_free: 1
+    infected_within_m: 8
+    target_kinds: [human, lurker, animal]
+  moral_tags_if_target:
+    human: [feed_to_dead, kill_human]
+    lurker: [feed_to_dead, kill_human]
+    infant: [feed_to_dead, kill_child]
+    child: [feed_to_dead, kill_child]
+    preteen: [feed_to_dead, kill_child]
+    teen: [feed_to_dead, kill_child]
+  duration:
+    base_s: 1
+  noise_db: 40
+  check:
+    attribute: S
+    skill: brawling
+    opposed: true
+    opposed_attribute: A
+    opposed_skill: athletics
+  effect: shove_toward
+  tags: [attack, control, feed_to_dead]
+  paces: [rushed]
+- schema: as.affordance.v1
+  id: shoot_leg
+  verb: attack
+  label: Shoot {target} in the leg with {item} ({distance})
+  ui_label: Shoot {target}'s leg
+  binds: body
+  range: visible
+  requires:
+    held_item_tags: [firearm]
+    fear_exposure: true
+  moral_tags_if_target:
+    human: [kill_human]            # a bullet in anyone's leg can kill them
+    lurker: [kill_human]
+    infant: [kill_child]
+    child: [kill_child]
+    preteen: [kill_child]
+    teen: [kill_child]
+  duration:
+    base_s: 1
+  noise_db: 0
+  check:
+    attribute: P
+    skill: firearms
+    tags: [marksman]
+    resistance: range_band
+  effect: shoot
+  tags: [attack, ranged, leg]

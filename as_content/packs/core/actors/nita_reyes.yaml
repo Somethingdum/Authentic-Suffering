@@ -139,6 +139,12 @@ voice:
     - "I promise I'll tell you everything."
   profanity: frequent
   dialect_notes: Northwest Indiana, drops her g's, says 'ain't' only when she's mocking herself.
+temper:
+  fuse: 2
+  outlet: fists
+  grudge: 2
+  pet_peeves: ["being told to be careful", "anyone slowing her down on a run", "people touching her knife"]
+  cools_down_by: "a hard run alone"
 social:
   household_role: ""
   relations:
@@ -148,7 +154,7 @@ social:
       history: They split the dangerous work; Nita respects Mara and is afraid of how fast Mara would shoot the man at the fence.
     - target: "core:actor/ray_delgado"
       kind: acquaintance
-      axes: {trust: 0, resentment: 1}
+      axes: {trust: 0, resentment: 2}
       history: Ray relies on her runs and refuses her a gun; she thinks he is afraid of what she'd do with one.
     - target: "core:actor/june_okafor"
       kind: friend

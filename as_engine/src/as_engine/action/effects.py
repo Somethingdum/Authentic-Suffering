@@ -135,10 +135,15 @@ Per effect (result strings in quotes; 'done' unless noted):
                      20 dB with kind 'click' ('a dry click') and result 'click' (no check, no hit;
                      a click is never a gunshot cue). 'fired' -> NOISE at
                      the firearm's noise_db ('a gunshot'), then P + firearms check vs 'range_band'.
-                     Hit (CLEAN/COST): anatomy 'head' for defs tagged 'head', else
+                     Hit (CLEAN/COST): anatomy 'head' for defs tagged 'head', (H1) for defs tagged
+                     'leg' rng.choice('resolve', f'leg:{actor}:{target}', ['leg_l', 'leg_r']), else
                      rng.weighted('resolve', f'anatomy:{actor}:{target}', CENTRE_MASS); severity by
                      WEAPON_WOUNDS[damage_class][band] (+ head/neck upgrade), type 'gunshot',
-                     contamination 1; bodies.apply_harm -> result 'hit'. FAIL 'miss'. BREAK 'miss'
+                     contamination 1; bodies.apply_harm -> result 'hit'. (H1) A 'leg' hit is at least
+                     'significant' (function_loss 1: the target can walk, not run — bodies can_run),
+                     and a target still alive and conscious after it goes down:
+                     bodies.posture_event(target, 'lying', land_at, the HARM id, turn_index) — shot in
+                     the leg and left for the dead. FAIL 'miss'. BREAK 'miss'
                      and, when another living body stands within 1 m of the target's point, the
                      lowest-id such body is resolved as a fresh shot at situation - 2 ('stray').
   strike_melee       walks to the target first when it is farther than the weapon's reach (MOVE to
@@ -161,6 +166,19 @@ Per effect (result strings in quotes; 'done' unless noted):
                      'grabbed' / 'slipped'.
   break_grip         opposed S + brawling vs the gripper's S + brawling; wins -> release_event.
   shove              opposed S + brawling vs S; wins -> target posture 'lying' ('knocked_down').
+  shove_toward       (H1 — shove_toward_dead) the def's opposed check: S + brawling vs the target's
+                     A + athletics (keeping your feet); a target that is not conscious and mobile does
+                     not defend and loses. NOISE as shove. The attacker loses -> 'braced' (FAIL).
+                     Wins -> D = the active infected body (world.infected.active) in the target's place,
+                     other than the target, nearest to it (space.point_distance; ties by body_id); none
+                     -> as shove
+                     ('knocked_down'). Else: the target is pushed along the line from its point to D's,
+                     s = min(2.0, max(0.0, distance - 0.5)) metres (it lands at most 2 m from where
+                     it stood and never closer than 0.5 m to D): space.move_event(tx, target, its
+                     place, None, x, y, land_at, the ACTION_START, turn_index) committed; then
+                     bodies.posture_event(target, 'lying', ...) when it is conscious; then
+                     world.infected.attract(tx, D, target, land_at, the MOVE's id, turn_index,
+                     reason='sight'); result 'shoved_to_the_dead' (CLEAN/COST as shove).
   disarm             opposed A + brawling vs A + brawling; wins -> the target's held weapon
                      (firearm first, then melee; hand_r first) is transferred to the floor at the
                      target's anchor ('disarmed').
@@ -250,7 +268,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "grapple", "break_grip", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
-    "throw_distraction",
+    "throw_distraction", "shove_toward",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -267,6 +285,8 @@ WEAPON_WOUNDS: dict[str, dict[str, str]] = {
 SEEN: dict[str, str | None] = {
     "shoot_center_mass": "raises {item} toward {target}",
     "shoot_head": "takes careful aim at {target}'s head with {item}",
+    "shoot_leg": "aims {item} low at {target}'s legs",
+    "shove_toward_dead": "shoves {target} toward the dead",
     "strike_melee": "swings {item} at {target}",
     "strike_head": "brings {item} down at {target}'s head",
     "finish_downed": "stands over {target} with {item} raised",

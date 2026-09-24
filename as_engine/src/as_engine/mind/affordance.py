@@ -55,7 +55,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
               kind), target_kinds, portal_kinds (the bound portal's kind; P10), target_alive
               (PERCEIVED: a target is 'still' when its posture is lying/prone and it is
               unconscious, dead or false-dead — what anyone can see), admits() for
-              move_through_portal
+              move_through_portal; (H1) requires.can_run (capacity can_run), requires.infected_within_m
+              (a visual percept of this turn, up to ``at``, at clear or partial, of a body of kind
+              'infected' whose point — space.point_distance — is within that many metres of the actor)
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def
               with only skill_or_belief_cue needs the cue)
     belief    (every requires.belief_cues held — e.g. 'knows_headshot_rule')
@@ -149,9 +151,11 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
                  waiting, not doing — it must not crowd out picking something up)
   Sort key: (group, inner, DISTANCE, catalog index, target id). inner is 0 except:
     threat group  0 an ATTACK on a threat, 1 a def tagged 'protect_dependent', 2 verbs FLEE /
-                  ESCAPE, 3 verbs TAKE_COVER / HIDE, 4 SURRENDER, 5 anything else (attacks on
-                  bodies that are not threats, shove) — facing a shambler with a gun in hand,
-                  'shoot it' must never lose its slot to 'crouch';
+                  ESCAPE, 3 (H1) a def tagged 'feed_to_dead' (someone else between you and the
+                  dead: the way out a frightened person sees right after running), 4 verbs
+                  TAKE_COVER / HIDE, 5 SURRENDER, 6 anything else (attacks on bodies that are
+                  not threats, shove) — facing a shambler with a gun in hand, 'shoot it' must
+                  never lose its slot to 'crouch';
     hold group    0 defs tagged 'freeze', 1 verb OBSERVE, 2 verb GUARD, 3 the rest (so 'stay
                   where you are' and 'watch' are never crowded out by 'sleep').
   DISTANCE for an option bound to an anchor or portal = metres from that point to the actor's

@@ -33,6 +33,8 @@ Impairment (HARM-07) = clamp(pain // 2 + blood steps + needs steps, 0, H.impairm
 Capacity (``capacity``):
   conscious  = alive and awareness in (alert, awake, drowsy)
   mobile     = conscious and not restrained and NOT (both legs carry a wound with function_loss 2)
+  can_run    = (H1) mobile and no unhealed wound on a leg or foot with function_loss >= 1 (a shot leg
+               hobbles: you can walk, not run)
   hands_free = the number of hands (l, r) that hold nothing (no item in hand_l / hand_r) AND are
                not disabled; a hand is disabled when an unhealed wound on that side's arm or hand
                has function_loss 2 (ANATOMY_SIDE)
@@ -203,6 +205,7 @@ class Capacity:
     can_speak: bool
     conscious: bool
     impairment: int
+    can_run: bool = True   # H1: see capacity
 
 
 

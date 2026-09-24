@@ -72,6 +72,10 @@ simulate — stages 0-12 in ONE store transaction:
        trigger_at) of action.reactions.material_holders(tx, every event of this transaction so far,
        T) whose holder is the PC: horizon = select.pull(horizon, trigger_at, the latest events.at of
        this turn).
+    S3b temper (H1): for each perceiver of the wave that select.conscious (sorted; the PC included —
+       its anger goes on record, it never snaps): mind.temper.take_in(tx, rng, a, T, wave_at) —
+       provocations taken in, and a snap when someone reaches their breaking point (TEMPER-05);
+       what a snap does is turn.cognition step 4.
     S4 select: minds = the conscious cands; for each: select.mandatory(tx, a, T, wave_at, horizon,
        pc_intent (wave 0) | None, FORCED (wave 0) | empty), select.salience(select.salience_flags(
        tx, a, minds, pc, T, wave_at), mandatory, weights); plan = lanes.scheduler.plan_cognition(

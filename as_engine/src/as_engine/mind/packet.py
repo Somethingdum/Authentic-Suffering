@@ -24,6 +24,11 @@ SKULL-10 (P10) Nothing later than the moment reaches a mind: a mind deciding at 
   (known bodies and items, threats, the attention point), mind.retrieval (the moment set) and
   turn.select (salience; mind.cues always did).
 
+TEMPER-08 (H1) A person knows their own state: body_lines gains the strain line, each entity its
+  PacketEntity.feeling, and a snap of outlet 'words' this wave sets SkullPacket.outburst — all as
+  mind.temper TEMPER-08 words them. The prompt shows the feeling in the entity's line, after its
+  relation, as '; ' + feeling, and the outburst first under what is happening now.
+
 LOOK-06 (F1a, F1b) Everyone the holder sees now comes with what the holder sees and smells of them:
   each entity 'here' carries PacketEntity.appearance (entities below — mind.perception.
   appearance_text at the best level and the distance, then smell_text), and the prompt shows it on

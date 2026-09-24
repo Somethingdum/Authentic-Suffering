@@ -25,12 +25,13 @@ from as_engine.prompts.render import PROMPT_DIR, render
 
 pytestmark = pytest.mark.phase(4)
 
-KEYS = ["who", "priorities", "values", "contradictions", "private_life", "habits", "voice", "silence", "competence"]
+KEYS = ["who", "priorities", "values", "contradictions", "private_life", "habits", "temper", "voice", "silence",
+        "competence"]
 HEADINGS = [None, "What matters to you", "Your limits", "Where you are pulled both ways", "Your own life", "Your habits",
-            "How you talk", "When you go quiet", "What you know how to do"]
+            "What sets you off", "How you talk", "When you go quiet", "What you know how to do"]
 ROLE_WORDS = re.compile(r"\b(story|stories|storyteller|narrat\w*|player|npc|author\w*|quest|performance|performer|"
                         r"audience|assistant|character|role-?play\w*|game)\b", re.I)
-WORDED = ("voice.profanity",)  # an enum the card puts in words ('rare' -> 'You rarely swear.')
+WORDED = ("voice.profanity", "temper.fuse", "temper.outlet", "temper.grudge")  # enums the card puts in words
 CORE_OPENING = ("You are the person described under Who you are. The current moment is yours to respond to. Choose "
                 "what you try to do, what you say if anything, and what you attend to from your own position.")
 REACTION_LAST = ("Something just reached you. Respond to that immediate change with the response time and attempts "
@@ -141,7 +142,8 @@ def test_the_message_begins_with_who_you_are(scenario, canon):
 @pytest.mark.parametrize("ref", ["core:actor/mara_voss", "core:actor/june_okafor"])
 def test_the_card_is_the_whole_person(canon, ref):
     """IDN-01 (AC04): who, priorities, limits, contradictions, private life, habits with what they
-    make you do, voice, silence and competence — in that order, in the dossier's own words."""
+    make you do, what sets you off (H1), voice, silence and competence — in that order, in the
+    dossier's own words."""
     d = canon.get(ref)
     card = identity.compile_identity(d)
     assert [s.key for s in card.sections] == KEYS and [s.heading for s in card.sections] == HEADINGS
@@ -159,6 +161,13 @@ def test_the_card_is_the_whole_person(canon, ref):
     for t, line in zip(d.traits, texts["habits"], strict=False):
         assert line.startswith(f"{cap(t.tag.replace('_', ' '))}: {end(t.manifests)}")
         assert f"What it makes you do: {end(t.causes)}" in line and f"What it costs you: {end(t.costs)}" in line
+    tm = d.temper
+    assert texts["temper"][:3] == [identity.FUSE_WORDS[tm.fuse], identity.OUTLET_WORDS[tm.outlet],
+                                   identity.GRUDGE_WORDS[tm.grudge]], "H1: how this person breaks"
+    if tm.pet_peeves:
+        assert f"Things that get under your skin: {'; '.join(bare(x) for x in tm.pet_peeves)}." in texts["temper"]
+    if tm.cools_down_by:
+        assert texts["temper"][-1] == f"What settles you: {end(tm.cools_down_by)}"
     assert texts["silence"][0] == f"You go quiet when: {'; '.join(bare(x) for x in d.silence.goes_quiet_when)}."
     ex = d.voice.exemplars
     for label, words in (("Your voice when it is easy", ex.low_stakes), ("Under pressure", ex.under_pressure),
@@ -244,14 +253,15 @@ def test_the_card_follows_the_dossier(scenario):
 
 @pytest.mark.parametrize("ref", ["core:actor/mara_voss", "core:actor/june_okafor"])
 def test_a_reaction_keeps_a_minimum_card(canon, ref):
-    """IDN-05: the same lines, fewer of them — who, what comes first, the limits, the voice under
-    pressure, when they go quiet, what they know how to do."""
+    """IDN-05: the same lines, fewer of them — who, what comes first, the limits, what sets them off
+    (H1), the voice under pressure, when they go quiet, what they know how to do."""
     d = canon.get(ref)
     full, mini = identity.compile_identity(d), identity.compile_identity(d, minimum=True)
-    assert mini.minimum and [s.key for s in mini.sections] == ["who", "priorities", "values", "voice", "silence", "competence"]
+    assert mini.minimum and [s.key for s in mini.sections] == ["who", "priorities", "values", "temper", "voice", "silence",
+                                                                "competence"]
     by = {s.key: [ln.text for ln in s.lines] for s in full.sections}
     mby = {s.key: [ln.text for ln in s.lines] for s in mini.sections}
-    for k in ("who", "values", "competence"):
+    for k in ("who", "values", "temper", "competence"):
         assert mby[k] == by[k], k
     assert mby["priorities"] == [x for x in by["priorities"] if not x.startswith("Once, when it mattered:")]
     assert mby["voice"] == [by["voice"][0]] + [x for x in by["voice"] if x.startswith(("Under pressure:", "At your limit:",

@@ -56,7 +56,7 @@ motive:
   moral_line:
     will: ["Hide somewhere he was told not to go", "Keep a grown-up's secret if they ask him to"]
     wont: ["Leave his mother", "Tell a lie to his mother's face"]
-    wont_tags: [abandon_dependent, lie_to_family]
+    wont_tags: [abandon_dependent, lie_to_family, feed_to_dead]
   inner_conflict: He knows something about Ray that he thinks he should tell his mother, and he is scared that telling will get them thrown out.
   past_wound: He heard the neighbor pounding and begging on the second day and his mother held her hand over his mouth until it stopped.
   signature_behaviour: Counts things — cans, bolts, footsteps — under his breath when he is scared, the way he heard June counting.
@@ -133,6 +133,12 @@ voice:
     - "Whatever, I don't care."
   profanity: none
   dialect_notes: ""
+temper:
+  fuse: 2
+  outlet: tears
+  grudge: 1
+  pet_peeves: ["being called little", "anyone taking his flashlight", "grown-ups whispering about his dad"]
+  cools_down_by: "his mother's hand on his head"
 social:
   household_role: child
   relations:

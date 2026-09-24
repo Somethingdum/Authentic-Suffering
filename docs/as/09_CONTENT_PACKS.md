@@ -132,6 +132,25 @@ without colour: `work jacket`), a default `colour`, `plural` for words that take
 uniform and tactical read as uniformed, formal as formally dressed), `warmth`, `protection`, and
 `conceals` for a long outer layer that hides a handgun or knife on the belt (bulk 2 or less).
 
+### 3.2 What sets them off (`temper`, H1)
+
+Everybody has a breaking point (05_ACTORS §7.1). `temper` says how this person breaks, and goes on
+their card as "What sets you off":
+- `fuse` 1–5 — 1 a hair trigger, 3 can take a fair amount, 5 almost never loses it. The breaking
+  point is `fuse x 2`, shortened by stress. Give a group a spread: a room where everyone has fuse
+  4 never fights.
+- `outlet` — what comes out when they blow: `fists` (they swing — even people who say they never
+  hit an unarmed man), `words` (they let you have it, out loud), `cold` (they go cold and walk
+  out), `flight` (they leave), `tears` (they break down). Match it to the person, not to their
+  job: a gentle-looking cook can have fists.
+- `grudge` 0–3 — 0 over it by evening, 3 never forgets. A snap leaves a grudge unless it is 0.
+- `pet_peeves` — concrete things that get under their skin (`"being told to be careful"`, `"people
+  touching her knife"`); they are the model's cue, never a trigger the code reads.
+- `cools_down_by` — what settles them (`"a hard run alone"`).
+A person without `temper` gets the middle of the road (fuse 3, words, grudge 1). Put
+`feed_to_dead` in `wont_tags` for someone who would never push another person to the dead to
+save themselves — and leave it out for someone who, in the worst moment, might.
+
 **Capability tags** give +2 on any check that lists them (07_RULES §1; one tag, never stacking).
 The core pack's checks use: `parkour`, `climber` (climbing), `quiet_mover` (sneaking, hiding),
 `locksmith` (picking), `breacher` (forcing doors), `calm_voice` (talking someone down),

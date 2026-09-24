@@ -297,6 +297,24 @@ class ItemGrant(Strict):
     props: dict = Field(default_factory=dict)
 
 
+class Temper(Strict):
+    """How this person breaks (H1, TEMPER-01; the owner: "everybody has a breaking point"). People are
+    smart, but human smart: pride, fear, grief and grudges weigh as much as reasons do."""
+
+    fuse: int = Field(default=3, ge=1, le=5, description="How much provocation it takes before they snap: "
+                      "1 = a hair trigger, 5 = a saint on a good day (mind.temper: the breaking point is fuse x 2 "
+                      "heat, lower the more strained they are).")
+    outlet: Literal["fists", "words", "cold", "flight", "tears"] = Field(
+        default="words", description="How they blow when they do: swing at whoever pushed them; tear into them "
+        "out loud; go ice-cold and cut them off; storm off; break down.")
+    grudge: int = Field(default=1, ge=0, le=3, description="How long they carry it: 0 = over it by the evening, "
+                        "3 = never forgets.")
+    pet_peeves: list[str] = Field(default_factory=list, description="Small things that get under their skin out "
+                                  "of all proportion — fair or not: 'people who whistle', 'being called kid'.")
+    cools_down_by: str = Field(default="", description="What actually settles them: 'a cigarette alone', "
+                               "'hitting something that isn't a person', 'Eli asleep and safe'.")
+
+
 class ActorDossier(Strict):
     schema_id: Literal["as.actor.v1"] = Field(alias="schema", default="as.actor.v1")
     id: str = Field(pattern=SLUG_PATTERN)
@@ -312,6 +330,8 @@ class ActorDossier(Strict):
     silence: Silence
     knowledge: KnowledgeSeed
     voice: Voice
+    temper: Temper | None = Field(default=None, description="H1: how this person breaks (None: the default "
+                                  "Temper — a middling fuse that comes out in words).")
     social: Social
     life: Life
     disposition: Disposition

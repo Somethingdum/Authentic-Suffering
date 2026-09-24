@@ -146,6 +146,11 @@ class AffordanceRequires(Strict):
     target_kinds: list[str] | None = None
     portal_kinds: list[str] | None = Field(default=None, description="Portal kinds this may bind to (physical gate), e.g. ['door', 'window', 'gate'] for closing; None = any portal the binding offers. An 'opening' has nothing to close, lock or bar (P10).")
     actor_kinds: list[str] | None = Field(default=None, description="Body kinds that may attempt this (physical gate), e.g. ['infected'] for bite; None = any kind that has hands for the option.")
+    can_run: bool = Field(default=False, description="H1: the actor must be able to run (physical.bodies capacity "
+                          "can_run: no leg or foot wound that hobbles it).")
+    infected_within_m: float | None = Field(default=None, gt=0, description="H1: offered only while the actor sees "
+                                            "one of the dead (a visual percept this turn, clear or partial, of an "
+                                            "infected body) within this many metres of it.")
 
 
 class DurationSpec(Strict):
@@ -311,7 +316,8 @@ class InfectionPathwayDef(Strict):
 
 
 class CascadeEffect(Strict):
-    kind: Literal["emit_event", "schedule_event", "adjust", "create_trace", "create_rumour", "drain_resolve"]
+    kind: Literal["emit_event", "schedule_event", "adjust", "create_trace", "create_rumour", "drain_resolve",
+                  "adjust_stress"]
     event_type: str | None = None
     target: str | None = Field(default=None, description="Selector (action/cascade.py CAS-05), e.g. 'actor(trigger.actor_id)', 'settlement_of(trigger.payload.workplace_id)'")
     field: str | None = None

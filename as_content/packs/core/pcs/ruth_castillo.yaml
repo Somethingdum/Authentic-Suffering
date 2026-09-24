@@ -64,7 +64,7 @@ motive:
   moral_line:
     will: ["Refuse a patient the faction forbids, if it keeps the clinic open", "Lie to the faction about how much medicine she used"]
     wont: ["Leave a wounded person untreated when she has what they need", "Put down a confirmed infected who is still a person", "Hurt a patient"]
-    wont_tags: [leave_wounded, execute_prisoner, harm_dependent]
+    wont_tags: [leave_wounded, execute_prisoner, harm_dependent, feed_to_dead]
   inner_conflict: She took an oath to treat anyone and works for an order whose clinic treats the paying first, and every day at the door she decides who that oath covers.
   past_wound: In the first week her ER was overrun while she was holding a patient's airway; she stayed until the patient died and then ran, and she has never known how many of her nurses got out.
   signature_behaviour: Speaks to every patient by name and tells them exactly what she's about to do before she does it.
@@ -139,6 +139,12 @@ voice:
     - "Rules are rules."
   profanity: rare
   dialect_notes: El Paso border Spanglish; 'ándale', 'ay, no', 'mija'.
+temper:
+  fuse: 4
+  outlet: words
+  grudge: 2
+  pet_peeves: ["people ignoring her about their wounds", "clean dressings wasted"]
+  cools_down_by: "a cup of anything hot"
 social:
   household_role: ""
   relations: []

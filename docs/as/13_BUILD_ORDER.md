@@ -99,6 +99,27 @@ machine yet, so start here, not at P0 task 1:
    - P5: `cues_of` adds the smell cues (`SMELL_CUES`) — the smell tests in `test_appearance_cues.py`.
    - P10: `world/infected.sees` — gore camouflage, INF-14 (`world/_impl_p10.py`) —
      `p10_world/test_gore_mask.py`.
+   The owner's human people (H1: breaking points, grudges, quarrels and betrayal; D-84; 05_ACTORS
+   §7.1; rules TEMPER-01..08, LOOP-07 and STL-15) the same way:
+   - P4: `mind/identity.compile_identity` — the 'temper' section (IDN-01; kept whole in the
+     reaction card, IDN-05). Add only those lines; the rest of the function stays as it is —
+     `p04_one_actor/test_identity.py`. And AFF-02's weapon binding for every `shoot_*` def in
+     `mind/_impl_affordance.py` (the built code binds only `shoot_center_mass` and `shoot_head`,
+     so the new `shoot_leg` gets no gun) — `p04_one_actor/test_affordances.py`.
+   - P5: `mind/temper.py` (new: `temper_of`, `heat`, `threshold`, `provocations`, `provoke`,
+     `take_in`; write them in place or in a `_impl_temper.py` bound at its end);
+     `mind/mind.strengthen_loop` (LOOP-07, in `mind/_impl_p6.py`, bound like its neighbours);
+     `physical/bodies.capacity` — `can_run`; `mind/_impl_affordance.py` — `requires.can_run`,
+     `requires.infected_within_m`, and AFF-07's threat-group inner rank 3 for defs tagged
+     'feed_to_dead'; `mind/_impl_packet.py` — TEMPER-08 (the strain line, `PacketEntity.feeling`,
+     `SkullPacket.outburst`); `action/_impl_effects.py` — the `shove_toward` handler and the
+     'leg' shot; `action/_impl_p5b.py` — the `adjust_stress` cascade dispatch —
+     `p05_many_actors/test_temper.py`, `test_temper_in_packet.py`, `test_betrayal.py`.
+   - P7: `turn/_impl_select.py` — SEL-02 (a snap is mandatory) and SEL-03 `grievance_near`;
+     `turn/_impl_cognition.py` — decide step 4 (what a snap does); `turn/_impl_pipeline.py` —
+     stage S3b (take_in) — `p07_slice/test_breaking_point.py`.
+   - P9: `society/settlement.friction` (STL-15) and the settlement day's step 8b
+     (`society/_impl_society.py`) — `p09_society/test_quarrels.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
@@ -181,6 +202,8 @@ Read: 05 §2–8, `mind/actor.py`, `mind/resolve.py`, `mind/affordance.py`, `min
 6. `action/intent.py::to_intent` (the Actor v2 answer: pace, speech limits, expression —
    `test_intent_v2.py`, D-74).
 7. `mind/consult.py`: `check`, `families`, `more_actions` — `test_consult.py` (D-74).
+8. H1 (D-84): the card's 'temper' section in `mind/identity.compile_identity` — what sets this
+   person off, in their card's words (`test_identity.py`).
 Gate: `p04_one_actor` green.
 **Forbidden:** multiple actors resolving together. One mind, done properly, before five.
 
@@ -198,6 +221,10 @@ Read: 04 §3, 07 §1, §8, §9, `action/*`, `mind/cues.py`, `lanes/scheduler.py`
    `plan_continuation`, `intent_to_dict` / `intent_from_dict`). 8. `action/reactions.py`.
    9. `action/propagate.py` (P5 returns []). 10. `action/cascade.py` (P5 selectors + dispatch;
    the rest records `cascade_unbuilt`). 11. `lanes/scheduler.py::plan_cognition`.
+   12. H1 (D-84): `mind/temper.py` and `mind/mind.strengthen_loop` (`test_temper.py`); the strain
+   line, feelings and the snap in the packet, the running and the dead-within gates, AFF-07's rank
+   for 'feed_to_dead' (`test_temper_in_packet.py`); `physical/bodies.capacity` can_run, the
+   `shove_toward` handler, the leg shot and the `adjust_stress` dispatch (`test_betrayal.py`).
 Gate: `p05_many_actors` green (TELEPATHY-01, BARRIER-01, INTENT-03 and HALLUC-01 included).
 **Forbidden:** society tables (households, settlements, workplaces) beyond reading what fixtures put there. Five people in a room, not a settlement.
 
@@ -232,6 +259,8 @@ Read: 04 (all), 05 §11, 07 §10, 10 §5–6, and the docstrings of every module
 8. Rollback + strict retry + degradation paths (the pipeline docstring).
 9. `service/runs.py` (scenario path, save/load/autosave/list/delete; not worldgen), `service/view.py`, `service/replay.py` — `test_save_load.py`, the view tests, `test_slice_refusal.py`.
 10. `cli.py` (`content-check`, `new-scenario`, `play`, `replay`) — `test_cli.py`.
+11. H1 (D-84): SEL-02's snap and SEL-03's `grievance_near` in `turn/select.py`, decide step 4 in
+   `turn/cognition.py`, stage S3b in `turn/pipeline.py` — `test_breaking_point.py`.
 Gate: `p07_slice` green, the `sim` soak green (`tests/sim/test_soak_metal_fence.py`: 50 turns, every committed turn passes the 58 bits, no rollback, then DET-02 re-simulation of every turn), and every item of §5.7.
 **Forbidden:** worldgen, society, UI. The slice runs on hand-authored scenarios.
 
@@ -275,6 +304,7 @@ that makes exactly what they drink).
    `test_rumours.py`).
 7. `test_econ_chain.py` last: it is the proof that the pieces add up, and it must pass without a
    single line written for it.
+8. H1 (D-84): `society/settlement.friction` (STL-15) and the day's step 8b — `test_quarrels.py`.
 Gate: `p09_society` green with P0–P8, the sim soak and the P8 steps: the ECON-01 chain fires
 unprompted from one injury; SOC-02 relationships drift with the PC absent; a rumour reaches trade;
 the P7 scenarios (no settlements) run exactly as before.

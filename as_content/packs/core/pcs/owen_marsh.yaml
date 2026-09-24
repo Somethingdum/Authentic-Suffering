@@ -138,6 +138,12 @@ voice:
     - "Let's talk about how you're feeling."
   profanity: frequent
   dialect_notes: Northwest Indiana 'Region' accent; drops g's; 'youse' when tired.
+temper:
+  fuse: 3
+  outlet: fists
+  grudge: 1
+  pet_peeves: ["people who panic loud", "wasted water"]
+  cools_down_by: "sharpening the axe"
 social:
   household_role: ""
   relations: []

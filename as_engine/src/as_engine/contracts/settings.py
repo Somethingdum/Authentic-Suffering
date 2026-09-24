@@ -161,7 +161,7 @@ class ResolveRules(Strict):
     drains: dict[str, int] = Field(default_factory=lambda: {
         "witness_bonded_death": 2, "sustained_fear_scene": 1, "humiliated_publicly": 1, "severe_pain": 1,
         "betrayed": 2, "first_kill": 1, "killed_child": 3, "starving_day": 1, "sleepless_night": 1,
-        "lost_dependent": 3, "made_to_watch": 2, "coerced": 1,
+        "lost_dependent": 3, "made_to_watch": 2, "coerced": 1, "held_temper": 1,
     })
     recover_per_safe_night: int = 1
     recover_fulfilled_obligation: int = 1
@@ -180,6 +180,7 @@ class SchedulerRules(Strict):
     salience_weights: dict[str, float] = Field(default_factory=lambda: {
         "mandatory": 100.0, "unique_info": 3.0, "loudest_percept": 2.0, "addressed": 4.0, "in_conflict": 3.0,
         "interrupt_trigger": 5.0, "open_loop_with_pc": 1.0, "dependent_present": 1.0, "visible_to_pc": 1.0,
+        "grievance_near": 3.0,
     })
 
 
@@ -294,6 +295,19 @@ class InfectedRules(Strict):
     mask_break_db: float = 55.0    # [SAND] a sound of your own this loud gives you away (a run, a strike, a normal voice)
 
 
+class TemperRules(Strict):
+    """H1 breaking points (mind.temper; TEMPER-02..06)."""
+    provocation_heat: dict[str, int] = Field(default_factory=lambda: {   # [SAND] heat each provocation adds
+        "struck": 4, "shoved": 3, "grabbed": 3, "threatened": 3, "harmed_bonded": 4, "stole_from": 3,
+        "insulted": 2, "ordered_about": 1, "quarreled": 3,
+    })
+    stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1})
+    heat_decay_min: int = 60       # [SAND] anger fades by one point per this many minutes
+    hold_per_resolve: float = 0.1  # [SAND] the chance to swallow it, per point of Resolve left
+    hold_max: float = 0.8          # [SAND] nobody always holds it in
+    fists_reach_m: float = 1.5
+
+
 class OlfactionRules(Strict):
     """F1b smell numbers (sense.olfaction; SMELL-01..03)."""
     range_m: dict[int, float] = Field(default_factory=lambda: {1: 1.0, 2: 2.0, 3: 5.0, 4: 10.0, 5: 20.0})  # [SAND]
@@ -310,6 +324,9 @@ class SocietyRules(Strict):
     ration_mult: dict[int, float] = Field(default_factory=lambda: {0: 0.25, 1: 0.5, 2: 0.75, 3: 1.0, 4: 1.25})
     shortage_days: float = 3.0         # a store under this many days of need is short (content CAS-004)
     recovery_days: float = 7.0         # every rationed store at or above this many days ...
+    quarrel_base: float = 0.05         # [SAND] H1 STL-15: the daily chance two people who resent each other have a row,
+    quarrel_per_stress: float = 0.05   # [SAND]   plus this per point of the higher stress of the two
+    brawl_chance: float = 0.3          # [SAND]   the chance a row comes to blows (a quarter of it unless the instigator swings)
     recovery_streak: int = 3           # ... on this many daily draws in a row -> ration +1 (up to 3)
     draw_hour: int = Field(default=7, ge=0, le=23)     # SETTLEMENT_DAY
     group_hour: int = Field(default=20, ge=0, le=23)   # GROUP_DAY
@@ -400,6 +417,7 @@ class RulesConfig(Strict):
     checks: CheckRules = Field(default_factory=CheckRules)
     acoustics: AcousticRules = Field(default_factory=AcousticRules)
     olfaction: OlfactionRules = Field(default_factory=OlfactionRules)
+    temper: TemperRules = Field(default_factory=TemperRules)
     harm: HarmRules = Field(default_factory=HarmRules)
     needs: NeedsRules = Field(default_factory=NeedsRules)
     resolve: ResolveRules = Field(default_factory=ResolveRules)

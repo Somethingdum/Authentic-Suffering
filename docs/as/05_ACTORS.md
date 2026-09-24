@@ -234,6 +234,49 @@ the person would have chosen. It is never done to the player's character: the PC
 the story (the stage's `felt` sentence) and the player decides. The earlier weeks' pull shows only
 in what the host feels and in the packet's body lines.
 
+### 7.1 Breaking points, grudges and betrayal (H1, D-84; `mind/temper.py` TEMPER-01..08)
+
+The owner: people here are smart, but *human* smart. Humans fight — wars, bar-room brawls,
+bickering. The logical thing is to suck it up and get along, and not everyone can. Everybody has a
+breaking point; disrespect the wrong person too much and you get decked in the jaw. Somebody can be
+furious for a reason that is not fair and mean it with their whole heart. Consequences are not
+always violence. And when the dead come, someone may push the person who has been getting on their
+nerves into them to buy a few seconds.
+
+The engine never tells a mind to make trouble (Actor Spec §10). It keeps the pressures true and
+makes the snap, when it comes, code's act:
+
+- **Stress** (`actors.stress` 0–10) is what wears a person down: seeing someone die (more the closer
+  they were, CAS-019), hunger, thirst and exhaustion past the first pangs (CAS-020), being struck or
+  threatened, seeing their people hurt. A night's sleep takes the edge off (CAS-021).
+- **Temper** (dossier `temper`: `fuse` 1–5, `outlet` fists / words / cold / flight / tears,
+  `grudge` 0–3, `pet_peeves`, `cools_down_by`) is how this person breaks. It is on their card
+  ("What sets you off").
+- **Heat** (`tempers`, per person toward another) builds from what they perceive done or said to
+  them — struck, shoved, grabbed, threatened, ordered about by someone they don't answer to,
+  insulted, their own people hurt, their things taken — each once, and fades an hour at a time;
+  a grudge keeps it warm. The breaking point is `fuse x 2 - stress // 3`: the more stressed, the
+  shorter.
+- **The packet says it**: "You are close to breaking." / "You are at the end of your rope."; beside
+  each person, "they are getting under your skin", "you are furious with them", "you hold a grudge
+  against them". The actor core now says it plainly: you are a person, not a planner; you can lose
+  your temper, hold a grudge that is not fair, say the cruel thing, look after yourself first.
+- **The snap**: past the breaking point a person may swallow it (a chance from their Resolve, which
+  it costs) or it comes out — `INVOLUNTARY {kind: 'outburst', outlet}`. Fists: a punch, whatever
+  they had decided and whatever nerve is left (never at a child, never at someone in their care).
+  Words: they must have it out, raised or shouted, in their own words. Cold / flight: they walk out.
+  Tears: they sit down and break down. A snap leaves a grudge (it deepens if one was there) and
+  resentment. The player's character is never made to snap; their anger is on record.
+- **Off-screen friction** (STL-15): in a settlement, two people who resent each other have a row on
+  any given day more often the more strained they are; a brawler's rows come to blows (bruises, lost
+  standing); either way people talk.
+- **Betrayal**: with the dead within 8 m, *shove someone toward the dead* is an option like any
+  other, ranked right after running (AFF-07): win the shove and they land on their back up to 2 m
+  closer, and the dead turn on them. *Shoot someone in the leg*: they go down and cannot run. A
+  person's own lines (`feed_to_dead`, `kill_human`, `kill_child`) take the shove off their menu.
+  Everyone who saw it stops trusting the one who did it, the story travels (CAS-022), and whoever
+  lived through it never forgets (CAS-023).
+
 ## 8. The player's side
 
 - **Manner, never target/verb/refusal** (SYM-02): the PC's dossier colours how an action is done.

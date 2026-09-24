@@ -133,6 +133,12 @@ voice:
     - "Runners are all thieves."
   profanity: frequent
   dialect_notes: Fall-child slang — 'before-times', 'clean' for trustworthy, 'turned' for anything spoiled.
+temper:
+  fuse: 3
+  outlet: words
+  grudge: 1
+  pet_peeves: ["hagglers who waste her time", "being called kid", "people pawing at her stall"]
+  cools_down_by: "a few notes on her clarinet reed"
 social:
   household_role: ""
   relations:

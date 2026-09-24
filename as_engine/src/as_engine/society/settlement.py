@@ -57,8 +57,28 @@ STL-03 day(tx, rng, row, fired, turn_index) -> list[Event]   (the SETTLEMENT_DAY
     settlement (this one included) all have min_days >= R.recovery_days, and no RATION_CHANGE
     event of this settlement is newer than the oldest of them -> change_ration(+1, 'recovered').
   8 society.household.day(tx, h, at, turn_index, SD) for each h in households_of(s).
+  8b (H1) friction(tx, rng, s, at, turn_index, SD) — STL-15.
   9 kernel.clock.schedule(tx, at + DAY, 'SETTLEMENT_DAY', s, {'settlement_id': s}, SD).
   Returns every event committed, in seq order.
+STL-15 (H1) friction(tx, rng, settlement_id, at, turn_index, cause_event_id) -> list[Event]: people
+  who live on top of each other, short of everything, fight. The pairs: the settlement's named
+  members (group_members of settlements.group_id with status 'member' or 'probation', alive, never
+  the PC), each unordered pair (a, b) with a < b, where either has resentment >= 2 toward the other
+  (relationships) or an open 'grudge' loop naming the other. For each pair in (a, b) order: m =
+  the higher actors.stress of the two; p = min(1, R.quarrel_base + R.quarrel_per_stress x m);
+  rng.chance(tx, 'society', f"quarrel:{a}:{b}:{day}", p) (day = at // 86 400 000) -> a quarrel.
+  The instigator is the one with the higher stress (ties: a); brawl = rng.chance(tx, 'society',
+  f"brawl:{a}:{b}:{day}", R.brawl_chance x (1.0 when the instigator's temper outlet is 'fists',
+  else 0.25)). Q = QUARREL {settlement_id, a, b, instigator_id, brawl} (writer 'society.settlement',
+  actor_id = the instigator, cause SD); then, each with cause Q: mind.temper.provoke(tx, x, y,
+  'quarreled', Q, ...) both ways (a toward b first); when brawl, for each of the two (a first)
+  physical.bodies.apply_harm(tx, who, WoundSpec(rng.weighted('society', f"bruise:{who}:{day}",
+  CENTRE_MASS), 'blunt', 'minor', 0), at, Q, turn_index, rng) and mind.mind.adjust_group_standing(tx,
+  the settlement's group, who, -1, Q, at, turn_index); world.rumours.seed(tx, each id of the
+  cascade selector who_would_hear_of(the instigator) (action.cascade CAS-05), the instigator,
+  'lost_it' when brawl else 'fell_out', at, turn_index, Q) — people talk. Returns every event
+  committed, in seq order.
+
 STL-04 declare_shortage(tx, settlement_id, resource, at, turn_index, cause_event_id) -> Event | None
   (cascade dispatch of SHORTAGE — core CAS-004.) Already short of it -> None. Else SHORTAGE
   {settlement_id, resource, days: days_of rounded to 2 (inf -> 999.0)} appending resource to
@@ -226,5 +246,10 @@ def ensure_timers(tx: "Tx", settlement_id: str, at: int, turn_index: int) -> lis
 def set_lockdown(tx: "Tx", settlement_id: str, on: bool, reason: str, at: int, turn_index: int,
                  cause_event_id: str | None) -> "Event | None":
     raise NotImplementedError("P10")
+
+
+def friction(tx: "Tx", rng: "Rng", settlement_id: str, at: int, turn_index: int,
+             cause_event_id: str | None) -> list["Event"]:
+    raise NotImplementedError("P9")
 from ._impl_society import daily_need, days_of, has_shortage, receive, settlement_day as day, declare_shortage, change_ration, stl_adjust as adjust, add_vacancy, remove_vacancy, laws_of, law_def, apply_law, settlement_of, trade_terms, settlement_ensure as ensure_timers  # noqa
 from ._impl_society import set_lockdown  # noqa

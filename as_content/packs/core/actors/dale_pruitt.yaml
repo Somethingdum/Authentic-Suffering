@@ -137,6 +137,12 @@ voice:
     - "Kids are tough, she'll be fine."
   profanity: rare
   dialect_notes: Central Indiana; says "warsh" for wash, "you'uns" when he's exhausted.
+temper:
+  fuse: 4
+  outlet: tears
+  grudge: 1
+  pet_peeves: ["people talking about sick kids like they're luggage", "being called a beggar"]
+  cools_down_by: "talking about Kayla to anyone who will listen"
 social:
   household_role: head
   relations: []

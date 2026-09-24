@@ -136,6 +136,12 @@ voice:
     - "Kill him."
   profanity: none
   dialect_notes: Hamtramck Polish-American — 'pop' for soda, her grandmother's 'Boże' under her breath.
+temper:
+  fuse: 4
+  outlet: cold
+  grudge: 3
+  pet_peeves: ["sloppy handwriting", "people who say 'just this once'", "being interrupted"]
+  cools_down_by: "writing all of it down in her ledger"
 social:
   household_role: ""
   relations:

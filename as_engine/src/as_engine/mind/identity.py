@@ -62,6 +62,19 @@ IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard   (``dossier`
     f'A habit of yours: {end(motive.signature_behaviour)}'       [motive.signature_behaviour]
     f'Under stress: {end(appearance.movement_under_stress)}'     [appearance.movement_under_stress]
     f'A habit of your hands: {end(appearance.habit_gesture)}'    [appearance.habit_gesture]
+  'temper' ('What sets you off') — H1, from the dossier's temper (None: the section is left out):
+    FUSE_WORDS[temper.fuse]                                      [temper.fuse]
+    OUTLET_WORDS[temper.outlet]                                  [temper.outlet]
+    GRUDGE_WORDS[temper.grudge]                                  [temper.grudge]
+    f'Things that get under your skin: {pet_peeves in words}.'   [temper.pet_peeves]   (when any)
+    f'What settles you: {end(cools_down_by)}'                    [temper.cools_down_by]   (when set)
+    FUSE_WORDS = {1: 'You have a hair trigger.', 2: 'You have a short fuse.', 3: 'You can take a fair
+      amount before you blow.', 4: 'It takes a lot to make you lose it.', 5: 'You almost never lose
+      it. Almost.'}; OUTLET_WORDS = {fists: 'When you blow, you swing.', words: 'When you blow, you let
+      them have it, out loud.', cold: 'When you blow, you go cold and cut them off.', flight: 'When you
+      blow, you walk out.', tears: 'When you blow, you break down.'}; GRUDGE_WORDS = {0: 'You are over
+      it by evening.', 1: 'A slight stays with you a while.', 2: 'You hold a grudge.', 3: 'You never
+      forget.'} (implemented data below).
   'voice' ('How you talk'):
     end(voice.capsule)                                           [voice.capsule]
     f'How you tend to speak: {" ".join(end(t) for t in speech_tendencies)}'
@@ -102,7 +115,7 @@ IDN-04 dossier_hash = sha256 hex of kernel.jsoncanon.canonical_json(dossier.mode
 IDN-05 minimum=True gives the reaction card (Actor Spec §4: "keep a minimum identity card in
   reactions too"): a split second leaves no room for a whole life, never for none of it. The same
   lines, only these: 'who' all; 'priorities' without 'Once, when it mattered'; 'values' all;
-  'voice' only the capsule, 'Under pressure', 'At your limit' and 'You would never say'; 'silence'
+  'temper' all (H1: a split second is when it matters); 'voice' only the capsule, 'Under pressure', 'At your limit' and 'You would never say'; 'silence'
   only 'You go quiet when'; 'competence' all. minimum = True on the card.
 """
 
@@ -134,9 +147,23 @@ HEADINGS: dict[str, str | None] = {
     "contradictions": "Where you are pulled both ways",
     "private_life": "Your own life",
     "habits": "Your habits",
+    "temper": "What sets you off",
     "voice": "How you talk",
     "silence": "When you go quiet",
     "competence": "What you know how to do",
+}
+FUSE_WORDS: dict[int, str] = {
+    1: "You have a hair trigger.", 2: "You have a short fuse.", 3: "You can take a fair amount before you blow.",
+    4: "It takes a lot to make you lose it.", 5: "You almost never lose it. Almost.",
+}
+OUTLET_WORDS: dict[str, str] = {
+    "fists": "When you blow, you swing.", "words": "When you blow, you let them have it, out loud.",
+    "cold": "When you blow, you go cold and cut them off.", "flight": "When you blow, you walk out.",
+    "tears": "When you blow, you break down.",
+}
+GRUDGE_WORDS: dict[int, str] = {
+    0: "You are over it by evening.", 1: "A slight stays with you a while.", 2: "You hold a grudge.",
+    3: "You never forget.",
 }
 _CLOSERS = (".", "!", "?", "…", '"', "”", "'", "’")
 
@@ -168,7 +195,7 @@ def dossier_hash(dossier: ActorDossier | PCDossier) -> str:
 
 
 MINIMUM_PREFIXES: dict[str, tuple[str, ...] | None] = {
-    "who": None, "values": None, "competence": None,
+    "who": None, "values": None, "competence": None, "temper": None,
     "priorities": ("What you want most:", "How you go about it:", "What comes first", "Except:", "How you take risks:"),
     "voice": ("", "Under pressure:", "At your limit:", "You would never say"),
     "silence": ("You go quiet when:",),
