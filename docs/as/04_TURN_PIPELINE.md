@@ -15,7 +15,7 @@ player are in `STAGE_LABELS` (never engine words).
 | 3 | perceive | CODE | `perception.compile_scene` for every candidate actor | **G3** every percept row granted by `perception.grant` |
 | 4 | select | CODE | salience, mandatory set (`turn/select.py`), LOD plan (`lanes.scheduler.plan_cognition`) | **G4** mandatory set ⊆ HOT∪WARM |
 | 5 | afford | CODE | `AffordanceSet` per HOT/WARM/COLD actor | **G5** every option passes the physical gate for that body |
-| 6 | cognition | LM(A+B) | `CognitionOutput` per HOT/WARM actor; plan continuation for COLD (`turn/cognition.py`) | **G6** schema-valid; choice ∈ offered handles; echo check on speech; targeted portrayal pre-check (§3.3, P11) |
+| 6 | cognition | LM(A+B) | `ActorReplyV2` per HOT/WARM actor (a decision, or one consultation then a decision); plan continuation for COLD (`turn/cognition.py`) | **G6** schema-valid; choice ∈ offered handles; echo check on speech; targeted portrayal pre-check (§3.3, P11) |
 | 7 | barrier | CODE | validated `Intent` list; nothing mutated yet | **G7** every referent resolves at T0 or is marked for ACTION_BLOCKED |
 | 8 | resolve | CODE | outcome events (checks, conflicts, effects); how each mind answered what it was asked (refusals recorded, `turn/cognition.record_responses`) | **G8** each intent resolved exactly once; every draw in `prng_ledger` |
 | 9 | propagate | CODE | sound, sight, evidence, harm follow-ons | **G9** conservation holds (items, bodies, cohorts) |
@@ -155,7 +155,19 @@ moving to within 20 m is news to whoever sees it, and it ends the player's watch
 - The scheduler fills both lanes breadth-first: a WARM call beside a HOT call costs no wall-clock
   (plan §4.4). Mandatory actors always get a call, even past budget (`BUDGET_OVERRUN` logged).
 - Every generated speech line is checked against the echo ledger; an echo triggers one repair with
-  the phrase forbidden; a second echo drops the speech and keeps the action (ECHO-02).
+  the phrase forbidden; when that repair fails or still echoes, the original line stands and the
+  echo is logged (ECHO-02, Actor Spec §11: a failed repair is no reason to silence a person).
+- **The answer (Actor Spec §7; REPLY-01..02, D-74).** An `ActorReplyV2`: a decision (one offered
+  attempt with its pace, speech with delivery and timing, goal, private reason) or — only when the
+  packet offers one — one consultation first: *recall* (their own episodes and beliefs the packet
+  did not show) or *more_actions* (more options of one family the menu hides). It is answered from
+  the same snapshot and a second call decides. At most two decision calls and one repair per
+  decision; a V1 answer is read through the adapter.
+- **A failed answer never becomes a choice (HOLD-01..02, D-75).** Still unusable after its repair,
+  or the lane timed out: when the moment is consequential (an unanswered ask, or a threat they
+  perceived) the turn is not played (`DecisionHeld`: rolled back, input kept, a plain message);
+  otherwise what they already took on goes on (`plan_continuation(accepted_only=True)`), or they
+  make no attempt this wave. `DEGRADED_FALLBACK` records which.
 - **Answers are read by code (stage 8):** what each mind had heard addressed to it before it
   decided is classified by the firewall (form, standing, signature); a refusal is recorded
   (`REFUSAL`, WILL-07), a "yes" with a different action is a recorded lie (WILL-11). The model is
@@ -199,11 +211,11 @@ were (PROTO-06). From stage 12 on the answer is `too_late` and the result still 
 | Lane B down at turn start | stage 0 probe | Single-lane mode: the scheduler places HOT and WARM calls on lane A within the budget (the rest run COLD); every other call moves to lane A; the turn's notice: "Your second model is offline; turns will be thinner until it is back." |
 | Lane A down | stage 0 probe | No HOT; WARM, narration and the rest move to lane B (thinking off); notice: "Your main model is offline; the story runs on the second model until it is back." |
 | Both down | stage 0 | Refuse the turn: `turn_rejected {code: 'no_models'}`; nothing changes |
-| Lane dies mid-wave | timeout / reset | That actor falls back to plan continuation; `DEGRADED_FALLBACK` event |
-| Grammar/schema failure | parse_status | One repair call (INTENT_REPAIR); then plan continuation + `DEGRADED_FALLBACK` + `error_repair_log` |
+| Lane dies mid-wave | timeout / reset | No repair; HOLD-01 for that actor (a consequential moment: the turn is not played; otherwise what they took on goes on, or no attempt); `DEGRADED_FALLBACK` event |
+| Grammar/schema failure | parse_status | One repair call (INTENT_REPAIR, a decision only); then HOLD-01 + `DEGRADED_FALLBACK` + `error_repair_log` |
 | Choice not in the offered set | intent validator | Same as above; never reaches `resolve` |
-| An Actor line repeats the player's words | echo ledger | One repair with the phrases named; then the speech is dropped and the action kept (when the words were the action, a SPEAK, the Actor falls back to plan continuation); logged as `echo_reject` |
-| Call over deadline | scheduler | Cancel, fall back, record |
+| An Actor line repeats the player's words | echo ledger | One repair with the phrases named; when it fails or still echoes, the original line stands; logged as `echo_reject` |
+| Call over deadline | scheduler | Cancel; HOLD-01; record |
 | Model swapped mid-session | `check_models` | Hard stop before T0 with a plain message (LANE-05) |
 | Commit fails | exception | Full rollback; input not consumed |
 | Save write fails | checksum | Keep previous save; keep new as `.partial`; refuse to advance |

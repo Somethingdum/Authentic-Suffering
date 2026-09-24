@@ -49,7 +49,8 @@ phase's contract tests pass. You do not design; you implement what the docstring
 8. **No network** from `as_engine` except the configured LM Studio lane URLs. Tests never touch the
    network (except `tests/live/`, which runs only with `AS_LIVE=1`).
 9. **Talemate upstream**: change only the files listed in `docs/as/02_ARCHITECTURE.md` §4.1.
-10. Keep every function in the module that owns it. If a behaviour has no owner, file a spec issue.
+10. Keep every function in the module that owns it — or in that module's own `_impl_*.py` file, which
+    it binds at its end (§4). If a behaviour has no owner, file a spec issue.
 
 ## 3. Commands
 
@@ -70,6 +71,13 @@ check; when you stop, a check that **Next task** is filled and protected files a
 
 - `docs/as/13_BUILD_ORDER.md` — phases, task order, gates, forbidden work.
 - `as_engine/src/as_engine/<package>/<module>.py` — each docstring is the contract for that module.
+- `as_engine/src/as_engine/**/_impl_*.py` — the bodies of functions that are already built (P0–P10).
+  A module whose functions are built ends with lines like `from ._impl_packet import build_packet  # noqa`:
+  those names are bound to the bodies in that `_impl_` file, and a fix to one goes there (the contract
+  module's docstrings and signatures stay as they are). Import the owning module, never an `_impl_`
+  file. Some modules are built in place (their functions simply have bodies). A function that still
+  raises `NotImplementedError("P<n>")` and is not bound at the end is yours to write, in the owning
+  module. 13_BUILD_ORDER §4.0 says where this copy starts.
   Never change a docstring or a documented signature: `python tools/as/gate.py --docstrings` compares
   them with the kit's snapshot (`docs/as/reference/docstrings_v1.json`) and the full gate fails on drift.
 - `as_engine/tests/contract/pNN_*/` — the executable spec for phase NN.

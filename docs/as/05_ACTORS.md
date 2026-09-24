@@ -140,6 +140,20 @@ world answers when it is broken. Only their own immutable lines (the moral gate)
 options away. When several costs apply they are all said: the post's, then the laws', then the
 nerve's.
 
+**The answer** (Actor Spec §7, §8, AC05; D-74). The first menu is short and diverse (24 options,
+`PacketRules.max_affordances`); what it hides stays in the set's pool. A person answers with a
+decision — one offered attempt, its pace (careful or rushed only where the attempt allows it; the
+one manner that changes time, noise and the check), what they say (at most 100 words, 12 in a
+reaction), a goal and a private reason — or, only when offered, with one consultation first: recall
+something of their own, or see more attempts of one family the menu names. A consultation reads
+their own head and menu, never the world, and nothing happens until the decision (`mind/consult.py`,
+CONSULT-01..06).
+
+**A failed answer never becomes a choice** (AC15; HOLD-01..02; D-75). If a person's answer cannot be
+used even after its repair, code never picks for them: what they already took on goes on (their
+task, a plan step, a watch at their post), or they make no attempt; and when someone had just asked
+them something or they faced a threat, the turn is not played at all.
+
 Consequences: two people with different stats want different things because different things were
 on their menus; a weak Actor never selects a strong Actor's plan; incompetence is portrayable
 without being narrated as stupidity. The catalog is content: `as_content/packs/core/affordances/`.

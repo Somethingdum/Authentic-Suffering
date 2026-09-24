@@ -12,14 +12,15 @@ LM Studio models.
 | Part | State |
 |---|---|
 | Design and rules (`docs/as/`, 14 docs + CHEATS, GLOSSARY, DECISIONS, RULES) | Specified for all phases P0–P12 |
-| Engine skeleton (`as_engine/src/`) | Every module, function and contract docstring for P0–P12; bodies are stubs that raise `NotImplementedError("P<n>")` |
+| Engine (`as_engine/src/`) | Every module, function and contract docstring for P0–P12. **P0–P10 are built** (committed on your instruction, 2026-09-24): the bodies are in `_impl_*.py` files bound at the end of each contract module, Actor v2 steps 1–3 included. P11–P12 bodies are stubs that raise `NotImplementedError("P<n>")` |
 | Contract tests P0–P6 (substrate, lanes, space/bodies/content, perception, one Actor, many Actors, memory) | **699 tests** (693, plus six that pin P10 lines of those phases) |
 | Contract tests P7 (the slice: whole turns of the fence scene, intake, narration and its lint, the *Where you are* panel, saves, replay, the command line) and the 50-turn sim soak | **41 tests + 1 soak** |
-| Contract tests P8 (the Play UI protocol: connect, runs, turns in the background, Stop, reconnect, Ask, settings, the developer panel, packs) | **98 tests** (83, plus one check per fixture message P10 added; the reference implementation the tests were proven against is not shipped — the builder writes its own) |
-| Play UI specs (`talemate_frontend/src/play/__tests__/`, vitest) | **161 tests in 14 files**, with 41 fixture messages. The P8 specs (124 tests) pass against a reference front end built on a real Talemate 0.39.0 frontend with the 02 §4.1 changes; the P10 specs (37 tests: the New Life wizard, the Worldgen screen, the loading bar and its lines) and the amended app spec pass against a reference of the P10 screens (neither reference is shipped) |
+| Contract tests P8 (the Play UI protocol: connect, runs, turns in the background, Stop, reconnect, Ask, settings, the developer panel, packs) | **98 tests** (83, plus one check per fixture message P10 added; the service side is built — the Talemate plugin, the frontend toolchain and the P8 screens are the builder's) |
+| Play UI specs (`talemate_frontend/src/play/__tests__/`, vitest) | **161 tests in 14 files**, with 41 fixture messages. The P8 specs (124 tests) pass against a reference front end built on a real Talemate 0.39.0 frontend with the 02 §4.1 changes; the P10 specs (37 tests: the New Life wizard, the Worldgen screen, the loading bar and its lines) and the amended app spec pass against a reference of the P10 screens (the P10 screens are now in `talemate_frontend/src/play/`; the P8 screens are placeholders the builder writes) |
 | Talemate plugin test (`tests/test_as_game_plugin.py`) and the Play UI smoke checklist | In. The plugin test passes (7/7) against the reference service; checked against the real Talemate 0.39.0 source (plugin base, route table, one-connection rule, the sequential message loop, pnpm, uv) |
 | Contract tests P9 (society: households, routines, work and cover, the settlement's stores and rations, tension, drift, loyalty, standing, rumours, the off-screen step; the one-injury-reaches-morale chain) | **91 tests** |
 | Contract tests P10 (the wide world: worldgen from the wizard's choices to a playable run; buildings found, not pre-built; marks; the dead up close and counted by district; hordes, the exterior and the Mega Horde; the world's day with nobody deciding; outings and raids; the wet strain's living spreaders; the Ghosts; the quiet hours between turns; the loading bar) | **268 tests** (231 test functions). All 1198 engine tests (P0–P10 and the soak) pass against the reference implementation |
+| Actor v2 steps 1–3 (the Actor Specification: a person's own prompt and identity card; a menu from what they know, laws as costs, who is where; the answer format, one consultation, the hold when an answer fails) | Contracts, tests and bodies in. **All 1299 engine tests pass** on the committed engine |
 | Contract tests P11–P12, live tests | **Not in this copy yet.** The builder stops after the P10 gate; a kit update adds them |
 | Core content pack (`as_content/packs/core/`) | 289 records, all validate |
 | DSH builder kit (`AGENTS.md`, `.dsh/skills/`, hooks, `tools/as/`) | In. The hook scripts are tested (59 tool-call cases); the DSH bridge-plugin wiring comes from the DSH hooks docs and has **not** been run on a real DSH install — §4 tells you how to check it in two minutes |
@@ -105,9 +106,10 @@ Open DSH on the repo folder with the model you want as the builder and send:
 
 > Start the build. Follow AGENTS.md §1.
 
-It reads `docs/as/PROGRESS.md` (P0, first task `kernel/ids.py::mint`), runs the phase tests, and
-implements one function at a time. Each phase ends with `python tools/as/gate.py --phase N`, which
-writes the evidence row. With this copy it should stop after the P10 gate.
+It reads `docs/as/PROGRESS.md`. The engine is built through P10, so it first records the gates P0–P7
+(`python tools/as/gate.py --phase N`, which writes each evidence row), then builds P8's plugin,
+frontend toolchain and screens, then gates P8, P9 and P10 (13_BUILD_ORDER §4.0). With this copy it
+should stop after the P10 gate.
 
 ## 6. Your part
 
@@ -162,6 +164,10 @@ The builder never runs the maintainer commands; the guard blocks them.
   sexual or romantic content involving minors (content rule CNT-11, protected).
 
 ## 8. Updating from an earlier copy
+
+**The engine is in the repo from this copy on.** If your builder already wrote bodies in an earlier
+copy, taking this one replaces them (or conflicts with them in git): keep one or the other. The
+committed engine passes every P0–P10 test; the builder's copy has its own gate evidence.
 
 **Haven't started the builder yet?** Unzip this kit over the folder and commit. **Already
 building?** Don't unzip over it (that would put stubs back over finished functions) — apply the
@@ -320,7 +326,8 @@ What the P6 update changed (for anyone still on the first copy):
 
 ## 9. Known gaps in this copy
 
-- P11–P12 contract tests and the live suites are still to be written (next kit updates). The
+- Actor v2 steps 4–6, P11–P12 contract tests and the live suites are still to be written (next kit
+  updates). The
   death screen, saved worlds and the sessions browser come with P12 (their specs too).
 - Lots for settlement goods, leadership challenges, splintering, coalitions and faction doctrine in
   play are backlog, not v1 (DECISIONS D-49). P10 brings the rest of what P9 left for world motion:

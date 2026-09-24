@@ -67,6 +67,28 @@ right after the slice (P8) so the human can play and judge it early.
 
 ## 4. Tasks per phase
 
+### 4.0 Where this copy starts (2026-09-24)
+
+The engine side of P0–P10 is **built**, Actor v2 steps 1–3 included: every contract function of
+those phases has a body, and every contract test of P0–P10 plus the sim soak passes. The bodies
+are in `_impl_*.py` files beside their modules (AGENTS.md §4). Nothing has been gated on your
+machine yet, so start here, not at P0 task 1:
+1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
+   one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
+   it like any failing test (skill `as-failing-test`) — the fix goes where AGENTS.md §4 says.
+2. P8: steps 1–3 are built; build steps 4–6 (the plugin and the upstream patches, the frontend
+   toolchain, the Play UI). In `talemate_frontend/src/play/` the P10 parts exist already —
+   `PlayApp.vue`, `WizardScreen.vue`, `WorldgenScreen.vue`, `LaterScreen.vue`, `LoadingBar.vue`,
+   `PCCard.vue`, `quips.js` and the P10 parts of `store.js` / `words.js`. Files whose first line says
+   *Placeholder* or *Partial* are yours to write. Extend `store.js`, `words.js` and `socket.js`; do
+   not replace them: the P10 specs (wizard, worldgen, loading_bar, quips, app) must stay green.
+   Then `gate.py --phase 8`.
+3. `gate.py --phase 9`, then `--phase 10` (from P8 on every gate also runs the plugin test, the
+   Play UI tests and the upstream check).
+4. Then stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" in PROGRESS.
+
+The phase lists below stay as the map of what each module does and which tests pin it.
+
 ### P0 — Substrate
 Read: 02, 03, `kernel/*` docstrings, `audit/commit_gate.py`.
 1. `kernel/ids.py::mint` (counters as bookkeeping writes via `Tx.bookkeep`).
@@ -126,7 +148,9 @@ Read: 05 §2–8, `mind/actor.py`, `mind/resolve.py`, `mind/affordance.py`, `min
    identity card comes from `mind/identity.compile_identity`, which is implemented — do not
    rewrite it; `test_identity.py` pins the card and the person's own prompt (D-70, D-71); the
    whereabouts, the hour, the cut words and what the budget pins and records are D-73.
-6. `action/intent.py::to_intent`.
+6. `action/intent.py::to_intent` (the Actor v2 answer: pace, speech limits, expression —
+   `test_intent_v2.py`, D-74).
+7. `mind/consult.py`: `check`, `families`, `more_actions` — `test_consult.py` (D-74).
 Gate: `p04_one_actor` green.
 **Forbidden:** multiple actors resolving together. One mind, done properly, before five.
 
@@ -161,6 +185,7 @@ Read: 05 §6, §9, `mind/mind.py`, `mind/memory.py`, `mind/retrieval.py`, the P6
 5. `mind/retrieval.py`: `recency_bonus`, `retrieve`; then wire it into `mind/packet.build_packet`
    (memories, lessons, beliefs, loops, refusals; the budget's new drop order) (`test_retrieval.py`).
    The P3–P5 tests must stay green after this step.
+6. `mind/consult.recall` — `test_recall.py`.
 Gate: `p06_memory` green (with P0–P5).
 **Forbidden:** narration. The minds are right before anything describes them.
 
@@ -171,7 +196,8 @@ Read: 04 (all), 05 §11, 07 §10, 10 §5–6, and the docstrings of every module
 3. `narration/location.py` — `test_location_view.py` (the describe tests).
 4. `lanes/requests.py`, then `narration/narrator.py` (packet, narrate with the judge, code_render, write_narration).
 5. `service/session.py` (`append_story`), `testing/scenario.ScenarioWorld.session`.
-6. `turn/select.py`, `turn/timers.py`, `turn/intake.py`, `turn/cognition.py`.
+6. `turn/select.py`, `turn/timers.py`, `turn/intake.py`, `turn/cognition.py` (the answer, one
+   consultation — `mind/consult.answer` — and the hold: `test_decision_v2.py`, D-74, D-75).
 7. `turn/pipeline.py::run_turn` — stages in order; get `test_p07_slice_metal_fence.py` green stage by stage (the ledger rows tell you how far a turn got), then `test_slice_checks.py`.
 8. Rollback + strict retry + degradation paths (the pipeline docstring).
 9. `service/runs.py` (scenario path, save/load/autosave/list/delete; not worldgen), `service/view.py`, `service/replay.py` — `test_save_load.py`, the view tests, `test_slice_refusal.py`.
@@ -181,6 +207,7 @@ Gate: `p07_slice` green, the `sim` soak green (`tests/sim/test_soak_metal_fence.
 
 ### P8 — Play UI
 Read: 10 (all), 02 §3, §4.1, §6, 11 §1.2, `contracts/protocol.py`, `service/game_service.py`, `service/guide.py`.
+Steps 1–3 are built in this copy (§4.0): start at step 4.
 1. Small pieces first: `kernel/store.Store.transaction` must roll back on any `BaseException` (a cancelled turn) — `p00_substrate/test_store.py` gains `test_a_cancelled_task_rolls_back_too`; `service/session.change_settings`; `service/replay.resimulate` re-applies mid-run settings changes (SET-01).
 2. `service/guide.py` (`rules_for`, `pc_facts`, `answer`) — `test_guide.py`.
 3. `service/game_service.py`: `out`, `handle` (validation, errors, not_built_yet), `push`, `idle`, `get_service`, then the `on_<action>` handlers of the module docstring in the order of the test files: `test_protocol.py`, `test_models_config.py`, `test_runs_protocol.py`, `test_packs_content.py`, `test_settings_dev.py`, `test_turns_protocol.py` (the background turn task, busy, Stop, reconnect, Ask). Leave the P10 / P12 handlers as stubs.

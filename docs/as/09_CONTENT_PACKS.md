@@ -267,7 +267,9 @@ holds it.
   duration, noise, an optional check, and the **effect handler id** that resolves it (CNT-06, the
   list in `action/effects.py`). `label` is what an Actor reads; `ui_label` is what you see as a
   suggestion. Both are templates with `{target}`, `{destination}`, `{item}`, `{distance}`,
-  `{duration}`. Say what an option is FOR: `requires.target_kinds` names the kinds of body it may
+  `{duration}`. `paces` lists the paces the attempt allows besides normal (`careful`, `rushed`;
+  Actor v2, INTENT-07) and `family` overrides the family a consultation lists it under
+  (`AFFORDANCE_FAMILIES`; by default it follows from the verb). Say what an option is FOR: `requires.target_kinds` names the kinds of body it may
   bind (`[human]` for talking someone down, signalling, shielding — the dead are not people) and
   `requires.portal_kinds` the kinds of way (`[door, window, gate, …]` for closing, locking and
   barring — an `opening`, a gap in a fence or a ladder hole, has nothing to close). Without them an

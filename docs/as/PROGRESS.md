@@ -6,26 +6,26 @@ Status words: **not started** · **in progress** · **observed implementation, n
 
 ## Current
 
-- Current phase: P0
-- Next task: P0 task 1 — `kernel/ids.py::mint`
+- Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
+- Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: contract tests exist for P0–P10 (P7 = the slice + the sim soak; P8 = the protocol, the Play UI specs and the plugin test; P9 = the society; P10 = the wide world: worldgen, the dead, hordes and the Mega Horde, the world's day, the Ghosts, the quiet hours, the loading bar, the wizard and worldgen screens). After the P10 gate, stop and write "waiting for the kit update (P11+ tests)" here.
+- Kit status: the engine side of P0–P10 is built and every contract test of P0–P10 and the sim soak passes (1299 tests; the bodies are in `_impl_*.py` files, AGENTS.md §4), Actor v2 steps 1–3 included. Not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built). After the P10 gate, stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" here.
 
 ## Phases
 
 | Phase | Status | Commit | Command | Gate | Artifact | Date |
 |---|---|---|---|---|---|---|
-| P0 Substrate | not started | | | | | |
-| P1 Lane harness | not started | | | | | |
-| P2 Bodies, space, objects, content | not started | | | | | |
-| P3 Perception | not started | | | | | |
-| P4 One Actor | not started | | | | | |
-| P5 Many Actors | not started | | | | | |
-| P6 Memory | not started | | | | | |
-| P7 The Slice | not started | | | | | |
-| P8 Play UI | not started | | | | | |
-| P9 Society | not started | | | | | |
-| P10 Wide world | not started | | | | | |
+| P0 Substrate | observed implementation, not proven gate | | | | | |
+| P1 Lane harness | observed implementation, not proven gate | | | | | |
+| P2 Bodies, space, objects, content | observed implementation, not proven gate | | | | | |
+| P3 Perception | observed implementation, not proven gate | | | | | |
+| P4 One Actor | observed implementation, not proven gate | | | | | |
+| P5 Many Actors | observed implementation, not proven gate | | | | | |
+| P6 Memory | observed implementation, not proven gate | | | | | |
+| P7 The Slice | observed implementation, not proven gate | | | | | |
+| P8 Play UI | in progress (steps 1–3 built; plugin, toolchain and UI screens to build) | | | | | |
+| P9 Society | observed implementation, not proven gate | | | | | |
+| P10 Wide world | observed implementation, not proven gate | | | | | |
 | P11 Audits | not started | | | | | |
 | P12 Surfaces | not started | | | | | |
 
@@ -62,3 +62,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 ## Notes (builder)
 
 (append dated notes here: what was tricky, what you tried, anything the next session must know)
+
+- 2026-09-24 (kit maintainer): the engine through P10 was built outside DSH and committed on the owner's
+  instruction. Its bodies are in `_impl_*.py` files; see AGENTS.md §4 before changing one. Start at
+  13_BUILD_ORDER §4.0, not at P0 task 1.

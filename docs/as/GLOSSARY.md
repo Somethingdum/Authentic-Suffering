@@ -19,6 +19,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | whereabouts | where one mind can account for a person being: here (seen now), heard not seen, last seen somewhere, or not seen (`PacketEntity.whereabouts`, Actor Spec AC14) | — | location (for a person in a mind) |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
+| decision | an Actor's answer that attempts something: one offered option, its pace, speech, goal, private reason (`ActorReplyV2` kind decision) | what they do | — |
+| consultation | one lookup in a person's own head before they decide: recall, or more options of one family (`mind/consult.py`) | — | — |
+| affordance family | the kind of thing an option is (attention, movement, access …; `AFFORDANCE_FAMILIES`) | — | — |
+| pace | normal, careful or rushed: the one manner that changes time, noise and the check (INTENT-07) | "carefully", "quickly" | — |
+| held decision | a consequential decision whose answer could not be used: the turn is not played (`DecisionHeld`, HOLD-01) | "this turn was not played" | — |
 | percept | one thing that reached one mind, with fidelity | "you heard / saw / felt" | — |
 | fidelity | exact / partial / tone only / visual only | "clearly", "partly", "only the tone" | — |
 | claim | a truth-layer fact | — | canonical fact |

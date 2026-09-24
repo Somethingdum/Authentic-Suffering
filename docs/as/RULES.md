@@ -219,7 +219,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| CONSULT-01 | CONSULT-01 What a packet offers (mind.packet fills SkullPacket.consult_kinds): a reaction offers nothing; a deliberation offers 'recall', and 'more_actions' when the packet lists at least one family (CONSULT-03). 'compo… | as_engine/mind/consult.py | `as_engine/mind/consult.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_consult.py` |
+| CONSULT-01 | CONSULT-01..06). | 05_ACTORS §4 | `as_engine/mind/consult.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_consult.py` |
 | CONSULT-02 | CONSULT-02 check(packet, consultation) -> str / None Why this consultation cannot be answered in this call, or None when it can, first match: kind not in packet.consult_kinds -> 'not_offered'; a subject that is not a P#… | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p04_one_actor/test_consult.py` |
 | CONSULT-03 | CONSULT-03 families(affordances, defs) -> list[str] ``defs`` maps def id -> AffordanceDef. The keys of contracts.content.AFFORDANCE_FAMILIES, in that order, that have at least one option in affordances.pool that is not… | as_engine/mind/consult.py | `as_engine/mind/affordance.py`, `as_engine/mind/consult.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_consult.py` |
 | CONSULT-04 | CONSULT-04 more_actions(affordances, family, subject_ids, defs) -> list[BoundAffordance] The options of affordances.pool, in pool order, that are not in affordances.options (by signature), whose def's family_of is ``fam… | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p04_one_actor/test_consult.py` |
@@ -947,7 +947,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| TELEPATHY-01 | *Gate: `p05_many_actors` green (TELEPATHY-01, BARRIER-01, INTENT-03 and HALLUC-01 included).* | 13_BUILD_ORDER §4 | — | `contract/p05_many_actors/test_telepathy.py` |
+| TELEPATHY-01 | *Gate: `p05_many_actors` green (TELEPATHY-01, BARRIER-01, INTENT-03 and HALLUC-01 included).* | 13_BUILD_ORDER §4.0 | — | `contract/p05_many_actors/test_telepathy.py` |
 
 ## TIME
 

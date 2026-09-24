@@ -61,10 +61,10 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | Call class | Lane | Think | Output | When | If ablated (why it exists) |
 |---|---|---|---|---|---|
 | intake | B | no | IntakeOutput (dynamic enum) | player Do text | player prose would leak unperceived facts into intent; free text can't be trusted to map to legal options |
-| actor_cognition (HOT) | A | yes | CognitionOutput (dynamic enums) | salient/mandatory Actors | Skull Law becomes an instruction instead of a fact; F2 returns |
-| actor_cognition (WARM) | B | no | CognitionOutput | other Actors in budget | same, for more people per turn at no wall-clock cost |
-| actor_reaction | B | no | CognitionOutput | reaction waves | Actors could not respond within the same instant |
-| intent_repair | B | no | CognitionOutput | one per failed structured call | a malformed answer would cost the Actor its turn |
+| actor_cognition (HOT) | A | yes | ActorReplyV2 (dynamic enums; a decision or one consultation first) | salient/mandatory Actors | Skull Law becomes an instruction instead of a fact; F2 returns |
+| actor_cognition (WARM) | B | no | ActorReplyV2 | other Actors in budget | same, for more people per turn at no wall-clock cost |
+| actor_reaction | B | no | ActorReplyV2 (a decision; no consultation) | reaction waves | Actors could not respond within the same instant |
+| intent_repair | B | no | ActorReplyV2 (a decision only) | one per failed structured call | a malformed answer would cost the Actor its turn |
 | writeback | B | no | WritebackOutput | per holder / identical group, after commit | memory becomes objective; two people remember the same thing |
 | portrayal_audit | B | no | PortrayalVerdict | targeted pre-check + retrospective | "would they do that?" answered by the one who did it |
 | narration | A | no | prose | every turn | the renderer would see hidden state |

@@ -6,15 +6,20 @@ the DSH builder; delete it when P12 ships.
 
 ## 0. Where the kit stands
 
-**P0–P10 are complete and verified**: contract docstrings, protected contract tests, a scratch
-reference that passes every test, the docs, the records and the builder's task list. **P11 and P12
-are still at stub / design level**: the modules exist with short docstrings from the original plan,
-but they are not contract-grade and have no tests.
+**The engine is built through P10 and committed** (2026-09-24, on the owner's instruction: "Commit
+all of your working code. The rest of your work will remain uncoded, and your job is to get
+DeepSeek to finish that properly."). What was the scratch reference now lives in the repo: its
+bodies are the `_impl_*.py` files bound at the end of each contract module (AGENTS.md §4), plus the
+modules built in place. All 1299 engine tests pass (P0–P10, Actor v2 steps 1–3, the sim soak). The
+P10 screens of the Play UI are in `talemate_frontend/src/play/`; the P8 screens, the Talemate plugin
+and the frontend toolchain are not built — the DSH builder builds them (13_BUILD_ORDER §4.0).
 
-The owner's requests still to do, in this order (their words are in the session log):
-1. **Actor v2** — the Actor Specification's AC01–AC16 and the Simulation Fidelity Plan's C04, C05,
-   C06, C08, C10, as in-place amendments to P0–P9 (tests and reference updated; the kit update
-   notes list the functions a builder rebuilds).
+**From here on nothing more is implemented by the kit-maker.** The owner's words: the rest is
+DeepSeek's to build. The kit-maker writes contracts, tests, docs and instructions only. What is left:
+1. **Actor v2 steps 4–6** — the Actor Specification's remaining parts (speech segments, gestures,
+   attention, resources — spec §9; memory, firewall and promises — AC08–AC13, fidelity C10; the
+   society and wake fixes — C04, C06, C08) as contracts and tests amending the built phases. Each
+   amended function is named, so the builder knows which bodies to change.
 2. **P11** — the audits (§5).
 3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
@@ -22,16 +27,18 @@ The owner's requests still to do, in this order (their words are in the session 
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).
 4. **The sessions browser and the hard delete** (P12, amends RUN-06): one simple screen listing
    every session ever played, one easy delete, and a delete that leaves nothing — every log, every
-   line of dialogue — as the normal mode, not an option. Design notes are in the scratch NOTES.
-5. **The final pass** — docs coherence, RULES regenerated, the manifest, the last zips, the handoff
-   to DeepSeek as a finished product.
+   line of dialogue — as the normal mode, not an option.
+5. **The final pass** — docs coherence, RULES regenerated, the manifest, the handoff.
+Known fault for step 6 (B6): CAS-012 (a witnessed theft becomes a rumour) can never fire — an
+ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a contract change.
 
 ## 1. How the kit is made (the method to keep using)
 
 Per phase: design → contract docstrings in `as_engine/src/as_engine/**` (the docstring IS the spec;
 function bodies stay `raise NotImplementedError("P<n>")`) → protected contract tests in
-`as_engine/tests/contract/p<nn>_<name>/` → a scratch reference implementation that is NEVER shipped,
-used only to prove the contracts and tests are buildable and consistent → docs (`docs/as/*`) →
+`as_engine/tests/contract/p<nn>_<name>/` → (until P10: a scratch reference implementation proved
+them; from now on no implementation is written — review each test against its docstring line by
+line instead, and let the builder file SPEC_ISSUES) → docs (`docs/as/*`) →
 `tools/as/gate.py --docstrings --write-rules --scan`, `tools/as/protect.py --write-manifest` →
 full suite green on the reference → full-kit zip + patch zip vs the previous delivery. Then **play
 it**: a generated world played through the service found faults no contract test had (§3.2).
@@ -43,7 +50,7 @@ Standing rules (from the owner, all still in force):
 - `.cmd` downloads fail for the owner; deliver `.zip` or `.txt`.
 - Codex_Master_Guide may only be edited with the owner's permission (pending requests below).
 - No sexual or romantic content involving minors anywhere (content check CNT-11 is protected).
-- The scratch reference never goes into the repo (a builder could read it).
+- The kit-maker writes no more implementation (the owner, 2026-09-24): contracts, tests, docs only.
 
 Merge rule for patches (the owner's builder has already filled P0–P9 bodies): insert new functions
 BEFORE an existing `def` line, never directly after a body the builder wrote; do not change a
@@ -55,21 +62,13 @@ the new patch.
 
 ```
 cd as_engine
-PYTHONPATH=<reference dir> python3 -m pytest tests -q -p no:randomly \
+PYTHONPATH=src python3 -m pytest tests -q -p no:randomly \
   -o addopts="-p no:cacheprovider --import-mode=importlib -m 'not live'"
 ```
-With the P10 scratch reference (delivered separately as `AS_p10_scratch_reference.zip`, folder
-`ref2/`) every engine test passes: P0–P10 and the sim soak (the count is in README_FIRST §1).
-Without a reference every body raises NotImplementedError, as intended. The UI specs run with
-vitest (`corepack pnpm run test:play`); the P10 specs were proven against a scratch reference of
-the P10 screens (the same zip's `ui/` folder: the P10 screens only, so the P8 specs do not run
-there — `npm install`, then `npx vitest run src/play/__tests__/wizard.spec.js` and the worldgen,
-loading_bar, quips and app specs), the P8 specs against the P8 reference.
-
-The reference is kept in sync by `sync_ref.sh`: it copies the kit's source over `ref2/` except the
-hand-written files listed in `ref_impl_files.txt`, then appends `from ._ref_x import …` lines that
-rebind the stubs to the `_ref_*.py` implementations. Change `S=` at its top to the folder you
-unpacked it in.
+Every engine test passes on the committed engine (the count is in README_FIRST §1); a new contract
+test for an unbuilt function fails with NotImplementedError until the builder writes it. The UI
+specs run with vitest once the builder has installed the toolchain (P8 step 5); the P10 specs pass
+on the committed P10 screens.
 
 ## 3. P10 — how it was verified
 
@@ -156,7 +155,7 @@ without asking anyone. For every phase that means nine things exist and agree wi
 | R1 | Contract docstrings for every function the phase builds: inputs, outputs, every rule, every error, exact event types and payloads, rng streams and purposes, row shapes. Bodies stay `raise NotImplementedError("P<n>")` | `as_engine/src/as_engine/**` |
 | R2 | Protected contract tests that fail on the stubs and pass on a correct build | `as_engine/tests/contract/p<nn>_*/` |
 | R3 | Fixtures the tests need (scenarios, packs, fake-model scripts, vectors) | `as_engine/tests/fixtures/`, `testing/fake_lm.py` |
-| R4 | Proof: a scratch reference passes R2 AND every earlier phase's tests (never shipped) — and a played world reads right | scratch `ref2/` |
+| R4 | Proof: until P10 a scratch reference passed R2 and every earlier phase's tests. From now on no implementation is written: each test is reviewed line by line against its docstring, every earlier test still passes on the committed engine (a new test of a built function must pass on it), and the builder files SPEC_ISSUES for anything inconsistent | the review; the suite |
 | R5 | Design docs rewritten to match R1 (the docs explain; the docstrings rule) | `docs/as/0x_*.md` |
 | R6 | The phase's task list, gate and forbidden list in `13_BUILD_ORDER.md` §4, in build order | docs |
 | R7 | Records: DECISIONS rows, CHANGELOG row, GLOSSARY terms, RULES.md regenerated, PROGRESS row, SPEC_ISSUES for anything left open | docs |
