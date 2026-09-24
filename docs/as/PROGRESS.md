@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine side of P0–P10 is built and every contract test of P0–P10 and the sim soak passes (1299 tests; the bodies are in `_impl_*.py` files, AGENTS.md §4), Actor v2 steps 1–3 included. Not built: the owner's appearance work (F1a, D-82: looks, clothing, condition, what a look shows, the glance cues — its parts sit in P2, P3, P4, P5 and P10; 13 §4.0 step 1 lists them), the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, the Your lives screen; a P10 genesis that names no run), P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" here.
+- Kit status: the engine side of P0–P10 is built and every contract test of P0–P10 and the sim soak passes (1299 tests; the bodies are in `_impl_*.py` files, AGENTS.md §4), Actor v2 steps 1–3 included. Not built: the owner's appearance and smell work (F1a, F1b — D-82, D-83: looks, clothing, condition, what a look shows, the glance cues, smell, gore camouflage — their parts sit in P2, P3, P4, P5 and P10; 13 §4.0 step 1 lists them), the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, the Your lives screen; a P10 genesis that names no run), P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" here.
 
 ## Phases
 
@@ -47,6 +47,8 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | wear by wet days | `DecayRules.rust_per_wet_day`, `pulp_per_wet_day`, `rot_per_wet_day` | play-tuning |
 | relationship drift chances 0.25 / 0.2 / 0.3 | `SocietyRules.drift_bond` / `drift_household` / `drift_friction` | play-tuning (how fast a settlement's feelings move) |
 | thirst stage interval | `NeedsRules.thirst_stage_every_h` | play-tuning |
+| how far a smell carries (1/2/5/10/20 m, half outdoors); when a corpse starts to smell (6/24/72 h) | `OlfactionRules.range_m`, `outdoor_mult`, `death_hours` | play-tuning (F1b) |
+| gore camouflage: how much gore masks you, how loud gives you away, for how long (4, 55 dB, 30 s) | `InfectedRules.gore_mask_min`, `mask_break_db`, `mask_window_s` | play-tuning (F1b) |
 
 ## Human checklist items
 

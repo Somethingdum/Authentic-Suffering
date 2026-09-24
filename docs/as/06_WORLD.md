@@ -396,6 +396,14 @@ it, and the dead who walk on out of sight go back into the crowd.
 - Infected never hunt infected (INF-05); a Lurker-to-be past its first stage is never a target
   (INF-06, CMG §42 hard rule); a wet host three weeks in is not hunted by sight (INF-07). Quirks are
   seeded per body (INF-08): the same world makes the same body with the same quirks.
+- **Gore camouflage** (INF-14, the owner's F1b): a living body caked in the gore of the dead
+  (`bodies.gore` 4 or more) moves among them as one of them — the common dead do not pick it out,
+  until it gives itself away within the last 30 s: a sound of its own of 55 dB or more (a run, a
+  strike, a shot, a normal voice; a whisper or a low voice is not) or a hand on one of them. Sound
+  still draws them to where it is, and one already hunting it keeps on. A Lurker reads heat
+  straight through it (CODEX). The dead do not track by smell (their lore's false belief); people
+  do — whoever wears the dead reeks of them (sense.olfaction), and the fluids carry the wet strain
+  (D-77; smearing is F1c's).
 
 ### 5.3 Crowds, and the Mega Horde (HRD-03..17)
 - **Drift**: a district with enough active dead sometimes sends a crowd off to a neighbouring hub

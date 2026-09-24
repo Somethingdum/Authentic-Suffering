@@ -90,6 +90,15 @@ machine yet, so start here, not at P0 task 1:
    - P5: `cues_of` adds the appearance cues (`action/_impl_p5a.py`) — `p05_many_actors/test_appearance_cues.py`.
    - P10 (step 3): `world/worldgen/opening` step 2 — the PC is created with their looks and
      dressed in their outfit (`_impl_wg.place_pc`) — `p10_world/test_dressed.py`.
+   The owner's smell work (F1b: SMELL-01..06, INF-14; D-83) follows the same way:
+   - P3: `sense/olfaction.py` (new: `odour_of`, `smell_range_m`, `smells`), and in
+     `mind/perception.py` `smell_text` and the standing view's smell (`compile_scene` step 1) —
+     `p03_perception/test_smell.py`.
+   - P4: the packet line adds `smell_text` (`mind/_impl_packet.py`, `mind/_impl_p6.py`) —
+     `test_appearance_in_packet.py::test_someone_smeared_with_the_dead_reeks_of_them`.
+   - P5: `cues_of` adds the smell cues (`SMELL_CUES`) — the smell tests in `test_appearance_cues.py`.
+   - P10: `world/infected.sees` — gore camouflage, INF-14 (`world/_impl_p10.py`) —
+     `p10_world/test_gore_mask.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
@@ -154,6 +163,7 @@ Read: 05 §3, 07 §3–4, `sense/*`, `mind/perception.py`, `kernel/truth.py`.
 3. `kernel/truth.py::current_facts`.
 4. `mind/perception.py`: `grant` (the single writer), `render_visual`, `compile_scene`, `compile_aftermath`.
 5. F1a: `mind/perception.appearance_text` and `mind/cues.appearance_cues` — what someone looks like, and what that tells you at a glance (`test_appearance.py`).
+6. F1b: `sense/olfaction.py` and `mind/perception.smell_text` / the standing view's smell (`test_smell.py`).
 Gate: `p03_perception` green.
 **Forbidden:** decisions. Minds receive; they do not yet choose.
 

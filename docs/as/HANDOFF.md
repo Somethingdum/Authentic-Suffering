@@ -45,10 +45,14 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   **F1a is SPECIFIED** (D-82, LOOK-01..06, CNT-17; 13 §4.0 step 1 says where the builder builds it; tests
   12 §3.5): looks, clothing items and the outfit, condition columns and `soil`, what a look shows at each
   distance and light, the glance cues, the packet line, the PC dressed at the opening; the thirteen core
-  people and Fredrick have looks. Left of this item: **F1a-2** generated people (worldgen people and
+  people and Fredrick have looks. **F1b is SPECIFIED** (D-83, SMELL-01..06, INF-14): smell as a people's sense
+  (the dead, death, blood, sweat and dirt; range by strength, halved in the open air, never your own; with the
+  look for someone seen, one smell per kind unseen; smell cues) and gore camouflage against the common dead (the
+  lore's "they smell you" stays false). Left of this item: **F1a-2** generated people (worldgen people and
   `society.population.materialise`) get looks and outfits, and the narrator and the Play UI show how people
-  look; **F1b** smell; **F1c** washing, changing, smearing gore (with the D-77 exposure), rain, grime that
-  builds, nakedness's consequences and people's reactions (group dynamics).
+  look and smell; **F1c** washing, changing, smearing gore (with the D-77 exposure; a belief cue for it),
+  rain, grime that builds, nakedness's consequences and people's reactions — keeping away from someone who
+  reeks is group dynamics.
 - **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own

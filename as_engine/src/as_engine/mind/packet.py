@@ -24,10 +24,10 @@ SKULL-10 (P10) Nothing later than the moment reaches a mind: a mind deciding at 
   (known bodies and items, threats, the attention point), mind.retrieval (the moment set) and
   turn.select (salience; mind.cues always did).
 
-LOOK-06 (F1a) Everyone the holder sees now comes with what the holder sees of them: each entity
-  'here' carries PacketEntity.appearance (entities below — mind.perception.appearance_text at the
-  best level and the distance), and the prompt shows it on its own line under the entity's line;
-  nobody out of sight gets one.
+LOOK-06 (F1a, F1b) Everyone the holder sees now comes with what the holder sees and smells of them:
+  each entity 'here' carries PacketEntity.appearance (entities below — mind.perception.
+  appearance_text at the best level and the distance, then smell_text), and the prompt shows it on
+  its own line under the entity's line; nobody out of sight gets one.
 
 Handles (never an internal id in anything rendered — SKULL-06 is tested over the rendered prompt):
   S1..Sn  this holder's percept_log rows with turn_index == turn_index and at <= ``at`` (SKULL-10),
@@ -110,8 +110,9 @@ Fields (second person, plain English):
                     at - last_seen) when last_seen and last_seen_place are set; else 'not seen'.
                     appearance (LOOK-06): for an entity 'here', mind.perception.appearance_text(
                     tx, actor_id, the body, the best level of those VISUAL percepts ('clear' over
-                    'partial'), space.point_distance(actor, body)); else ''. The prompt shows it on
-                    its own line under the entity's line.
+                    'partial'), space.point_distance(actor, body)) and mind.perception.smell_text(
+                    tx, actor_id, the body, at), the non-empty ones joined with one space; else ''.
+                    The prompt shows it on its own line under the entity's line.
   relationships     RelationshipLine(handle, text) per entity with a relationships row from the
                     holder, in entity order. text = the non-zero axes, in the order trust, fear,
                     respect, affection, resentment, obligation, joined with '; ', first letter

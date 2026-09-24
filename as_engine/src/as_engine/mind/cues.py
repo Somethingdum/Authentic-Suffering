@@ -62,6 +62,9 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
   for every other body B that is the source_id of one of the holder's visual percept_log rows of
   this turn (turn_index, at <= ``at``) at level clear or partial — level = the best of them
   ('clear' over 'partial').
+  SMELL-06 (F1b): plus SMELL_CUES[kind] for the detail.odour of each of the holder's olfactory
+  percept_log rows of this turn (turn_index, at <= ``at``), and for each such seen body B that
+  sense.olfaction.smells(holder, B, at) is not None: SMELL_CUES[odour_of(B, at).kind].
 Returns the set; pure (reads only).
 
 LOOK-05 appearance_cues(tx, holder_id, subject_id, level, distance_m) -> list[str]   (F1a)
@@ -96,6 +99,11 @@ SENSORY_CUES_P5: frozenset[str] = frozenset({
     "infected_seen", "infected_close", "blood_seen", "corpse_seen", "dark_room", "door_forced",
     "bonded_hurt", "dependent_in_danger", "stranger_approaching",
 })
+
+
+SMELL_CUES: dict[str, str] = {    # F1b, SMELL-06: sense.olfaction kind -> registry cue
+    "dead": "reek_of_dead", "death": "smell_of_death", "blood": "blood_smell", "unwashed": "unwashed_smell",
+}
 
 
 APPEARANCE_CUES: frozenset[str] = frozenset({

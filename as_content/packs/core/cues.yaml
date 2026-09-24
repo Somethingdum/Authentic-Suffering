@@ -43,6 +43,11 @@ cues:
   - {id: soaked, description: "A person in view who is soaked through."}
   - {id: half_dressed, description: "A person in view bare to the waist."}
   - {id: naked, description: "A person in view with no clothing over the torso or groin."}
+  # --- smell cues (F1b, SMELL-06): what the holder smells, on someone in view or unseen close by (mind.cues)
+  - {id: reek_of_dead, description: "The reek of the dead: one of them close by, or someone smeared with them."}
+  - {id: smell_of_death, description: "The smell of a body some hours or days dead."}
+  - {id: blood_smell, description: "The smell of blood close by."}
+  - {id: unwashed_smell, description: "The smell of someone long unwashed."}
   # --- belief cues (things a person believes that open options)
   - {id: knows_headshot_rule, description: "Believes the dead only stay down when the brainstem or upper spine is destroyed."}
   - {id: knows_false_death, description: "Believes a downed infected can get back up hours later."}

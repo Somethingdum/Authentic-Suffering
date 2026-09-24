@@ -112,6 +112,17 @@ transparent portal with one side within 3 m of it. Thermal observers treat light
 visible act (leaning close, passing something low, whispering) produces a visual percept with an
 inference hint even when nothing was heard (CROWD-05).
 
+### 4.1 Smell (`sense/olfaction.py`, F1b)
+
+What a body smells of comes from what is on it and, for a corpse, how long it has been dead:
+gore ≥ 2 → *the dead* (strength = gore); a corpse 6 / 24 / 72 hours dead → *death* 2 / 3 / 4;
+blood ≥ 3 → *blood* (blood − 1); grime ≥ 3 → *sweat and dirt* (grime − 2); the strongest wins, ties
+in that order. Range by strength indoors 1 / 2 / 5 / 10 / 20 m, half that in the open air; within
+half the range it is smelled clearly, beyond it faintly; only in the same place, only awake, and
+never your own. Someone seen clearly or partly is smelled with how they look ("Reeks of the dead."
+on the line under them); what is not seen reaches you as one smell per kind ("The reek of the
+dead, close by.").
+
 ## 5. Harm, bleeding, death (`physical/bodies.py`)
 
 No hit points. A wound: anatomy, type, severity, bleed rate, pain, contamination, function loss,

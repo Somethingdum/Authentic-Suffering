@@ -23,6 +23,8 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | SHOWN | the pieces of clothing someone looking can see: the outermost layer at each slot (a one-piece suit hides a shirt of its own layer), in slot order (`mind.perception.appearance_text`) | — | — |
 | condition (of a body) | grime, blood, gore (0–5) and wet (0–3) on a body and its clothes (`bodies.grime / blood / gore / wet`, `physical.bodies.soil`, LOOK-04); the dead start at grime 5, blood 3, gore 5 | filthy, bloodied, caked in gore, soaked through | — |
 | appearance (of a person, to a mind) | what one mind sees of someone at this moment, from their looks, clothes, visible gear and condition at that distance and light (`appearance_text`, `PacketEntity.appearance`, LOOK-03, LOOK-06) | — | — |
+| odour | what a body smells of now: kind (the dead, death, blood, unwashed) and strength 1–5, from its condition or, for a corpse, the hours since death (`sense.olfaction.odour_of`, SMELL-01) | "reeks of the dead", "smells of blood" | — |
+| gore camouflage | a living body caked in the dead's gore goes unpicked by the common dead until it gives itself away (`world.infected` INF-14) | — | — |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | decision | an Actor's answer that attempts something: one offered option, its pace, speech, goal, private reason (`ActorReplyV2` kind decision) | what they do | — |

@@ -1,5 +1,5 @@
-"""What people look like is a cue for the people who see them (P5, the owner's F1a). Rule LOOK-05
-(mind/cues.py cues_of + appearance_cues).
+"""What people look and smell like is a cue for the people who see them (P5, the owner's F1a and
+F1b). Rules LOOK-05, SMELL-06 (mind/cues.py cues_of + appearance_cues, SMELL_CUES).
 
 Two people on a porch and one out of sight in the kitchen: only a body seen this turn, clearly or
 partly, lends its look to the cues — a revolver on a hip, blood on a coat, nothing at all.
@@ -88,3 +88,36 @@ def test_your_own_look_is_no_cue_to_you(porch):
     w, t = porch()
     soil(w, t, "june", blood=5, gore=5, grime=5, wet=3)
     assert cues_now(w, t).isdisjoint({"bloodied", "gore_covered", "filthy", "soaked"})
+
+
+def test_the_reek_on_someone_seen_is_a_cue(porch):
+    """SMELL-06: Mara smeared with the dead two metres away; blood on Dale behind the door is not
+    smelled. Your own reek is nothing to you."""
+    w, t = porch()
+    soil(w, t, "mara", gore=5)
+    soil(w, t, "dale", blood=5)
+    got = cues_now(w, t)
+    assert "reek_of_dead" in got and "blood_smell" not in got
+    soil(w, t, "june", grime=5)
+    assert "unwashed_smell" not in cues_now(w, t)
+
+
+def test_the_dead_smelled_in_the_dark_are_a_cue(fixture_packs, core_pack_dir):
+    """SMELL-06: a smell percept with nobody seen is a cue too."""
+    spec = copy.deepcopy(PORCH)
+    spec["places"][1]["light"] = 0
+    spec["bodies"].append({"id": "dead", "infected": "ZOMBIE_ARCHETYPE_SHAMBLER01", "controller": "policy",
+                           "place": "kitchen", "x": 4.5, "y": 3.5})
+    spec["bodies"] = [b for b in spec["bodies"] if b["id"] != "dale"]
+    w = load_scenario(spec, packs_root=fixture_packs, core_pack_dir=core_pack_dir)
+    try:
+        t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+        with w.store.transaction() as tx:
+            perception.compile_scene(tx, w.id("pc"), t, 0)
+        assert "reek_of_dead" in cues_now(w, t, "pc")
+    finally:
+        w.store.close()
+
+
+def test_every_smell_cue_is_in_the_registry(canon):
+    assert set(cues.SMELL_CUES.values()) <= {c.id for c in canon.all("cue")}

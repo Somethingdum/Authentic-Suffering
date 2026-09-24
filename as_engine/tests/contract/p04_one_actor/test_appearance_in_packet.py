@@ -1,5 +1,6 @@
-"""What a person sees of the people around them goes into their decision (P4, the owner's F1a).
-Rule LOOK-06 (mind/packet.py PacketEntity.appearance; prompts/actor_cognition.user.j2).
+"""What a person sees and smells of the people around them goes into their decision (P4, the owner's
+F1a and F1b). Rules LOOK-06, SMELL-04 (mind/packet.py PacketEntity.appearance;
+prompts/actor_cognition.user.j2).
 
 June stands on the porch with Mara two metres away, the revolver on Mara's hip in plain view; Owen
 is at the steps with his axe in hand; Dale, a friend of June's, is inside the kitchen, out of sight.
@@ -70,3 +71,21 @@ def test_the_people_here_come_with_what_she_sees_of_them(porch):
     user = render(CallClass.ACTOR_COGNITION, p=p)[1].content
     assert f"— here\n  {want}\n" in user, "on its own line, under the line that names her"
     assert "scraggly" not in user and "work jacket, torn" not in user
+
+
+def test_someone_smeared_with_the_dead_reeks_of_them(porch):
+    """F1b: the line under a person says what she smells on them too (SMELL-04)."""
+    from as_engine.physical import bodies
+
+    w = porch
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    june = w.id("june")
+    with w.store.transaction() as tx:
+        bodies.soil(tx, w.id("mara"), gore=5, source="smeared", at=t, cause_event_id=None, turn_index=0)
+        perception.compile_scene(tx, june, t, 0)
+        aff = enumerate_affordances(tx, june, w.canon.all("affordance"), t, 0)
+        p = build_packet(tx, june, LOD.HOT, aff, 0, t)
+        look = perception.appearance_text(tx, june, w.id("mara"), "clear", space.point_distance(tx, june, w.id("mara")))
+    [mara] = [e for e in p.entities if p.handles[e.handle] == w.id("mara")]
+    assert look.endswith("; caked in gore.")
+    assert mara.appearance == look + " Reeks of the dead."

@@ -1,4 +1,4 @@
-"""Infected ecology (P10). Canon: Lore v1.0 §2-4, CMG §42. Rules INF-01..13. Owner 'world.infected'
+"""Infected ecology (P10). Canon: Lore v1.0 §2-4, CMG §42. Rules INF-01..14. Owner 'world.infected'
 (infected_state). docs/as/06_WORLD.md §5. R = RulesConfig().infected; types and states are canon
 records (InfectedTypeDef by id, InfectedStateDef by id). Every function that returns an Event has
 committed it (writer 'world.infected' unless said otherwise; at and turn_index as given). rng stream
@@ -46,16 +46,25 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     place_id: b's place} (writer 'action.propagate', actor_id b) — except a portal into an enclave
     place (places.props.enclave; world.factions FAC-01), which holds whatever the strain. A lone
     body never breaks in; a crowd that knows someone is inside does, in time.
+  INF-14 (F1b) Gore camouflage: a living body caked in gore moves among the dead as one of them.
+    sees() is False for a target whose bodies.gore >= R.gore_mask_min when the seeing body's type
+    vision_mode is not 'thermal' (a Lurker reads heat straight through it), unless within
+    (at - R.mask_window_s s, at] the target gave itself away: a NOISE or SPEECH event with
+    actor_id = the target whose payload source_db >= R.mask_break_db (a run, a strike, a shot, a
+    normal voice — a whisper or a low voice is not), or an ACTION_START with actor_id = the
+    target whose target_id is an infected body (it touched one of them). Sound still draws them to
+    where the target is (INF-09), and a body already hunting the target keeps on: the mask keeps
+    you from being picked out, it does not shake off what already has you.
 
 active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, awareness not
   'unconscious' (false-dead), an infected_state row with folded_at NULL (P10: a body folded back
   into a count is no longer in the world, world.hordes HRD-18), and 'dormant' not in states.
 threshold(store, body_id) -> float; speed(store, body_id) -> float: the type's speed_m_s x every
   state's speed_mult (0 when dormant).
-sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07)
+sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07, INF-14)
   False unless the target is a living body whose awareness is not 'unconscious' (a sleeper lies in
-  plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-07. Then the
-  type's senses: distance (straight line, physical.space.point_distance) <= vision_range_m and
+  plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-07 / INF-14.
+  Then the type's senses: distance (straight line, physical.space.point_distance) <= vision_range_m and
   vision_mode 'motion_contrast' -> the target moved in (at - R.motion_window_s s, at]: a MOVE with
   actor_id = the target, or an ACTION_START with actor_id = the target whose payload verb is not in
   STILL_VERBS (standing still to watch, wait, keep guard, hide or talk is not movement — the one

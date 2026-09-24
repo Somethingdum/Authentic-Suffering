@@ -86,8 +86,8 @@ class PacketEntity(Strict):
     relation_summary: str | None = None
     whereabouts: str = Field(description="'here', 'heard, not seen', 'last seen in <place> <age>' or 'not seen' "
                              "(mind.packet; Actor Spec AC14).")
-    appearance: str = Field(default="", description="What you see of them right now (F1a, LOOK-06); '' when you "
-                            "do not see them now.")
+    appearance: str = Field(default="", description="What you see and smell of them right now (F1a/F1b, LOOK-06); "
+                            "'' when you do not see them now.")
 
 
 class PerceivedItem(Strict):

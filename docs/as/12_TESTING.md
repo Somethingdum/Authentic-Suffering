@@ -150,7 +150,7 @@ They change finished phases in place, so their tests live in those phases' folde
 | `p06_memory/test_recall.py` | recall brings back the holder's own episodes and beliefs the packet did not show — by their words or by whom they are about — saying how they know and when; memories first, at most three; nothing found is only that; never anyone else's records (CONSULT-05) |
 | `p07_slice/test_decision_v2.py` | a V1 and a V2 answer both read; a lookup, then the decision on the same snapshot; more of one kind added after the menu and chosen; a consultation where none is offered repaired into a decision; a failed answer goes on with what they took on, or no attempt at all; a timeout gets no repair; an unanswered ask holds the decision, and in a whole turn nothing happens and the player is told (REPLY-01..02, HOLD-01..02) |
 
-### 3.5 The owner's appearance work (F1a, D-82)
+### 3.5 The owner's appearance and smell work (F1a, F1b; D-82, D-83)
 
 Each part lives in the phase that owns the function it pins; every world is a small dict scenario
 (bodies with `dress: true` and, for a stub, its own `looks`).
@@ -162,6 +162,11 @@ Each part lives in the phase that owns the function it pins; every world is a sm
 | `p04_one_actor/test_appearance_in_packet.py` | a person present comes with what the holder sees of them, on its own line under theirs; someone out of sight, nothing (LOOK-06) |
 | `p05_many_actors/test_appearance_cues.py` | `cues_of` adds a glance's cues only for someone seen this turn: a gun on a hip in view, not in a pocket; blood behind a closed door is no cue; your own look is none (LOOK-05) |
 | `p10_world/test_dressed.py` | the player starts in their own clothes: their looks on record, their outfit worn, their gear on top (worldgen opening, LOOK-01, -02) |
+| `p03_perception/test_smell.py` | F1b: what is on someone is what they smell of, the strongest winning, ties in order; a corpse smells of death after 6 / 24 / 72 hours; the open air halves how far a smell carries; clearly within half the range, faintly to its edge, never your own, never asleep, never through a wall; the dead in the dark smelled before they are seen — one smell per kind, naming nobody, the nearest setting how strongly; someone seen is smelled with how they look (SMELL-01..05) |
+| `p10_world/test_gore_mask.py` | F1b: caked in gore a living body moves among the dead unpicked — a smear is not a mask; a whisper or a low voice keeps it, a normal voice, a shout, a run or a hand on one of them gives it away, for 30 s; touching a living person does not; masked, a body looking round the room finds nobody, and what already has you keeps on (INF-14) |
+
+`test_appearance_in_packet.py` and `test_appearance_cues.py` also pin the smell on the packet line
+(SMELL-04) and the smell cues, seen and unseen (SMELL-06).
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

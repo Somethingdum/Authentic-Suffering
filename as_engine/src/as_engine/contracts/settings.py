@@ -288,6 +288,17 @@ class InfectedRules(Strict):
     saliva_hours: float = 12.0     # [SAND] a spreader's mouth on a bottle stays infective this long
     sign_range_m: float = 3.0      # a host's stage signs (fever, spreader signs, a bite) are seen this close
     compulsion_cooldown_min: int = 10   # a week-3 spreader's involuntary offer, at most once per this
+    # F1b gore camouflage (INF-14): a living body caked in gore moves among them as one of them
+    gore_mask_min: int = 4         # [SAND] bodies.gore at or above this masks the living
+    mask_window_s: int = 30        # [SAND] giving yourself away is remembered this long
+    mask_break_db: float = 55.0    # [SAND] a sound of your own this loud gives you away (a run, a strike, a normal voice)
+
+
+class OlfactionRules(Strict):
+    """F1b smell numbers (sense.olfaction; SMELL-01..03)."""
+    range_m: dict[int, float] = Field(default_factory=lambda: {1: 1.0, 2: 2.0, 3: 5.0, 4: 10.0, 5: 20.0})  # [SAND]
+    outdoor_mult: float = 0.5      # [SAND] open air carries a smell off: ranges outdoors are this much of indoors
+    death_hours: tuple[float, float, float] = (6.0, 24.0, 72.0)   # [SAND] a corpse smells of death at 2 / 3 / 4 from these hours
 
 
 class SocietyRules(Strict):
@@ -388,6 +399,7 @@ class BackgroundRules(Strict):
 class RulesConfig(Strict):
     checks: CheckRules = Field(default_factory=CheckRules)
     acoustics: AcousticRules = Field(default_factory=AcousticRules)
+    olfaction: OlfactionRules = Field(default_factory=OlfactionRules)
     harm: HarmRules = Field(default_factory=HarmRules)
     needs: NeedsRules = Field(default_factory=NeedsRules)
     resolve: ResolveRules = Field(default_factory=ResolveRules)

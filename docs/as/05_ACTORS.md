@@ -82,8 +82,9 @@ where a word ends, with " …" — heard, not obeyed, and never crowding the per
 context); **People you can account for** (by name if known, else description, and where they are
 as far as this mind knows: *here* — seen now —, *heard, not seen*, *last seen in the office 2 hours
 ago*, or *not seen*: being someone's son never puts him in the room, Actor Spec AC14; for someone
-*here*, a line under theirs says what this person sees of them — hair, clothes, a badge, a gun on the
-belt, blood and filth — at that distance and in that light, LOOK-06); **Your
+*here*, a line under theirs says what this person sees and smells of them — hair, clothes, a badge,
+a gun on the belt, blood and filth, the reek of the dead — at that distance and in that light,
+LOOK-06, SMELL-04); **Your
 understanding of them**; **What remains uncertain**; and the **Possibilities you notice**
 (affordances A1…).
 

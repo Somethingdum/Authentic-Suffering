@@ -1,4 +1,4 @@
-"""Perception compiler and THE single knowledge writer (P3). Rules SKULL-01..06, L1, LOOK-03.
+"""Perception compiler and THE single knowledge writer (P3). Rules SKULL-01..06, L1, LOOK-03, SMELL-04..05.
 Owner 'mind.perception'. May import kernel.truth, sense.*, physical.*.
 
 grant(tx, holder_id, *, event_id, channel, fidelity, text, source_id, at, turn_index,
@@ -35,6 +35,7 @@ DETAIL (percept_log.detail, JSON) — what later stages need without re-reading 
             null when the source is in the listener's place
   visual:   {level}  ('clear' | 'partial' | 'silhouette')
   tactile:  {wound_id}
+  olfactory: {odour, strength}  (F1b: the sense.olfaction kind and the strongest source's strength)
 
 Which events are sensory (SENSORY_TYPES) and how each is perceived:
   NOISE    auditory. Source point = acoustics.source_point(payload, actor_id); source_db =
@@ -80,7 +81,13 @@ compile_scene(tx, holder_id, at, turn_index) -> list[str]   (Stage 3, every wave
      (source_id = item id); for every non-wall portal of the holder's place one VISUAL percept
      render_portal (source_id = portal id); P10 (TRACE-05): when the light where the holder stands
      (optics.light_at(holder)) is above 0, one VISUAL percept per trace in the holder's place (world.traces.traces_in order),
-     text = the trace's text, source_id = the trace id. Standing-view percepts are NOT deduplicated across
+     text = the trace's text, source_id = the trace id. F1b (SMELL-05): then, per kind in
+     sense.olfaction.ODOUR_KINDS order, the other bodies (by body_id) the holder does not see at
+     clear or partial now and smells (olfaction.smells not None): one OLFACTORY percept for the
+     kind — fidelity 'exact' when any of them is smelled exactly, else 'partial'; text
+     ODOUR_WORDS[kind][2] (exact) or [3] (partial); source_id NULL; detail {odour: kind, strength:
+     the strongest of them}. (Someone seen clearly or partly is smelled with how they look: smell_text,
+     mind.packet LOOK-06.) Standing-view percepts are NOT deduplicated across
      moments: each compile describes the present — but a compile at the same ``at`` as a
      standing view the holder already got this turn grants no standing view again.
   2. Every sensory event of this turn (events.turn_index == turn_index, at <= at) the holder has
@@ -230,6 +237,14 @@ LOOK-03 appearance_text(tx, holder_id, subject_id, level, distance_m) -> str: wh
   The non-empty parts, in the order features, clothes, insignia, gear, condition, joined with '; ',
   the first letter capitalised, ending with '.'; nothing to say -> ''. Deterministic: the same world
   and the same arguments give the same text.
+
+SMELL-04 (F1b) smell_text(tx, holder_id, subject_id, at) -> str: what the holder smells on someone
+  it can see: f = sense.olfaction.smells(tx, holder_id, subject_id, at); None -> ''; else
+  ODOUR_WORDS[odour_of(subject).kind][0] when f is 'exact', [1] when 'partial' ('Reeks of the
+  dead.', 'Smells faintly of blood.').
+SMELL-05 (F1b) What the holder smells but does not see reaches it as the standing view's smell
+  (compile_scene step 1): one OLFACTORY percept per kind, naming nobody; the nearest sets how
+  strongly (exact over partial). Someone seen clearly or partly is smelled with how they look.
 """
 
 from __future__ import annotations
@@ -886,4 +901,8 @@ def infer(tx: "Tx", holder_id: str, *, about: tuple[str, str | None], text: str,
 
 
 def appearance_text(tx: "Tx", holder_id: str, subject_id: str, level: str, distance_m: float) -> str:
+    raise NotImplementedError("P3")
+
+
+def smell_text(tx: "Tx", holder_id: str, subject_id: str, at: int) -> str:
     raise NotImplementedError("P3")

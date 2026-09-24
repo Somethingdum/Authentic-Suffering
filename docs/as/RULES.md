@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-613 ids; 360 with their own statement, 253 named only in context.
+620 ids; 367 with their own statement, 253 named only in context.
 
 
 ## ABUSE
@@ -515,6 +515,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INF-11 | INF-11 Infected in a place come from its zone's danger the first time a person arrives (populate). | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_infected.py` |
 | INF-12 | INF-12 The same rules run everywhere: an INFECTED_STEP timer moves a body one leg at a time, in a turn's window or off-screen alike. | as_engine/world/infected.py | `as_engine/physical/space.py`, `as_engine/world/infected.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/infected/states.yaml` | `contract/p10_world/test_hordes.py`, `contract/p10_world/test_infected.py` |
 | INF-13 | INF-13 (P10) A crowd breaks what one body only bangs on. After a bang (step 1): when at least R.push_min living infected bodies (b included) stand in b's place within 2 m of the portal's point on this side, and the port… | as_engine/world/infected.py | `as_engine/action/propagate.py`, `as_engine/physical/space.py`, `as_engine/world/infected.py` | `contract/p10_world/test_ghosts.py`, `contract/p10_world/test_hordes.py` |
+| INF-14 | INF-14 (F1b) Gore camouflage: a living body caked in gore moves among the dead as one of them. sees() is False for a target whose bodies.gore >= R.gore_mask_min when the seeing body's type vision_mode is not 'thermal' (… | as_engine/world/infected.py | `as_engine/sense/olfaction.py`, `as_engine/world/infected.py` | `contract/p10_world/test_gore_mask.py` |
 
 ## INFO
 
@@ -593,9 +594,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | LOOK-01 | LOOK-01 bodies.looks holds the body's contracts.dossier.Looks WITHOUT its outfit (JSON; NULL = height and build are all anyone sees): what anyone can see — hair, facial hair, eyes, complexion, visible marks (where and w… | as_engine/physical/bodies.py | `as_engine/contracts/dossier.py`, `as_engine/physical/bodies.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/opening.py` | `contract/p02_space_bodies/test_looks.py`, `contract/p10_world/test_dressed.py` |
 | LOOK-02 | LOOK-02 A worn item is an items row with holder_slot 'worn'; clothing is an item whose ItemDef has a ``clothing`` block (contracts.content.ClothingProps); its props may carry colour (overrides the block's colour), state… | as_engine/physical/objects.py | `as_engine/contracts/content.py`, `as_engine/contracts/dossier.py`, `as_engine/physical/objects.py`, `as_engine/world/worldgen/opening.py`, `as_content/packs/core/items/clothing.yaml` | `contract/p02_space_bodies/test_looks.py`, `contract/p10_world/test_dressed.py` |
 | LOOK-03 | LOOK-03 appearance_text(tx, holder_id, subject_id, level, distance_m) -> str: what the holder sees of the subject beyond describe()'s Ref, never naming what cannot be seen; built from L = physical.bodies.looks_of(subjec… | as_engine/mind/perception.py | `as_engine/mind/perception.py` | `contract/p03_perception/test_appearance.py` |
-| LOOK-04 | LOOK-04 Condition: bodies.grime / blood / gore (0..5) and wet (0..3) — what is on the body and its clothes; washed_at = when it was last washed (F1c). condition_of(store, body_id) -> BodyCondition(grime, blood, gore, we… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_looks.py` |
+| LOOK-04 | LOOK-04 Condition: bodies.grime / blood / gore (0..5) and wet (0..3) — what is on the body and its clothes; washed_at = when it was last washed (F1c). condition_of(store, body_id) -> BodyCondition(grime, blood, gore, we… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/sense/olfaction.py` | `contract/p02_space_bodies/test_looks.py` |
 | LOOK-05 | LOOK-05 appearance_cues(tx, holder_id, subject_id, level, distance_m) -> list[str] (F1a) What the subject's appearance tells the holder at a glance, sorted, from the same facts as mind.perception.appearance_text (level… | as_engine/mind/cues.py | `as_engine/mind/cues.py`, `as_content/packs/core/cues.yaml` | `contract/p03_perception/test_appearance.py`, `contract/p05_many_actors/test_appearance_cues.py` |
-| LOOK-06 | LOOK-06 (F1a) Everyone the holder sees now comes with what the holder sees of them: each entity 'here' carries PacketEntity.appearance (entities below — mind.perception.appearance_text at the best level and the distance… | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_appearance_in_packet.py` |
+| LOOK-06 | LOOK-06, SMELL-04); **Your | 05_ACTORS §3 | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p04_one_actor/test_appearance_in_packet.py` |
 
 ## LOOP
 
@@ -890,6 +891,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
 | SKULL-09 | *it (SKULL-09): a smaller prompt never costs a person their identity.* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_retrieval.py` |
 | SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
+
+## SMELL
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| SMELL-01 | SMELL-01 odour_of(store, body_id, at) -> Odour / None: what the body smells of, from what is on it (physical.bodies.condition_of) and, for a corpse, how long it has been dead. The candidates: 'dead' gore >= 2 strength =… | as_engine/sense/olfaction.py | `as_engine/contracts/settings.py`, `as_engine/sense/olfaction.py` | `contract/p03_perception/test_smell.py` |
+| SMELL-02 | SMELL-02 smell_range_m(store, strength, place_id) -> float: O.range_m[strength], times O.outdoor_mult when the place is not indoor (places.indoor 0). | as_engine/sense/olfaction.py | `as_engine/contracts/settings.py`, `as_engine/sense/olfaction.py` | `contract/p03_perception/test_smell.py` |
+| SMELL-03 | SMELL-03 smells(store, holder_id, source_id, at) -> 'exact' / 'partial' / None: whether the holder smells the source now. None when source_id == holder_id (you get used to your own), when the holder is not alive with aw… | as_engine/sense/olfaction.py | `as_engine/sense/olfaction.py` | `contract/p03_perception/test_smell.py` |
+| SMELL-04 | SMELL-04 (F1b) smell_text(tx, holder_id, subject_id, at) -> str: what the holder smells on someone it can see: f = sense.olfaction.smells(tx, holder_id, subject_id, at); None -> ''; else ODOUR_WORDS[odour_of(subject).ki… | as_engine/mind/perception.py | `as_engine/mind/perception.py` | `contract/p03_perception/test_smell.py`, `contract/p04_one_actor/test_appearance_in_packet.py` |
+| SMELL-05 | SMELL-05 (F1b) What the holder smells but does not see reaches it as the standing view's smell (compile_scene step 1): one OLFACTORY percept per kind, naming nobody; the nearest sets how strongly (exact over partial). S… | as_engine/mind/perception.py | `as_engine/mind/perception.py` | `contract/p03_perception/test_smell.py` |
+| SMELL-06 | SMELL-06 (F1b): plus SMELL_CUES[kind] for the detail.odour of each of the holder's olfactory percept_log rows of this turn (turn_index, at <= ``at``), and for each such seen body B that sense.olfaction.smells(holder, B,… | as_engine/mind/cues.py | `as_engine/mind/cues.py`, `as_content/packs/core/cues.yaml` | `contract/p05_many_actors/test_appearance_cues.py` |
 
 ## SOC
 
