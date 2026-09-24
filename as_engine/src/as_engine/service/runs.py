@@ -146,21 +146,24 @@ async def create_run(config: "EngineConfig", pc_ref: str, settings: "RunSettings
     world_id given -> NotImplementedError('P12'). canon = content.pack.load_canon([content_dir /
     'core'] + [content_dir / p for p in settings.pack_ids if p != 'core']) (an error-severity issue
     -> RunError('content_missing', "A content pack this run needs has errors; check it on the
-    Content screen.")). pc = the canon PC record at pc_ref (none -> RunError('not_found', f"There is
-    no character called {pc_ref}.")). seed = settings.seed, else int(sha256((wall_clock_iso() +
+    Content screen.")). pc = the canon record at pc_ref, which must be of kind 'pc' (none, or
+    another kind -> RunError('not_found', f"There is no character called {pc_ref}.")). seed = settings.seed, else int(sha256((wall_clock_iso() +
     pc_ref).encode()).hexdigest()[:15], 16) — the one place a new seed comes from outside the Rng.
-    run_id as RUN-01 (the PC's display name); world_id = f"w_{seed:x}", then '_2', '_3', … while
-    <runs_dir>/_worlds/<world_id> exists. The run folder and its sub-folders are made; store =
-    Store.create(run_dir / 'world.sqlite', run_id=run_id, seed=seed, settings_json = settings JSON
-    (seed filled in), content_hash = canon.content_hash, start_ms 0, rules_json = config.rules JSON);
+    run_id as RUN-01 (pc.card.display_name); world_id = f"w_{seed:x}", then '_2', '_3', … while
+    <runs_dir>/_worlds/<world_id> exists. The run folder and its sub-folders (saves, autosave,
+    logs, reports) are made; store = Store.create(run_dir / 'world.sqlite', run_id=run_id,
+    seed=seed, settings_json = settings JSON (seed filled in), content_hash = canon.content_hash,
+    start_ms 0, rules_json = config.rules JSON);
     store.attach(canon, config.rules); client = LaneClient(config, transport).
     report = await world.worldgen.pipeline.run_worldgen(store, client, canon, pc_ref, settings,
     config, run_id=run_id, world_id=world_id, world_dir = runs_dir / '_worlds' / world_id,
     progress=progress). One kernel.meta event SETTINGS_CHANGE {source: 'worldgen', world_id}
-    writes meta 'world_id'. Every model call worldgen made is in lm_calls (turn 0). Then
+    (at kernel.clock.now, turn_index 0, origin 'system') writes meta UPSERT {key 'world_id', value
+    world_id}. Every model call worldgen made is in lm_calls (turn 0). Then
     store.backup_to(run_dir / 'turn0.sqlite'); the store is closed; the session is opened as
     "Opening a session" says, with extras['pack_dirs'] = the pack dirs used, extras['notices'] =
-    one plain line per skipped authored character (f"{name} is not in this world: {reason}.") and
+    one plain line per report.skipped_actors entry (f"{name} is not in this world: {reason}.",
+    name = that dossier's identity.name) and
     extras['worldgen_report'] = report; write_manifest(session). Returns the session.
 
     Cancellation (worldgen_cancel): the caller cancels the task running this coroutine. The

@@ -197,7 +197,9 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     worldgen_progress {stage, label, pct, eta_s}); then push run_loaded (as on_run_load), view,
     story and state {screen 'play', run_id, busy False}. A WorldgenAborted -> push error {code
     'worldgen_aborted', message: its message} then state {screen 'wizard', run_id None, busy
-    False}; a RunError -> push error {its code, message} then the same state; any other exception ->
+    False}; a RunError -> push error {its code, message} then the same state; a
+    kernel.errors.SettingsError (WG-34: settings the world cannot honour) -> push error {code
+    'bad_settings', message: its message} then the same state; any other exception ->
     logged, error {internal, INTERNAL}, the same state; cancelled -> nothing is pushed (on_
     worldgen_cancel answers). Finally worldgen_task = None.
   on_worldgen_cancel: no worldgen_task -> ServiceError('nothing_to_cancel', NO_WORLDGEN).

@@ -1,6 +1,7 @@
-"""Command line (P7; new-run P10). Rules CLI-01..05. `as-engine [--config PATH] <command> …` — the debugging
-surface of the slice. main(argv=None) -> int (argv None: sys.argv[1:]); every command returns an
-exit code and prints plain lines to stdout; nothing raises to the shell for an expected problem.
+"""Command line (P7; new-run P10). Rules CLI-01..05. `as-engine [--config PATH] <command> …` —
+the debugging surface of the slice. main(argv=None) -> int (argv None: sys.argv[1:]); every command
+returns an exit code and prints plain lines to stdout; nothing raises to the shell for an expected
+problem.
 
 Global: --config PATH (default 'as_config.yaml'): config_loader.load_engine_config(PATH) (a
 missing file means the defaults; relative paths resolve against the file's folder).
@@ -34,11 +35,16 @@ CLI-04 replay RUN_ID
   f"{count} turns re-simulated: " + ('all the same.' | 'the run diverged.'). Exit 0 when every
   entry is ok, else 1.
 CLI-05 new-run PC_REF [--difficulty D] [--era E] [--detail T] [--days N] [--seed S] [--fake]   (P10)
-  A generated world: settings = RunSettings(difficulty, era, world_detail, days_since_fall, seed
-  given, the rest defaults); session = asyncio.run(service.runs.create_run(config, PC_REF, settings,
-  transport, progress = a callable printing f"{pct:.0f}% {label}" per stage)); prints f"Created run
-  {run_id} in {run_dir}"; closes the store; exit 0. A WorldgenAborted prints f"[{code}] {message}"
-  and exits 1; a RunError the same. transport as for new-scenario.
+  A generated world. --difficulty / --era / --detail take the Difficulty / Era / WorldDetail values
+  (argparse choices, so a wrong word is argparse's usage error); --days and --seed are ints.
+  settings = RunSettings(difficulty, era, world_detail, days_since_fall, seed — only the options
+  given; the rest are the defaults); a value RunSettings refuses (a pydantic ValidationError, e.g.
+  --days 0) prints f"[bad_settings] {its first error's msg}" and exits 1. session =
+  asyncio.run(service.runs.create_run(config, PC_REF, settings, transport, progress = a callable
+  printing f"{pct:.0f}% {label}" per stage)); prints f"Created run {run_id} in {run_dir}"; closes
+  the store; exit 0. A WorldgenAborted prints f"[{code}] {message}" (message = str(error)), a
+  kernel.errors.SettingsError f"[bad_settings] {message}", a RunError f"[{code}] {message}"; each
+  exits 1. transport as for new-scenario.
 probe | bench | doctor
   These are repository tools (they need the live models or the repo): print f"Run it from the
   repository: python tools/as/{command}.py" and exit 2.
