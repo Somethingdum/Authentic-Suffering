@@ -1,5 +1,5 @@
 {
- "_why": "world/worldgen/params.py with the tables in tables.py. Stream 'worldgen:params', draws in DRAW_ORDER, each exactly once; rnd = floor(x + 0.5). Each case lists every draw (purpose, n, value) so a mismatch pinpoints the first wrong draw. Contradiction passes: two patch passes then overrides (params.py docstring). days_since_fall is drawn inside ERA_DAYS_RANGE[era] intersected with the PC's days_since_fall_range (WG-34).",
+ "_why": "world/worldgen/params.py with the tables in tables.py. Stream 'worldgen:params', draws in DRAW_ORDER, each exactly once; rnd = floor(x + 0.5). Each case lists every draw (purpose, n, value) so a mismatch pinpoints the first wrong draw. Contradiction passes: two patch passes then overrides (params.py docstring). days_since_fall is drawn inside ERA_DAYS_RANGE[era] intersected with the PC's days_since_fall_range (WG-34). P10: after days_since_fall come the key_resource draws — 'key_resource_type' only when key_resource_type() offers more than one type, then 'key_resource' (params.py docstring).",
  "rnd": [
   {
    "x": 2.5,
@@ -239,8 +239,24 @@
      "purpose": "days_since_fall",
      "n": 364,
      "value": 125
+    },
+    {
+     "purpose": "key_resource_type",
+     "n": 2,
+     "value": 1
+    },
+    {
+     "purpose": "key_resource",
+     "n": 3,
+     "value": 3
     }
-   ]
+   ],
+   "expected_key_resource": "supply node — a church food bank",
+   "expected_key_resource_types": [
+    "supply node",
+    "infrastructure"
+   ],
+   "expected_climate_descriptor": "subtropical ruin, heavy rain"
   },
   {
    "seed": 1,
@@ -443,8 +459,18 @@
      "purpose": "days_since_fall",
      "n": 317,
      "value": 298
+    },
+    {
+     "purpose": "key_resource",
+     "n": 3,
+     "value": 2
     }
-   ]
+   ],
+   "expected_key_resource": "supply node — a flooded distribution depot",
+   "expected_key_resource_types": [
+    "supply node"
+   ],
+   "expected_climate_descriptor": "temperate, rain some days"
   },
   {
    "seed": 2508,
@@ -645,8 +671,18 @@
      "purpose": "wildcard_level",
      "n": 5,
      "value": 5
+    },
+    {
+     "purpose": "key_resource",
+     "n": 3,
+     "value": 1
     }
-   ]
+   ],
+   "expected_key_resource": "supply node — a sealed grocery warehouse",
+   "expected_key_resource_types": [
+    "supply node"
+   ],
+   "expected_climate_descriptor": "temperate, rain some days"
   },
   {
    "seed": 7,
@@ -852,8 +888,27 @@
      "purpose": "days_since_fall",
      "n": 317,
      "value": 16
+    },
+    {
+     "purpose": "key_resource_type",
+     "n": 5,
+     "value": 3
+    },
+    {
+     "purpose": "key_resource",
+     "n": 3,
+     "value": 3
     }
-   ]
+   ],
+   "expected_key_resource": "biological — a goat herd",
+   "expected_key_resource_types": [
+    "supply node",
+    "infrastructure",
+    "biological",
+    "territory",
+    "information source"
+   ],
+   "expected_climate_descriptor": "temperate, rain some days"
   }
  ]
 }

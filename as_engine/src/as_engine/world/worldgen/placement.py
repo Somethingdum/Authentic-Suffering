@@ -13,7 +13,8 @@ WG-11 place(rng, tx, values, pc, canon) -> Placement   (Part X steps 1-4)
   t = pc.faction_start_type; E = eligible_factions(canon, values); density = values['faction_density'];
   pref = pc.start_constraints.faction_present_preferred.
   entity_type:
-    always_in_faction  'faction' (even with E empty: QC-2's faction-protection rule catches it);
+    always_in_faction  'faction' (even with E empty: faction_id None, which QC-2's
+                       faction-protection rule catches);
     usually_adjacent   'faction' when E and density >= 3 and pref != 'no', else 'group';
     outsider_tied      'faction' when E and pref != 'no', else 'none';
     outsider_solo      'group' when density >= 2, else 'none'.
@@ -41,7 +42,8 @@ WG-13 plausibility(values, placement, pc) -> 'pass' | 'fail' | 'hard_fail'   (QC
   v = values + {'entity_type': placement.entity_type, 'start_trust': placement.start_trust or 0}.
   'hard_fail' when pc.plausibility_gate.hard_fail_all is set and evaluates true, or (the faction
   protection rule) the method is 'faction_protection', pc.faction_start_type is 'always_in_faction'
-  and entity_type != 'faction'; else 'pass' when ANY pass_any expression evaluates true; else 'fail'.
+  and there is no faction to be inside (entity_type != 'faction', or faction_id None); else 'pass'
+  when ANY pass_any expression evaluates true; else 'fail'.
 
 WG-14 qc(rng, tx, params, placement, pc, canon, difficulty) -> QCResult   (Part XII + hard-fail protocol)
   QCResult(params, placement, result 'pass' | 'patched' | 'aborted', patches: list[str]).
@@ -49,7 +51,7 @@ WG-14 qc(rng, tx, params, placement, pc, canon, difficulty) -> QCResult   (Part 
   QC-2 (only when difficulty is in tables.QC2_ENFORCED): p = plausibility(...). 'fail' or 'hard_fail'
     -> the world is patched (Part XII): faction_density = max(2, density) (patch "QC-2:
     faction_density <old>-><new>" when it changed); for 'hard_fail' placement = place(...) again
-    with the patched values (Steps 9-11 re-run); then, when entity_type is 'none', the placement
+    with the patched values (Steps 9-11 re-run; patch "QC-2: placed again"); then, when entity_type is 'none', the placement
     becomes a procedural group at 'neutral' (group_descriptor = descriptor(..., hostile=False),
     start_trust drawn as in place() for 'neutral' with no faction) (patch "QC-2: procedural group
     added"). Re-evaluate: 'hard_fail' -> result 'aborted' (nothing else runs); 'fail' after a

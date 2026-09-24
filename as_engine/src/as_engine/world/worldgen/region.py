@@ -31,8 +31,8 @@ build_region(rng, tx, params, detail, canon, at) -> Region
         already used in this zone gets f" ({k})" with k = 2, 3, …;
       per site one portal hub <-> site: kind 'opening', name f"the way to {site name}" (a leading 'The'
         lower-cased), aperture 300 x 300, seal_db 0, anchor_a NULL, anchor_b = the site's anchor.
-  3 Routes: the ring (i, (i + 1) % n) for i in 0..n-1, then chords (i, j) for i < j that are not ring
-    neighbours, each when rng.chance(atlas.CHORD_CHANCE, purpose f"chord:{i}:{j}"); per route (ring
+  3 Routes: the ring pairs (i, (i + 1) % n) for i in 0..n-1, each written smaller index first (the
+    last one is (0, n-1)), then chords (i, j) for i < j that are not ring neighbours, each when rng.chance(atlas.CHORD_CHANCE, purpose f"chord:{i}:{j}"); per route (ring
     first, then chords, each in (i, j) order) distance = rng.range_int(*atlas.ROUTE_DISTANCE_M,
     purpose f"distance:{i}:{j}") and one PLACE_DISCOVERED {route_id, place_id, source: 'worldgen'}
     inserting: the ROAD place (kind 'street', name f"The road from {A} to {B}", zone_id = zone i's,
@@ -52,9 +52,11 @@ danger(values, zone_kind) -> dict[str, int]   (implemented below)
   atlas.ZONE_DANGER_MOD[zone_kind] for its key, clamped 0..10 (keys sorted).
 
 WG-15 assert_region(store, region) -> None   (raises WorldgenAssertion(stage 'WG1', ...))
-  Every place of the region is reachable from the start zone's hub through portals whose kind is
-  not 'wall' (open or not), and the start zone has at least two edge-disjoint paths over routes to
-  some other zone (WG-17 — the ring guarantees it; the check guards against a broken writer).
+  Checks what was WRITTEN (the store), not the Region it was handed: every place of the region
+  (hubs, sites, roads) is reachable from the start zone's hub through the portals rows whose kind is
+  not 'wall' (open or not), and the start zone has at least two edge-disjoint paths to some other
+  zone over the routes rows (an edge per row joining the zones of its from_place and to_place hubs)
+  (WG-17 — the ring guarantees it; the check guards against a broken writer).
 WG-16 Every building site has layout_generated 0 and an archetype_ref; no room exists yet.
 """
 

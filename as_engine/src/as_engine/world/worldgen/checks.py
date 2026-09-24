@@ -11,8 +11,8 @@ WG-35 assert_world(store, region, plan, opening) -> list[str]   (plain sentences
     body is alive and stands in a place of physical.space.places_near(the PC's place, 2) or the PC's
     place itself.
   4 "Nothing warns of the danger." unless the telegraph trace exists in the PC's place.
-  5 "The start zone has only one way out." unless the start zone has two edge-disjoint paths over
-    routes to some other zone.
+  5 "The start zone has only one way out." unless the start zone has two edge-disjoint paths to
+    some other zone over the routes rows (as region.assert_region reads them).
   6 f"{name} has no history." for every planned settlement and group that no history_events row
     names in subject_ids (WORLD-01).
   7 f"{settlement name}: {issue}" for every society.population.demographic_issues sentence of every

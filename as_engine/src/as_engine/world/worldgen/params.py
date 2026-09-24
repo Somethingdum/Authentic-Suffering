@@ -23,10 +23,11 @@ generate_params(rng, tx, difficulty, era, bias: WorldgenBias, days_since_fall|No
          ((a, b) = fall_range)
          (the New Life wizard never offers such a combination, so this is a guard, not a flow).
   Step 7 contradictions: see apply_contradictions (on the flat values, after every draw above).
-  key_resource (P10): types = key_resource_type(values, hazard_type); type = types[0] when there is
-         one, else rng.choice(tx, 'worldgen:params', 'key_resource_type', types); descriptor =
-         rng.choice(tx, 'worldgen:params', 'key_resource', atlas.KEY_RESOURCE_DESCRIPTORS[type]);
-         key_resource = f"{type} — {descriptor}". These two draws come after days_since_fall.
+  key_resource (P10): types = key_resource_type(values, hazard_type); type = types[0] when the
+         list has exactly one, else rng.choice(tx, 'worldgen:params', 'key_resource_type', types);
+         descriptor = rng.choice(tx, 'worldgen:params', 'key_resource',
+         atlas.KEY_RESOURCE_DESCRIPTORS[type]); key_resource = f"{type} — {descriptor}". These draws
+         come after days_since_fall (and after apply_contradictions, which draws nothing).
   climate_descriptor = climate_descriptor(climate_heat, climate_moisture) (below).
   The returned patches are apply_contradictions' patches. Every parameter makes exactly one draw
   (days_since_fall none when it is given), in DRAW_ORDER, and its purpose is the parameter's name.
@@ -46,8 +47,10 @@ key_resource_type(values, hazard_type) -> list[str] candidate types by Part VIII
   1 food<=3 or water<=3 -> ['supply node']; 2 tech_preservation>=7 and tech_baseline>=6 ->
   ['infrastructure']; 3 hazard_type=='biological' and hazard_severity>=6 -> ['biological'];
   4 faction_density>=6 and faction_fragmentation>=6 -> ['territory']; 5 otherwise by the highest
-  C-block value: hostile_human strictly highest -> ['information source','territory'];
-  any zombie parameter strictly highest -> ['supply node','infrastructure']; tie -> all five types.
+  of the six C-block values: hostile_human strictly highest -> ['information source', 'territory'];
+  one of zombie_common, horde_pressure, runner_pressure, lurker_pressure strictly highest ->
+  ['supply node', 'infrastructure']; anything else (a tie at the top, or ambient_danger highest) ->
+  all five: ['supply node', 'infrastructure', 'biological', 'territory', 'information source'].
 """
 
 from __future__ import annotations
