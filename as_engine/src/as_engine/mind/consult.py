@@ -143,3 +143,4 @@ def recall(tx: "Tx", packet: "SkullPacket", query: str | None, subject_ids: list
 def answer(tx: "Tx", packet: "SkullPacket", affordances: "AffordanceSet", consultation: "Consultation",
            defs: dict[str, "AffordanceDef"], turn_index: int, at: int) -> Consulted:
     raise NotImplementedError("P7")
+from ._impl_consult import check, families, more_actions, recall, answer  # noqa

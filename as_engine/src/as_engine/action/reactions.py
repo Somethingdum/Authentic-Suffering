@@ -59,3 +59,4 @@ def reaction_time(tx: "Tx", rng: "Rng", holder_id: str, trigger_at: int) -> int:
 def next_wave(tx: "Tx", rng: "Rng", new_events: list["Event"], turn_index: int, wave_index: int,
               horizon_ms: int, *, exclude: frozenset[str] | set[str] = frozenset()) -> tuple[int | None, list[str]]:
     raise NotImplementedError("P5")
+from ._impl_p5b import material_holders, reaction_time, next_wave  # noqa

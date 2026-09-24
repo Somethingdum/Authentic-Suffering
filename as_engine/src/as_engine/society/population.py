@@ -99,3 +99,5 @@ def consumption(c: Census, rules: "SocietyRules") -> dict[str, float]:
 def adjust_cohort(tx: "Tx", cohort_id: str, delta: int, reason: str, at: int, turn_index: int,
                   cause_event_id: str | None) -> "Event":
     raise NotImplementedError("P9")
+from ._impl_society import census, demographic_issues, consumption, adjust_cohort  # noqa
+from ..world._impl_p10 import take_from_cohort, materialise  # noqa

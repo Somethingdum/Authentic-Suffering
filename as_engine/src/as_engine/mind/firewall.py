@@ -181,3 +181,5 @@ def negotiable_target_penalty(times_asked: int) -> int:
 def record_lie(tx: "Tx", liar_id: str, to_id: str, signature: str, words: str, speech_event_id: str,
                at: int, turn_index: int) -> "Event":
     raise NotImplementedError("P6")
+from ._impl_p4a import classify_form, classify_standing, request_signature, classify_response  # noqa
+from ._impl_p6 import record_refusal, negotiable_target_penalty, record_lie  # noqa

@@ -117,3 +117,4 @@ def plausibility(values: dict, placement: Placement, pc: "PCDossier") -> Literal
 def qc(rng: "Rng", tx: "Tx", params: WorldParams, placement: Placement, pc: "PCDossier", canon,
        difficulty: "Difficulty", params_patches: list[str]) -> QCResult:
     raise NotImplementedError("P10")
+from ._impl_wg import eligible_factions, enclave_factions, place, descriptor, plausibility, qc  # noqa

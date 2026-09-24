@@ -61,3 +61,4 @@ def interrupt(tx: "Tx", task_id: str, cause_event_id: str | None, at: int, turn_
 
 def active_task(store: "Store | Tx", actor_id: str) -> dict | None:
     raise NotImplementedError("P5")
+from ._impl_p5a import start, advance, pause, resume, interrupt, active_task  # noqa

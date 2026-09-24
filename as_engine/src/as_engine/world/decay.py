@@ -53,3 +53,4 @@ def wet(store: "Store | Tx") -> bool:
 
 def day(tx: "Tx", rng: "Rng", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
     raise NotImplementedError("P10")
+from ._impl_p10 import exposed, wet, decay_day as day  # noqa

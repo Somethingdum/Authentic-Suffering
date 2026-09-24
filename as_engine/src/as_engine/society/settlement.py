@@ -226,3 +226,5 @@ def ensure_timers(tx: "Tx", settlement_id: str, at: int, turn_index: int) -> lis
 def set_lockdown(tx: "Tx", settlement_id: str, on: bool, reason: str, at: int, turn_index: int,
                  cause_event_id: str | None) -> "Event | None":
     raise NotImplementedError("P10")
+from ._impl_society import daily_need, days_of, has_shortage, receive, settlement_day as day, declare_shortage, change_ration, stl_adjust as adjust, add_vacancy, remove_vacancy, laws_of, law_def, apply_law, settlement_of, trade_terms, settlement_ensure as ensure_timers  # noqa
+from ._impl_society import set_lockdown  # noqa

@@ -156,3 +156,5 @@ def intent_to_dict(intent: Intent) -> dict:
 
 def intent_from_dict(d: dict) -> Intent:
     raise NotImplementedError("P5")
+from ._impl_intent import to_intent  # noqa
+from ._impl_p5b import barrier, plan_continuation, intent_to_dict, intent_from_dict  # noqa

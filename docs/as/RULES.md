@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-586 ids; 338 with their own statement, 248 named only in context.
+601 ids; 351 with their own statement, 250 named only in context.
 
 
 ## ABUSE
@@ -215,6 +215,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CONSERVE-02 | *Location rule (CONSERVE-02, enforced by the items CHECK constraint): an item is held by exactly one* | as_engine/physical/objects.py | `as_engine/physical/objects.py` | — |
 | CONSERVE-04 | CONSERVE-04 — the materialise step itself is P10). | 06_WORLD §2.1 | `as_engine/society/population.py`, `as_engine/world/factions.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/polity.py` | `contract/p09_society/test_population.py`, `contract/p10_world/test_materialise.py` |
 
+## CONSULT
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| CONSULT-01 | CONSULT-01 What a packet offers (mind.packet fills SkullPacket.consult_kinds): a reaction offers nothing; a deliberation offers 'recall', and 'more_actions' when the packet lists at least one family (CONSULT-03). 'compo… | as_engine/mind/consult.py | `as_engine/mind/consult.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_consult.py` |
+| CONSULT-02 | CONSULT-02 check(packet, consultation) -> str / None Why this consultation cannot be answered in this call, or None when it can, first match: kind not in packet.consult_kinds -> 'not_offered'; a subject that is not a P#… | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p04_one_actor/test_consult.py` |
+| CONSULT-03 | CONSULT-03 families(affordances, defs) -> list[str] ``defs`` maps def id -> AffordanceDef. The keys of contracts.content.AFFORDANCE_FAMILIES, in that order, that have at least one option in affordances.pool that is not… | as_engine/mind/consult.py | `as_engine/mind/affordance.py`, `as_engine/mind/consult.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_consult.py` |
+| CONSULT-04 | CONSULT-04 more_actions(affordances, family, subject_ids, defs) -> list[BoundAffordance] The options of affordances.pool, in pool order, that are not in affordances.options (by signature), whose def's family_of is ``fam… | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p04_one_actor/test_consult.py` |
+| CONSULT-05 | CONSULT-05 recall(tx, packet, query, subject_ids, turn_index, at) -> list[str] Up to MAX_RECALL of the holder's own records that the packet does not already show, one line each, with where it came from and how long ago… | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p06_memory/test_recall.py` |
+| CONSULT-06 | *answer(tx, packet, affordances, consultation, defs, turn_index, at) -> Consulted (CONSULT-06)* | as_engine/mind/consult.py | `as_engine/mind/consult.py` | `contract/p04_one_actor/test_consult.py`, `contract/p07_slice/test_decision_v2.py` |
+
 ## CROWD
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -289,7 +300,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | ECHO-01 | ECHO-01 each sorted n-gram of content_ngrams(unquoted text, numbers.echo_n, numbers.echo_min_content_tokens) that is in packet.player_input_echo_block (quoted speech is licensed: the PC's own words may be quoted) passed… | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
-| ECHO-02 | ECHO-02, WILL-04..11, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3. | as_engine/turn/cognition.py | `as_engine/narration/lint.py`, `as_engine/turn/cognition.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
+| ECHO-02 | ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3. | as_engine/turn/cognition.py | `as_engine/narration/lint.py`, `as_engine/turn/cognition.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
 
 ## ECON
 
@@ -408,6 +419,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | HH-05 | HH-05 apply_change(tx, household_id, change, actor_id, at, turn_index, cause_event_id, grief_delta=0) -> Event change in {'member_died', 'member_joined', 'member_left', 'grief_eased'} (ValueError otherwise); an unknown… | as_engine/society/household.py | `as_engine/society/household.py` | `contract/p09_society/test_household.py` |
 | HH-06 | HH-06 day(tx, household_id, at, turn_index, cause_event_id) -> Event / None Grief eases with time (society.settlement.day calls this for each household of the settlement). When grief_state > 0 and the newest HOUSEHOLD_C… | as_engine/society/household.py | `as_engine/society/household.py` | `contract/p09_society/test_household.py` |
 | HH-07 | HH-07 worst_hit(store, settlement_id) -> str / None The household of households_of(settlement) that is hit hardest by a shortage: among those with at least one living member, the highest ratio dependents / max(1, provid… | as_engine/society/household.py | `as_engine/society/household.py` | — |
+
+## HOLD
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| HOLD-01 | HOLD-01 a failed answer never becomes a choice (Actor Spec AC15, §14; AR10). When the decision is consequential (HOLD-02) -> raise DecisionHeld(actor, kind): turn.pipeline rolls the turn back — nothing happens, no time… | as_engine/turn/cognition.py | `as_engine/action/intent.py`, `as_engine/lanes/repair.py`, `as_engine/mind/consult.py`, `as_engine/turn/cognition.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_decision_v2.py` |
+| HOLD-02 | HOLD-02 consequential(tx, actor_id, affs[actor], turn_index, answered) -> bool: someone asked it something it has not answered (asks_for(tx, actor_id, turn_index, answered) is not empty) or it perceived a threat this tu… | as_engine/turn/cognition.py | `as_engine/mind/affordance.py`, `as_engine/turn/cognition.py` | `contract/p07_slice/test_decision_v2.py` |
 
 ## HOR
 
@@ -530,11 +548,15 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| INTENT-01 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..06, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py` |
-| INTENT-02 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..06, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/mind.py`, `as_engine/turn/cognition.py` | — |
-| INTENT-03 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..06, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_effects.py` |
-| INTENT-04 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..06, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
-| INTENT-05 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..06, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-01 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py` |
+| INTENT-02 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/mind.py`, `as_engine/turn/cognition.py` | — |
+| INTENT-03 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_effects.py` |
+| INTENT-04 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-05 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-06 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-07 | * INTENT-07 pace (a decision's or the player's; a V1 answer's is 'normal'): 'normal', or one of the chosen option's paces (BoundAffordance.paces, copied from AffordanceDef.paces) — else IntentError 'unsupported_pace' (a… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_intent_v2.py` |
+| INTENT-08 | * INTENT-08 an Actor's answer (source 'model') with more than 100 words of speech (whitespace-separated), or more than 12 in a reaction (reaction=True) -> IntentError 'speech_too_long' (Actor Spec §7: long talk goes on… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
+| INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (no packet offers any yet) — else IntentError 'hallucinated_expression'. An inscription needs a chosen option tagged 'write' (no core opt… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
 
 ## LANE
 
@@ -545,7 +567,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | LANE-03 | LANE-03, PROMPT-01, SCHEMA-02. Nothing above this boundary writes messages by hand. | as_engine/lanes/requests.py | `as_engine/lanes/client.py`, `as_engine/lanes/requests.py` | — |
 | LANE-04 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py` | — |
 | LANE-05 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py`, `as_engine/lanes/errors.py`, `as_engine/turn/pipeline.py` | `contract/p01_lanes/test_client.py` |
-| LANE-06 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py`, `as_engine/lanes/repair.py`, `as_engine/lanes/requests.py`, `as_engine/turn/cognition.py` | `contract/p01_lanes/test_repair.py` |
+| LANE-06 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py`, `as_engine/lanes/repair.py`, `as_engine/lanes/requests.py`, `as_engine/turn/cognition.py` | `contract/p01_lanes/test_repair.py`, `contract/p07_slice/test_decision_v2.py` |
 | LANE-07 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py` | — |
 
 ## LESSON
@@ -561,7 +583,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | LOD-01 | *est_wall_s = the final estimate. LOD never changes competence, knowledge or morality (LOD-01);* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/turn/cognition.py` | `contract/p05_many_actors/test_cues_and_continuation.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py` |
-| LOD-02 | *plan_continuation(tx, actor_id, affordances, at, turn_index) -> Intent (COLD, LOD-02)* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | — |
+| LOD-02 | *(COLD, LOD-02) The same decision the actor made last time, still running. First match wins; the* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | — |
 
 ## LOOP
 
@@ -724,6 +746,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | REL-04 | REL-04 A relationship is one-directional: relate(from, to) never reads or writes the (to, from) row. from_id == to_id -> ValueError (nobody has a relationship with themselves). | as_engine/mind/mind.py | `as_engine/mind/mind.py` | `contract/p06_memory/test_mind.py` |
 | REL-05 | REL-05 relate never changes ``kind`` (content, households and worldgen set kinds); an existing row keeps its kind. | as_engine/mind/mind.py | `as_engine/mind/mind.py` | `contract/p06_memory/test_mind.py` |
 
+## REPLY
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| REPLY-01 | REPLY-01 reading an answer (Actor Spec §7): parse_status 'ok' -> ActorReplyV2.model_validate( parsed) (its V1 adapter reads a V1 answer; a validation error is a failure of kind 'schema_fail'). A decision -> action.inten… | as_engine/turn/cognition.py | `as_engine/turn/cognition.py` | `contract/p07_slice/test_decision_v2.py` |
+| REPLY-02 | REPLY-02 at most two decision calls and one repair per decision (Actor Spec §7): an actor whose first answer is a valid consultation gets it answered — consulted = mind.consult.answer(tx, packet, affs[actor], reply.cons… | as_engine/turn/cognition.py | `as_engine/mind/consult.py`, `as_engine/turn/cognition.py` | `contract/p07_slice/test_decision_v2.py` |
+
 ## RES
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -791,6 +820,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SCHEMA-01 | *JSON schemas for constrained decoding (P1). Rules SCHEMA-01..04.* | as_engine/lanes/schemas.py | `as_engine/lanes/schemas.py` | `contract/p01_lanes/test_schemas.py` |
 | SCHEMA-02 | *LANE-03, PROMPT-01, SCHEMA-02. Nothing above this boundary writes messages by hand.* | as_engine/lanes/requests.py | `as_engine/lanes/requests.py`, `as_engine/lanes/schemas.py` | `contract/p01_lanes/test_schemas.py` |
 | SCHEMA-03 | SCHEMA-03: affordance_handles (cognition, intake) and percept_handles (writeback) must be | as_engine/lanes/schemas.py | `as_engine/lanes/schemas.py` | `contract/p01_lanes/test_schemas.py` |
+| SCHEMA-04 | SCHEMA-04: a schema offers only what the engine can do: a field whose handles or attempt the | as_engine/lanes/schemas.py | `as_engine/lanes/schemas.py` | `contract/p01_lanes/test_schemas.py` |
 
 ## SCOPE
 
@@ -904,7 +934,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | SYM-01 | *from; simulation modules must never call this (SYM-01).* | as_engine/mind/actor.py | `as_engine/mind/actor.py`, `as_engine/physical/bodies.py` | `contract/p00_substrate/test_boundaries.py` |
-| SYM-02 | *PC's manner colouring (SYM-02): how this person carries an idea into the world. Each field is* | as_engine/contracts/dossier.py | `as_engine/contracts/dossier.py`, `as_engine/turn/intake.py` | — |
+| SYM-02 | *``manner`` is colour only (the PC's dossier colouring, SYM-02, and the narrator): nothing* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/dossier.py`, `as_engine/turn/intake.py` | — |
 
 ## TASK
 

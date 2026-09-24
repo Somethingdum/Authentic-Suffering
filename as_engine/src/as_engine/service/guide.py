@@ -114,3 +114,4 @@ def pc_facts(view: "PlayView", last_narration: str | None) -> list[str]:
 
 async def answer(session: "Session", question: str, view: "PlayView") -> str:
     raise NotImplementedError("P8")
+from ._impl_guide import rules_for, pc_facts, answer  # noqa

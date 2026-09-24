@@ -121,3 +121,4 @@ class WorldgenReport:
 async def run_worldgen(store, client, canon, pc_ref: str, settings, config, *, run_id: str, world_id: str,
                        world_dir, progress=None) -> WorldgenReport:
     raise NotImplementedError("P10")
+from ._impl_wg import run_worldgen  # noqa

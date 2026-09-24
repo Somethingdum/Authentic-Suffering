@@ -37,3 +37,4 @@ if TYPE_CHECKING:
 
 def assert_world(store: "Store | Tx", region: "Region", plan: "PolityPlan", opening: "Opening") -> list[str]:
     raise NotImplementedError("P10")
+from ._impl_wg import assert_world  # noqa

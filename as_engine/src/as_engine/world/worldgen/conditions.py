@@ -39,9 +39,59 @@ def _int_leaves() -> frozenset[str]:
 CONDITION_NAMES: frozenset[str] = _int_leaves() | {"start_trust"}
 
 
+import re as _re
+
+_TOK = _re.compile(r"\s*(>=|<=|==|!=|>|<|=|[A-Za-z_][A-Za-z0-9_]*|\d+|\S)")
+
+
 def parse(expr: str) -> list[tuple[str, str, str]]:
-    raise NotImplementedError("P2")
+    toks = []
+    pos = 0
+    s = expr
+    while pos < len(s):
+        m = _TOK.match(s, pos)
+        if not m:
+            break
+        toks.append(m.group(1))
+        pos = m.end()
+        if s[pos:].strip() == "":
+            break
+    if not toks:
+        raise ConditionSyntaxError(f"empty condition {expr!r}")
+    out = []
+    i = 0
+    while True:
+        if i + 3 > len(toks):
+            raise ConditionSyntaxError(f"incomplete clause in {expr!r}")
+        name, op, val = toks[i:i + 3]
+        if name == "entity_type":
+            if op != "=" or val not in ("faction", "group", "none"):
+                raise ConditionSyntaxError(f"bad entity_type clause in {expr!r}")
+        else:
+            if name not in CONDITION_NAMES:
+                raise ConditionSyntaxError(f"unknown name {name!r} in {expr!r}")
+            if op not in (">=", "<=", "==", "!=", ">", "<"):
+                raise ConditionSyntaxError(f"bad operator {op!r} in {expr!r}")
+            if not val.isdigit():
+                raise ConditionSyntaxError(f"value {val!r} is not a whole number in {expr!r}")
+        out.append((name, op, val))
+        i += 3
+        if i == len(toks):
+            return out
+        if toks[i] != "and":
+            raise ConditionSyntaxError(f"expected 'and' in {expr!r}")
+        i += 1
 
 
 def evaluate(expr: str, values: dict[str, int | str]) -> bool:
-    raise NotImplementedError("P10")
+    ops = {">=": lambda a, b: a >= b, "<=": lambda a, b: a <= b, "==": lambda a, b: a == b,
+           "!=": lambda a, b: a != b, ">": lambda a, b: a > b, "<": lambda a, b: a < b}
+    for name, op, val in parse(expr):
+        if name not in values:
+            raise ConditionSyntaxError(f"no value for {name!r}")
+        if name == "entity_type":
+            if values[name] != val:
+                return False
+        elif not ops[op](int(values[name]), int(val)):
+            return False
+    return True

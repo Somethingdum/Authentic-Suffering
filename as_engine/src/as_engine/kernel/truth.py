@@ -37,4 +37,9 @@ def retire_write(claim_id: str, true_until: int) -> WriteRecord:
 def current_facts(store: "Store | Tx", subject_type: str, subject_id: str,
                   predicate: str | None = None) -> list[dict[str, Any]]:
     """Rows of canonical_truth for a subject (optionally one predicate), ordered by claim_id."""
-    raise NotImplementedError("P3")
+    sql = "SELECT * FROM canonical_truth WHERE subject_type=? AND subject_id=?"
+    params = [subject_type, subject_id]
+    if predicate is not None:
+        sql += " AND predicate=?"
+        params.append(predicate)
+    return [dict(r) for r in store.query(sql + " ORDER BY claim_id", tuple(params))]

@@ -138,4 +138,172 @@ class GateResult:
 
 
 def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
-    raise NotImplementedError("P11 (framework in P0; checks added as subsystems land)")
+    import hashlib, json, re
+    from ..contracts.events import EventType
+    from ..contracts.common import OpenLoopKind
+    from ..contracts.narration import NarratorStyle
+    from ..kernel.ownership import EVENT_WRITERS as MODULES
+    from ..kernel.store import SCHEMA_VERSION
+    q = store_or_tx.query
+    q1 = store_or_tx.query_one
+    T = turn_index
+    meta = {r[0]: r[1] for r in q("SELECT key, value FROM meta")}
+    pc = meta.get("pc_actor_id", "")
+    now = q1("SELECT now_ms, turn_index FROM world_clock WHERE id=1")
+    sha = lambda t: hashlib.sha256(t.encode("utf-8")).hexdigest()
+    def jobj(t):
+        try:
+            return isinstance(json.loads(t), dict)
+        except Exception:
+            return False
+    def has_exhaust(t):
+        return (t is None) or (t.strip() == "") or any(x.lower() in t.lower() for x in EXHAUST_STRINGS)
+    bodies = {r[0] for r in q("SELECT body_id FROM bodies")}
+    def body_alive(b):
+        r = q1("SELECT alive FROM bodies WHERE body_id=?", (b,))
+        return r is not None and r[0] == 1
+    checks = {}
+    # ---- session
+    stages = {r[0] for r in q("SELECT stage FROM turn_ledger WHERE turn_index=?", (T,))}
+    checks["S01"] = T < 1 or set(range(12)) <= stages
+    checks["S02"] = T < 1 or not q("SELECT 1 FROM turn_ledger WHERE turn_index=? AND status='failed'", (T,))
+    r = q1("SELECT received_hash, raw_text FROM player_inputs WHERE turn_index=?", (T,))
+    checks["S03"] = r is None or r[0] == sha(r[1])
+    bad = False
+    for tbl, col in (("voice_lines", "text"), ("episodes", "text"), ("propositions", "text")):
+        pass
+    ok = True
+    for tbl, col, turncol in (("voice_lines", "text", None), ("episodes", "summary", "turn_index"), ("propositions", "text", None)):
+        pass
+    for r in q("SELECT text FROM voice_lines v JOIN events e ON e.event_id=v.event_id WHERE e.turn_index=?", (T,)):
+        ok = ok and not has_exhaust(r[0])
+    for r in q("SELECT summary FROM episodes WHERE turn_index=?", (T,)):
+        ok = ok and not has_exhaust(r[0])
+    for r in q("SELECT p.text FROM propositions p JOIN events e ON e.event_id=p.created_event WHERE e.turn_index=?", (T,)):
+        ok = ok and not has_exhaust(r[0])
+    checks["S04"] = ok
+    ok = True
+    for e in q("SELECT payload FROM events WHERE turn_index=? AND type='SPEECH'", (T,)):
+        words = json.loads(e[0]).get("words", "").lower()
+        if any(m in words for m in META_STRINGS):
+            ok = False
+    checks["S05"] = ok
+    checks["S06"] = now[1] == T
+    ns = q1("SELECT style_json FROM narrator_state WHERE id=1")
+    try:
+        checks["S07"] = ns is not None and bool(NarratorStyle.model_validate_json(ns[0]))
+    except Exception:
+        checks["S07"] = False
+    checks["S08"] = not q("SELECT 1 FROM event_queue WHERE status='pending' AND due_at < ?", (now[0],))
+    kinds = {k.value for k in OpenLoopKind}
+    checks["S09"] = all(r[0] in kinds and (r[1] or "").strip() for r in q("SELECT kind, text FROM open_loops"))
+    checks["S10"] = not q("SELECT 1 FROM tasks WHERE status='active' AND next_due_at IS NULL")
+    checks["S11"] = all(r[0] in ERROR_KINDS and (r[1] is None or 0 <= r[1] <= 19) for r in q("SELECT kind, stage FROM error_repair_log WHERE turn_index=?", (T,)))
+    checks["S12"] = all(body_alive(r[0]) and q1("SELECT 1 FROM actors WHERE actor_id=?", (r[0],)) for r in q("SELECT actor_id FROM pending_reactions WHERE status='pending'"))
+    # ---- world
+    checks["W01"] = all((r[0] is None or r[0] in bodies) and (r[1] is None or q1("SELECT 1 FROM items WHERE item_id=?", (r[1],))) and (r[2] is None or q1("SELECT 1 FROM places WHERE place_id=?", (r[2],))) for r in q("SELECT holder_body, container_id, place_id FROM items"))
+    checks["W02"] = all(jobj(r[0]) for r in q("SELECT props FROM items"))
+    canon = getattr(store_or_tx, "canon", None)
+    if canon is None and hasattr(store_or_tx, "store"):
+        canon = store_or_tx.store.canon
+    ok = True
+    if canon is not None:
+        for r in q("SELECT item_id, def_ref FROM items"):
+            d = canon.get(r[1]) if canon.has(r[1]) else None
+            if d is not None and d.container is not None:
+                used = 0
+                for c in q("SELECT def_ref, qty FROM items WHERE container_id=?", (r[0],)):
+                    used += (canon.get(c[0]).bulk if canon.has(c[0]) else 0) * c[1]
+                ok = ok and used <= d.container.capacity_bulk
+    checks["W03"] = ok
+    ledger = {}
+    for r in q("SELECT type, payload FROM events WHERE type IN ('ITEM_CREATED','ITEM_DESTROYED')"):
+        pl = json.loads(r[1])
+        ledger[pl["def_ref"]] = ledger.get(pl["def_ref"], 0) + (pl["qty"] if r[0] == "ITEM_CREATED" else -pl["qty"])
+    have = {r[0]: r[1] for r in q("SELECT def_ref, SUM(qty) FROM items GROUP BY def_ref")}
+    checks["W04"] = all(have.get(k, 0) == v for k, v in ledger.items()) and all(k in ledger for k in have)
+    checks["W05"] = all(q1("SELECT 1 FROM anchors WHERE anchor_id=? AND place_id=?", (r[0], r[1])) for r in q("SELECT anchor_id, place_id FROM positions WHERE anchor_id IS NOT NULL"))
+    checks["W06"] = all(jobj(r[0]) for r in q("SELECT props FROM places"))
+    checks["W07"] = not q("SELECT 1 FROM traces WHERE (decays_at IS NOT NULL AND decays_at <= created_at) OR (locked=1 AND decays_at IS NOT NULL)")
+    checks["W08"] = not q("SELECT 1 FROM portals WHERE is_open=1 AND barricade>0")
+    if pc:
+        pos = q1("SELECT place_id FROM positions WHERE body_id=?", (pc,))
+        checks["W09"] = pos is not None and q1("SELECT 1 FROM known_places WHERE holder_id=? AND place_id=?", (pc, pos[0])) is not None
+    else:
+        checks["W09"] = True
+    checks["W10"] = not q("SELECT 1 FROM groups WHERE next_due_at IS NOT NULL AND next_due_at < ?", (now[0] - 86_400_000,))
+    ok = True
+    for r in q("SELECT participants FROM operations"):
+        ok = ok and all(x in bodies for x in json.loads(r[0]))
+    checks["W11"] = ok
+    places_ = {r[0] for r in q("SELECT place_id FROM places")}
+    checks["W12"] = all(r[0] is None or r[0] in bodies or r[0] in places_ for r in q("SELECT target_id FROM infected_state"))
+    ok = True
+    for r in q("SELECT stores FROM settlements"):
+        d = json.loads(r[0])
+        ok = ok and all(isinstance(v, (int, float)) and v >= 0 for v in d.values())
+    checks["W13"] = ok
+    checks["W14"] = not any(any(n in (r[0] or "") for n in RETIRED_NAMES) for r in q("SELECT text FROM narration WHERE turn_index=?", (T,)))
+    checks["W15"] = all(q1("SELECT 1 FROM claims WHERE claim_id=?", (r[0],)) or q1("SELECT 1 FROM propositions WHERE prop_id=?", (r[0],)) for r in q("SELECT superseded_by FROM claim_holdings WHERE superseded_by IS NOT NULL"))
+    checks["W16"] = not q("SELECT 1 FROM events e WHERE cause_event_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM events c WHERE c.event_id=e.cause_event_id)")
+    # ---- entities
+    if pc:
+        a = q1("SELECT dossier_id FROM actors WHERE actor_id=?", (pc,))
+        checks["E01"] = a is not None and q1("SELECT 1 FROM dossiers WHERE dossier_id=?", (a[0],)) is not None
+        checks["E02"] = not q("SELECT 1 FROM dossier_deltas WHERE actor_id=? AND path LIKE 'identity.%'", (pc,))
+        checks["E03"] = all(r[0] <= 1 for r in q("SELECT COUNT(*) FROM items WHERE holder_body=? AND holder_slot IN ('hand_l','hand_r') GROUP BY holder_slot", (pc,)))
+        checks["E04"] = all(r[0] in bodies and r[1] in bodies for r in q("SELECT from_id, to_id FROM relationships WHERE from_id=? OR to_id=?", (pc, pc)))
+    else:
+        checks["E01"] = checks["E02"] = checks["E03"] = checks["E04"] = True
+    checks["E05"] = all(q1("SELECT 1 FROM positions WHERE body_id=?", (r[0],)) for r in q("SELECT a.actor_id FROM actors a JOIN bodies b ON b.body_id=a.actor_id WHERE b.alive=1"))
+    checks["E06"] = all(q1("SELECT 1 FROM dossiers WHERE dossier_id=?", (r[0],)) for r in q("SELECT dossier_id FROM actors"))
+    checks["E07"] = all(r[0] == sha(r[1]) for r in q("SELECT content_hash, baseline_json FROM dossiers"))
+    checks["E08"] = all(r[0] in bodies for r in q("SELECT body_id FROM wounds"))
+    checks["E09"] = not q("SELECT 1 FROM items WHERE holder_body IS NOT NULL AND holder_slot IS NULL")
+    ok = True
+    for r in q("SELECT payload FROM events WHERE turn_index=? AND type='RELATION_CHANGE'", (T,)):
+        ok = ok and abs(json.loads(r[0]).get("delta", 0)) <= 2
+    checks["E10"] = ok
+    if meta.get("cheat_active") != "1":
+        texts = [r[0] or "" for r in q("SELECT text FROM narration WHERE turn_index=?", (T,))] + [r[0] or "" for r in q("SELECT text FROM story_log WHERE turn_index=?", (T,))]
+        checks["E11"] = not any(any(c in t.lower() for c in CHEAT_STRINGS) for t in texts)
+    else:
+        checks["E11"] = True
+    checks["E12"] = all(q1("SELECT 1 FROM groups WHERE group_id=?", (r[0],)) and r[1] in bodies for r in q("SELECT group_id, actor_id FROM group_members"))
+    checks["E13"] = not any(any(x.lower() in (r[0] or "").lower() for x in EXHAUST_STRINGS) for r in q("SELECT baseline_json FROM dossiers"))
+    checks["E14"] = not q("SELECT 1 FROM events WHERE turn_index=? AND length(payload) > 65536", (T,))
+    checks["E15"] = all(r[0] == sha(r[1]) for r in q("SELECT hash, content FROM blobs"))
+    checks["E16"] = not q("SELECT 1 FROM events WHERE origin='migration' AND type!='MIGRATION_BACKFILL'")
+    # ---- global
+    checks["G01"] = meta.get("schema_version") == str(SCHEMA_VERSION)
+    checks["G02"] = all(k in meta for k in REQUIRED_META_KEYS)
+    checks["G03"] = bool(meta.get("run_id"))
+    checks["G04"] = not q("SELECT 1 FROM events WHERE at > ?", (now[0],))
+    checks["G05"] = all(q1("SELECT 1 FROM commit_gate_log WHERE turn_index=?", (t,)) for t in range(1, T))
+    checks["G06"] = not q("SELECT 1 FROM turn_ledger WHERE turn_index > ?", (T,))
+    ok = True
+    for r in q("SELECT type, payload FROM events WHERE type IN ('SPEECH','HARM','DEATH')"):
+        p = json.loads(r[1])
+        ok = ok and ((r[0] == "SPEECH" and bool(p.get("words"))) or (r[0] == "HARM" and bool(p.get("wound_id"))) or (r[0] == "DEATH" and bool(p.get("cause"))))
+    checks["G07"] = ok
+    types = {t.value for t in EventType}
+    checks["G08"] = all(r[0] in types and r[1] in MODULES for r in q("SELECT type, writer FROM events"))
+    ok = True
+    for r in q("SELECT state_delta FROM events"):
+        try:
+            ok = ok and isinstance(json.loads(r[0]), list)
+        except Exception:
+            ok = False
+    checks["G09"] = ok
+    checks["G10"] = not q("SELECT 1 FROM turn_ledger WHERE turn_index=? AND run_count > 3", (T,))
+    seqs = [r[0] for r in q("SELECT seq FROM prng_ledger ORDER BY seq")]
+    checks["G11"] = seqs == list(range(1, len(seqs) + 1))
+    seqs = [r[0] for r in q("SELECT seq FROM events ORDER BY seq")]
+    checks["G12"] = seqs == list(range(1, len(seqs) + 1))
+    checks["G13"] = all(q1("SELECT 1 FROM blobs WHERE hash=?", (r[0],)) for r in q("SELECT output_ref FROM turn_ledger WHERE output_ref IS NOT NULL"))
+    checks["G14"] = all(re.fullmatch(r"[0-9a-f]{64}", r[0] or "") for r in q("SELECT request_hash FROM lm_calls"))
+    bits = {b.id: ("1" if checks[b.id] else "0") for b in ALL_BITS}
+    res = GateResult("".join(bits[b.id] for b in SESSION_BITS), "".join(bits[b.id] for b in WORLD_BITS),
+                     "".join(bits[b.id] for b in ENTITY_BITS), "".join(bits[b.id] for b in GLOBAL_BITS),
+                     [b.id for b in ALL_BITS if bits[b.id] == "0"])
+    return res

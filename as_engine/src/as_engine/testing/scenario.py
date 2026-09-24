@@ -668,3 +668,8 @@ class ScenarioWorld:
 def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, core_pack_dir: str | Path,
                   rules: Any = None, transport: Any = None) -> ScenarioWorld:
     raise NotImplementedError("P2")
+from ._impl_loader import load_scenario  # noqa: E402,F811
+def _session(self, run_dir=None):
+    from ..service._impl_session import session_from_world
+    return session_from_world(self, run_dir)
+ScenarioWorld.session = _session  # noqa

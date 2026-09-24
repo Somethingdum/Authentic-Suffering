@@ -307,3 +307,4 @@ def jaccard(a: AffordanceSet, b: AffordanceSet) -> float:
     if not sa and not sb:
         return 1.0
     return len(sa & sb) / len(sa | sb)
+from ._impl_affordance import enumerate_affordances  # noqa

@@ -247,3 +247,4 @@ def rise(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> li
 
 def day(tx: "Tx", rng: "Rng", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
     raise NotImplementedError("P10")
+from ._impl_p10 import active, threshold, speed, sees, attract, step, feed, seed_quirks, spawn, populate, rise, infected_day as day  # noqa

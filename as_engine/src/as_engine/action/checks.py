@@ -91,3 +91,4 @@ def opposed(tx: "Tx", rng: "Rng", a_id: str, a_spec: "CheckSpec", b_id: str, b_s
     b_result, how). The defender's spec is usually CheckSpec(attribute=a_spec.opposed_attribute,
     skill=a_spec.opposed_skill) — built by the caller."""
     raise NotImplementedError("P5")
+from ._impl_p5a import compute_target, band_for_margin, stealth6, roll, opposed  # noqa

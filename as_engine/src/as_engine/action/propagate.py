@@ -42,3 +42,5 @@ if TYPE_CHECKING:
 
 def propagate(tx: "Tx", outcome_events: list["Event"], at: int, turn_index: int) -> list["Event"]:
     raise NotImplementedError("P5")
+from ._impl_p5b import propagate  # noqa
+from ..world._impl_p10 import propagate  # noqa

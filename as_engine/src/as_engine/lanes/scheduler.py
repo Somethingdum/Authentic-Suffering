@@ -60,9 +60,31 @@ class CognitionPlan:
 
 
 async def run_jobs(client: LaneClient, jobs: list[Job]) -> dict[str, LMResponse]:
-    raise NotImplementedError("P1")
+    import asyncio
+    sems = {lane: asyncio.Semaphore(max(1, cfg.max_concurrency)) for lane, cfg in client.config.lanes.items()}
+    queued = {Lane.A: 0.0, Lane.B: 0.0}
+    planned = []
+    for j in jobs:
+        lane = j.lane_pref
+        if lane is None:
+            lane = Lane.A if queued[Lane.A] < queued[Lane.B] else Lane.B
+        req = j.request.model_copy(update={"lane": lane})
+        if client.is_down(lane):
+            other = Lane.B if lane == Lane.A else Lane.A
+            if not client.is_down(other):
+                lane = other
+                req = j.request.model_copy(update={"lane": other, "thinking": False})
+        queued[lane] += j.est_s
+        planned.append((j, req))
+
+    async def one(j, req):
+        async with sems[req.lane]:
+            return j.job_id, await client.call(req, j.output_model)
+    res = await asyncio.gather(*(one(j, r) for j, r in planned))
+    return dict(res)
 
 
 def plan_cognition(candidates: list[tuple[str, float, bool]], config: Any, turn_depth: str,
                    lanes_up: set[Lane]) -> CognitionPlan:
-    raise NotImplementedError("P5")
+    from ..action._impl_p5b import plan_cognition as _p
+    return _p(candidates, config, turn_depth, lanes_up)

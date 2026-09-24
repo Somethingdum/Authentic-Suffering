@@ -120,3 +120,4 @@ def writeback_groups(packets: dict[str, AftermathPacket]) -> list[list[str]]:
 def apply_writeback(tx: "Tx", holder_id: str, output: WritebackOutput, packet: AftermathPacket,
                     at: int, turn_index: int, *, cue_ids: frozenset[str] | set[str]) -> list[str]:
     raise NotImplementedError("P6")
+from ._impl_p6 import build_aftermath, writeback_groups, apply_writeback  # noqa

@@ -475,3 +475,4 @@ def get_service(config=None, transport=None) -> GameService:
     a new Talemate plugin, which calls this again.) Tests start fresh by setting
     ``game_service._SERVICE = None``."""
     raise NotImplementedError("P8")
+from ._impl_game_service import GameService, out, get_service  # noqa

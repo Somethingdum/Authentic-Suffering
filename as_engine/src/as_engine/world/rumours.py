@@ -118,3 +118,5 @@ def holders(store: "Store | Tx", rumour_id: str) -> list[tuple[str, int]]:
 
 def spread_day(tx: "Tx", group_id: str, at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
     raise NotImplementedError("P9")
+from ._impl_rumours import seed, spread_one, holders, spread_day  # noqa
+from ._impl_p10 import retell  # noqa

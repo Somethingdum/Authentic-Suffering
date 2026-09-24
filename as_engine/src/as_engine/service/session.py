@@ -85,3 +85,4 @@ def change_settings(tx, session: "Session", patch: dict) -> list:
 
 def append_story(tx, turn_index: int, kind: str, text: str, mode: str | None = None) -> int:
     raise NotImplementedError("P7")
+from ._impl_session import append_story, change_settings  # noqa

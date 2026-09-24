@@ -208,3 +208,4 @@ def build_packet(tx: "Tx", actor_id: str, lod: LOD, affordances: "AffordanceSet"
 def estimate_tokens(text: str) -> int:
     """len(text) // 4 (implemented; the same estimate is used everywhere)."""
     return len(text) // 4
+from ._impl_packet import build_packet  # noqa

@@ -64,3 +64,4 @@ import sys
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     raise NotImplementedError("P7")
+from ._impl_cli import main  # noqa

@@ -140,3 +140,4 @@ def build_region(rng: "Rng", tx: "Tx", params: "WorldParams", detail: str, canon
 
 def assert_region(store: "Store | Tx", region: Region) -> None:
     raise NotImplementedError("P10")
+from ._impl_wg import build_region, assert_region  # noqa

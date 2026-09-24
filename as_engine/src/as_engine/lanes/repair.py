@@ -27,4 +27,7 @@ from .client import LaneClient
 async def call_with_repair(client: LaneClient, request: LMRequest, output_model: type[BaseModel],
                            *, repair_builder: Callable[[LMRequest, LMResponse], LMRequest]
                            ) -> tuple[LMResponse, bool]:
-    raise NotImplementedError("P1")
+    resp = await client.call(request, output_model)
+    if resp.parse_status in ("grammar_fail", "schema_fail"):
+        return await client.call(repair_builder(request, resp), output_model), True
+    return resp, False

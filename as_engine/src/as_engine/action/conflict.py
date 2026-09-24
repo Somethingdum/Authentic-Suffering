@@ -64,3 +64,4 @@ def form_groups(tx: "Tx", intents: list["Intent"]) -> tuple[list[ConflictGroup],
 def precedence(tx: "Tx", rng: "Rng", resource: tuple[str, str], members: list["Intent"],
                land_at: int) -> list["Intent"]:
     raise NotImplementedError("P5")
+from ._impl_p5b import resources_of, form_groups, precedence  # noqa

@@ -240,3 +240,4 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                         "encounter_default": "calls for the watch and keeps distance"},
         "tags": ["generated"],
     }
+from ._impl_wg import write_people  # noqa

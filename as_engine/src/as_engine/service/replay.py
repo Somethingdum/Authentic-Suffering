@@ -56,3 +56,4 @@ if TYPE_CHECKING:
 
 async def resimulate(config: "EngineConfig", run_id: str, *, pack_dirs: list[str | Path] | None = None) -> list[dict]:
     raise NotImplementedError("P7")
+from ._impl_replay import resimulate  # noqa

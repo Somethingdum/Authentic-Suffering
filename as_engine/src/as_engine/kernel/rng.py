@@ -106,22 +106,45 @@ class Rng:
         self.run_seed = run_seed
 
     def draw(self, tx: "Tx", stream: str, purpose: str, n: int) -> int:
-        raise NotImplementedError("P0 — kernel/rng.py docstring")
+        from ..contracts.events import WriteOp
+        row = tx.query_one("SELECT state FROM rng_streams WHERE stream = ?", (stream,))
+        st = derive_state(self.run_seed, stream) if row is None else decode_state(row[0])
+        st, v = bounded(st, n)
+        tx.bookkeep("kernel.rng", "rng_streams", WriteOp.UPSERT, {"stream": stream}, {"state": encode_state(st)})
+        seq = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM prng_ledger")[0] + 1
+        ti = tx.query_one("SELECT turn_index FROM world_clock WHERE id=1")[0]
+        tx.bookkeep("kernel.rng", "prng_ledger", WriteOp.INSERT, {}, {"seq": seq, "turn_index": ti, "stream": stream, "purpose": purpose, "n": n, "value": v})
+        return v
 
     def d10(self, tx: "Tx", stream: str, purpose: str) -> int:
-        raise NotImplementedError("P0")
+        return self.draw(tx, stream, purpose, 10)
 
     def range_int(self, tx: "Tx", stream: str, purpose: str, lo: int, hi: int) -> int:
-        raise NotImplementedError("P0")
+        return lo + self.draw(tx, stream, purpose, hi - lo + 1) - 1
 
     def chance(self, tx: "Tx", stream: str, purpose: str, p: float) -> bool:
-        raise NotImplementedError("P0")
+        p = max(0.0, min(1.0, p))
+        return self.draw(tx, stream, purpose, 1_000_000) <= round(p * 1_000_000)
 
     def choice(self, tx: "Tx", stream: str, purpose: str, seq: Sequence[T]) -> T:
-        raise NotImplementedError("P0")
+        if not seq:
+            raise ValueError("empty sequence")
+        return seq[self.draw(tx, stream, purpose, len(seq)) - 1]
 
     def weighted(self, tx: "Tx", stream: str, purpose: str, items: Sequence[tuple[T, float]]) -> T:
-        raise NotImplementedError("P0")
+        cum = []
+        t = 0
+        for it, w in items:
+            t += round(w * 1000)
+            cum.append((it, t))
+        v = self.draw(tx, stream, purpose, t)
+        for it, c in cum:
+            if c >= v:
+                return it
 
     def shuffle(self, tx: "Tx", stream: str, purpose: str, seq: Sequence[T]) -> list[T]:
-        raise NotImplementedError("P0")
+        lst = list(seq)
+        for i in range(len(lst) - 1, 0, -1):
+            j = self.draw(tx, stream, purpose, i + 1) - 1
+            lst[i], lst[j] = lst[j], lst[i]
+        return lst

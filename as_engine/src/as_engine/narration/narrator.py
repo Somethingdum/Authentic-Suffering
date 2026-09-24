@@ -147,3 +147,4 @@ def packet_hash(packet: NarratorPacket) -> str:
 
 def write_narration(tx: "Tx", turn_index: int, prose: str, packet: NarratorPacket, passed: bool, attempts: int) -> "Event":
     raise NotImplementedError("P7")
+from ._impl_narrator import pc_first_name, build_narrator_packet, narrate, known_names, write_narration, code_render, packet_hash  # noqa

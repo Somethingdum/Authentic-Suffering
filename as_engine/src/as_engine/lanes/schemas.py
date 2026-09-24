@@ -88,18 +88,95 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
 
 
 def to_lm_schema(model: type[BaseModel]) -> dict[str, Any]:
-    raise NotImplementedError("P1")
+    from ._impl_schemas import _inline, _close
+    raw = model.model_json_schema()
+    defs = raw.get("$defs", {})
+    return _close(_inline(raw, defs))
+
+
+def _set_enum_everywhere(node, key, enum):
+    """Set enum on property `key` wherever it appears (string or array of strings)."""
+    if isinstance(node, dict):
+        props = node.get("properties")
+        if isinstance(props, dict) and key in props:
+            props[key] = _enumify(props[key], enum)
+        for k, v in node.items():
+            _set_enum_everywhere(v, key, enum)
+    elif isinstance(node, list):
+        for v in node:
+            _set_enum_everywhere(v, key, enum)
+
+
+def _enumify(sch, enum):
+    if "anyOf" in sch:
+        return {"anyOf": [_enumify(s, enum) if s.get("type") != "null" else s for s in sch["anyOf"]]}
+    if sch.get("type") == "array":
+        out = dict(sch); out["items"] = {"type": "string", "enum": list(enum)}; return out
+    out = {k: v for k, v in sch.items() if k not in ("minLength", "maxLength", "pattern")}
+    out["type"] = "string"; out["enum"] = list(enum); return out
+
+
+def _branch(sch):
+    """The non-null branch of a nullable schema (the node itself when it is not nullable)."""
+    if "anyOf" in sch:
+        return next(x for x in sch["anyOf"] if x.get("type") != "null")
+    return sch
 
 
 def cognition_schema(affordance_handles: list[str], entity_handles: list[str], *,
                      consult_kinds: tuple[str, ...] | list[str] = (), families: tuple[str, ...] | list[str] = (),
                      subject_handles: tuple[str, ...] | list[str] = ()) -> dict[str, Any]:
-    raise NotImplementedError("P1")
+    if not affordance_handles:
+        raise ValueError("SCHEMA-03: no affordance handles")
+    sch = to_lm_schema(ActorReplyV2)
+    props = sch["properties"]
+    props["kind"] = {"type": "string", "enum": ["decision"] + (["consultation"] if consult_kinds else [])}
+    act = _branch(props["action"])
+    ap = act["properties"]
+    ap["choice"] = {"type": "string", "enum": list(affordance_handles)}
+    sp = _branch(ap["speech"])
+    to = dict(sp["properties"]["to"])
+    to["items"] = {"type": "string", "enum": list(entity_handles) + ["everyone"]}
+    sp["properties"]["to"] = to
+    for k in ("gesture", "attention", "inscription"):
+        ap[k] = {"type": "null"}                       # SCHEMA-04: nothing of the kind is offered yet
+    if not consult_kinds:
+        props["consultation"] = {"type": "null"}
+    else:
+        cp = _branch(props["consultation"])["properties"]
+        cp["kind"] = {"type": "string", "enum": list(consult_kinds)}
+        cp["family"] = ({"anyOf": [{"type": "string", "enum": list(families)}, {"type": "null"}]} if families
+                        else {"type": "null"})
+        cp["template"] = {"type": "null"}
+        subj = dict(cp["subjects"])
+        if subject_handles:
+            subj["items"] = {"type": "string", "enum": list(subject_handles)}
+        else:
+            subj["maxItems"] = 0
+        cp["subjects"] = subj
+    return sch
 
 
 def intake_schema(affordance_handles: list[str]) -> dict[str, Any]:
-    raise NotImplementedError("P1")
+    if not affordance_handles:
+        raise ValueError("SCHEMA-03")
+    sch = to_lm_schema(IntakeOutput)
+    sch["properties"]["choice"] = {"type": "string", "enum": list(affordance_handles) + ["NONE"]}
+    return sch
 
 
 def writeback_schema(percept_handles: list[str], entity_handles: list[str], loop_handles: list[str]) -> dict[str, Any]:
-    raise NotImplementedError("P1")
+    if not percept_handles:
+        raise ValueError("SCHEMA-03")
+    sch = to_lm_schema(WritebackOutput)
+    _set_enum_everywhere(sch, "because", percept_handles)
+    _set_enum_everywhere(sch, "about", list(entity_handles) + ["self", "place"])
+    if entity_handles:
+        _set_enum_everywhere(sch, "with", list(entity_handles))
+    else:
+        sch["properties"]["relationships"]["maxItems"] = 0
+    if loop_handles:
+        _set_enum_everywhere(sch["properties"]["closed_loops"], "loop", loop_handles)
+    else:
+        sch["properties"]["closed_loops"]["maxItems"] = 0
+    return sch

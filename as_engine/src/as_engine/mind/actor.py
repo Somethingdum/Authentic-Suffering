@@ -78,4 +78,7 @@ def adjust_stress(tx: "Tx", actor_id: str, delta: int, cause_event_id: str, at: 
 def controller(store: "Store | Tx", actor_id: str) -> str:
     """'human' | 'model' | 'policy'. Used ONLY by turn.pipeline to decide where an intent comes
     from; simulation modules must never call this (SYM-01)."""
-    raise NotImplementedError("P4")
+    return store.query_one("SELECT controller FROM actors WHERE actor_id=?", (actor_id,))["controller"]
+from ._impl_p4a import resolve_max, fused, display_name, recent_lines  # noqa
+from ..action._impl_p5a import adjust_stress  # noqa
+from ..world._impl_p10 import actor_create as create  # noqa

@@ -91,8 +91,130 @@ class Holder:
     anchor_id: str | None = None  # for kind == 'place'
 
 
+
+import json as _json
+
+SLOT_ORDER = ("hand_l", "hand_r", "worn", "pocket", "pack")
+ORIGINS = ("worldgen", "scenario", "production", "loot", "cheat", "craft")
+
+
+def _item(s, item_id):
+    r = s.query_one("SELECT * FROM items WHERE item_id=?", (item_id,))
+    if r is None:
+        raise KeyError(item_id)
+    d = dict(r)
+    d["props"] = _json.loads(d["props"])
+    return d
+
+
+def _def(s, def_ref):
+    return s.canon.get(def_ref) if hasattr(s, "canon") and s.canon is not None else s.store.canon.get(def_ref)
+
+
+def _canon(s):
+    return s.canon if getattr(s, "canon", None) is not None else s.store.canon
+
+
 def location_of(store: "Store | Tx", item_id: str) -> Holder:
-    raise NotImplementedError("P2")
+    it = _item(store, item_id)
+    if it["holder_body"]:
+        return Holder("body", it["holder_body"], it["holder_slot"])
+    if it["container_id"]:
+        return Holder("container", it["container_id"])
+    return Holder("place", it["place_id"], anchor_id=it["anchor_id"])
+
+
+def _hd(h):
+    return {"kind": h.kind, "id": h.id, "slot": h.slot, "anchor_id": h.anchor_id}
+
+
+def _cols(h):
+    if h.kind == "body":
+        if h.slot not in SLOT_ORDER:
+            raise ValueError("a body holder needs a slot")
+        return {"holder_body": h.id, "holder_slot": h.slot, "container_id": None, "place_id": None, "anchor_id": None}
+    if h.kind == "container":
+        return {"holder_body": None, "holder_slot": None, "container_id": h.id, "place_id": None, "anchor_id": None}
+    return {"holder_body": None, "holder_slot": None, "container_id": None, "place_id": h.id, "anchor_id": h.anchor_id}
+
+
+def _contents(s, cid):
+    return [dict(r) for r in s.query("SELECT * FROM items WHERE container_id=? ORDER BY item_id", (cid,))]
+
+
+def _descendants(s, iid):
+    out = []
+    for c in _contents(s, iid):
+        out.append(c["item_id"])
+        out += _descendants(s, c["item_id"])
+    return out
+
+
+def _check_destination(tx, def_ref, qty, to, moving_id=None):
+    canon = _canon(tx)
+    d = canon.get(def_ref)
+    if to.kind == "body" and to.slot in ("hand_l", "hand_r"):
+        if tx.query_one("SELECT 1 FROM items WHERE holder_body=? AND holder_slot=?", (to.id, to.slot)):
+            raise ValueError(f"{to.slot} already holds something (one item per hand)")
+        if qty is not None and moving_id is None and False:
+            pass
+    if to.kind == "container":
+        if moving_id is not None and (to.id == moving_id or to.id in _descendants(tx, moving_id)):
+            raise ValueError("an item cannot go inside itself")
+        host = _item(tx, to.id)
+        hd = canon.get(host["def_ref"])
+        if hd.container is not None:
+            used = sum(canon.get(c["def_ref"]).bulk * c["qty"] for c in _contents(tx, to.id) if c["item_id"] != moving_id)
+            if used + d.bulk * qty > hd.container.capacity_bulk:
+                raise ValueError(f"{hd.name} is full (bulk {used} + {d.bulk * qty} > {hd.container.capacity_bulk})")
+        elif hd.firearm is not None:
+            if d.kind != "magazine" or hd.firearm.caliber not in d.tags or qty != 1:
+                raise ValueError(f"only one {hd.firearm.caliber} magazine fits {hd.name}")
+            if [c for c in _contents(tx, to.id) if c["item_id"] != moving_id]:
+                raise ValueError(f"{hd.name} already has a magazine")
+        else:
+            raise ValueError(f"{hd.name} is not a container")
+
+
+def create(tx: "Tx", def_ref: str, qty: int, to: Holder, origin: str, props: dict, at: int,
+           cause_event_id: str | None, turn_index: int, *, event_origin: str = "sim", condition: int = 100) -> Event:
+    """ITEM_CREATED. ``origin`` is the ITEM's origin column (worldgen, scenario, production, loot,
+    cheat, craft); ``event_origin`` is the Event.origin (the scenario loader passes 'system',
+    worldgen 'worldgen', cheats 'cheat')."""
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    if origin not in ORIGINS:
+        raise ValueError(f"item origin {origin!r} not allowed")
+    d = _canon(tx).get(def_ref)
+    if qty > 1 and not d.stackable:
+        raise ValueError(f"{def_ref} is not stackable")
+    _check_destination(tx, def_ref, qty, to)
+    props = dict(props or {})
+    if d.food is not None and d.food.spoil_days is not None and "made_at" not in props:
+        props["made_at"] = at   # WEAR-04 (P10)
+    iid = tx.mint("itm")
+    vals = {"item_id": iid, "def_ref": def_ref, "qty": qty, "condition": condition, "lot_id": None,
+            "props": props, "origin": origin, **_cols(to)}
+    return tx.commit_event(Event(type=EventType.ITEM_CREATED, writer="physical.objects", at=at, turn_index=turn_index,
+                                 cause_event_id=cause_event_id, origin=event_origin, target_ids=[iid],
+                                 writes=[WriteRecord(op=WriteOp.INSERT, table="items", values=vals)],
+                                 payload={"item_id": iid, "def_ref": def_ref, "qty": qty, "origin": origin, "props": props or {}, "to": _hd(to)}))
+
+
+def _create_with_id(tx, iid, def_ref, qty, to, origin, props, at, cause_event_id, turn_index, event_origin="sim", condition=100):
+    """Loader helper: create with a pre-minted id (ids are minted up front by the scenario loader)."""
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    if origin not in ORIGINS:
+        raise ValueError(f"item origin {origin!r} not allowed")
+    d = _canon(tx).get(def_ref)
+    if qty > 1 and not d.stackable:
+        raise ValueError(f"{def_ref} is not stackable")
+    _check_destination(tx, def_ref, qty, to)
+    vals = {"item_id": iid, "def_ref": def_ref, "qty": qty, "condition": condition, "lot_id": None,
+            "props": props or {}, "origin": origin, **_cols(to)}
+    return tx.commit_event(Event(type=EventType.ITEM_CREATED, writer="physical.objects", at=at, turn_index=turn_index,
+                                 cause_event_id=cause_event_id, origin=event_origin, target_ids=[iid],
+                                 writes=[WriteRecord(op=WriteOp.INSERT, table="items", values=vals)],
+                                 payload={"item_id": iid, "def_ref": def_ref, "qty": qty, "origin": origin, "props": props or {}, "to": _hd(to)}))
 
 
 def transfer(tx: "Tx", item_id: str, to: Holder, qty: int | None, at: int, actor_id: str | None,
@@ -101,26 +223,154 @@ def transfer(tx: "Tx", item_id: str, to: Holder, qty: int | None, at: int, actor
     (two hands); a container over bulk capacity raises ValueError (rule OBJ-02).
     ``props_update`` (P5: equip / holster) merges keys into the moved item's props in the same
     write (a key with value None is removed); the payload then also carries props_after."""
-    raise NotImplementedError("P2")
-
-
-def create(tx: "Tx", def_ref: str, qty: int, to: Holder, origin: str, props: dict, at: int,
-           cause_event_id: str | None, turn_index: int, *, event_origin: str = "sim", condition: int = 100) -> Event:
-    """ITEM_CREATED. ``origin`` is the ITEM's origin column (worldgen, scenario, production, loot,
-    cheat, craft); ``event_origin`` is the Event.origin (the scenario loader passes 'system',
-    worldgen 'worldgen', cheats 'cheat')."""
-    raise NotImplementedError("P2")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    it = _item(tx, item_id)
+    q = it["qty"] if qty is None else qty
+    if q < 1 or q > it["qty"]:
+        raise ValueError("bad qty")
+    frm = location_of(tx, item_id)
+    _check_destination(tx, it["def_ref"], q, to, moving_id=item_id)
+    writes = []
+    new_id = None
+    props = it["props"] if isinstance(it["props"], dict) else _json.loads(it["props"])
+    if props_update:
+        props = dict(props)
+        for k, v in props_update.items():
+            if v is None:
+                props.pop(k, None)
+            else:
+                props[k] = v
+    if q < it["qty"]:
+        new_id = tx.mint("itm")
+        writes.append(WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": item_id}, values={"qty": it["qty"] - q}))
+        writes.append(WriteRecord(op=WriteOp.INSERT, table="items", values={
+            "item_id": new_id, "def_ref": it["def_ref"], "qty": q, "condition": it["condition"], "lot_id": it["lot_id"],
+            "props": props, "origin": it["origin"], **_cols(to)}))
+    else:
+        vals = dict(_cols(to))
+        if props_update:
+            vals["props"] = props
+        writes.append(WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": item_id}, values=vals))
+    payload = {"item_id": item_id, "qty": q, "from": _hd(frm), "to": _hd(to), "new_item_id": new_id}
+    if props_update:
+        payload["props_after"] = props
+    return tx.commit_event(Event(type=EventType.ITEM_TRANSFER, writer="physical.objects", at=at, turn_index=turn_index,
+                                 actor_id=actor_id, cause_event_id=cause_event_id, target_ids=[item_id], writes=writes,
+                                 payload=payload))
 
 
 def destroy(tx: "Tx", item_id: str, at: int, cause_event_id: str, turn_index: int,
             qty: int | None = None) -> Event:
-    raise NotImplementedError("P2")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    if not cause_event_id:
+        raise ValueError("destruction needs a cause")
+    it = _item(tx, item_id)
+    if _contents(tx, item_id):
+        raise ValueError("empty the container first")
+    q = it["qty"] if qty is None else qty
+    if q < 1 or q > it["qty"]:
+        raise ValueError("bad qty")
+    if q == it["qty"]:
+        w = WriteRecord(op=WriteOp.DELETE, table="items", key={"item_id": item_id})
+    else:
+        w = WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": item_id}, values={"qty": it["qty"] - q})
+    return tx.commit_event(Event(type=EventType.ITEM_DESTROYED, writer="physical.objects", at=at, turn_index=turn_index,
+                                 cause_event_id=cause_event_id, target_ids=[item_id], writes=[w],
+                                 payload={"item_id": item_id, "def_ref": it["def_ref"], "qty": q, "cause_event_id": cause_event_id}))
 
 
 def fire(tx: "Tx", firearm_id: str, at: int, actor_id: str, cause_event_id: str | None,
          turn_index: int) -> tuple[bool, Event]:
     """Returns (shot_fired, event). See module docstring (OBJ-05)."""
-    raise NotImplementedError("P2")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    gun = _item(tx, firearm_id)
+    fd = _canon(tx).get(gun["def_ref"]).firearm
+    if fd is None:
+        raise ValueError("not a firearm")
+    writes = []
+    if fd.feeds_from in ("cylinder", "internal"):
+        n = int(gun["props"].get("rounds", 0))
+        fired = n > 0
+        left = n - 1 if fired else 0
+        if fired:
+            writes.append(WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": firearm_id}, values={"props": {**gun["props"], "rounds": left}}))
+    else:
+        mags = _contents(tx, firearm_id)
+        mag = None
+        if mags:
+            mag = dict(mags[0]); mag["props"] = _json.loads(mag["props"])
+        chambered = bool(gun["props"].get("chambered", False))
+        fired = chambered
+        mag_rounds = int(mag["props"].get("rounds", 0)) if mag else 0
+        if fired:
+            if mag_rounds > 0:
+                mag_rounds -= 1
+                writes.append(WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": mag["item_id"]}, values={"props": {**mag["props"], "rounds": mag_rounds}}))
+                new_ch = True
+            else:
+                new_ch = False
+                writes.append(WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": firearm_id}, values={"props": {**gun["props"], "chambered": False}}))
+            left = mag_rounds + (1 if new_ch else 0)
+        else:
+            left = mag_rounds
+    ev = tx.commit_event(Event(type=EventType.ITEM_CONDITION, writer="physical.objects", at=at, turn_index=turn_index,
+                               actor_id=actor_id, cause_event_id=cause_event_id, target_ids=[firearm_id], writes=writes,
+                               payload={"firearm_id": firearm_id, "result": "fired" if fired else "click", "rounds_left": left}))
+    return fired, ev
+
+
+def access_time_s(store: "Store | Tx", item_id: str) -> float:
+    it = _item(store, item_id)
+    if it["holder_body"]:
+        return {"hand_l": 0.0, "hand_r": 0.0, "worn": 1.0, "pocket": 2.0, "pack": 4.0}[it["holder_slot"]]
+    if it["place_id"]:
+        return 1.0
+    host = _item(store, it["container_id"])
+    hd = _canon(store).get(host["def_ref"])
+    own = hd.container.access_time_s if hd.container is not None else 1.0
+    return own + access_time_s(store, host["item_id"])
+
+
+def _held_tree_ids(store, body_id):
+    out = []
+    for r in store.query("SELECT item_id FROM items WHERE holder_body=?", (body_id,)):
+        out.append(r[0])
+        out += _descendants(store, r[0])
+    return out
+
+
+def carried_mass_kg(store: "Store | Tx", body_id: str) -> float:
+    canon = _canon(store)
+    tot = 0
+    for iid in _held_tree_ids(store, body_id):
+        it = _item(store, iid)
+        tot += canon.get(it["def_ref"]).mass_g * it["qty"]
+    return tot / 1000
+
+
+def load_word(store: "Store | Tx", body_id: str) -> str:
+    m = store.query_one("SELECT mass_kg FROM bodies WHERE body_id=?", (body_id,))[0]
+    r = carried_mass_kg(store, body_id) / m
+    return "light" if r <= 0.20 else "moderate" if r <= 0.35 else "heavy" if r <= 0.50 else "overloaded"
+
+
+def _node(store, it):
+    d = _canon(store).get(it["def_ref"])
+    props = it["props"] if isinstance(it["props"], dict) else _json.loads(it["props"])
+    return {"item_id": it["item_id"], "def_ref": it["def_ref"], "name": d.plural if it["qty"] > 1 else d.name,
+            "qty": it["qty"], "slot": it["holder_slot"], "props": props,
+            "contents": [_node(store, dict(c)) for c in _contents(store, it["item_id"])]}
+
+
+def inventory_tree(store: "Store | Tx", body_id: str) -> list[dict]:
+    """Held/worn/pocket/pack items with nested container contents, ordered by slot then item_id."""
+    items = [dict(r) for r in store.query("SELECT * FROM items WHERE holder_body=?", (body_id,))]
+    items.sort(key=lambda i: (SLOT_ORDER.index(i["holder_slot"]), i["item_id"]))
+    return [_node(store, i) for i in items]
+
+
+def total_qty(store: "Store | Tx", def_ref: str) -> int:
+    return store.query_one("SELECT COALESCE(SUM(qty),0) FROM items WHERE def_ref=?", (def_ref,))[0]
 
 
 def chamber(tx: "Tx", firearm_id: str, at: int, actor_id: str | None, cause_event_id: str | None,
@@ -129,7 +379,23 @@ def chamber(tx: "Tx", firearm_id: str, at: int, actor_id: str | None, cause_even
     commit ITEM_CONDITION {firearm_id, result: 'chambered', rounds_left} moving one round from the
     magazine (rounds - 1) into the chamber (props.chambered true); rounds_left = magazine rounds + 1
     afterwards. Otherwise None (nothing to do)."""
-    raise NotImplementedError("P5")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    gun = _item(tx, firearm_id)
+    if gun["props"].get("chambered"):
+        return None
+    mags = _contents(tx, firearm_id)
+    if not mags:
+        return None
+    m = dict(mags[0])
+    mp = _json.loads(m["props"])
+    n = int(mp.get("rounds", 0))
+    if n <= 0:
+        return None
+    return tx.commit_event(Event(type=EventType.ITEM_CONDITION, writer="physical.objects", at=at, turn_index=turn_index, actor_id=actor_id,
+                                 cause_event_id=cause_event_id,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": m["item_id"]}, values={"props": {**mp, "rounds": n - 1}}),
+                                         WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": firearm_id}, values={"props": {**gun["props"], "chambered": True}})],
+                                 payload={"firearm_id": firearm_id, "result": "chambered", "rounds_left": n}))
 
 
 def load_rounds(tx: "Tx", firearm_id: str, rounds: int, at: int, actor_id: str | None,
@@ -137,34 +403,39 @@ def load_rounds(tx: "Tx", firearm_id: str, rounds: int, at: int, actor_id: str |
     """P5 (reload of a cylinder / internal firearm). Set the firearm's props.rounds to ``rounds``
     (0..capacity, ValueError otherwise): ITEM_CONDITION {firearm_id, result: 'loaded',
     rounds_left: rounds}. The loose rounds are consumed by the caller with destroy(qty=...)."""
-    raise NotImplementedError("P5")
-
-
-def access_time_s(store: "Store | Tx", item_id: str) -> float:
-    raise NotImplementedError("P2")
-
-
-def carried_mass_kg(store: "Store | Tx", body_id: str) -> float:
-    raise NotImplementedError("P2")
-
-
-def load_word(store: "Store | Tx", body_id: str) -> str:
-    raise NotImplementedError("P2")
-
-
-def inventory_tree(store: "Store | Tx", body_id: str) -> list[dict]:
-    """Held/worn/pocket/pack items with nested container contents, ordered by slot then item_id."""
-    raise NotImplementedError("P2")
-
-
-def total_qty(store: "Store | Tx", def_ref: str) -> int:
-    raise NotImplementedError("P2")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    gun = _item(tx, firearm_id)
+    cap = _canon(tx).get(gun["def_ref"]).firearm.capacity
+    if not 0 <= rounds <= cap:
+        raise ValueError("rounds out of range")
+    return tx.commit_event(Event(type=EventType.ITEM_CONDITION, writer="physical.objects", at=at, turn_index=turn_index, actor_id=actor_id,
+                                 cause_event_id=cause_event_id,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": firearm_id}, values={"props": {**gun["props"], "rounds": rounds}})],
+                                 payload={"firearm_id": firearm_id, "result": "loaded", "rounds_left": rounds}))
 
 
 def contaminate(tx: "Tx", item_id: str, pathway: str, body_id: str, at: int, cause_event_id: str | None,
                 turn_index: int) -> Event:
-    raise NotImplementedError("P10")
+    """P10: a spreader's mouth on the item (ITEM_CONTAMINATED updating props.contaminated)."""
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    it = _item(tx, item_id)
+    props = dict(it["props"])
+    props["contaminated"] = {"pathway": pathway, "by": body_id, "at": at}
+    return tx.commit_event(Event(type=EventType.ITEM_CONTAMINATED, writer="physical.objects", at=at, turn_index=turn_index,
+                                 actor_id=body_id, cause_event_id=cause_event_id, target_ids=[item_id],
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": item_id},
+                                                     values={"props": props})],
+                                 payload={"item_id": item_id, "pathway": pathway, "by": body_id}))
 
 
 def contaminated(store: "Store | Tx", item_id: str, at: int) -> dict | None:
-    raise NotImplementedError("P10")
+    r = store.query_one("SELECT props FROM items WHERE item_id=?", (item_id,))
+    if r is None:
+        return None
+    c = _json.loads(r[0] or "{}").get("contaminated")
+    if not c:
+        return None
+    rules = store.rules if hasattr(store, "rules") else store.store.rules
+    if at - c["at"] > rules.infected.saliva_hours * 3_600_000:
+        return None
+    return c

@@ -103,3 +103,4 @@ def flat_values(params: WorldParams) -> dict[str, int | str]:
     for block in (params.a, params.b, params.c, params.d, params.e, params.sim):
         out.update(block.model_dump())
     return out
+from ._impl_wg import generate_params, apply_contradictions, key_resource_type  # noqa

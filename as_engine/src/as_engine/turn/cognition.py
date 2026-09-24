@@ -4,8 +4,8 @@ ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELIN
 decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset()) -> dict[actor_id, Intent]
   ``answered`` = the pipeline's set of (actor, speech event) pairs already answered this turn (HOLD-02
   reads it).
-  One intent for every actor in plan.lod, keyed by actor id — except an actor held in place by
-  HOLD-01, which has none this wave (nothing is attempted for it).
+  One intent for every actor in plan.lod, keyed by actor id — except an actor held in place
+  by HOLD-01, which has none this wave (nothing is attempted for it).
   1. Requests, actors in sorted order: COLD -> none. HOT / WARM -> packet = mind.packet.build_packet(
      tx, actor, lod, affs[actor], turn_index, at, reaction=reaction); request =
      cognition_request(session.config, packet, lod, plan.lane[actor], reaction=reaction,
@@ -216,3 +216,4 @@ def perceived_entities(tx: "Tx", actor_id: str, turn_index: int) -> dict[str, st
 def record_responses(tx: "Tx", intents: dict[str, "Intent"], affs: dict, asks: dict[str, list[dict]], turn_index: int,
                      wave_at: int, first_seq: int) -> list[tuple[str, str, Any]]:
     raise NotImplementedError("P7")
+from ._impl_cognition import *  # noqa

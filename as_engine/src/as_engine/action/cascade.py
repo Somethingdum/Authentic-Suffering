@@ -165,3 +165,5 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""
     raise NotImplementedError("P5")
+from ._impl_p5b import sweep, select, evaluate_precondition  # noqa
+from ._impl_p5b import fire_scheduled  # noqa

@@ -94,3 +94,4 @@ def day(tx: "Tx", household_id: str, at: int, turn_index: int, cause_event_id: s
 
 def worst_hit(store: "Store | Tx", settlement_id: str) -> str | None:
     raise NotImplementedError("P9")
+from ._impl_society import hh_members as members, household_of, head_of, dependents_of, has_dependents, households_of, worst_hit, apply_change, household_day as day  # noqa

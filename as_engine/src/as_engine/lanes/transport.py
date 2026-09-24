@@ -53,16 +53,64 @@ class HttpTransport:
     so tests can inject ``httpx.MockTransport`` (real runs pass nothing)."""
 
     def __init__(self, transport: object | None = None) -> None:
-        raise NotImplementedError("P1 — see module docstring")
+        import httpx
+        self._c = httpx.AsyncClient(transport=transport) if transport is not None else httpx.AsyncClient()
 
     async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse:
-        raise NotImplementedError("P1")
+        import httpx, time
+        from .errors import LaneTimeout, LaneUnavailable
+        msgs = [m.model_dump() for m in request.messages]
+        body = dict(model=lane.model, temperature=request.temperature, top_p=request.top_p,
+                    max_tokens=request.max_tokens, stream=False)
+        mode = lane.thinking_mode
+        if mode == "system_no_think" and not request.thinking:
+            for m in msgs:
+                if m["role"] == "system":
+                    m["content"] += "\n/no_think"; break
+        elif mode == "chat_template_kwargs":
+            body["chat_template_kwargs"] = {"enable_thinking": request.thinking}
+        elif mode == "prefill_empty_think" and not request.thinking:
+            msgs.append({"role": "assistant", "content": "<think></think>"})
+        body["messages"] = msgs
+        if request.json_schema is not None and lane.structured_mode == "json_schema" and (
+                not request.thinking or lane.structured_with_thinking == "supported"):
+            body["response_format"] = {"type": "json_schema", "json_schema": {
+                "name": request.schema_name or "output", "strict": True, "schema": request.json_schema}}
+        t0 = time.monotonic()
+        try:
+            r = await self._c.post(f"{lane.base_url}/chat/completions", json=body,
+                                   headers={"Authorization": f"Bearer {lane.api_key}"}, timeout=request.deadline_s)
+        except httpx.TimeoutException as e:
+            raise LaneTimeout(str(e)) from e
+        except httpx.HTTPError as e:
+            raise LaneUnavailable(str(e)) from e
+        if r.status_code >= 400:
+            raise LaneUnavailable(f"HTTP {r.status_code}")
+        data = r.json()
+        msg = data["choices"][0]["message"]
+        usage = data.get("usage") or {}
+        return LMResponse(call_class=request.call_class, lane=request.lane, text=msg.get("content") or "",
+                          reasoning=msg.get("reasoning_content") or msg.get("reasoning") or None,
+                          prompt_tokens=usage.get("prompt_tokens", 0), completion_tokens=usage.get("completion_tokens", 0),
+                          latency_ms=int((time.monotonic() - t0) * 1000), model=lane.model)
 
     async def list_models(self, lane_id: Lane, lane: LaneConfig) -> list[str]:
-        raise NotImplementedError("P1")
+        import httpx
+        from .errors import LaneUnavailable
+        try:
+            r = await self._c.get(f"{lane.base_url}/models", headers={"Authorization": f"Bearer {lane.api_key}"}, timeout=5)
+        except httpx.HTTPError as e:
+            raise LaneUnavailable(str(e)) from e
+        if r.status_code >= 400:
+            raise LaneUnavailable(f"HTTP {r.status_code}")
+        return [m["id"] for m in r.json()["data"]]
 
     async def health(self, lane_id: Lane, lane: LaneConfig) -> bool:
-        raise NotImplementedError("P1")
+        from .errors import LaneUnavailable
+        try:
+            await self.list_models(lane_id, lane); return True
+        except LaneUnavailable:
+            return False
 
     async def aclose(self) -> None:
-        raise NotImplementedError("P1")
+        await self._c.aclose()

@@ -155,3 +155,4 @@ async def place_pc(client, rng: "Rng", tx: "Tx", pc_ref: str, pc: "PCDossier", p
                    placement: "Placement", plan: "PolityPlan", region: "Region", people: "People", canon,
                    run_id: str, seed: int, qc, at: int) -> Opening:
     raise NotImplementedError("P10")
+from ._impl_wg import place_pc  # noqa

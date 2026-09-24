@@ -115,3 +115,5 @@ def standing_toward(store: "Store | Tx", group_id: str, actor_id: str) -> int:
 def adjust_group_standing(tx: "Tx", group_id: str, actor_id: str, delta: int, cause_event_id: str | None,
                           at: int, turn_index: int) -> Event | None:
     raise NotImplementedError("P9")
+from ._impl_p6 import relate, open_loop, close_loop, learn  # noqa
+from ._impl_p9 import standing_toward, adjust_group_standing  # noqa

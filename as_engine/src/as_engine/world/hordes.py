@@ -338,3 +338,4 @@ def fold(tx: "Tx", body_id: str, at: int, turn_index: int, cause: str | None) ->
 
 def rise(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> list["Event"]:
     raise NotImplementedError("P10")
+from ._impl_hordes import pool, total, change, seed_pools, count, target, path, leg_ms, form, step, promote, press, draw, day, census, density, schedule_rise, rise, fold  # noqa

@@ -78,3 +78,4 @@ SENSORY_CUES_P5: frozenset[str] = frozenset({
 
 def cues_of(tx: "Tx", holder_id: str, turn_index: int, at: int) -> set[str]:
     raise NotImplementedError("P5")
+from ..action._impl_p5a import cues_of  # noqa

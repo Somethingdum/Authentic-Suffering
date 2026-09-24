@@ -61,3 +61,4 @@ def traces_in(store: "Store | Tx", place_id: str) -> list[dict]:
 
 def washout(tx: "Tx", at: int, turn_index: int, cause_event_id: str | None) -> list["Event"]:
     raise NotImplementedError("P10")
+from ._impl_p10 import trace_create as create, trace_decay as decay, traces_in, trace_washout as washout  # noqa

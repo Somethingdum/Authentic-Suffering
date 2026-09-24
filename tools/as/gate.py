@@ -189,10 +189,11 @@ RULES_MD = ROOT / "docs" / "as" / "RULES.md"
 
 def collect_docstrings(src_root: Path = SRC) -> dict[str, dict[str, dict[str, str]]]:
     """{module: {qualname or '<module>': {'doc': ..., 'sig': ...}}} for every docstring in src.
-    Only documented names are the contract; nested functions are not walked."""
+    Only documented names are the contract; nested functions are not walked. ``_impl_*.py`` files
+    are implementation, not contract: the module that binds them at its end holds the contract."""
     out: dict[str, dict[str, dict[str, str]]] = {}
     for py in sorted(src_root.rglob("*.py")):
-        if "__pycache__" in py.parts:
+        if "__pycache__" in py.parts or py.name.startswith("_impl_"):
             continue
         mod = ".".join(("as_engine", *py.relative_to(src_root).with_suffix("").parts))
         mod = mod.removesuffix(".__init__")

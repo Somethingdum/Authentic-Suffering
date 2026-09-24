@@ -126,3 +126,4 @@ def addressee_for(session: "Session", packet: "SkullPacket", submit: "InTurnSubm
 
 def record_input(tx: "Tx", turn_index: int, mode: str, raw_text: str, mapped: dict) -> "Event":
     raise NotImplementedError("P7")
+from ._impl_intake import *  # noqa

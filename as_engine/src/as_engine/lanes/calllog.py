@@ -44,24 +44,51 @@ class ReplayMismatch(ASError):
 def request_hash(request: LMRequest) -> str:
     """sha256 hex of canonical_json(request.model_dump(mode='json', exclude={'context', 'seq'}))."""
     import hashlib
-
     from ..kernel.jsoncanon import canonical_json
-    return hashlib.sha256(canonical_json(request.model_dump(mode="json", exclude={"context", "seq"})).encode("utf-8")).hexdigest()
+    return hashlib.sha256(canonical_json(request.model_dump(mode="json", exclude={"context", "seq"})).encode()).hexdigest()
 
 
 def record(tx: "Tx", request: LMRequest, response: LMResponse) -> int:
-    raise NotImplementedError("P1")
+    t = request.turn_index if request.turn_index is not None else 0
+    n = tx.query_one("SELECT COUNT(*) AS n FROM lm_calls WHERE turn_index=?", (t,))["n"]
+    seq = n + 1
+    from ..contracts.events import WriteOp
+    tx.bookkeep("lanes", "lm_calls", WriteOp.INSERT, {}, dict(
+        turn_index=t, seq=seq, call_class=request.call_class.value, lane=request.lane.value,
+        actor_id=request.actor_id, status=response.parse_status, latency_ms=response.latency_ms,
+        prompt_tokens=response.prompt_tokens, completion_tokens=response.completion_tokens,
+        request_hash=request_hash(request), response_text=response.text if response.raw is None else response.raw,
+        cache_key=request.cache_key))
+    return seq
 
 
 class ReplayTransport:
     def __init__(self, store: "Store"):
-        raise NotImplementedError("P1")
+        self.store = store
+        self._used: set = set()
 
     async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse:
-        raise NotImplementedError("P1")
+        from .errors import LaneTimeout, LaneUnavailable
+        t = request.turn_index if request.turn_index is not None else 0
+        h = request_hash(request)
+        row = None
+        for r in self.store.query("SELECT * FROM lm_calls WHERE turn_index=? AND request_hash=? ORDER BY seq", (t, h)):
+            if (t, r["seq"]) not in self._used:
+                row = r
+                break
+        if row is None:
+            raise ReplayMismatch(f"turn {t}: no recorded call matches this request (the simulation diverged)")
+        self._used.add((t, row["seq"]))
+        if row["status"] == "timeout":
+            raise LaneTimeout("replayed timeout")
+        if row["status"] == "lane_error":
+            raise LaneUnavailable("replayed lane error")
+        return LMResponse(call_class=request.call_class, lane=request.lane, text=row["response_text"],
+                          prompt_tokens=row["prompt_tokens"], completion_tokens=row["completion_tokens"],
+                          latency_ms=row["latency_ms"], model="replay")
 
     async def list_models(self, lane_id: Lane, lane: LaneConfig) -> list[str]:
-        raise NotImplementedError("P1")
+        return [lane.model]
 
     async def health(self, lane_id: Lane, lane: LaneConfig) -> bool:
-        raise NotImplementedError("P1")
+        return True

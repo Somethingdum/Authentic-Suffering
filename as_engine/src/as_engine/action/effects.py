@@ -391,3 +391,4 @@ def range_band(distance_m: float, effective_range_m: float) -> int:
 def land_ms(start_ms: int, est_duration_s: float) -> int:
     """start + ceil(seconds x 1000) (implemented; every duration rounds UP to the next ms)."""
     return start_ms + math.ceil(est_duration_s * 1000)
+from ._impl_effects import land, situation, resistance  # noqa

@@ -35,4 +35,10 @@ def format_id(kind: str, n: int) -> str:
 
 def mint(tx: "Tx", kind: str) -> str:
     """Return the next id of ``kind`` and advance ``counters`` (bookkeeping write, owner kernel.meta)."""
-    raise NotImplementedError("P0 — docs/as/03_DATA_MODEL.md §Ids")
+    from ..contracts.events import WriteOp
+    if kind not in ID_KINDS:
+        raise ValueError(f"unknown id kind: {kind}")
+    row = tx.query_one("SELECT next FROM counters WHERE kind = ?", (kind,))
+    n = 1 if row is None else row[0]
+    tx.bookkeep("kernel.meta", "counters", WriteOp.UPSERT, {"kind": kind}, {"next": n + 1})
+    return format_id(kind, n)

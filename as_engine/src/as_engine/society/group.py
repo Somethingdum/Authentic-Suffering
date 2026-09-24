@@ -156,3 +156,4 @@ def day(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> lis
 
 def ensure_timers(tx: "Tx", group_id: str, at: int, turn_index: int) -> list[str]:
     raise NotImplementedError("P9")
+from ._impl_society import g_members as members, leader_of, tension_of, adjust_tension, contacts, pairs, defection_pressure, loyalty_check, animosity, group_day as day, group_ensure as ensure_timers  # noqa

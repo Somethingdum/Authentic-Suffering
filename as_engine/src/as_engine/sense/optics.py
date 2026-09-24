@@ -38,21 +38,80 @@ if TYPE_CHECKING:
 Visibility = Literal["clear", "partial", "silhouette", "none"]
 
 
-def light_at(store: "Store | Tx", body_id: str, at_ms: int) -> int:
-    """P5 (checks need it; factor it out of ``visibility``): the light that falls on this body —
-    the 'light' rule of the module docstring for a subject, without the thermal substitution."""
-    raise NotImplementedError("P5")
 
-
-def visibility(store: "Store | Tx", observer_id: str, subject_id: str, at_ms: int) -> Visibility:
-    raise NotImplementedError("P3")
+import json as _json
+import math as _math
 
 
 def visibility_score(light: int, observer_p: int, distance_m: float, concealment: int,
                      hidden: bool, moved: bool) -> int:
     """Pure formula from the module docstring (P3)."""
-    raise NotImplementedError("P3")
+    from ..contracts.common import attr_mod
+    return light + (attr_mod(observer_p) - 3) - _math.floor(distance_m / 10) - concealment - (2 if hidden else 0) + (1 if moved else 0)
 
 
 def band(score: int) -> Visibility:
-    raise NotImplementedError("P3")
+    return "clear" if score >= 3 else "partial" if score >= 1 else "silhouette" if score >= -1 else "none"
+
+
+def _row(s, sql, params=()):
+    r = s.query_one(sql, params)
+    return dict(r) if r is not None else None
+
+
+def _thermal(store, body_id):
+    b = _row(store, "SELECT kind FROM bodies WHERE body_id=?", (body_id,))
+    if b["kind"] == "lurker":
+        return True
+    if b["kind"] == "infected":
+        st = _row(store, "SELECT type_id FROM infected_state WHERE body_id=?", (body_id,))
+        canon = store.canon if getattr(store, "canon", None) is not None else store.store.canon
+        if st:
+            return bool(canon.find("infected", st["type_id"]).senses.thermal)
+    return False
+
+
+def light_at(store: "Store | Tx", body_id: str, at_ms: int) -> int:
+    """P5 (checks need it; factor it out of ``visibility``): the light that falls on this body —
+    the 'light' rule of the module docstring for a subject, without the thermal substitution."""
+    subject_id = body_id   # the contract names it body_id
+    from ..kernel.clock import daylight_level
+    from ..physical.space import distance_m
+    pos = _row(store, "SELECT * FROM positions WHERE body_id=?", (subject_id,))
+    pl = _row(store, "SELECT * FROM places WHERE place_id=?", (pos["place_id"],))
+    if pl["indoor"]:
+        light = pl["light_level"]
+    else:
+        c = _row(store, "SELECT weather FROM world_clock WHERE id=1")
+        light = daylight_level(at_ms, c["weather"])
+    canon = store.canon if getattr(store, "canon", None) is not None else store.store.canon
+    for r in store.query("SELECT i.def_ref, i.props, p.x_m, p.y_m FROM items i JOIN positions p ON p.body_id=i.holder_body "
+                         "WHERE p.place_id=? AND i.holder_slot IN ('hand_l','hand_r')", (pos["place_id"],)):
+        d = canon.get(r[0])
+        if d.kind == "light" and _json.loads(r[1]).get("on") and distance_m(r[2], r[3], pos["x_m"], pos["y_m"]) <= 6.0:
+            light = max(light, 3)
+    return light
+
+
+def visibility(store: "Store | Tx", observer_id: str, subject_id: str, at_ms: int) -> Visibility:
+    from ..physical.space import line_of_sight, point_distance
+    ob = _row(store, "SELECT * FROM bodies WHERE body_id=?", (observer_id,))
+    if not ob["alive"] or ob["awareness"] in ("asleep", "unconscious", "dead"):
+        return "none"
+    if not line_of_sight(store, observer_id, subject_id):
+        return "none"
+    light = light_at(store, subject_id, at_ms)
+    if _thermal(store, observer_id) and light <= 1:
+        light = 4
+    p = _json.loads(ob["special"])["P"]
+    d = point_distance(store, observer_id, subject_id) or 0.0
+    pos = _row(store, "SELECT * FROM positions WHERE body_id=?", (subject_id,))
+    sb = _row(store, "SELECT posture FROM bodies WHERE body_id=?", (subject_id,))
+    conc = 0
+    if pos["anchor_id"]:
+        a = _row(store, "SELECT cover, concealment FROM anchors WHERE anchor_id=?", (pos["anchor_id"],))
+        conc = a["concealment"]
+        if sb["posture"] in ("prone", "crouched") and a["cover"] >= 2:
+            conc += 1
+    moved = store.query_one("SELECT 1 FROM events WHERE type='MOVE' AND actor_id=? AND at>? AND at<=? AND json_extract(payload,'$.from_place') IS NOT NULL", (subject_id, at_ms - 1000, at_ms)) is not None
+    return band(visibility_score(light, p, d, conc, bool(pos["hidden"]), moved))

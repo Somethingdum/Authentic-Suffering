@@ -90,3 +90,4 @@ def retrieve(tx: "Tx", holder_id: str, turn_index: int, at: int, *, max_beliefs:
 
 def recency_bonus(hours_since: float) -> float:
     raise NotImplementedError("P6")
+from ._impl_p6 import retrieve, recency_bonus  # noqa

@@ -97,3 +97,4 @@ def write_cohorts(rng: "Rng", tx: "Tx", plan: "PolityPlan", params: "WorldParams
 
 def write_laws(tx: "Tx", plan: "PolityPlan", params: "WorldParams", canon, at: int) -> list["Event"]:
     raise NotImplementedError("P10")
+from ._impl_wg import write_groups, write_settlements, write_cohorts, write_laws  # noqa

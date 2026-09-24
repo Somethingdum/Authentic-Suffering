@@ -118,3 +118,4 @@ def need_word(stage: int) -> str:
 
 def build_view(tx: "Tx", session: "Session") -> PlayView:
     raise NotImplementedError("P7")
+from ._impl_view import build_view, condition_word, resolve_word, bleeding_word, need_word  # noqa

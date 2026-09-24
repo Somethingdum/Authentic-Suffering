@@ -107,3 +107,4 @@ def impairment_word(n: int) -> str:
 
 def describe(tx: "Tx", pc_id: str, at: int, refs: dict[str, str] | None = None) -> LocationView:
     raise NotImplementedError("P7")
+from ._impl_location import describe, latest_view, light_of, impairment_word  # noqa

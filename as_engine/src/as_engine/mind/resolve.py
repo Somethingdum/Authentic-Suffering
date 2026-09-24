@@ -42,3 +42,4 @@ def recover(tx: "Tx", actor_id: str, reason: str, cause_event_id: str | None, at
 
 def gate(resolve_cur: int, definition: AffordanceDef, authority_name: str | None = None) -> tuple[bool, str | None]:
     raise NotImplementedError("P4")
+from ._impl_p4a import drain, recover, gate  # noqa
