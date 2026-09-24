@@ -1,0 +1,9 @@
+schema: as.pack.v1
+id: p10_hopeless
+name: P10 test pack — a start nobody survives
+version: 1.0.0
+description: >-
+  Test fixture (PROTECTED). One playable character whose plausibility gate always hard-fails, so
+  worldgen's hard-fail protocol refuses every world at Bitch Mode .. Realism (WG-14).
+depends_on: [core]
+authors: [AS build spec v1]

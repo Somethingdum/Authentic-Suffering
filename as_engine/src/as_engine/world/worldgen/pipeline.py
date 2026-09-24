@@ -10,14 +10,18 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
   Stages run in atlas.STAGES order, EACH IN ITS OWN TRANSACTION. Before a stage starts:
   progress(WorldgenProgress(stage, label = atlas.STAGE_LABELS[stage], pct = the sum of
   atlas.STAGE_SHARE of the earlier stages, eta_s = the remaining share x T['est_minutes'] x 60 / 100)).
-  Every stage ends with WORLDGEN_STAGE {stage, ...its counts} (writer 'world.worldgen', origin
-  'worldgen', turn_index 0).
+  Every stage ends with one closing WORLDGEN_STAGE {stage} that writes nothing (COMMIT's is {stage
+  'COMMIT', world_id}); worldgen's own rows are written by earlier WORLDGEN_STAGE events of the same
+  stage: WG0 {stage, patches: the number of qc patches} (world_params), WG2 {stage, events: n}
+  (history_events), WG8 {stage, personal: n} (the PC's history) and {stage, commit: true}
+  (world_params.commit_json). All of them: writer 'world.worldgen', origin 'worldgen', turn_index 0,
+  at = the stage's at (WG0's row event: the clock before it moves).
     WG0  (params, patches) = params.generate_params(rng, tx, settings.difficulty, settings.era,
          pc.worldgen_bias, settings.days_since_fall); placement = placement.place(...);
          qc = placement.qc(...) — result 'aborted' -> WorldgenAborted('hopeless_start', its message,
          options ['difficulty_lower', 'change_character', 'change_era']). world_params row {id 1,
-         params_json = the (possibly patched) WorldParams JSON, commit_json '{}'} in the WG0
-         WORLDGEN_STAGE; then kernel.clock.advance_event(tx, dsf x DAY + WorldRules.start_hour x H,
+         params_json = the (possibly patched) WorldParams JSON, commit_json '{}'} in the WG0 row
+         event; then kernel.clock.advance_event(tx, dsf x DAY + WorldRules.start_hour x H,
          'worldgen'). at for every later stage = that time.
     WG1  region = region.build_region(...); region.assert_region(tx, region).
     WG2  plan = history.plan_polity(...); events = history.skeleton(...); await
@@ -38,10 +42,17 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
   society.population.materialise, world.infected.spawn), is origin 'worldgen'; the few committed
   through functions without one (physical.space.place_body / change_place, world.traces.create,
   mind.mind relation seeds) keep 'sim'. Nothing reads the origin of a turn-0 event.
+  Every stage function is called through its module (region.build_region, history.write_history,
+  checks.assert_world, …), never through a name imported into this one: the P10 tests replace one to
+  make a stage fail.
   Retry (WG-DET-01): a WorldgenAssertion raised inside a stage rolls that stage's transaction back;
-  the stage runs once more after one draw with purpose 'retry' on each rng stream it uses (so it sees
-  fresh numbers); a second WorldgenAssertion -> WorldgenAborted('stage_failed', f"{label} failed
-  twice: {message}").
+  the stage runs once more, in a new transaction that first makes one rng.draw(tx, stream, 'retry',
+  2) on each stream the stage draws from, in this order — WG0 'worldgen:params' and
+  'worldgen:placement'; WG1 'worldgen:region'; WG2 'worldgen:history' and 'worldgen:placement'; WG4
+  and WG5 'worldgen:polity'; WG6 'worldgen:people'; WG8 'worldgen:opening'; none for WG3, WG7, WG9 —
+  so it sees fresh numbers (the rolled-back transaction took its draws with it). The stage's
+  progress message is not repeated; the stage name is added to report.retries. A second
+  WorldgenAssertion -> WorldgenAborted('stage_failed', f"{label} failed twice: {message}").
   Call log: for the whole run client.on_call is set to record every call into the current stage's
   transaction (lanes.calllog.record, turn_index 0) and count it in report.model_calls; the previous
   on_call is restored at the end, whatever happens.
@@ -50,8 +61,11 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
   to read, never broken.
   Returns WorldgenReport(world_id, stages: [stage names run], qc_result, qc_patches, skipped_actors:
   [(ref, reason)], retries: [stage names], model_calls: int).
-  Determinism (WG-DET-01): the same seed, settings, packs and model answers give the same
-  world_state_hash; with the fake model's defaults, the same seed gives the same world.
+  Determinism (WG-DET-01): the same seed, settings, packs and model answers give the same world:
+  every table has the same kernel.hashing.table_digest, except meta, which differs only in
+  created_at_real (the wall-clock moment the run was made; so world_state_hash, which covers meta,
+  matches once that one value is the same). With the fake model's defaults, the same seed gives
+  the same world.
 
 Worldgen never pre-scripts outcomes (who betrays, dies, befriends) — WG-30.
 """

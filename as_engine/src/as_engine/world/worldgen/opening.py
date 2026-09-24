@@ -76,12 +76,14 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     code lines f"{first name} got through the first weeks near {start zone name}." and f"{first name}
     learned the roads around {start zone name} by heart." until there are 3; days = sorted
     rng.range_int(1, max(1, dsf - 1)) per text. Each: a history_events row {kind 'personal',
-    subject_ids [the PC], truth_text = belief_text = text} (WORLDGEN_STAGE 'WG8') and an anchor
+    subject_ids [the PC], truth_text = belief_text = text} (one WORLDGEN_STAGE {stage 'WG8', personal:
+    n} for all of them) and an anchor
     episode for the PC {holder, at = day x DAY + 12 h, turn_index 0, summary = text, salience 95,
     anchor 1, subject_ids [the PC]} (ANCHOR_MEMORY, writer 'mind.memory').
   8 world_params.commit_json = WorldgenCommit(run_id, seed, pc_ref, params, placement,
     start_zone_type = the start zone's kind, start_district_type = the start place's archetype name
-    or kind, opening, qc_result, qc_patches) (WORLDGEN_STAGE {stage: 'WG8'}, writer 'world.worldgen').
+    or kind, opening, qc_result, qc_patches) (WORLDGEN_STAGE {stage: 'WG8', commit: true}, writer
+    'world.worldgen').
   Opening(pc_body, start_place_id, contacts, threat_kind, threat_place_id, threat_ids, magnets,
   telegraph_trace_id, opening: OpeningPressure).
 
