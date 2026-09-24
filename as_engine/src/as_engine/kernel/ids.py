@@ -22,7 +22,7 @@ ID_KINDS: tuple[str, ...] = (
     "tsk", "que", "scn", "rct",  # task, queue entry, scene, pending reaction
     "dos", "ddl",  # dossier, dossier delta
     "grp", "hh", "stl", "wkp", "coh", "rtn",  # society
-    "his", "ops", "trc", "rum",  # world
+    "his", "ops", "trc", "rum", "hrd",  # world (hrd: a horde, P10)
     "aud", "err", "cht",  # audit, error log, cheat log
 )
 

@@ -91,6 +91,18 @@ ZONE_DANGER_MOD: dict[str, dict[str, int]] = {
 }
 ROUTE_DISTANCE_M: tuple[int, int] = (400, 2500)
 CHORD_CHANCE: float = 0.25
+# P10 — a district's dead before zombie_common scales them (world.hordes HRD-02; fidelity E01)
+ZONE_INFECTED: dict[str, int] = {
+    "downtown": 3000, "residential": 2000, "industrial": 900, "riverside": 700, "rural": 200, "highway": 400,
+    "wilds": 80,
+}
+# P10 — the four ways out of the region (W04): each an exterior zone holding the dead beyond it
+EXTERIOR_DIRECTIONS: tuple[str, ...] = ("north", "east", "south", "west")
+EXTERIOR_NAMES: dict[str, str] = {
+    "north": "The North Road", "east": "The Interstate East", "south": "The South Highway",
+    "west": "The West Rail Line",
+}
+EXTERIOR_DISTANCE_M: tuple[int, int] = (3000, 6000)
 
 # --------------------------------------------------------------------------------------- polity
 GROUP_DYNAMICS: tuple[str, ...] = (

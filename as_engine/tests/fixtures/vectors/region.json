@@ -1,5 +1,5 @@
 {
- "_why": "world/worldgen/region.py (WG1): the region a seed makes, draw for draw. Params come first from params.generate_params(Rng(seed), tx, normal, established, no bias, days_since_fall 900) on the same Rng; then build_region(rng, tx, params, detail, core canon, at 1000). Zones list kind, name and each site as [name, kind, archetype_ref]; routes as [zone index a, zone index b, distance_m, road name].",
+ "_why": "world/worldgen/region.py (WG1): the region a seed makes, draw for draw. Params come first from params.generate_params(Rng(seed), tx, normal, established, no bias, days_since_fall 900) on the same Rng; then build_region(rng, tx, params, detail, core canon, at 1000). Zones list kind, name and each site as [name, kind, archetype_ref]; routes as [zone index a, zone index b, distance_m, road name] (region routes); exterior as [exterior zone name, gateway zone index, distance_m, road name] in direction order; pools as {zone name: {type_id: [active, dormant]}} (world.hordes.seed_pools, default rules).",
  "cases": [
   {
    "seed": 21,
@@ -153,6 +153,26 @@
      "purpose": "distance:0:2",
      "n": 2101,
      "value": 1638
+    },
+    {
+     "purpose": "exterior:north",
+     "n": 3001,
+     "value": 2285
+    },
+    {
+     "purpose": "exterior:east",
+     "n": 3001,
+     "value": 1975
+    },
+    {
+     "purpose": "exterior:south",
+     "n": 3001,
+     "value": 825
+    },
+    {
+     "purpose": "exterior:west",
+     "n": 3001,
+     "value": 1829
     }
    ],
    "zones": [
@@ -254,7 +274,133 @@
      2037.0,
      "The road from Birch Flats to Stony Ridge"
     ]
-   ]
+   ],
+   "exterior": [
+    [
+     "The North Road",
+     0,
+     5284.0,
+     "The road north out of Birch Flats"
+    ],
+    [
+     "The Interstate East",
+     0,
+     4974.0,
+     "The road east out of Birch Flats"
+    ],
+    [
+     "The South Highway",
+     1,
+     3824.0,
+     "The road south out of Dry Creek"
+    ],
+    [
+     "The West Rail Line",
+     2,
+     4828.0,
+     "The road west out of Stony Ridge"
+    ]
+   ],
+   "pools": {
+    "Birch Flats": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      140,
+      140
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      546,
+      546
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      14,
+      14
+     ]
+    },
+    "Dry Creek": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      14,
+      14
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      55,
+      54
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1,
+      2
+     ]
+    },
+    "Stony Ridge": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      5,
+      6
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      22,
+      22
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1,
+      0
+     ]
+    },
+    "The North Road": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      6400,
+      6400
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      24960,
+      24960
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      640,
+      640
+     ]
+    },
+    "The Interstate East": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      6400,
+      6400
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      24960,
+      24960
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      640,
+      640
+     ]
+    },
+    "The South Highway": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      6400,
+      6400
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      24960,
+      24960
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      640,
+      640
+     ]
+    },
+    "The West Rail Line": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      6400,
+      6400
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      24960,
+      24960
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      640,
+      640
+     ]
+    }
+   }
   },
   {
    "seed": 8,
@@ -543,6 +689,26 @@
      "purpose": "distance:0:3",
      "n": 2101,
      "value": 1205
+    },
+    {
+     "purpose": "exterior:north",
+     "n": 3001,
+     "value": 2588
+    },
+    {
+     "purpose": "exterior:east",
+     "n": 3001,
+     "value": 875
+    },
+    {
+     "purpose": "exterior:south",
+     "n": 3001,
+     "value": 2014
+    },
+    {
+     "purpose": "exterior:west",
+     "n": 3001,
+     "value": 1903
     }
    ],
    "zones": [
@@ -716,7 +882,147 @@
      1604.0,
      "The road from Willow Court to Fox Hollow"
     ]
-   ]
+   ],
+   "exterior": [
+    [
+     "The North Road",
+     0,
+     5587.0,
+     "The road north out of Willow Court"
+    ],
+    [
+     "The Interstate East",
+     1,
+     3874.0,
+     "The road east out of Quail Run"
+    ],
+    [
+     "The South Highway",
+     2,
+     5013.0,
+     "The road south out of Birch Flats"
+    ],
+    [
+     "The West Rail Line",
+     3,
+     4902.0,
+     "The road west out of Fox Hollow"
+    ]
+   ],
+   "pools": {
+    "Willow Court": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      200,
+      200
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      770,
+      770
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      30,
+      30
+     ]
+    },
+    "Quail Run": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      200,
+      200
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      770,
+      770
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      30,
+      30
+     ]
+    },
+    "Birch Flats": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      200,
+      200
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      770,
+      770
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      30,
+      30
+     ]
+    },
+    "Fox Hollow": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      8,
+      8
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      31,
+      31
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1,
+      1
+     ]
+    },
+    "The North Road": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      8800,
+      8800
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      33880,
+      33880
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1320,
+      1320
+     ]
+    },
+    "The Interstate East": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      8800,
+      8800
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      33880,
+      33880
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1320,
+      1320
+     ]
+    },
+    "The South Highway": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      8800,
+      8800
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      33880,
+      33880
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1320,
+      1320
+     ]
+    },
+    "The West Rail Line": {
+     "ZOMBIE_ARCHETYPE_CRAWLER01": [
+      8800,
+      8800
+     ],
+     "ZOMBIE_ARCHETYPE_SHAMBLER01": [
+      33880,
+      33880
+     ],
+     "ZOMBIE_VARIANT_ID_RUNNER01": [
+      1320,
+      1320
+     ]
+    }
+   }
   }
  ]
 }

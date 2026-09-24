@@ -258,8 +258,9 @@ class WorldRules(Strict):
 class InfectedRules(Strict):
     """P10 infected ecology numbers (world.infected; docs/as/06_WORLD.md §5)."""
     energy_start: int = 60
-    energy_per_step: dict[str, int] = Field(default_factory=lambda: {
-        "ZOMBIE_ARCHETYPE_SHAMBLER01": 1, "ZOMBIE_ARCHETYPE_CRAWLER01": 1, "ZOMBIE_VARIANT_ID_RUNNER01": 3,
+    energy_period_s: dict[str, int] = Field(default_factory=lambda: {   # INF-03: 1 energy per this many
+        "ZOMBIE_ARCHETYPE_SHAMBLER01": 60, "ZOMBIE_ARCHETYPE_CRAWLER01": 120,     # seconds active (60 unlisted)
+        "ZOMBIE_VARIANT_ID_RUNNER01": 20,
     })
     energy_per_feed: int = 40      # a bite that lands
     starved_below: int = 20        # energy under this -> state 'starved'
@@ -275,6 +276,11 @@ class InfectedRules(Strict):
         "street": 1.0, "outdoor": 0.7, "building": 0.5, "room": 0.3, "tunnel": 1.2, "vehicle": 0.2,
     })
     quirks_max: int = 2
+    push_min: int = 3              # INF-13: this many infected at a closed portal make it give
+    portal_holds_min: dict[str, int] = Field(default_factory=lambda: {
+        "door": 30, "window": 10, "gate": 45, "hatch": 30, "opening": 0})   # [SAND] minutes of pressure
+    barricade_min: int = 30        # every barricade level holds this much longer
+    lock_min: int = 15             # every point of lock quality holds this much longer
 
 
 class SocietyRules(Strict):
@@ -319,6 +325,50 @@ class SocietyRules(Strict):
     grief_ease_days: int = 7
 
 
+class HordeRules(Strict):
+    """P10 the region's dead in numbers, hordes, the exterior and the Mega Horde (world.hordes
+    HRD-01..17; fidelity E01-E03, W04). Per-difficulty / per-era keys are Difficulty / Era values."""
+    exterior_pool: dict[str, int] = Field(default_factory=lambda: {
+        "bitch_mode": 20_000, "easy": 40_000, "normal": 80_000, "realism": 120_000,
+        "actually_hell": 200_000, "fuck_you": 400_000})       # [SAND] the dead past each map edge
+    dormant_share: dict[str, float] = Field(default_factory=lambda: {
+        "early": 0.2, "established": 0.5, "mature": 0.7})     # standing still, waiting ("statues")
+    runner_share: dict[str, float] = Field(default_factory=lambda: {
+        "early": 0.25, "established": 0.05, "mature": 0.01})  # x runner_pressure / 5: fresh dead
+    crawler_share: float = 0.2
+    runner_days: float = 30.0      # a pooled Runner becomes a Shambler after about this long (INF-10)
+    density_full: int = 2000       # active dead at which a district's density reads 10
+    populate_scale: float = 20.0   # a place shows 1 in this many of its share of the district's dead
+    speed_m_s: float = 0.25        # a horde's walking pace (about 0.9 km/h)
+    mill_h: float = 6.0            # a drift or drawn horde stays this long where it went, then scatters
+    tick_min: float = 5.0          # while a horde is in sight it keeps the street full this often
+    local_cap: int = 40            # bodies one horde shows in one place at once
+    straggle: float = 0.02         # left behind at every hub
+    rally: float = 0.05            # of a hub zone's active dead join a drifting or mega horde
+    drift_min: int = 50            # a district needs this many active dead to send a crowd off
+    drift_chance: float = 0.15     # [SAND] per district per day, x horde_pressure / 5
+    drift_share: float = 0.05
+    draw_db: float = 130.0         # a sound this loud at its source draws the district's dead
+    draw_share: float = 0.01       # of the district's active dead, per 10 dB at or above draw_db
+    draw_minutes: int = 30         # until the drawn dead start arriving
+    draw_cooldown_h: float = 6.0
+    breach_scale: float = 40.0     # dead per point of defence (+1) that make a breach likely
+    breach_kill: float = 0.02      # unnamed killed per infected in a breach
+    breach_bite: float = 0.25      # chance each named person at the site is bitten in a breach
+    mega_daily_chance: dict[str, float] = Field(default_factory=lambda: {
+        "bitch_mode": 0.0005, "easy": 0.001, "normal": 0.004, "realism": 0.006,
+        "actually_hell": 0.012, "fuck_you": 0.02})           # [SAND] x horde_pressure / 5 x the ramp
+    mega_ramp_days: int = 60       # the chance grows from 0 over the run's first this-many days
+    mega_size: dict[str, tuple[int, int]] = Field(default_factory=lambda: {
+        "bitch_mode": (8_000, 20_000), "easy": (12_000, 40_000), "normal": (20_000, 80_000),
+        "realism": (30_000, 120_000), "actually_hell": (50_000, 200_000),
+        "fuck_you": (80_000, 300_000)})
+    mega_eta_days: tuple[int, int] = (3, 10)   # from forming to reaching the region's edge
+    mega_speed_m_s: float = 0.15
+    mega_throughput_per_day: int = 20_000       # how many pass through one district in a day
+    mega_ambient_db: float = 85.0               # a district the Mega Horde is in never goes quiet
+
+
 class BackgroundRules(Strict):
     """P10 quiet-hours numbers (service.background BG-02; Actor Spec AC12, fidelity C07)."""
     material_salience: int = Field(default=60, ge=0, le=100)  # this salient (or an anchor): material
@@ -342,6 +392,7 @@ class RulesConfig(Strict):
     society: SocietyRules = Field(default_factory=SocietyRules)
     infected: InfectedRules = Field(default_factory=InfectedRules)
     background: BackgroundRules = Field(default_factory=BackgroundRules)
+    hordes: HordeRules = Field(default_factory=HordeRules)
 
 
 class EngineConfig(Strict):

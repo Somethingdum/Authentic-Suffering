@@ -72,6 +72,8 @@ TABLE_OWNERS: dict[str, str] = {
     "operations": "world.worldmove",
     "traces": "world.traces",
     "rumours": "world.rumours",
+    "infected_pools": "world.hordes",
+    "hordes": "world.hordes",
     "narration": "narration.narrator",
     "narrator_state": "narration.narrator",
     "echo_ledger": "narration.lint",

@@ -134,6 +134,14 @@ class EventType(StrEnum):
     OFFSCREEN_DEATH = "OFFSCREEN_DEATH"
     INFECTED_STATE = "INFECTED_STATE"        # P10: world.infected changes an infected body's state / energy / target
     WORLD_DAY = "WORLD_DAY"                  # P10: world.worldmove's daily tick
+    POOL_CHANGE = "POOL_CHANGE"              # P10: world.hordes changes a district's count of the dead
+    HORDE_FORMED = "HORDE_FORMED"            # P10: world.hordes — a crowd of the dead sets off
+    HORDE_MOVED = "HORDE_MOVED"
+    HORDE_PROMOTED = "HORDE_PROMOTED"        # P10: counted dead become bodies where the player is
+    HORDE_PRESSED = "HORDE_PRESSED"          # P10: a horde against a settlement's defences
+    HORDE_SIGN = "HORDE_SIGN"                # P10: a sign of the Mega Horde, recorded once
+    HORDE_STATE = "HORDE_STATE"              # P10: a horde's status / route / props change
+    HORDE_GONE = "HORDE_GONE"
     # system
     WORLDGEN_STAGE = "WORLDGEN_STAGE"
     SCENE_START = "SCENE_START"
@@ -180,7 +188,9 @@ _groups: dict[EventClass, list[str]] = {
                          "SHORTAGE_ENDED", "ROUTINE_STEP", "GROUP_DAY"],
     EventClass.WORLD: ["FACTION_OPERATION", "MIGRATION", "TRADE", "RAID", "CONSTRUCTION",
                        "INFRASTRUCTURE_FAIL", "TRACE_CREATED", "TRACE_DECAYED", "POPULATION_CHANGE",
-                       "MATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE", "WORLD_DAY"],
+                       "MATERIALIZE", "INFECTED_DRIFT", "OFFSCREEN_DEATH", "INFECTED_STATE", "WORLD_DAY",
+                       "POOL_CHANGE", "HORDE_FORMED", "HORDE_MOVED", "HORDE_PROMOTED", "HORDE_PRESSED",
+                       "HORDE_SIGN", "HORDE_STATE", "HORDE_GONE"],
     EventClass.SYSTEM: ["WORLDGEN_STAGE", "SCENE_START", "SCENE_END", "CLOCK_ADVANCE", "TIMER_SET", "TIMER_FIRED", "TIMER_CANCELLED",
                         "OVERRIDE", "MIGRATION_BACKFILL",
                         "DEGRADED_FALLBACK", "CHEAT_ACTIVATED", "CHEAT_OVERRIDE", "CHEAT_DEACTIVATED",

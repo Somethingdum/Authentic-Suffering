@@ -40,8 +40,10 @@ STL-03 day(tx, rng, row, fired, turn_index) -> list[Event]   (the SETTLEMENT_DAY
     included) all have unnamed_short[resource] > 0, n = the smallest of those k values: n people
     die of it, the last in line first — cohorts in reverse serving order (highest band rank, then
     highest cohort_id), each giving min(its count, the rest) — each through
-    society.population.adjust_cohort(tx, cohort, -m, 'thirst' | 'hunger', at, turn_index, SD).
-    (Named people die of the same thing through their own needs, physical.bodies.)
+    society.population.adjust_cohort(tx, cohort, -m, 'thirst' | 'hunger', at, turn_index, SD);
+    their dead rise (world.hordes HRD-16, pathway 'cold_start', zone = the settlement site's
+    zone, count = n, cause SD). (Named people die of the same thing through their own needs,
+    physical.bodies.)
   3 receive(tx, s, {resource: -drawn}, 'consumption', ...) when anything was drawn.
   4 The fed: for each named person covered for water and level >= 1: physical.bodies.
     refresh_need(tx, p, 'thirst', at, SD, turn_index); covered for food and level >= 2:

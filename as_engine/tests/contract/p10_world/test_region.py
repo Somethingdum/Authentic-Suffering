@@ -61,8 +61,17 @@ def test_region_vectors(store, canon, vectors, case):
     assert zones == c["zones"]
     idx = {z.zone_id: i for i, z in enumerate(reg.zones)}
     routes = [[idx[r.a_zone], idx[r.b_zone], row(store, "routes", "route_id", r.route_id)["distance_m"],
-               row(store, "places", "place_id", r.road_id)["name"]] for r in reg.routes]
+               row(store, "places", "place_id", r.road_id)["name"]] for r in reg.routes if r.b_zone in idx]
     assert routes == c["routes"]
+    ext = {z.zone_id: z for z in reg.exterior}
+    exterior = [[ext[r.b_zone].name, idx[r.a_zone], row(store, "routes", "route_id", r.route_id)["distance_m"],
+                 row(store, "places", "place_id", r.road_id)["name"]] for r in reg.routes if r.b_zone in ext]
+    assert exterior == c["exterior"]
+    names = {z.zone_id: z.name for z in list(reg.zones) + list(reg.exterior)}
+    pools = {}
+    for r in store.query("SELECT zone_id, type_id, active, dormant FROM infected_pools ORDER BY zone_id, type_id"):
+        pools.setdefault(names[r[0]], {})[r[1]] = [r[2], r[3]]
+    assert pools == c["pools"]
 
 
 @pytest.mark.parametrize("seed, detail", [(21, "gotta_go_to_work_soon"), (8, "quick_look"), (33, "standard")])
@@ -76,7 +85,7 @@ def test_zones_hubs_and_sites(store, canon, seed, detail):
     assert len({z.name for z in reg.zones}) == len(reg.zones), "zone names are not reused"
     ev = [dict(r) for r in store.query("SELECT * FROM events WHERE type = 'PLACE_DISCOVERED' ORDER BY seq")]
     zone_events = [e for e in ev if "zone_id" in json.loads(e["payload"])]
-    assert len(zone_events) == len(reg.zones)
+    assert len(zone_events) == len(reg.zones) + len(atlas.EXTERIOR_DIRECTIONS)
     for e in ev:
         assert (e["writer"], e["origin"], e["turn_index"], e["at"]) == ("physical.space", "worldgen", 0, AT)
     for z in reg.zones:
@@ -129,12 +138,14 @@ def test_routes_ring_and_roads(store, canon, seed, detail):
     p, reg = build(store, canon, seed, detail)
     n = len(reg.zones)
     idx = {z.zone_id: i for i, z in enumerate(reg.zones)}
-    pairs = [(idx[r.a_zone], idx[r.b_zone]) for r in reg.routes]
+    inner = [r for r in reg.routes if r.b_zone in idx]
+    assert list(reg.routes[:len(inner)]) == inner, "the exterior routes come last"
+    pairs = [(idx[r.a_zone], idx[r.b_zone]) for r in inner]
     ring = [tuple(sorted((i, (i + 1) % n))) for i in range(n)]
     assert pairs[:n] == ring
     assert all(a < b and (a, b) not in ring for a, b in pairs[n:]), "chords join non-neighbours, smaller index first"
     assert pairs[n:] == sorted(pairs[n:])
-    for r in reg.routes:
+    for r in inner:
         za, zb = reg.zones[idx[r.a_zone]], reg.zones[idx[r.b_zone]]
         rr = row(store, "routes", "route_id", r.route_id)
         lo, hi = atlas.ROUTE_DISTANCE_M
@@ -154,6 +165,34 @@ def test_routes_ring_and_roads(store, canon, seed, detail):
         assert a_way["name"] == f"the {za.name} end of the road to {zb.name}"
         assert b_way["name"] == f"the {zb.name} end of the road to {za.name}"
         assert (a_way["aperture_w_cm"], b_way["aperture_w_cm"]) == (400, 400)
+
+
+@pytest.mark.parametrize("seed, detail", [(21, "gotta_go_to_work_soon"), (5, "settle_in")])
+def test_the_four_ways_out(store, canon, seed, detail):
+    """Step 4 (W04): four exterior zones in direction order, each a hub street with one road to its
+    gateway zone (number k x n // 4), danger 10 everywhere; no site stands in them."""
+    p, reg = build(store, canon, seed, detail)
+    n = len(reg.zones)
+    assert [z.name for z in reg.exterior] == [atlas.EXTERIOR_NAMES[d] for d in atlas.EXTERIOR_DIRECTIONS]
+    by_zone = {r.b_zone: r for r in reg.routes}
+    for k, (d, z) in enumerate(zip(atlas.EXTERIOR_DIRECTIONS, reg.exterior, strict=True)):
+        zr = row(store, "zones", "zone_id", z.zone_id)
+        assert (zr["kind"], zr["name"]) == ("exterior", z.name) and set(json.loads(zr["danger"]).values()) == {10}
+        hub = row(store, "places", "place_id", z.hub_id)
+        assert (hub["kind"], hub["name"], hub["zone_id"], hub["indoor"], hub["width_m"], hub["depth_m"]) == \
+            ("street", z.name, z.zone_id, 0, 80, 30)
+        assert z.site_ids == () and store.query_one("SELECT COUNT(*) FROM places WHERE zone_id = ?", (z.zone_id,))[0] == 1
+        gate = reg.zones[(k * n) // 4]
+        r = by_zone[z.zone_id]
+        assert r.a_zone == gate.zone_id
+        rr = row(store, "routes", "route_id", r.route_id)
+        lo, hi = atlas.EXTERIOR_DISTANCE_M
+        assert (rr["from_place"], rr["to_place"], rr["danger"], rr["terrain"]) == (gate.hub_id, z.hub_id, 10, "road")
+        assert lo <= rr["distance_m"] <= hi
+        road = row(store, "places", "place_id", r.road_id)
+        assert (road["name"], road["zone_id"], road["width_m"]) == (f"The road {d} out of {gate.name}", gate.zone_id,
+                                                                     rr["distance_m"])
+        assert portals_between(store, gate.hub_id, r.road_id) and portals_between(store, r.road_id, z.hub_id)
 
 
 def test_wg15_the_region_holds(store, canon):

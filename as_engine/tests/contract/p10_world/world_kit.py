@@ -94,3 +94,23 @@ def run(s, hours: float) -> list:
     Returns the events it committed."""
     with s.store.transaction() as tx:
         return timers.run_offscreen(tx, s.rng, now(s) + int(hours * H), turn(s))
+
+
+def pc(s) -> str:
+    return s.store.meta("pc_actor_id")
+
+
+def area(s) -> set[str]:
+    """turn.select.active_area around the PC, as the world's code sees it."""
+    from as_engine.turn.select import active_area
+    with s.store.transaction() as tx:
+        return set(active_area(tx, pc(s), turn(s)))
+
+
+def tune(s, **groups):
+    """The run's rules with some numbers changed for a test: tune(s, hordes={'drift_chance': 1.0})."""
+    from as_engine.contracts.settings import RulesConfig
+    r = s.store.rules.model_dump()
+    for g, vals in groups.items():
+        r[g].update(vals)
+    s.store.attach(rules=RulesConfig.model_validate(r))

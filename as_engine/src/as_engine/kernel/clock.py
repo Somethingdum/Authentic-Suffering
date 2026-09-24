@@ -81,6 +81,8 @@ QUEUE_TYPES: dict[str, str] = {
     "INFECTED_STEP": "world.infected",    # payload {body_id, leg} (P10: one step of an infected body)
     "WORLD_DAY": "world.worldmove",       # payload {} (P10: the world's daily tick)
     "OPERATION_STEP": "world.worldmove",  # payload {op_id, step} (P10)
+    "HORDE_STEP": "world.hordes",         # payload {horde_id} (P10: a horde walks on, mills, or keeps a street full)
+    "POOL_RISE": "world.hordes",          # payload {zone_id, count, pathway} (P10: the unnamed dead rise)
     "ROUTINE_STEP": "society.routine",    # payload {actor_id}
     "PRODUCTION_CYCLE": "society.work",   # payload {workplace_id}
     "SETTLEMENT_DAY": "society.settlement",  # payload {settlement_id} (the daily draw, P9)
@@ -94,11 +96,12 @@ QUEUE_TYPES: dict[str, str] = {
 # delayed consequences. These rows do not end the PC's condition-ended window (turn.select HOR-01):
 # a neighbour's shift change is not news. Everything else in QUEUE_TYPES is news. P10 adds the
 # world's own clocks: its day, operations, infected steps and rising dead (what they cause still
-# ends a watch through what the PC perceives).
+# ends a watch through what the PC perceives). The hordes' steps and the rising of the unnamed dead
+# are background too: a horde matters when it is heard or seen, through the PC's percepts.
 BACKGROUND_QUEUE_TYPES: frozenset[str] = frozenset({
     "ROUTINE_STEP", "PRODUCTION_CYCLE", "SETTLEMENT_DAY", "GROUP_DAY", "LOYALTY_CHECK",
     "CASCADE_EFFECT", "TRACE_DECAY",
-    "WORLD_DAY", "OPERATION_STEP", "INFECTED_STEP", "REANIMATION",
+    "WORLD_DAY", "OPERATION_STEP", "INFECTED_STEP", "REANIMATION", "HORDE_STEP", "POOL_RISE",
 })
 
 

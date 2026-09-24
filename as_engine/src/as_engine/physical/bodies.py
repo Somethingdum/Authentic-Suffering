@@ -133,9 +133,10 @@ expose(tx, rng, body_id, pathway, exposure, at, cause_event_id, turn_index) -> E
   body_id, cause as given) inserting, when infected, infections {body_id, pathway, exposed_at = at,
   stage = the record's first stage name, cause_event = cause_event_id, known_to_self 0}.
 die(tx, rng, body_id, at, cause_event_id, turn_index, *, cause='offscreen') -> Event | None
-  (world.worldmove's off-screen deaths.) A dead body -> None. Otherwise DEATH {body_id, cause,
-  cause_event_id} written like any death (alive 0, dead_at, death_event, awareness 'dead', posture
-  'lying'), and the rise is scheduled as for every death above.
+  (a death with no wound to show for it — the P12 cheats; P10 has no death lottery any more.) A
+  dead body -> None. Otherwise DEATH {body_id, cause, cause_event_id} written like any death
+  (alive 0, dead_at, death_event, awareness 'dead', posture 'lying'), and the rise is scheduled
+  as for every death above.
 rise(tx, corpse_id, type_id, at, cause_event_id, turn_index) -> str   (world.infected.rise)
   A new body: create(kind 'infected', sex / age_years / height_cm / mass_kg from the corpse,
   special = {letter: (lo + hi) // 2} of the canon infected type, origin 'reanimation',

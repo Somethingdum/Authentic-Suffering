@@ -1,5 +1,6 @@
-"""WG1 — the region: zones, their streets and buildings, and the roads between them (P10). Rules
-WG-15..17, GEO-00, GEO-03. docs/as/06_WORLD.md §1.3. Code only; rng stream 'worldgen:region'.
+"""WG1 — the region: zones, their streets and buildings, the roads between them, and the four ways
+out (P10). Rules WG-15..17, GEO-00, GEO-03. docs/as/06_WORLD.md §1.3. Code only; rng stream
+'worldgen:region'.
 Tables: world/worldgen/atlas.py. T = tables.DETAIL_TIERS[detail].
 
 build_region(rng, tx, params, detail, canon, at) -> Region
@@ -43,8 +44,20 @@ build_region(rng, tx, params, detail, canon, at) -> Region
     seal_db 0; the routes row {route_id, from_place = hub A, to_place = hub B, distance_m, terrain
     'road', danger = max(zone A danger 'shambler', zone B danger 'shambler'), known_by_default 1}.
     (A = zone i's name, B = zone j's name.)
-  Returns Region(zones: [Zone(zone_id, kind, name, hub_id, site_ids)], routes: [Route(route_id,
-  a_zone, b_zone, road_id)], start_zone_id = zone 0's id).
+  4 The exterior (P10, fidelity W04: the region is not the world): for k, dir in enumerate(
+    atlas.EXTERIOR_DIRECTIONS), one PLACE_DISCOVERED {zone_id, places: [hub id], source: 'worldgen'}
+    inserting the zones row {zone_id, name = atlas.EXTERIOR_NAMES[dir], kind 'exterior',
+    content_ref NULL, danger = every key of danger() at 10} and its HUB (kind 'street', named as the
+    zone, zone_id, width 80, depth 30, indoor 0, open_air, light 3, ambient_db 40, layout_generated
+    1, one anchor 'the middle of the road' (feature, 40, 15)); gateway = region zone number (k x n)
+    // 4; then a route from the gateway's hub (A) to this hub (B) written exactly as in step 3, with
+    distance = rng.range_int(*atlas.EXTERIOR_DISTANCE_M, purpose f"exterior:{dir}"), the road place
+    in the gateway zone named f"The road {dir} out of {A}", and routes.danger 10.
+  5 world.hordes.seed_pools(tx, params, at): the dead of every zone, region and exterior (HRD-02).
+  Returns Region(zones: [Zone(zone_id, kind, name, hub_id, site_ids)] of the REGION zones,
+  routes: [Route(route_id, a_zone, b_zone, road_id)] (step 3's, then the exterior ones),
+  start_zone_id = zone 0's id, exterior: [Zone(zone_id, 'exterior', name, hub_id, ())] in
+  direction order). No stage after WG1 places anything in an exterior zone.
 
 danger(values, zone_kind) -> dict[str, int]   (implemented below)
   {'crawler': zombie_common // 2, 'horde': horde_pressure, 'hostile': hostile_human, 'lurker':
@@ -96,6 +109,7 @@ class Region:
     routes: tuple[Route, ...]
     start_zone_id: str
     extras: dict = field(default_factory=dict, compare=False)
+    exterior: tuple[Zone, ...] = ()
 
 
 def danger(values: dict, zone_kind: str) -> dict[str, int]:

@@ -407,7 +407,9 @@ CREATE TABLE infected_state (
   lurker_clan  TEXT,
   risen_from   TEXT,                 -- P10: the corpse this body rose from (world.infected.rise)
   since        INTEGER NOT NULL DEFAULT 0,   -- P10: when it came to be here (spawn / rise)
-  degrade_at   INTEGER               -- P10: a Runner's decline into a Shambler or Crawler (INF-10)
+  degrade_at   INTEGER,              -- P10: a Runner's decline into a Shambler or Crawler (INF-10)
+  horde_id     TEXT,                 -- P10: the horde it was promoted from (world.hordes HRD-07)
+  charged_at   INTEGER               -- P10: when its energy was last charged (INF-03; NULL: not yet)
 );
 
 -- OWNER physical.objects
@@ -843,6 +845,30 @@ CREATE TABLE operations (
   participants TEXT NOT NULL DEFAULT '[]',
   next_due_at INTEGER,
   outcome    TEXT
+);
+
+-- OWNER world.hordes   (P10: a district's dead nobody has met yet, counted — fidelity E01)
+CREATE TABLE infected_pools (
+  zone_id    TEXT NOT NULL,
+  type_id    TEXT NOT NULL,
+  active     INTEGER NOT NULL DEFAULT 0 CHECK (active >= 0),
+  dormant    INTEGER NOT NULL DEFAULT 0 CHECK (dormant >= 0),
+  PRIMARY KEY (zone_id, type_id)
+);
+
+-- OWNER world.hordes   (P10: the dead on the move — fidelity E02; the Mega Horde)
+CREATE TABLE hordes (
+  horde_id     TEXT PRIMARY KEY,
+  kind         TEXT NOT NULL CHECK (kind IN ('drift','drawn','mega')),
+  composition  TEXT NOT NULL DEFAULT '{}',   -- JSON {type_id: count}
+  zone_id      TEXT NOT NULL,
+  place_id     TEXT NOT NULL,
+  route        TEXT NOT NULL DEFAULT '[]',   -- JSON list of the places still to walk
+  target_place TEXT,
+  status       TEXT NOT NULL CHECK (status IN ('moving','milling','gone')),
+  origin       TEXT NOT NULL,
+  since        INTEGER NOT NULL,
+  props        TEXT NOT NULL DEFAULT '{}'
 );
 
 -- OWNER world.traces

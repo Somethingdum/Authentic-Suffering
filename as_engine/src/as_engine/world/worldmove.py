@@ -42,7 +42,8 @@ day(tx, rng, row, fired, turn_index) -> list[Event]   (the WORLD_DAY handler)
   3 Operations (OPS-01): plan_operations(tx, rng, at, turn_index, WD).
   4 Departures (OPS-06): depart(tx, rng, at, turn_index, WD).
   5 world.decay.day(tx, rng, at, turn_index, WD) (physical wear); 6 world.infected.day(tx, rng, at,
-    turn_index, WD).
+    turn_index, WD), then world.hordes.day(tx, rng, at, turn_index, WD) (the dead in numbers:
+    lifecycle, drifting crowds, the Mega Horde).
   7 kernel.clock.schedule(tx, at + DAY, 'WORLD_DAY', None, {}, WD).
   Returns every event committed, in seq order.
 weather_weights(values) -> list[tuple[str, float]]   (implemented below)
@@ -59,7 +60,9 @@ OPS-01 plan_operations(tx, rng, at, turn_index, cause) -> list[Event]
   rng.range_int(..., f"party:{settlement}:{d}", *W.op_party) people (fewer when the crew is smaller;
   none -> no operation). Destination: scavenge -> rng.choice over building sites (not settlement
   sites) of other zones, else of any zone; patrol -> the far hub of a route touching the
-  settlement's zone (rng.choice); trade_run -> rng.choice over the other settlements' sites. Per
+  settlement's zone (rng.choice); trade_run -> rng.choice over the other settlements' sites.
+  (P10: an exterior zone is never a destination: no site stands there and no patrol walks to one.)
+  Per
   hostile group (by id) with 2+ named living members outside the active area: rng.chance(...,
   f"raid:{group}:{d}", W.op_chance['raid'] x hostile_human / 5) -> a raid on rng.choice(the
   settlements) by all of them. A new operation: op_id = tx.mint('ops'); FACTION_OPERATION {op_id,
@@ -79,8 +82,9 @@ OPS-02 step(tx, rng, row, fired, turn_index) -> list[Event]   (the OPERATION_STE
     FACTION_OPERATION {op_id, step: 'return', status: 'done'} updating status 'done', next_due_at
     NULL.
 OPS-03 outcome(...) at the destination, stream 'offscreen', purposes f"{op}:<what>":
-  every mover: rng.chance(zone danger 'shambler' / 20) -> physical.bodies.apply_harm (a 'minor' or
-  'significant' laceration on a CENTRE_MASS anatomy, weighted; cause the arrive event).
+  every mover: rng.chance(world.hordes.density(the destination's zone) / 20) (P10: how thick the
+  district's dead actually are — a cleared district is safe) -> physical.bodies.apply_harm (a
+  'minor' or 'significant' laceration on a CENTRE_MASS anatomy, weighted; cause the arrive event).
   scavenge: found = rng.chance(0.6); when the destination is discovered and holds loose items, up to
   3 of them (by item_id) are transferred to the movers' packs (physical.objects.transfer) and a
   TRACE 'missing_stock' "Shelves pulled out; whatever was here is gone." is left; a TRACE 'tracks'
@@ -131,8 +135,8 @@ OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event]   (the loyalty plan
   for each of their work_assignments rows (key order) ROLE_RELEASED {workplace_id, role, actor_id,
   shift_start_hh, covering_for, reason: 'left'} (writer 'society.work') deleting it, then
   society.settlement.add_vacancy(...) for that post; mind.mind.close_loop(tx, the loop, 'fulfilled',
-  the DEFECTION id, at, turn_index); they MOVE to the hub of the zone farthest (by route hops, ties by
-  zone id) from their settlement's zone.
+  the DEFECTION id, at, turn_index); they MOVE to the hub of the region zone farthest (by route
+  hops, ties by zone id) from their settlement's zone.
 """
 
 from __future__ import annotations

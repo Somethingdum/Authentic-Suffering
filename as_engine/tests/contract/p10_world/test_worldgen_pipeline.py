@@ -361,8 +361,9 @@ async def test_a_stage_that_fails_once_runs_again(run_cfg, monkeypatch):
         assert rep.retries == ["WG1"] and rep.stages == list(atlas.STAGES)
         retry = all_rows(s, "SELECT stream, n FROM prng_ledger WHERE purpose = 'retry'")
         assert retry == [{"stream": "worldgen:region", "n": 2}]
-        assert one(s, "SELECT COUNT(*) AS n FROM zones")["n"] == tables.DETAIL_TIERS["gotta_go_to_work_soon"]["zones"], \
-            "the failed attempt's rows are gone"
+        assert one(s, "SELECT COUNT(*) AS n FROM zones WHERE kind != 'exterior'")["n"] == \
+            tables.DETAIL_TIERS["gotta_go_to_work_soon"]["zones"], "the failed attempt's rows are gone"
+        assert one(s, "SELECT COUNT(*) AS n FROM zones WHERE kind = 'exterior'")["n"] == len(atlas.EXTERIOR_DIRECTIONS)
     finally:
         s.store.close()
 

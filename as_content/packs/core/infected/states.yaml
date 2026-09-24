@@ -1,6 +1,7 @@
 # States apply across types (Shambler/Crawler/Runner/Lurker) — orthogonal to InfectedTypeDef.
 # Lore_and_World_Building.pdf §3.2. bite_commitment: probability an engaged infected follows through
-# on a bite/attack this beat rather than disengaging (used by mind/affordance resolve gate & effects).
+# on a bite/attack this beat rather than disengaging (the lowest of a body's states counts; used by
+# world.infected step, INF-12).
 - schema: as.infected_state.v1
   id: dormant
   effects: [motionless, minimal_stimulus_response, can_reboot_on_stimulus]
