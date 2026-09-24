@@ -130,6 +130,14 @@ receipt names a defence). Each pins a P10 line of an earlier module: a fresh bui
 own phase (13 §1 rule 4); a builder updating from the P9 kit meets it as a failing test of a
 finished phase and amends that function in P10.
 
+### 3.4 The Actor v2 amendments (the Actor Specification, AC01–AC16)
+
+They change finished phases in place, so their tests live in those phases' folders:
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_identity.py` | a person's own prompt (AC01: the spec's text, no story or author words, a reaction adds one paragraph, the message opens *Who you are*); the identity card is the whole person in the dossier's words, every line traceable to its fields (IDN-01, -03, -04); what it keeps out never reaches a prompt (IDN-02); a reaction's minimum card (IDN-05); an accepted development changes exactly its line |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -98,9 +98,9 @@ Every Actor:
 - **Grows an inner life.** Memories can create goals, desires, grudges, fears, questions, plans and
   promises (each citing the moment that caused it). In quiet hours a background "reflection" pass
   lets them decide what they now want. Lessons change what they believe works.
-- **Has a stable voice.** Three example lines in three moods, a "would never say" list, their own
-  recent real lines, and human-only writer's notes. Nobody quotes your last sentence back at you
-  (the echo ledger rejects it).
+- **Has a stable voice.** Three example lines in three moods, a "would never say" list and their own
+  recent real lines, every time they decide — the writer's notes guide the people who write them,
+  never the model. Nobody quotes your last sentence back at you (the echo ledger rejects it).
 - **Has a public face and a private truth.** Deception is a sustained state that can be pierced.
 - **Lives off-screen.** Shifts, meals, watch rotations, childcare, scavenging runs, arguments. Their
   relationships drift without you. They can die without you.

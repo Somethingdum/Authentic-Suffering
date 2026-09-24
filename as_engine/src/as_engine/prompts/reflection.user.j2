@@ -1,6 +1,5 @@
-{{ ctx.packet.identity_text }}
-{% for line in ctx.packet.motive_lines %}{{ line }}
-{% endfor %}
+{{ ctx.packet.identity.as_text() }}
+
 Recent memories:
 {% for e in ctx.recent_episodes %}- {{ e }}
 {% endfor %}

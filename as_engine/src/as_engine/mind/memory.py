@@ -20,7 +20,8 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
   utterances    speech rows as UtteranceView, built exactly as mind.packet builds them.
   entities      PacketEntity per P-handle, as mind.packet (known_name, description,
                 relation_summary).
-  identity_text, voice_capsule   as mind.packet.
+  identity      the holder's whole card, mind.identity.compile_identity(mind.actor.fused(tx,
+                holder_id)) (IDN-01): what happened is read by this person, as this person.
   own_action_text   what the holder did itself this turn (it never perceives its own actions):
                 None when it committed no SPEECH and no ACTION_START this turn (events with
                 actor_id = holder and this turn_index); else these sentences, in event seq order,

@@ -14,6 +14,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | body | the physical record of any creature | — | — |
 | dossier | the full record of who a person is (never trimmed) | "character sheet" (Content screen only: "dossier", "affordance", "actor" allowed there, 10 §1) | profile, character card (for the record) |
 | Skull Packet | everything one mind receives for one decision | — | actor packet, perception packet, context bundle |
+| identity card | who a person is as their decision calls show it: the whole dossier's person in plain lines, each traceable to its fields; the minimum card in a reaction (`mind.identity`, IDN-01..05) | — | character summary, persona prompt |
 | affordance | one thing a body could attempt now, computed by code | "option" / a suggestion | action menu item |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | percept | one thing that reached one mind, with fidelity | "you heard / saw / felt" | — |

@@ -1,4 +1,4 @@
-"""The Skull Packet (P4). Rules SKULL-01..09, WILL-00, WILL-C (mind/packet.py).
+"""The Skull Packet (P4). Rules SKULL-01..09, WILL-00, WILL-C, IDN (mind/packet.py).
 
 A packet is everything one mind may know right now, and nothing else. It is built only from that
 mind's own body, inventory, records and percepts; handles replace every internal id.
@@ -16,7 +16,7 @@ from as_engine.contracts.events import Event, EventType
 from as_engine.contracts.mind import SkullPacket, UtteranceView
 from as_engine.contracts.settings import PacketRules, RulesConfig
 from as_engine.kernel.rng import Rng
-from as_engine.mind import perception
+from as_engine.mind import actor, identity, perception
 from as_engine.mind.affordance import AffordanceSet, enumerate_affordances
 from as_engine.mind.packet import build_packet, estimate_tokens
 from as_engine.physical import bodies, space
@@ -189,31 +189,17 @@ def test_the_fill_lines_when_there_is_nothing(scenario):
 
 
 # --------------------------------------------------------------------------- the fields, in words
-def test_identity_time_and_place(scenario, canon):
+def test_identity_time_and_place(scenario):
+    """The card is the fused dossier's (IDN-01); the whole card deliberating, the reaction card
+    reacting (IDN-05)."""
     w = scenario("metal_fence")
     at = crash_and_call(w)
     p = packet_for(w, "june", at)
-    d = canon.get("core:actor/june_okafor")
-    assert p.identity_text == f"You are {d.identity.name}, {d.identity.age}. {d.identity.one_line}"
+    fused = actor.fused(w.store, w.id("june"))
+    assert p.identity == identity.compile_identity(fused) and not p.identity.minimum
+    assert packet_for(w, "june", at, reaction=True).identity == identity.compile_identity(fused, minimum=True)
     assert p.world_time_text == "23:14, day 18 since the Fall (night)"
     assert p.position_text == "at the shelves in the stockroom"
-    assert p.voice_exemplars == [d.voice.exemplars.low_stakes, d.voice.exemplars.under_pressure, d.voice.exemplars.at_the_limit]
-    assert p.writers_notes == d.writers_notes
-    assert p.motive_lines[0] == f"What you want most: {d.motive.motive}"
-    assert p.moral_lines[1] == "You won't: " + "; ".join(d.motive.moral_line.wont) + "."
-    assert p.decision_lines[0] == "What comes first, in order: " + "; ".join(d.decision_stack.layers) + "."
-    assert p.active_traits == [f"{t.tag.replace('_', ' ')}: {t.manifests}" for t in d.traits]
-
-
-def test_capability_lines(scenario, canon):
-    w = scenario("metal_fence")
-    p = packet_for(w, "june", now(w))
-    d = canon.get("core:actor/june_okafor")
-    words = {1: "trained", 2: "skilled", 3: "expert"}
-    want = [f"{s.domain.value.capitalize()}: {words[s.rank]}." for s in d.capability.skills]
-    if d.capability.tags:
-        want.append("You are good at: " + ", ".join(t.replace("_", " ") for t in d.capability.tags) + ".")
-    assert p.capability_lines == want + ["Untrained in everything else."]
 
 
 def test_body_lines(scenario):
@@ -322,8 +308,8 @@ def test_the_budget_never_drops_the_protected_fields(scenario):
     assert p.beliefs == [] and p.memories == [] and p.uncertainty == []
     present = {p.handles[x.source_handle] for x in p.perceived_now if x.source_handle}
     assert all(p.handles[r.handle] in present for r in p.relationships), "only people in the scene keep their line"
-    for f in ("identity_text", "voice_capsule", "voice_exemplars", "body_lines", "capability_lines", "position_text",
-              "perceived_now", "utterances", "entities", "affordances", "commitments", "stakes", "resources"):
+    for f in ("identity", "recent_lines", "body_lines", "position_text", "perceived_now", "utterances", "entities",
+              "affordances", "commitments", "stakes", "resources"):
         assert getattr(p, f) == getattr(full, f), f
 
 

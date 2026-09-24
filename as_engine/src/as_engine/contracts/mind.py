@@ -31,6 +31,50 @@ from .common import (
 
 
 # ---------------------------------------------------------------------------
+# The identity card (Actor Spec §4, AC02 / AC04) — compiled ONLY by mind.identity.compile_identity
+# ---------------------------------------------------------------------------
+
+
+class CardLine(Strict):
+    text: str = Field(min_length=1)
+    sources: list[str] = Field(min_length=1, description="The dossier paths this line is made from, dotted, "
+                               "list items by index: 'decision_stack.inversion_conditions[1]'.")
+
+
+class CardSection(Strict):
+    key: Literal["who", "priorities", "values", "contradictions", "private_life", "habits", "voice", "silence",
+                 "competence"]
+    heading: str | None = Field(description="None only for 'who', the card's opening.")
+    lines: list[CardLine] = Field(min_length=1)
+
+
+class IdentityCard(Strict):
+    """Who a person is, as a decision call shows it: the whole dossier's person in plain lines, each
+    traceable to the fields it came from (mind.identity, IDN-01..04). Never trimmed for budget."""
+
+    name: str
+    age: int
+    one_line: str
+    compiler: Literal["card-1"] = "card-1"
+    dossier_hash: str = Field(description="sha256 of kernel.jsoncanon.canonical_json(dossier dump, by alias).")
+    minimum: bool = Field(default=False, description="The reaction card (IDN-05).")
+    sections: list[CardSection] = Field(min_length=1)
+
+    def section(self, key: str) -> CardSection | None:
+        """The section with that key, or None (implemented)."""
+        return next((s for s in self.sections if s.key == key), None)
+
+    def as_text(self) -> str:
+        """The card as a prompt shows it (implemented): each section's heading on its own line (none
+        for 'who'), then its lines, one per line; a blank line between sections."""
+        blocks = []
+        for s in self.sections:
+            lines = ([s.heading] if s.heading else []) + [line.text for line in s.lines]
+            blocks.append("\n".join(lines))
+        return "\n\n".join(blocks)
+
+
+# ---------------------------------------------------------------------------
 # Skull Packet (AS Rebuild Plan §6.1) — built ONLY by mind.packet.build_packet
 # ---------------------------------------------------------------------------
 
@@ -118,13 +162,9 @@ class SkullPacket(Strict):
     turn_index: int
     lod: LOD
     world_time_text: str
-    identity_text: str
-    voice_capsule: str
-    voice_exemplars: list[str] = Field(min_length=3, max_length=3)
+    identity: IdentityCard
     recent_lines: list[str] = Field(default_factory=list)
-    would_never_say: list[str] = Field(default_factory=list)
     body_lines: list[str] = Field(min_length=1)
-    capability_lines: list[str] = Field(min_length=1)
     resolve_cur: int = Field(ge=0)
     resolve_max: int = Field(ge=1)
     position_text: str
@@ -140,12 +180,6 @@ class SkullPacket(Strict):
     commitments: Commitments = Field(default_factory=Commitments)
     stakes: Stakes = Field(default_factory=Stakes)
     resources: list[str] = Field(default_factory=list)
-    motive_lines: list[str] = Field(default_factory=list)
-    persona_lines: list[str] = Field(default_factory=list)
-    moral_lines: list[str] = Field(default_factory=list)
-    decision_lines: list[str] = Field(default_factory=list)
-    active_traits: list[str] = Field(default_factory=list)
-    writers_notes: str | None = None
     affordances: list[AffordanceOption] = Field(min_length=1)
     uncertainty: list[str] = Field(default_factory=list)
     handles: dict[str, str] = Field(default_factory=dict, description="handle -> internal id. NEVER rendered.")
@@ -235,8 +269,7 @@ class AftermathPacket(Strict):
 
     holder_id: str
     turn_index: int
-    identity_text: str
-    voice_capsule: str
+    identity: IdentityCard
     percepts: list[PerceivedItem] = Field(default_factory=list)
     utterances: list[UtteranceView] = Field(default_factory=list)
     entities: list[PacketEntity] = Field(default_factory=list)

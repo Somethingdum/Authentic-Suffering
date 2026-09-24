@@ -1,83 +1,124 @@
-WHO YOU ARE
-{{ p.identity_text }}
-{% for line in p.motive_lines %}{{ line }}
-{% endfor %}{% for line in p.persona_lines %}{{ line }}
-{% endfor %}{% for line in p.moral_lines %}{{ line }}
-{% endfor %}{% for line in p.decision_lines %}{{ line }}
-{% endfor %}{% if p.active_traits %}Traits that matter right now:
-{% for t in p.active_traits %}- {{ t }}
-{% endfor %}{% endif %}
+Who you are
+{{ p.identity.as_text() }}
+{% if p.recent_lines %}
 
-HOW YOU TALK
-{{ p.voice_capsule }}
-Your voice, in three moods:
-- When it is easy: "{{ p.voice_exemplars[0] }}"
-- Under pressure: "{{ p.voice_exemplars[1] }}"
-- At your limit: "{{ p.voice_exemplars[2] }}"
-{% if p.recent_lines %}Things you said recently:
-{% for l in p.recent_lines %}- "{{ l }}"
-{% endfor %}{% endif %}{% if p.would_never_say %}You would never say anything like:
-{% for l in p.would_never_say %}- "{{ l }}"
-{% endfor %}{% endif %}{% if p.writers_notes %}
-AUTHOR'S NOTES ABOUT YOU (always follow these)
-{{ p.writers_notes }}
+Things you said lately:
+{% for l in p.recent_lines %}
+- "{{ l }}"
+{% endfor %}
+{% endif %}
+{% if p.beliefs or p.memories or p.lessons %}
+
+What you remember
+{% if p.beliefs %}
+What you believe:
+{% for b in p.beliefs %}
+- {{ b.text }} ({{ b.provenance_text }}, {{ b.age_text }})
+{% endfor %}
+{% endif %}
+{% if p.memories %}
+What you remember:
+{% for m in p.memories %}
+- {{ m.handle }} ({{ m.age_text }}): {{ m.text }}
+{% endfor %}
+{% endif %}
+{% if p.lessons %}
+What experience has taught you:
+{% for l in p.lessons %}
+- {{ l }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
-RIGHT NOW: {{ p.world_time_text }}
-Your body:
-{% for l in p.body_lines %}- {{ l }}
-{% endfor %}What you can do well or badly:
-{% for l in p.capability_lines %}- {{ l }}
-{% endfor %}- Your nerve: {{ p.resolve_cur }} of {{ p.resolve_max }}.
-Where you are: {{ p.position_text }}
-
-What you perceive:
-{% for s in p.perceived_now %}- {{ s.handle }} ({{ s.channel.value }}, {{ fidelity_words[s.fidelity.value] }}{% if s.seconds_ago > 0 %}, {{ '%.0f' % s.seconds_ago }} seconds ago{% endif %}): {{ s.text }}
-{% else %}- Nothing new.
-{% endfor %}
-{% if p.utterances %}What was said:
-{% for u in p.utterances %}- {{ u.handle }}: {% if u.speaker_handle %}{{ u.speaker_handle }}{% else %}Someone you could not place{% endif %} ({{ u.standing.value | replace('_', ' ') }}) spoke {{ u.volume.value }}{% if u.addressed_to_me %} to you{% endif %}, and you heard it {{ fidelity_words[u.fidelity.value] }}: {% if u.words %}"{{ u.words }}"{% else %}(no words){% endif %} It came across as a {{ u.form.value }}.
-{% endfor %}{% endif %}
-People and things you are aware of:
-{% for e in p.entities %}- {{ e.handle }}: {{ e.description }}{{ (" (" ~ e.relation_summary ~ ")") if e.relation_summary else "" }}
-{% else %}- No one else.
-{% endfor %}
-{% if p.relationships %}How you feel about them:
-{% for r in p.relationships %}- {{ r.handle }}: {{ r.text }}
-{% endfor %}{% endif %}
-{% if p.beliefs %}What you believe:
-{% for b in p.beliefs %}- {{ b.text }} ({{ b.provenance_text }}, {{ b.age_text }})
-{% endfor %}{% endif %}
-{% if p.memories %}What you remember:
-{% for m in p.memories %}- {{ m.handle }} ({{ m.age_text }}): {{ m.text }}
-{% endfor %}{% endif %}{% if p.lessons %}What experience has taught you:
-{% for l in p.lessons %}- {{ l }}
-{% endfor %}{% endif %}
-{% if p.open_loops %}Things hanging over you:
-{% for l in p.open_loops %}- {{ l.handle }} ({{ l.kind.value | replace('_', ' ') }}): {{ l.text }}
-{% endfor %}{% endif %}
-{% if p.refusals %}Things you already refused:
-{% for r in p.refusals %}- {{ r }}
-{% endfor %}{% endif %}
+What matters to you now
 What you are in the middle of:
 - {{ p.commitments.current_task or "Nothing in particular." }}
-{% if p.commitments.plan_step %}- Next step of your plan: {{ p.commitments.plan_step }}
-{% endif %}{% for o in p.commitments.standing_orders %}- Standing order: {{ o }}
-{% endfor %}{% if p.commitments.deadline %}- Deadline: {{ p.commitments.deadline }}
+{% if p.commitments.plan_step %}
+- Next step of your plan: {{ p.commitments.plan_step }}
+{% endif %}
+{% for o in p.commitments.standing_orders %}
+- Standing order: {{ o }}
+{% endfor %}
+{% if p.commitments.deadline %}
+- Deadline: {{ p.commitments.deadline }}
 {% endif %}
 Who depends on you:
-{% for d in p.stakes.dependents %}- {{ d }}
-{% else %}- No one here.
-{% endfor %}{% for o in p.stakes.obligations %}- You owe: {{ o }}
+{% for d in p.stakes.dependents %}
+- {{ d }}
+{% else %}
+- No one here.
 {% endfor %}
+{% for o in p.stakes.obligations %}
+- You owe: {{ o }}
+{% endfor %}
+{% if p.stakes.would_lose %}
 What it would cost you:
-{% for w in p.stakes.would_lose %}- {{ w }}
-{% endfor %}{% for r in p.resources %}- {{ r }}
+{% for w in p.stakes.would_lose %}
+- {{ w }}
 {% endfor %}
-{% if p.uncertainty %}What you do not know:
-{% for u in p.uncertainty %}- {{ u }}
-{% endfor %}{% endif %}
+{% endif %}
+{% if p.open_loops %}
+Things hanging over you:
+{% for l in p.open_loops %}
+- {{ l.handle }} ({{ l.kind.value | replace('_', ' ') }}): {{ l.text }}
+{% endfor %}
+{% endif %}
+{% if p.refusals %}
+Things you already refused:
+{% for r in p.refusals %}
+- {{ r }}
+{% endfor %}
+{% endif %}
 
-WHAT YOU COULD ATTEMPT NOW (choose exactly one)
-{% for a in p.affordances %}- {{ a.handle }}: {{ a.label }}{{ (" (" ~ a.cost_note ~ ")") if a.cost_note else "" }}{{ (" [risk: " ~ a.risk_note ~ "]") if a.risk_note else "" }}
+Right now: {{ p.world_time_text }}
+
+Your body
+{% for l in p.body_lines %}
+- {{ l }}
+{% endfor %}
+- Your nerve: {{ p.resolve_cur }} of {{ p.resolve_max }}.
+{% for r in p.resources %}
+- {{ r }}
+{% endfor %}
+
+Where you are: {{ p.position_text }}
+
+What reaches you
+{% for s in p.perceived_now %}
+- {{ s.handle }} ({{ s.channel.value }}, {{ fidelity_words[s.fidelity.value] }}{% if s.seconds_ago > 0 %}, {{ '%.0f' % s.seconds_ago }} seconds ago{% endif %}): {{ s.text }}
+{% else %}
+- Nothing new.
+{% endfor %}
+{% if p.utterances %}
+
+What you heard
+{% for u in p.utterances %}
+- {{ u.handle }}: {% if u.speaker_handle %}{{ u.speaker_handle }}{% else %}Someone you could not place{% endif %} ({{ u.standing.value | replace('_', ' ') }}) spoke {{ u.volume.value }}{% if u.addressed_to_me %} to you{% endif %}, and you heard it {{ fidelity_words[u.fidelity.value] }}: {% if u.words %}"{{ u.words }}"{% else %}(no words){% endif %} It came across as a {{ u.form.value }}.
+{% endfor %}
+{% endif %}
+
+People you can account for
+{% for e in p.entities %}
+- {{ e.handle }}: {{ e.description }}{{ (" (" ~ e.relation_summary ~ ")") if e.relation_summary else "" }}
+{% else %}
+- No one else.
+{% endfor %}
+{% if p.relationships %}
+
+Your understanding of them
+{% for r in p.relationships %}
+- {{ r.handle }}: {{ r.text }}
+{% endfor %}
+{% endif %}
+{% if p.uncertainty %}
+
+What remains uncertain
+{% for u in p.uncertainty %}
+- {{ u }}
+{% endfor %}
+{% endif %}
+
+Possibilities you notice (choose one)
+{% for a in p.affordances %}
+- {{ a.handle }}: {{ a.label }}{{ (" (" ~ a.cost_note ~ ")") if a.cost_note else "" }}{{ (" [risk: " ~ a.risk_note ~ "]") if a.risk_note else "" }}
 {% endfor %}

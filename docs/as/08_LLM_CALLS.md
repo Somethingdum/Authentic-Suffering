@@ -100,6 +100,10 @@ one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 
 - **PROMPT-02 No pseudo-code in what the model reads**: plain organised English. Bracket-colon
   labels, arrows, ALL_CAPS field names and symbol operators bleed into model output (a lesson
   learned on this project). JSON appears only as the required answer shape.
+- **The actor prompts are a person's own** (Actor Spec §6, AC01): `_actor_core.j2` is the spec's
+  text verbatim, `_actor_answer.j2` the answer's shape; a reaction adds only its last paragraph. No
+  story, narrator, player, author or audience appears in them, and the user message opens with
+  *Who you are* and the identity card (05 §2.1; p04 `test_identity.py`).
 
 ## 7. Live tools (run on your machines; `AS_LIVE=1`)
 - `tools/as/probe.py` — reachability, model ids, JSON-schema compliance, thinking control; writes

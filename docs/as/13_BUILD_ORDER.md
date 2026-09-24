@@ -121,7 +121,9 @@ Read: 05 §2–8, `mind/actor.py`, `mind/resolve.py`, `mind/affordance.py`, `min
 2. `mind/resolve.py`.
 3. `mind/firewall.py`: `classify_form`, `classify_standing`, `request_signature`, `classify_response`.
 4. `mind/affordance.py::enumerate_affordances` (all seven gates in order; selection rules).
-5. `mind/packet.py::build_packet` (render budget via `prompts/actor_cognition` templates).
+5. `mind/packet.py::build_packet` (render budget via `prompts/actor_cognition` templates). The
+   identity card comes from `mind/identity.compile_identity`, which is implemented — do not
+   rewrite it; `test_identity.py` pins the card and the person's own prompt (D-70, D-71).
 6. `action/intent.py::to_intent`.
 Gate: `p04_one_actor` green.
 **Forbidden:** multiple actors resolving together. One mind, done properly, before five.

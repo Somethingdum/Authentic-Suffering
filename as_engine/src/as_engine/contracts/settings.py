@@ -184,7 +184,8 @@ class SchedulerRules(Strict):
 
 
 class PacketRules(Strict):
-    token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 3500, "warm": 2200, "reaction": 1400})
+    # [SAND] Actor Spec §5: 6000 deliberating, 4000 routine, 3000 a reaction, fixed text included
+    token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 6000, "warm": 4000, "reaction": 3000})
     max_beliefs: int = 12
     max_memories: int = 6
     max_open_loops: int = 8

@@ -1,4 +1,4 @@
-The character: {{ ctx.packet.identity_text }}
+The character: {{ ctx.packet.identity.name }}, {{ ctx.packet.identity.age }}. {{ ctx.packet.identity.one_line }}
 Where they are: {{ ctx.packet.position_text }}
 What they can perceive:
 {% for s in ctx.packet.perceived_now %}- {{ s.text }}

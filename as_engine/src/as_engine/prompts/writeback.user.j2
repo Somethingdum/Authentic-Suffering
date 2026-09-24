@@ -1,6 +1,5 @@
 WHO
-{{ a.identity_text }}
-{{ a.voice_capsule }}
+{{ a.identity.as_text() }}
 
 WHAT THEY PERCEIVED
 {% for s in a.percepts %}- {{ s.handle }} ({{ s.channel.value }}, {{ fidelity_words[s.fidelity.value] }}): {{ s.text }}

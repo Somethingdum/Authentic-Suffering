@@ -1,10 +1,6 @@
-{{ ctx.packet.identity_text }}
-Voice: {{ ctx.packet.voice_capsule }}
-- easy: "{{ ctx.packet.voice_exemplars[0] }}"
-- under pressure: "{{ ctx.packet.voice_exemplars[1] }}"
-- at the limit: "{{ ctx.packet.voice_exemplars[2] }}"
-Would never say: {{ ctx.packet.would_never_say | join(' / ') }}
-{% if ctx.behavior_notes %}How they carry an idea:
+{{ ctx.packet.identity.name }}, {{ ctx.packet.identity.age }}. {{ ctx.packet.identity.one_line }}
+{% for l in ctx.packet.identity.section('voice').lines %}{{ l.text }}
+{% endfor %}{% if ctx.behavior_notes %}How they carry an idea:
 {% for n in ctx.behavior_notes %}- {{ n }}
 {% endfor %}{% endif %}Right now: {% for s in ctx.packet.perceived_now %}{{ s.text }} {% endfor %}
 

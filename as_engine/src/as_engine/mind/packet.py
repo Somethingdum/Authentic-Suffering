@@ -1,4 +1,5 @@
-"""Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.
+"""Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,
+IDN (the card).
 MUST NOT import as_engine.kernel.truth (SKULL-02, import-graph test). Reads only: the actor's
 own body, wounds, needs and inventory, its actors row and fused dossier, percept_log rows for
 this holder, its claim_holdings + propositions, its relationships / acquaintance / households /
@@ -39,25 +40,12 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
 Fields (second person, plain English):
   world_time_text   f'{format_clock(at)}, day {world_time(at).day} since the Fall ({part_of_day})'
                     e.g. '23:14, day 18 since the Fall (night)'.
-  identity_text     f'You are {identity.name}, {identity.age}. {identity.one_line}'.
-  voice_capsule, voice_exemplars [low_stakes, under_pressure, at_the_limit], would_never_say
-                    from the fused dossier; recent_lines = mind.actor.recent_lines(n = PacketRules
-                    .max_recent_lines).
-  motive_lines      [f'What you want most: {motive.motive}', f'How you go about it: {motive.method}',
-                     f'What eats at you: {motive.inner_conflict}', f'What you carry from before:
-                     {motive.past_wound}', f'How you take risks: {motive.risk_text}',
-                     f'What you fear: {"; ".join(life.fears)}.']
-  persona_lines     [f'What people see: {", ".join(public.shown_traits)}. What you tell them:
-                     {public.claimed_history}', f'What you hide: {private.concealed_history}',
-                     f'What you really want: {"; ".join(private.true_goals)}.', f'Who you really
-                     stand with: {private.real_affiliation}', f'A habit of yours:
-                     {motive.signature_behaviour}']
-  moral_lines       [f'You will: {"; ".join(moral_line.will)}.', f"You won't: {"; ".join(moral_line
-                     .wont)}."]
-  decision_lines    [f'What comes first, in order: {"; ".join(decision_stack.layers)}.'] + one
-                    f'Except: {c}' per inversion condition.
-  active_traits     every dossier trait, in order, as f'{tag with _ as spaces}: {manifests}'.
-  writers_notes     the dossier's writers_notes (always, when present).
+  identity          mind.identity.compile_identity(mind.actor.fused(tx, actor_id), minimum=reaction)
+                    (IDN-01..05; Actor Spec AC02 / AC04): the whole card for a deliberation, the
+                    reaction card for a reaction. What the card keeps out — writers_notes,
+                    knowledge.does_not_know, who knows a secret, reflexes, counts that go stale —
+                    reaches no field of the packet (IDN-02).
+  recent_lines      mind.actor.recent_lines(n = PacketRules.max_recent_lines).
   body_lines        in this order, each a full sentence:
                     * per unhealed wound (created_at, wound_id): f'{SEVERITY_WORDS[severity]
                       capitalised} {type} wound to your {ANATOMY_WORDS[anatomy]}{", bleeding" when
@@ -76,10 +64,6 @@ Fields (second person, plain English):
                     * P10: per physical.bodies.stages(actor) (pathway order), the stage's ``felt``
                       sentence when it is not empty — what the host feels, never what it has;
                     nothing to say -> ['Unhurt.'].
-  capability_lines  per dossier skill, in dossier order: f'{Domain capitalised}: {trained|skilled|
-                    expert}.' (rank 1/2/3); then f'You are good at: {", ".join(tags with _ as
-                    spaces)}.' when there are capability tags; then always 'Untrained in
-                    everything else.'
   resolve_cur / resolve_max   the actors row.
   position_text     f'{at_phrase(anchor name)} in {place_phrase(place name)}' ('at the counter in
                     the sales floor'), or f'in {place_phrase(place name)}' with no anchor.
@@ -163,9 +147,9 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   over PacketRules.token_budget[key], drop ONE item and re-render, in this order: memories (last
   first), lessons (last first), beliefs (last first), relationship lines whose entity is not a source of this turn's
   percepts (last first), refusals created more than 7 days before ``at`` (oldest first),
-  uncertainty lines (last first). Never dropped: identity, voice, body, capability, position,
-  perceived_now, utterances, entities, affordances, commitments, stakes, resources. When nothing
-  droppable is left the packet is returned over budget (the scheduler logs it).
+  uncertainty lines (last first). Never dropped: identity (the card), recent_lines, body,
+  position, perceived_now, utterances, entities, affordances, commitments, stakes, resources.
+  When nothing droppable is left the packet is returned over budget (the scheduler logs it).
 No instruction to forget anything is ever added (L1): what must not be used is absent.
 """
 

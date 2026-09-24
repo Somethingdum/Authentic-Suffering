@@ -65,7 +65,7 @@ persona:
     real_affiliation: Eli, and nobody else
 traits:
   - tag: vigilant
-    manifests: Stands at an angle to every doorway and knows where each person in the room is without looking at them.
+    manifests: Stands at an angle to every doorway and keeps checking where each person in the room is, with quick looks nobody notices.
     triggers: A new sound, a new face, or a door she has not checked herself.
     causes: She repositions before she answers anyone, and leaves conversations mid-sentence to go look.
     costs: She never fully rests, and the crew reads her as cold and stops telling her things.

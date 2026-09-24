@@ -26,12 +26,12 @@ Contract: `contracts/dossier.py` (`ActorDossier`, `PCDossier`). Authoring guide:
 | contradictions | ≥1: belief A vs belief B and when each wins | CMG §15.2 |
 | decision stack | ≥4 ordered layers, inversion conditions, a past example | CMG §15.5 |
 | silence | when they go quiet (≥2), body when silent, topics refused, comfortable vs uncomfortable | CMG §15.6 |
-| knowledge | knows / does not know / knows but hides → seed beliefs at worldgen | CMG §15.4 |
+| knowledge | knows / does not know / knows but hides → seed beliefs at worldgen; *does not know* is an authoring check only and never reaches a prompt (naming a hidden fact supplies it, IDN-02) | CMG §15.4 |
 | voice | capsule, speech tendencies, **three exemplars (low stakes, under pressure, at the limit)**, **would never say (≥3)**, profanity level, dialect | CMG §14, §22.1 |
 | social | household role, relations (with history), dependents, guardians, faction memberships | Plan §8.2 |
 | life | aspiration, current project, routine, obligations, hopes, **fears (≥1)**, secrets (with who knows and exposure consequence) | Plan §6.3 |
 | disposition | archetype prior, stance toward strangers, default action on detecting a stranger | S/U First Contact, Stage-2 filter |
-| writers_notes | **human-only**; the model never writes it; always injected when the Actor is on stage | CMG §05 three-source anti-drift |
+| writers_notes | **human-only**: the model never writes it and never reads it — editorial guidance for authors, kept out of every prompt (IDN-02, Actor Spec AC02). What a note asks for belongs in the fields the card is made from | CMG §05 three-source anti-drift; Actor Spec §4 |
 | depth_reference | long-form markdown, pulled only on demand (never in a packet by default) | CMG PC dossier L5 |
 
 **Never trimmed (DOS-01).** Storage = full baseline JSON + deltas; fused at call time. A dossier
@@ -39,19 +39,53 @@ that describes a category instead of a person fails validation (CNT-10), because
 the identified root cause of drift.
 
 **Voice comes from the database, not model recall (DOS-05).** Every committed SPEECH by an Actor is
-stored in `voice_lines`; the packet carries the three exemplars plus up to five recent real lines
-(pinned lines first). Pinning is a UI action (People panel → "Pin this line").
+stored in `voice_lines`; the card carries the three exemplars and the packet adds up to five recent
+real lines (pinned lines first). Pinning is a UI action (People panel → "Pin this line").
+
+### 2.1 The identity card (Actor Spec §4, AC02 / AC04; `mind/identity.py`, IDN-01..05)
+A call shows a person the whole of who they are, compiled from the fused dossier by code
+(`compile_identity`, implemented in the kit): who they are and where they come from; what matters
+to them (their motive, the order of their priorities and when it flips, the risks they take); their
+limits (will / won't, what they owe); **where they are pulled both ways** (each contradiction and
+when each side wins); their own life (what eats at them, what they carry, hope, fear, the face they
+show and what they hide, their secrets); **their habits** (each trait with what it makes them do and
+what it costs, their habits of hand and movement); **how they talk** (capsule, tendencies, the three
+exemplars, what they would never say, swearing, accent); **when they go quiet**; and what they know
+how to do, ending *"No established specialist training beyond this list."* Every line names the
+dossier fields it came from (the source map), so the card never says anything the dossier does not.
+
+What it keeps out (IDN-02): the writers' notes, what the person does not know, who knows their
+secrets, reflexes (code's), counts that go stale (what they carry comes from their body and items),
+the numbers the rules use, and the generation labels. A reaction gets the **minimum card** — the
+same lines, fewer of them: who, what comes first, the limits, the voice under pressure, when they go
+quiet, their skills. No budget trims the card (SKULL-09); a card that will not fit is a reason for
+a larger context, never for a smaller person.
+
+Authoring (09): the fields the card is made from describe tendencies, never senses or knowledge of
+the present. "Knows where everyone is without looking" would grant a sense; Mara's vigilance reads
+"keeps checking where each person in the room is, with quick looks nobody notices", and where people
+actually are comes from what she perceives.
 
 ## 3. The Skull Packet
 
 Built only by `mind.packet.build_packet` (contract `SkullPacket`, rendered by
-`prompts/actor_cognition.*.j2`). It contains, in plain English: identity; motive, persona, moral,
-decision and trait lines; voice; body; capability incl. Resolve; position; **perceived now** (with
-fidelity words: *clearly / only partly, some words lost / only the tone, no words*); **what was
-said** (utterances with form and the receiver's standing); people (by name if known, else
-description); relationships; beliefs with provenance and age; retrieved memories; open loops;
-standing refusals; commitments; dependents and obligations; what it would cost; uncertainty; the
-**options** (affordances A1…).
+`prompts/actor_cognition.*.j2`). It contains, in plain English, under the Actor Spec's headings and
+in this order — identity first, then memory, then the moment (§6 of the spec): **Who you are** (the
+card, §2.1, and the lines they said lately); **What you remember** (beliefs with provenance and
+age, retrieved memories, lessons); **What matters to you now** (commitments, dependents and
+obligations, what it would cost, open loops, standing refusals); the time; **Your body** (with
+Resolve and what they carry); where they are; **What reaches you** (percepts with fidelity words:
+*clearly / only partly, some words lost / only the tone, no words*); **What you heard** (utterances
+with form and the receiver's standing); **People you can account for** (by name if known, else
+description); **Your understanding of them**; **What remains uncertain**; and the **Possibilities
+you notice** (affordances A1…).
+
+The instructions around it are a person's own (Actor Spec §6, AC01): *"You are the person described
+under Who you are. The current moment is yours to respond to…"* — cooperate, refuse, hesitate, keep
+working or stay silent as follows from who they are; an order is someone asking for conduct; do not
+search for a dramatic outcome; choose an attempt, never its success. Nothing in them names a story,
+a narrator, a player, an author or an audience. A reaction adds one last paragraph ("Something just
+reached you…"). The answer's fields follow the instructions as a technical note.
 
 Four absences are as load-bearing as any field:
 - **No objective event log.** Ever.

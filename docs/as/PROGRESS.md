@@ -36,7 +36,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | per-call latency estimates | `SchedulerRules.estimated_call_s` | `tools/as/bench.py` on your machines (BENCH-01) |
 | acoustic fidelity margins 12/5/0 dB | `AcousticRules` | `tools/as/eval.py` belief-accuracy runs (BENCH-07) |
 | Resolve drains/recoveries | `ResolveRules` | eval refusal/compliance rates (BENCH-03) |
-| packet token budgets 3500/2200/1400 | `PacketRules.token_budget` | bench prefill times (BENCH-04) |
+| packet token budgets 6000/4000/3000 (Actor Spec §5; were 3500/2200/1400) | `PacketRules.token_budget` | bench prefill times (BENCH-04) with the identity card in every call |
 | outings: daily chance per kind | `WorldRules.op_chance` | 100-day fake-model soak per difficulty (BENCH-06): how many go out, how many come back |
 | how long marks last under a roof | `WorldRules.sheltered_trace_mult` | play-tuning |
 | the dead past each map edge; drift chance; the Mega Horde's daily chance | `HordeRules.exterior_pool`, `drift_chance`, `mega_daily_chance` | 100-day soak per difficulty: how often a Mega Horde comes, how full the streets get |

@@ -7,6 +7,10 @@ so a human can read the rendered prompts and judge them.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import yaml
+
 from as_engine.contracts.calls import (
     AuditContext,
     CheatPersonaContext,
@@ -39,20 +43,23 @@ from as_engine.contracts.mind import (
     Stakes,
     UtteranceView,
 )
+from as_engine.contracts.dossier import ActorDossier
 from as_engine.contracts.narration import NarratorLine, NarratorPacket
+from as_engine.mind.identity import compile_identity
+
+MARA = Path(__file__).resolve().parents[4] / "as_content" / "packs" / "core" / "actors" / "mara_voss.yaml"
+
+
+def mara_card():
+    """Mara's identity card, compiled from the core pack's dossier (mind.identity, IDN-01)."""
+    return compile_identity(ActorDossier.model_validate(yaml.safe_load(MARA.read_text(encoding="utf-8"))))
 
 
 def mara_packet() -> SkullPacket:
     return SkullPacket(
         actor_id="act_000002", turn_index=1, lod=LOD.HOT, world_time_text="Day 18, 23:14, night, wind rising",
-        identity_text="Mara Voss, 34, a former prison guard who holds the front window at night.",
-        voice_capsule="Low, flat and short. Prison-count cadence; gets quieter when scared.",
-        voice_exemplars=["Eat the peaches first. The beans'll keep.",
-                         "Quiet. Everybody down. June — doorway, not past it.",
-                         "I'm going to ask you one time to put it on the ground."],
-        recent_lines=["Window's clear."], would_never_say=["Trust me.", "I'm sorry for your loss."],
+        identity=mara_card(), recent_lines=["Window's clear."],
         body_lines=["Tired: four hours of sleep.", "No injuries."],
-        capability_lines=["Firearms: skilled (eight years of qualification).", "Brawling: skilled."],
         resolve_cur=5, resolve_max=6, position_text="At the front window of the sales floor, standing.",
         perceived_now=[PerceivedItem(handle="S1", channel=Channel.AUDITORY, fidelity=Fidelity.EXACT,
                                      text="A loud metal crash from behind the store, out back.", seconds_ago=0.2)],
@@ -70,12 +77,7 @@ def mara_packet() -> SkullPacket:
         commitments=Commitments(current_task=None, plan_step="Watch the front window",
                                 standing_orders=["On a loud noise: find the source and cover it."]),
         stakes=Stakes(dependents=["Eli, your son, asleep in the office"], obligations=["Night watch"]),
-        resources=["Your .38 revolver: six loaded, eleven loose rounds."],
-        motive_lines=["You want Eli to reach an age where he can survive without you."],
-        moral_lines=["You will not leave Eli behind. You will not shoot a living child."],
-        decision_lines=["Eli first; then your ability to keep standing watch; then Ray's rules."],
-        active_traits=["vigilant: you move to cover the side the sound came from before you answer anyone."],
-        writers_notes="Holding herself together with procedure; the warmth goes to Eli and June.",
+        resources=["You have: a .38 revolver (holstered), 11 .38 rounds."],
         affordances=[AffordanceOption(handle="A1", verb=Verb.MOVE, label="Move to the end of the rear shelving (7 m, about 5 seconds)"),
                      AffordanceOption(handle="A2", verb=Verb.SPEAK, label="Say something to anyone who can hear (you choose the words and how loud)"),
                      AffordanceOption(handle="A3", verb=Verb.OBSERVE, label="Stay put and watch everything you can see and hear"),
@@ -88,8 +90,8 @@ def mara_packet() -> SkullPacket:
 
 def aftermath() -> AftermathPacket:
     p = mara_packet()
-    return AftermathPacket(holder_id=p.actor_id, turn_index=1, identity_text=p.identity_text,
-                           voice_capsule=p.voice_capsule, percepts=p.perceived_now, utterances=p.utterances,
+    return AftermathPacket(holder_id=p.actor_id, turn_index=1, identity=p.identity, percepts=p.perceived_now,
+                           utterances=p.utterances,
                            entities=p.entities, own_action_text='Said "Quiet." and moved to the end of the rear shelving.',
                            own_expectation_text="To cover the back door from the shelving.",
                            open_loops=p.open_loops, relationships=p.relationships,

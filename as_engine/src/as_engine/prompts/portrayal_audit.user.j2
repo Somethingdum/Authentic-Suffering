@@ -1,11 +1,6 @@
 THE CHARACTER'S RECORD
-{{ ctx.packet.identity_text }}
-{% for line in ctx.packet.motive_lines %}{{ line }}
-{% endfor %}{% for line in ctx.packet.moral_lines %}{{ line }}
-{% endfor %}{% for line in ctx.packet.decision_lines %}{{ line }}
-{% endfor %}Nerve: {{ ctx.packet.resolve_cur }} of {{ ctx.packet.resolve_max }}.
-Voice: {{ ctx.packet.voice_capsule }}
-Would never say: {{ ctx.packet.would_never_say | join(' / ') }}
+{{ ctx.packet.identity.as_text() }}
+Nerve: {{ ctx.packet.resolve_cur }} of {{ ctx.packet.resolve_max }}.
 
 WHAT THEY KNEW AND FACED
 {% for s in ctx.packet.perceived_now %}- {{ s.text }}

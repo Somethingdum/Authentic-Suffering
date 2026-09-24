@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-580 ids; 332 with their own statement, 248 named only in context.
+585 ids; 337 with their own statement, 248 named only in context.
 
 
 ## ABUSE
@@ -277,7 +277,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| DOS-01 | DOS-01), so a run keeps working if packs change later; on load the UI warns when the content hash | 03_DATA_MODEL §1 | `as_engine/mind/actor.py` | `contract/p02_space_bodies/test_scenario_loader.py`, `contract/p04_one_actor/test_actor.py`, `contract/p10_world/test_materialise.py` |
+| DOS-01 | DOS-01), so a run keeps working if packs change later; on load the UI warns when the content hash | 03_DATA_MODEL §1 | `as_engine/mind/actor.py`, `as_engine/mind/identity.py` | `contract/p02_space_bodies/test_scenario_loader.py`, `contract/p04_one_actor/test_actor.py`, `contract/p10_world/test_materialise.py` |
 | DOS-02 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-03 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-04 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
@@ -450,6 +450,16 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | I-AS-13 | I-AS-13: CMG §42.1 names Codex as responsible for the escape; AS has no narrator-god, so the | DECISIONS §5 | — | — |
 | I-AS-14 | I-AS-14: CMG §61 Part XV locks Addison at age 20 with "started collapse at ~10", which pins her | DECISIONS §5 | — | — |
 | I-AS-15 | I-AS-15: CMG §43.C's No-Release Quarantine names "execution" and "black-site observation" as | DECISIONS §5 | — | — |
+
+## IDN
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| IDN-01 | IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard (``dossier``: ActorDossier or PCDossier — pass mind.actor.fused, so accepted developments, the dossier deltas, are in it) name / age / one_line from ide… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py`, `contract/p04_one_actor/test_packet.py` |
+| IDN-02 | IDN-02 Kept outside the card, never in any prompt a person's call renders (Actor Spec §4, §5): writers_notes (editorial guidance for authors — AC02), knowledge.does_not_know (naming a hidden fact supplies it — AC04; the… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
+| IDN-03 | IDN-03 Every line's sources are paths that exist in the dossier (list items by index); a line is made only from its sources and the fixed words above. The card is a pure function: the same dossier gives the same card, a… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
+| IDN-04 | IDN-04 dossier_hash = sha256 hex of kernel.jsoncanon.canonical_json(dossier.model_dump(mode='json', by_alias=True)) — the decision audit's pin of which identity a call saw. | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
+| IDN-05 | IDN-05 minimum=True gives the reaction card (Actor Spec §4: "keep a minimum identity card in reactions too"): a split second leaves no room for a whole life, never for none of it. The same lines, only these: 'who' all;… | as_engine/mind/identity.py | `as_engine/mind/identity.py` | `contract/p04_one_actor/test_identity.py`, `contract/p04_one_actor/test_packet.py` |
 
 ## IFACE
 
@@ -817,15 +827,15 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SKULL-01 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p05_many_actors/test_telepathy.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_rumours.py` |
+| SKULL-01 | *a person carries comes from the body and its items, SKULL-01), motive.risk_threshold and* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py`, `as_engine/mind/perception.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p05_many_actors/test_telepathy.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_rumours.py` |
 | SKULL-02 | *Import boundary (SKULL-02, BOUND-02): only these modules may import ``as_engine.kernel.truth``:* | as_engine/kernel/truth.py | `as_engine/kernel/truth.py`, `as_engine/mind/cues.py`, `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p00_substrate/test_boundaries.py`, `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-03 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-04 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-05 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p09_society/test_rumours.py` |
-| SKULL-06 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py` |
-| SKULL-07 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
-| SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
-| SKULL-09 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C.* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_retrieval.py` |
+| SKULL-03 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-04 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-05 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_packet.py`, `contract/p09_society/test_rumours.py` |
+| SKULL-06 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/perception.py` | `contract/p03_perception/test_perception.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py` |
+| SKULL-07 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
+| SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
+| SKULL-09 | *it (SKULL-09): a smaller prompt never costs a person their identity.* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_retrieval.py` |
 | SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
 
 ## SOC

@@ -129,7 +129,7 @@ def test_the_aftermath_and_the_packet_agree(scenario, canon):
     assert {h: v for h, v in a.handles.items() if h[0] in "SP"} == {h: v for h, v in p.handles.items() if h[0] in "SP"}
     assert a.percepts == p.perceived_now and a.utterances == p.utterances
     assert a.entities == p.entities and a.relationships == p.relationships
-    assert (a.identity_text, a.voice_capsule) == (p.identity_text, p.voice_capsule)
+    assert a.identity == p.identity and not a.identity.minimum  # the whole card: this person reads what happened
 
 
 def test_what_the_holder_did_itself_comes_from_its_own_record(scenario):

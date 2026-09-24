@@ -77,14 +77,22 @@ specificity that stops drift (CNT-10); these are the rules in words:
 | `contradictions` | at least one belief A vs belief B, and when each wins | people are not consistent; this makes them consistent in *how* they are inconsistent |
 | `decision_stack` | at least four layers, highest first, inversion conditions, a past example | what they do when priorities collide |
 | `silence` | at least two situations when they go quiet, body when silent | silence is characterisation |
-| `knowledge` | knows / does not know / knows but hides | seeds their beliefs at world start |
+| `knowledge` | knows / does not know / knows but hides | seeds their beliefs at world start; *does not know* is for authoring checks and never reaches a prompt |
 | `voice` | capsule (20–500 chars), ≥ 2 speech tendencies, **three example lines** — low stakes, under pressure, at the limit — **≥ 3 things they would never say**, profanity level | the single strongest defence against every character sounding the same |
 | `social` | relations with history, dependents, guardians, memberships | dependents appear in their decisions as stakes |
 | `life` | aspiration, current project, ≥ 1 fear, secrets with who knows and what exposure costs | goals and grudges grow from these |
 | `disposition` | archetype prior, stance to strangers, default first-contact behaviour | first contact without a model call when they are far away |
 | `days_since_fall_range` | optional `[min, max]` days since the Fall that this person's age and history fit | a nine-year-old who remembers the Fall cannot exist ten years later; worldgen skips people who do not fit (WG-34) |
-| `writers_notes` | optional, **human only** | always shown to the model when they are on stage; the model never writes this field |
+| `writers_notes` | optional, **human only** | never shown to the model (IDN-02): guidance for whoever writes this person; what a note asks for belongs in the fields above. The model never writes this field |
 | `depth_reference` | optional long Markdown | pulled only on demand, never by default |
+
+Almost every field above becomes a line of the person's **identity card** (05 §2.1), in their
+own words, every time they decide. Write them as tendencies and history, never as senses or
+knowledge of the present: "keeps checking where everyone in the room is" is a habit, "knows where
+everyone is without looking" would grant a sense nobody has. Where people are, what is in the gun and
+who is lying come from what the person perceives, not from their dossier. Kept off the card:
+`writers_notes`, `depth_reference`, *does not know*, who knows a secret, `disposition`, trained
+responses (code's reflexes), `resource_constraints` (a count that goes stale) and the numbers.
 
 Voice lines are the most important craft element. Rules that make them work:
 
