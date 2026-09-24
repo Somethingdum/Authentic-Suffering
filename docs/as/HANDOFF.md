@@ -33,6 +33,25 @@ DeepSeek's to build. The kit-maker writes contracts, tests, docs and instruction
 Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo
 (git stash / scratch patch) — the content filter kept stopping replies while its tests were being
 written; resume it with neutral wording (a speaker who faints, not one who dies).
+Owner requirements queued (2026-09-24, in the owner's words where it matters; specify in this order):
+- **Appearance, smell, condition, clothing** (new senses work, amends P2 bodies/items, P3 perception, P4 packet
+  and cues, P10 infected): everyone and everything has a visual identity in high detail (hair, faces, marks,
+  clothes in layers and slots with state, insignia; concealment under layers) that people read to judge each
+  other — "never judge a book by its cover is a bold-faced lie". Smell is a real sense (sources, distance,
+  wind, rooms; you get used to your own). Grime / blood / gore on body and clothes; washing and changing.
+  Gore camouflage works on ordinary infected (CODEX: not on Lurkers, by heat) at an infection-exposure cost,
+  and people avoid you until you wash. Nakedness: exposure and no protection, and a shock to most people —
+  strictly non-sexual.
+- **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
+  captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
+  a settlement's law response, reputation that travels; the player's character pays for crossing their own
+  values (nerve, intrusive memories, sleep). The owner intends to push atrocity edge cases: the world must
+  answer with Authentic Suffering, never a lecture.
+- **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
+  group talk, distinct voices.
+- **The wet strain corrections** (D-77, D-80) and **Willis / the cheat cure** (D-78, D-79) — with P12's
+  cheat system.
+
 Known fault for step 6 (B6): CAS-012 (a witnessed theft becomes a rumour) can never fire — an
 ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a contract change.
 
