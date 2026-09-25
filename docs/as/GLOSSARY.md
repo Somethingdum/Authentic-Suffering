@@ -136,7 +136,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | forced act | what a person or one of the dead does and nothing else until it ends, put there by the console (CHEAT-19) | — | puppet, mind control |
 | show | what the console makes happen that the world has no rules for: seen, remembered, told, and nothing more (CHEAT-18) | — | illusion |
 | blast | an explosion the console sets off: burns by distance, doors blown, a 180 dB bang (CHEAT-19) | — | — |
-| the roast | what Willis says to the dead at every death, from their own record (DEATH-13) | — | eulogy |
+| the roast | what Willis says in the frozen moment of every death of the PC, from their own record (DEATH-13) | — | eulogy |
+| doom | the moment a person's death becomes certain — bleeding the best care could no longer stop, the wet strain's last minutes, or the killing blow itself; nothing undoes it, and a doom that leaves time makes them scream (DOOM-01..05; the `dooms` table) | — | fate, death sentence |
+| the Doom scene | what the PC lives through at its doom: the frozen moment, Willis, the thing that takes him, the Voice (VOICE-01) | — | cutscene |
+| the Voice | the one who speaks in the Doom scene after Willis is taken: unnamed on every screen and in every prompt (canon: `docs/as/sources/THE_VOICE.md`) | — | narrator, god |
+| the loan | the console's power used by anyone but Willis: it is his; he mocks them twice as hard and collects after the death (D-106) | — | — |
 | seal | the guard that lets the game talk only to this machine and the owner's model machines (02 §9, SEAL-01..05) | — | firewall, sandbox |
 | Act / Say / Cheat | the Play input's three fields, sent together as `turn_compose`; Cheat only while the console is open (D-103) | "Act", "Say", "Cheat" | Do box |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |

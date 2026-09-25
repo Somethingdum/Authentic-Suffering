@@ -36,6 +36,7 @@ TABLE_OWNERS: dict[str, str] = {
     "infections": "physical.bodies",
     "conditions": "physical.bodies",
     "grips": "physical.bodies",
+    "dooms": "physical.bodies",
     "infected_state": "world.infected",
     "items": "physical.objects",
     "lots": "physical.objects",

@@ -1,5 +1,6 @@
 // The death screen, and Willis at every death (10_UI §2.6; P12, D-105: "When you die, regardless of
-// Wildcard activation, you see Willis. He mocks and roasts you joyously over your mistakes."). PROTECTED.
+// Wildcard activation, you see Willis. He mocks and roasts you joyously over your mistakes."). He came
+// in the frozen moment (D-106, doom.spec.js); the screen keeps his lines and the Voice's words. PROTECTED.
 import { describe, expect, test } from 'vitest'
 import DeathScreen from '../screens/DeathScreen.vue'
 import { BANNED_WORDS, ID_PATTERN, TEXT } from '../words.js'
@@ -16,16 +17,31 @@ async function dead(...names) {
 const lines = (w, id) => byId(w, id).map((x) => x.text())
 
 describe('the death screen', () => {
-  test('Willis is there at once, laughing, and his lines follow', async () => {
-    const { store, sock, w } = await dead('death_pending')
+  test("Willis's lines and the Voice's words are there at once; its last word follows", async () => {
+    const { store, sock, w } = await dead('death_voice_pending')
+    const first = fixture('death_voice_pending').data.death
     expect(store.screen).toBe('dead')
     expect(one(w, 'death-willis').text()).toContain(TEXT.death.willis)
-    expect(one(w, 'death-willis-pending').text()).toBe(TEXT.death.willisArriving)
-    expect(byId(w, 'death-willis-line')).toEqual([])
+    expect(has(w, 'death-willis-pending')).toBe(false)
+    expect(lines(w, 'death-willis-line')).toEqual(first.willis)
+    expect(one(w, 'death-voice').text()).toContain(TEXT.death.voice)
+    expect(lines(w, 'death-voice-line')).toEqual(first.voice)
+    expect(one(w, 'death-voice-pending').text()).toBe(TEXT.death.voicePending)
     sock.emit(fixture('death_willis'))
     await flush()
-    expect(has(w, 'death-willis-pending')).toBe(false)
-    expect(lines(w, 'death-willis-line')).toEqual(fixture('death_willis').data.death.willis)
+    const d = fixture('death_willis').data.death
+    expect(has(w, 'death-voice-pending')).toBe(false)
+    expect(lines(w, 'death-voice-line')).toEqual(d.voice)
+    expect(d.voice.slice(0, first.voice.length)).toEqual(first.voice)
+  })
+
+  test('a server that still sends Willis late: he is on his way', async () => {
+    const late = fixture('death_voice_pending')
+    Object.assign(late.data.death, { willis: [], willis_pending: true, voice: [], voice_pending: false })
+    const { w } = await dead(late)
+    expect(one(w, 'death-willis-pending').text()).toBe(TEXT.death.willisArriving)
+    expect(byId(w, 'death-willis-line')).toEqual([])
+    expect(has(w, 'death-voice')).toBe(false)
   })
 
   test("the dead person's own story: who, when, how, the last moments, their own choices", async () => {

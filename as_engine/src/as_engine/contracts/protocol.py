@@ -42,7 +42,7 @@ OUTBOUND_ACTIONS = (
     "import_result", "intake_progress", "intake_result", "quickmake_result", "worldgen_progress",
     "runs", "run_deleted", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
-    "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done", "code_result",
+    "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done", "code_result", "doom",
 )
 
 Screen = Literal["connect", "home", "wizard", "worldgen", "play", "dead"]
@@ -254,7 +254,7 @@ class OutTurnResult(Strict):
 class OutTurnRejected(Strict):
     reason_code: Literal["impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action", "busy", "dead",
                          "no_run", "empty", "suggestion_stale", "intake_failed", "no_models", "model_swapped", "turn_failed",
-                         "decision_held"]
+                         "decision_held", "doomed_words"]
     message: str
     clarify: str | None = None
 
@@ -313,6 +313,20 @@ class OutLanes(Strict):
 
 class OutDeath(Strict):
     death: DeathView
+
+
+class DoomBeat(Strict):
+    """D-106 (service.voice VOICE-01): one beat of the Doom scene, shown after ``pause_ms``."""
+
+    kind: Literal["scene", "willis", "snatch", "voice"]
+    text: str
+    pause_ms: int = Field(ge=0, le=10_000)
+
+
+class OutDoom(Strict):
+    """D-106: the Doom scene, pushed before the result of the moment in which the PC's death became certain."""
+
+    beats: list[DoomBeat]
 
 
 class OutView(Strict):
@@ -389,7 +403,7 @@ OUT_MODELS: dict[str, type[Strict] | None] = {
     "intake_result": None, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns, "run_deleted": OutRunDeleted,
     "run_loaded": OutRunLoaded, "saved": OutSaved, "turn_progress": OutTurnProgress, "turn_result": OutTurnResult,
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,
-    "death": OutDeath, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
+    "death": OutDeath, "doom": OutDoom, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
     "dev_data": OutDevData, "error": OutError, "worlds": OutWorlds, "world_file": OutWorldFile, "settings": OutSettings,
     "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone,
     "code_result": OutCodeResult,

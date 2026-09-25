@@ -196,7 +196,8 @@ Handlers (P8):
           callback has none to give); tr.done(outcome.ok) as soon as run_turn returns (before
           turn_result / turn_rejected); on an exception or a cancel tr.done(False).
         outcome = await turn.pipeline.run_turn(session, msg, progress).
-        ok -> push turn_result {turn_index, narration, view = view(), notices, degraded}; push
+        ok -> (P12, D-106) outcome.doom not empty -> push doom {beats: outcome.doom} first (the
+          Doom scene); push turn_result {turn_index, narration, view = view(), notices, degraded}; push
           story {story()}; outcome.died -> await self.on_death() (P12, D-105: the death screen
           and Willis).
         not ok -> push turn_rejected {reason_code = rejected_code, message = rejected_message,
@@ -508,11 +509,15 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death(self):
-        """P12 (DEATH-11, DEATH-13, D-105): after a turn in which the PC died. Push death
-        {service.death.build_death_view(store, pc_id)} at once; when its willis_pending is true,
-        await service.death.roast(session) (Willis, at every death, whatever the settings) and push
-        death again with his lines (willis filled, willis_pending false) and story {story()} (his
-        lines are in it, kind 'willis'). The turn task's own final state push says screen 'dead'."""
+        """P12 (DEATH-11, D-105, D-106): after a turn in which the PC died. Willis collects: meta
+        cheat_active '1' -> CHEAT_DEACTIVATED {reason: 'willis_collects'} (writer kernel.meta, origin
+        'cheat', writing cheat_active '0'; the console closes, the run stays a Sandbox). Push death
+        {service.death.build_death_view(store, pc_id)} at once (Willis's lines from the frozen moment
+        are in it); when its voice_pending is true, paragraphs = await service.voice.voice(session,
+        'after') (VOICE-09) — its call recorded (lanes.calllog.record) and each paragraph stored as
+        story kind 'voice_after' at the death's turn — then push death again (voice filled,
+        voice_pending false) and story {story()}. The turn task's own final state push says screen
+        'dead'."""
         raise NotImplementedError("P12")
 
 

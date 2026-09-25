@@ -516,6 +516,9 @@ class GameService:
                 raise
             await tr.done(o.ok)
             if o.ok:
+                if o.doom:
+                    from ..contracts.protocol import OutDoom
+                    await self.push(out("doom", OutDoom(beats=o.doom)))
                 await self.push(out("turn_result", OutTurnResult(turn_index=o.turn_index, narration=o.narration, view=self._view(),
                                                                  notices=o.notices, degraded=o.degraded)))
                 await self.push(out("story", OutStory(entries=self._story())))
@@ -753,13 +756,36 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death(self):
+        from ..contracts.events import Event, EventType, WriteOp, WriteRecord
         from ..contracts.protocol import OutDeath, OutStory
-        from . import death
+        from ..kernel import clock
+        from ..lanes.calllog import record
+        from . import death, voice
+        from .session import append_story
         s = self.session
+        if s.store.meta("cheat_active") == "1":   # D-106: Willis collects
+            with s.store.transaction() as tx:
+                tx.commit_event(Event(type=EventType.CHEAT_DEACTIVATED, writer="kernel.meta", origin="cheat", at=clock.now(tx),
+                                      turn_index=clock.turn_index(tx), payload={"reason": "willis_collects"},
+                                      writes=[WriteRecord(op=WriteOp.UPDATE, table="meta", key={"key": "cheat_active"},
+                                                          values={"value": "0"})]))
         dv = death.build_death_view(s.store, s.pc_id)
         await self.push(out("death", OutDeath(death=dv)))
-        if dv.willis_pending:
-            await death.roast(s)
+        if dv.voice_pending:
+            calls = []
+            prev = s.client.on_call
+            s.client.on_call = lambda q, r: calls.append((q, r))
+            try:
+                paragraphs = await voice.voice(s, "after")
+            finally:
+                s.client.on_call = prev
+            with s.store.transaction() as tx:
+                for q, r in calls:
+                    record(tx, q, r)
+                T = tx.query_one("SELECT turn_index FROM events WHERE type='DEATH' AND json_extract(payload, '$.body_id')=? "
+                                 "ORDER BY seq DESC", (s.pc_id,))[0]
+                for p in paragraphs:
+                    append_story(tx, T, "voice_after", p)
             await self.push(out("death", OutDeath(death=death.build_death_view(s.store, s.pc_id))))
             await self.push(out("story", OutStory(entries=self._story())))
 

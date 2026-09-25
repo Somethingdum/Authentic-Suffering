@@ -18,13 +18,20 @@
       ],
       "truth_reveal": [],
       "willis": [
-        "Ha! Oh, that was beautiful. Do it again.",
-        "Anyway. Coffee's getting cold. That was your only one, by the way."
+        "Huh.",
+        "Why am I here? I don't know you. Who even are—"
       ],
       "willis_pending": false,
       "can_new_life_here": false,
       "can_load": false,
-      "world_id": null
+      "world_id": null,
+      "voice": [
+        "You want to know why. Everyone does. I have built this place every way it can be built, every stone of it, since before the atoms had names, and I got sick of watching it stand. So now I push. Once, at the right place, and I watch it go. The most fun game of dominoes there ever was.",
+        "Day 211, 21:40: you chose to leave the stockroom, thinking \"I'll be quick.\" Day 212, 03:12: something scraped behind the dumpster. You noticed it. You did nothing. Do you know how much effort it takes to keep a runner in one alley for two days? Mara knows. She was the bait. I didn't have to touch you once. I gave you a revolver and Mara. And still.",
+        "Did you know something has been in that alley with you? For six hours. You never noticed. In about 30 seconds you are going to die. I won't tell you how. You should have paid more attention. Like I did.",
+        "And that is how. Teeth, the forearm, the dark. Every piece had a cause. Every piece was mine. Until my next game, when there's none of you left."
+      ],
+      "voice_pending": false
     }
   }
 }

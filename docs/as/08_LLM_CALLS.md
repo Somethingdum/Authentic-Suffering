@@ -85,7 +85,9 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | dossier_intake / pc_quickmake | A | no | JSON | content tools | — |
 | cheat_persona | B | no | text | cheat commands | falls back to canned persona lines |
 | cheat_interpret | A | no | CheatPlan | a plain-words line in the Cheat field (D-103) | the console would understand only /commands |
-| willis_roast | A | no | WillisRoast | every death of the PC (D-105) | falls back to service.death.fallback_roast: Willis still comes, in fewer words |
+| willis_roast | A | no | WillisRoast | the PC's Doom, the frozen moment (D-105, D-106): at most 3 lines, 6 in his debt, cut off mid-sentence | falls back to service.death.fallback_roast: Willis still comes (in his debt / met before / a stranger) |
+| the_voice | A | no | VoiceMessage | the PC's Doom ('before': the chain, what was near, the upper hand, how long — never how) and after the death ('after': how) (D-106, VOICE-06) | falls back to service.voice.fallback_voice: the architect, the chain walked, the time left |
+| doom_guard | B | no | DoomGuardOutput | a doomed PC's Act / Say words: do they tell anything about the end that ordinary people do not know? (DOOM-07) | falls back to turn.intake.doom_words (the phrase check) |
 | probe | A/B | per probe | JSON/text | Connect screen, bench | — |
 
 **Ablation duty** (plan §17.3 LAW): `tools/as/eval.py --ablate <call_class>` runs the canonical

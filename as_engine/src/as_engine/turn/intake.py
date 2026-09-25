@@ -14,6 +14,16 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      packet = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0). info = {'remainder': None,
      'addressee': None}. text = (submit.text or '').strip() — every later use of "the text" means
      this stripped text.
+  DOOM-07 (1b, D-106) The doomed cannot tell. When the PC is alive and doomed
+     (physical.bodies.doomed(tx, pc) is not None), submit.mode is 'do' or 'say' and the text is not
+     empty: one DOOM_GUARD call (lane B; build_request(config, DOOM_GUARD, turn_index = T, actor_id =
+     the PC, context = ctx = DoomGuardContext(text), json_schema =
+     lanes.schemas.to_lm_schema(DoomGuardOutput))); its ``tells`` true — or, when the call fails in
+     any way, doom_words(text) true — -> Rejected('doomed_words', DOOMED_WORDS). Nothing about the
+     end of life that ordinary people don't know gets out: the voice, what it said, that the death
+     is certain, when or how. (The owner: "It should be explicitly rejected ... It will just not
+     let you.")
+  doom_words(text) -> bool: DOOM_WORDS_RE.search(text) is not None (the fallback check).
   INTAKE-02 (2) A suggestion chip (submit.suggestion_ref): entry =
      session.extras['suggestions'][ref] (service.view writes them) — missing ->
      Rejected('suggestion_stale', "That option is gone; things have changed.").
@@ -89,6 +99,7 @@ record_pc_input = narration.lint.record_pc_input(tx, turn_index, text, tx.rules.
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -108,6 +119,10 @@ NONE_MESSAGES: dict[str, str] = {
     "not_an_action": "That isn't something you do in the world. Use Ask for questions.",
 }
 PLAYER_REASON = "The player chose this."
+DOOMED_WORDS = "The words won't come. Not those words."
+DOOM_WORDS_RE = re.compile(
+    r"\b(voices?|whisper\w*|told me|telling me|spoke to me|talking to me|(seconds?|minutes?|hours?) (left|to live)"
+    r"|die in (about |approximately )?\w+ (seconds?|minutes?|hours?))\b", re.IGNORECASE)
 
 
 class Rejected(Exception):
@@ -129,4 +144,8 @@ def addressee_for(session: "Session", packet: "SkullPacket", submit: "InTurnSubm
 
 def record_input(tx: "Tx", turn_index: int, mode: str, raw_text: str, mapped: dict) -> "Event":
     raise NotImplementedError("P7")
+def doom_words(text: str) -> bool:
+    raise NotImplementedError("P12")
+
+
 from ._impl_intake import *  # noqa

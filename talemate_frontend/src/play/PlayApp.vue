@@ -6,11 +6,13 @@
       <button type="button" data-testid="error-dismiss" @click="store.clearError()">{{ TEXT.dismiss }}</button>
     </div>
     <SettingsDialog v-if="store.settingsOpen" />
+    <DoomOverlay v-if="store.doom" />
   </div>
 </template>
 
 <script setup>
 import { computed, provide } from 'vue'
+import DoomOverlay from './components/DoomOverlay.vue'
 import SettingsDialog from './components/SettingsDialog.vue'
 import ConnectScreen from './screens/ConnectScreen.vue'
 import ContentScreen from './screens/ContentScreen.vue'

@@ -69,6 +69,9 @@ async execute(session, command) -> CheatResult   (CHEAT-04..08)
     at, chill 0. A dead body -> "They're past a bandage, Boss. Try /revive."
   god: meta 'god_bodies' (a JSON list, sorted) gains or loses the body (UPSERT, kernel.meta).
     physical.bodies.apply_harm then gives that body no wound (L12: per body).
+  DOOM-08 (D-106) The console cannot undo a doom (physical.bodies DOOM-05) — the power is Willis's,
+    and what dooms is above him: heal, cure and god on of a living body that has a dooms row change
+    nothing and answer DOOM_REFUSAL.
   tp: the PC's positions row -> the place, its first anchor by anchor_id (its point) or, with
     none, the place's centre; since_ms = at, hidden 0 (physical.space; not a MOVE: no one sees it).
   set: a letter -> bodies.special[letter] (physical.bodies) and, for an actor, a dossier_deltas
@@ -115,7 +118,9 @@ async execute(session, command) -> CheatResult   (CHEAT-04..08)
     'cheat'); dead already -> 'Already dead, Boss. Thorough, though.'; a body in the reality
     exception (physical.bodies.excepted, D-102) -> "Reality lost that argument a long time ago, Boss."
   revive: a dead human, lurker or animal body -> the heal writes plus alive 1, dead_at /
-    death_event / false_dead_until NULL, awareness 'awake', posture 'standing'; its pending
+    death_event / false_dead_until NULL, awareness 'awake', posture 'standing', and its dooms row
+    deleted (the death fulfilled it: a new life owes nothing, D-106); a forced act still running
+    ends (physical.bodies.force_act(..., until = at, origin 'cheat')); its pending
     REANIMATION timers cancelled (kernel.clock.cancel, reason 'revived'); its infections stay
     exactly as they were — nothing cures (CMG §42.2). Alive -> "They're still breathing, Boss.";
     an infected body -> "That one's past saving, Boss."
@@ -280,6 +285,8 @@ ACTIVATION_LINE = ("Alright, alright, settle down. 'Mr. Cheater Man' reporting f
                    "we rewrite today?")
 DEACTIVATION_LINE = "Right you are, Boss. Reality re-solidifying... mostly. Enjoy the ripples."
 SHIMMER_NOTICE = "A barely perceptible shimmer passes over the world for a moment."
+# The console's answer to heal, cure or god on of a doomed body (DOOM-08).
+DOOM_REFUSAL = "Not that one, Boss. That's above my pay grade. Way above."
 RETIRED_SPAWNS: dict[str, str] = {
     "campervan": ("Whoa there, Boss! The 'Camper-Van of the Gods'? Ah, you speak of legends! That thing "
                   "was so unbelievably cool it started to unravel reality just by existing. The devs had "

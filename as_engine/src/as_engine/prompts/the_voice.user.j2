@@ -1,0 +1,11 @@
+{% set f = ctx.facts %}{{ f.pc_name }}. Alive for {{ f.lived }}.
+{% if ctx.moment == "before" %}{% set s = f.seconds_left %}Time they have left: {% if s == 0 %}none — it is happening this very instant{% elif s < 10 %}a few seconds{% elif s < 90 %}about {{ s }} seconds{% elif s < 5400 %}about {{ (s / 60) | round | int }} minutes{% else %}about {{ (s / 3600) | round | int }} hours{% endif %}.
+{% endif %}The chain, oldest first (choice = what they chose, and what they typed; consequence = what came of it; unseen = what they never saw; clue = what they noticed and could not place):
+{% for b in f.chain %}- {{ b.when }} [{{ b.kind }}] {{ b.text }}{% if b.said %} — they typed: "{{ b.said }}"{% endif %}
+{% else %}- (nothing recorded but the end itself)
+{% endfor %}{% if f.threat %}What has been near them: {{ f.threat }}{% if f.threat_near %}, for {{ f.threat_near }}{% endif %}.
+{% endif %}{% if f.upper_hand %}The upper hand you gave them: {{ f.upper_hand | join(", ") }}.
+{% endif %}{% if ctx.moment == "after" %}How it happened: {{ f.manner }}
+What you said to them before:
+{% for p in f.said_before %}- {{ p }}
+{% endfor %}{% endif %}

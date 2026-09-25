@@ -22,15 +22,21 @@
         "You never saw it: Mara Voss: Bar the back door — \"keep them out, whatever it costs\""
       ],
       "willis": [
-        "Ha! Oh, that was beautiful. Do it again.",
-        "\"I go see what the noise is.\" That's what you went with. Incredible.",
-        "You opened a door in a world full of the dead to find out what the noise was. The noise was lunch. You were lunch.",
-        "Anyway. Coffee's getting cold. Go on, try again. I'll be watching."
+        "Oh, it's you from earlier.",
+        "The noise. You went outside to see what the noise was. In this world. I laughed out loud.",
+        "Yeah, this is going to be neat. Hold still. Well, you can't not, can you—"
       ],
       "willis_pending": false,
       "can_new_life_here": true,
       "can_load": true,
-      "world_id": null
+      "world_id": null,
+      "voice": [
+        "You want to know why. Everyone does. I have built this place every way it can be built, every stone of it, since before the atoms had names, and I got sick of watching it stand. So now I push. Once, at the right place, and I watch it go. The most fun game of dominoes there ever was.",
+        "Day 211, 21:40: you chose to leave the stockroom, thinking \"I'll be quick.\" Day 212, 03:12: something scraped behind the dumpster. You noticed it. You did nothing. Do you know how much effort it takes to keep a runner in one alley for two days? Mara knows. She was the bait. I didn't have to touch you once. I gave you a revolver and Mara. And still.",
+        "Did you know something has been in that alley with you? For six hours. You never noticed. In about 30 seconds you are going to die. I won't tell you how. You should have paid more attention. Like I did.",
+        "And that is how. Teeth, the forearm, the dark. Every piece had a cause. Every piece was mine. Until my next game, when there's none of you left."
+      ],
+      "voice_pending": false
     }
   }
 }

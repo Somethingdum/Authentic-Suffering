@@ -87,6 +87,8 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.CHEAT_PERSONA: CallRegime(lane=B, temperature=0.9, max_tokens=150, deadline_s=15),
         CallClass.CHEAT_INTERPRET: CallRegime(lane=A, temperature=0.2, max_tokens=900, deadline_s=60),
         CallClass.WILLIS_ROAST: CallRegime(lane=A, temperature=0.95, max_tokens=700, deadline_s=45),
+        CallClass.THE_VOICE: CallRegime(lane=A, temperature=0.95, max_tokens=1400, deadline_s=90),
+        CallClass.DOOM_GUARD: CallRegime(lane=B, temperature=0.0, max_tokens=40, deadline_s=15),
         CallClass.PROBE: CallRegime(lane=B, temperature=0.0, max_tokens=64, deadline_s=30),
     }
 
@@ -147,6 +149,9 @@ class HarmRules(Strict):
     minor_clot_min: float = 10.0
     unconscious_at_blood_loss_pct: float = 30.0
     death_at_blood_loss_pct: float = 40.0
+    doom_horizon_min: float = 30.0          # D-106 DOOM-01: certain death this close is a doom (up to half an hour)
+    doom_infection_lead_min: float = 5.0    # D-106 DOOM-02: the strain's death is known this far ahead
+    doom_overdue_min: float = 2.0           # D-106 DOOM-05: the safety net's slack after death_by
     impairment_from_blood_loss: list[tuple[float, int]] = Field(default_factory=lambda: [(15.0, 1), (25.0, 2)])
     impairment_max: int = 6
     pain_per_severity: dict[str, int] = Field(default_factory=lambda: {

@@ -13,9 +13,11 @@ import yaml
 
 from as_engine.contracts.calls import (
     AuditContext,
+    ChainBeat,
     CheatInterpretContext,
     CheatPersonaContext,
     CheatScene,
+    DoomGuardContext,
     DossierIntakeContext,
     GuideContext,
     IntakeContext,
@@ -28,6 +30,8 @@ from as_engine.contracts.calls import (
     SayMyWayContext,
     SceneEntry,
     SummaryContext,
+    VoiceContext,
+    VoiceFacts,
     WillisRoastContext,
     WorldgenContext,
 )
@@ -154,5 +158,12 @@ def render_kwargs() -> dict[CallClass, dict]:
             pc_name="Owen Marsh", lived="2 days", turns=41, cause_text="You bled to death. The shambling figure bites your forearm.",
             choices=["Open the back door", "Walk into the alley"], typed=["I open the back door.", "I go see what the noise is."],
             bent_rules=False, ironman=True, rises=True))},
+        CallClass.THE_VOICE: {"ctx": VoiceContext(moment="before", facts=VoiceFacts(
+            pc_name="Owen Marsh", lived="2 days", seconds_left=30,
+            chain=[ChainBeat(when="day 210, 21:40", kind="choice", text="Fire at the dog", said="I shoot the dog."),
+                   ChainBeat(when="day 210, 21:41", kind="unseen", text="one of the dead went to the Rear alley"),
+                   ChainBeat(when="day 211, 03:12", kind="clue", text="Something creaks in the stockroom.")],
+            threat="a lurker", threat_near="6 hours", upper_hand=["revolver", "Mara"]))},
+        CallClass.DOOM_GUARD: {"ctx": DoomGuardContext(text='I grab Mara. "Something told me I have thirty seconds left."')},
         CallClass.PROBE: {"ctx": ProbeContext(probe="hello")},
     }

@@ -1,12 +1,11 @@
-{% set f = ctx.facts %}The dead: {{ f.pc_name }}. They lasted {{ f.lived }} ({{ f.turns }} moment{% if f.turns != 1 %}s{% endif %} of their own).
-How they died: {{ f.cause_text }}
-{% if f.choices %}Their own choices on the way here, newest first:
+{% set f = ctx.facts %}The one frozen in front of you: {{ f.pc_name }}. They have lasted {{ f.lived }} ({{ f.turns }} moment{% if f.turns != 1 %}s{% endif %} of their own).
+{% if f.in_debt %}They are in your debt. What they did with your power this life, oldest first:
+{% for b in f.borrowed %}- {{ b }}
+{% endfor %}{% endif %}{% if f.choices %}Their last choices, newest first:
 {% for c in f.choices %}- {{ c }}
-{% endfor %}{% endif %}{% if f.typed %}What they said they would do, in their own words, oldest first:
+{% endfor %}{% endif %}{% if f.typed %}Their last words about what they would do, oldest first:
 {% for t in f.typed %}- "{{ t }}"
-{% endfor %}{% endif %}{% if f.bent_rules %}They had bent reality's rules with the console. It did not help.
-{% endif %}{% if f.ironman %}This was their only life. There is no going back to an earlier save.
-{% endif %}{% if f.rises %}They will get up again in a few hours, as one of the dead.
-{% endif %}{% if f.met_him %}They had met you in the world. You remember them.
-{% endif %}{% if f.by_his_hand %}You killed them yourself.
+{% endfor %}{% endif %}{% if f.ironman %}This is their only life. There is no going back to an earlier save.
+{% endif %}{% if f.met_him %}You have met them before.{% else %}You have never met them.{% endif %}
+{% if f.by_his_hand %}You helped this along yourself.
 {% endif %}

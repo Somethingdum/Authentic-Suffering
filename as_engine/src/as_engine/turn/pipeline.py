@@ -131,7 +131,10 @@ simulate — stages 0-12 in ONE store transaction:
     due_between(tx, -1, final), T, final) (P9: fire, dispatch, propagate, sweep) — until none is
     left (S08). Then action.tasks.advance(tx, a, final, T) for
     each actor with an active task (sorted); physical.bodies.progress(tx, b, final, T, rng) for each
-    living body (sorted); clock.advance_event(tx, final, 'turn'); perception.compile_scene(tx, pc,
+    living body (sorted) — the screams of a doom that began there (its NOISE events of kind
+    'screaming', DOOM-04) are heard as a wave's are: perception.compile_aftermath(tx, h, those
+    events, their latest at, T) for EVERYONE and each of select.reached(tx, those events, T);
+    clock.advance_event(tx, final, 'turn'); perception.compile_scene(tx, pc,
     final, T) (the PC's view as the window closes: the play view and the narrator read it);
     scenes(tx, pc, T, t0, final); every buffered call -> lanes.calllog.record; g =
     audit.commit_gate.compute(tx, T); commit_gate_log row (bookkeep 'audit'); not g.passed ->
@@ -163,6 +166,13 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
     Ledger 13 {holders: the sorted holders that go on}.
   S16 PC compile: npk = narration.narrator.build_narrator_packet(tx, pc, T, t0, settings); names =
     narration.narrator.known_names(tx). Ledger 16 {lines: len(npk.lines)}.
+  VOICE-07 (P12, D-106) When the PC is doomed and its scene has not played
+    (physical.bodies.doomed(store, pc) is not None and service.voice.scene_turn(store, pc) is None:
+    doomed this turn, or between turns by the console), beats = await
+    service.voice.doom_scene(session) runs in the same gather (lane A, after the narration's turn in
+    the lane's queue): Willis in the frozen moment, then the Voice. An exception from it -> beats [],
+    and a repair (kind 'degraded', stage 13, rule 'VOICE-07', detail {error}) in the S18 story
+    transaction.
   S17+S18 narrate + lint (lane A) run CONCURRENTLY with the S14 writeback calls (lane B)
     (asyncio.gather): narration.narrator.narrate(client, npk, canon style 'narration',
     rules.style, config=config, all_known_names=names, turn_index=T) -> (prose, findings,
@@ -195,7 +205,9 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
     narrator's continuity (P11, NARR-09): narration.style.save(tx, style.update_after_turn(
     style.load(tx), prose, style.scene_type(npk)), T); story
     (service.session.append_story): kind 'player' with player_inputs.raw_text (mode 'say' for a
-    say, else 'do'), kind 'notice' for each notice, then kind 'narration'; not passed ->
+    say, else 'do'), kind 'notice' for each notice, (VOICE-07) the Doom scene's beats in order —
+    kind 'willis' for Willis's, 'voice' for the Voice's, 'doom' for the rest — then kind
+    'narration'; not passed ->
     audit.log.repair('lint_fail', 18, 'NARR-07', {findings: each finding's model_dump}); ledger
     17 {attempts}, ledger 18 'ok' | 'degraded' {findings: the findings' rule ids}; the calls
     buffered since stage 13 are recorded here.
@@ -264,6 +276,7 @@ class TurnOutcome:
     degraded: bool = False
     notices: list[str] = field(default_factory=list)
     died: bool = False
+    doom: list = field(default_factory=list)   # P12, D-106: the Doom scene's DoomBeats when the PC was doomed this turn
 
 
 ProgressFn = Callable[[int, str, float], Any]

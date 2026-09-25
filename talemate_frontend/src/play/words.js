@@ -87,6 +87,8 @@ export const TEXT = {
     when: (day, time) => `Day ${day}, ${time}`,
     willis: 'Willis',
     willisArriving: 'Somebody is laughing.',
+    voice: 'In the dark',   // D-106: the Voice has no name, anywhere
+    voicePending: "It isn't finished with you.",
     lastMoments: 'The last moments',
     choices: 'What led here',
     reveal: 'Show me everything',
@@ -97,5 +99,9 @@ export const TEXT = {
     ironman: 'This life is over. The world is still out there.',
     load: 'Load a save',
     newWorld: 'A new life in a new world',
+  },
+  // P12 (D-106): the Doom — the frozen moment when a death becomes certain
+  doom: {
+    next: 'Go on',
   },
 }

@@ -206,8 +206,10 @@ async def simulate(ctx):
         ctx.final = final
         for a in [r[0] for r in tx.query("SELECT DISTINCT actor_id FROM tasks WHERE status='active' ORDER BY actor_id")]:
             tasks.advance(tx, a, final, T)
+        before = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
         for b in [r[0] for r in tx.query("SELECT body_id FROM bodies WHERE alive=1 ORDER BY body_id")]:
             bodies.progress(tx, b, final, T, rng)
+        _hear_the_doomed(ctx, tx, _events_after(tx, before))
         clock.advance_event(tx, final, "turn")
         perception.compile_scene(tx, s.pc_id, final, T)
         scenes(tx, s.pc_id, T, t0, final)
@@ -220,6 +222,21 @@ async def simulate(ctx):
         if not gate.passed:
             raise GateFailed(gate.failures)
         _ledger(tx, T, 12, "ok", {"horizon": ctx.horizon, "final": final, "gate": "all 58"}, 2 if ctx.strict else 1)
+
+
+def _hear_the_doomed(ctx, tx, evs):
+    """DOOM-04 in S12: a doom that began in the window's last progress — its scream — is heard like a
+    wave's events (EVERYONE and whoever it reaches)."""
+    from ..contracts.events import EventType
+    from ..mind import perception
+    from . import select
+    cries = [e for e in evs if e.type == EventType.NOISE and e.payload.get("kind") == "screaming"]
+    if not cries:
+        return
+    s = ctx.session
+    last = max(e.at for e in cries)
+    for h in sorted(set(select.candidates(tx, s.pc_id, ctx.T, ctx.horizon)) | {s.pc_id} | set(select.reached(tx, cries, ctx.T))):
+        perception.compile_aftermath(tx, h, cries, last, ctx.T)
 
 
 async def _after_wave(ctx, tx, evs, wave_idx, max_waves, perceivers):
@@ -449,7 +466,21 @@ async def after_commit(ctx, notices):
 
         from ..audit import portrayal as _portrayal
         retro = _portrayal.jobs(s.config, ctx.judged, T)   # PORT-06: judged after the fact, on lane B
-        (prose, findings, attempts, passed), (groups, wres) = await asyncio.gather(do_narrate(), do_writeback())
+        from ..physical import bodies as _bodies
+        from ..service import voice as _voice
+        play_doom = _bodies.doomed(store, s.pc_id) is not None and _voice.scene_turn(store, s.pc_id) is None
+        doom_failed = []
+
+        async def do_doom():
+            if not play_doom:
+                return []
+            try:
+                return await _voice.doom_scene(s)
+            except Exception as e:  # noqa: BLE001 — VOICE-07: the scene never costs the turn
+                doom_failed.append(repr(e)[:300])
+                return []
+
+        (prose, findings, attempts, passed), (groups, wres), beats = await asyncio.gather(do_narrate(), do_writeback(), do_doom())
         # 14 writeback apply
         await _progress(ctx, 14)
         with store.transaction() as tx:
@@ -494,6 +525,10 @@ async def after_commit(ctx, notices):
                 append_story(tx, T, "player", pin[1], "say" if pin[0] == "say" else "do")
             for n in notices:
                 append_story(tx, T, "notice", n)
+            for bt in beats:   # VOICE-07: the Doom scene, just before the moment's narration
+                append_story(tx, T, {"willis": "willis", "voice": "voice"}.get(bt.kind, "doom"), bt.text)
+            if doom_failed:
+                log_repair(tx, "degraded", 13, "VOICE-07", {"error": doom_failed[0]}, T, clock.now(tx))
             append_story(tx, T, "narration", prose)
             if not passed:
                 log_repair(tx, "lint_fail", 18, "NARR-07", {"findings": [f.model_dump(mode="json") for f in findings]}, T, clock.now(tx))
@@ -514,7 +549,7 @@ async def after_commit(ctx, notices):
                                                              "full_state_hash": full_state_hash(store)})
         died = store.query_one("SELECT alive FROM bodies WHERE body_id=?", (s.pc_id,))[0] == 0
         return TurnOutcome(ok=True, turn_index=T, narration=prose, degraded=(not passed) or bool(notices) or bool(wb_failed),
-                           notices=notices, died=died)
+                           notices=notices, died=died, doom=beats)
     finally:
         s.client.on_call = prev
 

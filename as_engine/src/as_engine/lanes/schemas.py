@@ -57,11 +57,13 @@ from ..contracts.mind import (
     ActorReplyV2,
     CascadeSuggestion,
     CheatPlan,
+    DoomGuardOutput,
     IntakeOutput,
     PortrayalVerdict,
     ReflectionOutput,
     RumourDistortion,
     SayMyWayOutput,
+    VoiceMessage,
     WillisRoast,
     WritebackOutput,
 )
@@ -91,6 +93,8 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.CHEAT_PERSONA: None,
     CallClass.CHEAT_INTERPRET: CheatPlan,
     CallClass.WILLIS_ROAST: WillisRoast,
+    CallClass.THE_VOICE: VoiceMessage,
+    CallClass.DOOM_GUARD: DoomGuardOutput,
     CallClass.PROBE: None,
 }
 

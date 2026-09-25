@@ -11,6 +11,12 @@
         <p v-for="(line, i) in d.willis" :key="'w' + i" data-testid="death-willis-line">{{ line }}</p>
       </section>
 
+      <section v-if="(d.voice && d.voice.length) || d.voice_pending" data-testid="death-voice" class="voice">
+        <h2>{{ TEXT.death.voice }}</h2>
+        <p v-for="(p, i) in d.voice" :key="'v' + i" data-testid="death-voice-line">{{ p }}</p>
+        <p v-if="d.voice_pending" data-testid="death-voice-pending">{{ TEXT.death.voicePending }}</p>
+      </section>
+
       <section v-if="d.last_turns.length">
         <h2>{{ TEXT.death.lastMoments }}</h2>
         <p v-for="(t, i) in d.last_turns" :key="'t' + i" data-testid="death-last-turns">{{ t }}</p>

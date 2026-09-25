@@ -122,16 +122,19 @@ class CheatPersonaContext(Strict):
 
 
 class RoastFacts(Strict):
-    """D-105 (service.death.roast_facts): what Willis has to work with — the dead person's own record
-    only; the world's secrets wait for 'Show me everything' (DEATH-10)."""
+    """D-105, D-106 (service.death.roast_facts): what Willis has in the frozen moment — the doomed
+    person's own record only; the world's secrets are the Voice's to tell."""
 
     pc_name: str
     lived: str = Field(description="How long this life lasted: '2 days', '5 hours', '40 minutes'.")
     turns: int = Field(ge=0, description="Moments the player played in this life.")
-    cause_text: str
-    choices: list[str] = Field(default_factory=list, max_length=5, description="Their own choices that led here, newest first.")
+    cause_text: str = Field(default="", description="D-106: empty in the frozen moment — Willis does not know how, and does not care.")
+    choices: list[str] = Field(default_factory=list, max_length=5, description="Their own last choices, newest first.")
     typed: list[str] = Field(default_factory=list, max_length=5, description="What the player typed last, oldest first.")
     bent_rules: bool = Field(default=False, description="The run is a Sandbox: the console was used.")
+    borrowed: list[str] = Field(default_factory=list, max_length=8, description="D-106: what they did with his power this life "
+                                "(the console lines), oldest first.")
+    in_debt: bool = Field(default=False, description="D-106: they used his power and are not him — a loan; he mocks twice as hard.")
     ironman: bool = False
     rises: bool = Field(default=False, description="The body will get up again.")
     met_him: bool = Field(default=False, description="The dead person had met Willis in the world.")
@@ -142,6 +145,42 @@ class WillisRoastContext(Strict):
     """WILLIS_ROAST input (D-105)."""
 
     facts: RoastFacts
+
+
+class ChainBeat(Strict):
+    """D-106: one link of the chain that killed them, from the record (service.voice)."""
+
+    when: str = Field(description="'day 212, 06:05'")
+    kind: Literal["choice", "consequence", "unseen", "clue"]
+    text: str = Field(max_length=300)
+    said: str | None = Field(default=None, max_length=300, description="For a choice: what the player typed that moment.")
+
+
+class VoiceFacts(Strict):
+    """D-106 (service.voice.voice_facts): everything the Voice brags with — all of it from the record."""
+
+    pc_name: str
+    lived: str
+    seconds_left: int = Field(ge=0, description="Before the death: about how long they have; after: 0.")
+    chain: list[ChainBeat] = Field(default_factory=list, max_length=24, description="Oldest first.")
+    threat: str | None = Field(default=None, description="What has been with them, by what it truly is ('a lurker', 'Mara Voss').")
+    threat_near: str | None = Field(default=None, description="For how long it has been near them ('6 hours').")
+    upper_hand: list[str] = Field(default_factory=list, max_length=8, description="What they had going for them.")
+    manner: str | None = Field(default=None, description="Only after the death: how it happened.")
+    said_before: list[str] = Field(default_factory=list, max_length=3, description="After the death: what the Voice said before it.")
+
+
+class VoiceContext(Strict):
+    """THE_VOICE input (D-106)."""
+
+    moment: Literal["before", "after"]
+    facts: VoiceFacts
+
+
+class DoomGuardContext(Strict):
+    """DOOM_GUARD input (D-106, DOOM-07): what a doomed player just tried to do or say."""
+
+    text: str = Field(max_length=2000)
 
 
 class WorldgenContext(Strict):

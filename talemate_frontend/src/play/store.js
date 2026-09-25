@@ -22,7 +22,7 @@ export function createPlayStore(socket, { download } = {}) {
     screen: 'connect', connected: false, busy: false, serverVersion: null, modelsOk: false, hasRuns: false, runId: null,
     lanes: null, models: {}, laneTests: {}, config: null, runs: [], pcs: [], packs: [], contentReport: null, view: null,
     story: [], progress: null, rejection: null, settings: null, changeable: [], ironman: false, sandbox: false,
-    notices: [], death: null, worldgen: null, worlds: [], devData: {}, cheatShimmer: false, error: null, saved: null,
+    notices: [], death: null, doom: null, worldgen: null, worlds: [], devData: {}, cheatShimmer: false, error: null, saved: null,
     composeText: '', mode: 'do', settingsOpen: false, bar: null, wizard: freshDraft(), codeResult: null,
   })
   const send = (action, fields = {}) => socket.send({ action, ...fields })
@@ -36,6 +36,7 @@ export function createPlayStore(socket, { download } = {}) {
   s.clearError = () => { s.error = null }
   s.listPcs = () => send('pcs_list')
   s.revealDeath = () => send('death_reveal')   // P12 (DEATH-10): the truth, only when asked
+  s.dismissDoom = () => { s.doom = null }   // P12, D-106: the frozen moment is over
   s.enterCode = (code) => { s.codeResult = null; send('code_enter', { code }) }   // P12, CHEAT-12: the menu's code box
   s.newLife = (pcRef, settings, worldId = null) => {
     send('run_new', worldId ? { pc_ref: pcRef, settings, world_id: worldId } : { pc_ref: pcRef, settings })
@@ -61,13 +62,14 @@ export function createPlayStore(socket, { download } = {}) {
   })
   on('run_loaded', (d) => {
     s.runId = d.run_id; s.ironman = d.ironman; s.sandbox = d.sandbox; s.settings = d.settings; s.notices = d.notices
-    s.screen = 'play'; s.story = []; s.rejection = null; s.death = null; s.progress = null; s.wizard = freshDraft()
+    s.screen = 'play'; s.story = []; s.rejection = null; s.death = null; s.doom = null; s.progress = null; s.wizard = freshDraft()
     send('settings_get')
   })
   on('view', (d) => { s.view = d.view; s.lanes = d.view?.lanes ?? s.lanes })
   on('story', (d) => { s.story = d.entries })
   on('pcs', (d) => { s.pcs = d.cards })
-  on('death', (d) => { s.death = d.death; s.screen = 'dead' })   // P12, D-105: sent twice — at once, then with Willis
+  on('death', (d) => { s.death = d.death; s.screen = 'dead' })   // P12, D-105/D-106: sent twice — at once, then with the Voice's last word
+  on('doom', (d) => { s.doom = { beats: d.beats || [] } })   // P12, D-106: the Doom scene, before the turn's result
   on('code_result', (d) => {   // taken or not, and nothing about what a code does (CHEATS §2)
     s.codeResult = d.accepted ? 'accepted' : 'rejected'
     if (d.accepted) s.pcs = []   // the New Life list asks again (CHEAT-12)

@@ -392,6 +392,17 @@ CREATE TABLE grips (
   PRIMARY KEY (holder_id, target_id)
 );
 
+-- OWNER physical.bodies   (D-106, DOOM-01..06: the Doom — the moment a person's death became certain)
+CREATE TABLE dooms (
+  body_id     TEXT PRIMARY KEY REFERENCES bodies(body_id),
+  doomed_at   INTEGER NOT NULL,
+  expected_at INTEGER NOT NULL,      -- when it will most likely come (the course as it is)
+  death_by    INTEGER NOT NULL,      -- the latest it can come (the best care anyone could give)
+  kind        TEXT NOT NULL CHECK (kind IN ('bleeding','infection','instant')),
+  cause_event TEXT,                  -- what set it in motion (the worst wound's cause, the infection's)
+  turn_index  INTEGER NOT NULL
+);
+
 -- OWNER physical.bodies   (one condition model for bodies, vehicles, structures, tools — plan §11.4)
 CREATE TABLE conditions (
   condition_id TEXT PRIMARY KEY,
@@ -975,7 +986,7 @@ CREATE TABLE echo_ledger (
 CREATE TABLE story_log (
   entry_id   INTEGER PRIMARY KEY,
   turn_index INTEGER NOT NULL,
-  kind       TEXT NOT NULL CHECK (kind IN ('narration','player','guide','notice','cheat','willis')),   -- willis: D-105, his lines at a death
+  kind       TEXT NOT NULL CHECK (kind IN ('narration','player','guide','notice','cheat','willis','doom','voice','voice_after')),   -- willis: D-105; doom / voice: D-106, the Voice before a death and (voice_after) after it
   mode       TEXT,
   text       TEXT NOT NULL
 );

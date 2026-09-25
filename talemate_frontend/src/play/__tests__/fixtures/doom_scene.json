@@ -1,0 +1,68 @@
+{
+  "type": "as_game",
+  "action": "doom",
+  "data": {
+    "beats": [
+      {
+        "kind": "scene",
+        "text": "Everything stops. The dust hangs in the air. The air itself has stopped moving; somewhere under you the planet has stopped turning. You can still move, but not here. Not in your body. The thing you were fighting is stopped mid-motion, close enough to touch.",
+        "pause_ms": 0
+      },
+      {
+        "kind": "scene",
+        "text": "Then the lights go out. Lights that weren't even there. The sun goes out. Everything is black but the faintest glow of the room you're in.",
+        "pause_ms": 3000
+      },
+      {
+        "kind": "scene",
+        "text": "Something is walking toward you.",
+        "pause_ms": 1500
+      },
+      {
+        "kind": "willis",
+        "text": "Oh, it's you from earlier.",
+        "pause_ms": 900
+      },
+      {
+        "kind": "willis",
+        "text": "The noise. You went outside to see what the noise was. In this world. I laughed out loud.",
+        "pause_ms": 900
+      },
+      {
+        "kind": "willis",
+        "text": "Yeah, this is going to be neat. Hold still. Well, you can't not, can you—",
+        "pause_ms": 900
+      },
+      {
+        "kind": "snatch",
+        "text": "Something huge and jointed takes him out of the dark. A quarter of a second, if that: something like a mantis. A crack, like a shell giving way.",
+        "pause_ms": 250
+      },
+      {
+        "kind": "scene",
+        "text": "Then nothing. There is nothing. It is just you.",
+        "pause_ms": 2000
+      },
+      {
+        "kind": "voice",
+        "text": "You want to know why. Everyone does. I have built this place every way it can be built, every stone of it, since before the atoms had names, and I got sick of watching it stand. So now I push. Once, at the right place, and I watch it go. The most fun game of dominoes there ever was.",
+        "pause_ms": 1200
+      },
+      {
+        "kind": "voice",
+        "text": "Day 211, 21:40: you chose to leave the stockroom, thinking \"I'll be quick.\" Day 212, 03:12: something scraped behind the dumpster. You noticed it. You did nothing. Do you know how much effort it takes to keep a runner in one alley for two days? Mara knows. She was the bait. I didn't have to touch you once. I gave you a revolver and Mara. And still.",
+        "pause_ms": 1200
+      },
+      {
+        "kind": "voice",
+        "text": "Did you know something has been in that alley with you? For six hours. You never noticed. In about 30 seconds you are going to die. I won't tell you how. You should have paid more attention. Like I did.",
+        "pause_ms": 1200
+      },
+      {
+        "kind": "scene",
+        "text": "Then the dust moves again. You are screaming.",
+        "pause_ms": 1500
+      }
+    ]
+  }
+}

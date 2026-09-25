@@ -320,21 +320,33 @@ async def _give(tx, s, a, at, T):
     return True, f"gave {qty} {d.plural if qty > 1 else d.name} to {_name(tx, who)}", "", evs
 
 
+def _doomed(tx, who):
+    """A doomed body that is still alive is beyond the console (DOOM-08)."""
+    from ..physical import bodies
+    return bodies.doomed(tx, who) is not None and _alive(tx, who)[0]
+
+
 async def _heal(tx, s, a, at, T):
+    from .commands import DOOM_REFUSAL
     who, why = _person(tx, s, a)
     if who is None:
         return False, why, "", []
     alive, _k = _alive(tx, who)
     if not alive:
         return False, "They're past a bandage, Boss. Try /revive.", "", []
+    if _doomed(tx, who):
+        return False, DOOM_REFUSAL, "", []
     ev = _ev(tx, "physical.bodies", _heal_writes(tx, who, at), {"command": "heal", "body_id": who}, at, T, target_ids=[who])
     return True, f"healed {_name(tx, who)}", "", [ev]
 
 
 async def _god(tx, s, a, at, T):
+    from .commands import DOOM_REFUSAL
     who, why = _person(tx, s, a)
     if who is None:
         return False, why, "", []
+    if a["on"] and _doomed(tx, who):
+        return False, DOOM_REFUSAL, "", []
     g = god_bodies(tx)
     g = (g | {who}) if a["on"] else (g - {who})
     ev = _ev(tx, "kernel.meta", [_W("meta", {"key": "god_bodies", "value": json.dumps(sorted(g))}, "upsert", {"key": "god_bodies"})],
@@ -562,6 +574,7 @@ async def _kill(tx, s, a, at, T):
 
 async def _revive(tx, s, a, at, T):
     from ..kernel import clock
+    from ..physical import bodies
     who, why = _person(tx, s, a)
     if who is None:
         return False, why, "", []
@@ -570,8 +583,13 @@ async def _revive(tx, s, a, at, T):
         return False, "They're still breathing, Boss.", "", []
     if kind not in ("human", "lurker", "animal"):
         return False, "That one's past saving, Boss.", "", []
-    evs = [_ev(tx, "physical.bodies", _heal_writes(tx, who, at, revive=True), {"command": "revive", "body_id": who}, at, T,
-               target_ids=[who])]
+    ws = _heal_writes(tx, who, at, revive=True)
+    if tx.query_one("SELECT 1 FROM dooms WHERE body_id=?", (who,)) is not None:   # D-106: the death fulfilled it
+        ws.append(_W("dooms", {}, "delete", {"body_id": who}))
+    evs = [_ev(tx, "physical.bodies", ws, {"command": "revive", "body_id": who}, at, T, target_ids=[who])]
+    act = bodies.forced(tx, who, at)
+    if act is not None:
+        evs.append(bodies.force_act(tx, who, act, at, at, T, evs[0].event_id, origin="cheat"))
     for q in tx.query("SELECT queue_id FROM event_queue WHERE status='pending' AND type='REANIMATION' AND "
                       "json_extract(payload,'$.body_id')=? ORDER BY queue_id", (who,)):
         evs.append(clock.cancel(tx, q[0], "revived", at, None, T))
@@ -929,6 +947,9 @@ async def _cure(tx, s, a, at, T):
             return False, "Dead and staying dead, Boss. Nothing to cure.", "", []
         ev = bodies.kill(tx, risen, "cured", at, T, s.rng, extra={"core_intact": 0})
         return True, f"cured what {_name(tx, who)} became: it dies at once", "", [ev]
+    from .commands import DOOM_REFUSAL
+    if _doomed(tx, who):
+        return False, DOOM_REFUSAL, "", []
     rows = [r[0] for r in tx.query("SELECT pathway FROM infections WHERE body_id=? ORDER BY pathway", (who,))]
     if not rows:
         return False, "Nothing in them to cure, Boss.", "", []

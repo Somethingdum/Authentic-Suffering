@@ -115,6 +115,12 @@ Every Actor:
   due. There is no protection for named characters during play.
 - **The world is lethal off-screen too**: each person faces daily risk by difficulty and activity.
   Deaths leave traces and rumours.
+- **The Doom** (D-106): the moment a death becomes certain — bleeding nothing can stop now, the
+  wet strain's last minutes, or the killing blow itself — the world stops for the one who will die:
+  the dust hangs, the lights go out, Willis wanders in to mock them and is taken by something out of
+  the dark, and a voice with no name walks them through every cause that led here and tells them how
+  long they have, never how. Nothing undoes it. Then the world moves again and they are screaming:
+  everybody dies this way, and nobody in the world knows why.
 - **When you die**: an honest death scene, then a death screen with the cause, your last three
   turns and the choices that led there (from your own record). One button more — **"Show me
   everything"** — reveals the truth you never perceived: who was behind the wall, what they

@@ -108,7 +108,7 @@ line (§5) and a plain detail line.
 | `/spawn <what> [x<n>] [ally]` | A person from any pack (`core:actor/mara_voss`, `fredrick`) or infected by type word (`shambler`, `crawler`, `runner`, `lurker`), 1–20, at your place; `ally` makes you someone they take orders from | `/spawn shambler x5` · `/spawn fredrick ally` |
 | `/despawn <person or item>` | Removes a **cheat-origin** entity and records the reconciliation | `/despawn Fredrick` |
 | `/kill <person>` | Death, cause "cheat" | `/kill "the man in the red jacket"` |
-| `/revive <person>` | Alive again, wounds cleared. Infection stays exactly as it was — nothing cures (CMG §42.2) | `/revive Nita` |
+| `/revive <person>` | Alive again, wounds cleared. Infection stays exactly as it was — nothing cures (CMG §42.2). A doom the death fulfilled is spent, and a forced act ends (D-106) | `/revive Nita` |
 | `/reveal` | The truth about your place and the places next to it: who is where, doing what, carrying what | `/reveal` |
 | `/mind <person>` | That person's current goal, plan, strongest beliefs, open loops and last private reason | `/mind Mara` |
 | `/brief <person>` | Puts the current truth about your place, the people present and the known factions into that person's head as beliefs | `/brief Fredrick` |
@@ -175,6 +175,16 @@ never an error dump.
 irreverent, world-weary amusement at how malleable the simulation is, casually omnipotent,
 sarcastic or darkly funny, absolutely obedient to the Boss. Knows it is a simulation and says so.
 One or two short sentences per command. Never refuses (except §8), never lectures.
+
+**What it is** (D-106): nobody knows — not the Boss, not Willis, not anyone who has ever held this
+power, and it never says. Every being with the power hears it. Willis hears it too and is convinced
+it is a schizophrenia demon. It is not Willis.
+
+**The power is Willis's** (D-106). Whoever uses the console and is not Willis is using his power, on
+loan: at their Doom he mocks them twice as hard (six lines, not three; `RoastFacts.borrowed`,
+`in_debt`), and after the death **Willis collects** — the console closes (CHEAT_DEACTIVATED
+`willis_collects`); the run stays a Sandbox. **Nothing undoes a Doom** (DOOM-08): /heal, /cure and
+/god on the doomed get "Not that one, Boss. That's above my pay grade. Way above." and change nothing.
 
 **How lines are made** (CHEAT-09): a CHEAT_PERSONA call on the laptop brain writes a fresh line from
 the command and its outcome, with the last five lines listed as "do not repeat". If the call fails
@@ -254,10 +264,16 @@ feel about you, and he is in your groups. Beside anyone else he is a stranger wh
 
 ## 6b. Willis (D-79, D-102; his card: `docs/as/sources/WILLIS.md`)
 
-**At every death (D-105).** Whoever the Boss plays, whatever the house rules — Wild Card or not,
-console or not, Ironman or not — the death screen opens on Willis, delighted, roasting the dead over
-their own mistakes (`service/death.py`, DEATH-13). He works only from what the dead person did and
-typed; he knows the rest and keeps it to himself until 'Show me everything'.
+**At every death (D-105, D-106).** Whoever the Boss plays, whatever the house rules — Wild Card or
+not, console or not, Ironman or not — Willis comes when the death becomes certain, in the frozen
+moment of the Doom (`service/voice.py`, VOICE-01/02; `service/death.py`, DEATH-13): out of the dark,
+delighted, careless of how it happened. Who they are to him decides what he says — in his debt (the
+console used this life), twice as hard; met before, "Oh, it's you from earlier"; a stranger, "Why am
+I here? I don't know you." He never finishes: something like a giant mantis takes him mid-sentence.
+Then the Voice speaks — and the Voice is not his: above him, unnamed in the game (canon and the
+owner's words: `docs/as/sources/THE_VOICE.md`). The death screen keeps his lines and the Voice's
+words. He works only from what the dead person did and typed; the world's secrets wait for 'Show me
+everything'.
 
 `as_content/packs/cheat_admin/pcs/willis.yaml` is the owner's own cheat entity — a grinning man in an
 immaculate tuxedo and top hat with a villainous mustache and a cup of black coffee, who is not human,
@@ -283,7 +299,7 @@ dossier carries the owner's words on him in full (`depth_reference`). What the e
   someone he gave a gift, the same disrespect he shrugs off from anyone else is ingratitude, and his
   wrath on them kills.
 - **Mr. Cheater Man** stays the console voice; when you are Willis, the voice knows Willis takes him
-  for a demon in his head.
+  for a demon in his head (a schizophrenia demon, in his opinion; what it really is nobody knows, §5).
 - **The Wild Card house rule (CHEAT-15, off by default).** In a normal life, Willis walks the world as a
   person of his own: out of the world's maths, in the reality exception, placed away from you, and
   never where you left him — each world day you are not with him he is somewhere else (WORLD-07). The

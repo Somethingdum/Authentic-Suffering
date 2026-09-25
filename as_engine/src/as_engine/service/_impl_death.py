@@ -106,6 +106,7 @@ def _excepted(store):
 def build_death_view(store, pc_id):
     from ..contracts.view import DeathView
     from ..kernel.clock import format_clock, world_time
+    from ..physical import bodies
     from .death import CAUSE_WORDS
     d = _death(store, pc_id)
     cause_text = " ".join([CAUSE_WORDS.get(d["payload"].get("cause"), "You died.")] + _seen(store, pc_id, d))
@@ -113,10 +114,19 @@ def build_death_view(store, pc_id):
     last = [r[0] for r in store.query("SELECT text FROM narration ORDER BY turn_index DESC LIMIT 3")][::-1]
     stored = roast_stored(store, pc_id)
     iron = _ironman(store)
+    doom = bodies.doomed(store, pc_id)
+    voice, pending = [], False
+    if doom is not None:
+        from .voice import scene_turn
+        voice = [r[0] for r in store.query("SELECT text FROM story_log WHERE kind='voice' AND turn_index=? ORDER BY entry_id",
+                                           (scene_turn(store, pc_id),))]
+        after = [r[0] for r in store.query("SELECT text FROM story_log WHERE kind='voice_after' AND turn_index=? ORDER BY entry_id",
+                                           (d["turn_index"],))]
+        voice, pending = (voice + after)[:8], not after
     return DeathView(pc_name=name[0] if name else pc_id, cause_text=cause_text, day=world_time(d["at"]).day,
                      time_text=format_clock(d["at"]), last_turns=last, contributing=_choices(store, pc_id, d, _chain(store, d)),
-                     willis=stored or [], willis_pending=stored is None, can_new_life_here=not iron, can_load=not iron,
-                     world_id=store.meta("world_id"))
+                     willis=stored or [], willis_pending=False, voice=voice, voice_pending=pending,
+                     can_new_life_here=not iron, can_load=not iron, world_id=store.meta("world_id"))
 
 
 def lifespan_words(ms):
@@ -130,58 +140,77 @@ def lifespan_words(ms):
     return f"{ms // DAY_MS} days"
 
 
+def _doom_of(store, pc_id):
+    from ..physical import bodies
+    d = bodies.doomed(store, pc_id)
+    if d is None:
+        raise ValueError(f"no doom for {pc_id}")
+    r = store.query_one("SELECT seq, cause_event_id FROM events WHERE type='DOOM' AND actor_id=? ORDER BY seq DESC LIMIT 1",
+                        (pc_id,))
+    d["seq"], d["doom_cause"] = (r[0], r[1]) if r else (10**12, None)
+    return d
+
+
 def roast_facts(store, pc_id):
     from ..contracts.calls import RoastFacts
-    d = _death(store, pc_id)
-    dv = build_death_view(store, pc_id)
-    ctl = store.query_one("SELECT seq FROM events WHERE type='PC_CONTROL_CHANGE' AND json_extract(payload, '$.pc_actor_id') = ? "
-                          "AND seq < ? ORDER BY seq DESC LIMIT 1", (pc_id, d["seq"]))
+    d = _doom_of(store, pc_id)
+    ctl = store.query_one("SELECT seq, turn_index FROM events WHERE type='PC_CONTROL_CHANGE' AND json_extract(payload, "
+                          "'$.pc_actor_id') = ? AND seq < ? ORDER BY seq DESC LIMIT 1", (pc_id, d["seq"]))
     from_seq = ctl[0] if ctl else 0
+    life_turn = ctl[1] if ctl else 0
     first = store.query_one("SELECT at, turn_index FROM events WHERE type='PLAYER_INPUT' AND seq > ? AND seq < ? ORDER BY seq LIMIT 1",
                             (from_seq, d["seq"]))
     turns = store.query_one("SELECT COUNT(*) FROM events WHERE type='PLAYER_INPUT' AND seq > ? AND seq < ?", (from_seq, d["seq"]))[0]
-    typed = []
-    if first is not None:
-        typed = [r[0] for r in store.query(
-            "SELECT raw_text FROM player_inputs WHERE turn_index >= ? AND turn_index <= ? AND mode IN ('do','say') "
-            "ORDER BY turn_index DESC LIMIT 5", (first[1], d["turn_index"]))][::-1]
+    first_turn = first[1] if first else d["turn_index"]
+    typed = [r[0] for r in store.query(
+        "SELECT raw_text FROM player_inputs WHERE turn_index >= ? AND turn_index <= ? AND mode IN ('do','say') "
+        "ORDER BY turn_index DESC LIMIT 5", (first_turn, d["turn_index"]))][::-1]
+    choices = []
+    for r in store.query("SELECT payload FROM events WHERE type='ACTION_START' AND actor_id=? AND seq < ? ORDER BY seq DESC LIMIT 20",
+                         (pc_id, d["seq"])):
+        label = (_j(r[0], {}).get("label") or "").strip()
+        if label and label not in choices:
+            choices.append(label)
+        if len(choices) == 5:
+            break
+    borrowed = [r[0][:300] for r in store.query("SELECT command FROM cheat_log WHERE turn_index >= ? ORDER BY rowid DESC LIMIT 8",
+                                                (life_turn,))][::-1]
     exc = _excepted(store)
-    met = bool(exc) and any(store.query_one("SELECT 1 FROM acquaintance WHERE holder_id=? AND subject_id=?", (pc_id, b))
-                            for b in sorted(exc))
-    by_him = bool(exc) and any(c["actor_id"] in exc for c in _chain(store, d))
-    return RoastFacts(pc_name=dv.pc_name, lived=lifespan_words(d["at"] - (first[0] if first else d["at"])), turns=turns,
-                      cause_text=dv.cause_text, choices=dv.contributing, typed=[t[:300] for t in typed],
-                      bent_rules=store.meta("sandbox") == "1", ironman=_ironman(store),
-                      rises=bool(d["payload"].get("rise_pending")), met_him=met, by_his_hand=by_him)
+    walked = _chain(store, {"cause": d.get("cause_event"), "links": [{"event_id": d["doom_cause"]}] if d.get("doom_cause") else []})
+    name = store.query_one("SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))
+    return RoastFacts(pc_name=name[0] if name else pc_id, lived=lifespan_words(d["doomed_at"] - (first[0] if first else d["doomed_at"])),
+                      turns=turns, cause_text="", choices=choices, typed=[x[:300] for x in typed],
+                      bent_rules=store.meta("sandbox") == "1", borrowed=borrowed, in_debt=bool(borrowed) and pc_id not in exc,
+                      ironman=_ironman(store), rises=False,
+                      met_him=bool(exc) and any(store.query_one("SELECT 1 FROM acquaintance WHERE holder_id=? AND subject_id=?",
+                                                                (pc_id, b)) for b in sorted(exc)),
+                      by_his_hand=bool(exc) and any(c["actor_id"] in exc for c in walked))
 
 
 def roast_stored(store, pc_id):
-    try:
-        d = _death(store, pc_id)
-    except ValueError:
+    from ..physical import bodies
+    from .voice import scene_turn
+    if bodies.doomed(store, pc_id) is None:
         return None
     rows = [r[0] for r in store.query("SELECT text FROM story_log WHERE kind='willis' AND turn_index=? ORDER BY entry_id",
-                                      (d["turn_index"],))]
+                                      (scene_turn(store, pc_id),))]
     return rows or None
 
 
 def fallback_roast(facts):
-    first = facts.cause_text.split(". ")[0].rstrip(".") + "."
-    head = ["Ha! Oh, that was beautiful. Do it again."]
-    if facts.typed:
-        head.append(f"\"{facts.typed[-1]}\" — that's what you went with. Incredible.")
-    head.append(f"{first} I've watched mayflies plan better.")
-    extra = []
-    if facts.by_his_hand:
-        extra.append("And yes, that was me. You had it coming, and I had a free minute.")
-    if facts.bent_rules:
-        extra.append("You bent the rules of reality and STILL managed this. I'm genuinely impressed.")
-    if facts.rises:
-        extra.append("Don't worry, you'll be back on your feet in a few hours. Just not as you.")
-    last = ("Anyway. Coffee's getting cold. That was your only one, by the way." if facts.ironman
-            else "Anyway. Coffee's getting cold. Go on, try again. I'll be watching.")
-    lines = head + extra
-    return lines[:5] + [last]
+    if facts.in_debt:
+        n = len(facts.borrowed)
+        return ["Well, well, well. Look who's in my debt.",
+                f"You borrowed my power {n} time{'s' if n != 1 else ''}, and you spent it on '{facts.borrowed[-1]}'.",
+                "That's not a loan, that's a confession.",
+                "You had MY power. Mine. And you still ended up here, frozen, about to die like everybody else.",
+                ("And yes, I helped. You had it coming, and I had a free minute." if facts.by_his_hand
+                 else "Do you know what I do to people who owe me? Nothing. I watch. It's funnier."),
+                "Ha! Now, about collecting. See, the thing about borrowing from me is\u2014"]
+    if facts.met_him:
+        return ["Oh, it's you from earlier."] + (["Yeah, that was me, by the way. Worth it."] if facts.by_his_hand else []) + \
+            ["Yeah, this is going to be neat. Hold still. Well, you can't not, can you\u2014"]
+    return ["Huh.", "Why am I here? I don't know you. Who even are\u2014"]
 
 
 async def roast(session):
@@ -189,37 +218,25 @@ async def roast(session):
     from ..contracts.common import CallClass
     from ..contracts.mind import WillisRoast
     from ..kernel import clock
-    from ..lanes.calllog import record
     from ..lanes.requests import build_request
     from ..lanes.schemas import to_lm_schema
-    from .session import append_story
     store, pc = session.store, session.pc_id
     got = roast_stored(store, pc)
     if got is not None:
         return got
-    d = _death(store, pc)
     facts = roast_facts(store, pc)
-    T = clock.turn_index(store)
     ctx = WillisRoastContext(facts=facts)
-    req = resp = None
     lines = []
     try:
-        req = build_request(session.config, CallClass.WILLIS_ROAST, turn_index=T, context=ctx, ctx=ctx,
+        req = build_request(session.config, CallClass.WILLIS_ROAST, turn_index=clock.turn_index(store), context=ctx, ctx=ctx,
                             json_schema=to_lm_schema(WillisRoast))
         resp = await session.client.call(req)
         if resp.parse_status == "ok":
             data = resp.parsed if resp.parsed is not None else json.loads(resp.text or "{}")
             lines = [ln.strip()[:300] for ln in WillisRoast.model_validate(data).lines if ln and ln.strip()]
-    except Exception:  # noqa: BLE001 — DEATH-13: the death screen never waits on a model that is not there
+    except Exception:  # noqa: BLE001 — DEATH-13: he always comes
         lines = []
-    if not lines:
-        lines = fallback_roast(facts)
-    with store.transaction() as tx:
-        if req is not None and resp is not None:
-            record(tx, req, resp)
-        for ln in lines:
-            append_story(tx, d["turn_index"], "willis", ln)
-    return lines
+    return lines[:6 if facts.in_debt else 3] or fallback_roast(facts)
 
 
 def _name(store, body_id):

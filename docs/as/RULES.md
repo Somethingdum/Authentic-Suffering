@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-699 ids; 449 with their own statement, 250 named only in context.
+716 ids; 466 with their own statement, 250 named only in context.
 
 
 ## ABUSE
@@ -263,11 +263,11 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DEATH-04 | *DEATH-01..05) would already have killed:* | as_engine/audit/abuse.py | `as_engine/audit/abuse.py`, `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_bodies.py` |
 | DEATH-05 | (named only by tests) |  | — | `contract/p02_space_bodies/test_bodies.py` |
 | DEATH-06 | DEATH-06 (fidelity C10, Actor v2 B5c: every wound that bled is a cause) a DEATH whose cause is blood_loss carries links (contracts.events.EventLink, role 'contributed', kernel.store STORE-12) to the cause_event of every… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_bodies.py` |
-| DEATH-10 | DEATH-10 The canonical account of the final scene and what led to it, shown only when asked for (GameService.on_death_reveal). At most 30 lines: - who was where: every body in the PC's place at its death and in the plac… | as_engine/service/death.py | `as_engine/contracts/calls.py`, `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-10 | DEATH-10 The canonical account of the final scene and what led to it, shown only when asked for (GameService.on_death_reveal). At most 30 lines: - who was where: every body in the PC's place at its death and in the plac… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
 | DEATH-11 | DEATH-11 From the newest DEATH event whose payload body_id is pc_id (ValueError "no death for {pc_id}" when there is none): - cause_text = CAUSE_WORDS.get(cause, "You died.") and then, each after one space, what the PC… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
-| DEATH-12 | DEATH-12 What Willis has to work with — the dead person's own record only (never kernel.truth: the world's secrets wait for 'Show me everything', DEATH-10). This life began at the first PLAYER_INPUT after the PC's lates… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py` |
-| DEATH-13 | DEATH-13 Willis at every death of the PC — regardless of the Wild Card, the console, the difficulty or Ironman. A stored roast is returned as it is (no call). Otherwise ONE WILLIS_ROAST call (lane A; lanes.requests.buil… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
-| DEATH-14 | DEATH-14 Willis without a model, built from the facts only, in this order: "Ha! Oh, that was beautiful. Do it again."; with typed: the last one in double quotes, then " — that's what you went with. Incredible."; the fir… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-12 | DEATH-12 What Willis has in the frozen moment — the dead person's own record only (never kernel.truth: the world's secrets are the Voice's to tell). doom = physical.bodies.doomed(store, pc_id) (ValueError f"no doom for… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-13 | DEATH-13 Willis in the frozen moment of every death of the PC (service.voice VOICE-07) — regardless of the Wild Card, the console, the difficulty or Ironman. Stored lines are returned as they are (no call). Otherwise ON… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-14 | DEATH-14 Willis without a model, from the facts only. He never finishes: the last line ends in an em dash, where the thing takes him. in_debt (six lines, twice as hard): "Well, well, well. Look who's in my debt."; f"You… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py`, `contract/p12_surfaces/test_doom.py` |
 
 ## DEGRADE
 
@@ -307,6 +307,19 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | DISCLOSE-03 | *explanation and changes no fact (DISCLOSE-03).* | 05_ACTORS §11 | — | — |
+
+## DOOM
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| DOOM-01 | DOOM-01 bleeding (the death test left the body alive): per unhealed wound that bleeds now, best care = min(the current treatment multiplier, harm.tourniquet_mult on a limb (ANATOMY_GROUP arm / hand / leg / foot), else h… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-02 | DOOM-02 infection: a 'wet' infections row whose pathway death_at_h moment (exposed_at + death_at_h) is within harm.doom_infection_lead_min minutes after ``at``: kind 'infection', expected_at = death_by = that moment, ca… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-03 | DOOM-03 instant: the death test is about to kill the person and it has no dooms row: kind 'instant', doomed_at = expected_at = death_by = at, cause_event = the death's cause, committed just before the DEATH. | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-04 | DOOM-04 A doom commits DOOM {body_id, kind, expected_at, death_by, cause_event_id} (writer 'physical.bodies', actor_id = body_id, cause_event_id = the death test's) inserting dooms {body_id, doomed_at = at, expected_at,… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/turn/_impl_pipeline.py`, `as_engine/turn/pipeline.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-05 | DOOM-05 Nothing undoes a doom (the console refuses to heal, cure or god-mode a doomed body: cheats.commands, rule DOOM-08). As a safety net that must never fire, a doomed body the death test finds alive at or after deat… | as_engine/physical/bodies.py | `as_engine/cheats/commands.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-06 | DOOM-06 Only the doomed know, and only in the frozen moment: the Doom scene is the player's alone (service.voice) and stands only in the story (bookkeeping, outside both state hashes); no event, percept, belief, claim o… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-07 | DOOM-07 (1b, D-106) The doomed cannot tell. When the PC is alive and doomed (physical.bodies.doomed(tx, pc) is not None), submit.mode is 'do' or 'say' and the text is not empty: one DOOM_GUARD call (lane B; build_reques… | as_engine/turn/intake.py | `as_engine/contracts/calls.py`, `as_engine/physical/bodies.py`, `as_engine/turn/_impl_intake.py`, `as_engine/turn/intake.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-08 | DOOM-08 (D-106) The console cannot undo a doom (physical.bodies DOOM-05) — the power is Willis's, and what dooms is above him: heal, cure and god on of a living body that has a dooms row change nothing and answer DOOM_R… | as_engine/cheats/commands.py | `as_engine/cheats/_impl_cheats.py`, `as_engine/cheats/commands.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
 
 ## DOS
 
@@ -1160,6 +1173,20 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | VIS-02 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
 | VIS-03 | *visual percept at clear: what shows what a hand holds, sense.optics VIS-03)* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py`, `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py`, `contract/p04_one_actor/test_knowledge_menus.py` |
 | VIS-04 | *Visual observation (P3). Rules VIS-01..05. Separate from audibility (plan §7.3).* | as_engine/sense/optics.py | `as_engine/sense/optics.py` | `contract/p03_perception/test_optics.py` |
+
+## VOICE
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| VOICE-01 | VOICE-01 scene(store, pc_id, willis_lines, voice_paragraphs) -> list[DoomBeat], in this order: 1. 'scene' FREEZE_TEXT (+ ' ' + FIGHT_TEXT when the PC holds a grip on a body or a body holds one on it: grips), pause 0; 2.… | as_engine/service/voice.py | `as_engine/contracts/protocol.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-02 | VOICE-02 Willis in the frozen moment: service.death.roast (DEATH-13) — who he is to them decides what he says: in his debt (the console used this life, the PC not Willis) he mocks them twice as hard; met him before: "oh… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-03 | VOICE-03 Everything the Voice brags with, from the record. doom = physical.bodies.doomed(store, pc_id) (ValueError f"no doom for {pc_id}" when there is none): - pc_name = the PC's actors.display_name; lived = service.de… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-04 | VOICE-04 The chain, oldest first, at most 24 beats: the events reached walking back from the doom's cause_event (cause_event_id and links, breadth first, at most 300 events), and the PC's own last 5 ACTION_STARTs before… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-05 | VOICE-05 upper_hand: the names of the weapons the PC holds or carries (canon firearm or melee), then the known names of the living people in its place whom it knows by name (not the threat); at most 8. | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-06 | VOICE-06 ONE THE_VOICE call (lane A; lanes.requests.build_request(config, THE_VOICE, turn_index = the current turn, actor_id = None, context = ctx = VoiceContext(moment, voice_facts(store, pc_id, moment)), json_schema =… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-07 | VOICE-07 For the first turn that ends with the PC doomed and its scene not yet played (scene_turn None) — the turn in which it was doomed, or, for a doom made between turns (the console), the next one (turn.pipeline, af… | as_engine/service/voice.py | `as_engine/service/death.py`, `as_engine/service/voice.py`, `as_engine/turn/pipeline.py` | `contract/p12_surfaces/test_death.py`, `contract/p12_surfaces/test_doom.py` |
+| VOICE-08 | VOICE-08 The Voice without a model, from the facts only. 'before': three paragraphs — ARCHITECT; the chain walked, each text without its closing . ! ? ("{when}: you chose to {text}" + (, thinking "{said}") / "{when}: {t… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-09 | VOICE-09 After the death (GameService.on_death): voice(session, 'after'), stored as kind 'voice_after' at the death's turn; the death screen shows Willis's lines and the Voice's words, before and after (service.death.bu… | as_engine/service/voice.py | `as_engine/service/death.py`, `as_engine/service/game_service.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_death.py` |
 
 ## WEAR
 

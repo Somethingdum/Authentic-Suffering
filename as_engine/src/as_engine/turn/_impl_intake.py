@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 import re
 
 NONE_MESSAGES = {
@@ -105,6 +106,31 @@ def record_input(tx, turn_index, mode, raw_text, mapped):
                                                              "received_hash": h, "mapped": mapped})]))
 
 
+def doom_words(text):
+    from .intake import DOOM_WORDS_RE
+    return DOOM_WORDS_RE.search(text) is not None
+
+
+async def _tells(session, text, turn_index):
+    """Does this pass on anything about the end of life that ordinary people don't know? (DOOM-07)"""
+    from ..contracts.calls import DoomGuardContext
+    from ..contracts.common import CallClass
+    from ..contracts.mind import DoomGuardOutput
+    from ..lanes.requests import build_request
+    from ..lanes.schemas import to_lm_schema
+    ctx = DoomGuardContext(text=text[:2000])
+    try:
+        req = build_request(session.config, CallClass.DOOM_GUARD, turn_index=turn_index, actor_id=session.pc_id, context=ctx,
+                            ctx=ctx, json_schema=to_lm_schema(DoomGuardOutput))
+        resp = await session.client.call(req)
+        if resp.parse_status == "ok":
+            data = resp.parsed if resp.parsed is not None else json.loads(resp.text or "{}")
+            return DoomGuardOutput.model_validate(data).tells
+    except Exception:  # noqa: BLE001 — the fallback check below
+        pass
+    return doom_words(text)
+
+
 async def intake(tx, session, submit, turn_index, t0, calls=None):
     """Returns (Intent, info) where info = {'remainder': str|None, 'addressee': id|None, 'mode': ...}."""
     from ..action.intent import IntentError, to_intent
@@ -127,6 +153,12 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
     info = {"remainder": None, "addressee": None}
     text = (submit.text or "").strip()
     mode = submit.mode
+    if text and mode in ("do", "say"):
+        from ..physical import bodies
+        if bodies.doomed(tx, pc) is not None and tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (pc,))[0] == 1:
+            if await _tells(session, text, turn_index):
+                from .intake import DOOMED_WORDS
+                raise Rejected("doomed_words", DOOMED_WORDS)
     if submit.suggestion_ref:
         entry = session.extras.get("suggestions", {}).get(submit.suggestion_ref)
         if entry is None:

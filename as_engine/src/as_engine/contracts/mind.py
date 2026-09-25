@@ -462,6 +462,18 @@ class CheatPlan(Strict):
     summary: str = Field(default="", max_length=200)
 
 
+class VoiceMessage(Strict):
+    """THE_VOICE output (D-106)."""
+
+    paragraphs: list[str] = Field(min_length=1, max_length=3)
+
+
+class DoomGuardOutput(Strict):
+    """DOOM_GUARD output (D-106): does it pass on anything about the dying that is not common knowledge?"""
+
+    tells: bool
+
+
 class WillisRoast(Strict):
     """WILLIS_ROAST output (D-105): what Willis says to the dead, line by line."""
 
