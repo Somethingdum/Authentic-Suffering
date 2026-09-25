@@ -74,11 +74,12 @@ The engine side of P0–P10 is **built**, and so is everything added to it since
 (the identity card, knowledge-built menus, the reply protocol, speech timing, gestures and
 attention, answers, memory that is never lost, several causes, promises, work output, feuds, far
 sounds, witnessed theft) and the
-owner's F1a looks, F1b smell, H1 human people, I1 the dead who feed, W1 the wet strain and F1c
-washing, clothes and the cold. Every contract function of those has a body — in the `_impl_*.py`
+owner's F1a looks (and F1a-2: generated people's looks and clothes, shown in the prose and the
+UI), F1b smell, H1 human people, I1 the dead who feed, W1 the wet strain and F1c washing, clothes
+and the cold. Every contract function of those has a body — in the `_impl_*.py`
 file beside its module or built in place (AGENTS.md §4) — and every engine contract test passes
 except the owner's sessions browser and a world that names no run (D-76, steps 2 and 3). What
-each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-93. Nothing has been gated
+each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-94. Nothing has been gated
 on your machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage

@@ -118,6 +118,24 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     view = [p for p in latest_view(tx, pc_id) if p["source_id"] and p["source_id"].startswith("act_") or
             (p["source_id"] is None and json.loads(p["detail"]).get("level") == "silhouette")]
     people = [p["text"] for p in view]
+    # NARR-10 (F1a-2): how someone looks, told as they come into the scene
+    from ..mind._impl_packet import seen_appearance
+    from ..mind.perception import with_article, word_for
+    before = {r[0] for r in tx.query("SELECT DISTINCT source_id FROM percept_log WHERE holder_id=? AND turn_index<? AND channel='visual' "
+                                     "AND fidelity IN ('exact','partial') AND source_id IS NOT NULL", (pc_id, turn_index))}
+    looks_lines, told = [], set()
+    for p in view:
+        s = p["source_id"]
+        if not s or not s.startswith("act_") or s == pc_id or s in told:
+            continue
+        told.add(s)
+        if not establish and s in before:
+            continue
+        text = seen_appearance(tx, pc_id, s, view, at)
+        if text:
+            kn = _row(tx, "SELECT known_name FROM acquaintance WHERE holder_id=? AND subject_id=?", (pc_id, s))
+            label = kn["known_name"] if kn and kn["known_name"] else with_article(word_for(tx, pc_id, s))
+            looks_lines.append(f"{label}: {text}")
     state = []
     for w in tx.query("SELECT * FROM wounds WHERE body_id=? AND healed_at IS NULL ORDER BY created_at, wound_id", (pc_id,)):
         w = dict(w)
@@ -160,6 +178,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         turn_index=turn_index, world_time_text=f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})",
         place_text=place["name"], pc_name=pc, pc_state_lines=state, comprehension=_comprehension(tx, pc_id), lines=lines,
         establish_place=establish, place_details=loc.description_lines if establish else [], people_present=people,
+        people_looks=looks_lines,
         choice_prompt_hint=hint, allowed_names=sorted(allowed), style=style, length=settings.narration_length,
         person=settings.narration_person, tense=settings.narration_tense, banned_phrases=list(rules.banned_phrases),
         intensity=settings.intensity, player_input_echo_block=echo_block(tx, turn_index, numbers))

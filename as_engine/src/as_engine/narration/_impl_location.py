@@ -174,7 +174,9 @@ def describe(tx, pc_id, at, refs=None):
                         status.append("armed")
                 if tx.query_one("SELECT 1 FROM wounds WHERE body_id=? AND healed_at IS NULL AND (severity IN ('severe','catastrophic') OR clotted=0)", (s,)):
                     status.append("hurt")
-            people.append(PersonChip(ref=_assign(refs, "p", s, local), label=label, status_words=status, known=bool(kn and kn["known_name"])))
+            from ..mind._impl_packet import seen_appearance
+            people.append(PersonChip(ref=_assign(refs, "p", s, local), label=label, status_words=status, known=bool(kn and kn["known_name"]),
+                                     looks=seen_appearance(tx, pc_id, s, view, at)))
         elif s is None and det.get("level") == "silhouette":
             people.append(PersonChip(ref=_assign(refs, "p", f"figure:{p['percept_id']}", local), label="a figure", status_words=[], known=False))
     # exits

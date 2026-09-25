@@ -12,6 +12,8 @@ TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
 {% for d in k.place_details %}- {{ d }}
 {% endfor %}{% endif %}{% if k.people_present %}People they can perceive here:
 {% for p in k.people_present %}- {{ p }}
+{% endfor %}{% endif %}{% if k.people_looks %}How they look to {{ k.pc_name }} (show someone like this as they come in; add nothing to it):
+{% for p in k.people_looks %}- {{ p }}
 {% endfor %}{% endif %}{% if k.pc_state_lines %}{{ k.pc_name }} right now:
 {% for l in k.pc_state_lines %}- {{ l }}
 {% endfor %}{% endif %}

@@ -81,10 +81,20 @@ def materialise(tx, rng, *, settlement_id, zone_id, band, sex, dossier, place_id
     if ev is None:
         raise ValueError(f"nobody left in the {band} {sex} cohort to name")
     idn, ap, cap = dossier["identity"], dossier["appearance"], dossier["capability"]
+    from ..contracts.dossier import Looks
+    looks = Looks.model_validate(ap["looks"]) if ap.get("looks") else None     # LOOK-10 (F1a-2)
     bid = bodies.create(tx, kind="human", sex=sex, age_years=idn["age"], height_cm=ap["height_cm"], mass_kg=ap["mass_kg"],
                         special=dict(cap["special"]), at=at, turn_index=turn_index,
-                        origin="worldgen" if event_origin == "worldgen" else "materialize", cause_event_id=ev.event_id)
+                        origin="worldgen" if event_origin == "worldgen" else "materialize", cause_event_id=ev.event_id,
+                        looks=looks)
     _place_at_first_anchor(tx, bid, place_id, at, ev.event_id, turn_index)
+    if looks is not None and looks.outfit:
+        # what they wore was already in the world, only unnamed: worldgen items, events of this origin
+        from ..physical import objects
+        for piece in looks.outfit:
+            props = {k: v for k, v in (("colour", piece.colour), ("state", piece.state), ("insignia", piece.insignia)) if v is not None}
+            objects.create(tx, piece.item, 1, objects.Holder("body", bid, "worn"), "worldgen", props, at, ev.event_id, turn_index,
+                           event_origin=event_origin)
     actor_create(tx, bid, dossier, "generated", at, turn_index, mind_kind="model", cause_event_id=ev.event_id,
                  event_origin=event_origin)
     E(tx, EventType.PERCEIVE, "mind.perception", at, turn_index,

@@ -36,11 +36,11 @@ def cohort_row(s, band="adult", sex=None) -> dict:
     return r
 
 
-def dossier(name="Wes Harlan", age=34, sex="male", variant=11) -> dict:
+def dossier(name="Wes Harlan", age=34, sex="male", variant=11, occupation="mechanic", climate_heat=5) -> dict:
     return people.skeleton_dossier(people.PersonSeed(
-        name=name, age=age, sex=sex, cohort="pre_fall_adult", occupation="mechanic",
+        name=name, age=age, sex=sex, cohort="pre_fall_adult", occupation=occupation,
         skills={"mechanics": 2, "firearms": 1}, special={k: 5 for k in "SPECIAL"}, variant=variant,
-        settlement_name="Mill Creek", group_name="the Mill Creek folk"))
+        settlement_name="Mill Creek", group_name="the Mill Creek folk", climate_heat=climate_heat))
 
 
 def site_of(s, settlement_id) -> str:
@@ -209,3 +209,90 @@ def test_every_settlement_has_its_feud(gw):
             r = one(s, "SELECT kind, trust, resentment FROM relationships WHERE from_id = ? AND to_id = ?", (x, y))
             assert (r["kind"], r["trust"], r["resentment"]) == ("rival", -2, 2)
 
+
+
+# =========================================================================== F1a-2 (LOOK-10)
+def _clothing(canon, ref):
+    return canon.get(ref).clothing
+
+
+def test_generated_people_look_like_someone(canon):
+    """LOOK-10: every generated person has looks of their own — hair, eyes, a skin, marks — and
+    their dossier's prose says the same; no child carries a tattoo; the looks are the seed's alone."""
+    from as_engine.contracts.dossier import ActorDossier
+    seen = set()
+    for v in range(120):
+        for age, sex in ((34, "male"), (8, "female"), (72, "male")):
+            d = dossier(age=age, sex=sex, variant=v)
+            looks = ActorDossier.model_validate(d).appearance.looks
+            assert looks is not None and "skin" in looks.complexion
+            assert d["appearance"]["eyes"] == looks.eye_colour and d["appearance"]["skin"] == looks.complexion
+            if looks.hair_length in ("shaved", "bald"):
+                assert looks.hair_colour == ""
+            if age >= 70 and looks.hair_colour:
+                assert looks.hair_colour in ("white", "grey")
+            if age < 13:
+                assert not any("tattoo" in m.what for m in looks.marks)
+            if sex == "female" or age < 16:
+                assert looks.facial_hair == "none"
+            seen.add((looks.hair_colour, looks.eye_colour, looks.complexion))
+    assert len(seen) >= 40, "a settlement is not a row of the same face"
+    assert dossier(variant=7)["appearance"]["looks"] == dossier(variant=7)["appearance"]["looks"]
+
+
+@pytest.mark.parametrize("heat", [2, 5, 9])
+def test_they_dress_for_where_they_live(canon, heat):
+    """LOOK-10: an outfit of core clothing, one piece per slot and layer, covering torso, groin and
+    feet; warm where it is cold (a heavy coat) and light where it is hot (no coat)."""
+    for v in range(80):
+        for age, occ in ((34, "mechanic"), (8, "child"), (40, "medic"), (29, "cook"), (25, "watcher")):
+            outfit = dossier(age=age, variant=v, occupation=occ, climate_heat=heat)["appearance"]["looks"]["outfit"]
+            cl = [_clothing(canon, p["item"]) for p in outfit]
+            assert all(c is not None for c in cl), "clothing only"
+            slots = [(c.slot, c.layer) for c in cl]
+            assert len(slots) == len(set(slots)), "one piece per slot and layer"
+            covered = {part for c in cl for part in c.covers}
+            assert {"torso", "groin", "feet"} <= covered
+            warmth = sum(c.warmth for c in cl)
+            outers = [c for c in cl if c.slot == "torso" and c.layer == "outer"]
+            if heat <= 3:
+                assert warmth >= 4 and any(c.warmth >= 2 for c in outers), (v, occ, [p["item"] for p in outfit])
+            if heat >= 8:
+                assert not any(c.warmth >= 2 for c in cl) and warmth <= 2, (v, occ, [p["item"] for p in outfit])
+    medic = [p["item"] for p in dossier(age=40, occupation="medic", climate_heat=5)["appearance"]["looks"]["outfit"]]
+    assert "core:item/scrubs" in medic and "core:item/clogs" in medic
+
+
+def test_nobody_steps_out_of_the_count_naked(gw):
+    """materialise (LOOK-10): the new body has the dossier's looks (without the outfit) and wears
+    its outfit — worldgen items, each made because of the count's change."""
+    from as_engine.physical import bodies, objects
+    s = gw
+    c = cohort_row(s, sex="male")
+    d = dossier(variant=23, climate_heat=2)
+    with s.store.transaction() as tx:
+        who = population.materialise(tx, s.rng, settlement_id=c["settlement_id"], zone_id=None, band="adult",
+                                     sex="male", dossier=d, place_id=site_of(s, c["settlement_id"]), at=now(s),
+                                     turn_index=turn(s), cause_event_id=None)
+    looks = bodies.looks_of(s.store, who)
+    want = dict(d["appearance"]["looks"], outfit=[])
+    assert looks is not None and looks.model_dump(mode="json") == want
+    worn = objects.worn(s.store, who)
+    assert sorted(o["def_ref"] for o in worn) == sorted(p["item"] for p in d["appearance"]["looks"]["outfit"])
+    change = [r for r in rows(s, "POPULATION_CHANGE") if r["payload"]["reason"] == "materialised"][-1]
+    made = [r for r in rows(s, "ITEM_CREATED") if r["payload"]["to"]["id"] == who]
+    assert made and all(r["cause_event_id"] == change["event_id"] for r in made)
+    assert {one(s, "SELECT origin FROM items WHERE item_id = ?", (o["item_id"],))["origin"] for o in worn} == {"worldgen"}
+    assert objects.warmth(s.store, who) >= 4, "dressed for a cold country"
+
+
+def test_a_generated_world_is_dressed(gw):
+    """WG-28 / LOOK-10: every generated person in a new world has looks and clothes on."""
+    from as_engine.physical import bodies, objects
+    s = gw
+    gen = [r[0] for r in s.store.query("SELECT a.actor_id FROM actors a JOIN dossiers d ON d.dossier_id = a.dossier_id "
+                                       "JOIN bodies b ON b.body_id = a.actor_id WHERE d.source = 'generated' AND b.alive = 1")]
+    assert gen
+    for who in gen:
+        assert bodies.looks_of(s.store, who) is not None
+        assert len(objects.worn(s.store, who)) >= 3, who

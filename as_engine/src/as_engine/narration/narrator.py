@@ -1,4 +1,4 @@
-"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, L9,
+"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,
 DISC-01..04. Owner 'narration.narrator' (writes the narration row only). MUST NOT import
 kernel.truth: the narrator is a mind whose skull is the PC's.
 
@@ -34,6 +34,15 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    place_details = narration.location.describe(tx, pc_id, now).description_lines then.
   people_present   the text of every latest_view row (narration.location.latest_view) whose source
                    is a body or which is a silhouette.
+  people_looks     (F1a-2, NARR-10: the prose shows how people look and smell) for each body other
+                   than the PC that the PC sees at clear or partial in its latest view, each once,
+                   in row order — all of them when establish_place, else only those it had no
+                   VISUAL percept of at 'exact' or 'partial' before this turn (someone just come
+                   into the scene): f"{label}: {text}", label = the PC's known_name for it, else
+                   with_article(perception.word_for(...)), text = what mind.packet LOOK-06 gives an
+                   entity here (appearance_text at the best level and the distance, then
+                   smell_text); none when text is empty. The prompt asks the prose to show someone
+                   like that when they come in, and never to add to it.
   pc_state_lines   per unhealed wound of the PC (created_at, wound_id): f"{SEVERITY_WORDS[severity]
                    capitalised} {type} wound to the {ANATOMY_WORDS[anatomy]}" + ', bleeding' when
                    physical.bodies.effective_bleed > 0 + '.'; then, when impairment > 0,

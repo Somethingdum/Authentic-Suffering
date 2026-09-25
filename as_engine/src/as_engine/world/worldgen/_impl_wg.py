@@ -1023,6 +1023,8 @@ async def _actor_answer(client, seed, skel, role, history):
         cap["special"] = skel["capability"]["special"]
         cap["skills"] = skel["capability"]["skills"]
         merged["capability"] = cap
+        # LOOK-10 (F1a-2): how they look and what they wear stays the skeleton's
+        merged["appearance"] = {**(merged.get("appearance") or {}), "looks": skel["appearance"].get("looks")}
         merged["schema"] = "as.actor.v1"
         ActorDossier.model_validate(merged)
         return merged
@@ -1156,7 +1158,8 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
         special = {L: 3 + rng.range_int(tx, SPE, f"special:{n}:{L}", 0, 4) for L in "SPECIAL"}
         variant = rng.range_int(tx, SPE, f"variant:{n}", 0, 999)
         seed = PersonSeed(name=name, age=age, sex=sex, cohort=cohort_kind(age, dsf), occupation=occ, skills=skills,
-                          special=special, variant=variant, settlement_name=s.name, group_name=groups[s.group_id].name)
+                          special=special, variant=variant, settlement_name=s.name, group_name=groups[s.group_id].name,
+                          climate_heat=params.a.climate_heat)
         seeds.append(((kind, s, role, site, sh), seed, band))
         n += 1
     # WORLDGEN_ACTOR for the first llm_dossiers
@@ -1540,7 +1543,7 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
                             skills={"brawling": 1, "firearms": 1},
                             special={L: 3 + rng.range_int(tx, SO, f"raider_special:{i}:{L}", 0, 4) for L in "SPECIAL"},
                             variant=rng.range_int(tx, SO, f"raider_variant:{i}", 0, 999),
-                            settlement_name=zones[g.home_zone_id].name, group_name=g.name)
+                            settlement_name=zones[g.home_zone_id].name, group_name=g.name, climate_heat=params.a.climate_heat)
             aid = P.materialise(tx, rng, settlement_id=None, zone_id=g.home_zone_id, band="adult", sex=sex,
                                 dossier=skeleton_dossier(sd), place_id=tplace, at=at, turn_index=0, cause_event_id=None,
                                 archetype=g.group_id, event_origin="worldgen")

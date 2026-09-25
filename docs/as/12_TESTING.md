@@ -263,6 +263,13 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p07_slice/test_far_hearing.py` | the moment ends at the street but a shot reaches the shop, never the sealed cellar; the one in the shop perceives it in a played turn |
 | `p09_society/test_theft_seen.py` | only who saw the taking and knows whose it is carries the rumour; talk spreads from them; taking one's own, or moving a thing, is no theft |
 
+### 3.16 Generated people's looks and clothes; the story and the UI show them (F1a-2; D-94)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_materialise.py` (amended) | generated people look like someone (hair by age, no beard on a woman or a boy, no tattoo on a child, the prose agrees) and not like each other; they dress for the climate (warm and coated where cold, no coat where hot, a medic's scrubs), one piece per slot and layer; nobody steps out of the count naked; a generated world is dressed |
+| `p07_slice/test_narration_looks.py` | the prose is given how someone looks and smells as they come in, and only then, never the player; the scene's people chip carries it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

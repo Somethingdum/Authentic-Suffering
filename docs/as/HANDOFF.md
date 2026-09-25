@@ -11,7 +11,7 @@ the DSH builder; delete it when P12 ships.
 throw them into the final system, don't waste compute."). The bodies are the `_impl_*.py` files
 bound at the end of each contract module (AGENTS.md §4), plus the modules built in place. Built:
 P0–P10, the sim soak, Actor v2 B1–B6 (D-87..D-93) and the owner's F1a, F1b, H1, I1, W1 and F1c
-(D-77, D-80, D-82..D-86). Every engine contract test passes except the seven D-76 items (the
+(D-77, D-80, D-82..D-86, D-94: F1a-2 too). Every engine contract test passes except the seven D-76 items (the
 sessions browser and a world that names no run), which the DSH builder builds. The P10 screens of
 the Play UI are in `talemate_frontend/src/play/`; the P8 screens, the Talemate plugin and the
 frontend toolchain are not built — the DSH builder builds them (13_BUILD_ORDER §4.0).
@@ -53,9 +53,9 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   them grimy; rain soaks them and rinses the gore off; a wash takes water, a wipe less; smearing on the
   dead carries the strain; clothes come off, go on and off people who cannot stop you, never a child's;
   clothes keep people warm and the cold can kill; the reek of the dead and a naked adult in sight wear on
-  people; settlements have a decency law. Left of this item: **F1a-2** generated people (worldgen people
-  and `society.population.materialise`) get looks and outfits fit for their climate, and the narrator
-  and the Play UI show how people look and smell.
+  people; settlements have a decency law. **F1a-2 is BUILT** (D-94; tests 12 §3.16): generated people get looks
+  and clothes for their climate, and the narrator and the Play UI's people chips show how people
+  look and smell.
 - **Human people** (the owner: smart, but human smart; everybody has a breaking point; bickering,
   brawls, betrayal). **H1 is BUILT** (D-84, TEMPER-01..08, LOOP-07, STL-15; 05 §7.1; 13 §4.0 step
   1; tests 12 §3.6): stress that deaths, hunger and blows build and sleep eases; a temper per person on

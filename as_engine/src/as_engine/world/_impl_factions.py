@@ -283,11 +283,12 @@ def operator_dossier(rng, tx, group_id, k, sex, cause):
     age = rng.range_int(tx, "factions", f"decon_age:{cause}:{k}", 22, 45)
     special = {L: 4 + rng.range_int(tx, "factions", f"decon_special:{cause}:{k}:{L}", 0, 3) for L in "SPECIAL"}
     from .worldgen._impl_wg import cohort_kind
-    dsf = json.loads(tx.query_one("SELECT params_json FROM world_params WHERE id=1")[0])["days_since_fall"]
+    wp = json.loads(tx.query_one("SELECT params_json FROM world_params WHERE id=1")[0])
+    dsf = wp["days_since_fall"]
     seed = PersonSeed(name=f"{given} {family}", age=age, sex=sex, cohort=cohort_kind(age, dsf), occupation=D.occupation,
                       skills={"firearms": 2, "melee": 1, "athletics": 1}, special=special,
                       variant=rng.range_int(tx, "factions", f"decon_variant:{cause}:{k}", 0, 999),
-                      settlement_name=sname, group_name=r[1])
+                      settlement_name=sname, group_name=r[1], climate_heat=int((wp.get("a") or {}).get("climate_heat", 5)))
     d = skeleton_dossier(seed)
     d["id"] = d["id"] + f"_{k}_{(cause or 'x')[-6:]}"
     d["appearance"]["clothing_usual"] = D.appearance

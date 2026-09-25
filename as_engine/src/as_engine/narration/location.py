@@ -47,8 +47,10 @@ describe(tx, pc_id, at, refs=None) -> LocationView
     status_words, known = a known_name exists); status_words only at level 'clear', in this order:
     'asleep' (alive and awareness 'asleep'), 'down' (dead or unconscious), 'armed' (a firearm or
     melee item in hand_l / hand_r), 'hurt' (an unhealed wound that is severe or catastrophic, or
-    not clotted). A silhouette (no source, detail.level 'silhouette') -> PersonChip(ref for the
-    internal id f"figure:{percept_id}", label 'a figure', [], known False).
+    not clotted). (F1a-2) looks = what mind.packet LOOK-06 gives an entity here (appearance_text at
+    the best level of the PC's latest view of it and space.point_distance, then smell_text, the
+    non-empty ones joined with one space). A silhouette (no source, detail.level 'silhouette') ->
+    PersonChip(ref for the internal id f"figure:{percept_id}", label 'a figure', [], known False).
   exits: every portal of the place except walls, by portal_id -> ExitView(ref, label = portal
     name, state_words, leads_to = the far place's name when the PC has a known_places row for it,
     else 'unknown'). state_words, orthogonal (GEO-01): 'open' / 'closed' (not for fences);

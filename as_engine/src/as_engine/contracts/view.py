@@ -37,6 +37,8 @@ class PersonChip(Strict):
     label: str = Field(description="Name if the PC knows it, else a short description.")
     status_words: list[str] = Field(default_factory=list, description="e.g. ['asleep'], ['armed', 'hurt']")
     known: bool
+    looks: str = Field(default="", description="F1a-2: how they look and smell to the PC now (as mind.packet LOOK-06); "
+                       "'' when not seen clearly or partly.")
 
 
 class ExitView(Strict):

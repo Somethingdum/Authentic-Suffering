@@ -53,8 +53,9 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   ActorDossier schema, client.call with no output model; the answer (lanes.parse.extract_json of
   the text) must validate as an ActorDossier after the LOCKED fields are copied over it from the
   skeleton: schema, id, generation ('generated'), identity, capability.special,
-  capability.skills, days_since_fall_range (None), tags; a failed call, or an answer that does not
-  validate, keeps the skeleton (no repair call).
+  capability.skills, days_since_fall_range (None), tags, and (F1a-2, LOOK-10) appearance.looks —
+  how a person looks and what they wear is not the model's to rewrite; a failed call, or an answer
+  that does not validate, keeps the skeleton (no repair call).
 WG-28 Writing (per person, slot order; pack actors first in placement order): the body, needs, a
   position at the settlement site's anchor, the dossier (source 'pack' with its content ref, or
   'generated') and the actor (resolve_max from mind.actor.resolve_max; resolve_cur = resolve_max;
@@ -100,6 +101,19 @@ async write_people(client, rng, tx, plan, region, params, canon, detail, at, pro
   People(pack_placed: [actor ids], generated: [actor ids], skipped: [(ref, reason)], home_settlement_id,
   leaders: {group_id: actor_id}, roles: {actor_id: post role, 'leader' or the seat} for the
   generated posts, leaders and seat holders).
+
+LOOK-10 (the owner's F1a-2: everyone has a visual identity, and people dress for where they live)
+  generated_looks(seed) -> dict: a contracts.dossier.Looks as a dict, a pure function of the
+  PersonSeed (implemented below): hair (colour by age — grey from 50, white or grey from 70, none
+  when shaved or bald; length and, for collar length or longer, a style), facial hair (men of 16
+  and over), eyes, a complexion that names the skin, up to two visible marks (never a tattoo on a
+  child), and an outfit of core clothing, one piece per slot and layer, chosen by the climate band
+  of seed.climate_heat (1-3 cold: a warm top, a heavy outer coat, long legs, boots; 4-7 mild; 8-10
+  hot: light top, short or light legs, no coat), by age (under 13: a child's outfit) and by post
+  (a medic's scrubs, with clogs where it is not cold, a cook's apron where no coat is needed, a watcher's or raider's
+  boots and vest, a gardener's or pump hand's rubber boots). skeleton_dossier's appearance.looks is
+  it, and its prose hair, eyes and skin say the same thing. Every generated person is created
+  with those looks and dressed in that outfit (society.population.materialise).
 """
 
 from __future__ import annotations
@@ -127,6 +141,7 @@ class PersonSeed:
     variant: int
     settlement_name: str
     group_name: str
+    climate_heat: int = 5       # LOOK-10: the region's climate_heat (1-10); what they dress for
 
 
 @dataclass
@@ -145,7 +160,122 @@ async def write_people(client, rng: "Rng", tx: "Tx", plan: "PolityPlan", region:
 
 
 _BUILD = ("slight", "ordinary", "wiry", "broad", "heavyset")
-_HAIR = ("black", "brown", "grey", "red", "fair", "shaved")
+
+# LOOK-10 (F1a-2): what anyone can see of a generated person, and what they wear for the climate.
+_HAIR_COLOURS = ("black", "dark brown", "brown", "light brown", "auburn", "red", "dark blonde", "blonde", "sandy")
+_HAIR_GREYING = ("grey", "greying brown", "iron-grey", "salt-and-pepper")
+_HAIR_OLD = ("white", "grey")
+_HAIR_LENGTHS = ("cropped", "short", "short", "collar", "shoulder", "long", "shaved", "short")
+_HAIR_STYLES = ("", "tied back", "in a rough braid", "matted at the back", "hacked short with a knife", "combed flat", "")
+_FACIAL_HAIR = ("none", "stubble", "stubble", "beard", "mustache", "full_beard", "none")
+_EYES = ("brown", "dark brown", "hazel", "green", "blue", "grey", "brown")
+_SKIN = ("pale skin", "fair skin freckled across the nose", "olive skin", "light brown skin", "brown skin",
+         "deep brown skin", "tanned, weathered skin", "ruddy, windburnt skin", "sallow skin")
+_MARKS = (("through the left eyebrow", "a pale crescent scar", "near"),
+          ("across the back of the right hand", "a ridged burn scar", "near"),
+          ("on the side of the neck", "a faded tattoo of a swallow", "near"),
+          ("along the jaw", "a thin white scar", "close"),
+          ("on the left forearm", "a row of tally marks inked in blue", "near"),
+          ("on the bridge of the nose", "a badly set break", "near"),
+          ("across the knuckles of both hands", "old split scars", "close"),
+          ("on the right cheek", "a pitted pockmark scar", "close"))
+_CHILD_MARKS = (("on the chin", "a small white scar", "close"), ("on the back of the left hand", "a healing scrape", "close"))
+_OUTER_COLOURS = ("black", "navy", "olive", "grey", "brown", "dark green", "faded red")
+_CLOTHES = {   # climate band -> slot -> choices (None = nothing there)
+    "cold": {"top": ("thermal_top", "turtleneck", "thermal_top"), "outer": ("parka", "car_coat", "fleece_jacket", "parka"),
+             "legs": ("work_pants", "cargo_pants", "jeans"), "feet": ("combat_boots", "rubber_boots")},
+    "mild": {"top": ("t_shirt", "button_down_shirt", "hooded_sweatshirt", "polo_shirt", "t_shirt"),
+             "outer": ("denim_jacket", "fleece_jacket", "running_jacket", "cardigan", None, None),
+             "legs": ("jeans", "cargo_pants", "work_pants", "long_skirt", "leggings"),
+             "feet": ("sneakers", "combat_boots", "rubber_boots", "sneakers")},
+    "hot": {"top": ("tank_top", "t_shirt", "athletic_top", "button_down_shirt"), "outer": (None,),
+            "legs": ("cargo_shorts", "skort", "long_skirt", "jeans"), "feet": ("sneakers", "clogs", "sneakers")},
+}
+_CHILD_CLOTHES = {
+    "cold": {"top": ("thermal_top", "hooded_sweatshirt"), "outer": ("parka", "car_coat"), "legs": ("jeans", "leggings"),
+             "feet": ("rubber_boots", "sneakers")},
+    "mild": {"top": ("t_shirt", "hooded_sweatshirt"), "outer": (None, "denim_jacket"), "legs": ("jeans", "leggings"),
+             "feet": ("sneakers",)},
+    "hot": {"top": ("t_shirt", "tank_top"), "outer": (None,), "legs": ("cargo_shorts", "skort"), "feet": ("sneakers",)},
+}
+_TRADE_FEET = {"watcher": "combat_boots", "raider": "combat_boots", "hunter": "combat_boots", "tracker": "combat_boots",
+               "scavenger": "combat_boots", "gardener": "rubber_boots", "pump_operator": "rubber_boots"}
+_TRADE_LEGS = {"watcher": "cargo_pants", "raider": "cargo_pants", "hunter": "cargo_pants", "gardener": "work_pants",
+               "builder": "work_pants", "mechanic": "work_pants", "pump_operator": "work_pants"}
+
+
+def _climate_band(heat: int) -> str:
+    return "cold" if heat <= 3 else "hot" if heat >= 8 else "mild"
+
+
+def generated_looks(seed: "PersonSeed") -> dict:
+    """LOOK-10 (implemented; deterministic): a Looks dict — hair, eyes, skin, marks and a climate-fit
+    outfit — from the seed alone."""
+    v, age, child = seed.variant, seed.age, seed.age < 13
+    length = _HAIR_LENGTHS[(v // 3) % len(_HAIR_LENGTHS)]
+    if seed.sex == "male" and age >= 60 and v % 5 == 0:
+        length = "bald"
+    if length in ("shaved", "bald"):
+        colour = ""
+    elif age >= 70:
+        colour = _HAIR_OLD[v % len(_HAIR_OLD)]
+    elif age >= 50:
+        colour = _HAIR_GREYING[v % len(_HAIR_GREYING)]
+    else:
+        colour = _HAIR_COLOURS[v % len(_HAIR_COLOURS)]
+    style = _HAIR_STYLES[(v // 7) % len(_HAIR_STYLES)] if length in ("collar", "shoulder", "long") else ""
+    facial = _FACIAL_HAIR[(v // 5) % len(_FACIAL_HAIR)] if seed.sex == "male" and age >= 16 else "none"
+    if child:
+        marks = [_CHILD_MARKS[v % len(_CHILD_MARKS)]] if v % 3 == 1 else []
+    else:
+        n = v % 3
+        first = (v // 17) % len(_MARKS)
+        marks = [_MARKS[(first + 3 * i) % len(_MARKS)] for i in range(n)]
+    band = _climate_band(seed.climate_heat)
+    table = (_CHILD_CLOTHES if child else _CLOTHES)[band]
+    top = table["top"][v % len(table["top"])]
+    outer = table["outer"][(v // 2) % len(table["outer"])]
+    legs = table["legs"][(v // 3) % len(table["legs"])]
+    feet = table["feet"][(v // 4) % len(table["feet"])]
+    occ = "" if child else seed.occupation
+    body = None
+    if occ == "medic":
+        body, top, legs, feet = "scrubs", None, None, ("combat_boots" if band == "cold" else "clogs")
+        if band == "mild":
+            outer = "cardigan"
+        elif band == "cold":
+            outer = "parka"          # scrubs are thin: the heaviest coat over them
+    feet = _TRADE_FEET.get(occ, feet)
+    legs = _TRADE_LEGS.get(occ, legs) if legs is not None else None
+    if occ == "cook" and band != "cold":
+        outer = "apron"
+    if occ in ("watcher", "raider") and band != "cold":
+        outer = "tactical_vest"
+    state = "soiled" if v % 5 == 0 else "torn" if v % 7 == 3 else "worn"
+    outfit = []
+    for i, item in enumerate((body, top, outer, legs, feet)):
+        if item is None:
+            continue
+        piece = {"item": f"core:item/{item}", "state": state if not outfit else "worn"}
+        if item == outer and i == 2 and item not in ("apron", "tactical_vest"):
+            piece["colour"] = _OUTER_COLOURS[(v // 11) % len(_OUTER_COLOURS)]
+        outfit.append(piece)
+    if band == "hot" and not child and v % 4 == 0:
+        outfit.append({"item": "core:item/bandana", "state": "worn"})
+    if age >= 60 and v % 3 == 0:
+        outfit.append({"item": "core:item/reading_glasses", "state": "worn"})
+    elif not child and v % 11 == 0:
+        outfit.append({"item": "core:item/glasses", "state": "worn"})
+    return {"hair_colour": colour, "hair_length": length, "hair_style": style, "facial_hair": facial, "facial_hair_words": "",
+            "eye_colour": _EYES[(v // 2) % len(_EYES)], "complexion": _SKIN[(v // 13) % len(_SKIN)],
+            "marks": [{"where": w, "what": what, "shows": shows} for w, what, shows in marks], "outfit": outfit}
+
+
+def _hair_words(looks: dict) -> str:
+    if looks["hair_length"] in ("shaved", "bald"):
+        return "shaved head" if looks["hair_length"] == "shaved" else "bald"
+    style = f", {looks['hair_style']}" if looks["hair_style"] else ""
+    return f"{looks['hair_length']} {looks['hair_colour']} hair{style}"
 _TRAITS = (
     ("careful", "checks every door twice", "a noise at night", "is slow to move", "loses time",
      "made everyone wait at the gate while the street was checked"),
@@ -203,6 +333,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     ex = _EXEMPLARS[(v // 7) % len(_EXEMPLARS)]
     skills = [{"domain": d, "rank": r, "evidence": f"{first} learned it the hard way at {seed.settlement_name}."}
               for d, r in sorted(seed.skills.items())]
+    looks = generated_looks(seed)
     work = seed.occupation if adult else "child"
     return {
         "schema": "as.actor.v1", "id": "gen_" + "".join(c if c.isalnum() else "_" for c in seed.name.lower()),
@@ -213,14 +344,14 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                      "one_line": f"{seed.name}, {'a ' + work if adult else 'a child'} at {seed.settlement_name}."},
         "appearance": {"height_cm": (160 + (v % 30)) if adult else (90 + seed.age * 5),
                        "mass_kg": (55 + (v % 40)) if adult else (12 + seed.age * 3),
-                       "build": _BUILD[v % len(_BUILD)], "hair": _HAIR[(v // 3) % len(_HAIR)], "eyes": "brown",
-                       "skin": "weathered" if adult else "sunburnt",
-                       "distinguishing_marks": [f"a scar {first} never explains" if v % 2 else "a chipped front tooth"],
+                       "build": _BUILD[v % len(_BUILD)], "hair": _hair_words(looks), "eyes": looks["eye_colour"],
+                       "skin": looks["complexion"],
+                       "distinguishing_marks": [f"{m['what']} {m['where']}" for m in looks["marks"]] or ["nothing anyone remembers"],
                        "clothing_usual": "patched work clothes" if adult else "hand-me-downs two sizes big",
                        "movement_under_stress": "moves quickly and keeps to the walls",
                        "habit_gesture": ("rubs the back of the neck", "taps two fingers on anything near",
                                          "cracks the knuckles")[v % 3],
-                       "relation_to_appearance": "does not think about it"},
+                       "relation_to_appearance": "does not think about it", "looks": looks},
         "capability": {"special": dict(seed.special), "skills": skills, "literacy": 2 if adult else 1,
                        "tech_literacy": 1},
         "motive": {"motive": f"keep {seed.group_name} fed and safe", "method": "does the work assigned, and some more",
