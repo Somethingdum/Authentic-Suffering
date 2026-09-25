@@ -1,86 +1,151 @@
-"""Cheat activation, parsing and execution (P12). Owner 'cheats' (cheat_log) — state changes go
-through the owning modules' APIs with Event.origin = 'cheat' and type CHEAT_OVERRIDE.
+"""Cheat activation, parsing and execution (P12). Rules CHEAT-01..11. Owner 'cheats' (cheat_log).
+docs/as/CHEATS.md is the bonus document (voice, examples); this docstring is the machine contract.
+Every state change is an event with origin 'cheat' of type CHEAT_OVERRIDE whose writer is the
+module that owns what it writes (bodies -> 'physical.bodies', positions -> 'physical.space', meta
+-> 'kernel.meta', world_clock -> 'kernel.clock', actors / dossier_deltas -> 'mind.actor',
+group_standing -> 'society.group', cheat_log -> 'cheats'), unless a named owner function does it.
+Commands run between turns in ONE store transaction of their own: at = world_clock.now_ms, T =
+world_clock.turn_index; no world time passes (except /time) and nobody perceives a command
+(CHEAT_OVERRIDE is not a sensory type); people meet the resulting state at the next turn.
 
-detect_activation(text) -> bool   (CHEAT-01)
-  True when the standalone token 2508 appears: re.search(r"(?<!\\d)2508(?!\\d)", text).
-  Activation commits CHEAT_ACTIVATED, sets meta.cheat_active = '1', and the UI receives
-  cheat_activated {persona_line} (the narrator tell is a UI shimmer; the narrator itself never
-  knows — cheat vocabulary appears in NO narrator/actor prompt, ever: CHEAT-03).
-  The input line that contained the token is consumed by activation (no turn is played).
+detect_activation(text) -> bool   (CHEAT-01, implemented): the standalone token 2508.
+activate(session) -> CheatResult   (CHEAT-01)
+  The line that held the token is consumed (no turn is played). When meta cheat_active != '1':
+  CHEAT_ACTIVATED (writer 'kernel.meta', origin 'cheat', payload {}) setting it to '1'. Either way
+  the story gets a 'notice' entry SHIMMER_NOTICE and a 'cheat' entry ACTIVATION_LINE (service.
+  session.append_story, turn_index T). Returns CheatResult(True, ACTIVATION_LINE, SHIMMER_NOTICE,
+  [the event id, when one was made]). Activation alone does not mark the run Sandbox.
 
-parse(text) -> CheatCommand | CheatParseError   (CHEAT-02) — only when cheat_active and text
-  starts with '/'. The full grammar, argument vocabulary and persona live in docs/as/CHEATS.md
-  (the bonus document); this list is the machine contract. Command words are case-insensitive;
-  arguments may be quoted with "..." to include spaces; <person>, <place>, <item> resolve by
-  name (see Resolution below).
-    /help                                   list commands (persona voice)
-    /off                                    deactivate (CHEAT_DEACTIVATED; persona signs off)
-    /give <item> [<qty>] [to <person>]      ITEM_CREATED origin 'cheat' (default: to the PC's pack)
-    /heal [<person>]                        remove wounds, blood loss 0, needs 0, pain 0
-    /god on|off [<person>]                  toggle meta 'god_bodies' membership for that body
-    /tp <place>                             move the PC (MOVE origin 'cheat') to a known or named place
-    /set <stat> <value> [<person>]          stat in S P E C I A L (1..10), resolve (0..max),
-                                            or a skill domain (0..3) -> dossier_deltas row
-    /time +<n>h                             advance the world clock n hours (1..720) through the
-                                            normal off-screen tick (the world keeps living)
-    /weather <kind>                         clear|overcast|rain|storm|fog|wind|heat|snow
-    /rep <group> <-5..5>                    set group_standing toward the PC
-    /spawn <what> [x<n>] [ally]             <what> = an actor/pc dossier ref (core:actor/mara_voss),
-                                            a cheat-pack dossier id (e.g. fredrick), or an infected
-                                            type word (shambler|crawler|runner|lurker); n 1..20;
-                                            'ally' adds the PC to the spawned actor's
-                                            accepted_authority. Placed at the PC's place.
-    /despawn <person or item>               remove a CHEAT-ORIGIN entity only; emits CHEAT_OVERRIDE
-                                            with payload {"reconciliation": true} (quarantine repair)
-    /kill <person>                          DEATH with cause 'cheat'
-    /revive <person>                        alive again, wounds cleared (origin 'cheat'); infection
-                                            state is left exactly as it was — no command cures
-                                            (CMG §42.2, lore core:lore/no_cure)
-    /reveal                                 truth-layer summary of the PC's place and adjacent places
-                                            (cheat message only)
-    /mind <person>                          that actor's current goal, plan, top beliefs, open loops
-                                            and last private_reason (cheat message only)
-    /brief <person>                         GRANT that actor the current truth about the PC's place,
-                                            present people and known factions as beliefs
-                                            (perception.grant, provenance 'cheat', confidence 3).
-                                            This is how an omniscient cheat companion stays inside
-                                            Skull Law: it believes true things because a cheat put
-                                            them in its head, and nothing else changes.
-    /noise <db> [here|at <anchor>]          a NOISE event of that level (40..180)
-  Resolution: names resolve against what the PC knows first (acquaintance, known_places), then
-  every entity (display names, place names, item names, group names), case-insensitive; exact
-  match first, else difflib.get_close_matches(cutoff=0.8); ambiguity or no match ->
-  CheatParseError naming the candidates. Unknown command word -> CheatParseError whose message is
-  a persona line (never a stack trace).
+parse(text) -> CheatCommand | CheatParseError   (only for a line that starts with '/' while
+  cheat_active is '1'). Tokens: TOKEN_RE over the text after '/' — a "double-quoted" run is one
+  token (quotes dropped), anything else splits at whitespace. The first token, lowercased, is the
+  command; not in USAGE -> CheatParseError("No lever called '<word>', Boss. Try /help."); nothing
+  after the slash -> CheatParseError('Say the word, Boss — a command after the slash. Try
+  /help.'). Arguments that do not fit -> CheatParseError(f"That's not how /{name} works, Boss:
+  {USAGE[name]}."). args by command (names are joined with single spaces when unquoted):
+    help, off, reveal: {} (anything after is ignored)
+    give <item> [<qty 1..999>] [to <person>]: {item, qty?, person?}
+    heal [<person>]: {person?}          god on|off [<person>]: {on: bool, person?}
+    tp <place>: {place}                 time +<n>h (n 1..720): {hours}
+    set <stat> <value> [<person>]: {stat, value, person?} — stat a SPECIAL letter (uppercased;
+      value 1..10), 'resolve' (0..99) or a SKILL_DOMAINS value (0..3)
+    weather <kind in WEATHER_KINDS>: {kind}    rep <group> <-5..5>: {group, value}
+    spawn <what> [x<n 1..20>] [ally] (in any order after what): {what, n (1), ally (False)}
+    despawn <person or item>: {target}; kill / revive / mind / brief <person>: {person}
+    noise <db 40..180> [here | at <anchor>]: {db, anchor?}
+  CheatCommand(name, args, raw = the stripped text).
 
-execute(session, command) -> CheatResult(ok, persona_line, detail, events)   (CHEAT-04..07)
-  Runs in its own store transaction OUTSIDE the turn pipeline; takes no world time (except /time);
-  CHEAT_OVERRIDE is not a sensory event (perception ignores it — people perceive only the
-  resulting state at the next compile).
-  Every executed command: cheat_log row (verbatim command, outcome, persona line), CHEAT_OVERRIDE
-  event with origin 'cheat'; every command NOT in SANDBOX_EXEMPT also sets meta.sandbox = '1'
-  (irreversible for the run; the run card and top bar show it).
-  Cheat packs (CHEAT-10): packs whose id starts with 'cheat_' are compiled with the others but only
-  /spawn may resolve their dossiers; worldgen and the New Life wizard never read them.
-  Quarantine (CHEAT-05): spawned bodies/items get origin 'cheat'; actors.quarantine = 1;
-  worldgen, threat scaling, faction balance and the abuse battery exclude quarantined entities.
-  God mode: meta 'god_bodies' JSON list; bodies.apply_harm skips wounds for listed bodies (the
-  check is per body, never per player — L12).
-  /reveal and /mind return text for the cheat message only; they never enter narration or any
-  actor packet (CHEAT-06). /brief is the one command that writes beliefs, and only through
-  perception.grant (so every belief it creates is visible in percept_log with origin 'cheat').
-  Persona lines (CHEAT-09): the CHEAT_PERSONA call (lane B) writes one line per executed command
-  with the last 5 persona lines listed as 'do not repeat'; on any failure a canned line from
-  CANNED_LINES[command] is used, never the same canned line twice in a row (rng stream 'cheats').
-  Standing brief (CHEAT-11): an actor whose dossier carries the tag 'standing_brief' (allowed only
-  in cheat_ packs; generation 'cheat') is briefed automatically at Stage 2 of every turn in which
-  it is HOT or WARM, before its packet is built: the /brief grant PLUS the truth_text of every
-  loaded faction, the current goal and dossier secrets of every body present, and the positions of
-  infected within two route hops. Same door (perception.grant, provenance 'cheat', confidence 3),
-  no cheat_log row (the spawn already logged it), and nothing changes for anyone else. This is
-  Fredrick's "engine-level awareness" (your Batch-2 idea) implemented inside Skull Law.
-  Hard line (CHEAT-08): no command, argument or spawned dossier may produce sexual content
-  involving a minor; CNT-11 validation runs on every spawned dossier. This outranks cheats.
+resolve(tx, pc_id, kind, name) -> (id, None) | (None, persona line)   (§4 Names)
+  kind 'person': 'me' / 'myself' / 'self' -> the PC; else first the PC's acquaintance rows
+  (known_name, then description), then every actors row (display_name, then its first word);
+  'place': the PC's known_places, then every place; 'group': every group; 'item_def': canon items
+  by ref, bare id, name and plural; 'item': the world's items by their def's name. Within each
+  tier: an exact case-insensitive key naming one id wins; several ids -> ambiguous; else
+  difflib.get_close_matches(cutoff 0.8) over the tier's keys, one id -> it. The first tier that
+  names exactly one id wins. Ambiguous -> f"Too many of those, Boss: {up to five names}. Be
+  specific."; nothing -> f"Never heard of {anyone | anywhere | any group | any such thing} called
+  '{name}', Boss."
+
+async execute(session, command) -> CheatResult   (CHEAT-04..08)
+  help -> the persona line (below) and detail HELP_TEXT; a story 'cheat' entry; nothing else.
+  Every other command runs its effect; an effect that cannot happen returns (False, a persona line
+  — resolve's, or the command's own below) and changes nothing: no log, no sandbox. A command that
+  happened: persona line; unless in SANDBOX_EXEMPT, a CHEAT_OVERRIDE (writer 'cheats', payload
+  {command, raw, outcome} + reconciliation: true for /despawn) inserting cheat_log {entry_id
+  (kind 'cht'), turn_index T, command = raw, outcome, persona_line, event_id = the first effect
+  event's id or None}, and — when meta sandbox != '1' — CHEAT_OVERRIDE (writer 'kernel.meta',
+  payload {sandbox: true}) setting it to '1' for good. Story: a 'cheat' entry raw + '\n' + the
+  line (never /reveal's or /mind's detail: CHEAT-06). Returns CheatResult(True, line, detail or
+  outcome, the effect event ids).
+  give: the item def (resolve 'item_def') to the person (default the PC): physical.objects.create
+    (origin 'cheat', event_origin 'cheat') into holder slot 'pack' — one row of qty when it
+    stacks (or qty is 1), else qty rows of 1. Outcome f"gave {qty} {plural or name} to {name}".
+  heal: a living body -> CHEAT_OVERRIDE (physical.bodies): every unhealed wound healed_at = at and
+    clotted 1; blood_loss_pct 0, pain 0, impairment 0 (awareness 'awake', posture 'standing'
+    when it was 'unconscious'); its needs row (if any) all stages 0, last drink / meal / sleep =
+    at, chill 0. A dead body -> "They're past a bandage, Boss. Try /revive."
+  god: meta 'god_bodies' (a JSON list, sorted) gains or loses the body (UPSERT, kernel.meta).
+    physical.bodies.apply_harm then gives that body no wound (L12: per body).
+  tp: the PC's positions row -> the place, its first anchor by anchor_id (its point) or, with
+    none, the place's centre; since_ms = at, hidden 0 (physical.space; not a MOVE: no one sees it).
+  set: a letter -> bodies.special[letter] (physical.bodies) and, for an actor, a dossier_deltas
+    'set' of capability.special.<letter> (mind.actor); 'resolve' -> actors.resolve_cur =
+    clamp(value, 0, resolve_max); a skill -> a dossier_deltas 'set' of capability.skills: the
+    list without that domain, plus {domain, rank = value, evidence 'The Boss said so, and so it
+    was.'} when value > 0, sorted by domain. No actor for resolve or a skill -> f"{name} has no
+    mind to set that in, Boss."
+  time: turn.timers.run_offscreen(tx, session.rng, at + hours h, T) — the world keeps living.
+  weather: world_clock weather = kind, wind_level 2 for 'wind', 3 for 'storm', else 0.
+  rep: group_standing {group, the PC} UPSERT standing = value, reasons [].
+  spawn: RETIRED_SPAWNS[what] -> that line and nothing else (ok, not logged). A type word (shambler,
+    crawler, runner, lurker: a canon 'infected' record whose name, lowercased, is the word — else
+    whose id holds the word in capitals, ZOMBIE_ARCHETYPE_SHAMBLER01) -> n x
+    world.infected.spawn(tx, rng, the PC's place, that type's id, at, T, None, origin 'cheat',
+    x = min(width, PC x + 1 + 0.5 i), y = the PC's y). Else a dossier: a full ref or bare id among
+    the run's actor / pc records, then among the cheat_ packs under config.content_dir
+    (content.pack.load_pack; CHEAT-10: nothing else reads them). None -> "Never heard of anyone or
+    anything called '<what>', Boss." A dossier of someone under 18 carrying any
+    content.safety.unsafe_terms word -> refused: "No. Not that, not ever, Boss.", a cheat_log row
+    (outcome 'refused: the hard line', payload refused: true), no sandbox (CHEAT-08). Otherwise n
+    times: physical.bodies.create (kind 'lurker' when the dossier's tags hold 'lurker', else
+    'human'; origin 'cheat'; its looks), physical.space.place_body at the PC's place and anchor, x
+    as above, the outfit created worn (origin 'cheat'), mind.actor.create(..., source 'cheat',
+    content_ref, event_origin 'cheat'), actors quarantine = 1 and accepted_authority = [the PC]
+    for 'ally' else [] (CHEAT_OVERRIDE, mind.actor), and a known_places row for where it stands.
+  despawn: a person whose body has origin 'cheat' -> bodies alive 0, dead_at = at, awareness
+    'dead', posture 'lying' (physical.bodies) and its positions row deleted (physical.space): gone
+    from the world; an item of origin 'cheat' -> physical.objects.destroy. Anything else -> "Only
+    what I made, Boss. That one was here before me."
+  kill: a living body -> physical.bodies.kill(tx, body, 'cheat', at, T, rng) (DEATH, cause
+    'cheat'); dead already -> 'Already dead, Boss. Thorough, though.'
+  revive: a dead human, lurker or animal body -> the heal writes plus alive 1, dead_at /
+    death_event / false_dead_until NULL, awareness 'awake', posture 'standing'; its pending
+    REANIMATION timers cancelled (kernel.clock.cancel, reason 'revived'); its infections stay
+    exactly as they were — nothing cures (CMG §42.2). Alive -> "They're still breathing, Boss.";
+    an infected body -> "That one's past saving, Boss."
+  reveal: detail = one line per place — the PC's, then the places a portal joins it to (sorted):
+    f"{place}: " + '; '.join(each living body there but the PC, by body_id: its display name (or
+    'one of the dead' / its kind), ' — ' + current_task or goal_text when there is one, and ' (holding
+    …)' with the names of what is in its hands) or 'nobody'. Text only (CHEAT-06).
+  mind: an actor -> detail lines 'Goal: …', 'Plan: goal — steps' (plans row), 'Believes: ' the five
+    believed, live holdings by (confidence desc, acquired_at desc), 'On their mind: ' five open
+    loops by (strength desc, created_at desc), 'Last reason: ' the private_reason of its latest
+    ACTION_START. Text only (CHEAT-06).
+  brief: a living actor -> CHEAT_OVERRIDE (writer 'cheats', no writes) and perception.grant(tx,
+    it, event_id = that event, VISUAL, EXACT, 'You simply know how things stand here.', None, at,
+    T, confidence 3, beliefs = brief_beliefs(tx, it, the PC's place), detail {cheat: true},
+    provenance 'cheat') — the ordinary door, on the record (CHEAT-06: the one command that writes
+    a mind).
+  noise: a NOISE (writer 'action.propagate', origin 'cheat', place_id) {source_db: db, kind
+    'noise', text 'a loud noise' (db >= 100) or 'a noise', place_id, x_m, y_m of the PC — or of the
+    anchor of its place named by 'at' (resolved like a name)}.
+  off: CHEAT_DEACTIVATED (writer 'kernel.meta') setting cheat_active '0'; the line is
+    DEACTIVATION_LINE; the Sandbox mark stays.
+brief_beliefs(tx, holder, place) -> list[BeliefFromPercept]: for each living body in the place but
+  the holder (by body_id): ('body', id, 'location', f"{name} is here, in {place name}.", place)
+  and, when it has a goal, ('body', id, 'wants', f"{name} wants: {goal}"); for each faction group
+  (by group_id) whose doctrine has 'aims' (or 'goal', or 'truth_text'): ('group', id, 'aims',
+  f"{group}: {aims}").
+async persona(session, tx, name, outcome) -> str   (CHEAT-09)
+  One CHEAT_PERSONA call (lane B) with CheatPersonaContext(command f'/{name}', outcome,
+  recent_lines = the last five non-empty cheat_log persona lines, newest first), recorded with
+  lanes.calllog.record. Its first line, stripped, when the call is 'ok', not empty and not one of
+  those lines (at most 300 characters); else a canned line from CANNED_LINES[name] that is not
+  the newest logged line — rng.choice(tx, 'cheats', f"canned:{name}:{count}:{at}", …) — so a
+  canned line never comes twice in a row.
+god_bodies(tx) -> set[str]: meta 'god_bodies' parsed (absent or unreadable: empty).
+standing_brief(tx, actor_id, turn_index, at) -> int   (CHEAT-11)
+  An actor whose fused dossier's tags hold 'standing_brief' and that has a position: brief_beliefs
+  for its place plus, for each place within two hops (physical.space.places_near(place, 2) and the
+  place itself, sorted) with living infected bodies, ('place', id, 'infected_count', f"{n} of the
+  dead are at {place}.") — granted as /brief does, cause a CHEAT_OVERRIDE (writer 'cheats', payload
+  {standing_brief: actor}); no cheat_log row (the spawn already logged). Returns the belief count
+  (0 for anyone else). turn.pipeline calls it once per turn, for such an actor the first wave it
+  is HOT or WARM, before its packet is built.
+Quarantine (CHEAT-05): cheat-made bodies and items keep origin 'cheat'; cheat-made actors have
+  quarantine 1; worldgen, threat scaling, faction balance and the abuse battery leave them out.
+Hard line (CHEAT-08): no command, argument or spawned dossier may produce sexual content involving
+  a minor; it outranks the developer word.
 """
 
 from __future__ import annotations
@@ -89,12 +154,29 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from ..contracts.common import SkillDomain
+
 ACTIVATION_RE = re.compile(r"(?<!\d)2508(?!\d)")
 
 CommandName = Literal["help", "off", "give", "heal", "god", "tp", "set", "time", "weather", "rep",
                       "spawn", "despawn", "kill", "revive", "reveal", "mind", "brief", "noise"]
 
 SANDBOX_EXEMPT: frozenset[str] = frozenset({"help", "off"})
+
+WEATHER_KINDS: tuple[str, ...] = ("clear", "overcast", "rain", "storm", "fog", "wind", "heat", "snow")
+SKILL_DOMAINS: tuple[str, ...] = tuple(d.value for d in SkillDomain)
+
+USAGE: dict[str, str] = {
+    "help": "/help", "off": "/off", "give": '/give <item> [<qty>] [to <person>]', "heal": "/heal [<person>]",
+    "god": "/god on|off [<person>]", "tp": "/tp <place>", "set": "/set <stat> <value> [<person>]",
+    "time": "/time +<n>h", "weather": "/weather " + "|".join(WEATHER_KINDS), "rep": "/rep <group> <-5..5>",
+    "spawn": "/spawn <what> [x<n>] [ally]", "despawn": "/despawn <person or item>", "kill": "/kill <person>",
+    "revive": "/revive <person>", "reveal": "/reveal", "mind": "/mind <person>", "brief": "/brief <person>",
+    "noise": "/noise <db> [here|at <anchor>]",
+}
+HELP_TEXT = ("The keyring, Boss:\n" + "\n".join(USAGE[c] for c in ("give", "heal", "god", "tp", "set", "time", "weather",
+                                                                   "rep", "spawn", "despawn", "kill", "revive", "reveal",
+                                                                   "mind", "brief", "noise", "off")))
 
 COMMAND_NAMES: tuple[str, ...] = ("help", "off", "give", "heal", "god", "tp", "set", "time", "weather",
                                   "rep", "spawn", "despawn", "kill", "revive", "reveal", "mind",
@@ -177,11 +259,35 @@ def detect_activation(text: str) -> bool:
     return bool(ACTIVATION_RE.search(text))
 
 
+def activate(session) -> CheatResult:
+    raise NotImplementedError("P12")
+
+
 def parse(text: str) -> CheatCommand | CheatParseError:
     raise NotImplementedError("P12")
 
 
-def execute(session, command: CheatCommand) -> CheatResult:
+def resolve(tx, pc_id: str, kind: str, name: str) -> tuple[str | None, str | None]:
+    raise NotImplementedError("P12")
+
+
+async def execute(session, command: CheatCommand) -> CheatResult:
+    raise NotImplementedError("P12")
+
+
+def brief_beliefs(tx, holder: str, place: str) -> list:
+    raise NotImplementedError("P12")
+
+
+async def persona(session, tx, name: str, outcome: str) -> str:
+    raise NotImplementedError("P12")
+
+
+def god_bodies(tx) -> set[str]:
+    raise NotImplementedError("P12")
+
+
+def standing_brief(tx, actor_id: str, turn_index: int, at: int) -> int:
     raise NotImplementedError("P12")
 
 
@@ -193,3 +299,4 @@ def is_cheat_question(text: str) -> bool:
     keys = ("cheat", "god mode", "godmode", "noclip", "infinite ammo", "console", "dev mode",
             "developer", "mr. cheater", "mr cheater")
     return any(k in t for k in keys) or ("code" in t and "unlock" in t)
+from ._impl_cheats import activate, parse, resolve, execute, brief_beliefs, persona, god_bodies, standing_brief  # noqa

@@ -351,7 +351,8 @@ def apply_harm(tx: "Tx", body_id: str, wound: WoundSpec, at: int, cause_event_id
                turn_index: int, rng: "Rng") -> list[Event]:
     """HARM event inserting the wound (+ pain/impairment update) then the death test (rng is
     needed for a false-death draw). Returns the committed events (HARM, and possibly
-    AWARENESS_CHANGE / DEATH / FALSE_DEATH).
+    AWARENESS_CHANGE / DEATH / FALSE_DEATH). (P12, CHEAT god mode) A body listed in meta
+    'god_bodies' takes no wound: nothing is written and [] is returned (L12: per body).
     actor_id (event and payload) = the cause event's actor_id when that actor is a human body,
     else null (infected bites, animals, falls).
     HARM payload (cascades filter on it): {wound_id, body_id, actor_id (null for infected/animals),
@@ -359,6 +360,9 @@ def apply_harm(tx: "Tx", body_id: str, wound: WoundSpec, at: int, cause_event_id
     function_loss, bleed_pct_per_min, contamination}. (F1c LOOK-07: then the wounded body's blood,
     a BODY_CONDITION committed right after the HARM and NOT in the returned list.)"""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    g = tx.query_one("SELECT value FROM meta WHERE key='god_bodies'")
+    if g is not None and body_id in _god_list(g[0]):
+        return []
     R = _rules(tx)
     wid = tx.mint("wnd")
     vals = _wound_values(R, wound.anatomy, wound.type, wound.severity, wound.contamination, at, cause_event_id)
@@ -402,6 +406,22 @@ def _rise_pathway(tx, body_id, at):
         if pw.death_at_h is not None and (at - inf["exposed_at"]) >= pw.death_at_h * 3_600_000:
             return "wet"
     return "cold_start"
+
+
+def _god_list(raw):
+    import json as _json
+    try:
+        return set(_json.loads(raw or "[]"))
+    except (ValueError, TypeError):
+        return set()
+
+
+def kill(tx: "Tx", body_id: str, cause: str, at: int, turn_index: int, rng: "Rng", *,
+         cause_event_id: str | None = None) -> Event:
+    """P12 (the cheat /kill; any code that must end a life outright): the DEATH the death test
+    commits — alive 0, dead_at, death_event, awareness 'dead', posture 'lying', payload {body_id,
+    cause, cause_event_id} and the rise that follows for an infected body (DEATH-01..05)."""
+    return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, rng=rng)
 
 
 def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rng=None):

@@ -34,8 +34,9 @@ pc_facts(view, last_narration) -> list[str]   (in this order, then the first MAX
 answer(session, question, view) -> str   (async)
   last = the text of the newest story_log entry of kind 'narration' (None when there is none);
   turn = world_clock.turn_index. ctx = GuideContext(question = question, pc_name = view.pc_name,
-  pc_facts = pc_facts(view, last), rules_snippets = rules_for(question), cheat_query = False
-  (P12: cheats sets it for a question about cheats before activation)). request =
+  pc_facts = pc_facts(view, last), rules_snippets = rules_for(question), cheat_query =
+  cheats.commands.is_cheat_question(question) and meta cheat_active != '1' (P12, CHEAT-03: a
+  question about cheats before activation gets the in-world deflection)). request =
   lanes.requests.build_request(session.config, CallClass.GUIDE, turn_index=None, context=ctx,
   ctx=ctx); response = await session.client.call(request) (no output model: the answer is prose).
   text = response.text stripped when parse_status is 'ok' and it is not empty, else GUIDE_DOWN.

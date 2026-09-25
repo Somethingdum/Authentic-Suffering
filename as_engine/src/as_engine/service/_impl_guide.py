@@ -52,8 +52,10 @@ async def answer(session, question, view):
     row = st.query_one("SELECT text FROM story_log WHERE kind='narration' ORDER BY entry_id DESC LIMIT 1")
     last = row[0] if row else None
     turn = st.query_one("SELECT turn_index FROM world_clock")[0]
+    from ..cheats.commands import is_cheat_question
+    cq = is_cheat_question(question) and st.meta("cheat_active") != "1"     # CHEAT-03: the in-world deflection
     ctx = GuideContext(question=question, pc_name=view.pc_name, pc_facts=pc_facts(view, last), rules_snippets=rules_for(question),
-                       cheat_query=False)
+                       cheat_query=cq)
     req = build_request(session.config, CallClass.GUIDE, turn_index=None, context=ctx, ctx=ctx)
     resp = await session.client.call(req)
     text = resp.text.strip() if resp.parse_status == "ok" and resp.text and resp.text.strip() else GUIDE_DOWN

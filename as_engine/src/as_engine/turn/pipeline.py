@@ -83,6 +83,9 @@ simulate — stages 0-12 in ONE store transaction:
        audit.log.repair('budget_overrun', 4, 'SCHED-01', {notes}). The wave's record {wave, at,
        lod: {actor: lod value}, salience: {actor: number}, mandatory: sorted ids} goes into the
        stage-4 ledger detail {'waves': [...]} (the PC is never in it).
+    (P12, CHEAT-11) Then, for each actor of plan.lod that is HOT or WARM and not yet seen this turn
+       (sorted), whose actors.quarantine is 1 (only cheat-made people can carry a standing brief):
+       cheats.commands.standing_brief(tx, actor, T, wave_at) — before its packet is built.
     S5 afford: affs = {a: enumerate_affordances(tx, a, canon affordances, wave_at, T) for a in
        plan.lod}.
     S6 cognition: intents = await turn.cognition.decide(tx, session, plan, affs, T, wave_at,

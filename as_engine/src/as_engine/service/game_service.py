@@ -156,9 +156,16 @@ Handlers (P8):
 
   on_turn_submit(InTurnSubmit)   (the player's move; answers are turn_rejected, not error)
     no session -> [turn_rejected {no_run, NO_RUN}]; turn_task running -> [turn_rejected {busy,
-    BUSY}]; the PC's body is dead -> [turn_rejected {dead, DEAD}].
-    (P12, before anything else: cheats.detect_activation on the raw text of every mode — CHEAT-01;
-    after activation a line starting with '/' is a cheat command. Not in P8.)
+    BUSY}].
+    (P12, CHEAT-01) Then, whatever the mode: cheats.detect_activation(text) -> r =
+      cheats.activate(session) -> [cheat_activated {persona_line, ok, detail}, story {story()}] (the
+      line is consumed: no turn, no question). meta cheat_active is '1' and the stripped text
+      starts with '/' -> cmd = cheats.parse(text): a CheatParseError -> [cheat_result
+      {persona_line: its message, ok False, detail ''}]; else r = await cheats.execute(session, cmd)
+      -> [cheat_result {r.persona_line, r.ok, r.detail}, view {view()}, story {story()}]. Before
+      activation a '/' line is ordinary input (CHEAT-01, CHEAT-03).
+    the PC's body is dead -> [turn_rejected {dead, DEAD}] (after the cheat routing: a dead
+    character can still be revived by a cheat).
     mode 'ask' (PROTO-07: not a turn): the stripped text empty -> [turn_rejected {empty,
       EMPTY_QUESTION}]; else text = await service.guide.answer(session, question, last_view or
       view()) -> [guide_answer {text}, story {story()}].

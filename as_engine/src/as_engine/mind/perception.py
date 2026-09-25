@@ -18,6 +18,8 @@ grant(tx, holder_id, *, event_id, channel, fidelity, text, source_id, at, turn_i
       ``confidence`` is given (0..3, else ValueError), min(that, the given value): second-hand news
       is held less surely than it was heard (world.rumours, INFO-02) — believed
       from the BeliefFromPercept, acquired_at = last_confirmed = at, acquired_via = event_id.
+      (P12) ``provenance`` given -> every holding gets that provenance instead ('cheat': what the
+      cheat /brief and the standing brief put in a head, CHEAT-11).
   A new belief on the same (subject_type, subject_id, predicate) as a live holding (superseded_by
   NULL) the holder already has — compared through the holdings' propositions — supersedes it: the
   OLD holding's superseded_by = the new prop id (never deleted; W15 holds). Unknown channel or fidelity 'none' -> ValueError (nothing is
@@ -304,7 +306,8 @@ def _canon(tx):
 def grant(tx: "Tx", holder_id: str, *, event_id: str, channel: Channel, fidelity: Fidelity,
           text: str, source_id: str | None, at: int, turn_index: int,
           confidence: int | None = None,
-          beliefs: list[BeliefFromPercept] | None = None, detail: dict | None = None) -> str:
+          beliefs: list[BeliefFromPercept] | None = None, detail: dict | None = None,
+          provenance: str | None = None) -> str:
     if confidence is not None and not (0 <= int(confidence) <= 3):
         raise ValueError('confidence must be 0..3')
     ch = Channel(channel)
@@ -326,7 +329,9 @@ def grant(tx: "Tx", holder_id: str, *, event_id: str, channel: Channel, fidelity
         writes.append(_W(op=_Op.INSERT, table="propositions", values={"prop_id": prp, "subject_type": b.subject_type,
                          "subject_id": b.subject_id, "predicate": b.predicate, "object_value": b.object_value, "text": b.text, "matches_claim": b.matches_claim,
                          "created_event": event_id}))
-        if ch == Channel.SPEECH:
+        if provenance is not None:
+            prov = provenance
+        elif ch == Channel.SPEECH:
             addressed = bool((detail or {}).get("addressed_to_me"))
             prov = f"told_by:{source_id}" if addressed and source_id else "overheard"
         else:

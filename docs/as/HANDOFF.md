@@ -25,7 +25,8 @@ replaces "the rest will remain uncoded"). What is left:
    leader's orders the recipient decides on) and §11's conversations.
 2. **P11** — BUILT (D-95..D-99; tests 12 §3.17): the 58-bit fault proof and BIT_STAGE, the narrator's
    continuity, the abuse battery, the release audit, the portrayal audit, ablation (§5).
-3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
+3. **P12** — the surfaces (§5). The cheat console of CHEATS.md is BUILT (D-100; tests 12 §3.18);
+   still to do: the **rest of the cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

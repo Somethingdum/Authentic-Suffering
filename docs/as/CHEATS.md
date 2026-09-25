@@ -185,9 +185,9 @@ everyone else:
   pipeline kills him like anyone else.
 - **Quarantined** like every cheat entity (§7).
 
-Cheat packs (`cheat_*`) are compiled with the others but only `/spawn` may use them; worldgen and
-the New Life wizard never read them (CHEAT-10). A `generation: cheat` dossier outside a `cheat_`
-pack is a content error (CNT-14).
+Cheat packs (`cheat_*`) ship in the content folder with the others, but no run loads them: only
+`/spawn` reads them (validated like any pack), and worldgen and the New Life wizard never see
+them (CHEAT-10). A `generation: cheat` dossier outside a `cheat_` pack is a content error (CNT-14).
 
 ## 7. Sandbox and quarantine — cheating is allowed, hiding it is not
 

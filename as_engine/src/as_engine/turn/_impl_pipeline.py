@@ -23,6 +23,7 @@ class Ctx:
     calls: list = field(default_factory=list)
     answered: set = field(default_factory=set)
     judged: list = field(default_factory=list)   # PORT-06: audit.portrayal.Judged, every wave
+    briefed: set = field(default_factory=set)    # CHEAT-11: standing briefs given this turn
     ledger: dict = field(default_factory=dict)
     progress: object = None
     final: int = 0
@@ -145,6 +146,15 @@ async def simulate(ctx):
                 log_repair(tx, "budget_overrun", 4, "SCHED-01", {"notes": plan.notes}, T, wave_at)
             plans.append({"wave": wave_idx, "at": wave_at, "lod": {a: l.value for a, l in plan.lod.items()},
                           "salience": {a: sc for a, sc, _m in sel}, "mandatory": sorted(a for a, _s, m in sel if m)})
+            # CHEAT-11: a standing-brief actor (always cheat-made: quarantine 1) is briefed once a turn
+            from ..cheats.commands import standing_brief
+            from ..contracts.common import LOD as _LOD
+            for a in sorted(plan.lod):
+                if plan.lod[a] in (_LOD.HOT, _LOD.WARM) and a not in ctx.briefed:
+                    ctx.briefed.add(a)
+                    q = tx.query_one("SELECT quarantine FROM actors WHERE actor_id=?", (a,))
+                    if q is not None and q[0] == 1:
+                        standing_brief(tx, a, T, wave_at)
             # 5 afford
             await _progress(ctx, 5)
             affs = {a: enumerate_affordances(tx, a, catalog, wave_at, T) for a in plan.lod}

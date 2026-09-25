@@ -423,7 +423,7 @@ class GameService:
         return [out("dev_data", OutDevData(what=what, turn_index=t, rows=data))]
 
     async def on_turn_submit(self, msg):
-        from ..contracts.protocol import OutGuideAnswer, OutStory, OutTurnRejected
+        from ..contracts.protocol import OutGuideAnswer, OutStory, OutTurnRejected, OutView
         from . import guide
         G = _G()
 
@@ -433,6 +433,20 @@ class GameService:
             return reject("no_run", G.NO_RUN)
         if self.busy:
             return reject("busy", G.BUSY)
+        from ..cheats import commands as cheats
+        from ..contracts.protocol import OutCheat
+        text = msg.text or ""
+        if cheats.detect_activation(text):                     # CHEAT-01: the line is consumed
+            r = cheats.activate(self.session)
+            return [out("cheat_activated", OutCheat(persona_line=r.persona_line, ok=r.ok, detail=r.detail)),
+                    out("story", OutStory(entries=self._story()))]
+        if self.session.store.meta("cheat_active") == "1" and text.strip().startswith("/"):
+            cmd = cheats.parse(text)
+            if isinstance(cmd, cheats.CheatParseError):
+                return [out("cheat_result", OutCheat(persona_line=cmd.message, ok=False, detail=""))]
+            r = await cheats.execute(self.session, cmd)
+            return [out("cheat_result", OutCheat(persona_line=r.persona_line, ok=r.ok, detail=r.detail)),
+                    out("view", OutView(view=self._view())), out("story", OutStory(entries=self._story()))]
         if self.session.store.query_one("SELECT alive FROM bodies WHERE body_id=?", (self.session.pc_id,))[0] == 0:
             return reject("dead", G.DEAD)
         if msg.mode == "ask":
