@@ -117,5 +117,73 @@ def cues_of(tx: "Tx", holder_id: str, turn_index: int, at: int) -> set[str]:
 
 
 def appearance_cues(tx: "Tx", holder_id: str, subject_id: str, level: str, distance_m: float) -> list[str]:
-    raise NotImplementedError("P3")
-from ..action._impl_p5a import cues_of  # noqa
+    from ..physical.bodies import condition_of, looks_of
+    from ..physical.objects import visible_gear
+    from .perception import shown_pieces
+    if level not in ("clear", "partial"):
+        return []
+    canon = tx.canon if getattr(tx, "canon", None) is not None else tx.store.canon
+    out = set()
+    L = looks_of(tx, subject_id)
+    C = condition_of(tx, subject_id)
+    clear = level == "clear"
+    if clear:
+        for i in visible_gear(tx, subject_id):
+            d = canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (i,))[0])
+            if d.firearm is not None or d.melee is not None:
+                out.add("visibly_armed")
+    if L is not None:
+        shown, cov = shown_pieces(tx, subject_id)
+        key = [o for o in shown if o["clothing"]["slot"] == "torso"] or [o for o in shown if o["clothing"]["slot"] == "body"]
+        if key:
+            st = key[0]["clothing"]["style"]
+            if "uniform" in st or "tactical" in st:
+                out.add("uniformed")
+            if "formal" in st:
+                out.add("formally_dressed")
+        if clear and any(o["insignia"] for o in shown):
+            out.add("wearing_insignia")
+        if "torso" not in cov and "groin" in cov:
+            out.add("half_dressed")
+        if "torso" not in cov and "groin" not in cov:
+            out.add("naked")
+    if C.blood >= (3 if clear else 4):
+        out.add("bloodied")
+    if C.gore >= (2 if clear else 4):
+        out.add("gore_covered")
+    if clear and C.grime >= 4:
+        out.add("filthy")
+    if clear and C.wet >= 2:
+        out.add("soaked")
+    return sorted(out)
+
+
+from ..action._impl_p5a import cues_of as _cues_of_p5  # noqa
+
+
+def cues_of(tx, holder_id, turn_index, at):
+    import json
+    from ..physical.space import point_distance
+    out = _cues_of_p5(tx, holder_id, turn_index, at)
+    best = {}
+    for r in tx.query("SELECT source_id, detail FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? AND channel='visual'",
+                      (holder_id, turn_index, at)):
+        det = json.loads(r[1]) if isinstance(r[1], str) else (r[1] or {})
+        lv = det.get("level")
+        if r[0] and r[0] != holder_id and lv in ("clear", "partial"):
+            if tx.query_one("SELECT 1 FROM bodies WHERE body_id=?", (r[0],)) is None:
+                continue
+            if best.get(r[0]) != "clear":
+                best[r[0]] = lv
+    from ..sense import olfaction as _olf
+    for b in sorted(best):
+        d = point_distance(tx, holder_id, b)
+        out |= set(appearance_cues(tx, holder_id, b, best[b], 999.0 if d is None else d))
+        if _olf.smells(tx, holder_id, b, at) is not None:
+            out.add(SMELL_CUES[_olf.odour_of(tx, b, at).kind])
+    for r in tx.query("SELECT detail FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? AND channel='olfactory'",
+                      (holder_id, turn_index, at)):
+        det = json.loads(r[0]) if isinstance(r[0], str) else (r[0] or {})
+        if det.get("odour") in SMELL_CUES:
+            out.add(SMELL_CUES[det["odour"]])
+    return out

@@ -57,12 +57,50 @@ class Odour:
 
 
 def odour_of(store: "Store | Tx", body_id: str, at: int) -> Odour | None:
-    raise NotImplementedError("P3")
+    r = store.query_one("SELECT alive, kind, dead_at, grime, blood, gore FROM bodies WHERE body_id=?", (body_id,))
+    if r is None:
+        return None
+    alive, kind, dead_at, grime, blood, gore = r
+    O = store.rules.olfaction
+    c = []
+    if gore >= 2:
+        c.append(Odour("dead", gore))
+    if not alive and kind != "infected" and dead_at is not None:
+        h = (at - dead_at) / 3_600_000
+        s = 4 if h >= O.death_hours[2] else 3 if h >= O.death_hours[1] else 2 if h >= O.death_hours[0] else 0
+        if s:
+            c.append(Odour("death", s))
+    if blood >= 3:
+        c.append(Odour("blood", blood - 1))
+    if grime >= 3:
+        c.append(Odour("unwashed", grime - 2))
+    if not c:
+        return None
+    return sorted(c, key=lambda o: (-o.strength, ODOUR_KINDS.index(o.kind)))[0]
 
 
 def smell_range_m(store: "Store | Tx", strength: int, place_id: str) -> float:
-    raise NotImplementedError("P3")
+    O = store.rules.olfaction
+    ind = store.query_one("SELECT indoor FROM places WHERE place_id=?", (place_id,))[0]
+    return O.range_m[strength] * (1.0 if ind else O.outdoor_mult)
 
 
 def smells(store: "Store | Tx", holder_id: str, source_id: str, at: int) -> str | None:
-    raise NotImplementedError("P3")
+    from ..physical.space import point_distance
+    if holder_id == source_id:
+        return None
+    h = store.query_one("SELECT alive, awareness FROM bodies WHERE body_id=?", (holder_id,))
+    if h is None or not h[0] or h[1] != "awake":
+        return None
+    a = store.query_one("SELECT place_id FROM positions WHERE body_id=?", (holder_id,))
+    b = store.query_one("SELECT place_id FROM positions WHERE body_id=?", (source_id,))
+    if a is None or b is None or a[0] != b[0]:
+        return None
+    o = odour_of(store, source_id, at)
+    if o is None:
+        return None
+    d = point_distance(store, holder_id, source_id)
+    rng = smell_range_m(store, o.strength, a[0])
+    if d is None or d > rng:
+        return None
+    return "exact" if d <= rng / 2 else "partial"

@@ -360,6 +360,8 @@ class LoopWrite(Strict):
     subject: str | None = None
     strength: int = Field(ge=1, le=3)
     because: str
+    category: Literal["deliver", "guard", "return", "disclose", "refrain", "assist"] | None = Field(
+        default=None, description="B5d (PROM-01): for promise_made / promise_owed, what kind of promise; None -> assist.")
 
 
 class LoopClose(Strict):

@@ -45,8 +45,8 @@ def new_episodes(s, actor_id, T):
     # BG-02 NEW episodes of ``actor_id`` at boundary T, by (at, episode_id); and prev.
     prev = _prev(s, actor_id, T)
     if prev is None:
-        return _rows(s, "SELECT * FROM episodes WHERE holder_id=? ORDER BY at, episode_id", (actor_id,)), None
-    return _rows(s, "SELECT * FROM episodes WHERE holder_id=? AND turn_index > ? ORDER BY at, episode_id",
+        return _rows(s, "SELECT * FROM episodes WHERE holder_id=? AND quarantined=0 ORDER BY at, episode_id", (actor_id,)), None
+    return _rows(s, "SELECT * FROM episodes WHERE holder_id=? AND quarantined=0 AND turn_index > ? ORDER BY at, episode_id",
                  (actor_id, prev[0])), prev
 
 

@@ -310,6 +310,16 @@ class Tx:
             rid, dep = self._cite[-1]
             event = event.model_copy(update={"rule_cited": rid, "payload": {**event.payload, "_cascade_depth": dep}})
         conn = self.store.conn
+        from ..contracts.events import LINK_ROLES
+        seen = set()
+        for lk in event.links:
+            if lk.role not in LINK_ROLES:
+                raise StoreError(f"link role {lk.role}", rule="STORE-12")
+            if lk.event_id in seen or lk.event_id == event.cause_event_id:
+                raise StoreError(f"link {lk.event_id} twice or the parent", rule="STORE-12")
+            if conn.execute("SELECT 1 FROM events WHERE event_id=?", (lk.event_id,)).fetchone() is None:
+                raise StoreError(f"link {lk.event_id} is not in the log", rule="STORE-12")
+            seen.add(lk.event_id)
         if _replay:
             eid, seq = event.event_id, event.seq
         else:
@@ -319,9 +329,10 @@ class Tx:
         for w in writes:
             _apply(conn, w)
         ev = event.model_copy(update={"event_id": eid, "seq": seq, "writes": writes})
-        conn.execute("INSERT INTO events(event_id, seq, at, type, writer, actor_id, target_ids, place_id, cause_event_id, payload, state_delta, rule_cited, turn_index, origin) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        conn.execute("INSERT INTO events(event_id, seq, at, type, writer, actor_id, target_ids, place_id, cause_event_id, payload, state_delta, rule_cited, turn_index, origin, links) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                      (eid, seq, ev.at, str(ev.type), ev.writer, ev.actor_id, canonical_json(ev.target_ids), ev.place_id, ev.cause_event_id,
-                      canonical_json(ev.payload), canonical_json([w.model_dump(mode="json") for w in ev.writes]), ev.rule_cited, ev.turn_index, ev.origin))
+                      canonical_json(ev.payload), canonical_json([w.model_dump(mode="json") for w in ev.writes]), ev.rule_cited, ev.turn_index, ev.origin,
+                      canonical_json([lk.model_dump(mode="json") for lk in ev.links])))
         self.events.append(ev)
         return ev
 

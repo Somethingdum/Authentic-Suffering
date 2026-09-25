@@ -206,7 +206,7 @@ def _bindings(c, d):
             cands = [t for t in c.known_bodies if t not in c.threats and (t in c.guardian_of or t in c.household or t in fond)]
         for t in cands:
             dist = space.point_distance(c.tx, c.me, t) or 0.0
-            if d.id in ("shoot_center_mass", "shoot_head"):
+            if d.id.startswith("shoot_"):
                 for it in c.held:
                     if c.canon.get(it["def_ref"]).firearm is not None:
                         out.append({"target_id": t, "item_id": it["item_id"], "dist": dist})
@@ -214,6 +214,18 @@ def _bindings(c, d):
                 for it in c.held:
                     if c.canon.get(it["def_ref"]).melee is not None:
                         out.append({"target_id": t, "item_id": it["item_id"], "dist": dist})
+            elif eff == "strip":
+                tb = _row(c.tx, "SELECT kind, age_years FROM bodies WHERE body_id=?", (t,))
+                if tb["kind"] != "human" or tb["age_years"] is None or tb["age_years"] < 18:
+                    continue
+                from ..physical.objects import CLOTHING_LAYER_ORDER, worn
+                ws = [o for o in worn(c.tx, t) if o["clothing"]]
+                for o in ws:
+                    li = CLOTHING_LAYER_ORDER.index(o["clothing"]["layer"])
+                    if any(p["clothing"]["slot"] == o["clothing"]["slot"] and CLOTHING_LAYER_ORDER.index(p["clothing"]["layer"]) < li
+                           for p in ws):
+                        continue
+                    out.append({"target_id": t, "item_id": o["item_id"], "dist": dist})
             else:
                 out.append({"target_id": t, "dist": dist})
     elif b == "item_held":
@@ -248,7 +260,36 @@ def _bindings(c, d):
                 continue
             if eff == "equip" and (dd.kind == "clothing" or (dd.container is not None and dd.container.worn)):
                 continue
+            if eff == "wash" and dd.water is None:
+                continue
+            if eff == "take_off" and not (dd.clothing is not None and it.get("holder_slot") == "worn" and it.get("holder_body") == c.me):
+                continue
+            if eff == "change_into" and not (dd.clothing is not None and it.get("holder_slot") != "worn"):
+                continue
+            if eff in ("take_off", "change_into") and not _f1c_adult(c):
+                from ..physical.objects import worn as _worn
+                ws = [o for o in _worn(c.tx, c.me) if o["clothing"]]
+                if eff == "take_off":
+                    cov = {x for o in ws if o["item_id"] != it["item_id"] for x in o["clothing"]["covers"]}
+                else:
+                    cov = {x for o in ws if not (o["clothing"]["slot"] == dd.clothing.slot and o["clothing"]["layer"] == dd.clothing.layer)
+                           for x in o["clothing"]["covers"]} | set(dd.clothing.covers)
+                if not {"torso", "groin"} <= cov:
+                    continue
             out.append({"item_id": it["item_id"], "dist": 0.0})
+        if eff == "change_into":
+            for it in c.held:
+                dd = c.canon.get(it["def_ref"])
+                if dd.clothing is None:
+                    continue
+                if not _f1c_adult(c):
+                    from ..physical.objects import worn as _worn
+                    ws = [o for o in _worn(c.tx, c.me) if o["clothing"]]
+                    cov = {x for o in ws if not (o["clothing"]["slot"] == dd.clothing.slot and o["clothing"]["layer"] == dd.clothing.layer)
+                           for x in o["clothing"]["covers"]} | set(dd.clothing.covers)
+                    if not {"torso", "groin"} <= cov:
+                        continue
+                out.append({"item_id": it["item_id"], "dist": 0.0})
     elif b == "item_reachable":
         for iid, anc in c.known_items:
             r = _row(c.tx, "SELECT * FROM items WHERE item_id=?", (iid,))
@@ -330,6 +371,21 @@ def _physical(c, d, o):
         return "not conscious"
     if q.mobile and not c.cap.mobile:
         return "cannot move"
+    if q.can_run and not c.cap.can_run:
+        return "cannot run"
+    if q.infected_within_m is not None:
+        from ..physical import space as _sp
+        near = False
+        for r in c.tx.query("SELECT DISTINCT p.source_id FROM percept_log p JOIN bodies b ON b.body_id = p.source_id "
+                            "WHERE p.holder_id=? AND p.turn_index=? AND p.at<=? AND p.channel='visual' "
+                            "AND p.fidelity IN ('exact','partial') AND b.kind='infected' ORDER BY p.source_id",
+                            (c.me, c.turn, c.at)):
+            dd = _sp.point_distance(c.tx, c.me, r[0])
+            if dd is not None and dd <= q.infected_within_m:
+                near = True
+                break
+        if not near:
+            return "the dead are not close"
     if c.cap.hands_free < q.hands_free:
         return "hands full"
     if not _range_ok(c, d, o):
@@ -549,6 +605,8 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index):
         auth = n[0] if n and n[0] else None
     cands = []
     for order, d in enumerate(catalog):
+        if d.requires.reflex_only:
+            continue
         for o in _bindings(c, d):
             t = o.get("target_id")
             why = _physical(c, d, o)
@@ -586,7 +644,7 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index):
                                  destination_id=o.get("destination_id"), item_id=o.get("item_id"), est_duration_s=o["est"],
                                  noise_db=d.noise_db, cost_note=" ".join(notes) or None, risk_note=None, check=d.check,
                                  tags=tuple(list(d.tags) + [x for x in tags if x not in d.tags]),
-                                 paces=tuple(d.paces))
+                                 paces=tuple(d.paces), hands=d.requires.hands_free)
             cands.append((order, o.get("dist", 0.0), ba))
     att = _attention(c)
 
@@ -599,11 +657,13 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index):
                 return 1
             if ba.verb in (Verb.FLEE, Verb.ESCAPE):
                 return 2
-            if ba.verb in (Verb.TAKE_COVER, Verb.HIDE):
+            if "feed_to_dead" in ba.tags:
                 return 3
-            if ba.verb == Verb.SURRENDER:
+            if ba.verb in (Verb.TAKE_COVER, Verb.HIDE):
                 return 4
-            return 5
+            if ba.verb == Verb.SURRENDER:
+                return 5
+            return 6
         if g != 6:
             return 0
         if "freeze" in ba.tags:
@@ -646,3 +706,8 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index):
     res.pool = [x[2] for x in cands]            # every survivor, sort-key order (CONSULT-03/04); keep ⊆ pool
     res.threats = list(c.threats)
     return res
+
+
+def _f1c_adult(c):
+    r = _row(c.tx, "SELECT age_years FROM bodies WHERE body_id=?", (c.me,))
+    return r["age_years"] is not None and r["age_years"] >= 18

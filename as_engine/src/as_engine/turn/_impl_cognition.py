@@ -18,7 +18,9 @@ def _schema(packet, consult=True):
     kinds = list(packet.consult_kinds) if consult else []
     subj = [h for h in packet.handles if h[:1] == "P"] + [h for h in packet.handles if h[:1] == "S"] if kinds else []
     return cognition_schema([a.handle for a in packet.affordances], [e.handle for e in packet.entities],
-                            consult_kinds=kinds, families=list(packet.families) if kinds else [], subject_handles=subj)
+                            consult_kinds=kinds, families=list(packet.families) if kinds else [], subject_handles=subj,
+                            gesture_handles=[g.handle for g in packet.gestures],
+                            attention_handles=[f.handle for f in packet.attention_points])
 
 
 def cognition_request(config, packet, lod, lane, *, reaction, turn_index):
@@ -172,54 +174,211 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
                 continue
         log_repair(tx, "echo_reject", 6, "ECHO-02", {"actor_id": a, "ngrams": sorted(hits)}, turn_index, at)
     _compel(tx, out, affs, at, turn_index)
+    await _snap(tx, out, affs, at, turn_index, plan, st, repair)
     return out
 
 
-def _compel(tx, out, affs, at, turn_index):
-    """P10: the wet strain's week-3 compulsion — an involuntary offer of the bottle in hand (never
-    the PC)."""
-    from ..contracts.events import Event, EventType
-    from ..mind.affordance import BoundAffordance
+def _urge_act(tx, a, at):
+    """W1: (stage, compulsion, act, item, target, def_id) or None — the first act at hand, and whether
+    the gap has passed."""
+    import math as _m
     from ..physical.bodies import stages
     from ..physical.space import point_distance
-    pcr = tx.query_one("SELECT value FROM meta WHERE key='pc_actor_id'")
-    pc = pcr[0] if pcr else None
     R = tx.rules.infected
-    for a in sorted(out):
-        if a == pc or not any(st.compulsion >= 3 for _pw, st in stages(tx, a)):
-            continue
-        item = None
-        for slot in ("hand_l", "hand_r"):
-            r = tx.query_one("SELECT item_id, def_ref FROM items WHERE holder_body=? AND holder_slot=?", (a, slot))
-            if r and tx.canon.get(r[1]).kind == "water":
-                item = r[0]
-                break
-        if item is None:
-            continue
-        last = tx.query_one("SELECT MAX(at) FROM events WHERE type='INVOLUNTARY' AND actor_id=? "
-                            "AND json_extract(payload,'$.kind')='compulsion'", (a,))[0]
-        if last is not None and at - last < R.compulsion_cooldown_min * 60_000:
-            continue
-        here = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (a,))[0]
-        near = []
-        for r in tx.query("SELECT b.body_id FROM bodies b JOIN positions q ON q.body_id=b.body_id WHERE q.place_id=? "
-                          "AND b.alive=1 AND b.kind='human' AND b.body_id != ?", (here, a)):
+    st = next((s for pw, s in stages(tx, a) if pw == "wet" and s.compulsion >= 2), None)
+    if st is None:
+        return None
+    exp = tx.query_one("SELECT exposed_at FROM infections WHERE body_id=? AND pathway='wet'", (a,))[0]
+    h = max((at - exp) / 3_600_000, 1.0)
+    gap = max(R.compulsion_min_gap_min, R.compulsion_cooldown_min * 336 / h)
+    last = tx.query_one("SELECT MAX(at) FROM events WHERE type='INVOLUNTARY' AND actor_id=? "
+                        "AND json_extract(payload,'$.kind') IN ('compulsion','urge')", (a,))[0]
+    if last is not None and at - last < gap * 60_000:
+        return None
+    here = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (a,))
+
+    def near(asleep):
+        out = []
+        for r in tx.query("SELECT b.body_id, b.awareness FROM bodies b JOIN positions q ON q.body_id=b.body_id "
+                          "WHERE q.place_id=? AND b.alive=1 AND b.kind='human' AND b.body_id != ?", (here[0], a)):
+            if asleep and r[1] != "asleep":
+                continue
             d = point_distance(tx, a, r[0])
             if d is not None and d <= 1.5:
-                near.append((d, r[0]))
-        if not near:
+                out.append((d, r[0]))
+        return sorted(out)[0][1] if out else None
+
+    sl = near(True)
+    if sl:
+        return st, "mouth", None, sl, "spit_in_mouth"
+    hands = []
+    for slot in ("hand_l", "hand_r"):
+        r = tx.query_one("SELECT item_id, def_ref FROM items WHERE holder_body=? AND holder_slot=?", (a, slot))
+        if r:
+            hands.append((r[0], tx.canon.get(r[1]).kind))
+    water = next((i for i, k in hands if k == "water"), None)
+    who = near(False)
+    if water and who:
+        return st, "give", water, who, "give_item"
+    food = next((i for i, k in hands if k in ("water", "food")), None)
+    if food is None:
+        for r in tx.query("SELECT item_id, def_ref, anchor_id FROM items WHERE place_id=? ORDER BY item_id", (here[0],)):
+            if tx.canon.get(r[1]).kind not in ("water", "food"):
+                continue
+            if r[2]:
+                ap = tx.query_one("SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (r[2],))
+                x, y = ap[0], ap[1]
+            else:
+                pl = tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (here[0],))
+                x, y = pl[0] / 2, pl[1] / 2
+            if _m.hypot(x - here[1], y - here[2]) <= 1.5:
+                food = r[0]
+                break
+    if food:
+        return st, "spit", food, None, "spit_into"
+    return None
+
+
+def _act_intent(tx, a, def_id, item, target, lod):
+    from ..action.intent import Intent
+    from ..mind.affordance import BoundAffordance
+    d = tx.canon.find("affordance", def_id)
+    iname = tx.canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (item,))[0]).name if item else ""
+    fill = lambda s: s.replace("{item}", iname).replace("{target}", "someone")  # noqa: E731
+    o = BoundAffordance(def_id=d.id, verb=d.verb, label=fill(d.label), ui_label=fill(d.ui_label), target_id=target,
+                        item_id=item, est_duration_s=d.duration.base_s, noise_db=d.noise_db, check=d.check, tags=tuple(d.tags))
+    return Intent(actor_id=a, bound=o, speech=None, manner="", goal="", private_reason="", source="reflex", lod=lod)
+
+
+def _commit_act(tx, a, act, item, target, at, turn_index, kind, pc=False):
+    from ..contracts.events import Event, EventType
+    from ..mind.actor import adjust_stress
+    from ..mind.resolve import drain
+    pl = {"actor_id": a, "kind": kind, "pathway": "wet", "act": act, "item_id": item, "target_id": target}
+    if pc:
+        pl["pc"] = True
+    ev = tx.commit_event(Event(type=EventType.INVOLUNTARY, writer="turn.pipeline", at=at, turn_index=turn_index, actor_id=a,
+                               payload=pl))
+    if kind == "compulsion":
+        adjust_stress(tx, a, 1, ev.event_id, at, turn_index)
+        drain(tx, a, "self_disgust", ev.event_id, at, turn_index)
+    else:
+        drain(tx, a, "resisting_urge", ev.event_id, at, turn_index)
+    return ev
+
+
+def _compel(tx, out, affs, at, turn_index):
+    """W1: the wet strain's compulsion (never the PC)."""
+    pcr = tx.query_one("SELECT value FROM meta WHERE key='pc_actor_id'")
+    pc = pcr[0] if pcr else None
+    for a in sorted(out):
+        if a == pc or out[a] is None:
             continue
-        who = sorted(near)[0][1]
-        d = tx.canon.find("affordance", "give_item")
-        iname = tx.canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (item,))[0]).name
-        fill = lambda s: s.replace("{item}", iname).replace("{target}", "someone")  # noqa: E731
-        o = BoundAffordance(def_id=d.id, verb=d.verb, label=fill(d.label), ui_label=fill(d.ui_label), target_id=who,
-                            item_id=item, est_duration_s=d.duration.base_s, noise_db=d.noise_db, check=d.check,
-                            tags=tuple(d.tags))
-        tx.commit_event(Event(type=EventType.INVOLUNTARY, writer="turn.pipeline", at=at, turn_index=turn_index, actor_id=a,
-                              payload={"actor_id": a, "kind": "compulsion", "pathway": "wet", "item_id": item,
-                                       "target_id": who}))
-        out[a] = dataclasses.replace(out[a], bound=o, speech=None, manner="", goal="", private_reason="", source="reflex")
+        got = _urge_act(tx, a, at)
+        if got is None:
+            continue
+        st, act, item, target, def_id = got
+        if st.compulsion >= 3:
+            _commit_act(tx, a, act, item, target, at, turn_index, "compulsion")
+            out[a] = _act_intent(tx, a, def_id, item, target, out[a].lod)
+        else:
+            _commit_act(tx, a, act, item, target, at, turn_index, "urge")
+
+
+def urge_pc(tx, rng, pc_id, intent, turn_index, at):
+    got = _urge_act(tx, pc_id, at)
+    if got is None:
+        return intent
+    st, act, item, target, def_id = got
+    if st.compulsion < 3:
+        return intent
+    if not rng.chance(tx, "mind", f"pc_urge:{pc_id}:{at}", tx.rules.infected.pc_urge_share.get(st.name, 0.0)):
+        return intent
+    _commit_act(tx, pc_id, act, item, target, at, turn_index, "compulsion", pc=True)
+    return _act_intent(tx, pc_id, def_id, item, target, intent.lod)
+
+
+async def _snap(tx, out, affs, at, turn_index, plan, st, repair):
+    """H1 (TEMPER-06): what a breaking point does."""
+    import json as _j
+    from ..action.intent import Intent
+    from ..mind.affordance import BoundAffordance
+    from ..physical.bodies import capacity
+    from ..physical.space import admits, point_distance
+    R = tx.rules.temper
+    rows = tx.query("SELECT actor_id, payload FROM events WHERE type='INVOLUNTARY' AND at=? AND turn_index=? AND "
+                    "json_extract(payload,'$.kind')='outburst' ORDER BY actor_id, seq", (at, turn_index))
+    seen = set()
+    for a, raw in rows:
+        if a in seen or a not in plan.lod:
+            continue
+        seen.add(a)
+        pl = _j.loads(raw)
+        T, outlet = pl["toward_id"], pl["outlet"]
+        lod = plan.lod.get(a)
+
+        def reflex(def_id, *, target=None, dest=None, dur=None):
+            d = tx.canon.find("affordance", def_id)
+            o = BoundAffordance(def_id=d.id, verb=d.verb, label=d.label, ui_label=d.ui_label, target_id=target,
+                                destination_id=dest, item_id=None,
+                                est_duration_s=d.duration.base_s if dur is None else dur, noise_db=d.noise_db,
+                                check=d.check, tags=tuple(d.tags))
+            return Intent(actor_id=a, bound=o, speech=None, manner="", goal="", private_reason="", source="reflex", lod=lod)
+
+        cap = capacity(tx, a)
+        if outlet == "fists":
+            dd = point_distance(tx, a, T)
+            band = tx.query_one("SELECT age_band FROM bodies WHERE body_id=?", (T,))
+            band = band[0] if band else None
+            cares = any(T in _j.loads(r[0]) for r in tx.query("SELECT guardian_of FROM household_members WHERE actor_id=?", (a,)))
+            if (cap.conscious and cap.hands_free >= 1 and dd is not None and dd <= R.fists_reach_m
+                    and band not in ("infant", "child", "preteen") and not cares):
+                out[a] = reflex("punch", target=T)
+                continue
+            outlet = "words"
+        if outlet == "words":
+            def ok(it):
+                return (it is not None and it.speech is not None and T in it.speech.to
+                        and str(getattr(it.speech.volume, "value", it.speech.volume)) in ("raised", "shout"))
+            it = out.get(a)
+            if it is not None and it.source == "model" and ok(it):
+                continue
+            if it is not None and it.source == "model" and a in st and not st[a]["repair"]:
+                handle = next((h for h, v in st[a]["pkt"].handles.items() if v == T), "them")
+                it2, _why = await repair(a, f"You have snapped at {handle}: say what you say to them, raised or shouted.",
+                                         it.speech.text if it.speech else "")
+                if ok(it2):
+                    out[a] = it2
+                    continue
+            outlet = "flight"
+        if outlet in ("cold", "flight"):
+            got = None
+            if cap.mobile:
+                here = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (a,))
+                ports = [r[0] for r in tx.query("SELECT portal_id FROM portals WHERE place_a=? OR place_b=? ORDER BY portal_id",
+                                                (here[0], here[0]))]
+                if any(admits(tx, p, a)[0] for p in ports):
+                    got = reflex("leave_place")
+                else:
+                    tp = tx.query_one("SELECT x_m, y_m FROM positions WHERE body_id=?", (T,))
+                    best = None
+                    for an in tx.query("SELECT anchor_id, x_m, y_m FROM anchors WHERE place_id=? ORDER BY anchor_id", (here[0],)):
+                        far = ((an[1] - tp[0]) ** 2 + (an[2] - tp[1]) ** 2) ** 0.5
+                        if best is None or far > best[0]:
+                            best = (far, an)
+                    if best is not None:
+                        an = best[1]
+                        d = tx.canon.find("affordance", "move_to_anchor")
+                        walk = ((an[1] - here[1]) ** 2 + (an[2] - here[2]) ** 2) ** 0.5
+                        got = reflex("move_to_anchor", dest=an[0],
+                                     dur=d.duration.base_s + (d.duration.per_meter_s or 0) * walk)
+            if got is not None:
+                out[a] = got
+            else:
+                out.pop(a, None)
+            continue
+        if outlet == "tears":
+            out[a] = reflex("rest")
 
 
 ASK_FORMS = ("request", "order", "demand", "threat")
@@ -237,6 +396,10 @@ def perceived_entities(tx, actor_id, turn_index):
         out.setdefault(r[1].lower(), r[0])
     for r in tx.query("SELECT portal_id, name FROM portals WHERE place_a=? OR place_b=? ORDER BY portal_id", (pl, pl)):
         out.setdefault(r[1].lower(), r[0])
+    for r in tx.query("SELECT anchor_id, name FROM anchors WHERE place_id=? ORDER BY anchor_id", (pl,)):
+        out.setdefault("anchor|" + r[1].lower(), r[0])
+    for r in tx.query("SELECT portal_id, name FROM portals WHERE place_a=? OR place_b=? ORDER BY portal_id", (pl, pl)):
+        out.setdefault("portal|" + r[1].lower(), r[0])
     items = [r[0] for r in tx.query("SELECT DISTINCT source_id FROM percept_log WHERE holder_id=? AND turn_index=? AND source_id LIKE 'itm_%' "
                                     "ORDER BY source_id", (actor_id, turn_index))]
     items += [r[0] for r in tx.query("SELECT item_id FROM items WHERE holder_body=? ORDER BY item_id", (actor_id,))]
@@ -288,8 +451,23 @@ def record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq):
             rc = tx.query_one("SELECT resolve_cur FROM actors WHERE actor_id=?", (a,))[0]
             drained = tx.query_one("SELECT 1 FROM events WHERE type='RESOLVE_CHANGE' AND actor_id=? AND turn_index=? "
                                    "AND json_extract(payload,'$.delta') < 0", (a, turn_index)) is not None
+            tgt = sig.split(":", 1)[1] if ":" in sig else "*"
+            toward = set()
+            if tgt.startswith("prt_"):
+                pr = tx.query_one("SELECT anchor_a, anchor_b FROM portals WHERE portal_id=?", (tgt,))
+                if pr is not None:
+                    toward |= {x for x in (pr[0], pr[1]) if x}
+            elif tgt.startswith("act_"):
+                pr = tx.query_one("SELECT anchor_id FROM positions WHERE body_id=?", (tgt,))
+                if pr is not None and pr[0]:
+                    toward.add(pr[0])
+            elif tgt.startswith("itm_"):
+                pr = tx.query_one("SELECT anchor_id FROM items WHERE item_id=?", (tgt,))
+                if pr is not None and pr[0]:
+                    toward.add(pr[0])
             resp = firewall.classify_response(sig, it.bound, it.speech.text if it.speech else None, rc, eff,
-                                              entrenched_block=block, resolve_drained_this_turn=drained)
+                                              entrenched_block=block, resolve_drained_this_turn=drained,
+                                              steps_toward=frozenset(toward))
             out.append((a, p["event_id"], resp.value))
             if resp in (ResponseClass.REFUSAL, ResponseClass.ENTRENCHED_REFUSAL):
                 rel = tx.query_one("SELECT trust, fear FROM relationships WHERE from_id=? AND to_id=?", (a, p["speaker"]))
@@ -303,8 +481,33 @@ def record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq):
                     reason = "cost"
                 firewall.record_refusal(tx, a, p["speaker"], sig, norm_text(words), reason, [p["event_id"]], it.private_reason[:200],
                                         resp == ResponseClass.ENTRENCHED_REFUSAL, wave_at, turn_index, p["event_id"])
-            elif resp == ResponseClass.FALSE_COMPLIANCE:
+            elif resp in (ResponseClass.READY_COMPLIANCE, ResponseClass.RELUCTANT_COMPLIANCE, ResponseClass.COERCED_COMPLIANCE):
+                firewall.revise_refusal(tx, a, p["speaker"], sig, wave_at, turn_index, p["event_id"])
+            elif resp == ResponseClass.PREPARING:
                 sp = tx.query_one("SELECT event_id FROM events WHERE type='SPEECH' AND actor_id=? AND seq > ? ORDER BY seq LIMIT 1", (a, first_seq))
-                if sp is not None:
-                    firewall.record_lie(tx, a, p["speaker"], sig, it.speech.text, sp[0], wave_at, turn_index)
+                if sp:
+                    from ..mind import promise as _pm
+                    d, _, tg = sig.partition(":")
+                    _pm.hold(tx, a, promiser_id=a, promisee_id=p["speaker"], category=_pm.CATEGORY_OF_DEF.get(d, "assist"),
+                             text=f'I said I would: {norm_text(words)} — "{it.speech.text}"',
+                             object_id=None if tg in ("*", "") else tg, condition=None, source_event_id=sp[0],
+                             loop_id=None, status="in_progress", at=wave_at, turn_index=turn_index)
+            elif resp in (ResponseClass.DEFERRED_ASSENT, ResponseClass.UNRESOLVED_ASSENT):
+                sp = tx.query_one("SELECT event_id FROM events WHERE type='SPEECH' AND actor_id=? AND seq > ? ORDER BY seq LIMIT 1", (a, first_seq))
+                if resp == ResponseClass.DEFERRED_ASSENT:
+                    from ..mind import mind as _mindmod
+                    from ..contracts.events import EventLink as _EL
+                    lid = _mindmod.open_loop(tx, a, "promise_made", f'I said I would: {norm_text(words)} — "{it.speech.text}"', [p["speaker"]],
+                                       1, sp[0] if sp else p["event_id"], wave_at, turn_index,
+                                       links=[_EL(event_id=p["event_id"], role="answered")] if sp else [])
+                    if sp:
+                        from ..mind import promise as _pm
+                        d, _, tg = sig.partition(":")
+                        txt = tx.query_one("SELECT text FROM open_loops WHERE loop_id=?", (lid,))[0]
+                        _pm.hold(tx, a, promiser_id=a, promisee_id=p["speaker"], category=_pm.CATEGORY_OF_DEF.get(d, "assist"), text=txt,
+                                 object_id=None if tg in ("*", "") else tg, condition=it.speech.text, source_event_id=sp[0],
+                                 loop_id=lid, status="accepted", at=wave_at, turn_index=turn_index)
+                else:
+                    firewall.record_unmet_assent(tx, a, p["speaker"], sig, it.speech.text, it.bound.def_id, sp[0] if sp else None,
+                                                 wave_at, turn_index, ask_event_id=p["event_id"])
     return out

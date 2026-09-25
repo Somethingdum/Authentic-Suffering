@@ -30,7 +30,7 @@ EventLink(event_id, role: contributed|answered)
 WriteRecord(op: insert|update|upsert|delete, table, key: {pk cols}, values: {cols})
 ```
 
-- `EventType` has 142 values in 8 classes (`contracts/events.py`); an unknown type is rejected
+- `EventType` has 145 values in 8 classes (`contracts/events.py`); an unknown type is rejected
   (STORE-05).
 - `cause_event_id` links consequences to causes. `kernel.events.cause_chain` walks it; the death
   screen uses it to list the player's contributing choices.
@@ -80,7 +80,8 @@ Resolve, stress, goal, duty post, accepted authority, quarantine) · `dossiers` 
 · `dossier_deltas` · `voice_lines` · `plans` · `tasks` · `relationships` (6 axes, per-axis cause) ·
 `refusals` · `open_loops` (promises, debts, grudges, goals, desires, fears, questions, plans, kept
 secrets) · `lessons` · `episodes` (+ FTS; `self_event_ids`, `quarantined`) · `memory_jobs` (a
-writeback per holder and turn, never lost to a failed call) · `acquaintance` (what a holder calls
+writeback per holder and turn, never lost to a failed call) · `promises` (each person's own
+understanding of a promise, and the agreement when both sides' agree) · `acquaintance` (what a holder calls
 another body) ·
 `known_places`.
 

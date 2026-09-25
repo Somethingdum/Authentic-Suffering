@@ -143,8 +143,9 @@ def cognition_schema(affordance_handles: list[str], entity_handles: list[str], *
     to = dict(sp["properties"]["to"])
     to["items"] = {"type": "string", "enum": list(entity_handles) + ["everyone"]}
     sp["properties"]["to"] = to
-    for k in ("gesture", "attention", "inscription"):
-        ap[k] = {"type": "null"}                       # SCHEMA-04: nothing of the kind is offered yet
+    for k, hs in (("gesture", gesture_handles), ("attention", attention_handles)):
+        ap[k] = {"anyOf": [{"type": "string", "enum": list(hs)}, {"type": "null"}]} if hs else {"type": "null"}
+    ap["inscription"] = {"type": "null"}
     if not consult_kinds:
         props["consultation"] = {"type": "null"}
     else:

@@ -760,6 +760,8 @@ def settlement_day(tx, rng, row, fired, turn_index):
                 change_ration(tx, sid, 1, "recovered", at, turn_index, sd.event_id)
     for h in households_of(tx, sid):
         household_day(tx, h, at, turn_index, sd.event_id)
+    from . import settlement as _stl_mod
+    _stl_mod.friction(tx, rng, sid, at, turn_index, sd.event_id)
     clock.schedule(tx, at + DAY, "SETTLEMENT_DAY", sid, {"settlement_id": sid}, sd.event_id)
     return _since(tx, first)
 

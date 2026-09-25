@@ -37,7 +37,8 @@ def intent_to_dict(i):
                       "target_id": b.target_id, "destination_id": b.destination_id, "item_id": b.item_id, "est_duration_s": b.est_duration_s,
                       "noise_db": b.noise_db, "cost_note": b.cost_note, "risk_note": b.risk_note,
                       "check": None if b.check is None else b.check.model_dump(mode="json"), "tags": list(b.tags),
-                      "paces": list(b.paces)}}
+                      "paces": list(b.paces), "hands": b.hands},
+            "gesture": None if i.gesture is None else list(i.gesture), "attention": i.attention}
 
 
 def intent_from_dict(d):
@@ -50,6 +51,7 @@ def intent_from_dict(d):
     bd["check"] = None if bd["check"] is None else CheckSpec.model_validate(bd["check"])
     bd["tags"] = tuple(bd["tags"])
     bd["paces"] = tuple(bd.get("paces", ()))
+    bd["hands"] = bd.get("hands", 0)
     sp = d["speech"]
     ins = d.get("inscription")
     return Intent(actor_id=d["actor_id"], bound=BoundAffordance(**bd),
@@ -59,7 +61,8 @@ def intent_from_dict(d):
                   manner=d["manner"], goal=d["goal"], private_reason=d["private_reason"], source=d["source"], lod=LOD(d["lod"]),
                   blocked=d.get("blocked"), pace=d.get("pace", "normal"),
                   inscription=None if ins is None else InscriptionAct(text=ins["text"],
-                                                                      quotation_source=ins.get("quotation_source")))
+                                                                      quotation_source=ins.get("quotation_source")),
+                  gesture=None if d.get("gesture") is None else tuple(d["gesture"]), attention=d.get("attention"))
 
 
 def barrier(tx, intents):
@@ -275,7 +278,8 @@ def _start_event(tx, intent, at, turn_index):
                                  payload={"actor_id": intent.actor_id, "def_id": b.def_id, "verb": b.verb.value if hasattr(b.verb, "value") else b.verb,
                                           "target_id": b.target_id, "destination_id": b.destination_id, "item_id": b.item_id,
                                           "est_duration_s": b.est_duration_s, "visible": d.visible_act, "seen": SEEN.get(b.def_id),
-                                          "continues_task": b.def_id == "keep_working", "label": b.label, "goal": intent.goal}))
+                                          "continues_task": b.def_id == "keep_working", "label": b.label, "goal": intent.goal,
+                                          "attention": intent.attention}))
 
 
 def _armed(tx, actor):
@@ -291,6 +295,7 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
     from .effects import EffectCtx, land_ms
     first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
     started = []
+    segq = []
     for i in sorted(intents, key=lambda x: x.actor_id):
         if i.blocked:
             tx.commit_event(Event(type=EventType.ACTION_BLOCKED, writer="action.resolve", at=wave_at, turn_index=turn_index, actor_id=i.actor_id,
@@ -301,7 +306,7 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
         for row in pend:
             pl = json.loads(row["payload"]) if isinstance(row["payload"], str) else row["payload"]
             old = intent_from_dict(pl["intent"])
-            if old.bound.signature == i.bound.signature:
+            if old.bound.signature == i.bound.signature and i.speech is None:
                 carry = True
                 continue
             clock.cancel(tx, row["queue_id"], "new_action", wave_at, pl.get("start_event_id"), turn_index)
@@ -310,16 +315,36 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
                                   payload={"actor_id": i.actor_id, "def_id": old.bound.def_id, "cause": "new_action"}))
         if carry:
             continue
+        _cut_speech(tx, i.actor_id, wave_at, turn_index, "new_action")
         st = _start_event(tx, i, wave_at, turn_index)
-        if i.speech is not None:
-            R = tx.rules.acoustics
-            vol = i.speech.volume.value if hasattr(i.speech.volume, "value") else i.speech.volume
-            tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=wave_at, turn_index=turn_index, actor_id=i.actor_id,
-                                  cause_event_id=st.event_id,
-                                  payload={"words": i.speech.text, "volume": vol, "to": list(i.speech.to), "source_db": R.speech_db[vol],
-                                           "armed": _armed(tx, i.actor_id)}))
+        if i.gesture is not None:
+            tx.commit_event(Event(type=EventType.GESTURE, writer="action.propagate", at=wave_at, turn_index=turn_index,
+                                  actor_id=i.actor_id, cause_event_id=st.event_id,
+                                  payload={"actor_id": i.actor_id, "gesture": i.gesture[0], "target_id": i.gesture[1]}))
         d = _def(tx, i.bound.def_id)
         la = wave_at if d.duration.condition_ended else land_ms(wave_at, i.bound.est_duration_s)
+        if i.speech is not None:
+            import math as _m
+            from .intent import segments as _segs
+            R = tx.rules.acoustics
+            vol = i.speech.volume.value if hasattr(i.speech.volume, "value") else i.speech.volume
+            segs = _segs(i.speech.text)
+            nwords = len(i.speech.text.split())
+            say_at = wave_at
+            if i.speech.timing == "after" and d.effect != "speak":
+                la = wave_at if d.duration.condition_ended else land_ms(wave_at, i.bound.est_duration_s - nwords / 2.5)
+                say_at = la
+            before = 0
+            for k, seg in enumerate(segs, 1):
+                pl = {"words": seg, "volume": vol, "to": list(i.speech.to), "source_db": R.speech_db[vol],
+                      "armed": _armed(tx, i.actor_id), "utterance_id": st.event_id, "segment": k, "segments": len(segs)}
+                due = say_at + _m.ceil(1000 * before / 2.5)
+                before += len(seg.split())
+                if k == 1 and due == wave_at:
+                    tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=wave_at, turn_index=turn_index,
+                                          actor_id=i.actor_id, cause_event_id=st.event_id, payload=pl))
+                else:
+                    segq.append((due, i.actor_id, k, pl, st.event_id))
         started.append((la, i, st))
     # ordering within the same land time by precedence
     groups, _ = form_groups(tx, [s[1] for s in started])
@@ -334,11 +359,71 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
                 for pos, i in enumerate(precedence(tx, rng, g.resource, mem, la)):
                     rank.setdefault(id(i), pos)
     started.sort(key=lambda s: (s[0], rank.get(id(s[1]), 0), s[1].actor_id))
-    for la, i, st in started:
-        if la > horizon_ms:
-            clock.schedule(tx, la, "ACTION_LAND", i.actor_id, {"intent": intent_to_dict(i), "start_event_id": st.event_id}, st.event_id)
-            continue
-        _land(tx, rng, i, la, EffectCtx(turn_index=turn_index, horizon_ms=horizon_ms, start_event_id=st.event_id, wave_start_ms=wave_at))
+    timeline = [(s[0], 0, n, "land", s) for n, s in enumerate(started)]
+    timeline += [(q[0], 1, n, "say", q) for n, q in enumerate(sorted(segq, key=lambda q: (q[0], q[1], q[2])))]
+    timeline.sort(key=lambda e: (e[0], e[1], e[2]))
+    cut_off = set()
+    for when, _k, _n, kind, item in timeline:
+        if kind == "land":
+            la, i, st = item
+            if la > horizon_ms:
+                clock.schedule(tx, la, "ACTION_LAND", i.actor_id, {"intent": intent_to_dict(i), "start_event_id": st.event_id}, st.event_id)
+                continue
+            _land(tx, rng, i, la, EffectCtx(turn_index=turn_index, horizon_ms=horizon_ms, start_event_id=st.event_id, wave_start_ms=wave_at))
+        else:
+            due, speaker, k, pl, sid = item
+            if pl["utterance_id"] in cut_off:
+                continue
+            if due > horizon_ms:
+                clock.schedule(tx, due, "SPEECH_SEGMENT", speaker, pl, sid)
+                continue
+            if not _say(tx, speaker, pl, sid, due, turn_index):
+                cut_off.add(pl["utterance_id"])
+    return _events_since(tx, first)
+
+
+def _say(tx, speaker, pl, sid, due, turn_index):
+    """SEG-04: say one segment if the speaker can; else the SPEECH_CUT. True when said."""
+    from ..physical.bodies import capacity
+    b = _row(tx, "SELECT alive FROM bodies WHERE body_id=?", (speaker,))
+    if b["alive"] and capacity(tx, speaker).conscious:
+        tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=due, turn_index=turn_index, actor_id=speaker,
+                              cause_event_id=sid, payload=pl))
+        return True
+    tx.commit_event(Event(type=EventType.SPEECH_CUT, writer="action.propagate", at=due, turn_index=turn_index, actor_id=speaker,
+                          cause_event_id=sid, payload={"actor_id": speaker, "utterance_id": pl["utterance_id"],
+                                                       "delivered": pl["segment"] - 1, "of": pl["segments"],
+                                                       "cause": "dead" if not b["alive"] else "unconscious"}))
+    return False
+
+
+def _cut_speech(tx, speaker, at, turn_index, cause):
+    from ..kernel import clock
+    rows = clock.pending_for(tx, "SPEECH_SEGMENT", speaker)
+    by = {}
+    for r in rows:
+        pl = json.loads(r["payload"]) if isinstance(r["payload"], str) else r["payload"]
+        by.setdefault(pl["utterance_id"], []).append((r, pl))
+    for uid in sorted(by):
+        items = by[uid]
+        for r, pl in items:
+            clock.cancel(tx, r["queue_id"], cause, at, uid, turn_index)
+        first = min(pl["segment"] for _, pl in items)
+        tx.commit_event(Event(type=EventType.SPEECH_CUT, writer="action.propagate", at=at, turn_index=turn_index, actor_id=speaker,
+                              cause_event_id=uid, payload={"actor_id": speaker, "utterance_id": uid, "delivered": first - 1,
+                                                           "of": items[0][1]["segments"], "cause": cause}))
+
+
+def say_pending(tx, row, turn_index):
+    from ..kernel import clock
+    first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    pl = json.loads(row["payload"]) if isinstance(row["payload"], str) else dict(row["payload"])
+    speaker = row["subject_id"]
+    if not _say(tx, speaker, pl, pl["utterance_id"], row["due_at"], turn_index):
+        for r in clock.pending_for(tx, "SPEECH_SEGMENT", speaker):
+            p2 = json.loads(r["payload"]) if isinstance(r["payload"], str) else r["payload"]
+            if p2["utterance_id"] == pl["utterance_id"] and r["queue_id"] != row["queue_id"]:
+                clock.cancel(tx, r["queue_id"], "speech_cut", row["due_at"], pl["utterance_id"], turn_index)
     return _events_since(tx, first)
 
 
@@ -678,6 +763,21 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
         open_loop(tx, target, pl["kind"], pl.get("text") or "", [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
                   trig.event_id, at, turn_index)
         return _events_since(tx, before)
+    if eff.kind == "adjust_stress":
+        from ..mind.actor import adjust_stress
+        alive = tx.query_one("SELECT b.alive FROM actors a JOIN bodies b ON b.body_id = a.actor_id WHERE a.actor_id=?", (target,))
+        if alive is None or not alive[0]:
+            return []
+        subj = (trig.payload or {}).get("body_id")
+        bond = 0
+        if (eff.payload or {}).get("scale_by") == "bond_to_subject":
+            if subj == target:
+                return []
+            r = tx.query_one("SELECT affection FROM relationships WHERE from_id=? AND to_id=?", (target, subj)) if subj else None
+            if r and r[0] >= 1:
+                bond = min(3, r[0])
+        ev = adjust_stress(tx, target, int(eff.amount) + bond, trig.event_id, at, turn_index)
+        return [] if ev is None else [ev]
     made = _dispatch_p9(tx, rule, eff, target, trig, at, turn_index)
     if made is not None:
         return made

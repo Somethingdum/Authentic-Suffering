@@ -208,11 +208,19 @@ record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> lis
       actor's first SPEECH event with seq > first_seq (else the ask's event), wave_at,
       turn_index, links = [EventLink(the ask's event id, 'answered')] when the cause is that SPEECH
       (B5c, C10)): their own understanding of what they promised (Actor Spec §12; the asker's
-      understanding is the asker's).
+      understanding is the asker's). (B5d) When that SPEECH exists, also mind.promise.hold(tx,
+      actor, promiser_id = actor, promisee_id = speaker, category = mind.promise.CATEGORY_OF_DEF
+      .get(the signature's def, 'assist'), text = the loop's text, object_id = the signature's
+      target (None for '*'), condition = the speech text, source_event_id = that SPEECH, loop_id =
+      the loop, status 'accepted', wave_at, turn_index).
+    PREPARING -> (B5d) a yes and a step toward it: when the actor's SPEECH exists,
+      mind.promise.hold as for DEFERRED_ASSENT (text f'I said I would: {norm_text(words)} —
+      "{the speech text}"') but with no loop (loop_id None), condition None and status
+      'in_progress'.
     UNRESOLVED_ASSENT -> firewall.record_unmet_assent(tx, actor, speaker, signature, the speech
       text, intent.bound.def_id, that SPEECH event's id, wave_at, turn_index, ask_event_id = the
       ask's event id).
-    CLARIFYING, PREPARING -> nothing more (the ledger has them).
+    CLARIFYING -> nothing more (the ledger has it).
   The pipeline adds (actor, event_id) to its answered set (an ask is answered once, in the wave
   its hearer first decided after hearing it) and writes the list into turn_ledger stage 8 detail
   {'responses': [[actor, event_id, response], ...]}.

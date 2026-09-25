@@ -57,6 +57,27 @@ def whereabouts(tx, holder, body, rows, at):
     return "not seen"
 
 
+def seen_appearance(tx, holder, body, rows, at):
+    """PacketEntity.appearance (F1a LOOK-06)."""
+    import json as _j
+    from ..physical.space import point_distance
+    from .perception import appearance_text
+    best = None
+    for p in rows:
+        if p["source_id"] != body or p["channel"] != "visual":
+            continue
+        det = _j.loads(p["detail"]) if isinstance(p["detail"], str) else (p["detail"] or {})
+        lv = det.get("level")
+        if lv == "clear" or (lv == "partial" and best is None):
+            best = lv
+    if best is None:
+        return ""
+    from .perception import smell_text
+    d = point_distance(tx, holder, body)
+    parts = [appearance_text(tx, holder, body, best, 999.0 if d is None else d), smell_text(tx, holder, body, at)]
+    return " ".join(x for x in parts if x)
+
+
 def cut_heard(words, limit):
     if len(words) <= limit:
         return words
@@ -124,13 +145,48 @@ def _body_lines(tx, actor_id):
                                   ("fatigue_stage", "You are tired.", "You are exhausted.")):
             if 2 <= n[col] <= 3: out.append(mild)
             elif n[col] >= 4: out.append(strong)
+    out += _f1c_lines(tx, actor_id)
     i = b["impairment"]
     if 1 <= i <= 2: out.append("Everything is harder than it should be.")
     elif 3 <= i <= 4: out.append("You are struggling to function.")
     elif i >= 5: out.append("You can barely function.")
     from ..physical.bodies import stages
     out += [st.felt for _pw, st in stages(tx, actor_id) if st.felt]
-    return out or ["Unhurt."]
+    out = out or ["Unhurt."]
+    st = _row(tx, "SELECT stress FROM actors WHERE actor_id=?", (actor_id,))
+    s = st["stress"] if st else 0
+    if 7 <= s <= 8:
+        out.append("You are close to breaking.")
+    elif s >= 9:
+        out.append("You are at the end of your rope.")
+    return out
+
+
+def _temper_feeling(tx, holder, body, at):
+    import json as _j
+    from . import temper
+    h = temper.heat(tx, holder, body, at)
+    th = temper.threshold(tx, holder)
+    if h >= th:
+        return "you are furious with them"
+    if 0 < h and h >= th // 2:
+        return "they are getting under your skin"
+    for r in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND kind='grudge' AND status='open'", (holder,)):
+        if body in _j.loads(r[0]):
+            return "you hold a grudge against them"
+    return ""
+
+
+def _outburst_line(tx, holder, ph, at):
+    import json as _j
+    r = tx.query_one("SELECT payload FROM events WHERE type='INVOLUNTARY' AND actor_id=? AND at=? "
+                     "AND json_extract(payload,'$.kind')='outburst' ORDER BY seq DESC LIMIT 1", (holder, at))
+    if r is None:
+        return None
+    pl = _j.loads(r[0])
+    if pl.get("outlet") != "words" or pl.get("toward_id") not in ph:
+        return None
+    return f"You snap. You are going to have it out with {ph[pl['toward_id']]} — now, to their face."
 
 
 _RANK = {1: "trained", 2: "skilled", 3: "expert"}
@@ -161,8 +217,10 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
     from .identity import compile_identity
     from .firewall import classify_form, classify_standing, effective_form
     from .perception import at_phrase, place_phrase
+    from .memory import unprocessed
     if lod == LOD.COLD:
         raise ValueError("COLD actors get no packet")
+    unprocessed_raw = unprocessed(tx, actor_id)
     if not affordances.options:
         raise ValueError("empty affordance set")
     PR = tx.rules.packet
@@ -200,7 +258,9 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         rs = rels.get(b)
         entities.append(PacketEntity(handle=h, description=kn or _name_or_desc(tx, actor_id, b), known_name=kn,
                                      relation_summary=f"your {_sp(rs['kind'])}" if rs and rs["kind"] != "acquaintance" else None,
-                                     whereabouts=whereabouts(tx, actor_id, b, percepts, at)))
+                                     whereabouts=whereabouts(tx, actor_id, b, percepts, at),
+                                     appearance=seen_appearance(tx, actor_id, b, percepts, at),
+                                     feeling=_temper_feeling(tx, actor_id, b, at)))
     perceived, utts, unc = [], [], []
     for i, p in enumerate(percepts, 1):
         h = f"S{i}"
@@ -238,7 +298,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
     loops = []
     for i, r in enumerate(R.loops, 1):
         handles[f"L{i}"] = r["loop_id"]
-        loops.append(LoopLine(handle=f"L{i}", kind=r["kind"], text=r["text"]))
+        from .promise import suffix as _psuffix
+        loops.append(LoopLine(handle=f"L{i}", kind=r["kind"], text=r["text"] + _psuffix(tx, r["loop_id"])))
     memories = []
     for i, e in enumerate(R.episodes, 1):
         handles[f"E{i}"] = e["episode_id"]
@@ -291,6 +352,36 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         position = f"{at_phrase(an)} in {place_phrase(place)}"
     else:
         position = f"in {place_phrase(place)}"
+    from ..contracts.mind import ExpressionOption
+    from ..physical.bodies import capacity as _cap_of
+    hf = _cap_of(tx, actor_id).hands_free
+    gests, pts = [], []
+    if not reaction:
+        from ..action.effects import GESTURES
+        here = [e for e in entities if e.whereabouts == "here"]
+        gi = 0
+        for gid, g in GESTURES.items():
+            if g.hands > hf:
+                continue
+            targets = [(handles[e.handle], e.description) for e in here][:3] if g.targeted else [(None, None)]
+            for bid, desc in targets:
+                gi += 1
+                handles[f"G{gi}"] = f"{gid}:{bid or '*'}"
+                gests.append(ExpressionOption(handle=f"G{gi}", label=g.label.format(target=desc) if g.targeted else g.label,
+                                              hands=g.hands))
+        fi = 0
+        for e in here:
+            fi += 1
+            handles[f"F{fi}"] = handles[e.handle]
+            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Keep your eyes on {e.description}"))
+        seen_portals = sorted({p["source_id"] for p in percepts if p["channel"] == "visual" and str(p["source_id"] or "").startswith("prt_")})
+        for pid in seen_portals:
+            pr = _row(tx, "SELECT name, place_a, place_b FROM portals WHERE portal_id=?", (pid,))
+            if pr is None or pos["place_id"] not in (pr["place_a"], pr["place_b"]):
+                continue
+            fi += 1
+            handles[f"F{fi}"] = pid
+            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Watch the {pr['name']}"))
     wt = world_time(at)
     fields = dict(
         actor_id=actor_id, turn_index=turn_index, lod=lod,
@@ -302,9 +393,11 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         perceived_now=perceived, utterances=utts, entities=entities, beliefs=beliefs, relationships=rel_lines,
         memories=memories, lessons=lessons, open_loops=loops, refusals=[f"You refused: {r['request_summary']}." for r in refusal_rows],
         commitments=com, stakes=stakes, resources=resources,
-        affordances=opts, uncertainty=unc, handles=handles,
-        families=fams, consult_kinds=kinds, looked_up=list(consulted.lines) if consulted is not None else [])
-    return fields, present, refusal_rows
+        affordances=opts, uncertainty=unc, handles=handles, gestures=gests, attention_points=pts, hands_free=hf,
+        unprocessed=[t for _tix, lines in unprocessed_raw for t in lines],
+        families=fams, consult_kinds=kinds, looked_up=list(consulted.lines) if consulted is not None else [],
+        outburst=_outburst_line(tx, actor_id, ph, at))
+    return fields, present, refusal_rows, unprocessed_raw
 
 
 def _tokens(packet, reaction):
@@ -315,9 +408,11 @@ def _tokens(packet, reaction):
 
 
 def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=False, consulted=None):
-    f, present, refusal_rows = _assemble(tx, actor_id, LOD(lod), affordances, turn_index, at, reaction, consulted)
+    f, present, refusal_rows, unprocessed_raw = _assemble(tx, actor_id, LOD(lod), affordances, turn_index, at, reaction, consulted)
     budget = tx.rules.packet.token_budget["reaction" if reaction else LOD(lod).value]
     f["omitted"] = []
+    # SKULL-09 (B5b): the raw lines of every unsettled turn but the latest may go, oldest first
+    older_left = sum(len(lines) for _t, lines in unprocessed_raw[:-1])
     pkt = SkullPacket(**f)
     # AC16: a refusal of someone here or speaking now is pinned, whatever its age
     old = [i for i, r in enumerate(refusal_rows) if r["created_at"] < at - 7 * 86_400_000 and r["requester_id"] not in present]
@@ -343,6 +438,10 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
             alive.remove(i)
             om.append(f"refusal: You refused: {refusal_rows[i]['request_summary']}.")
             f["refusals"] = [f"You refused: {refusal_rows[k]['request_summary']}." for k in alive]
+        elif older_left:
+            om.append(f"unprocessed: {f['unprocessed'][0]}")
+            f["unprocessed"] = f["unprocessed"][1:]
+            older_left -= 1
         elif f["uncertainty"]:
             om.append(f"uncertainty: {f['uncertainty'][-1]}")
             f["uncertainty"] = f["uncertainty"][:-1]
@@ -350,3 +449,20 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
             break
         pkt = SkullPacket(**f)
     return pkt
+
+
+def _f1c_lines(tx, actor_id):
+    from ..physical.objects import coverage
+    from .packet import BARE_LINES, COLD_LINES
+    out = []
+    n = tx.query_one("SELECT cold_stage FROM needs WHERE body_id=?", (actor_id,))
+    if n is not None and n[0] >= 1:
+        out.append(COLD_LINES[min(6, n[0])])
+    lk = tx.query_one("SELECT looks FROM bodies WHERE body_id=?", (actor_id,))
+    if lk is not None and lk[0] is not None:
+        cov = coverage(tx, actor_id)
+        if "torso" not in cov and "groin" not in cov:
+            out.append(BARE_LINES[0])
+        elif "torso" not in cov:
+            out.append(BARE_LINES[1])
+    return out

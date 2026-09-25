@@ -119,4 +119,14 @@ def visibility(store: "Store | Tx", observer_id: str, subject_id: str, at_ms: in
         if sb["posture"] in ("prone", "crouched") and a["cover"] >= 2:
             conc += 1
     moved = store.query_one("SELECT 1 FROM events WHERE type='MOVE' AND actor_id=? AND at>? AND at<=? AND json_extract(payload,'$.from_place') IS NOT NULL", (subject_id, at_ms - 1000, at_ms)) is not None
-    return band(visibility_score(light, p, d, conc, bool(pos["hidden"]), moved))
+    sc = visibility_score(light, p, d, conc, bool(pos["hidden"]), moved)
+    r = store.query_one("SELECT json_extract(payload,'$.attention') FROM events WHERE type='ACTION_START' AND actor_id=? AND at<=? "
+                        "ORDER BY seq DESC LIMIT 1", (observer_id, at_ms))
+    A = r[0] if r else None
+    if A:
+        hit = subject_id == A
+        if not hit and str(A).startswith("prt_") and pos["anchor_id"]:
+            pr = store.query_one("SELECT anchor_a, anchor_b FROM portals WHERE portal_id=?", (A,))
+            hit = pr is not None and pos["anchor_id"] in (pr[0], pr[1])
+        sc += 1 if hit else -1
+    return band(sc)

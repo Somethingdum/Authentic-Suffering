@@ -82,6 +82,9 @@ def mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=frozen
         return True
     if pc_intent is not None and pc_intent.bound.target_id == actor_id:
         return True
+    if tx.query_one("SELECT 1 FROM events WHERE type='INVOLUNTARY' AND actor_id=? AND at=? "
+                    "AND json_extract(payload,'$.kind')='outburst'", (actor_id, at)) is not None:
+        return True
     return False
 
 
@@ -133,8 +136,20 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
                 dep = True
     vis = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? AND channel='visual' "
                        "AND source_id=? AND fidelity IN ('exact','partial')", (pc_id, turn_index, at, actor_id)) is not None
+    from ..mind import temper as _tm
+    griev = False
+    grudges = [json.loads(r[0]) for r in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND kind='grudge' "
+                                                   "AND status='open'", (actor_id,))]
+    if here is not None and tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (actor_id,)) is not None:
+        need = max(1, _tm.threshold(tx, actor_id) // 2)
+        for r in tx.query("SELECT b.body_id FROM bodies b JOIN positions q ON q.body_id=b.body_id WHERE q.place_id=? "
+                          "AND b.alive=1 AND b.body_id != ? ORDER BY b.body_id", (here, actor_id)):
+            if _tm.heat(tx, actor_id, r[0], at) >= need or any(r[0] in g for g in grudges):
+                griev = True
+                break
     return {"unique_info": unique, "loudest_percept": loudest, "addressed": addressed, "in_conflict": in_conflict,
-            "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis}
+            "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis,
+            "grievance_near": griev}
 
 
 def salience(flags, is_mandatory, weights):

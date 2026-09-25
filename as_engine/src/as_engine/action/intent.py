@@ -175,7 +175,21 @@ SEGMENT_WORDS = 8
 
 
 def segments(text: str) -> list[str]:
-    raise NotImplementedError("P5")
+    words = text.split()
+    stops = (".", ",", ";", ":", "!", "?", "\u2026", "\u2014")
+    out, i = [], 0
+    while i < len(words):
+        chunk = words[i:i + SEGMENT_WORDS]
+        if i + SEGMENT_WORDS < len(words):
+            cut = None
+            for j in range(3, len(chunk)):
+                if chunk[j].endswith(stops):
+                    cut = j
+            if cut is not None:
+                chunk = chunk[:cut + 1]
+        out.append(" ".join(chunk))
+        i += len(chunk)
+    return out
 
 
 def intent_to_dict(intent: Intent) -> dict:

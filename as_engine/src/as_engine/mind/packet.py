@@ -168,7 +168,9 @@ Fields (second person, plain English):
                     refusals   f'You refused: {summary}.' per refusal — only refusals whose
                                requester is here or named (MEM-17).
   open_loops        the holder's loops with status 'open', ordered (strength desc, created_at desc,
-                    loop_id), up to PacketRules.max_open_loops: LoopLine(L#, kind, text).
+                    loop_id), up to PacketRules.max_open_loops: LoopLine(L#, kind, text +
+                    mind.promise.suffix(tx, loop_id)) — (B5d) how a promise it carries stands:
+                    'I said I would: … (agreed between you)'.
   refusals          the actor's refusals with status 'standing' or 'reopened', by created_at:
                     f'You refused: {request_summary}.'
   commitments       current_task: the actor's task named by actors.current_task, else its first

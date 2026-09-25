@@ -19,6 +19,7 @@ ID_KINDS: tuple[str, ...] = (
     "wnd", "cnd",  # wounds, conditions
     "clm", "prp", "pct",  # truth claim, proposition, percept
     "ref", "olp", "lsn", "epi", "vln",  # refusal, open loop, lesson, episode, voice line
+    "prm", "agr",  # a person's understanding of a promise, an agreement (mind.promise, B5d)
     "tsk", "que", "scn", "rct",  # task, queue entry, scene, pending reaction
     "dos", "ddl",  # dossier, dossier delta
     "grp", "hh", "stl", "wkp", "coh", "rtn",  # society

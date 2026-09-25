@@ -92,7 +92,8 @@ def recover(tx, actor_id, reason, cause_event_id, at, turn_index):
 def gate(resolve_cur, definition, authority_name=None):
     tags = set(definition.tags)
     if resolve_cur <= 0:
-        ok = definition.verb in (Verb.FLEE, Verb.ESCAPE, Verb.SURRENDER, Verb.WAIT) or bool(tags & {"protect_dependent", "comply_under_threat"})
+        ok = definition.verb in (Verb.FLEE, Verb.ESCAPE, Verb.SURRENDER, Verb.WAIT, Verb.OBSERVE, Verb.SPEAK, Verb.TAKE_COVER,
+                                 Verb.HIDE) or bool(tags & {"protect_dependent", "comply_under_threat", "low_exposure"})
         return ok, None
     if resolve_cur == 1:
         return (not definition.requires.fear_exposure), None
@@ -193,12 +194,25 @@ def request_signature(text, speaker_id, receiver_id, perceived_entities):
         x = None
         if "{x}" in tmpl:
             phrase = (m.groupdict().get("x") or "").strip()
-            best = None
-            for k, v in perceived_entities.items():
-                kk = k.lower()
-                if kk == phrase or kk in phrase:
-                    if best is None or len(kk) > len(best[0]):
-                        best = (kk, v)
+            dfn = tmpl.split(":", 1)[0]
+            kind = "portal" if dfn in ("open_portal", "close_portal") else ("anchor" if dfn == "guard_anchor" else None)
+
+            def _best(pref):
+                best = None
+                for k, v in perceived_entities.items():
+                    kk = k.lower()
+                    if pref is None:
+                        if "|" in kk:
+                            continue
+                    else:
+                        if not kk.startswith(pref + "|"):
+                            continue
+                        kk = kk[len(pref) + 1:]
+                    if kk == phrase or kk in phrase:
+                        if best is None or len(kk) > len(best[0]):
+                            best = (kk, v)
+                return best
+            best = (_best(kind) if kind else None) or _best(None)
             x = best[1] if best else "*"
         return tmpl.replace("{speaker}", speaker_id).replace("{x}", x or "*")
     return "*:*"
@@ -213,8 +227,9 @@ def _matches(sig, chosen):
     return True
 
 
-def classify_response(signature, chosen, speech_text, resolve_cur, form, *, entrenched_block, resolve_drained_this_turn):
-    from .firewall import ASSENT_TOKENS
+def classify_response(signature, chosen, speech_text, resolve_cur, form, *, entrenched_block, resolve_drained_this_turn,
+                      steps_toward=frozenset()):
+    from .firewall import ASSENT_TOKENS, CONDITION_TOKENS
     if signature != "*:*" and _matches(signature, chosen):
         if form == UtteranceForm.THREAT and resolve_cur == 0:
             return ResponseClass.COERCED_COMPLIANCE
@@ -224,8 +239,18 @@ def classify_response(signature, chosen, speech_text, resolve_cur, form, *, entr
     if entrenched_block:
         return ResponseClass.ENTRENCHED_REFUSAL
     s = (speech_text or "").lower()
-    if s and any(re.search(r"\b" + re.escape(a) + r"\b", s) for a in ASSENT_TOKENS):
-        return ResponseClass.FALSE_COMPLIANCE
+    if s.rstrip().endswith("?"):
+        return ResponseClass.CLARIFYING
+    def has(tokens):
+        return any(re.search(r"\b" + re.escape(a) + r"\b", s) for a in tokens)
+    if s and has(ASSENT_TOKENS):
+        if has(CONDITION_TOKENS):
+            return ResponseClass.DEFERRED_ASSENT
+        tgt = signature.split(":", 1)[1] if ":" in signature else "*"
+        near = set(steps_toward) | ({tgt} if tgt != "*" else set())
+        if near & {chosen.target_id, chosen.destination_id} - {None}:
+            return ResponseClass.PREPARING
+        return ResponseClass.UNRESOLVED_ASSENT
     if s and classify_form(s) == UtteranceForm.OFFER:
         return ResponseClass.COUNTER_OFFER
     return ResponseClass.REFUSAL

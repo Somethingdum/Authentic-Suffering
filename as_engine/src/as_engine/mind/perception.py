@@ -286,7 +286,7 @@ import json as _json
 
 from ..contracts.events import Event as _Event, EventType as _ET, WriteOp as _Op, WriteRecord as _W
 
-SENSORY_TYPES: tuple[str, ...] = ("NOISE", "SPEECH", "MOVE", "PORTAL_CHANGE", "ACTION_START", "ACTION_COMPLETE",
+SENSORY_TYPES: tuple[str, ...] = ("GESTURE", "NOISE", "SPEECH", "MOVE", "PORTAL_CHANGE", "ACTION_START", "ACTION_COMPLETE",
                                   "HARM", "DEATH", "FALSE_DEATH", "ITEM_TRANSFER")
 _CONF = {"exact": 3, "partial": 2, "tone_only": 1, "visual_only": 2}
 _LEVEL_FID = {"clear": "exact", "partial": "partial", "silhouette": "visual_only"}
@@ -355,6 +355,9 @@ def describe(tx: "Tx", holder_id: str, subject_id: str) -> str:
     if r:
         return r["description"]
     b = _row(tx, "SELECT kind FROM bodies WHERE body_id=?", (subject_id,))
+    if b["kind"] == "animal":
+        cr = _row(tx, "SELECT content_ref FROM bodies WHERE body_id=?", (subject_id,))["content_ref"]
+        return _canon(tx).get(cr).words
     if b["kind"] == "infected":
         st = _row(tx, "SELECT type_id FROM infected_state WHERE body_id=?", (subject_id,))
         return "fast figure" if "RUNNER" in st["type_id"] else "shambling figure"
@@ -544,6 +547,20 @@ def _perceive_event(tx, holder, ev, turn_index):
         return out
     if not _conscious(tx, holder):
         return out
+    if t == "GESTURE":
+        if actor is None or actor == holder:
+            return out
+        lvl = optics.visibility(tx, holder, actor, ev["at"])
+        if lvl not in ("clear", "partial"):
+            return out
+        from ..action.effects import GESTURES
+        g = GESTURES[payload["gesture"]]
+        tgt = payload.get("target_id")
+        tw = "you" if tgt == holder else (word_for(tx, holder, tgt) if tgt else "")
+        out.append(grant(tx, holder, event_id=ev["event_id"], channel="visual", fidelity=_LEVEL_FID[lvl],
+                         text=f"{_cap(ref(tx, holder, actor, lvl))} {g.seen.format(target=tw)}.", source_id=actor, at=ev["at"],
+                         turn_index=turn_index, detail={"level": lvl}))
+        return out
     if t in ("MOVE", "ACTION_START", "ACTION_COMPLETE", "ITEM_TRANSFER"):
         if actor is None or actor == holder:
             return out
@@ -606,7 +623,11 @@ def _perceive_event(tx, holder, ev, turn_index):
             else:
                 text = f"{rf} moves."
     elif t == "HARM":
-        text = f"{rf} is hurt."
+        if payload.get("type") == "bite":
+            alive = _row(tx, "SELECT alive FROM bodies WHERE body_id=?", (payload.get("body_id"),))
+            text = f"{rf} is being eaten alive." if alive and alive["alive"] else f"{rf} is being eaten."
+        else:
+            text = f"{rf} is hurt."
     elif t in ("DEATH", "FALSE_DEATH"):
         text = f"{rf} goes down and does not move."
     elif t == "ITEM_TRANSFER":
@@ -669,6 +690,24 @@ def compile_scene(tx: "Tx", holder_id: str, at: int, turn_index: int) -> list[st
             for tr in tx.query("SELECT trace_id, text FROM traces WHERE place_id=? ORDER BY created_at, trace_id", (hp["place_id"],)):
                 out.append(grant(tx, holder_id, event_id=ev_id, channel="visual", fidelity="exact", text=tr[1],
                                  source_id=tr[0], at=at, turn_index=turn_index, detail={"level": "clear"}))
+        from ..sense import olfaction as _olf
+        agg = {}
+        for r in tx.query("SELECT b.body_id FROM bodies b JOIN positions p ON p.body_id=b.body_id WHERE b.body_id != ? ORDER BY b.body_id", (holder_id,)):
+            if r[0] in seen:
+                continue
+            f = _olf.smells(tx, holder_id, r[0], at)
+            if f is None:
+                continue
+            o = _olf.odour_of(tx, r[0], at)
+            cur = agg.setdefault(o.kind, [False, 0])
+            cur[0] = cur[0] or f == "exact"
+            cur[1] = max(cur[1], o.strength)
+        for k in _olf.ODOUR_KINDS:
+            if k in agg:
+                ex, st = agg[k]
+                out.append(grant(tx, holder_id, event_id=ev_id, channel="olfactory", fidelity="exact" if ex else "partial",
+                                 text=_olf.ODOUR_WORDS[k][2 if ex else 3], source_id=None, at=at, turn_index=turn_index,
+                                 detail={"odour": k, "strength": st}))
         # bookkeeping
         ws = [_W(op=_Op.UPSERT, table="known_places", key={"holder_id": holder_id, "place_id": hp["place_id"]},
                  values={"first_seen": at, "last_seen": at, "visited": 1})]
@@ -882,6 +921,10 @@ def infer(tx: "Tx", holder_id: str, *, about: tuple[str, str | None], text: str,
     rows = []
     for pid in because:
         r = _row(tx, "SELECT * FROM percept_log WHERE percept_id=?", (pid,))
+        if r is None:
+            e = _row(tx, "SELECT event_id, actor_id FROM events WHERE event_id=?", (pid,))
+            if e is not None and e["actor_id"] == holder_id:
+                r = {"holder_id": holder_id, "event_id": pid, "fidelity": "exact"}
         if r is None or r["holder_id"] != holder_id:
             raise ValueError(f"not this holder's percept: {pid}")
         rows.append(r)
@@ -911,9 +954,119 @@ def infer(tx: "Tx", holder_id: str, *, about: tuple[str, str | None], text: str,
     return prp
 
 
+_LEN = {"cropped": "cropped", "short": "short", "collar": "collar-length", "shoulder": "shoulder-length", "long": "long"}
+_FH = {"stubble": "stubble", "mustache": "a mustache", "beard": "a beard", "full_beard": "a full beard"}
+
+
+def _list(xs):
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
+def shown_pieces(store, subject_id):
+    """(SHOWN clothing dicts in slot order, coverage) — the F1a outer-layer rule."""
+    from ..physical.objects import CLOTHING_LAYER_ORDER as LO, CLOTHING_SLOT_ORDER as SO, coverage, worn
+    w = [o for o in worn(store, subject_id) if o["clothing"]]
+    top = {}
+    for o in w:
+        s = o["clothing"]["slot"]
+        if s not in top or LO.index(o["clothing"]["layer"]) < LO.index(top[s]["clothing"]["layer"]):
+            top[s] = o
+    body = top.get("body")
+    shown = []
+    for s in SO:
+        o = top.get(s)
+        if o is None:
+            continue
+        if body is not None and s in ("torso", "legs") and not LO.index(o["clothing"]["layer"]) < LO.index(body["clothing"]["layer"]):
+            continue
+        shown.append(o)
+    return shown, coverage(store, subject_id)
+
+
+def _piece(o):
+    st = {"torn": "torn ", "soiled": "soiled "}.get(o["state"], "")
+    s = st + (o["colour"] + " " if o["colour"] else "") + o["clothing"]["words"]
+    return s if o["clothing"]["plural"] else with_article(s)
+
+
 def appearance_text(tx: "Tx", holder_id: str, subject_id: str, level: str, distance_m: float) -> str:
-    raise NotImplementedError("P3")
+    from ..physical.bodies import condition_of, looks_of
+    from ..physical.objects import visible_gear
+    if level not in ("clear", "partial"):
+        return ""
+    L = looks_of(tx, subject_id)
+    C = condition_of(tx, subject_id)
+    d = distance_m
+    parts = []
+    if level == "clear" and L is not None:
+        f = []
+        if L.hair_length == "bald":
+            f.append("bald")
+        elif L.hair_length == "shaved":
+            f.append("a shaved head")
+        else:
+            f.append(f"{_LEN[L.hair_length]} {L.hair_colour} hair" + (f" {L.hair_style}" if L.hair_style else ""))
+        if L.facial_hair != "none" and (L.facial_hair != "stubble" or d <= 5):
+            f.append(L.facial_hair_words or _FH[L.facial_hair])
+        if d <= 5:
+            f.append(L.complexion)
+        for m in L.marks:
+            if m.shows == "far" or (m.shows == "near" and d <= 5) or (m.shows == "close" and d <= 1.5):
+                f.append(f"{m.what} {m.where}")
+        if d <= 1.5:
+            f.append(f"{L.eye_colour} eyes")
+        parts.append(", ".join(f))
+    shown = []
+    if L is not None:
+        shown, cov = shown_pieces(tx, subject_id)
+        naked = "torso" not in cov and "groin" not in cov
+        half = "torso" not in cov and "groin" in cov
+        if level == "clear":
+            if naked:
+                parts.append("naked" + (" but for " + _list([_piece(o) for o in shown]) if shown else ""))
+            else:
+                parts.append(("bare to the waist, " if half else "") + "in " + _list([_piece(o) for o in shown]))
+        else:
+            if naked:
+                parts.append("naked")
+            elif half:
+                parts.append("bare to the waist")
+            else:
+                key = [o for o in shown if o["clothing"]["slot"] == "torso"] or [o for o in shown if o["clothing"]["slot"] == "body"]
+                if key:
+                    parts.append("in " + _piece(key[0]))
+    if level == "clear":
+        ins = [o["insignia"] for o in shown if o["insignia"]]
+        if ins:
+            parts.append(", ".join(ins))
+        canon = tx.canon if getattr(tx, "canon", None) is not None else tx.store.canon
+        hands = {r[0] for r in tx.query("SELECT item_id FROM items WHERE holder_body=? AND holder_slot IN ('hand_l','hand_r')", (subject_id,))}
+        g = [i for i in visible_gear(tx, subject_id) if i not in hands]
+        if g:
+            names = [with_article(canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (i,))[0]).name) for i in g]
+            parts.append("carrying " + _list(names))
+    cw = []
+    if level == "clear":
+        if C.gore >= 4: cw.append("caked in gore")
+        elif C.gore >= 2: cw.append("smeared with gore")
+        if C.blood >= 5: cw.append("soaked in blood")
+        elif C.blood >= 3: cw.append("bloodied")
+        if C.grime >= 4: cw.append("filthy")
+        elif C.grime >= 3: cw.append("grimy")
+        if C.wet >= 2: cw.append("soaked through")
+    else:
+        if C.gore >= 4: cw.append("caked in gore")
+        if C.blood >= 5: cw.append("soaked in blood")
+        elif C.blood >= 4: cw.append("bloodied")
+    if cw:
+        parts.append(", ".join(cw))
+    txt = "; ".join(x for x in parts if x)
+    return (txt[0].upper() + txt[1:] + ".") if txt else ""
 
 
 def smell_text(tx: "Tx", holder_id: str, subject_id: str, at: int) -> str:
-    raise NotImplementedError("P3")
+    from ..sense import olfaction
+    f = olfaction.smells(tx, holder_id, subject_id, at)
+    if f is None:
+        return ""
+    return olfaction.ODOUR_WORDS[olfaction.odour_of(tx, subject_id, at).kind][0 if f == "exact" else 1]

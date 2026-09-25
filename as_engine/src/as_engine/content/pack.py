@@ -202,7 +202,7 @@ import yaml as _yaml
 _FOLDERS = [  # folder, kind, contract name, one-or-list
     ("actors", "actor", "ActorDossier"), ("pcs", "pc", "PCDossier"), ("factions", "faction", "FactionDossier"),
     ("lore", "lore", "LoreEntry"), ("items", "item", "ItemDef"), ("affordances", "affordance", "AffordanceDef"),
-    ("infected", None, None), ("pathways", "pathway", "InfectionPathwayDef"), ("cascade", "cascade", "CascadeRuleDef"),
+    ("infected", None, None), ("pathways", "pathway", "InfectionPathwayDef"), ("animals", "animal", "AnimalDef"), ("cascade", "cascade", "CascadeRuleDef"),
     ("laws", "law", "LawDef"), ("buildings", "building", "BuildingArchetype"), ("loot", "loot", "LootTable"),
     ("names", "names", "NameList"), ("style", "style", "StyleRules"), ("ui", "quips", "QuipList"),
 ]
@@ -211,9 +211,9 @@ _INFECTED = {"as.infected.v1": ("infected", "InfectedTypeDef"), "as.infected_sta
 _SCHEMA_OF = {"actor": "as.actor.v1", "pc": "as.pc.v1", "faction": "as.faction.v1", "lore": "as.lore.v1",
               "item": "as.item.v1", "affordance": "as.affordance.v1", "pathway": "as.pathway.v1",
               "cascade": "as.cascade.v1", "law": "as.law.v1", "building": "as.building.v1", "loot": "as.loot.v1",
-              "names": "as.names.v1", "style": "as.style.v1", "quips": "as.quips.v1"}
+              "names": "as.names.v1", "style": "as.style.v1", "quips": "as.quips.v1", "animal": "as.animal.v1"}
 KINDS = ("actor", "pc", "faction", "lore", "item", "affordance", "infected", "infected_state", "quirk", "pathway",
-         "cascade", "law", "building", "loot", "names", "style", "quips", "cue")
+         "cascade", "law", "building", "loot", "names", "style", "quips", "cue", "animal")
 EXHAUST = ('IGNORE_WHEN_COPYING', 'content_copy', 'Use code with caution', 'As an AI', '[INSERT', 'TODO', 'lorem ipsum')
 REF_RE = _re.compile(r"^[a-z0-9_]+:(" + "|".join(KINDS) + r")/[A-Za-z0-9_-]+$")
 
@@ -566,6 +566,25 @@ def load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:
                 if pt.to_room not in ids:
                     err(p, rel, "CNT-04", f"exterior_portals[{j}].to_room", f"to_room '{pt.to_room}' is not one of its rooms.")
         if kind in ("actor", "pc"):
+            lk = rec.appearance.looks
+            if lk is None:
+                issues.append(_issue(p.manifest.id, rel, "CNT-17", "appearance.looks", "has no appearance.looks; others will see only height and build.", "warning"))
+            else:
+                cov = set()
+                for i, pc in enumerate(lk.outfit):
+                    if pc.item not in all_refs:
+                        continue
+                    d = canon.get(pc.item)
+                    if d.clothing is None:
+                        err(p, rel, "CNT-17", f"appearance.looks.outfit[{i}]", f"outfit[{i}] '{pc.item}' is not clothing (it has no clothing: block).")
+                    else:
+                        cov |= set(d.clothing.covers)
+                miss = [x for x in ("torso", "groin") if x not in cov]
+                if miss:
+                    err(p, rel, "CNT-17", "appearance.looks.outfit", f"the outfit leaves the {' and the '.join(miss)} uncovered.")
+                for i, g in enumerate(rec.starting_inventory):
+                    if g.slot == "worn" and not g.container and g.item in all_refs and canon.get(g.item).clothing is not None:
+                        err(p, rel, "CNT-17", f"starting_inventory[{i}]", f"starting_inventory[{i}] '{g.item}' is clothing worn; put it in appearance.looks.outfit instead.")
             labels = {g.label for g in rec.starting_inventory if g.label}
             for i, g in enumerate(rec.starting_inventory):
                 if g.container and g.container not in labels:
@@ -619,7 +638,7 @@ def load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:
                 if req.skill_or_belief_cue and req.skill_or_belief_cue not in cues:
                     err(p, rel, "CNT-05", "requires.skill_or_belief_cue", f"cue '{req.skill_or_belief_cue}' is not in any cues.yaml.")
         if kind == "item":
-            need = {"firearm": "firearm", "melee": "melee", "container": "container", "food": "food", "water": "water", "medical": "medical"}
+            need = {"firearm": "firearm", "melee": "melee", "container": "container", "food": "food", "water": "water", "medical": "medical", "clothing": "clothing"}
             for block in need.values():
                 present = getattr(rec, block) is not None
                 if rec.kind == block and not present:

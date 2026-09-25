@@ -71,7 +71,8 @@ check; when you stop, a check that **Next task** is filled and protected files a
 
 - `docs/as/13_BUILD_ORDER.md` — phases, task order, gates, forbidden work.
 - `as_engine/src/as_engine/<package>/<module>.py` — each docstring is the contract for that module.
-- `as_engine/src/as_engine/**/_impl_*.py` — the bodies of functions that are already built (P0–P10).
+- `as_engine/src/as_engine/**/_impl_*.py` — the bodies of functions that are already built (P0–P10
+  and everything added since; 13_BUILD_ORDER §4.0 says what is still yours).
   A module whose functions are built ends with lines like `from ._impl_packet import build_packet  # noqa`:
   those names are bound to the bodies in that `_impl_` file, and a fix to one goes there (the contract
   module's docstrings and signatures stay as they are). Import the owning module, never an `_impl_`

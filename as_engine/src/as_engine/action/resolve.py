@@ -82,7 +82,8 @@ def resolve_wave(tx: "Tx", rng: "Rng", intents: list["Intent"], wave_at: int, tu
 
 
 def say_pending(tx: "Tx", row: dict, turn_index: int) -> list["Event"]:
-    raise NotImplementedError("P5")
+    from ._impl_p5b import say_pending as _sp
+    return _sp(tx, row, turn_index)
 
 
 def land_pending(tx: "Tx", rng: "Rng", row: dict, turn_index: int, *, horizon_ms: int) -> list["Event"]:

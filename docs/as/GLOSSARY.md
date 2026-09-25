@@ -105,6 +105,8 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | background timer | a queue row of `BACKGROUND_QUEUE_TYPES`: fires in a window but never ends a wait | — | — |
 | off-screen step | `turn.timers.run_offscreen`: time passing in 6-hour windows without a played turn | — | society tick |
 | open loop | promise, debt, grudge, goal, desire, fear, question, plan, kept secret | Journal entries | objective (for all of these) |
+| promise | one person's understanding of what was promised in words someone said: category, status, the SPEECH it came from (`promises`, PROM-01..07) | promises | — |
+| agreement | the promiser's and the promisee's understandings of the same words, found to agree (PROM-03) | agreed | deal (in code) |
 | lesson | a belief about what works, from experience | "lessons" | — |
 | episode | one memory in the holder's own voice | — | memory entry |
 | self-experience | what a person did and felt themselves ('I said…', 'It did not work.'), evidence a memory may cite as O# (MEM-01, Actor v2 B5b) | — | — |

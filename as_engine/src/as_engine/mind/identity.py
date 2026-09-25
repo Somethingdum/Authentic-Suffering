@@ -267,6 +267,16 @@ def compile_identity(dossier: ActorDossier | PCDossier, *, minimum: bool = False
     add("habits", f"Under stress: {end(d.appearance.movement_under_stress)}", "appearance.movement_under_stress")
     add("habits", f"A habit of your hands: {end(d.appearance.habit_gesture)}", "appearance.habit_gesture")
 
+    tm = getattr(d, "temper", None)
+    if tm is not None:
+        add("temper", FUSE_WORDS[tm.fuse], "temper.fuse")
+        add("temper", OUTLET_WORDS[tm.outlet], "temper.outlet")
+        add("temper", GRUDGE_WORDS[tm.grudge], "temper.grudge")
+        if tm.pet_peeves:
+            add("temper", f"Things that get under your skin: {in_words(tm.pet_peeves)}.", "temper.pet_peeves")
+        if tm.cools_down_by.strip():
+            add("temper", f"What settles you: {end(tm.cools_down_by)}", "temper.cools_down_by")
+
     v = d.voice
     add("voice", end(v.capsule), "voice.capsule")
     add("voice", f"How you tend to speak: {' '.join(end(t) for t in v.speech_tendencies)}", "voice.speech_tendencies")

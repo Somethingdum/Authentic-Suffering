@@ -126,6 +126,10 @@ async def simulate(ctx):
                 for h, trig in reactions.material_holders(tx, _events_after(tx, turn_first_seq), T):
                     if h == s.pc_id:
                         ctx.horizon = select.pull(ctx.horizon, trig, _last_at(tx, T))
+            from ..mind import temper as _temper
+            for h in perceivers:
+                if select.conscious(tx, h) and tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (h,)) is not None:
+                    _temper.take_in(tx, rng, h, T, wave_at)
             # 4 select
             await _progress(ctx, 4)
             minds = [c for c in cands if select.conscious(tx, c)]
@@ -147,7 +151,7 @@ async def simulate(ctx):
             await _progress(ctx, 6)
             intents = await cognition.decide(tx, s, plan, affs, T, wave_at, reaction=wave_idx > 0, answered=ctx.answered)
             if wave_idx == 0:
-                intents[s.pc_id] = ctx.pc_intent
+                intents[s.pc_id] = cognition.urge_pc(tx, rng, s.pc_id, ctx.pc_intent, T, wave_at)
             asks = {a: cognition.asks_for(tx, a, T, ctx.answered) for a in sorted(intents)}
             # 7 barrier
             await _progress(ctx, 7)
@@ -378,6 +382,13 @@ async def after_commit(ctx, notices):
                                               "WHERE p.turn_index=? AND b.alive=1 ORDER BY p.holder_id", (T,))]
             packets = {h: build_aftermath(tx, h, T, at) for h in holders}
             packets = {h: p for h, p in packets.items() if p.percepts or p.utterances}
+            from ..mind.memory import queue_writeback
+            keys = {h: queue_writeback(tx, h, T, at) for h in sorted(packets)}
+            R_m = store.rules.memory
+            retry = [dict(r) for r in tx.query("SELECT * FROM memory_jobs WHERE status='failed' AND attempts < ? AND turn_index < ? "
+                                                "ORDER BY turn_index, holder_id LIMIT ?", (R_m.writeback_retries, T, R_m.max_retry_jobs))]
+            retry_packets = {r["job_key"]: build_aftermath(tx, r["holder_id"], r["turn_index"], at) for r in retry}
+            allp = {**packets, **retry_packets}
             _ledger(tx, T, 13, "ok", {"holders": sorted(packets)})
         # 16 PC compile
         await _progress(ctx, 16)
@@ -397,15 +408,15 @@ async def after_commit(ctx, notices):
 
         async def do_writeback():
             from ..lanes.scheduler import Job, run_jobs
-            groups = writeback_groups(packets)
+            groups = writeback_groups(packets) + [[k] for k in retry_packets]
             jobs = []
             for g in groups:
-                a = packets[g[0]]
+                a = allp[g[0]]
                 ctxw = WritebackContext(aftermath=a)
                 cue_ids = [c.id for c in _cues(store)]
-                sch = writeback_schema([x.handle for x in a.percepts] + [u.handle for u in a.utterances] or ["S1"],
+                sch = writeback_schema([x.handle for x in a.percepts] + [u.handle for u in a.utterances] + [o.handle for o in a.self_experiences] or ["S1"],
                                        [e.handle for e in a.entities], [l.handle for l in a.open_loops])
-                req = build_request(s.config, CallClass.WRITEBACK, turn_index=T, actor_id=g[0], context=ctxw, json_schema=sch,
+                req = build_request(s.config, CallClass.WRITEBACK, turn_index=T, actor_id=a.holder_id, context=ctxw, json_schema=sch,
                                     a=a, cue_ids=cue_ids)
                 jobs.append(Job(job_id=g[0], call_class=CallClass.WRITEBACK, request=req, output_model=WritebackOutput,
                                 lane_pref=req.lane, est_s=store.rules.scheduler.estimated_call_s["writeback"]))
@@ -418,18 +429,22 @@ async def after_commit(ctx, notices):
         with store.transaction() as tx:
             at = clock.now(tx)
             cue_ids = [c.id for c in _cues(store)]
+            from ..mind.memory import finish_writeback
             wb_failed = []
             for g in groups:
                 r = wres[g[0]]
+                pk = allp[g[0]]
+                key = keys.get(g[0], g[0])
                 if r.parse_status != "ok":
                     wb_failed.append(g[0])
                     log_repair(tx, {"timeout": "timeout", "lane_error": "lane_down"}.get(r.parse_status, r.parse_status
                                    if r.parse_status in ("grammar_fail", "schema_fail") else "degraded"), 14, "MEM-02",
-                               {"holders": g, "status": r.parse_status}, T, at)
+                               {"holders": [pk.holder_id], "status": r.parse_status}, T, at)
+                    finish_writeback(tx, key, False, at, T)
                     continue
                 out = WritebackOutput.model_validate(r.parsed)
-                for h in g:
-                    apply_writeback(tx, h, out, packets[h], at, T, cue_ids=cue_ids)
+                apply_writeback(tx, pk.holder_id, out, pk, at, T, cue_ids=cue_ids)
+                finish_writeback(tx, key, True, at, T)
             _ledger(tx, T, 14, "degraded" if wb_failed else "ok", {"groups": groups, "failed": wb_failed})
         # 15 audits: the leak scan (a query)
         await _progress(ctx, 15)

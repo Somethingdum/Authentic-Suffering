@@ -46,7 +46,7 @@ def relate(tx, from_id, to_id, axis, delta, cause, at, turn_index):
                                  payload={"from_id": from_id, "to_id": to_id, "axis": axis.value, "old": old, "new": new, "delta": new - old}))
 
 
-def open_loop(tx, holder_id, kind, text, subject_ids, strength, cause, at, turn_index, due_at=None):
+def open_loop(tx, holder_id, kind, text, subject_ids, strength, cause, at, turn_index, due_at=None, links=()):
     from .perception import norm_text, word_for
     kind = OpenLoopKind(kind)
     if not text or not text.strip():
@@ -64,6 +64,7 @@ def open_loop(tx, holder_id, kind, text, subject_ids, strength, cause, at, turn_
     lid = tx.mint("olp")
     et = EventType.PROMISE if kind in (OpenLoopKind.PROMISE_MADE, OpenLoopKind.PROMISE_OWED) else EventType.LOOP_OPENED
     ev = Event(type=et, writer="mind.mind", at=at, turn_index=turn_index, actor_id=holder_id, cause_event_id=committed_or_none(tx, cause),
+               links=list(links),
                payload={"loop_id": lid, "holder_id": holder_id, "kind": kind.value, "text": text, "subject_ids": subject_ids,
                         "strength": strength, "due_at": due_at})
     # created_event must be the event's own id: mint happens in commit; patch via two-step (insert then fill)
@@ -94,7 +95,10 @@ def close_loop(tx, loop_id, status, cause, at, turn_index):
     ev = Event(type=et, writer="mind.mind", at=at, turn_index=turn_index, actor_id=r["holder_id"], cause_event_id=committed_or_none(tx, cause),
                payload=payload, writes=[WriteRecord(op=WriteOp.UPDATE, table="open_loops", key={"loop_id": loop_id},
                                                     values={"status": status, "resolved_event": "$event_id"})])
-    return _commit_self(tx, ev)
+    out = _commit_self(tx, ev)
+    from .promise import on_loop_closed
+    on_loop_closed(tx, loop_id, status, cause, at, turn_index)
+    return out
 
 
 def learn(tx, holder_id, cue_tags, text, expectation, outcome, cause, at, turn_index):
@@ -207,7 +211,7 @@ _PAREN = re.compile(r"\s*\([^()]*\)$")
 def build_aftermath(tx, holder_id, turn_index, at):
     from ..contracts.common import Standing
     from ..contracts.mind import AftermathPacket, LoopLine, PacketEntity, PerceivedItem, RelationshipLine, UtteranceView
-    from ._impl_packet import _name_or_desc, _rel_text, _sp, cut_heard, whereabouts
+    from ._impl_packet import _name_or_desc, _rel_text, _sp, cut_heard, seen_appearance, whereabouts
     from .actor import fused
     from .firewall import classify_form, classify_standing, effective_form
     rows = select_percepts(tx, holder_id, turn_index, at)
@@ -224,7 +228,8 @@ def build_aftermath(tx, holder_id, turn_index, at):
         rs = rels.get(b)
         entities.append(PacketEntity(handle=h, description=kn or _name_or_desc(tx, holder_id, b), known_name=kn,
                                      relation_summary=f"your {_sp(rs['kind'])}" if rs and rs["kind"] != "acquaintance" else None,
-                                     whereabouts=whereabouts(tx, holder_id, b, rows, at)))
+                                     whereabouts=whereabouts(tx, holder_id, b, rows, at),
+                                     appearance=seen_appearance(tx, holder_id, b, rows, at)))
     percepts, utts = [], []
     for i, p in enumerate(rows, 1):
         h = f"S{i}"
@@ -263,31 +268,35 @@ def build_aftermath(tx, holder_id, turn_index, at):
     expect = None
     if last_start is not None and last_start.get("goal") and last_start.get("goal") != last_start.get("label"):
         expect = last_start["goal"]
+    from ..contracts.mind import SelfExperience
+    selfx = []
+    band_words = {"clean": "It went cleanly.", "cost": "It worked, at a cost.", "fail": "It did not work.", "break": "It went badly wrong."}
+    for e in tx.query("SELECT event_id, type, payload FROM events WHERE actor_id=? AND turn_index=? AND at<=? "
+                      "AND type IN ('SPEECH','ACTION_START','ACTION_COMPLETE','ACTION_BLOCKED') ORDER BY seq", (holder_id, turn_index, at)):
+        pl = _j(e["payload"])
+        if e["type"] == "SPEECH":
+            txt = f'I said: "{pl["words"]}"'
+        elif e["type"] == "ACTION_START":
+            if pl["def_id"] == "speak":
+                continue
+            lab = _PAREN.sub("", pl.get("label") or pl["def_id"])
+            txt = f"I chose to {lab[:1].lower() + lab[1:]}."
+        elif e["type"] == "ACTION_COMPLETE":
+            txt = band_words.get(pl.get("band"), "I did it.")
+        else:
+            txt = "I could not do it."
+        h = f"O{len(selfx) + 1}"
+        handles[h] = e["event_id"]
+        selfx.append(SelfExperience(handle=h, text=txt))
     d = fused(tx, holder_id)
     from .identity import compile_identity
     return AftermathPacket(holder_id=holder_id, turn_index=turn_index, identity=compile_identity(d), percepts=percepts, utterances=utts, entities=entities, own_action_text=own,
-                           own_expectation_text=expect, open_loops=loops, relationships=rel_lines, handles=handles)
+                           own_expectation_text=expect, open_loops=loops, relationships=rel_lines, handles=handles,
+                           self_experiences=selfx)
 
 
 def writeback_groups(packets):
-    def key(p):
-        if p.own_action_text is not None or p.open_loops or p.relationships:
-            return None
-        return (tuple((x.channel, x.fidelity, x.text, p.handles.get(x.source_handle) if x.source_handle else None) for x in p.percepts),
-                tuple((u.words, u.volume, u.addressed_to_me, u.fidelity, p.handles.get(u.speaker_handle) if u.speaker_handle else None) for u in p.utterances),
-                tuple((p.handles[e.handle], e.description) for e in p.entities))
-    groups = {}
-    out = []
-    for hid in sorted(packets):
-        k = key(packets[hid])
-        if k is None:
-            out.append([hid])
-        elif k in groups:
-            groups[k].append(hid)
-        else:
-            groups[k] = [hid]
-            out.append(groups[k])
-    return sorted(out, key=lambda g: g[0])
+    return [[h] for h in sorted(packets)]
 
 
 def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
@@ -295,8 +304,13 @@ def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
     from .memory import BONDED_KINDS
     from .perception import infer
     first = tx.query_one("SELECT MAX(seq) FROM events")[0] or 0
+    jk = f"{holder_id}:{packet.turn_index}"
+    jr = tx.query_one("SELECT status FROM memory_jobs WHERE job_key=?", (jk,))
+    if jr is not None and jr[0] == "done":
+        return []
+    from .memory import unknown_names
     H = packet.handles
-    is_s = lambda h: isinstance(h, str) and h.startswith("S") and h in H  # noqa: E731
+    is_s = lambda h: isinstance(h, str) and h[:1] in ("S", "O") and h in H  # noqa: E731
     is_p = lambda h: isinstance(h, str) and h.startswith("P") and h in H  # noqa: E731
     is_l = lambda h: isinstance(h, str) and h.startswith("L") and h in H  # noqa: E731
 
@@ -304,6 +318,8 @@ def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
         repair(tx, "hallucinated_ref", 14, "MEM-02", {"holder_id": holder_id, "item": item, "index": index, "ref": ref}, turn_index, at)
 
     def pev(h):
+        if h.startswith("O"):
+            return H[h]
         return tx.query_one("SELECT event_id FROM percept_log WHERE percept_id=?", (H[h],))[0]
 
     beliefs = []
@@ -313,6 +329,9 @@ def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
             bad = b.about
         if bad is not None:
             drop("belief", i, bad)
+        elif unknown_names(tx, holder_id, b.claim):
+            repair(tx, "unknown_name", 14, "MEM-18", {"holder_id": holder_id, "item": "belief", "index": i,
+                                                       "names": unknown_names(tx, holder_id, b.claim)}, turn_index, at)
         else:
             beliefs.append(b)
     rels = []
@@ -371,6 +390,10 @@ def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
                 if r and (r["affection"] >= 2 or r["kind"] in BONDED_KINDS):
                     anchor = 1
                     break
+    bad_names = unknown_names(tx, holder_id, output.episode)
+    if bad_names:
+        repair(tx, "unknown_name", 14, "MEM-18", {"holder_id": holder_id, "item": "episode", "names": bad_names}, turn_index, at)
+    o_handles = sorted((h for h in H if h.startswith("O")), key=lambda h: int(h[1:]))
     eid = tx.mint("epi")
     place = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (holder_id,))
     tx.commit_event(Event(type=EventType.EPISODE_WRITTEN, writer="mind.memory", at=at, turn_index=turn_index, actor_id=holder_id,
@@ -378,14 +401,26 @@ def apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids):
                           writes=[WriteRecord(op=WriteOp.INSERT, table="episodes", values={
                               "episode_id": eid, "holder_id": holder_id, "at": at, "turn_index": turn_index,
                               "place_id": place[0] if place else None, "summary": output.episode.strip(), "salience": output.salience,
-                              "percept_ids": [H[h] for h in s_handles], "subject_ids": [H[h] for h in p_handles], "anchor": anchor, "decayed": 0})]))
+                              "percept_ids": [H[h] for h in s_handles], "subject_ids": [H[h] for h in p_handles], "anchor": anchor, "decayed": 0,
+                              "self_event_ids": [H[h] for h in o_handles], "quarantined": 1 if bad_names else 0})]))
     for b in beliefs:
         about = ("self", None) if b.about == "self" else ("place", None) if b.about == "place" else ("body", H[b.about])
         infer(tx, holder_id, about=about, text=b.claim, confidence=b.confidence, because=[H[h] for h in b.because], at=at, turn_index=turn_index)
     for r in rels:
         relate(tx, holder_id, H[r.with_], r.axis, r.delta, pev(r.because), at, turn_index)
     for lw in new_loops:
-        open_loop(tx, holder_id, lw.kind, lw.text, [H[lw.subject]] if lw.subject else [], lw.strength, pev(lw.because), at, turn_index)
+        lid = open_loop(tx, holder_id, lw.kind, lw.text, [H[lw.subject]] if lw.subject else [], lw.strength, pev(lw.because), at, turn_index)
+        if lw.kind in ("promise_made", "promise_owed"):
+            from . import promise as _pm
+            src = pev(lw.because)
+            subj = H[lw.subject] if lw.subject else None
+            promiser = holder_id if lw.kind == "promise_made" else subj
+            promisee = subj if lw.kind == "promise_made" else holder_id
+            if promiser is not None and _pm.heard(tx, holder_id, promiser, src):
+                txt = tx.query_one("SELECT text FROM open_loops WHERE loop_id=?", (lid,))[0]
+                _pm.hold(tx, holder_id, promiser_id=promiser, promisee_id=promisee, category=lw.category or "assist", text=txt,
+                         object_id=None, condition=None, source_event_id=src, loop_id=lid,
+                         status="accepted" if lw.kind == "promise_made" else "understood", at=at, turn_index=turn_index)
     for c in closes:
         close_loop(tx, H[c.loop], c.status, pev(c.because), at, turn_index)
     if lesson is not None:
@@ -461,7 +496,7 @@ def retrieve(tx, holder_id, turn_index, at, *, max_beliefs, max_memories, max_lo
     bl.sort(key=lambda b: (-b["score"], b["claim_id"]))
     out.beliefs = bl[:max_beliefs]
     # episodes
-    eps = [dict(r, rowid=r["rowid"]) for r in tx.query("SELECT rowid, * FROM episodes WHERE holder_id=? AND decayed=0", (holder_id,))]
+    eps = [dict(r, rowid=r["rowid"]) for r in tx.query("SELECT rowid, * FROM episodes WHERE holder_id=? AND decayed=0 AND quarantined=0", (holder_id,))]
     anchors = sorted([e for e in eps if e["anchor"]], key=lambda e: (-e["salience"], -e["at"], e["episode_id"]))[:2]
     words = _content_words(speech)
     match = set()

@@ -40,7 +40,9 @@ LOOP-02 A mind does not hold the same loop twice: when the holder already has an
   stays as it was).
 LOOP-03 close_loop(tx, loop_id, status, cause, at, turn_index) -> Event. The loop must exist and
   be 'open', and status must be one of 'fulfilled', 'broken', 'abandoned', 'expired' — else
-  ValueError. Writes open_loops UPDATE (status, resolved_event = this event's id).
+  ValueError. Writes open_loops UPDATE (status, resolved_event = this event's id). (Actor v2 B5d)
+  Then mind.promise.on_loop_closed(tx, loop_id, status, cause, at, turn_index): the promise the
+  loop carries, if any, moves with it; close_loop still returns the loop's own event.
 LOOP-04 The promisee is the one who decides a promise was kept or broken. Closing a
   **promise_owed** loop (the holder is owed) as 'fulfilled' commits PROMISE_KEPT, as 'broken'
   commits PROMISE_BROKEN, with payload {loop_id, holder_id, status, promisee_id: the holder,
@@ -112,7 +114,18 @@ def close_loop(tx: "Tx", loop_id: str, status: str, cause: str | None, at: int,
 
 def strengthen_loop(tx: "Tx", loop_id: str, delta: int, cause: str | None, at: int,
                     turn_index: int) -> Event | None:
-    raise NotImplementedError("P5")
+    from ..contracts.events import EventType, WriteOp, WriteRecord
+    r = tx.query_one("SELECT holder_id, strength, status FROM open_loops WHERE loop_id=?", (loop_id,))
+    if r is None or r[2] != "open":
+        raise ValueError(f"no open loop {loop_id}")
+    new = max(1, min(3, r[1] + delta))
+    if new == r[1]:
+        return None
+    return tx.commit_event(Event(type=EventType.LOOP_STRENGTH, writer="mind.mind", at=at, turn_index=turn_index,
+                                 actor_id=r[0], cause_event_id=cause,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="open_loops", key={"loop_id": loop_id},
+                                                     values={"strength": new})],
+                                 payload={"loop_id": loop_id, "holder_id": r[0], "old": r[1], "new": new}))
 
 
 def learn(tx: "Tx", holder_id: str, cue_tags: list[str], text: str, expectation: str, outcome: str,

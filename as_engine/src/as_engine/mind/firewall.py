@@ -218,12 +218,26 @@ def record_lie(tx: "Tx", liar_id: str, to_id: str, signature: str, words: str, s
 
 def revise_refusal(tx: "Tx", actor_id: str, requester_id: str, signature: str, at: int, turn_index: int,
                    cause_event_id: str | None) -> "Event | None":
-    raise NotImplementedError("P6")
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    r = tx.query_one("SELECT refusal_id FROM refusals WHERE actor_id=? AND requester_id=? AND request_signature=? "
+                     "AND status IN ('standing','reopened') ORDER BY created_at LIMIT 1", (actor_id, requester_id, signature))
+    if r is None:
+        return None
+    return tx.commit_event(Event(type=EventType.REFUSAL_REVISED, writer="mind.mind", at=at, turn_index=turn_index, actor_id=actor_id,
+                                 cause_event_id=cause_event_id,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="refusals", key={"refusal_id": r[0]},
+                                                     values={"status": "revised"})],
+                                 payload={"refusal_id": r[0], "actor_id": actor_id, "requester_id": requester_id, "signature": signature}))
 
 
 def record_unmet_assent(tx: "Tx", actor_id: str, to_id: str, signature: str, words: str, chosen_def_id: str,
                         speech_event_id: str | None, at: int, turn_index: int,
                         ask_event_id: str | None = None) -> "Event":
-    raise NotImplementedError("P6")
+    from ..contracts.events import Event, EventLink, EventType
+    lk = [EventLink(event_id=ask_event_id, role="answered")] if ask_event_id and ask_event_id != speech_event_id else []
+    return tx.commit_event(Event(type=EventType.ASSENT_UNMET, writer="mind.mind", at=at, turn_index=turn_index, actor_id=actor_id,
+                                 cause_event_id=speech_event_id, links=lk,
+                                 payload={"actor_id": actor_id, "to_id": to_id, "signature": signature, "words": words,
+                                          "chosen_def_id": chosen_def_id}))
 from ._impl_p4a import classify_form, classify_standing, request_signature, classify_response  # noqa
 from ._impl_p6 import record_refusal, negotiable_target_penalty, record_lie  # noqa

@@ -452,12 +452,14 @@ def contaminate(tx: "Tx", item_id: str, pathway: str, body_id: str, at: int, cau
     from ..contracts.events import EventType, WriteOp, WriteRecord
     it = _item(tx, item_id)
     props = dict(it["props"])
-    props["contaminated"] = {"pathway": pathway, "by": body_id, "at": at}
+    old = props.get("contaminated") or {}
+    if not (old.get("lasting") and not lasting):
+        props["contaminated"] = {"pathway": pathway, "by": body_id, "at": at, "lasting": bool(lasting)}
     return tx.commit_event(Event(type=EventType.ITEM_CONTAMINATED, writer="physical.objects", at=at, turn_index=turn_index,
                                  actor_id=body_id, cause_event_id=cause_event_id, target_ids=[item_id],
                                  writes=[WriteRecord(op=WriteOp.UPDATE, table="items", key={"item_id": item_id},
                                                      values={"props": props})],
-                                 payload={"item_id": item_id, "pathway": pathway, "by": body_id}))
+                                 payload={"item_id": item_id, "pathway": pathway, "by": body_id, "lasting": bool(lasting)}))
 
 
 def contaminated(store: "Store | Tx", item_id: str, at: int) -> dict | None:
@@ -467,6 +469,9 @@ def contaminated(store: "Store | Tx", item_id: str, at: int) -> dict | None:
     c = _json.loads(r[0] or "{}").get("contaminated")
     if not c:
         return None
+    c = {**c, "lasting": bool(c.get("lasting", False))}
+    if c["lasting"]:
+        return c
     rules = store.rules if hasattr(store, "rules") else store.store.rules
     if at - c["at"] > rules.infected.saliva_hours * 3_600_000:
         return None
@@ -478,21 +483,57 @@ CLOTHING_LAYER_ORDER = ("outer", "mid", "under")
 
 
 def worn(store: "Store | Tx", body_id: str) -> list[dict]:
-    raise NotImplementedError("P2")
+    canon = _canon(store)
+    rows = [dict(r) for r in store.query("SELECT item_id, def_ref, props FROM items WHERE holder_body=? AND holder_slot='worn'",
+                                         (body_id,))]
+    clothes, gear = [], []
+    for r in rows:
+        d = canon.get(r["def_ref"])
+        props = _json.loads(r["props"]) if isinstance(r["props"], str) else (r["props"] or {})
+        c = d.clothing
+        out = {"item_id": r["item_id"], "def_ref": r["def_ref"], "name": d.name,
+               "clothing": c.model_dump(mode="json") if c is not None else None,
+               "colour": props.get("colour") or (c.colour if c is not None else "") or "",
+               "state": props.get("state", "worn"), "insignia": props.get("insignia")}
+        (clothes if c is not None else gear).append(out)
+    clothes.sort(key=lambda o: (CLOTHING_SLOT_ORDER.index(o["clothing"]["slot"]),
+                                CLOTHING_LAYER_ORDER.index(o["clothing"]["layer"]), o["item_id"]))
+    gear.sort(key=lambda o: o["item_id"])
+    return clothes + gear
 
 
 def coverage(store: "Store | Tx", body_id: str) -> set[str]:
-    raise NotImplementedError("P2")
-
-
-def warmth(store: "Store | Tx", body_id: str) -> int:
-    raise NotImplementedError("P2")
+    return {c for o in worn(store, body_id) if o["clothing"] for c in o["clothing"]["covers"]}
 
 
 def visible_gear(store: "Store | Tx", body_id: str) -> list[str]:
-    raise NotImplementedError("P2")
+    canon = _canon(store)
+    out = []
+    for slot in ("hand_l", "hand_r"):
+        out += [r[0] for r in store.query("SELECT item_id FROM items WHERE holder_body=? AND holder_slot=? ORDER BY item_id",
+                                          (body_id, slot))]
+    w = worn(store, body_id)
+    hides = any(o["clothing"] and o["clothing"]["conceals"] and o["clothing"]["layer"] == "outer"
+                and "torso" in o["clothing"]["covers"] for o in w)
+    for o in w:
+        if o["clothing"] is None:
+            if hides and canon.get(o["def_ref"]).bulk <= 2:
+                continue
+            out.append(o["item_id"])
+    return out
 
 
 def dress(tx: "Tx", body_id: str, outfit: list, at: int, cause_event_id: str | None, turn_index: int,
           origin: str) -> list[str]:
-    raise NotImplementedError("P2")
+    eo = "worldgen" if origin == "worldgen" else "system" if origin == "scenario" else "sim"
+    ids = []
+    for piece in outfit:
+        props = {k: v for k, v in (("colour", piece.colour), ("state", piece.state), ("insignia", piece.insignia)) if v is not None}
+        ev = create(tx, piece.item, 1, Holder("body", body_id, "worn"), origin, props, at, cause_event_id, turn_index,
+                    event_origin=eo)
+        ids.append(ev.payload["item_id"])
+    return ids
+
+
+def warmth(store: "Store | Tx", body_id: str) -> int:
+    return sum((o["clothing"].get("warmth") or 0) for o in worn(store, body_id) if o["clothing"])

@@ -688,6 +688,25 @@ CREATE TABLE episodes (
 );
 CREATE INDEX episodes_holder ON episodes(holder_id, at);
 
+-- OWNER mind.promise
+CREATE TABLE promises (                        -- B5d PROM-02 (Actor Spec §12): one person's understanding of a promise
+  promise_id      TEXT PRIMARY KEY,
+  holder_id       TEXT NOT NULL,               -- whose understanding this is
+  promiser_id     TEXT NOT NULL,
+  promisee_id     TEXT,
+  category        TEXT NOT NULL CHECK (category IN ('deliver','guard','return','disclose','refrain','assist')),
+  text            TEXT NOT NULL,
+  object_id       TEXT,                        -- the target or item, when known
+  condition       TEXT,                        -- 'after I finish this'
+  source_event_id TEXT NOT NULL,               -- the SPEECH it was said in
+  loop_id         TEXT,                        -- the open loop that carries it in the holder's mind
+  status          TEXT NOT NULL CHECK (status IN ('proposed','understood','accepted','in_progress','fulfilled','failed','withdrawn','disputed')),
+  agreement_id    TEXT,                        -- PROM-03: set when both sides' understandings agree
+  created_at      INTEGER NOT NULL,
+  updated_at      INTEGER NOT NULL
+);
+CREATE INDEX promises_holder ON promises(holder_id, status);
+
 -- OWNER mind.memory
 CREATE TABLE memory_jobs (                     -- B5 MEM-19 (fidelity C10): a writeback is never lost to a failed call
   job_key     TEXT PRIMARY KEY,                -- f'{holder_id}:{turn_index}'

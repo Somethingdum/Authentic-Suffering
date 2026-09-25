@@ -295,7 +295,22 @@ def draw_to_feed(tx: "Tx", prey_id: str, feeder_id: str, at: int, cause_event_id
     """INF-15 (I1): every active infected body other than ``feeder_id`` in the prey's place within
     R.scream_draw_m of the prey (space.point_distance), by body_id -> attract(tx, it, prey_id, at,
     cause_event_id, turn_index, reason='feed'). Returns the INFECTED_DRIFT events committed."""
-    raise NotImplementedError("P10")
+    from ..physical.space import point_distance
+    R = tx.rules.infected
+    pos = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (prey_id,))
+    if pos is None:
+        return []
+    out = []
+    for r in tx.query("SELECT p.body_id FROM positions p JOIN bodies b ON b.body_id=p.body_id WHERE p.place_id=? "
+                      "AND b.kind='infected' AND p.body_id != ? ORDER BY p.body_id", (pos[0], feeder_id)):
+        if not active(tx, r[0]):
+            continue
+        d = point_distance(tx, r[0], prey_id)
+        if d is not None and d <= R.scream_draw_m:
+            ev = attract(tx, r[0], prey_id, at, cause_event_id, turn_index, reason="feed")
+            if ev is not None:
+                out.append(ev)
+    return out
 
 
 def taint_water(tx: "Tx", point_body_id: str, infected_id: str, at: int, cause_event_id: str | None,
@@ -305,7 +320,29 @@ def taint_water(tx: "Tx", point_body_id: str, infected_id: str, at: int, cause_e
     point_body_id's point, by item_id, not already carrying a lasting mark -> physical.objects.
     contaminate(tx, item, 'wet', infected_id, at, cause_event_id, turn_index, lasting=True).
     Returns the ITEM_CONTAMINATED events."""
-    raise NotImplementedError("P10")
+    import math
+    from ..physical.objects import contaminate, contaminated
+    R = tx.rules.infected
+    pos = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (point_body_id,))
+    if pos is None:
+        return []
+    out = []
+    for r in tx.query("SELECT i.item_id, i.def_ref, i.anchor_id FROM items i WHERE i.place_id=? ORDER BY i.item_id", (pos[0],)):
+        if tx.canon.get(r[1]).kind != "water":
+            continue
+        if r[2]:
+            ap = tx.query_one("SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (r[2],))
+            x, y = ap[0], ap[1]
+        else:
+            pl = tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (pos[0],))
+            x, y = pl[0] / 2, pl[1] / 2
+        if math.hypot(x - pos[1], y - pos[2]) > R.taint_radius_m:
+            continue
+        c = contaminated(tx, r[0], at)
+        if c and c.get("lasting"):
+            continue
+        out.append(contaminate(tx, r[0], "wet", infected_id, at, cause_event_id, turn_index, lasting=True))
+    return out
 
 
 def seed_quirks(tx: "Tx", rng: "Rng", body_id: str, type_id: str) -> list[str]:

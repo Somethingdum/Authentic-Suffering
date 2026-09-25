@@ -324,8 +324,8 @@ def _impairment_from(R, pain, blood, needs):
 
 
 def _needs_of(s, body_id):
-    r = s.query_one("SELECT thirst_stage, hunger_stage, fatigue_stage FROM needs WHERE body_id=?", (body_id,))
-    return list(r) if r is not None else [0, 0, 0]
+    r = s.query_one("SELECT thirst_stage, hunger_stage, fatigue_stage, cold_stage FROM needs WHERE body_id=?", (body_id,))
+    return list(r) if r is not None else [0, 0, 0, 0]
 
 
 def impairment(store: "Store | Tx", body_id: str) -> int:
@@ -380,6 +380,9 @@ def apply_harm(tx: "Tx", body_id: str, wound: WoundSpec, at: int, cause_event_id
                  "function_loss": vals["function_loss"], "bleed_pct_per_min": vals["bleed_pct_per_min"],
                  "contamination": vals["contamination"]}))
     out = [ev]
+    add = R.condition.blood_from_wound.get(vals["severity"], 0)
+    if add:
+        soil(tx, body_id, blood=add, source="harm", at=at, cause_event_id=ev.event_id, turn_index=turn_index)
     d = death_test(tx, body_id, at, turn_index, rng, ev.event_id)
     if d is not None:
         out.append(d)
@@ -410,8 +413,19 @@ def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rn
     payload = {"body_id": body_id, "cause": cause, "cause_event_id": cause_event_id}
     if pathway is not None:
         payload["rise_pending"] = True
+    links = []
+    if cause == "blood_loss":
+        from ..contracts.events import EventLink
+        seen = set()
+        for w in tx.query("SELECT cause_event FROM wounds WHERE body_id=? AND healed_at IS NULL AND bleed_pct_per_min > 0 "
+                          "ORDER BY created_at, wound_id", (body_id,)):
+            ce = w[0]
+            if ce in seen or ce == cause_event_id or tx.query_one("SELECT 1 FROM events WHERE event_id=?", (ce,)) is None:
+                continue
+            seen.add(ce)
+            links.append(EventLink(event_id=ce, role="contributed"))
     ev = tx.commit_event(Event(type=EventType.DEATH, writer="physical.bodies", at=at, turn_index=turn_index,
-        target_ids=[body_id], cause_event_id=cause_event_id,
+        target_ids=[body_id], cause_event_id=cause_event_id, links=links,
         writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values=vals)], payload=payload))
     if pathway is not None:
         from ..kernel import clock
@@ -508,6 +522,12 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
                 cands.append(dt)
     if b["false_dead_until"] is not None and b["false_dead_until"] > t:
         cands.append(b["false_dead_until"])
+    if _care_subject(tx, b):
+        C = _rules(tx).condition
+        for step in (C.weather_step_min * MIN, C.cold_step_min * MIN):
+            cands.append((t // step + 1) * step)
+        gh = int(C.grime_every_h * 3_600_000)
+        cands.append(b["washed_at"] + ((t - b["washed_at"]) // gh + 1) * gh)
     nxt = min(c for c in cands if c > t) if any(c > t for c in cands) else to_ms
     # land exactly on the step grid the minute-by-minute integration would use
     steps = max(1, (nxt - t + STEP_MS - 1) // STEP_MS)
@@ -573,6 +593,7 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
                         out.append(tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=end, turn_index=turn_index,
                             target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "asleep", "posture": "lying"})],
                             payload={"body_id": body_id, "awareness": "asleep", "from": bb["awareness"]})))
+        out += _care_step(tx, body_id, t, end, turn_index)
         # 3 infection
         for inf in tx.query("SELECT * FROM infections WHERE body_id=?", (body_id,)):
             pw = canon.find("pathway", inf["pathway"])
@@ -660,7 +681,9 @@ def capacity(store: "Store | Tx", body_id: str) -> Capacity:
         if not disabled and not held:
             free += 1
     can_speak = conscious and not any(w["severity"] == "catastrophic" and ANATOMY_GROUP[w["anatomy"]] == "neck" for w in ws)
-    return Capacity(mobile=mobile, hands_free=free, can_speak=can_speak, conscious=conscious, impairment=b["impairment"])
+    hobbled = any(ANATOMY_GROUP[w["anatomy"]] in ("leg", "foot") and w["function_loss"] >= 1 for w in ws)
+    return Capacity(mobile=mobile, hands_free=free, can_speak=can_speak, conscious=conscious, impairment=b["impairment"],
+                    can_run=mobile and not hobbled)
 
 
 def wake(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> Event | None:
@@ -788,8 +811,6 @@ def create(tx: "Tx", *, kind: str, sex: str | None, age_years: int | None, heigh
            special: dict, at: int, turn_index: int, origin: str, cause_event_id: str | None = None,
            awareness: str = "awake", posture: str = "standing", content_ref: str | None = None,
            looks: "Looks | None" = None) -> str:
-    if looks is not None:
-        raise NotImplementedError("P2")      # F1a LOOK-01: write bodies.looks
     from ..contracts.common import age_band_for
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     if origin not in ("worldgen", "birth", "materialize", "cheat", "reanimation", "scenario"):
@@ -800,6 +821,12 @@ def create(tx: "Tx", *, kind: str, sex: str | None, age_years: int | None, heigh
             "mass_kg": mass_kg, "alive": 1, "awareness": awareness, "posture": posture, "blood_loss_pct": 0.0,
             "pain": 0, "impairment": 0, "restrained": 0, "special": special, "progressed_at": at, "core_intact": 1,
             "origin": origin}
+    if looks is not None:
+        from ..kernel.jsoncanon import canonical_json
+        vals["looks"] = canonical_json({**looks.model_dump(mode="json"), "outfit": []})
+    if kind == "infected":
+        vals.update(grime=5, blood=3, gore=5)
+    vals["washed_at"] = at
     ws = [WriteRecord(op=WriteOp.INSERT, table="bodies", values=vals)]
     if kind in ("human", "lurker", "animal"):
         ws.append(WriteRecord(op=WriteOp.INSERT, table="needs", values={
@@ -818,7 +845,7 @@ def expose(tx: "Tx", rng: "Rng", body_id: str, pathway: str, exposure: str, at: 
     if exposure not in rec.exposure:
         raise ValueError(f"pathway {pathway} has no exposure {exposure}")
     b = _b(tx, body_id)
-    if not b["alive"]:
+    if not b["alive"] or b["kind"] not in ("human", "lurker"):
         return None
     if tx.query_one("SELECT 1 FROM infections WHERE body_id=? AND pathway=?", (body_id, pathway)) is not None:
         return None
@@ -846,11 +873,19 @@ def rise(tx: "Tx", corpse_id: str, type_id: str, at: int, cause_event_id: str | 
     t = _canon(tx).find("infected", type_id)
     return create(tx, kind="infected", sex=c["sex"], age_years=c["age_years"], height_cm=c["height_cm"],
                   mass_kg=c["mass_kg"], special={k: (v.lo + v.hi) // 2 for k, v in t.special.items()}, at=at,
-                  turn_index=turn_index, origin="reanimation", cause_event_id=cause_event_id)
+                  turn_index=turn_index, origin="reanimation", cause_event_id=cause_event_id,
+                  looks=looks_of(tx, corpse_id))
 
 
 def contagious(store: "Store | Tx", body_id: str) -> bool:
-    raise NotImplementedError("P10")
+    b = store.query_one("SELECT kind, alive FROM bodies WHERE body_id=?", (body_id,))
+    if b is None:
+        return False
+    if b[0] == "infected":
+        return True
+    if not b[1] or b[0] not in ("human", "lurker"):
+        return False
+    return any(pw == "wet" and st.saliva_infectious for pw, st in stages(store, body_id))
 
 
 def stages(store: "Store | Tx", body_id: str) -> list[tuple[str, "InfectionStage"]]:
@@ -874,22 +909,115 @@ class BodyCondition:
 
 
 def looks_of(store: "Store | Tx", body_id: str) -> "Looks | None":
-    raise NotImplementedError("P2")
+    import json
+    from ..contracts.dossier import Looks
+    r = store.query_one("SELECT looks FROM bodies WHERE body_id=?", (body_id,))
+    if r is None or r[0] is None:
+        return None
+    return Looks.model_validate(json.loads(r[0]))
 
 
 def condition_of(store: "Store | Tx", body_id: str) -> BodyCondition:
-    raise NotImplementedError("P2")
+    r = store.query_one("SELECT grime, blood, gore, wet, washed_at FROM bodies WHERE body_id=?", (body_id,))
+    return BodyCondition(*r)
 
 
 def soil(tx: "Tx", body_id: str, *, grime: int = 0, blood: int = 0, gore: int = 0, wet: int = 0, source: str,
          at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
-    raise NotImplementedError("P2")
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    c = condition_of(tx, body_id)
+    new = {"grime": max(0, min(5, c.grime + grime)), "blood": max(0, min(5, c.blood + blood)),
+           "gore": max(0, min(5, c.gore + gore)), "wet": max(0, min(3, c.wet + wet))}
+    if new == {"grime": c.grime, "blood": c.blood, "gore": c.gore, "wet": c.wet}:
+        return None
+    return tx.commit_event(Event(type=EventType.BODY_CONDITION, writer="physical.bodies", at=at, turn_index=turn_index,
+                                 actor_id=body_id, target_ids=[body_id], cause_event_id=cause_event_id,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", values=new, key={"body_id": body_id})],
+                                 payload={"body_id": body_id, **new, "source": source}))
 
 
 def wash(tx: "Tx", body_id: str, *, full: bool, at: int, cause_event_id: str | None,
          turn_index: int) -> "Event | None":
-    raise NotImplementedError("P5")
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    if tx.query_one("SELECT 1 FROM bodies WHERE body_id=?", (body_id,)) is None:
+        return None
+    c = condition_of(tx, body_id)
+    if full:
+        new = {"grime": 0, "blood": 0, "gore": 0, "wet": min(3, c.wet + 1), "washed_at": at}
+        source = "washed"
+    else:
+        new = {"grime": max(0, c.grime - 1), "blood": max(0, c.blood - 2), "gore": max(0, c.gore - 2), "wet": min(3, c.wet + 1)}
+        source = "wiped"
+    return tx.commit_event(Event(type=EventType.BODY_CONDITION, writer="physical.bodies", at=at, turn_index=turn_index,
+                                 actor_id=body_id, cause_event_id=cause_event_id,
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values=new)],
+                                 payload={"body_id": body_id, "grime": new["grime"], "blood": new["blood"], "gore": new["gore"],
+                                          "wet": new["wet"], "source": source}))
+
+
+def _care_subject(s, b):
+    return b["alive"] and b["kind"] == "human" and b["looks"] is not None
 
 
 def cold_need(store: "Store | Tx", body_id: str, at: int) -> int:
-    raise NotImplementedError("P10")
+    from ..kernel.clock import world_time
+    from ..world.decay import exposed
+    C = _rules(store).condition
+    b = _b(store, body_id)
+    if not _care_subject(store, b):
+        return 0
+    heat = _params(store)["climate_heat"]
+    band = "cold" if heat <= 3 else ("hot" if heat >= 8 else "mild")
+    base = C.cold_need[band]
+    pos = store.query_one("SELECT place_id FROM positions WHERE body_id=?", (body_id,))
+    if pos is not None and exposed(store, pos[0]):
+        if world_time(at).part_of_day in ("night", "late night"):
+            base += 1
+    else:
+        base = max(0, base - C.shelter)
+    if b["wet"] >= 2:
+        base += 1
+    return base
+
+
+def _care_step(tx, body_id, t, end, turn_index):
+    """LOOK-08 then LOOK-09 for one progress step [t, end]."""
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    from ..physical.objects import warmth
+    from ..world.decay import exposed, wet
+    R = _rules(tx)
+    C, N = R.condition, R.needs
+    out = []
+    b = _b(tx, body_id)
+    if not _care_subject(tx, b):
+        return out
+    g = min(C.grime_unwashed_max, (end - b["washed_at"]) // int(C.grime_every_h * 3_600_000))
+    if b["grime"] < g:
+        ev = soil(tx, body_id, grime=g - b["grime"], source="unwashed", at=end, cause_event_id=None, turn_index=turn_index)
+        if ev is not None:
+            out.append(ev)
+    W = C.weather_step_min * MIN
+    n = end // W - t // W
+    if n >= 1:
+        pos = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (body_id,))
+        if pos is not None and wet(tx) and exposed(tx, pos[0]):
+            ev = soil(tx, body_id, wet=n, blood=-n, gore=-n, source="rain", at=end, cause_event_id=None, turn_index=turn_index)
+        elif _b(tx, body_id)["wet"] > 0:
+            ev = soil(tx, body_id, wet=-n, source="dried", at=end, cause_event_id=None, turn_index=turn_index)
+        else:
+            ev = None
+        if ev is not None:
+            out.append(ev)
+    K = C.cold_step_min * MIN
+    k = end // K - t // K
+    nd = tx.query_one("SELECT * FROM needs WHERE body_id=?", (body_id,))
+    if k >= 1 and nd is not None:
+        d = cold_need(tx, body_id, end) - warmth(tx, body_id)
+        chill = nd["chill"] + k * d if d > 0 else max(0, nd["chill"] - k * C.warm_per_step)
+        stage = min(N.death_stage, chill // C.chill_per_stage)
+        if chill != nd["chill"]:
+            out.append(tx.commit_event(Event(type=EventType.NEED_STAGE, writer="physical.bodies", at=end, turn_index=turn_index,
+                target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="needs", key={"body_id": body_id},
+                                                          values={"chill": chill, "cold_stage": stage})],
+                payload={"body_id": body_id, "need": "cold", "stage": stage, "chill": chill})))
+    return out

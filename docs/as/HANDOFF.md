@@ -6,27 +6,22 @@ the DSH builder; delete it when P12 ships.
 
 ## 0. Where the kit stands
 
-**The engine is built through P10 and committed** (2026-09-24, on the owner's instruction: "Commit
-all of your working code. The rest of your work will remain uncoded, and your job is to get
-DeepSeek to finish that properly."). What was the scratch reference now lives in the repo: its
-bodies are the `_impl_*.py` files bound at the end of each contract module (AGENTS.md §4), plus the
-modules built in place. All 1299 engine tests pass (P0–P10, Actor v2 steps 1–3, the sim soak). The
-P10 screens of the Play UI are in `talemate_frontend/src/play/`; the P8 screens, the Talemate plugin
-and the frontend toolchain are not built — the DSH builder builds them (13_BUILD_ORDER §4.0).
+**The engine is built through P10 and committed**, and so is everything specified since (owner,
+2026-09-24: "Commit all of your working code"; 2026-09-25: "If you're making implementations,
+throw them into the final system, don't waste compute."). The bodies are the `_impl_*.py` files
+bound at the end of each contract module (AGENTS.md §4), plus the modules built in place. Built:
+P0–P10, the sim soak, Actor v2 B1–B5d (D-87..D-91) and the owner's F1a, F1b, H1, I1, W1 and F1c
+(D-77, D-80, D-82..D-86). Every engine contract test passes except the seven D-76 items (the
+sessions browser and a world that names no run), which the DSH builder builds. The P10 screens of
+the Play UI are in `talemate_frontend/src/play/`; the P8 screens, the Talemate plugin and the
+frontend toolchain are not built — the DSH builder builds them (13_BUILD_ORDER §4.0).
 
-**From here on nothing more is implemented by the kit-maker.** The owner's words: the rest is
-DeepSeek's to build. The kit-maker writes contracts, tests, docs and instructions only. What is left:
-1. **Actor v2 steps 4–6** — the Actor Specification's remaining parts. **Step 4 (B4) is SPECIFIED**
-   (D-87; 05 §7.2; 13 §4.0 step 1; tests 12 §3.10): words in segments on the clock, cut when the
-   speaker stops; gestures by free hands, seen and never heard; one attention point. **B5a is
-   SPECIFIED** (D-88; 05 §5, §6; tests 12 §3.11): zero Resolve keeps a person's voice, eyes and
-   retreat; a yes is sorted, never judged a lie; a refusal can be revised. **B5b is SPECIFIED** (D-89;
-   05 §9.1; tests 12 §3.12): own words and attempts are evidence, everyone reads as themselves, an
-   unknowable name quarantines a memory, and a failed writeback is a memory job tried again. **B5c
-   is SPECIFIED** (D-90; 03 §3; tests 12 §3.13): an event can name several causes (links). Left:
-   B5d — promises as each person understands them (Actor Spec §12); B6 — the society and wake
-   fixes (C04, C06, C08), as contracts and tests amending the built phases. Each amended function
-   is named, so the builder knows which bodies to change.
+**From here on the kit-maker writes contracts, tests, docs — and, where it implements to prove
+them, the implementation itself, committed with them** (the owner's 2026-09-25 instruction
+replaces "the rest will remain uncoded"). What is left:
+1. **Actor v2 step 6** — B6, the society and wake fixes (fidelity C04, C06, C08; the known
+   CAS-012 fault below); then Actor Spec §12's plans with stable keys and delegation (a leader's
+   orders the recipient decides on) and §11's conversations.
 2. **P11** — the audits (§5).
 3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
@@ -46,13 +41,13 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   Gore camouflage works on ordinary infected (CODEX: not on Lurkers, by heat) at an infection-exposure cost,
   and people avoid you until you wash. Nakedness: exposure and no protection, and a shock to most people —
   strictly non-sexual.
-  **F1a is SPECIFIED** (D-82, LOOK-01..06, CNT-17; 13 §4.0 step 1 says where the builder builds it; tests
+  **F1a is BUILT** (D-82, LOOK-01..06, CNT-17; tests
   12 §3.5): looks, clothing items and the outfit, condition columns and `soil`, what a look shows at each
   distance and light, the glance cues, the packet line, the PC dressed at the opening; the thirteen core
-  people and Fredrick have looks. **F1b is SPECIFIED** (D-83, SMELL-01..06, INF-14): smell as a people's sense
+  people and Fredrick have looks. **F1b is BUILT** (D-83, SMELL-01..06, INF-14): smell as a people's sense
   (the dead, death, blood, sweat and dirt; range by strength, halved in the open air, never your own; with the
   look for someone seen, one smell per kind unseen; smell cues) and gore camouflage against the common dead (the
-  lore's "they smell you" stays false). **F1c is SPECIFIED** (D-86, LOOK-07..09, TEMPER-09; 07 §4.2; 13
+  lore's "they smell you" stays false). **F1c is BUILT** (D-86, LOOK-07..09, TEMPER-09; 07 §4.2; 13
   §4.0 step 1; tests 12 §3.9): wounds, blows, treating and butchering bloody people; days unwashed make
   them grimy; rain soaks them and rinses the gore off; a wash takes water, a wipe less; smearing on the
   dead carries the strain; clothes come off, go on and off people who cannot stop you, never a child's;
@@ -61,7 +56,7 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   and `society.population.materialise`) get looks and outfits fit for their climate, and the narrator
   and the Play UI show how people look and smell.
 - **Human people** (the owner: smart, but human smart; everybody has a breaking point; bickering,
-  brawls, betrayal). **H1 is SPECIFIED** (D-84, TEMPER-01..08, LOOP-07, STL-15; 05 §7.1; 13 §4.0 step
+  brawls, betrayal). **H1 is BUILT** (D-84, TEMPER-01..08, LOOP-07, STL-15; 05 §7.1; 13 §4.0 step
   1; tests 12 §3.6): stress that deaths, hunger and blows build and sleep eases; a temper per person on
   their card; heat toward whoever provoked them, fading, kept warm by grudges; the packet says how close
   they are and how they feel about each person; the snap by outlet (a punch past their own nerve, having
@@ -70,12 +65,12 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   cost; all fourteen people have tempers, generated people get varied ones, and every settlement
   has its feud.
 - **The dead feed** (the owner: eaten alive, anything that moves, tainted meat and water, graphic).
-  **I1 is SPECIFIED** (D-85, INF-15..19; 06 §5.2; 13 §4.0 step 1; tests 12 §3.7): once they have you
+  **I1 is BUILT** (D-85, INF-15..19; 06 §5.2; 13 §4.0 step 1; tests 12 §3.7): once they have you
   they never let go, never the head or neck, the scream brings the rest, they stay on the dead, the
   devoured never rise, nothing draws a feeder off; six animals as prey (never infected); lasting
   taint in water near a feeding and in meat from what they fed on; butchering; witness stress; the
   narrator writes it without looking away, and never a child's body.
-- **The wet strain as the owner told it. W1 is SPECIFIED** (D-77, D-80; 06 §5.4; tests 12 §3.8): every
+- **The wet strain as the owner told it. W1 is BUILT** (D-77, D-80; 06 §5.4; tests 12 §3.8): every
   fluid from day three, and the dead's; blood on the hands that treat, blood in the eyes from a blow;
   the urge to contaminate (a sleeper's mouth, the bottle handed over, water and food spat into) that
   grows ever more often and sickens the host; the player's hand taken now and then from week three,
@@ -94,14 +89,14 @@ ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a cont
 
 ## 1. How the kit is made (the method to keep using)
 
-Per phase: design → contract docstrings in `as_engine/src/as_engine/**` (the docstring IS the spec;
-function bodies stay `raise NotImplementedError("P<n>")`) → protected contract tests in
-`as_engine/tests/contract/p<nn>_<name>/` → a scratch reference implementation, kept out of the repo
-and thrown away afterwards, proves the new tests and that the whole built suite still passes with
-the change in (the repo gets contracts, tests and docs only) → docs (`docs/as/*`) →
-`tools/as/gate.py --docstrings --write-rules --scan`, `tools/as/protect.py --write-manifest` →
-full suite green on the reference → full-kit zip + patch zip vs the previous delivery. Then **play
-it**: a generated world played through the service found faults no contract test had (§3.2).
+Per slice: design → contract docstrings in `as_engine/src/as_engine/**` (the docstring IS the
+spec) → protected contract tests in `as_engine/tests/contract/p<nn>_<name>/` → the implementation,
+in the repo (the `_impl_*.py` beside the module, or in place; owner 2026-09-25: never throw a
+working implementation away) → docs (`docs/as/*`) → `tools/as/gate.py --docstrings --write-rules
+--scan`, `tools/as/protect.py --write-manifest` → the full suite green once before the commit.
+Work that is only specified (a function still raising `NotImplementedError`) is named in
+13_BUILD_ORDER §4.0 for the builder. Then **play it**: a generated world played through the
+service found faults no contract test had (§3.2).
 
 Standing rules (from the owner, all still in force):
 - Never change the version number of any document or system without explicit instruction

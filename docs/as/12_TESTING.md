@@ -247,6 +247,13 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p02_space_bodies/test_bodies.py` (amended) | the attack that killed is the parent and every other wound that bled is a contributing cause; one wound is one cause |
 | `p07_slice/test_answers.py` (amended) | a promise and an unmet yes link the ask they answer |
 
+### 3.14 Promises as each person understands them (Actor v2 B5d; D-91)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_promises.py` | the words (categories, statuses, what an ask promises); each holds their own understanding, once; nobody holds what they never heard, words someone else said, or anything but words; an agreement only when both understandings agree, and then both stand accepted; different understandings make none; a status moves only forward; taking it back is withdrawn; kept against broken is disputed on both sides, with no liar and the promisee's own PROMISE_BROKEN; the packet line says how it stands; what Owen took from Mara's words is his own understanding, and a promise he never said is the loop alone |
+| `p07_slice/test_answers.py` (amended) | a yes with a condition is her accepted promise about the door, on its condition; a yes and a step toward it is under way; a question back and an unresolved yes promise nothing |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -284,7 +284,7 @@ def _turn(tx):
 
 
 # ------------------------------------------------------------------ legality
-_DEAD_OK = {"finish_downed", "watch_target"}
+_DEAD_OK = {"smear_gore", "strip_clothing", "finish_downed", "watch_target", "infected_bite", "butcher_carcass"}
 
 
 def _legal(tx, intent, land_at):
@@ -786,9 +786,12 @@ def h_throw(tx, rng, intent, land_at, ctx, d):
 def h_eat(tx, rng, intent, land_at, ctx, d):
     from ..physical.bodies import expose, refresh_need, stages
     from ..physical.objects import contaminate, contaminated, destroy
-    if d.effect == "drink":      # P10: mouth contact (lore 3.2)
-        c = contaminated(tx, intent.bound.item_id, land_at)
-        if c and c["by"] != intent.actor_id:
+    c = contaminated(tx, intent.bound.item_id, land_at)
+    if c and c.get("lasting"):
+        expose(tx, rng, intent.actor_id, c["pathway"], "tainted_food" if d.effect == "eat" else "tainted_water", land_at,
+               ctx.start_event_id, ctx.turn_index)
+    if True:      # P10: mouth contact (lore 3.2); I1/D-77: food as well as drink
+        if c and not c.get("lasting") and c["by"] != intent.actor_id:
             expose(tx, rng, intent.actor_id, c["pathway"], "mouth_contact_item", land_at, ctx.start_event_id, ctx.turn_index)
         if any(pw == "wet" and st.saliva_infectious for pw, st in stages(tx, intent.actor_id)):
             contaminate(tx, intent.bound.item_id, "wet", intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
@@ -802,6 +805,21 @@ def h_eat(tx, rng, intent, land_at, ctx, d):
 def _wound(tx, rng, intent, target, anatomy, wtype, severity, land_at, ctx, contamination=0):
     from ..physical.bodies import WoundSpec, apply_harm
     return apply_harm(tx, target, WoundSpec(anatomy, wtype, severity, contamination), land_at, ctx.start_event_id, ctx.turn_index, rng)
+
+
+def _splash(tx, rng, intent, target, evs, land_at, ctx):
+    from ..physical.bodies import contagious, expose
+    harm = next((e for e in evs if e.type == EventType.HARM), None)
+    if harm is None or harm.payload["severity"] not in ("significant", "severe", "catastrophic"):
+        return evs
+    if contagious(tx, target):
+        expose(tx, rng, intent.actor_id, "wet", "fluid_splash", land_at, harm.event_id, ctx.turn_index)
+    from ..physical.bodies import soil
+    if _body(tx, target)["kind"] == "infected":
+        soil(tx, intent.actor_id, gore=1, source="splashed", at=land_at, cause_event_id=harm.event_id, turn_index=ctx.turn_index)
+    else:
+        soil(tx, intent.actor_id, blood=1, source="splashed", at=land_at, cause_event_id=harm.event_id, turn_index=ctx.turn_index)
+    return evs
 
 
 def _centre_mass(tx, rng, actor, target):
@@ -839,9 +857,21 @@ def h_shoot(tx, rng, intent, land_at, ctx, d, *, sit_delta=0, target=None, stray
         intent = dataclasses.replace(intent, bound=dataclasses.replace(b, target_id=target))
     r = _check(tx, rng, intent, d, land_at, ctx, sit_delta=sit_delta)
     if r.band in (CheckBand.CLEAN, CheckBand.COST):
-        anatomy = "head" if "head" in d.tags else _centre_mass(tx, rng, intent.actor_id, target)
+        if "head" in d.tags:
+            anatomy = "head"
+        elif "leg" in d.tags:
+            anatomy = rng.choice(tx, "resolve", f"leg:{intent.actor_id}:{target}", ["leg_l", "leg_r"])
+        else:
+            anatomy = _centre_mass(tx, rng, intent.actor_id, target)
         sev = _severity(fd.damage_class, r.band, anatomy, firearm=True)
-        _wound(tx, rng, intent, target, anatomy, "gunshot", sev, land_at, ctx, 1)
+        if "leg" in d.tags and sev == "minor":
+            sev = "significant"
+        hev = _wound(tx, rng, intent, target, anatomy, "gunshot", sev, land_at, ctx, 1)
+        if "leg" in d.tags:
+            from ..physical.bodies import posture_event
+            bt = _body(tx, target)
+            if bt["alive"] and bt["awareness"] in ("alert", "awake", "drowsy"):
+                posture_event(tx, target, "lying", land_at, hev[0].event_id, ctx.turn_index)
         return _done("hit", r.band)
     if r.band == CheckBand.BREAK and not stray:
         tp = _pos(tx, target)
@@ -881,20 +911,36 @@ def h_strike(tx, rng, intent, land_at, ctx, d):
             pl, an, x, y = _body_point(tx, t)
             _move(tx, intent.actor_id, pl, an, x, y, land_at, ctx)
     if "bite" in d.tags:
-        if intent.actor_id not in grips_on(tx, t):
+        tb0 = _body(tx, t)
+        if tb0["alive"] and intent.actor_id not in grips_on(tx, t):
             return _done("no_grip")
-        anatomy = _centre_mass(tx, rng, intent.actor_id, t)
-        hev = _wound(tx, rng, intent, t, anatomy, "bite", "significant", land_at, ctx, 2)[0]
+        from ..world import infected as _inf
+        n = tx.query_one("SELECT COUNT(*) FROM events h JOIN events c ON c.event_id = h.cause_event_id WHERE h.type='HARM' "
+                         "AND json_extract(h.payload,'$.body_id')=? AND json_extract(h.payload,'$.type')='bite' AND c.actor_id=?",
+                         (t, intent.actor_id))[0]
+        anatomy = rng.weighted(tx, "resolve", f"feed:{intent.actor_id}:{t}:{n}", list(_inf.FEED_ANATOMY))
+        sev = "significant" if (n == 0 and tb0["alive"]) else "severe"
+        hev = _wound(tx, rng, intent, t, anatomy, "bite", sev, land_at, ctx, 2)[0]
         from ..physical.bodies import expose
-        from ..world.infected import feed
-        expose(tx, rng, t, "wet", "bite", land_at, hev.event_id, ctx.turn_index)
-        feed(tx, intent.actor_id, land_at, hev.event_id, ctx.turn_index)
+        if tb0["alive"]:
+            expose(tx, rng, t, "wet", "bite", land_at, hev.event_id, ctx.turn_index)
+            tb1 = _body(tx, t)
+            if tb1["alive"] and tb1["kind"] == "human" and tb1["awareness"] in ("alert", "awake", "drowsy"):
+                tp = _pos(tx, t)
+                sc = tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=land_at, turn_index=ctx.turn_index,
+                                           actor_id=t, cause_event_id=hev.event_id, place_id=tp["place_id"],
+                                           payload={"source_db": tx.rules.infected.scream_db, "kind": "screaming",
+                                                    "text": "someone screaming", "place_id": tp["place_id"],
+                                                    "x_m": tp["x_m"], "y_m": tp["y_m"]}))
+                _inf.draw_to_feed(tx, t, intent.actor_id, land_at, sc.event_id, ctx.turn_index)
+        _inf.feed(tx, intent.actor_id, land_at, hev.event_id, ctx.turn_index)
+        _inf.taint_water(tx, t, intent.actor_id, land_at, hev.event_id, ctx.turn_index)
         _noise(tx, intent, "strike_melee", d.noise_db, land_at, ctx)
         return _done("hit")
     if b.def_id == "finish_downed":
         klass = md.damage_class if md else "light"
         sev = "catastrophic" if klass in ("medium", "heavy") else "severe"
-        _wound(tx, rng, intent, t, "head", md.wound_types[0] if md else "blunt", sev, land_at, ctx)
+        _splash(tx, rng, intent, t, _wound(tx, rng, intent, t, "head", md.wound_types[0] if md else "blunt", sev, land_at, ctx), land_at, ctx)
         _noise(tx, intent, "strike_melee", md.noise_db if md else d.noise_db, land_at, ctx)
         return _done("hit")
     spec = d.check
@@ -922,7 +968,7 @@ def h_strike(tx, rng, intent, land_at, ctx, d):
         return _done("hit", band)
     klass = md.damage_class if md else "light"
     sev = _severity(klass, band, anatomy, firearm=False, margin=margin)
-    _wound(tx, rng, intent, t, anatomy, md.wound_types[0] if md else "blunt", sev, land_at, ctx)
+    _splash(tx, rng, intent, t, _wound(tx, rng, intent, t, anatomy, md.wound_types[0] if md else "blunt", sev, land_at, ctx), land_at, ctx)
     return _done("hit", band)
 
 
@@ -974,6 +1020,113 @@ def h_shove(tx, rng, intent, land_at, ctx, d):
             posture_event(tx, t, "lying", land_at, ctx.start_event_id, ctx.turn_index)
         return _done("knocked_down", CheckBand.CLEAN if how == "clean" else CheckBand.COST)
     return _done("braced", CheckBand.FAIL)
+
+
+def h_shove_toward(tx, rng, intent, land_at, ctx, d):
+    import math as _m
+    from ..physical.bodies import posture_event
+    from ..physical.space import move_event, point_distance
+    from ..world.infected import active, attract
+    t = intent.bound.target_id
+    won, how = _contest(tx, rng, intent, d, land_at, ctx, "S", "brawling", "A", "athletics") if _can_defend(tx, t) else (True, "clean")
+    _noise(tx, intent, "shove", d.noise_db, land_at, ctx)
+    if not won:
+        return _done("braced", CheckBand.FAIL)
+    band = CheckBand.CLEAN if how == "clean" else CheckBand.COST
+    tp = _pos(tx, t)
+    cands = []
+    for r in tx.query("SELECT p.body_id FROM positions p JOIN bodies b ON b.body_id=p.body_id WHERE p.place_id=? "
+                      "AND b.kind='infected' AND p.body_id != ? ORDER BY p.body_id", (tp["place_id"], t)):
+        if active(tx, r[0]):
+            dd = point_distance(tx, t, r[0])
+            if dd is not None:
+                cands.append((dd, r[0]))
+    conscious = _body(tx, t)["awareness"] not in ("unconscious", "dead")
+    if not cands:
+        if conscious:
+            posture_event(tx, t, "lying", land_at, ctx.start_event_id, ctx.turn_index)
+        return _done("knocked_down", band)
+    dist, dead = min(cands)
+    dp = _pos(tx, dead)
+    s = min(2.0, max(0.0, dist - 0.5))
+    x, y = tp["x_m"], tp["y_m"]
+    if dist > 0:
+        x, y = x + (dp["x_m"] - x) / dist * s, y + (dp["y_m"] - y) / dist * s
+    mv = tx.commit_event(move_event(tx, t, tp["place_id"], None, x, y, land_at, ctx.start_event_id, ctx.turn_index))
+    if conscious:
+        posture_event(tx, t, "lying", land_at, ctx.start_event_id, ctx.turn_index)
+    attract(tx, dead, t, land_at, mv.event_id, ctx.turn_index, reason="sight")
+    return _done("shoved_to_the_dead", band)
+
+
+def h_butcher(tx, rng, intent, land_at, ctx, d):
+    import json as _j
+    from ..contracts.events import WriteOp as _WO, WriteRecord as _WR
+    from ..physical.objects import Holder, contaminate, create
+    t = intent.bound.target_id
+    b = _body(tx, t)
+    special = _j.loads(b["special"]) if isinstance(b["special"], str) else (b["special"] or {})
+    blade = any("blade" in _idef(tx, it).tags for it in _held(tx, intent.actor_id))
+    if b is None or b["kind"] != "animal" or b["alive"] or special.get("butchered") or not blade:
+        return _done("nothing_to_butcher")
+    an = tx.canon.get(b["content_ref"])
+    pos = _pos(tx, t)
+    meat = None
+    if an.meat_portions > 0:
+        ev = create(tx, "core:item/raw_meat", an.meat_portions, Holder(kind="place", id=pos["place_id"], anchor_id=pos["anchor_id"]),
+                    "craft", {}, land_at, ctx.start_event_id, ctx.turn_index)
+        meat = ev.payload["item_id"]
+    tx.commit_event(Event(type=EventType.BODY_CONDITION, writer="physical.bodies", at=land_at, turn_index=ctx.turn_index,
+                          actor_id=t, cause_event_id=ctx.start_event_id,
+                          writes=[_WR(op=_WO.UPDATE, table="bodies", key={"body_id": t}, values={"special": {**special, "butchered": True}})],
+                          payload={"body_id": t, "butchered": True}))
+    first = tx.query_one("SELECT c.actor_id FROM events h JOIN events c ON c.event_id = h.cause_event_id WHERE h.type='HARM' "
+                         "AND json_extract(h.payload,'$.body_id')=? AND json_extract(h.payload,'$.type')='bite' ORDER BY h.seq LIMIT 1", (t,))
+    if meat and first and first[0]:
+        contaminate(tx, meat, "wet", first[0], land_at, ctx.start_event_id, ctx.turn_index, lasting=True)
+    from ..physical.bodies import soil
+    soil(tx, intent.actor_id, blood=2, source="butchered", at=land_at, cause_event_id=ctx.start_event_id, turn_index=ctx.turn_index)
+    _noise(tx, intent, "butcher", d.noise_db, land_at, ctx)
+    return _done("butchered")
+
+
+def _all_mine(tx, body):
+    out = []
+    todo = [r[0] for r in tx.query("SELECT item_id FROM items WHERE holder_body=?", (body,))]
+    while todo:
+        i = todo.pop(0)
+        out.append(_item(tx, i))
+        todo += [r[0] for r in tx.query("SELECT item_id FROM items WHERE container_id=?", (i,))]
+    return out
+
+
+def h_spit(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import expose
+    from ..physical.objects import contaminate
+    from ..physical.space import point_distance
+    b = intent.bound
+    if b.def_id == "spit_into":
+        it = _item(tx, b.item_id)
+        ok = it is not None and (it["holder_body"] == intent.actor_id and it["holder_slot"] in ("hand_l", "hand_r"))
+        if it is not None and not ok and it["place_id"]:
+            pos = _pos(tx, intent.actor_id)
+            if it["anchor_id"]:
+                ap = tx.query_one("SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (it["anchor_id"],))
+                x, y = ap[0], ap[1]
+            else:
+                pl = tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (it["place_id"],))
+                x, y = pl[0] / 2, pl[1] / 2
+            ok = it["place_id"] == pos["place_id"] and math.hypot(x - pos["x_m"], y - pos["y_m"]) <= 1.5
+        if not ok:
+            return _done("missed")
+        contaminate(tx, b.item_id, "wet", intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+        return _done("spat")
+    tb = _body(tx, b.target_id)
+    dd = point_distance(tx, intent.actor_id, b.target_id)
+    if tb is None or tb["awareness"] != "asleep" or dd is None or dd > 1.5:
+        return _done("missed")
+    expose(tx, rng, b.target_id, "wet", "mouth_contact_direct", land_at, ctx.start_event_id, ctx.turn_index)
+    return _done("spat")
 
 
 def h_disarm(tx, rng, intent, land_at, ctx, d):
@@ -1076,11 +1229,124 @@ def h_treat(tx, rng, intent, land_at, ctx, d):
         if r.band in (CheckBand.FAIL, CheckBand.BREAK):
             return _done("no_progress", band)
     try:
-        treat(tx, w["body_id"], w["wound_id"], method, intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+        tev = treat(tx, w["body_id"], w["wound_id"], method, intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
     except ValueError:
         return _done("cannot_treat", band)
+    from ..physical.bodies import contagious, expose
+    if tev is not None and w["body_id"] != intent.actor_id and contagious(tx, w["body_id"]):
+        expose(tx, rng, intent.actor_id, "wet", "fluid_contact", land_at, tev.event_id, ctx.turn_index)
+    if tev is not None and w["body_id"] != intent.actor_id and w["severity"] != "minor":
+        from ..physical.bodies import soil
+        soil(tx, intent.actor_id, blood=1, source="treated", at=land_at, cause_event_id=tev.event_id, turn_index=ctx.turn_index)
     _noise(tx, intent, d.effect, d.noise_db, land_at, ctx)
     return _done("done", band, _cost_time(intent, land_at, band) if band else None)
+
+
+def _stow(tx, actor):
+    from ..physical.objects import Holder
+    hand = _free_hand(tx, actor)
+    return _to_hand(tx, actor, hand) if hand else Holder(kind="body", id=actor, slot="pack")
+
+
+def _adult(tx, body_id):
+    a = _body(tx, body_id)["age_years"]
+    return a is not None and a >= 18
+
+
+def _bare_after(tx, body_id, off=(), on=None):
+    covers = set()
+    for o in _worn_clothes(tx, body_id):
+        if o["item_id"] in off:
+            continue
+        covers |= set(o["clothing"]["covers"])
+    if on is not None:
+        covers |= set(_idef(tx, _item(tx, on)).clothing.covers)
+    return not ({"torso", "groin"} <= covers)
+
+
+def _worn_clothes(tx, body_id):
+    from ..physical.objects import worn
+    return [o for o in worn(tx, body_id) if o["clothing"]]
+
+
+def h_wash(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import expose, wash
+    from ..physical.objects import contaminated, destroy
+    it = _item(tx, intent.bound.item_id)
+    ml = _idef(tx, it).water.ml
+    c = contaminated(tx, it["item_id"], land_at)
+    if c and c.get("by") != intent.actor_id:
+        expose(tx, rng, intent.actor_id, c["pathway"], "fluid_contact", land_at, ctx.start_event_id, ctx.turn_index)
+    destroy(tx, it["item_id"], land_at, ctx.start_event_id, ctx.turn_index, qty=1)
+    full = ml >= tx.rules.condition.wash_full_ml
+    wash(tx, intent.actor_id, full=full, at=land_at, cause_event_id=ctx.start_event_id, turn_index=ctx.turn_index)
+    _noise(tx, intent, "wash", d.noise_db, land_at, ctx)
+    return _done("washed" if full else "wiped")
+
+
+def h_smear(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import expose, soil
+    from ..physical.space import point_distance
+    t = intent.bound.target_id
+    tb = _body(tx, t)
+    dd = point_distance(tx, intent.actor_id, t)
+    if tb["kind"] != "infected" or tb["alive"] or dd is None or dd > 1.5:
+        return _done("nothing_to_smear")
+    ev = soil(tx, intent.actor_id, gore=tx.rules.condition.smear_gore, blood=1, grime=1, source="smeared", at=land_at,
+              cause_event_id=ctx.start_event_id, turn_index=ctx.turn_index)
+    import json as _j
+    open_wound = any("bandage" not in _j.loads(w["treatment"] or "[]")
+                     for w in tx.query("SELECT treatment FROM wounds WHERE body_id=? AND healed_at IS NULL", (intent.actor_id,)))
+    expose(tx, rng, intent.actor_id, "wet", "gore_in_wound" if open_wound else "gore_smear", land_at,
+           ev.event_id if ev is not None else ctx.start_event_id, ctx.turn_index)
+    _noise(tx, intent, "smear", d.noise_db, land_at, ctx)
+    return _done("smeared")
+
+
+def h_take_off(tx, rng, intent, land_at, ctx, d):
+    from ..physical.objects import transfer
+    iid = intent.bound.item_id
+    if not _adult(tx, intent.actor_id) and _bare_after(tx, intent.actor_id, off=(iid,)):
+        return _done("kept_on")
+    transfer(tx, iid, _stow(tx, intent.actor_id), None, land_at, intent.actor_id, ctx.start_event_id, ctx.turn_index)
+    _noise(tx, intent, "take_off", d.noise_db, land_at, ctx)
+    return _done("took_off")
+
+
+def h_change_into(tx, rng, intent, land_at, ctx, d):
+    from ..physical.objects import Holder, location_of, transfer
+    iid = intent.bound.item_id
+    cl = _idef(tx, _item(tx, iid)).clothing
+    off = sorted(o["item_id"] for o in _worn_clothes(tx, intent.actor_id)
+                 if o["clothing"]["slot"] == cl.slot and o["clothing"]["layer"] == cl.layer)
+    if not _adult(tx, intent.actor_id) and _bare_after(tx, intent.actor_id, off=off, on=iid):
+        return _done("kept_on")
+    was = location_of(tx, iid)
+    transfer(tx, iid, Holder(kind="body", id=intent.actor_id, slot="worn"), None, land_at, intent.actor_id,
+             ctx.start_event_id, ctx.turn_index)
+    for o in off:
+        dest = was if (was.kind == "body" and was.slot in ("hand_l", "hand_r")
+                       and not tx.query_one("SELECT 1 FROM items WHERE holder_body=? AND holder_slot=?", (was.id, was.slot))) \
+            else Holder(kind="body", id=intent.actor_id, slot="pack")
+        transfer(tx, o, dest, None, land_at, intent.actor_id, ctx.start_event_id, ctx.turn_index)
+    _noise(tx, intent, "change_into", d.noise_db, land_at, ctx)
+    return _done("changed")
+
+
+def h_strip(tx, rng, intent, land_at, ctx, d):
+    from ..physical.objects import transfer
+    from ..physical.space import point_distance
+    t = intent.bound.target_id
+    tb = _body(tx, t)
+    it = _item(tx, intent.bound.item_id) if intent.bound.item_id else None
+    still = (not tb["alive"]) or tb["awareness"] == "unconscious" or tb["false_dead_until"] is not None
+    dd = point_distance(tx, intent.actor_id, t)
+    if (tb["kind"] != "human" or not _adult(tx, t) or not still or dd is None or dd > 1.5
+            or it is None or it["holder_body"] != t or it["holder_slot"] != "worn"):
+        return _done("kept_on")
+    transfer(tx, it["item_id"], _stow(tx, intent.actor_id), None, land_at, intent.actor_id, ctx.start_event_id, ctx.turn_index)
+    _noise(tx, intent, "strip", d.noise_db, land_at, ctx)
+    return _done("stripped")
 
 
 HANDLERS = {
@@ -1090,7 +1356,8 @@ HANDLERS = {
     "barricade_portal": h_barricade, "unbarricade_portal": h_unbarricade, "force_portal": h_force, "peek_portal": h_peek,
     "pick_up": h_pick_up, "drop_item": h_drop, "give_item": h_give, "take_from": h_take_from, "put_into": h_put_into,
     "search_container": h_search, "search_place": h_search, "equip": h_equip, "holster": h_holster, "reload": h_reload,
-    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "shove": h_shove,
+    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "shove": h_shove, "shove_toward": h_shove_toward, "butcher": h_butcher, "spit": h_spit, "wash": h_wash, "smear": h_smear, "take_off": h_take_off,
+    "change_into": h_change_into, "strip": h_strip,
     "disarm": h_disarm, "take_cover": h_take_cover, "hide": h_take_cover, "crouch": h_posture, "stand": h_posture,
     "go_prone": h_posture, "observe": h_hold, "wait": h_hold, "guard": h_hold, "sleep": h_hold, "rest": h_hold,
     "continue_task": h_continue, "speak": h_speak, "signal": h_signal, "surrender": h_surrender,

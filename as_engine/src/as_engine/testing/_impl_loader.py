@@ -86,6 +86,9 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
         for it in b.inventory:
             if not canon.has(it.item):
                 raise ValueError(f"body {b.id}: item '{it.item}' does not exist")
+    for b in spec.bodies:
+        if b.animal and not canon.has(b.animal):
+            raise ValueError(f"body {b.id}: animal '{b.animal}' does not exist")
     for it in spec.items:
         if not canon.has(it.item):
             raise ValueError(f"loose item: '{it.item}' does not exist")
@@ -96,6 +99,18 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
     for g in spec.groups:
         if g.content_ref and not canon.has(g.content_ref):
             raise ValueError(f"group {g.id}: content_ref '{g.content_ref}' does not exist")
+    from ..contracts.dossier import Looks as _Looks
+    looks_of_body = {}
+    for b in spec.bodies:
+        lk = None
+        if b.looks is not None:
+            lk = _Looks.model_validate(b.looks)
+        elif b.dress and b.id in doss:
+            lk = doss[b.id][0].appearance.looks
+        if b.dress and lk is None:
+            raise ValueError(f"body {b.id}: dress without looks: nothing to dress it in")
+        if b.looks is not None or b.dress:
+            looks_of_body[b.id] = lk
     humans = [b for b in spec.bodies if b.controller == "human"]
     if len(humans) != 1:
         raise ValueError("exactly one human body")
@@ -167,14 +182,22 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
                 vals = {"kind": kind, "content_ref": doss[b.id][2], "sex": rec.identity.sex, "age_years": rec.identity.age,
                         "age_band": age_band_for(rec.identity.age).value, "height_cm": rec.appearance.height_cm, "mass_kg": rec.appearance.mass_kg,
                         "special": rec.capability.special.model_dump(mode="json")}
+            elif b.animal:
+                an = canon.get(b.animal)
+                vals = {"kind": "animal", "content_ref": b.animal, "sex": None, "age_years": None, "age_band": None,
+                        "height_cm": an.height_cm, "mass_kg": an.mass_kg, "special": {}}
             else:
                 t = canon.find("infected", b.infected)
                 if t.alive:
                     raise ValueError(f"body {b.id}: {b.infected} is alive (a Lurker); Lurkers are people with dossiers")
                 vals = {"kind": "infected", "content_ref": None, "sex": None, "age_years": None, "age_band": None, "height_cm": 170,
                         "mass_kg": 65, "special": {k: (v.lo + v.hi) // 2 for k, v in t.special.items()}}
+            if b.id in looks_of_body:
+                vals["looks"] = {**looks_of_body[b.id].model_dump(mode="json"), "outfit": []}
+            if vals["kind"] == "infected":
+                vals.update(grime=5, blood=3, gore=5)
             vals.update({"body_id": bid, "awareness": str(b.awareness), "posture": str(b.posture), "blood_loss_pct": b.blood_loss_pct,
-                         "pain": b.pain, "impairment": 0, "restrained": 0, "progressed_at": start, "origin": "scenario", "alive": 1})
+                         "pain": b.pain, "impairment": 0, "restrained": 0, "progressed_at": start, "washed_at": start, "origin": "scenario", "alive": 1})
             ws = [W("bodies", vals),
                   W("needs", {"body_id": bid, "thirst_stage": b.needs.thirst, "hunger_stage": b.needs.hunger, "fatigue_stage": b.needs.fatigue,
                               "last_drink_ms": start - int(b.needs.thirst * N.thirst_stage_every_h * MS_PER_H),
@@ -248,6 +271,11 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
             else:
                 to = pobjects.Holder("place", ids[it.place], anchor_id=I(it.anchor))
             pobjects._create_with_id(tx, iid, it.item, it.qty, to, "scenario", it.props, start, None, 0, event_origin="system", condition=it.condition)
+        for b in spec.bodies:
+            if b.dress:
+                has = any(canon.get(it.item).clothing is not None and it.slot == "worn" and not it.container for it in b.inventory)
+                if not has:
+                    pobjects.dress(tx, ids[b.id], looks_of_body[b.id].outfit, start, None, 0, "scenario")
         # tasks
         for b, tid in task_ids:
             t = b.task

@@ -212,8 +212,7 @@ def _excluded(store, target_id, at, *, sight):
             first = _canon(store).find("pathway", "lurker_deep").stages[0].name
             if inf[1] != first:
                 return True
-        if sight and inf[0] == "wet" and at - inf[2] >= store.rules.infected.wet_ignore_after_h * H:
-            return True
+        pass
     return False
 
 
@@ -230,7 +229,26 @@ def sees(store, body_id, target_id, at):
         return False
     r = _inf(store, body_id)
     ty = _canon(store).find("infected", r["type_id"])
-    if point_distance(store, body_id, target_id) > ty.senses.vision_range_m:
+    R = store.rules.infected
+    if t["gore"] >= R.gore_mask_min and ty.senses.vision_mode != "thermal":
+        w = R.mask_window_s * 1000
+        gave = False
+        for typ, pl in store.query("SELECT type, payload FROM events WHERE at > ? AND at <= ? AND actor_id=? "
+                                   "AND type IN ('NOISE','SPEECH','ACTION_START')", (at - w, at, target_id)):
+            pl = json.loads(pl) if isinstance(pl, str) else pl
+            if typ in ("NOISE", "SPEECH") and (pl.get("source_db") or 0) >= R.mask_break_db:
+                gave = True
+            if typ == "ACTION_START" and pl.get("target_id"):
+                k = store.query_one("SELECT kind FROM bodies WHERE body_id=?", (pl["target_id"],))
+                if k is not None and k[0] == "infected":
+                    gave = True
+        if not gave:
+            return False
+    rng_m = ty.senses.vision_range_m
+    for inf in store.query("SELECT pathway, exposed_at FROM infections WHERE body_id=?", (target_id,)):
+        if inf[0] == "wet" and at - inf[1] >= store.rules.infected.wet_ignore_after_h * H:
+            rng_m = rng_m / 2
+    if point_distance(store, body_id, target_id) > rng_m:
         return False
     mode = ty.senses.vision_mode
     if mode == "motion_contrast":
@@ -250,12 +268,24 @@ def sees(store, body_id, target_id, at):
     return pl["light_level"] <= 1 or bool(pl["indoor"])
 
 
+def _grips_on(tx, target):
+    from ..physical.bodies import grips_on
+    return grips_on(tx, target)
+
+
 def attract(tx, body_id, target_id, at, cause_event_id, turn_index, *, reason):
     from ..kernel import clock
     b = _body(tx, body_id)
     r = _inf(tx, body_id)
     if b is None or r is None or b["kind"] != "infected" or not b["alive"] or not b["core_intact"] or b["awareness"] == "unconscious":
         return None
+    cur_t = r["target_id"]
+    if cur_t and cur_t != target_id:
+        ct = _body(tx, cur_t)
+        R_ = tx.rules.infected
+        if ct is not None and ((ct["alive"] and body_id in _grips_on(tx, cur_t))
+                               or (not ct["alive"] and ct["dead_at"] is not None and at - ct["dead_at"] < R_.feed_on_dead_min * 60_000)):
+            return None
     tb = _body(tx, target_id)
     if tb is not None:
         if tb["kind"] == "infected" or _excluded(tx, target_id, at, sight=False):
@@ -425,19 +455,23 @@ def step(tx, rng, row, fired, turn_index):
         tb = _body(tx, target)
     if tb is not None:
         tpos = _row(tx, "SELECT * FROM positions WHERE body_id=?", (target,))
-        if not tb["alive"] or tpos is None or tb["kind"] == "infected" or _excluded(tx, target, at, sight=False):
+        _feeding_dead = (not tb["alive"] and tpos is not None and tb["dead_at"] is not None
+                         and at - tb["dead_at"] < R.feed_on_dead_min * 60_000 and tpos["place_id"] == mypos["place_id"]
+                         and (point_distance(tx, b, target) or 99) <= 1.5)
+        if (not tb["alive"] and not _feeding_dead) or tpos is None or tb["kind"] == "infected" or _excluded(tx, target, at, sight=False):
             out.append(_state_ev(tx, b, {"target_id": None}, {"target_id": target}, at, turn_index, cause))
             return out
         if tpos["place_id"] == mypos["place_id"]:
             d = point_distance(tx, b, target)
             if d <= 1.5:
                 c = min([tx.canon.find("infected_state", x).bite_commitment for x in states] or [1.0])
-                if c < 1 and not rng.chance(tx, "infected", f"commit:{b}:{at}", c):
+                holding = b in bodies.grips_on(tx, target) or not tb["alive"]
+                if not holding and c < 1 and not rng.chance(tx, "infected", f"commit:{b}:{at}", c):
                     out.append(_state_ev(tx, b, {"target_id": None}, {"target_id": target}, at, turn_index, cause))
                     if b in bodies.grips_on(tx, target):
                         out.append(bodies.release_event(tx, b, target, at, cause, turn_index))
                     return out
-                did = "infected_bite" if b in bodies.grips_on(tx, target) else "infected_grab"
+                did = "infected_bite" if (b in bodies.grips_on(tx, target) or not tb["alive"]) else "infected_grab"
                 ddef = tx.canon.find("affordance", did)
                 word = "someone"
                 ba = BoundAffordance(def_id=ddef.id, verb=ddef.verb, label=ddef.label.replace("{target}", word),
@@ -588,6 +622,8 @@ def rise(tx, rng, row, fired, turn_index):
         return []
     pos = _row(tx, "SELECT * FROM positions WHERE body_id=?", (corpse,))
     if pos is None:
+        return []
+    if tx.query_one("SELECT COUNT(*) FROM wounds WHERE body_id=? AND type='bite'", (corpse,))[0] >= tx.rules.infected.devoured_bites:
         return []
     for w in tx.query("SELECT anatomy, severity FROM wounds WHERE body_id=? AND healed_at IS NULL", (corpse,)):
         if w[1] == "catastrophic" and w[0] in ("head", "neck"):

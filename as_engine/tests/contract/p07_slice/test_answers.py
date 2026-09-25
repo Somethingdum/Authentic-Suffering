@@ -1,6 +1,7 @@
 """A yes is not a lie by itself; a no can be reconsidered (P7, Actor v2 — Actor Spec §10, §12; AC09).
 turn/cognition.py record_responses; mind/firewall.py WILL-09, WILL-12, WILL-13; mind/mind.py
-open_loop (promise_made); kernel/store.py STORE-12 (the answer links the ask, B5c).
+open_loop (promise_made); kernel/store.py STORE-12 (the answer links the ask, B5c); mind/promise.py
+hold (what she understood she promised, B5d).
 
 Owen asks Mara to open the yard door. What she answers and what she does are recorded first; code
 then only sorts it: a yes with a condition is a promise she now holds; a yes and a step toward the
@@ -88,6 +89,15 @@ def kinds(w, type_):
     return [json.loads(r[0]) for r in w.store.query("SELECT payload FROM events WHERE type = ? ORDER BY seq", (type_,))]
 
 
+def promises(w):
+    return [dict(r) for r in w.store.query("SELECT * FROM promises WHERE holder_id = ? ORDER BY created_at, promise_id",
+                                            (w.id("mara"),))]
+
+
+def her_words(w):
+    return w.store.query_one("SELECT event_id FROM events WHERE type = 'SPEECH' AND actor_id = ? ORDER BY seq", (w.id("mara"),))[0]
+
+
 def answers_the_ask(w, type_):
     """C10 (Actor v2 B5c, STORE-12): the event links the ask it replies to."""
     ask = w.store.query_one("SELECT event_id FROM events WHERE type = 'SPEECH' AND actor_id = ? ORDER BY seq", (w.id("pc"),))[0]
@@ -105,6 +115,10 @@ def test_a_yes_with_a_condition_is_a_promise_she_holds(room):
     assert "open the yard door" in loops[0]["text"].lower() and "after i finish this" in loops[0]["text"].lower()
     assert kinds(w, "ASSENT_UNMET") == [] and kinds(w, "LIE_TOLD") == []
     assert answers_the_ask(w, "PROMISE"), "her own words are the cause; the ask is what they answer"
+    (p,) = promises(w)
+    assert (p["promiser_id"], p["promisee_id"], p["category"], p["object_id"], p["condition"], p["status"], p["loop_id"],
+            p["source_event_id"]) == (w.id("mara"), w.id("pc"), "assist", w.id("yard_door"), "Yes, after I finish this.",
+                                      "accepted", loops[0]["loop_id"], her_words(w)), "what she understood she promised (B5d)"
 
 
 def test_a_yes_and_a_step_toward_it_is_preparing(room):
@@ -112,6 +126,9 @@ def test_a_yes_and_a_step_toward_it_is_preparing(room):
     ((_, _, resp),) = answer(w, "move_to_anchor", "Okay.", destination="door_in")
     assert resp == "preparing"
     assert kinds(w, "ASSENT_UNMET") == [] and kinds(w, "LIE_TOLD") == []
+    (p,) = promises(w)
+    assert (p["category"], p["object_id"], p["status"], p["loop_id"], p["source_event_id"]) == \
+        ("assist", w.id("yard_door"), "in_progress", None, her_words(w)), "under way (B5d)"
 
 
 def test_a_question_back_is_not_an_answer_yet(room):
@@ -119,6 +136,7 @@ def test_a_question_back_is_not_an_answer_yet(room):
     ((_, _, resp),) = answer(w, "wait_here", "Okay, what exactly do you mean?")
     assert resp == "clarifying"
     assert kinds(w, "ASSENT_UNMET") == [] and kinds(w, "REFUSAL") == []
+    assert promises(w) == [], "a question back promises nothing"
 
 
 def test_a_yes_and_something_else_is_recorded_not_judged(room):
@@ -129,7 +147,7 @@ def test_a_yes_and_something_else_is_recorded_not_judged(room):
     assert (u["actor_id"], u["to_id"], u["words"], u["chosen_def_id"]) == (w.id("mara"), w.id("pc"), "Sure.", "move_to_anchor")
     assert u["signature"] == f"open_portal:{w.id('yard_door')}"
     assert answers_the_ask(w, "ASSENT_UNMET")
-    assert kinds(w, "LIE_TOLD") == []
+    assert kinds(w, "LIE_TOLD") == [] and promises(w) == []
     assert w.store.query("SELECT 1 FROM relationships WHERE from_id = ? AND to_id = ?", (w.id("pc"), w.id("mara"))) == [], \
         "nobody's trust moves on a code guess"
 

@@ -67,150 +67,21 @@ right after the slice (P8) so the human can play and judge it early.
 
 ## 4. Tasks per phase
 
-### 4.0 Where this copy starts (2026-09-24)
+### 4.0 Where this copy starts (2026-09-25)
 
-The engine side of P0–P10 is **built**, Actor v2 steps 1–3 included: every contract function of
-those phases has a body, and every contract test of P0–P10 plus the sim soak passes. The bodies
-are in `_impl_*.py` files beside their modules (AGENTS.md §4). Nothing has been gated on your
-machine yet, so start here, not at P0 task 1:
+The engine side of P0–P10 is **built**, and so is everything added to it since (owner,
+2026-09-25: the kit-maker's working implementations go into the final system): Actor v2 steps
+1–5 (B1–B5d: the identity card, knowledge-built menus, the reply protocol, speech timing,
+gestures and attention, answers, memory that is never lost, several causes, promises) and the
+owner's F1a looks, F1b smell, H1 human people, I1 the dead who feed, W1 the wet strain and F1c
+washing, clothes and the cold. Every contract function of those has a body — in the `_impl_*.py`
+file beside its module or built in place (AGENTS.md §4) — and every engine contract test passes
+except the owner's sessions browser and a world that names no run (D-76, steps 2 and 3). What
+each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-91. Nothing has been gated
+on your machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
    it like any failing test (skill `as-failing-test`) — the fix goes where AGENTS.md §4 says.
-   The owner's appearance work (F1a: LOOK-01..06, CNT-17; DECISIONS D-82) is not built yet and its
-   tests sit in these phases, so build each part before recording that phase's gate:
-   - P2: `physical/bodies.py` — `create`'s looks and the dead's grime / blood / gore, `looks_of`,
-     `condition_of`, `soil`, `rise` copying the corpse's looks (remove the `raise
-     NotImplementedError("P2")` guard at the top of `create`); `physical/objects.py` — `worn`,
-     `coverage`, `visible_gear`, `dress`; the scenario loader (`testing/_impl_loader.py`: `looks`,
-     `dress`, the scenario's dead); `content/pack.py` — CNT-12's clothing block and CNT-17.
-     Tests: `p02_space_bodies/test_looks.py`.
-   - P3: `mind/perception.appearance_text`, `mind/cues.appearance_cues` — `p03_perception/test_appearance.py`.
-   - P4: `PacketEntity.appearance` in `mind/_impl_packet.py`, and the same in the aftermath
-     (`mind/_impl_p6.py`, MEM-01) — `p04_one_actor/test_appearance_in_packet.py`.
-   - P5: `cues_of` adds the appearance cues (`action/_impl_p5a.py`) — `p05_many_actors/test_appearance_cues.py`.
-   - P10 (step 3): `world/worldgen/opening` step 2 — the PC is created with their looks and
-     dressed in their outfit (`_impl_wg.place_pc`) — `p10_world/test_dressed.py`.
-   The owner's smell work (F1b: SMELL-01..06, INF-14; D-83) follows the same way:
-   - P3: `sense/olfaction.py` (new: `odour_of`, `smell_range_m`, `smells`), and in
-     `mind/perception.py` `smell_text` and the standing view's smell (`compile_scene` step 1) —
-     `p03_perception/test_smell.py`.
-   - P4: the packet line adds `smell_text` (`mind/_impl_packet.py`, `mind/_impl_p6.py`) —
-     `test_appearance_in_packet.py::test_someone_smeared_with_the_dead_reeks_of_them`.
-   - P5: `cues_of` adds the smell cues (`SMELL_CUES`) — the smell tests in `test_appearance_cues.py`.
-   - P10: `world/infected.sees` — gore camouflage, INF-14 (`world/_impl_p10.py`) —
-     `p10_world/test_gore_mask.py`.
-   The owner's human people (H1: breaking points, grudges, quarrels and betrayal; D-84; 05_ACTORS
-   §7.1; rules TEMPER-01..08, LOOP-07 and STL-15) the same way:
-   - P4: `mind/identity.compile_identity` — the 'temper' section (IDN-01; kept whole in the
-     reaction card, IDN-05). Add only those lines; the rest of the function stays as it is —
-     `p04_one_actor/test_identity.py`. And AFF-02's weapon binding for every `shoot_*` def in
-     `mind/_impl_affordance.py` (the built code binds only `shoot_center_mass` and `shoot_head`,
-     so the new `shoot_leg` gets no gun) — `p04_one_actor/test_affordances.py`.
-   - P5: `mind/temper.py` (new: `temper_of`, `heat`, `threshold`, `provocations`, `provoke`,
-     `take_in`; write them in place or in a `_impl_temper.py` bound at its end);
-     `mind/mind.strengthen_loop` (LOOP-07, in `mind/_impl_p6.py`, bound like its neighbours);
-     `physical/bodies.capacity` — `can_run`; `mind/_impl_affordance.py` — `requires.can_run`,
-     `requires.infected_within_m`, and AFF-07's threat-group inner rank 3 for defs tagged
-     'feed_to_dead'; `mind/_impl_packet.py` — TEMPER-08 (the strain line, `PacketEntity.feeling`,
-     `SkullPacket.outburst`); `action/_impl_effects.py` — the `shove_toward` handler and the
-     'leg' shot; `action/_impl_p5b.py` — the `adjust_stress` cascade dispatch —
-     `p05_many_actors/test_temper.py`, `test_temper_in_packet.py`, `test_betrayal.py`.
-   - P7: `turn/_impl_select.py` — SEL-02 (a snap is mandatory) and SEL-03 `grievance_near`;
-     `turn/_impl_cognition.py` — decide step 4 (what a snap does); `turn/_impl_pipeline.py` —
-     stage S3b (take_in) — `p07_slice/test_breaking_point.py`.
-   - P9: `society/settlement.friction` (STL-15) and the settlement day's step 8b
-     (`society/_impl_society.py`) — `p09_society/test_quarrels.py`.
-   - P10: WG-29's feud — the first rival draw between two generated people of a settlement
-     (`world/worldgen/_impl_wg.py`, the relationships loop of `write_people`) —
-     `p10_world/test_materialise.py::test_every_settlement_has_its_feud`. (Generated people's
-     tempers are data in `skeleton_dossier`, already written.)
-   The owner's dead who eat the living (I1: feeding, animals, tainted meat and water; D-85; 06 §5.2;
-   rules INF-15..19) the same way:
-   - P2: `content/pack.py` — the `animals` folder and the 'animal' kind (`_FOLDERS`, `_SCHEMA_OF`,
-     `KINDS`); the scenario loader's `animal:` bodies (`testing/_impl_loader.py`) —
-     `p02_space_bodies/test_animals.py`, and `test_content_pack.py` (until the folder is known the
-     core pack reports it as an unknown folder).
-   - P3: `mind/perception.describe` for animals, and the bite's words in the event text
-     ("is being eaten alive" / "is being eaten") — `p03_perception/test_animals_seen.py`.
-   - P5: `physical/objects.contaminate(lasting=)` and `contaminated` (a lasting mark never dries and
-     is never replaced by a passing one); `action/_impl_effects.py` — eat / drink with a lasting
-     mark, the `butcher` handler, and `_DEAD_OK` gains `infected_bite` and `butcher_carcass` —
-     `p05_many_actors/test_tainted.py`.
-   - P7: nothing to build — `prompts/narration.system.j2` is written; `p07_slice/test_narration_horror.py`
-     pins it.
-   - P10: `physical/bodies.expose` (only people take the strain); `world/infected.py` —
-     `draw_to_feed`, `taint_water`, step 3's feeding (no commitment roll for what it holds; the
-     dead within the window), `attract`'s busy rule, `rise`'s devoured rule
-     (`world/_impl_p10.py`); the feeding bite in `action/_impl_effects.py` (FEED_ANATOMY, the
-     count, the escalation, the scream, the draw, the taint) — `p10_world/test_feeding.py`.
-   The owner's wet strain (W1: every fluid, the urge to contaminate, the player's hand; D-77, D-80;
-   06 §5.4) the same way:
-   - P4: `mind/_impl_affordance.py` — a def with `requires.reflex_only` is never enumerated (until it
-     is in, the compulsion's spit defs sit on every menu; `p10_world/test_wet_fluids.py` pins it).
-   - P5: the `spit` handler in `action/_impl_effects.py` (`test_effects.py`'s handler coverage needs
-     it; what it does is pinned in `p10_world/test_wet_fluids.py`).
-   - P10: `physical/bodies.contagious`; treat_wound's `fluid_contact` and the melee `fluid_splash` in
-     `action/_impl_effects.py`; decide step 3 rewritten and `urge_pc` (`turn/_impl_cognition.py`),
-     the pipeline's S6 line (`turn/_impl_pipeline.py`), `URGE_LINE` in the narrator's pc_state_lines
-     (`narration/_impl_narrator.py`); INF-07's half range in `world/_impl_p10.py` (sees) —
-     `p10_world/test_wet_fluids.py`, `test_wet_strain.py`, `test_infected.py`.
-   The owner's washing, clothes and cold (F1c: LOOK-07..09, TEMPER-09; D-86; 07 §4.2) the same way:
-   - P2: `physical/bodies.py` — `create` sets washed_at = at; `apply_harm` soils the wounded body
-     (LOOK-07: committed after the HARM, not returned); `_needs_of` counts cold_stage (HARM-07);
-     `physical/objects.warmth`; the scenario loader's washed_at = start (`testing/_impl_loader.py`)
-     — `p02_space_bodies/test_bloodied.py`, `test_looks.py`.
-   - P4: `mind/_impl_affordance.py` — item_carried for wash / take_off / change_into (with the
-     CNT-11 coverage rule), AFF-02's strip_clothing binding; `mind/_impl_packet.py` body_lines —
-     COLD_LINES and BARE_LINES — `p04_one_actor/test_care_menu.py`.
-   - P5: `physical/bodies.wash`; `action/_impl_effects.py` — the handlers wash, smear, take_off,
-     change_into and strip (`test_effects.py`'s handler coverage needs all five), `_DEAD_OK` gains
-     smear_gore and strip_clothing, and the soiling in the melee splash, treat_wound and butcher;
-     `mind/temper.exposures` and take_in's use of it — `p05_many_actors/test_care.py`.
-   - P7: the narrator's pc_state_lines (`narration/_impl_narrator.py`) — `p07_slice/test_narration_care.py`.
-   - P10: `physical/bodies.cold_need`, and progress's step 2 (LOOK-08 grime and weather, LOOK-09
-     chill; their boundaries join the jump) — `p10_world/test_weather_and_cold.py`.
-   Actor v2 B4 — timing, gestures and attention (SEG-01..04, GEST-01..03, FOCUS-01..02; D-87; 05
-   §7.2; Actor Spec §9) the same way:
-   - P1: `lanes/schemas.cognition_schema` — the gesture / attention enums (SCHEMA-04) —
-     `p01_lanes/test_schemas.py`.
-   - P4: `action/_impl_intent.py` — SEG-02's timing and INTENT-09 (gesture, attention,
-     'no_free_hand'); `mind/_impl_affordance.py` — BoundAffordance.hands; `mind/_impl_packet.py` —
-     G# and F# handles, `gestures`, `attention_points`, `hands_free` (the prompts are written) —
-     `p04_one_actor/test_speech_timing.py`, `test_expressions.py`, `test_intent.py`, `test_intent_v2.py`.
-   - P5: `action/intent.segments` and the round trip's new fields (`action/_impl_p5b.py`
-     `intent_to_dict` / `intent_from_dict`); `action/_impl_p5b.py` resolve_wave — segments on the
-     clock, the SPEECH_CUT, a speaking intent never carries on, the GESTURE, the start's attention;
-     `action/resolve.say_pending` and its dispatch in `turn/_impl_timers.py`; `mind/perception.py` —
-     GESTURE (SENSORY_TYPES and `_perceive_event`); `sense/optics.visibility` — FOCUS-02 —
-     `p05_many_actors/test_speech_segments.py`, `test_gestures.py`.
-   - P7: `turn/_impl_cognition.py` `_schema` passes the packet's G and F handles.
-   Actor v2 B5a — zero Resolve, answers and reconsidering (AC08, AC09; D-88; 05 §5, §6) the same way:
-   - P4: `mind/_impl_p4a.py` — `gate` at 0 (RES-03), `classify_response` (WILL-09's new classes and
-     `steps_toward`), `request_signature` (WILL-08's kind-aware lookup) — `p04_one_actor/test_resolve.py`,
-     `test_firewall.py`.
-   - P6: `mind/firewall.revise_refusal` and `record_unmet_assent` (write them in place or bind them
-     from `_impl_p6.py`) — `p06_memory/test_refusals.py`.
-   - P7: `turn/_impl_cognition.py` — `record_responses` (steps_toward; what each class does) and
-     `perceived_entities` (the anchor| / portal| keys) — `p07_slice/test_answers.py`.
-   Actor v2 B5b — self-experience, own readings, unknown names, memory jobs (AC10, AC11, AC13, C10;
-   D-89; 05 §9.1) the same way:
-   - P4: `mind/_impl_packet.py` — 'unprocessed' and its place in SKULL-09's drop order (the prompt
-     is written) — `p06_memory/test_memory_v2.py` (it needs P6's `unprocessed`).
-   - P6: `mind/_impl_p6.py` — `build_aftermath` self_experiences (MEM-01), `writeback_groups` (MEM-03),
-     `apply_writeback` (O handles, the unknown-name checks, `self_event_ids`, `quarantined`, a done
-     job), `retrieve` (MEM-14); `mind/memory.unknown_names`, `queue_writeback`, `finish_writeback`,
-     `unprocessed` (write them in place); `mind/perception.infer` (the holder's own event ids);
-     `mind/_impl_consult.py` `recall` (CONSULT-05) — `p06_memory/test_memory_v2.py`, `test_memory.py`.
-   - P7: `turn/_impl_pipeline.py` — S13's jobs and retries, S14's finish — `p07_slice/test_memory_jobs.py`.
-   - P10: `service/_impl_background.py` — `new_episodes` (BG-02) — `p10_world/test_background.py`.
-   Actor v2 B5c — several causes (fidelity C10; D-90; 03 §3) the same way:
-   - P0: `kernel/store.py` `Tx.commit_event` — STORE-12 (check the links, store the column);
-     `kernel/events.py` — `_row_to_event` reads `links`, `causes`, `effects` —
-     `p00_substrate/test_event_links.py`.
-   - P2: `physical/bodies.py` — DEATH-06 (the links of a death by blood loss) — `p02_space_bodies/test_bodies.py`.
-   - P6: `mind/_impl_p6.py` `open_loop` (links); `mind/firewall.record_unmet_assent` (ask_event_id).
-   - P7: `turn/_impl_cognition.py` `record_responses` (the ask a promise or an unmet yes answers) —
-     `p07_slice/test_answers.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
@@ -224,7 +95,7 @@ machine yet, so start here, not at P0 task 1:
    Play UI tests and the upstream check). P10 first needs `kernel/store.Store.backup_to(...,
    as_world=)` and the GENESIS step of `world/worldgen/pipeline` using it (D-76) —
    `test_world_names_no_run.py`.
-4. Then stop and write "waiting for the kit update (Actor v2 steps 4–6, P11, P12)" in PROGRESS.
+4. Then stop and write "waiting for the kit update (Actor v2 B6, P11, P12)" in PROGRESS.
 
 The phase lists below stay as the map of what each module does and which tests pin it.
 

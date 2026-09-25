@@ -40,10 +40,16 @@ def to_intent(packet, affordances, output, *, lod, source, reaction=False):
             return IntentError("speech_too_long", str(n))
         speech = SpeechAct(text=sp.text, to=tuple(to) or ("everyone",), volume=sp.volume,
                            delivery=sp.delivery, timing=sp.timing)
-        if bound.verb != Verb.SPEAK and n > 12:
-            bound = dataclasses.replace(bound, est_duration_s=bound.est_duration_s + n / 2.5)
+        u = n / 2.5
         if bound.verb == Verb.SPEAK:
-            bound = dataclasses.replace(bound, est_duration_s=max(bound.est_duration_s, n / 2.5))
+            bound = dataclasses.replace(bound, est_duration_s=max(bound.est_duration_s, u))
+        else:
+            if speech.timing == "alongside" and ({"sneak", "hide"} & set(bound.tags)):
+                speech = dataclasses.replace(speech, timing="before")
+            if speech.timing == "alongside":
+                bound = dataclasses.replace(bound, est_duration_s=max(bound.est_duration_s, u))
+            else:
+                bound = dataclasses.replace(bound, est_duration_s=bound.est_duration_s + u)
     # INTENT-07 pace
     pace = "normal" if is_v1 else output.pace
     if pace != "normal" and pace not in bound.paces:
@@ -57,10 +63,19 @@ def to_intent(packet, affordances, output, *, lod, source, reaction=False):
                                     noise_db=min(180.0, max(0.0, bound.noise_db + db)))
     # INTENT-09 expression and writing
     inscription = None
+    gesture = attention = None
     if isinstance(output, ActionPayload):
-        for h in (output.gesture, output.attention):
-            if h is not None and not (h[:1] in ("G", "F") and h in packet.handles):
+        for h, letter in ((output.gesture, "G"), (output.attention, "F")):
+            if h is not None and not (h[:1] == letter and h in packet.handles):
                 return IntentError("hallucinated_expression", h)
+        if output.gesture is not None:
+            gopt = next(g for g in packet.gestures if g.handle == output.gesture)
+            if gopt.hands > packet.hands_free - bound.hands:
+                return IntentError("no_free_hand", output.gesture)
+            gid, _, tb = packet.handles[output.gesture].partition(":")
+            gesture = (gid, None if tb == "*" else tb)
+        if output.attention is not None:
+            attention = packet.handles[output.attention]
         ins = output.inscription
         if ins is not None:
             if "write" not in bound.tags or _words(ins.text) > 35:
@@ -86,5 +101,6 @@ def to_intent(packet, affordances, output, *, lod, source, reaction=False):
     else:
         goal, reason, manner = output.goal, output.private_reason or "", ""
     return Intent(actor_id=packet.actor_id, bound=bound, speech=speech, manner=manner, goal=goal,
-                  private_reason=reason, source=source, lod=lod, pace=pace, inscription=inscription)
+                  private_reason=reason, source=source, lod=lod, pace=pace, inscription=inscription,
+                  gesture=gesture, attention=attention)
 

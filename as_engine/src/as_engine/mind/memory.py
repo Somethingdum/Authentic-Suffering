@@ -76,7 +76,15 @@ MEM-02 apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids
   someone the holder could not know is dropped too: audit.log.repair(kind 'unknown_name', stage
   14, rule_id 'MEM-18', detail {holder_id, item 'belief', index, names: unknown_names(claim)}).
   The rest is applied, in this order; returns the ids of every event this call committed, in commit
-  order (read back by seq).
+  order (read back by seq). (Actor v2 B5d) A new loop of kind promise_made or promise_owed whose
+  ``because`` resolves to a SPEECH event (its percept's event, or an O handle's own event) also
+  becomes the holder's understanding, right after its open_loop: mind.promise.hold(tx, holder,
+  promiser_id = the holder for promise_made, else the subject's id; promisee_id = the subject's id
+  (or None) for promise_made, else the holder; category = the loop's category or 'assist'; text =
+  the loop text; object_id None; condition None; source_event_id = that SPEECH; loop_id = the new
+  loop; status 'accepted' for promise_made, 'understood' for promise_owed) — only when that
+  SPEECH's actor is the promiser and PROM-02 would accept it (the holder said or heard it);
+  otherwise the loop alone.
   MEM-04 episode  always (even when every other item was dropped): EPISODE_WRITTEN (writer
                   'mind.memory', actor_id = holder, cause_event_id = the event of the first percept
                   row in handle order whose event_id is a committed event, else NULL) {episode_id,
@@ -167,17 +175,59 @@ def apply_writeback(tx: "Tx", holder_id: str, output: WritebackOutput, packet: A
 
 
 def unknown_names(tx: "Tx", holder_id: str, text: str) -> list[str]:
-    raise NotImplementedError("P6")
+    import re as _re
+    known = set()
+    names = [r[0] for r in tx.query("SELECT known_name FROM acquaintance WHERE holder_id=? AND known_name IS NOT NULL", (holder_id,))]
+    names += [r[0] for r in tx.query("SELECT a.display_name FROM relationships r JOIN actors a ON a.actor_id = r.to_id "
+                                      "WHERE r.from_id=?", (holder_id,)) if r[0]]
+    for n in names:
+        known.add(n)
+        known.add(n.split()[0])
+    out = set()
+    for r in tx.query("SELECT actor_id, display_name FROM actors ORDER BY actor_id"):
+        if r[0] == holder_id or not r[1]:
+            continue
+        first = r[1].split()[0]
+        cands = [r[1]] + ([first] if len(first) >= 3 else [])
+        for c in cands:
+            if c in known:
+                continue
+            if _re.search(r"(?<!\w)" + _re.escape(c) + r"(?!\w)", text):
+                out.add(c)
+    return sorted(out)
 
 
 def queue_writeback(tx: "Tx", holder_id: str, turn_index: int, at: int) -> str:
-    raise NotImplementedError("P6")
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    key = f"{holder_id}:{turn_index}"
+    if tx.query_one("SELECT 1 FROM memory_jobs WHERE job_key=?", (key,)) is None:
+        tx.commit_event(Event(type=EventType.MEMORY_JOB, writer="mind.memory", at=at, turn_index=turn_index, actor_id=holder_id,
+                              writes=[WriteRecord(op=WriteOp.INSERT, table="memory_jobs", values={
+                                  "job_key": key, "holder_id": holder_id, "turn_index": turn_index, "status": "pending",
+                                  "attempts": 0, "updated_at": at})],
+                              payload={"job_key": key, "holder_id": holder_id, "turn_index": turn_index, "status": "pending", "attempts": 0}))
+    return key
 
 
 def finish_writeback(tx: "Tx", job_key: str, ok: bool, at: int, turn_index: int) -> "Event":
-    raise NotImplementedError("P6")
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    r = tx.query_one("SELECT holder_id, turn_index, attempts FROM memory_jobs WHERE job_key=?", (job_key,))
+    att = r[2] + (0 if ok else 1)
+    st = "done" if ok else "failed"
+    return tx.commit_event(Event(type=EventType.MEMORY_JOB, writer="mind.memory", at=at, turn_index=turn_index, actor_id=r[0],
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="memory_jobs", key={"job_key": job_key},
+                                                     values={"status": st, "attempts": att, "updated_at": at})],
+                                 payload={"job_key": job_key, "holder_id": r[0], "turn_index": r[1], "status": st, "attempts": att}))
 
 
 def unprocessed(store: "Store | Tx", holder_id: str) -> list[tuple[int, list[str]]]:
-    raise NotImplementedError("P6")
+    out = []
+    rows = store.query("SELECT turn_index FROM memory_jobs WHERE holder_id=? AND status IN ('pending','failed') ORDER BY turn_index",
+                       (holder_id,))
+    for r in rows:
+        tix = r[0]
+        at = store.query_one("SELECT MAX(at) FROM events WHERE turn_index=?", (tix,))[0] or 0
+        a = build_aftermath(store, holder_id, tix, at)
+        out.append((tix, [o.text for o in a.self_experiences] + [p.text for p in a.percepts]))
+    return out
 from ._impl_p6 import build_aftermath, writeback_groups, apply_writeback  # noqa

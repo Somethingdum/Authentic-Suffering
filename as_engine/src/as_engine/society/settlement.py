@@ -250,6 +250,62 @@ def set_lockdown(tx: "Tx", settlement_id: str, on: bool, reason: str, at: int, t
 
 def friction(tx: "Tx", rng: "Rng", settlement_id: str, at: int, turn_index: int,
              cause_event_id: str | None) -> list["Event"]:
-    raise NotImplementedError("P9")
+    import json as _j
+    from ..action.cascade import select as _select
+    from ..action.effects import CENTRE_MASS
+    from ..contracts.events import Event as _Ev, EventType
+    from ..mind import mind as _mind, temper as _temper
+    from ..physical.bodies import WoundSpec, apply_harm
+    from ..world import rumours
+    R = tx.rules.society
+    first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    g = tx.query_one("SELECT group_id, place_id FROM settlements WHERE settlement_id=?", (settlement_id,))
+    if g is None or not g[0]:
+        return []
+    gid = g[0]
+    pc = tx.query_one("SELECT value FROM meta WHERE key='pc_actor_id'")
+    pc = pc[0] if pc else None
+    mem = sorted(r[0] for r in tx.query("SELECT gm.actor_id FROM group_members gm JOIN bodies b ON b.body_id=gm.actor_id "
+                                        "WHERE gm.group_id=? AND gm.status IN ('member','probation') AND b.alive=1", (gid,))
+                 if r[0] != pc)
+
+    def sore(x, y):
+        r = tx.query_one("SELECT resentment FROM relationships WHERE from_id=? AND to_id=?", (x, y))
+        if r and r[0] >= 2:
+            return True
+        return any(y in _j.loads(q[0]) for q in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND kind='grudge' "
+                                                          "AND status='open'", (x,)))
+
+    def stress(x):
+        r = tx.query_one("SELECT stress FROM actors WHERE actor_id=?", (x,))
+        return r[0] if r else 0
+
+    day = at // 86_400_000
+    for i, a in enumerate(mem):
+        for b in mem[i + 1:]:
+            if not (sore(a, b) or sore(b, a)):
+                continue
+            sa, sb = stress(a), stress(b)
+            p = min(1.0, R.quarrel_base + R.quarrel_per_stress * max(sa, sb))
+            if not rng.chance(tx, "society", f"quarrel:{a}:{b}:{day}", p):
+                continue
+            inst = b if sb > sa else a
+            mult = 1.0 if _temper.temper_of(tx, inst).outlet == "fists" else 0.25
+            brawl = bool(rng.chance(tx, "society", f"brawl:{a}:{b}:{day}", R.brawl_chance * mult))
+            q = tx.commit_event(_Ev(type=EventType.QUARREL, writer="society.settlement", at=at, turn_index=turn_index,
+                                    actor_id=inst, cause_event_id=cause_event_id,
+                                    payload={"settlement_id": settlement_id, "a": a, "b": b, "instigator_id": inst,
+                                             "brawl": brawl}))
+            _temper.provoke(tx, a, b, "quarreled", q.event_id, at, turn_index)
+            _temper.provoke(tx, b, a, "quarreled", q.event_id, at, turn_index)
+            if brawl:
+                for who in (a, b):
+                    anat = rng.weighted(tx, "society", f"bruise:{who}:{day}", list(CENTRE_MASS))
+                    apply_harm(tx, who, WoundSpec(anat, "blunt", "minor", 0), at, q.event_id, turn_index, rng)
+                    _mind.adjust_group_standing(tx, gid, who, -1, q.event_id, at, turn_index)
+            for h in _select(tx, "who_would_hear_of(trigger.payload.instigator_id)", q):
+                rumours.seed(tx, h, inst, "lost_it" if brawl else "fell_out", at, turn_index, q.event_id)
+    from ._impl_society import _since
+    return _since(tx, first)
 from ._impl_society import daily_need, days_of, has_shortage, receive, settlement_day as day, declare_shortage, change_ration, stl_adjust as adjust, add_vacancy, remove_vacancy, laws_of, law_def, apply_law, settlement_of, trade_terms, settlement_ensure as ensure_timers  # noqa
 from ._impl_society import set_lockdown  # noqa

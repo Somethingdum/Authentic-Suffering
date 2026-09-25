@@ -1311,6 +1311,8 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
                                          "fidelity": "exact", "acquired_at": at, "acquired_via": ev.event_id}) for pid in props],
                     {"holder_id": x[0], "seed": True, "beliefs": len(props)}, actor_id=x[0])
         ids = sorted(x[0] for x in mine)
+        _gen = set(res.generated)
+        _feud = False
         for i, a in enumerate(ids):
             for b in ids[i + 1:]:
                 if hh_of.get(a) and hh_of.get(a) == hh_of.get(b):
@@ -1319,6 +1321,9 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
                     kind = rng.weighted(tx, SPE, f"rel:{a}:{b}", [("positive", 0.2), ("stranger", 0.6), ("rival", 0.2)])
                     rel = {"positive": ("friend", {"trust": 1, "affection": 1}), "rival": ("rival", {"trust": -1, "resentment": 1}),
                            "stranger": None}[kind]
+                    if kind == "rival" and not _feud and a in _gen and b in _gen:
+                        rel = ("rival", {"trust": -2, "resentment": 2})
+                        _feud = True
                 if rel is None:
                     continue
                 for f, t in ((a, b), (b, a)):
@@ -1422,7 +1427,7 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
     pcd = pc.model_dump(mode="json", by_alias=True)
     body = bodies.create(tx, kind="human", sex=pc.identity.sex, age_years=pc.identity.age, height_cm=pc.appearance.height_cm,
                          mass_kg=pc.appearance.mass_kg, special=pc.capability.special.model_dump(mode="json"), at=at,
-                         turn_index=0, origin="worldgen", content_ref=pc_ref)
+                         turn_index=0, origin="worldgen", content_ref=pc_ref, looks=pc.appearance.looks)
     if kinds[start]["kind"] == "building" and not kinds[start]["layout_generated"]:
         space.discover_layout(tx, rng, start, at, 0)
     P._place_at_first_anchor(tx, body, start, at, None, 0)
@@ -1435,6 +1440,8 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
         ev = objects.create(tx, g.item, g.qty, to, "worldgen", dict(g.props), at, None, 0, event_origin="worldgen")
         if g.label:
             labels[g.label] = ev.payload["item_id"]
+    if pc.appearance.looks is not None:
+        objects.dress(tx, body, pc.appearance.looks.outfit, at, None, 0, "worldgen")
     road_touch = [r.road_id for r in region.routes if region.start_zone_id in (r.a_zone, r.b_zone)]
     zpl = [r[0] for r in tx.query("SELECT place_id FROM places WHERE zone_id=? AND parent_id IS NULL ORDER BY place_id",
                                   (sz.zone_id,))]

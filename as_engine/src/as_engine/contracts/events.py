@@ -97,6 +97,9 @@ class EventType(StrEnum):
     GESTURE = "GESTURE"         # GEST-03: a gesture made with an attempt (action.resolve; seen, never heard)
     ASSENT_UNMET = "ASSENT_UNMET"          # WILL-13: said yes, did something else (mind.mind; no judgement)
     REFUSAL_REVISED = "REFUSAL_REVISED"    # WILL-12: a person changed their mind about a refusal (mind.mind)
+    PROMISE_HELD = "PROMISE_HELD"          # PROM-02: one person's understanding of a promise (mind.promise)
+    PROMISE_STATUS = "PROMISE_STATUS"      # PROM-04: how that understanding stands now (mind.promise)
+    AGREEMENT = "AGREEMENT"                # PROM-03: both sides understood the same promise (mind.promise)
     REQUEST = "REQUEST"
     ORDER = "ORDER"
     THREAT = "THREAT"
@@ -191,6 +194,7 @@ _groups: dict[EventClass, list[str]] = {
     EventClass.ACTION: ["ACTION_START", "ACTION_COMPLETE", "ACTION_INTERRUPT", "ACTION_BLOCKED",
                         "TASK_STEP", "CONTROL_ESTABLISH", "CONTROL_RELEASE", "CHECK_RESOLVED", "INVOLUNTARY"],
     EventClass.MIND: ["PERCEIVE", "BELIEF_FORM", "BELIEF_REVISE", "RELATION_CHANGE", "TEMPER_CHANGE", "REFUSAL", "REFUSAL_REVISED", "ASSENT_UNMET", "PROMISE",
+                      "PROMISE_HELD", "PROMISE_STATUS", "AGREEMENT",
                       "PROMISE_KEPT", "PROMISE_BROKEN", "LOOP_OPENED", "LOOP_CLOSED", "LOOP_STRENGTH", "LIE_TOLD",
                       "LIE_DISCOVERED", "PERSONA_PIERCED", "LESSON_LEARNED", "ANCHOR_MEMORY",
                       "EPISODE_WRITTEN", "MEMORY_JOB", "REFLECTION", "PLAN_CHANGE"],

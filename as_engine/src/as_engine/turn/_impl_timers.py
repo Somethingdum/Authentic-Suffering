@@ -22,6 +22,9 @@ def dispatch(tx, rng, row, fired, turn_index, horizon_ms):
     elif t == "ACTION_LAND":
         from ..action.resolve import land_pending
         land_pending(tx, rng, row, turn_index, horizon_ms=horizon_ms)
+    elif t == "SPEECH_SEGMENT":
+        from ..action.resolve import say_pending
+        say_pending(tx, row, turn_index)
     elif t == "WEATHER_CHANGE":
         vals = {"weather": pl["weather"]}
         if "wind_level" in pl:

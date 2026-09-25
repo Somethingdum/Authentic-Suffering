@@ -131,6 +131,12 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         state.append(f"{pc} is {impairment_word(imp)}.")
     from ..physical.bodies import stages
     state += [st.felt for _pw, st in stages(tx, pc_id) if st.felt]
+    if tx.query_one("SELECT 1 FROM events WHERE type='INVOLUNTARY' AND actor_id=? AND turn_index=? "
+                    "AND json_extract(payload,'$.kind')='compulsion'", (pc_id, turn_index)) is not None:
+        from .narrator import URGE_LINE
+        state.append(URGE_LINE)
+    from ..mind._impl_packet import _f1c_lines
+    state += _f1c_lines(tx, pc_id)
     allowed = {pc, _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"]}
     for r in tx.query("SELECT DISTINCT a.known_name FROM percept_log p JOIN acquaintance a ON a.holder_id=p.holder_id AND a.subject_id=p.source_id "
                       "WHERE p.holder_id=? AND p.turn_index=? AND a.known_name IS NOT NULL", (pc_id, turn_index)):

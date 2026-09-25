@@ -68,7 +68,7 @@ def recall(tx, packet, query, subject_ids, turn_index, at):
         q = " OR ".join(f'"{w}"' for w in words)
         match = {r[0] for r in tx.query("SELECT rowid FROM episodes_fts WHERE episodes_fts MATCH ?", (q,))}
     lines = []
-    for e in tx.query("SELECT rowid, * FROM episodes WHERE holder_id=? AND decayed=0 ORDER BY salience DESC, at DESC, episode_id",
+    for e in tx.query("SELECT rowid, * FROM episodes WHERE holder_id=? AND decayed=0 AND quarantined=0 ORDER BY salience DESC, at DESC, episode_id",
                       (holder,)):
         e = dict(e)
         if e["episode_id"] in shown_eps:

@@ -360,7 +360,25 @@ and refusals deterministically, within `PacketRules` caps and the packet token b
 memories (salience ≥ 90, or a bonded person's death) never decay and are always eligible. A
 quarantined memory (§9.1) is never retrieved or looked up.
 
-### 9.4 Forgetting
+### 9.4 Promises (Actor v2 B5d, D-91; Actor Spec §12; `mind/promise.py` PROM-01..07)
+
+A promise has two layers. The words are objective: the SPEECH that said them. What was promised is
+each person's own understanding — who promised what to whom, the target or item when known, on
+what condition, and how it stands (proposed, understood, accepted, in progress, fulfilled,
+failed, withdrawn, disputed). Categories: deliver, guard, return, disclose, refrain, assist.
+
+| Rule | What holds |
+|---|---|
+| Only what you heard | A person holds a promise only from words they said or heard (exact or partial); nobody else's understanding reaches them |
+| Where they come from | A yes with a condition, and a yes with a step toward it, are the speaker's own promise (accepted; under way); a writeback's promise loop citing the words it was said in is the holder's understanding |
+| Agreement | Recorded only when the promiser's and the promisee's understandings of the same words agree (same kind; the same thing, or one side does not know which); then both stand accepted. Understandings that differ get no agreement |
+| How it ends | Closing the loop that carries it moves it: kept, failed, or taken back (withdrawn, by the one who promised). When one side says it was kept and the other that it was not, both are marked disputed — nobody is called a liar and nobody's trust moves for it here; what a broken promise costs the promisee stays cascade content (CAS-011) |
+| The packet | The loop's line says how it stands: '(you took it on)', '(agreed between you)', '(under way)', '(as you understood it)' |
+
+'I promise' moves no stock and binds nobody's hands. Whether someone meant it stays each mind's
+own, evidence-backed interpretation, never a fact announced to the room.
+
+### 9.5 Forgetting
 
 A mind forgets by retrieval (§9.3): old, unremarkable episodes rank lower and stop coming back,
 while anchor memories always stay eligible. Nothing is deleted from the record — the world keeps its

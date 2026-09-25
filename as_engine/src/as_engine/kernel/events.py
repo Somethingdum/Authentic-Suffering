@@ -21,7 +21,7 @@ def _row_to_event(r):
     return Event(event_id=r["event_id"], seq=r["seq"], at=r["at"], type=r["type"], writer=r["writer"], actor_id=r["actor_id"],
                  target_ids=json.loads(r["target_ids"]), place_id=r["place_id"], cause_event_id=r["cause_event_id"],
                  payload=json.loads(r["payload"]), writes=[WriteRecord(**w) for w in json.loads(r["state_delta"])],
-                 rule_cited=r["rule_cited"], turn_index=r["turn_index"], origin=r["origin"])
+                 rule_cited=r["rule_cited"], turn_index=r["turn_index"], origin=r["origin"], links=json.loads(r["links"]))
 
 
 def get(store: "Store", event_id: str) -> Event:
@@ -54,13 +54,17 @@ def causes(store: "Store", event_id: str) -> list[tuple[str, str]]:
     """C10 (STORE-12): every recorded cause of the event, as (event id, role): (cause_event_id,
     'primary') first when it is set, then (link.event_id, link.role) for each link in stored
     order."""
-    raise NotImplementedError("P0")
+    e = get(store, event_id)
+    return ([(e.cause_event_id, "primary")] if e.cause_event_id else []) + [(lk.event_id, lk.role) for lk in e.links]
 
 
 def effects(store: "Store", event_id: str) -> list[Event]:
     """C10 (STORE-12): every event that names ``event_id`` as a cause — its cause_event_id or one
     of its links — by seq, each once."""
-    raise NotImplementedError("P0")
+    rows = store.query("SELECT DISTINCT e.* FROM events e WHERE e.cause_event_id = ? OR EXISTS "
+                       "(SELECT 1 FROM json_each(e.links) j WHERE json_extract(j.value, '$.event_id') = ?) ORDER BY e.seq",
+                       (event_id, event_id))
+    return [_row_to_event(r) for r in rows]
 
 
 def replay_world(src: "Store", dst_path: str | Path | None = None) -> "Store":
