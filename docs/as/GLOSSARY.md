@@ -29,6 +29,10 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | breaking point | the heat at which a person snaps: fuse x 2 - strain // 3 (`mind.temper.threshold`) | — | threshold (in code) |
 | snap | the involuntary act at a breaking point, by the person's outlet (`INVOLUNTARY {kind: 'outburst'}`, TEMPER-05/06) | losing it | outburst (in code) |
 | quarrel | an off-screen row between two people of a settlement who resent each other; a brawler's comes to blows (`QUARREL`, STL-15) | a row, a fight | — |
+| feeding | one of the dead eating a body it holds, alive or freshly dead (INF-15/16); a feeder is not drawn off (INF-17) | being eaten alive | — |
+| animal | a body of kind 'animal' from an AnimalDef: prey for the dead, meat for the living, never infected, never risen (INF-18) | a dog, a horse… | — |
+| lasting mark | contamination that never dries: the dead's fluids in meat or loose water (`props.contaminated.lasting`; INF-18/19) | tainted | — |
+| carcass | a dead animal, butchered or not (`bodies.special.butchered`) | a carcass | — |
 | odour | what a body smells of now: kind (the dead, death, blood, unwashed) and strength 1–5, from its condition or, for a corpse, the hours since death (`sense.olfaction.odour_of`, SMELL-01) | "reeks of the dead", "smells of blood" | — |
 | gore camouflage | a living body caked in the dead's gore goes unpicked by the common dead until it gives itself away (`world.infected` INF-14) | — | — |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |

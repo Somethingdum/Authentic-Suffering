@@ -1,7 +1,8 @@
 # States apply across types (Shambler/Crawler/Runner/Lurker) — orthogonal to InfectedTypeDef.
 # Lore_and_World_Building.pdf §3.2. bite_commitment: probability an engaged infected follows through
 # on a bite/attack this beat rather than disengaging (the lowest of a body's states counts; used by
-# world.infected step, INF-12).
+# world.infected step, INF-12) — only before it has hold of its prey: once it holds someone it eats
+# them until they are dead (INF-15, the owner: "They don't just bite you and waddle off").
 - schema: as.infected_state.v1
   id: dormant
   effects: [motionless, minimal_stimulus_response, can_reboot_on_stimulus]
@@ -16,7 +17,7 @@
   bite_commitment: 0.7
 - schema: as.infected_state.v1
   id: overfed
-  effects: [temporary_disengagement, embarrassment_walk_off, reduced_bite_commitment]
+  effects: [slow_to_take_hold, fumbles_new_prey, reduced_bite_commitment, never_lets_go_of_what_it_holds]
   speed_mult: 0.85
   hearing_threshold_delta_db: 5.0
   bite_commitment: 0.2

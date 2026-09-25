@@ -137,7 +137,9 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       acquaintance description when the holder has one, else describe_dossier(B's baseline
       dossier) (implemented below: height and build words from the numbers, never the prose
       fields), else for infected bodies 'shambling figure' (Shambler / Crawler) / 'fast figure'
-      (Runner) — the type name is NEVER used, because what a thing is has to be learned.
+      (Runner) — the type name is NEVER used, because what a thing is has to be learned; (I1) for
+      animal bodies the canon AnimalDef's ``words`` (bodies.content_ref names it: 'scrawny grey
+      dog').
   Phrase helpers (implemented below, so every module words places the same way): with_article,
       at_phrase(anchor name) ('at the counter', 'behind the counter', 'at the doors'),
       from_phrase(anchor or place name) ('from the counter', 'from behind the counter'),
@@ -184,7 +186,9 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       is here (seen through a doorway or across an open way) -> f'{Ref} moves into
       {place_phrase(to_place name)}'; else f'{Ref} moves',
       PORTAL_CHANGE f'The <portal name>
-      {opens|closes|is barricaded|is unbarricaded|is damaged}', HARM f'{Ref} is hurt', DEATH /
+      {opens|closes|is barricaded|is unbarricaded|is damaged}', HARM f'{Ref} is hurt' — (I1) a
+      HARM of type 'bite': f'{Ref} is being eaten alive' while the bitten body is alive after it,
+      else f'{Ref} is being eaten' —, DEATH /
       FALSE_DEATH f'{Ref} goes down and does not move', ITEM_TRANSFER f'{Ref} handles <item
       name>'. (Past or present is fixed per phrase above.)
   render_pain(wound): f'Pain: {SEVERITY_WORDS[severity]} {type} wound to the

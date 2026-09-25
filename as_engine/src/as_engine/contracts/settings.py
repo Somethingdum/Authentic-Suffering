@@ -293,6 +293,12 @@ class InfectedRules(Strict):
     gore_mask_min: int = 4         # [SAND] bodies.gore at or above this masks the living
     mask_window_s: int = 30        # [SAND] giving yourself away is remembered this long
     mask_break_db: float = 55.0    # [SAND] a sound of your own this loud gives you away (a run, a strike, a normal voice)
+    # I1 the dead feed (INF-15..19)
+    scream_db: float = 90.0        # someone being eaten alive screams this loud (it draws the rest of them)
+    scream_draw_m: float = 30.0    # [SAND] the dead in the same place this close come to eat too
+    feed_on_dead_min: int = 20     # [SAND] they stay on what they killed this long
+    devoured_bites: int = 8        # [SAND] a corpse bitten this often has too little left to rise
+    taint_radius_m: float = 1.0    # a feeding or a dead one this close to loose water fouls it
 
 
 class TemperRules(Strict):

@@ -71,3 +71,17 @@
       payload: {cause: betrayed}
   delay_s: 0
   cites: [TEMPER-07]
+# --- I1: seeing someone eaten alive.
+- schema: as.cascade.v1
+  id: CAS-024
+  description: Every bite someone sees the dead take out of a person or an animal wears them down; watching a whole feeding breaks people.
+  trigger_event: HARM
+  where: {type: bite}
+  preconditions: []
+  effects:
+    - kind: adjust_stress
+      target: witnesses_of(trigger.event_id)
+      amount: 1
+  delay_s: 0
+  cites: [INF-15, docs/as/06_WORLD.md#5]
+

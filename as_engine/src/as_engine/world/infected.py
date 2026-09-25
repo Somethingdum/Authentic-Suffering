@@ -1,4 +1,4 @@
-"""Infected ecology (P10). Canon: Lore v1.0 §2-4, CMG §42. Rules INF-01..14. Owner 'world.infected'
+"""Infected ecology (P10). Canon: Lore v1.0 §2-4, CMG §42. Rules INF-01..19. Owner 'world.infected'
 (infected_state). docs/as/06_WORLD.md §5. R = RulesConfig().infected; types and states are canon
 records (InfectedTypeDef by id, InfectedStateDef by id). Every function that returns an Event has
 committed it (writer 'world.infected' unless said otherwise; at and turn_index as given). rng stream
@@ -55,6 +55,45 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     target whose target_id is an infected body (it touched one of them). Sound still draws them to
     where the target is (INF-09), and a body already hunting the target keeps on: the mask keeps
     you from being picked out, it does not shake off what already has you.
+  INF-15 (I1) They eat people alive. The owner: "They don't just bite you and waddle off, they
+    don't attack for the kill either. They eat you alive. Feast on you while you watch." A body
+    that holds a grip on a living body does not let go of it: step 3 makes NO commitment roll for a
+    target it grips (a state's bite_commitment decides only whether it takes hold — the overfed
+    fumble and wander off before they have you, never after), and it bites again every step until
+    the prey is dead. Each bite (action.effects strike_melee, tag 'bite') tears at the body, never
+    at the head or neck — they are eating, not killing: anatomy = rng.weighted('resolve',
+    f"feed:{attacker}:{prey}:{n}", FEED_ANATOMY), n = the 'bite' HARMs this attacker has already
+    landed on this prey; the first is 'significant', every later one 'severe' (flesh torn away).
+    The prey dies of it slowly — blood loss takes it unconscious, then dead (physical.bodies) — and
+    feels every bite. While the bitten body is a conscious human, each bite also makes it scream:
+    NOISE {source_db: R.scream_db, kind: 'screaming', text: 'someone screaming'} at its point
+    (writer 'action.propagate', actor_id = the bitten body), and every OTHER active infected body in
+    the prey's place within R.scream_draw_m of it (by body_id) is drawn onto the prey: attract(tx,
+    it, the prey, at, the NOISE id, turn_index, reason='feed') — the rest of them come to eat too;
+    beyond the place the scream carries like any sound (INF-09), to everyone near. Any number of
+    them can hold and eat the same body.
+  INF-16 (I1) They stay on what they killed. When the body a feeder hunts dies within 1.5 m of it,
+    the feeder stays on the corpse and keeps eating until R.feed_on_dead_min minutes after the
+    death (step 3: a dead target within 1.5 m and inside that window -> the bite reflex, no grip
+    needed on the dead, every bite 'severe', no scream, no exposure, feed() as usual); after it, it
+    drops the corpse (target None). A human corpse bitten R.devoured_bites times or more, alive and
+    dead together, never rises: there is not enough left of it (rise -> []).
+  INF-17 (I1) Busy eating. A feeder — it holds a grip on a living body, or it is inside INF-16's
+    window on a corpse — is not drawn away: attract() returns None for it unless the new target
+    is the body it is eating. Noise and sight do not pull it off; whoever is left to them buys the
+    rest a little time.
+  INF-18 (I1) Anything that moves. Animals (bodies of kind 'animal': a dog, a cat, a deer, a
+    horse) are prey like people: seen, drawn to, grabbed, bitten and eaten the same way. Only
+    humans take the strain: a bite never infects an animal (physical.bodies.expose) and a dead
+    animal never rises (rise: not a dead human). Their meat carries it (action.effects butcher,
+    physical.objects contaminate — tainted meat).
+  INF-19 (I1) Fluids foul water. A water item lying loose in a place (not held or carried) within
+    R.taint_radius_m of a bite that lands, or of an infected body when it is destroyed or false-dies,
+    is contaminated — physical.objects.contaminate(item, 'wet', that infected body, at, the
+    event, turn_index, lasting=True): blood and what comes out of them does not dry out of a
+    barrel. taint_water(tx, point_body_id, infected_id, at, cause_event_id, turn_index) -> list[Event]
+    does it (called from the bite and from physical.bodies' destruction / false death of an
+    infected body).
 
 active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, awareness not
   'unconscious' (false-dead), an infected_state row with folded_at NULL (P10: a body folded back
@@ -74,7 +113,9 @@ sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07, INF-14)
 attract(tx, body_id, target_id, at, cause_event_id, turn_index, *, reason) -> Event | None   (INF-03/09)
   ``target_id`` is a body id or a place id; reason in 'noise' | 'sight' | 'opening' | 'feed' |
   'horde' (P10: following its horde, world.hordes HRD-07). None
-  (nothing committed) when: the body is not infected, dead, core-destroyed or false-dead; the target
+  (nothing committed) when: (I1, INF-17) the body is feeding — it grips a living body, or its
+  target is a dead body it is inside INF-16's window on — and target_id is not that body; the
+  body is not infected, dead, core-destroyed or false-dead; the target
   is an infected body (INF-05) or excluded (INF-06); the body already hunts a living body in its own
   place and the new target is a place (prey in reach beats a noise); or the target is already its
   target while an INFECTED_STEP row is pending for it (it is on its way: nothing changes). A place
@@ -108,12 +149,16 @@ step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handle
   3 Decide (target = infected_state.target_id; a target body is first brought up to date,
     physical.bodies.progress(tx, it, at, turn_index, rng), so the dead are seen dead):
       none -> stop (it stands where it is until something draws it);
+      (I1, INF-16) a dead body within 1.5 m of b that died less than R.feed_on_dead_min minutes
+        before ``at`` -> it feeds on it: the 'infected_bite' reflex below (no grip needed on the
+        dead), delay as below; once the window has passed -> target None (INFECTED_STATE), stop;
       a body that is dead, gone, infected or excluded -> target None (INFECTED_STATE), stop;
-      a body in b's place, within 1.5 m -> commitment c = the lowest bite_commitment among the canon
+      a body in b's place, within 1.5 m -> (I1, INF-15) when b already grips it
+        (physical.bodies.grips_on) there is no commitment roll: it does not let go; otherwise
+        commitment c = the lowest bite_commitment among the canon
         records of b's states (1.0 with none): c < 1 and not rng.chance(tx, 'infected',
-        f"commit:{b}:{at}", c) -> it disengages (the overfed walk off): target None
-        (INFECTED_STATE), its grip on the target released when it holds one
-        (physical.bodies.release_event), stop; else a reflex Intent (source 'reflex', lod COLD,
+        f"commit:{b}:{at}", c) -> it disengages (the overfed fumble and wander off before they
+        have you): target None (INFECTED_STATE), stop; else a reflex Intent (source 'reflex', lod COLD,
         bound = the core affordance 'infected_bite' when b grips it (physical.bodies.grips_on),
         else 'infected_grab', target = it) resolved with action.resolve.resolve_wave(tx, rng,
         [intent], at, turn_index, horizon_ms = at + 60 000); delay = max(R.step_min_s, the def's
@@ -170,8 +215,9 @@ populate(tx, rng, place_id, at, turn_index, cause_event_id) -> list[str]   (INF-
 
 rise(tx, rng, row, fired, turn_index) -> list[Event]   (the REANIMATION handler for corpses, INF-04)
   corpse = payload.body_id, pathway = payload.pathway. Nothing (return []) when the corpse is not a
-  dead human, has no positions row any more, or has since taken an unhealed catastrophic head or
-  neck wound. type = rng.choice(tx, 'infected', f"rise:{corpse}:type", the canon pathway's rise_as).
+  dead human, has no positions row any more, has since taken an unhealed catastrophic head or
+  neck wound, or (I1, INF-16) has taken R.devoured_bites 'bite' wounds or more (wounds rows of
+  type 'bite', alive and dead together: not enough is left of it to get up). type = rng.choice(tx, 'infected', f"rise:{corpse}:type", the canon pathway's rise_as).
   new = physical.bodies.rise(tx, corpse, type, at, fired.event_id, turn_index);
   physical.space.place_body(tx, new, the corpse's place / anchor / point, replaces = corpse); every
   item the corpse holds (holder_body = corpse, by item_id) -> physical.objects.transfer to new, same
@@ -206,6 +252,11 @@ SHAMBLER = "ZOMBIE_ARCHETYPE_SHAMBLER01"
 CRAWLER = "ZOMBIE_ARCHETYPE_CRAWLER01"
 RUNNER = "ZOMBIE_VARIANT_ID_RUNNER01"
 LURKER = "ZOMBIE_VARIANT_ID_LURKER01"
+# INF-15 (I1): where a feeding bite lands — never the head or the neck (implemented data)
+FEED_ANATOMY: tuple[tuple[str, int], ...] = (
+    ("arm_l", 14), ("arm_r", 14), ("leg_l", 14), ("leg_r", 14), ("abdomen", 16), ("chest", 10),
+    ("hand_l", 5), ("hand_r", 5), ("foot_l", 2), ("foot_r", 2), ("back", 6),
+)
 
 
 def active(store: "Store | Tx", body_id: str) -> bool:
@@ -234,6 +285,24 @@ def step(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> li
 
 
 def feed(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
+    raise NotImplementedError("P10")
+
+
+def draw_to_feed(tx: "Tx", prey_id: str, feeder_id: str, at: int, cause_event_id: str | None,
+                 turn_index: int) -> list["Event"]:
+    """INF-15 (I1): every active infected body other than ``feeder_id`` in the prey's place within
+    R.scream_draw_m of the prey (space.point_distance), by body_id -> attract(tx, it, prey_id, at,
+    cause_event_id, turn_index, reason='feed'). Returns the INFECTED_DRIFT events committed."""
+    raise NotImplementedError("P10")
+
+
+def taint_water(tx: "Tx", point_body_id: str, infected_id: str, at: int, cause_event_id: str | None,
+                turn_index: int) -> list["Event"]:
+    """INF-19 (I1): every water item lying loose in point_body_id's place (items.place_id set) whose
+    point (its anchor's, else the place centre's; physical.space) is within R.taint_radius_m of
+    point_body_id's point, by item_id, not already carrying a lasting mark -> physical.objects.
+    contaminate(tx, item, 'wet', infected_id, at, cause_event_id, turn_index, lasting=True).
+    Returns the ITEM_CONTAMINATED events."""
     raise NotImplementedError("P10")
 
 

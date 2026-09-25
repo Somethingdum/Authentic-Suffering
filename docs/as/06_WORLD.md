@@ -404,6 +404,21 @@ it, and the dead who walk on out of sight go back into the crowd.
   straight through it (CODEX). The dead do not track by smell (their lore's false belief); people
   do — whoever wears the dead reeks of them (sense.olfaction), and the fluids carry the wet strain
   (D-77; smearing is F1c's).
+- **They eat people alive** (INF-15..19, the owner's I1, D-85). The dead do not bite and wander
+  off, and they do not go for the kill: once one has hold of someone it does not let go (the
+  overfed only fumble before they have you), and it bites every step — never the head or the
+  neck, the first bite deep, every one after tearing flesh away — until the person dies of it,
+  slowly, conscious for most of it. Every bite on a conscious person makes them scream (90 dB);
+  the scream pulls every other one of the dead in the place (within 30 m) onto them, and carries
+  beyond like any sound. Any number can hold and eat one body. When the prey dies they stay on it
+  and keep eating for 20 minutes, then drop what is left; a body bitten eight times or more never
+  gets up. While one is eating, nothing else draws it off — whoever is left to them buys the rest
+  a little time. They eat anything that moves the same way — a dog, a horse — but only people take
+  the strain: an animal is never infected and never rises. What comes out of them fouls water: a
+  bottle or canteen lying within a metre of a feeding, or of one of them when it goes down, carries
+  the strain for good; meat butchered from something they fed on carries it too (a lasting mark;
+  eating or drinking it is an exposure, `tainted_food` / `tainted_water`). Everyone who sees a bite
+  is worn down by it (CAS-024), and the narrator does not look away — except from a child's body.
 
 ### 5.3 Crowds, and the Mega Horde (HRD-03..17)
 - **Drift**: a district with enough active dead sometimes sends a crowd off to a neighbouring hub

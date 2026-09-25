@@ -85,6 +85,9 @@ Row details (what the P2 loader tests read):
     sex / age_years / age_band (contracts.common.age_band_for) / height_cm / mass_kg / special
     from the dossier (identity, appearance, capability.special); infected bodies: sex and age NULL,
     height 170, mass 65, special = {letter: (lo + hi) // 2} from the type's SPECIAL ranges;
+    (I1) ``animal:`` bodies: kind 'animal', content_ref = the AnimalDef ref, sex and age NULL,
+    height_cm / mass_kg from the def, special {}; no actors row and no dossier —
+    they are prey and meat, not minds (world.infected INF-18; action.effects butcher);
     awareness / posture / blood_loss_pct / pain from the spec; progressed_at = start;
     impairment = physical.bodies.impairment() of the loaded body; origin 'scenario'.
   needs: stage from the spec; last_drink_ms = start - thirst x thirst_stage_every_h hours, and the
@@ -321,6 +324,7 @@ class BodySpec(Strict):
     dossier: str | None = Field(default=None, description="actor/pc content ref; None for infected bodies")
     stub: StubSpec | None = Field(default=None, description="fixture-only person (see stub_dossier)")
     infected: str | None = Field(default=None, description="infected type id, e.g. ZOMBIE_ARCHETYPE_SHAMBLER01")
+    animal: str | None = Field(default=None, description="I1: an animal content ref, e.g. core:animal/dog")
     controller: Literal["human", "model", "policy"] = "model"
     place: LocalId
     anchor: LocalId | None = None
@@ -347,8 +351,8 @@ class BodySpec(Strict):
 
     @model_validator(mode="after")
     def _kind(self) -> "BodySpec":
-        if sum(x is not None for x in (self.dossier, self.infected, self.stub)) != 1:
-            raise ValueError(f"body {self.id}: exactly one of dossier, stub or infected")
+        if sum(x is not None for x in (self.dossier, self.infected, self.stub, self.animal)) != 1:
+            raise ValueError(f"body {self.id}: exactly one of dossier, stub, infected or animal")
         if self.infected is not None and self.controller != "policy":
             raise ValueError(f"body {self.id}: infected bodies are controller 'policy' (Lurkers use a dossier)")
         return self

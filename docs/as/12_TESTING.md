@@ -180,7 +180,18 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p05_many_actors/test_temper_in_packet.py` | how close to breaking, and how they feel about each person, in the packet and the prompt; a snap is said first and belongs to its moment; the actor core's humanity paragraph; shoving someone to the dead offered only with the dead right there — and shown, not buried — and taken away by a person's own line; a gun can be aimed at a leg (TEMPER-08, AFF-07) |
 | `p05_many_actors/test_betrayal.py` | shoved into the dead: pushed at most 2 m, never through it, toward the one nearest him, on his back, and it turns on him by sight; keeping your feet; with no dead near it is a shove; shot in the leg you go down and cannot run, a graze in the leg still hobbles, the body shot is unchanged; a hurt leg or foot stops running, never walking, and running leaves the menu; everyone who saw the shove stops trusting him and word travels; the one shoved never forgets; seeing someone die wears you down more if you loved them; hunger past the first pangs; a night's sleep (CAS-019..023) |
 | `p07_slice/test_breaking_point.py` | a snap makes the person think this wave; someone you can hardly stand in the room raises salience; fists become a punch whatever was decided and whatever nerve is left — never at a child, and words when out of reach; a snap in words must be said out loud, one repair, then they walk out; cold walks out, or to the far end with the door shut; tears sit down; in a whole turn, insult him twice and he swings (TEMPER-06, SEL-02, SEL-03, S3b) |
+| `p10_world/test_materialise.py` (H1 tests) | generated people break in different ways — every outlet, fuse and grudge across a hundred of them, on their card; every settlement has its feud, the first rival pair of its generated people, and only that one (WG-29) |
 | `p09_society/test_quarrels.py` | nobody sore, no rows; a row between two who resent each other, more likely the more strained, started by the more strained, heard about by the settlement; blows (bruises, standing lost); a grudge is enough; never the player; the settlement day has its rows (STL-15, STL-03 step 8b) |
+
+### 3.7 The dead feed (I1; D-85)
+
+| File | What it proves |
+|---|---|
+| `p02_space_bodies/test_animals.py` | the six core animals and raw meat; an animal in a scenario is a body of kind 'animal' with its def's size — no dossier, no actor; a body is exactly one thing |
+| `p03_perception/test_animals_seen.py` | a dog reads as a dog; a bite reads as someone — or something — being eaten alive, and the dead as being eaten |
+| `p05_many_actors/test_tainted.py` | a lasting mark never dries and a passing one never washes it out; tainted meat and fouled water are exposures, clean meat is supper, a mouth on a can is not taint; only a dead animal is offered for butchering; butchering makes the def's meat and leaves a carcass, once; meat from what the dead fed on is tainted for good |
+| `p07_slice/test_narration_horror.py` | the narrator does not look away from the dead feeding, never describes a child's body, and the perceived-only rules still come first |
+| `p10_world/test_feeding.py` | once it has you it does not let go, overfed or not; never the head or the neck, first deep then torn; he screams and the rest of them come; busy eating it is not drawn off; they stay on what they killed, then leave it; the devoured do not rise; a dog is prey, never infected, never risen; expose takes only people; what comes out of them fouls the water near it for good, a passing mark still dries; every bite seen wears you down (INF-15..19, CAS-024) |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

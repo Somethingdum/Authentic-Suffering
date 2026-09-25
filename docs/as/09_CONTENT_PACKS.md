@@ -48,6 +48,7 @@ authors: [SomethingDum]
 | `affordances/` | `AffordanceDef` | `<pack>:affordance/<id>` | a list |
 | `infected/` | `InfectedTypeDef` / `InfectedStateDef` / `QuirkDef` (by `schema`) | type id | one or a list |
 | `pathways/` | `InfectionPathwayDef` | pathway id | one |
+| `animals/` | `AnimalDef` (I1: prey for the dead, meat for the living) | `<pack>:animal/<id>` | a list |
 | `cascade/` | `CascadeRuleDef` | `CAS-###` | a list |
 | `laws/` | `LawDef` | `<pack>:law/<id>` | a list |
 | `buildings/` | `BuildingArchetype` | `<pack>:building/<id>` | one |
@@ -319,6 +320,11 @@ holds it.
   `requires.portal_kinds` the kinds of way (`[door, window, gate, …]` for closing, locking and
   barring — an `opening`, a gap in a fence or a ladder hole, has nothing to close). Without them an
   option binds any body or way in range, and the menu offers nonsense (P10, D-66).
+- **Animals** (I1) are bodies, never minds: `name`, `plural`, `words` (what someone sees, no
+  article: `scrawny grey dog`), `size`, `height_cm`, `mass_kg`, `speed_m_s`, `meat_portions` (what
+  butchering yields in `core:item/raw_meat`) and a `sound` for the narrator. The dead eat them like
+  anyone else; they never take the strain. Put one in a scenario with `animal: core:animal/dog`.
+  Meat from a carcass the dead fed on is tainted — it looks and smells like any meat.
 - **Laws** put a price on options for the people who know them (per affordance tag, for
   members/visitors/all, with a `cost_note`) and carry a `belief_text` — how locals describe the
   law, and the note a person weighs when an effect has none of its own. A member of the

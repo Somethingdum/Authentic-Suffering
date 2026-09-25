@@ -8,6 +8,8 @@
     bite: 0.9
     deep_scratch_with_saliva_contact: 0.35
     mouth_contact_item: 0.3        # [SAND] drinking after a spreader (action.effects drink, P10)
+    tainted_food: 0.5              # [SAND] I1: meat from something the dead fed on (action.effects eat)
+    tainted_water: 0.4             # [SAND] I1: water fouled by a feeding or one of the dead (action.effects drink)
   # felt: what the host feels (second person, never the stage's name); signs: cues an observer who
   # sees the host clearly and close gets (mind.cues). Compulsion 3 = the involuntary offer
   # (turn.cognition, P10).

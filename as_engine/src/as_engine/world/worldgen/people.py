@@ -85,7 +85,12 @@ WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acqua
   2, affection 2}; else rng.weighted((('positive', 0.2), ('stranger', 0.6), ('rival', 0.2)), purpose
   f"rel:{a}:{b}"): positive -> both ways {kind 'friend', trust 1, affection 1}; rival -> both ways
   {kind 'rival', trust -1, resentment 1}; stranger -> no row (RELATION_CHANGE per row, seed: true,
-  no 'delta' key, like the scenario loader). History as belief: every named person holds, for every
+  no 'delta' key, like the scenario loader). (H1, D-84) Every settlement has somebody who cannot
+  stand somebody: its first rival draw between two GENERATED people (the lowest (a, b) in the
+  loop above) is a feud instead — both ways {kind 'rival', trust -2, resentment 2} — the pair
+  society.settlement STL-15 sets rowing. Generated
+  people's tempers come from their variant (skeleton_dossier), so a settlement breaks in
+  different ways. History as belief: every named person holds, for every
   history event whose subjects include their group, settlement or zone, a proposition {subject_type
   'event', subject_id = hist_id, predicate 'history', text = belief_text} (believed 1, confidence 2,
   provenance 'common', fidelity 'exact') — the propositions in their PERCEIVE, the holdings in a
@@ -169,6 +174,20 @@ _EXEMPLARS = (
 )
 
 
+# H1 (D-84): generated people break in different ways — a settlement is not a room of saints.
+_FUSES: tuple[int, ...] = (3, 2, 4, 3, 1, 3, 5, 2, 4, 3)
+_OUTLETS: tuple[str, ...] = ("words", "fists", "cold", "words", "tears", "fists", "flight", "words", "cold", "fists")
+_PEEVES: tuple[str, ...] = (
+    "people taking more than their share", "being talked down to", "waste", "lazy watch shifts",
+    "anyone touching their things", "being told what to do by someone who does no work", "whining",
+    "people who lie about little things",
+)
+_SETTLERS: tuple[str, ...] = (
+    "a long walk on the wall", "hard work until the arms ache", "an hour alone", "a smoke",
+    "talking it out the next day", "a drink, when there is one",
+)
+
+
 def skeleton_dossier(seed: PersonSeed) -> dict:
     """A VALID generated ActorDossier dict from a PersonSeed (implemented; deterministic).
     Plain but specific enough to pass CNT-10; ``variant`` picks among the small tables above, so two
@@ -238,6 +257,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                  "fears": [("the pump failing", "a fever in the camp", "the night watch sleeping")[v % 3]]},
         "disposition": {"archetype_prior": "civilized", "toward_strangers": ("wary", "neutral", "warm")[v % 3],
                         "encounter_default": "calls for the watch and keeps distance"},
+        "temper": {"fuse": _FUSES[(v // 5) % len(_FUSES)], "outlet": _OUTLETS[(v // 11) % len(_OUTLETS)],
+                   "grudge": (v // 7) % 4, "pet_peeves": [_PEEVES[(v // 3) % len(_PEEVES)]],
+                   "cools_down_by": _SETTLERS[(v // 13) % len(_SETTLERS)]},
         "tags": ["generated"],
     }
 from ._impl_wg import write_people  # noqa

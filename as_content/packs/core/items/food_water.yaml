@@ -69,3 +69,15 @@
   barter_value: 18
   water: {ml: 5000}
   description: A five-litre jug with a screw cap.
+- schema: as.item.v1
+  id: raw_meat
+  name: cut of raw meat
+  plural: cuts of raw meat
+  kind: food
+  mass_g: 500
+  bulk: 1
+  stackable: true
+  tags: [food, meat, fresh]
+  barter_value: 6
+  food: {kcal: 600, spoil_days: 2}
+  description: A dark red cut, still wet. Nothing about it says where it came from or what touched it.

@@ -169,3 +169,43 @@ def test_a_broken_dossier_is_refused(gw):
     with s.store.transaction() as tx, pytest.raises(ValueError):
         mind_actor.create(tx, b, d, "generated", now(s), turn(s))
     assert one(s, "SELECT 1 FROM actors WHERE actor_id = ?", (b,)) is None
+
+
+# =========================================================================== H1 (D-84)
+def test_generated_people_break_in_different_ways():
+    """skeleton_dossier gives every generated person a temper from their variant: across a
+    hundred people every outlet and every fuse turns up, and a card says it."""
+    from as_engine.contracts.dossier import ActorDossier
+    from as_engine.mind.identity import compile_identity
+    tempers = [ActorDossier.model_validate(dossier(variant=v)).temper for v in range(100)]
+    assert all(t is not None for t in tempers)
+    assert {t.outlet for t in tempers} == {"fists", "words", "cold", "flight", "tears"}
+    assert {t.fuse for t in tempers} == {1, 2, 3, 4, 5}
+    assert {t.grudge for t in tempers} == {0, 1, 2, 3}
+    assert all(t.pet_peeves and t.cools_down_by for t in tempers)
+    card = compile_identity(ActorDossier.model_validate(dossier(variant=11)))
+    assert "temper" in [sec.key for sec in card.sections]
+
+
+def test_every_settlement_has_its_feud(gw):
+    """WG-29 (H1): among a settlement's generated people, the first rival pair is a feud —
+    resentment 2 both ways — and only that one. (Pack people bring their own history.)"""
+    s = gw
+    for (sid,) in s.store.query("SELECT settlement_id FROM settlements ORDER BY settlement_id"):
+        named = {r[0] for r in s.store.query(
+            "SELECT gm.actor_id FROM group_members gm JOIN settlements st ON st.group_id = gm.group_id "
+            "JOIN actors a ON a.actor_id = gm.actor_id JOIN dossiers d ON d.dossier_id = a.dossier_id "
+            "WHERE st.settlement_id = ? AND d.source = 'generated'", (sid,))}
+        rivals = sorted({tuple(sorted((r[0], r[1]))) for r in s.store.query(
+            "SELECT from_id, to_id FROM relationships WHERE kind = 'rival'") if r[0] in named and r[1] in named})
+        feuds = sorted({tuple(sorted((r[0], r[1]))) for r in s.store.query(
+            "SELECT from_id, to_id FROM relationships WHERE resentment >= 2") if r[0] in named and r[1] in named})
+        if not rivals:
+            assert feuds == []
+            continue
+        assert feuds == [rivals[0]], sid
+        a, b = rivals[0]
+        for x, y in ((a, b), (b, a)):
+            r = one(s, "SELECT kind, trust, resentment FROM relationships WHERE from_id = ? AND to_id = ?", (x, y))
+            assert (r["kind"], r["trust"], r["resentment"]) == ("rival", -2, 2)
+

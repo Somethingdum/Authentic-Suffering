@@ -60,9 +60,14 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   they are and how they feel about each person; the snap by outlet (a punch past their own nerve, having
   it out out loud, walking out, breaking down) with a grudge after; rows and fights in settlements
   off-screen; shoving someone to the dead and the leg shot, with the trust, the talk and the grudge they
-  cost; all fourteen people have tempers. Left: **I1** the dead feed on the living (eaten alive, crowds
-  feeding, animals as prey, tainted meat and water, the narrator's horror — graphic, cutting away from
-  children), then the queue below.
+  cost; all fourteen people have tempers, generated people get varied ones, and every settlement
+  has its feud.
+- **The dead feed** (the owner: eaten alive, anything that moves, tainted meat and water, graphic).
+  **I1 is SPECIFIED** (D-85, INF-15..19; 06 §5.2; 13 §4.0 step 1; tests 12 §3.7): once they have you
+  they never let go, never the head or neck, the scream brings the rest, they stay on the dead, the
+  devoured never rise, nothing draws a feeder off; six animals as prey (never infected); lasting
+  taint in water near a feeding and in meat from what they fed on; butchering; witness stress; the
+  narrator writes it without looking away, and never a child's body.
 - **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own

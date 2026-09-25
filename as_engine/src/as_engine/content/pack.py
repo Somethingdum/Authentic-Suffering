@@ -14,6 +14,9 @@ Folder layout (every folder optional except pack.yaml):
                                    -> '<pack>:infected/<ID>', '<pack>:infected_state/<id>',
                                       '<pack>:quirk/<ID>' (bare ids inside infected records)
   <pack>/pathways/*.yaml           InfectionPathwayDef   -> '<pack>:pathway/<id>'
+  <pack>/animals/*.yaml            list[AnimalDef]       -> '<pack>:animal/<id>'   (I1: prey and meat;
+                                   the folder comes right after pathways in the load order and
+                                   'animal' is a record kind of refs, REF_RE)
   <pack>/cascade/*.yaml            list[CascadeRuleDef]  -> '<pack>:cascade/<CAS-nnn>'
   <pack>/laws/*.yaml               list[LawDef]          -> '<pack>:law/<id>'
   <pack>/buildings/*.yaml          BuildingArchetype     -> '<pack>:building/<id>'

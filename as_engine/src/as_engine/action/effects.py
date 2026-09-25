@@ -39,8 +39,9 @@ Legality at landing (EFF-02) — the state as it stands NOW (earlier landings al
                  (the actor's place or a place joined to it by an OPEN portal); for range
                  'visible' also a target in the actor's place that it can no longer see; an anchor
                  destination not in the actor's place
-  'target_dead'  a body target that is dead (alive 0), for every def except finish_downed and
-                 watch_target
+  'target_dead'  a body target that is dead (alive 0), for every def except finish_downed,
+                 watch_target and (I1) infected_bite (the dead feed on the dead: world.infected,
+                 rule INF-16) and butcher_carcass
   'item_gone'    the bound item is no longer where it was bound (held/carried by the actor for
                  item_held / item_carried; lying at the bound place/anchor for item_reachable;
                  inside the container for take_from)
@@ -155,12 +156,25 @@ Per effect (result strings in quotes; 'done' unless noted):
                      WEAPON_WOUNDS, type = the weapon's wound_types[0]; tag 'unarmed' -> 'blunt'
                      one step below light (CLEAN minor, COST no wound, result 'hit'); tag 'head' ->
                      anatomy head; finish_downed: no check, anatomy head, catastrophic for medium /
-                     heavy weapons, severe for light. Bite (tag 'bite'): only when the attacker
-                     holds a grip on the target (grips row) -> no check, significant 'bite' on
-                     rng.weighted CENTRE_MASS anatomy, plus (P10) physical.bodies.expose(tx, rng,
-                     target, 'wet', 'bite', land_at, the HARM id, turn_index) and
-                     world.infected.feed(tx, attacker, land_at, the HARM id, turn_index); no grip ->
-                     'no_grip'. BREAK (attacker lost):
+                     heavy weapons, severe for light. Bite (tag 'bite'; I1 — the dead eat people
+                     alive, world.infected INF-15/16): the attacker must hold a grip on a living
+                     target (grips row); a dead target needs none — else 'no_grip'. No check.
+                     anatomy = rng.weighted('resolve', f'feed:{attacker}:{target}:{n}',
+                     world.infected.FEED_ANATOMY) (never the head or the neck), n = the target's
+                     HARMs of type 'bite' whose cause event's actor_id is the attacker; severity
+                     'significant' for n = 0 on a living target, else 'severe' (flesh torn away);
+                     type 'bite', contamination 2 (bodies.apply_harm). Then, the target alive:
+                     physical.bodies.expose(tx, rng, target, 'wet', 'bite', land_at, the HARM id,
+                     turn_index) (it takes only humans), and when the target is a conscious human
+                     after the bite, NOISE {source_db: RulesConfig.infected.scream_db, kind
+                     'screaming', text 'someone screaming', place_id / x_m / y_m: the target's
+                     point} (writer 'action.propagate', actor_id = the target, at = land_at) — the
+                     sound that brings the rest of them: world.infected.draw_to_feed(tx, target,
+                     attacker, land_at, the NOISE id, turn_index) (INF-15). Then
+                     world.infected.feed(tx, attacker,
+                     land_at, the HARM id, turn_index), world.infected.taint_water(tx, target,
+                     attacker, land_at, the HARM id, turn_index), the attacker's NOISE as before;
+                     'hit'. BREAK (attacker lost):
                      the attacker's posture becomes 'crouched' ('stumbled').
   grapple            opposed S + brawling vs target A + brawling; attacker wins -> grip_event.
                      'grabbed' / 'slipped'.
@@ -209,6 +223,25 @@ Per effect (result strings in quotes; 'done' unless noted):
                      start event, turn_index); then, when a stage physical.bodies.stages(actor)
                      returns for 'wet' has saliva_infectious -> objects.contaminate(item, 'wet',
                      actor, land_at, the start event, turn_index).
+                     I1 — tainted food and water, and (D-77) every fluid of a host: eat is checked
+                     exactly as drink, BEFORE the destroy. A LASTING mark (c.lasting: the dead's
+                     fluids in meat or water, world.infected INF-18/19) -> expose(..., c.pathway,
+                     'tainted_food' for eat / 'tainted_water' for drink, ...), whoever made it; a
+                     passing mark by someone else -> 'mouth_contact_item' as above (food a host
+                     ate from carries it as a bottle does); and an eater at a saliva-infectious
+                     stage marks the food it ate from (objects.contaminate, passing).
+  butcher            (I1) the target is a dead animal body (bodies.kind 'animal', alive 0) that has
+                     not been butchered (bodies.special has no 'butchered') and the actor holds an
+                     item tagged 'blade' in a hand — else 'nothing_to_butcher'. meat = the AnimalDef's
+                     meat_portions (canon, by bodies.content_ref); objects.create(core:item/raw_meat,
+                     qty = meat, on the floor at the carcass's point (its anchor, else its place),
+                     origin 'craft', props {} ...); then BODY_CONDITION {body_id, butchered: true}
+                     (writer 'physical.bodies', cause = the start event) updating bodies.special
+                     with 'butchered': true (the body stays: a carcass). When the carcass carries any HARM of type 'bite'
+                     (the dead fed on it) the new meat is tainted: objects.contaminate(meat, 'wet',
+                     the actor of the first such bite's cause event, land_at, the start event,
+                     turn_index, lasting=True) — it looks and smells like any meat; result
+                     'butchered'.
   throw_distraction  objects.transfer to the destination anchor; NOISE 70 dB 'something clattering'
                      at the LANDING POINT (not the thrower).
 
@@ -268,7 +301,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "grapple", "break_grip", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
-    "throw_distraction", "shove_toward",
+    "throw_distraction", "shove_toward", "butcher",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -293,7 +326,8 @@ SEEN: dict[str, str | None] = {
     "punch": "throws a punch at {target}",
     "grapple": "grabs for {target}",
     "infected_grab": "lunges and grabs at {target}",
-    "infected_bite": "bites at {target}",
+    "infected_bite": "sinks its teeth into {target}",
+    "butcher_carcass": "cuts into {target} with a knife",
     "break_grip": "twists against {target}'s grip",
     "shove": "shoves {target}",
     "disarm": "grabs for {target}'s weapon",

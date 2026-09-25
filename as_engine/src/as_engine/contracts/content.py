@@ -239,6 +239,24 @@ class InfectedSenses(Strict):
     thermal: bool = False
 
 
+class AnimalDef(Strict):
+    """I1 (D-85): an animal — prey for the dead and meat for the living (world.infected INF-18;
+    action.effects butcher). Only people take the strain: an animal is eaten, never turned."""
+    schema_id: Literal["as.animal.v1"] = Field(alias="schema", default="as.animal.v1")
+    id: str = Field(pattern=r"^[a-z][a-z0-9_]*$")
+    name: str = Field(description="What it is, lower case, no article: 'dog'")
+    plural: str
+    words: str = Field(description="How it reads to someone who sees it, no article: 'scrawny grey dog' "
+                       "(mind.perception describe)")
+    size: Literal["small", "medium", "large"]
+    height_cm: int = Field(ge=5, le=250)
+    mass_kg: float = Field(gt=0, le=1200)
+    speed_m_s: float = Field(gt=0)
+    meat_portions: int = Field(ge=0, description="What butchering it yields: this many core:item/raw_meat")
+    sound: str = Field(default="", description="The sound it makes, for the narrator: 'a dog barking'")
+    model_config = Strict.model_config | {"populate_by_name": True}
+
+
 class InfectedTypeDef(Strict):
     schema_id: Literal["as.infected.v1"] = Field(alias="schema", default="as.infected.v1")
     id: str = Field(pattern=r"^[A-Z][A-Z0-9_]+$", description="Stable canon id, e.g. ZOMBIE_ARCHETYPE_SHAMBLER01")

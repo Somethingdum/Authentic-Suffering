@@ -165,3 +165,16 @@
   noise_db: 20
   effect: drink
   tags: [consume, water]
+# I1 (D-85): meat from a carcass. What the dead fed on carries it into the meat (action.effects butcher).
+- schema: as.affordance.v1
+  id: butcher_carcass
+  verb: manipulate
+  label: "Butcher {target} for meat (about {duration})"
+  ui_label: "Butcher the {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, held_item_tags: [blade], target_kinds: [animal], target_alive: false}
+  duration: {base_s: 900}
+  noise_db: 30
+  effect: butcher
+  tags: [food, work]

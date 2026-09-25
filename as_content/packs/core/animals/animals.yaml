@@ -1,0 +1,70 @@
+# Animals (I1, D-85): prey for the dead and meat for the living. The owner: "they'll eat anything that
+# moves, a dog, a cat, a man, a kid, a deer, a horse. Only humans get infected, but meat can be
+# tainted." An animal is never turned (world.infected INF-18); meat butchered from one the dead fed
+# on carries it (action.effects butcher).
+- schema: as.animal.v1
+  id: dog
+  name: dog
+  plural: dogs
+  words: scrawny grey dog
+  size: medium
+  height_cm: 55
+  mass_kg: 22
+  speed_m_s: 8.0
+  meat_portions: 4
+  sound: a dog barking
+- schema: as.animal.v1
+  id: cat
+  name: cat
+  plural: cats
+  words: thin tabby cat
+  size: small
+  height_cm: 25
+  mass_kg: 4
+  speed_m_s: 9.0
+  meat_portions: 1
+  sound: a cat yowling
+- schema: as.animal.v1
+  id: deer
+  name: deer
+  plural: deer
+  words: white-tailed deer
+  size: large
+  height_cm: 100
+  mass_kg: 60
+  speed_m_s: 13.0
+  meat_portions: 14
+  sound: a deer snorting
+- schema: as.animal.v1
+  id: horse
+  name: horse
+  plural: horses
+  words: bony brown horse
+  size: large
+  height_cm: 160
+  mass_kg: 450
+  speed_m_s: 12.0
+  meat_portions: 60
+  sound: a horse screaming
+- schema: as.animal.v1
+  id: goat
+  name: goat
+  plural: goats
+  words: shaggy goat
+  size: medium
+  height_cm: 70
+  mass_kg: 40
+  speed_m_s: 6.0
+  meat_portions: 8
+  sound: a goat bleating
+- schema: as.animal.v1
+  id: chicken
+  name: chicken
+  plural: chickens
+  words: speckled hen
+  size: small
+  height_cm: 40
+  mass_kg: 2
+  speed_m_s: 4.0
+  meat_portions: 1
+  sound: a hen squawking

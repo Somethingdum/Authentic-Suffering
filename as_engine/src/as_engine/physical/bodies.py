@@ -133,7 +133,8 @@ create(tx, *, kind, sex, age_years, height_cm, mass_kg, special, at, turn_index,
 expose(tx, rng, body_id, pathway, exposure, at, cause_event_id, turn_index) -> Event | None
   (action.effects bite, world.infected.) The canon pathway record ``pathway`` (ValueError when it has
   no ``exposure`` key of that name). A dead body, or one that already has an infections row for that
-  pathway -> None. infected = rng.chance(tx, 'infected', f"exposure:{body_id}:{cause_event_id}",
+  pathway -> None; (I1) so is a body whose kind is not 'human' or 'lurker': only people take the
+  strain — the dead eat animals, and animals never turn (world.infected INF-18). infected = rng.chance(tx, 'infected', f"exposure:{body_id}:{cause_event_id}",
   record.exposure[exposure]). INFECTION_EXPOSURE {body_id, pathway, exposure, infected} (actor_id =
   body_id, cause as given) inserting, when infected, infections {body_id, pathway, exposed_at = at,
   stage = the record's first stage name, cause_event = cause_event_id, known_to_self 0}.

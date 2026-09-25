@@ -129,7 +129,7 @@ def test_drinking_after_a_spreader(scenario):
     t0 = now(w)
     drink(w, "alice", b, t0)
     [mark] = events(w, "ITEM_CONTAMINATED")
-    assert mark["payload"] == {"item_id": b, "pathway": "wet", "by": w.id("alice")}
+    assert mark["payload"] == {"item_id": b, "pathway": "wet", "by": w.id("alice"), "lasting": False}, "saliva dries (I1)"
     c = objects.contaminated(w.store, b, t0 + MIN)
     assert c is not None and (c["pathway"], c["by"]) == ("wet", w.id("alice"))
     assert events(w, "INFECTION_EXPOSURE")[-1]["payload"]["body_id"] == w.id("alice"), "her own mouth exposes nobody"

@@ -64,12 +64,15 @@ inventory_tree: one dict per item held by the body — {item_id, def_ref, name, 
 
 P10 — mouth contact (lore §3.2: "everyone knows somebody who was killed by a shared bottle"; used
 by action.effects drink):
-  ITEM_CONTAMINATED {item_id, pathway, by}   (contaminate) updating items.props.contaminated =
-                                              {pathway, by, at} (a newer mark replaces the older)
-contaminate(tx, item_id, pathway, body_id, at, cause_event_id, turn_index) -> Event
+  ITEM_CONTAMINATED {item_id, pathway, by, lasting}   (contaminate) updating items.props.contaminated
+                                              = {pathway, by, at, lasting} (a newer mark replaces the
+                                              older — but never a lasting one with a passing one)
+contaminate(tx, item_id, pathway, body_id, at, cause_event_id, turn_index, *, lasting=False) -> Event
 contaminated(store, item_id, at) -> dict | None: the item's props.contaminated while at - its at <=
   RulesConfig.infected.saliva_hours hours (saliva dries out; [SAND]), else None (no mark, too old,
-  or no such item).
+  or no such item). (I1) A lasting mark never dries: the dead's blood and fluids in meat or in
+  loose water (world.infected INF-18/19; action.effects butcher) stay in it for good. A mark
+  written before I1 (no 'lasting' key) is a passing one.
 
 F1a — clothing.
 LOOK-02 A worn item is an items row with holder_slot 'worn'; clothing is an item whose ItemDef has a
@@ -442,7 +445,7 @@ def load_rounds(tx: "Tx", firearm_id: str, rounds: int, at: int, actor_id: str |
 
 
 def contaminate(tx: "Tx", item_id: str, pathway: str, body_id: str, at: int, cause_event_id: str | None,
-                turn_index: int) -> Event:
+                turn_index: int, *, lasting: bool = False) -> Event:
     """P10: a spreader's mouth on the item (ITEM_CONTAMINATED updating props.contaminated)."""
     from ..contracts.events import EventType, WriteOp, WriteRecord
     it = _item(tx, item_id)

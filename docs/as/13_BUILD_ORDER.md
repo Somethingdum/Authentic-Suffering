@@ -120,6 +120,29 @@ machine yet, so start here, not at P0 task 1:
      stage S3b (take_in) — `p07_slice/test_breaking_point.py`.
    - P9: `society/settlement.friction` (STL-15) and the settlement day's step 8b
      (`society/_impl_society.py`) — `p09_society/test_quarrels.py`.
+   - P10: WG-29's feud — the first rival draw between two generated people of a settlement
+     (`world/worldgen/_impl_wg.py`, the relationships loop of `write_people`) —
+     `p10_world/test_materialise.py::test_every_settlement_has_its_feud`. (Generated people's
+     tempers are data in `skeleton_dossier`, already written.)
+   The owner's dead who eat the living (I1: feeding, animals, tainted meat and water; D-85; 06 §5.2;
+   rules INF-15..19) the same way:
+   - P2: `content/pack.py` — the `animals` folder and the 'animal' kind (`_FOLDERS`, `_SCHEMA_OF`,
+     `KINDS`); the scenario loader's `animal:` bodies (`testing/_impl_loader.py`) —
+     `p02_space_bodies/test_animals.py`, and `test_content_pack.py` (until the folder is known the
+     core pack reports it as an unknown folder).
+   - P3: `mind/perception.describe` for animals, and the bite's words in the event text
+     ("is being eaten alive" / "is being eaten") — `p03_perception/test_animals_seen.py`.
+   - P5: `physical/objects.contaminate(lasting=)` and `contaminated` (a lasting mark never dries and
+     is never replaced by a passing one); `action/_impl_effects.py` — eat / drink with a lasting
+     mark, the `butcher` handler, and `_DEAD_OK` gains `infected_bite` and `butcher_carcass` —
+     `p05_many_actors/test_tainted.py`.
+   - P7: nothing to build — `prompts/narration.system.j2` is written; `p07_slice/test_narration_horror.py`
+     pins it.
+   - P10: `physical/bodies.expose` (only people take the strain); `world/infected.py` —
+     `draw_to_feed`, `taint_water`, step 3's feeding (no commitment roll for what it holds; the
+     dead within the window), `attract`'s busy rule, `rise`'s devoured rule
+     (`world/_impl_p10.py`); the feeding bite in `action/_impl_effects.py` (FEED_ANATOMY, the
+     count, the escalation, the scream, the draw, the taint) — `p10_world/test_feeding.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.
