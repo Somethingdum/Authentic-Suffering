@@ -660,7 +660,11 @@ def _hops(tx, from_zone, to_zone):
     return 10 ** 6
 
 
-def _mega_form(tx, rng, at, turn_index, cause):
+def mega(tx, rng, at, turn_index, cause):
+    return _mega_form(tx, rng, at, turn_index, cause, force=True)
+
+
+def _mega_form(tx, rng, at, turn_index, cause, force=False):
     from ..society.population import census as people
     H = tx.rules.hordes
     d = at // DAY
@@ -671,7 +675,7 @@ def _mega_form(tx, rng, at, turn_index, cause):
     hp = _values(tx)["horde_pressure"]
     days = tx.query_one("SELECT COUNT(*) FROM events WHERE type='WORLD_DAY'")[0]
     p = H.mega_daily_chance[diff] * hp / 5 * min(1.0, days / H.mega_ramp_days)
-    if not rng.chance(tx, "hordes", f"mega:{d}", p):
+    if not force and not rng.chance(tx, "hordes", f"mega:{d}", p):
         return None
     ext = [(r[0], sum(a for a, _d in pool(tx, r[0]).values()))
            for r in tx.query("SELECT zone_id FROM zones WHERE kind='exterior' ORDER BY zone_id")]

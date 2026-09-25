@@ -417,11 +417,12 @@ def _god_list(raw):
 
 
 def kill(tx: "Tx", body_id: str, cause: str, at: int, turn_index: int, rng: "Rng", *,
-         cause_event_id: str | None = None) -> Event:
-    """P12 (the cheat /kill; any code that must end a life outright): the DEATH the death test
-    commits — alive 0, dead_at, death_event, awareness 'dead', posture 'lying', payload {body_id,
-    cause, cause_event_id} and the rise that follows for an infected body (DEATH-01..05)."""
-    return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, rng=rng)
+         cause_event_id: str | None = None, extra: dict | None = None) -> Event:
+    """P12 (the cheat /kill, /cure of a risen body; any code that must end a life outright): the
+    DEATH the death test commits — alive 0, dead_at, death_event, awareness 'dead', posture 'lying'
+    (plus ``extra`` columns, e.g. core_intact 0 for a true death), payload {body_id, cause,
+    cause_event_id} and the rise that follows for an infected body (DEATH-01..05)."""
+    return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=extra, rng=rng)
 
 
 def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rng=None):

@@ -122,6 +122,41 @@ def parse(text):
         if not rest:
             return bad()
         args["target" if name == "despawn" else "person"] = " ".join(rest)
+    elif name == "will":
+        if len(rest) < 2:
+            return bad()
+        args.update(person=rest[0], want=" ".join(rest[1:]))
+    elif name == "forget":
+        low = [r.lower() for r in rest]
+        if "about" not in low or low.index("about") in (0, len(rest) - 1):
+            return bad()
+        k = low.index("about")
+        args.update(person=" ".join(rest[:k]), about=" ".join(rest[k + 1:]))
+    elif name == "infect":
+        low = [r.lower() for r in rest]
+        if not rest or low[0] == "with":
+            return bad()
+        if "with" in low:
+            k = low.index("with")
+            if k != len(rest) - 2:
+                return bad()
+            args.update(person=" ".join(rest[:k]), pathway=low[k + 1])
+        else:
+            args["person"] = " ".join(rest)
+    elif name == "cure":
+        if not rest:
+            return bad()
+        args["person"] = " ".join(rest)
+    elif name == "horde":
+        if not rest or not rest[0].isdigit() or not 1 <= int(rest[0]) <= 500:
+            return bad()
+        args["n"] = int(rest[0])
+        if len(rest) > 1:
+            if rest[1].lower() != "at" or len(rest) < 3:
+                return bad()
+            args["place"] = " ".join(rest[2:])
+    elif name in ("mega", "census"):
+        pass
     elif name == "noise":
         if not rest or not rest[0].isdigit() or not 40 <= int(rest[0]) <= 180:
             return bad()
@@ -659,9 +694,6 @@ async def _off(tx, s, a, at, T):
     return True, "deactivated", "", [ev]
 
 
-HANDLERS = {"give": _give, "heal": _heal, "god": _god, "tp": _tp, "set": _set, "time": _time, "weather": _weather,
-            "rep": _rep, "spawn": _spawn, "despawn": _despawn, "kill": _kill, "revive": _revive, "reveal": _reveal,
-            "mind": _mind, "brief": _brief, "noise": _noise, "off": _off}
 
 
 # ------------------------------------------------------------------------------------------ persona
@@ -705,6 +737,14 @@ def activate(session):
 
 
 async def execute(session, command):
+    from .commands import CheatResult
+    try:
+        return await _execute(session, command)
+    except _Refuse as r:                     # found impossible after a write: rolled back, nothing happened
+        return CheatResult(ok=False, persona_line=str(r), detail="")
+
+
+async def _execute(session, command):
     from ..service.session import append_story
     from .commands import HELP_TEXT, SANDBOX_EXEMPT, CheatResult
     store = session.store
@@ -769,3 +809,193 @@ def standing_brief(tx, actor_id, turn_index, at):
                                              object_value=str(n)))
     ev = _ev(tx, "cheats", [], {"standing_brief": actor_id}, at, turn_index)
     return _grant_brief(tx, actor_id, beliefs, ev.event_id, at, turn_index)
+
+
+# ------------------------------------------------------------------------------------------ the owner's additions (P12b)
+def _living_actor(tx, who):
+    r = tx.query_one("SELECT b.alive FROM actors a JOIN bodies b ON b.body_id=a.actor_id WHERE a.actor_id=?", (who,))
+    return r is not None and r[0] == 1
+
+
+async def _will(tx, s, a, at, T):
+    from ..mind import mind as mind_mod
+    who, why = _person(tx, s, a)
+    if who is None:
+        return False, why, "", []
+    if who == s.pc_id:
+        return False, "That one's yours already, Boss.", "", []
+    if not _living_actor(tx, who):
+        return False, f"{_name(tx, who)} has no will left to bend, Boss.", "", []
+    want = a["want"]
+    ev = _ev(tx, "mind.actor", [_W("actors", {"goal_text": want}, "update", {"actor_id": who}),
+                                _W("plans", {"actor_id": who, "goal_text": want, "steps": [], "standing_orders": [],
+                                             "updated_at": at}, "upsert", {"actor_id": who})],
+             {"command": "will", "actor_id": who, "want": want}, at, T)
+    evs = [ev]
+    for lp in tx.query("SELECT loop_id FROM open_loops WHERE holder_id=? AND status='open' AND kind IN ('goal','plan') "
+                       "ORDER BY loop_id", (who,)):
+        evs.append(mind_mod.close_loop(tx, lp[0], "abandoned", ev.event_id, at, T))
+    mind_mod.open_loop(tx, who, "goal", f"I want: {want}", [], 3, ev.event_id, at, T)
+    return True, f"{_name(tx, who)} now wants: {want}", "", evs
+
+
+async def _forget(tx, s, a, at, T):
+    from ..mind import mind as mind_mod
+    who, why = _person(tx, s, a)
+    if who is None:
+        return False, why, "", []
+    if not _living_actor(tx, who):
+        return False, f"{_name(tx, who)} has nothing left to forget, Boss.", "", []
+    subj, why = resolve(tx, s.pc_id, "person", a["about"])
+    if subj is None:
+        subj, why2 = resolve(tx, s.pc_id, "place", a["about"])
+        if subj is None:
+            return False, why, "", []
+    like = f'%"{subj}"%'
+    eps = [r[0] for r in tx.query("SELECT episode_id FROM episodes WHERE holder_id=? AND quarantined=0 AND "
+                                  "(subject_ids LIKE ? OR place_id=?) ORDER BY episode_id", (who, like, subj))]
+    bel = [r[0] for r in tx.query("SELECT h.claim_id FROM claim_holdings h JOIN propositions p ON p.prop_id=h.claim_id "
+                                  "WHERE h.holder_id=? AND h.superseded_by IS NULL AND (p.subject_id=? OR p.object_value=?) "
+                                  "ORDER BY h.claim_id", (who, subj, subj))]
+    loops = [r[0] for r in tx.query("SELECT loop_id FROM open_loops WHERE holder_id=? AND status='open' AND subject_ids LIKE ? "
+                                    "ORDER BY loop_id", (who, like))]
+    ev = _ev(tx, "cheats", [], {"command": "forget", "actor_id": who, "about": subj}, at, T)
+    evs = [ev]
+    if eps:
+        evs.append(_ev(tx, "mind.memory", [_W("episodes", {"quarantined": 1}, "update", {"episode_id": e}) for e in eps],
+                       {"command": "forget", "actor_id": who, "episodes": eps}, at, T))
+    ws = [_W("claim_holdings", {"superseded_by": c}, "update", {"holder_id": who, "claim_id": c}) for c in bel]
+    if tx.query_one("SELECT 1 FROM acquaintance WHERE holder_id=? AND subject_id=?", (who, subj)) is not None:
+        ws.append(_W("acquaintance", {}, "delete", {"holder_id": who, "subject_id": subj}))
+    if ws:
+        evs.append(_ev(tx, "mind.perception", ws, {"command": "forget", "actor_id": who, "beliefs": bel}, at, T))
+    for lp in loops:
+        evs.append(mind_mod.close_loop(tx, lp, "abandoned", ev.event_id, at, T))
+    mind_mod.open_loop(tx, who, "question", "There's a gap in my memory I can't account for.", [], 1, ev.event_id, at, T)
+    return True, (f"{_name(tx, who)} forgot {_name(tx, subj)}: {len(eps)} memories, {len(bel)} beliefs, "
+                  f"{len(loops)} things on their mind"), "", evs
+
+
+async def _infect(tx, s, a, at, T):
+    from ..world import factions
+    who, why = _person(tx, s, a)
+    if who is None:
+        return False, why, "", []
+    alive, kind = _alive(tx, who)
+    if not alive or kind not in ("human", "lurker"):
+        return False, "There's nothing in there left to infect, Boss.", "", []
+    pw = a.get("pathway", "wet")
+    try:
+        rec = tx.canon.find("pathway", pw)
+    except KeyError:
+        return False, f"No strain called '{pw}', Boss.", "", []
+    if tx.query_one("SELECT 1 FROM infections WHERE body_id=? AND pathway=?", (who, pw)) is not None:
+        return False, "Already carrying it, Boss.", "", []
+    ev = _ev(tx, "cheats", [], {"command": "infect", "body_id": who, "pathway": pw}, at, T)
+    ev2 = _ev(tx, "physical.bodies", [_W("infections", {"body_id": who, "pathway": pw, "exposed_at": at,
+                                                         "stage": rec.stages[0].name, "cause_event": ev.event_id,
+                                                         "known_to_self": 0}, "insert")],
+              {"command": "infect", "body_id": who, "pathway": pw}, at, T, target_ids=[who], cause_event_id=ev.event_id)
+    where = ""
+    for g in tx.query("SELECT group_id FROM group_members WHERE actor_id=? ORDER BY group_id", (who,)):
+        if factions.in_session(tx, g[0], at) is not None:
+            where = " — in the middle of the council's meeting"
+            break
+    return True, f"{_name(tx, who)} carries the {pw} strain now{where}", "", [ev, ev2]
+
+
+def _risen_from(tx, who):
+    r = tx.query_one("SELECT body_id FROM infected_state WHERE risen_from=? ORDER BY body_id LIMIT 1", (who,))
+    return None if r is None else r[0]
+
+
+async def _cure(tx, s, a, at, T):
+    from ..physical import bodies
+    who, why = _person(tx, s, a)
+    if who is None:
+        return False, why, "", []
+    alive, kind = _alive(tx, who)
+    if not alive:
+        risen = _risen_from(tx, who)
+        if risen is None or not _alive(tx, risen)[0]:
+            return False, "Dead and staying dead, Boss. Nothing to cure.", "", []
+        ev = bodies.kill(tx, risen, "cured", at, T, s.rng, extra={"core_intact": 0})
+        return True, f"cured what {_name(tx, who)} became: it dies at once", "", [ev]
+    rows = [r[0] for r in tx.query("SELECT pathway FROM infections WHERE body_id=? ORDER BY pathway", (who,))]
+    if not rows:
+        return False, "Nothing in them to cure, Boss.", "", []
+    ev = _ev(tx, "physical.bodies", [_W("infections", {}, "delete", {"body_id": who, "pathway": p}) for p in rows],
+             {"command": "cure", "body_id": who, "pathways": rows}, at, T, target_ids=[who])
+    return True, f"cured {_name(tx, who)} of {', '.join(rows)}", "", [ev]
+
+
+async def _horde(tx, s, a, at, T):
+    from ..world import hordes
+    if "place" in a:
+        place, why = resolve(tx, s.pc_id, "place", a["place"])
+        if place is None:
+            return False, why, "", []
+    else:
+        place = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (s.pc_id,))[0]
+    zone = tx.query_one("SELECT zone_id FROM places WHERE place_id=?", (place,))[0]
+    pool = hordes.pool(tx, zone) if zone else {}
+    comp, left = {}, a["n"]
+    for tid, (act, _dorm) in sorted(pool.items(), key=lambda kv: (-kv[1][0], kv[0])):
+        k = min(act, left)
+        if k > 0:
+            comp[tid] = k
+            left -= k
+    if not comp:
+        return False, "No dead to call up around there, Boss.", "", []
+    ev = _ev(tx, "cheats", [], {"command": "horde", "place_id": place, "composition": comp}, at, T)
+    try:
+        hid = hordes.form(tx, "drawn", zone, comp, place, at, T, ev.event_id)
+    except ValueError as e:
+        raise _Refuse(f"They won't come, Boss: {e}.") from e
+    return True, f"{sum(comp.values())} of the dead gathered, heading for {_name(tx, place)}", "", [ev], hid
+
+
+async def _mega(tx, s, a, at, T):
+    from ..world import hordes
+    if tx.query_one("SELECT 1 FROM hordes WHERE kind='mega' AND status != 'gone'") is not None:
+        return False, "One's already coming, Boss. Patience.", "", []
+    ev = _ev(tx, "cheats", [], {"command": "mega"}, at, T)
+    hid = hordes.mega(tx, s.rng, at, T, ev.event_id)
+    if hid is None:
+        raise _Refuse("There aren't enough dead out there to make one, Boss.")
+    return True, "the Mega Horde has set out", "", [ev]
+
+
+async def _census(tx, s, a, at, T):
+    from ..society import population
+    from ..world import hordes
+    c = hordes.census(tx)
+    lines = [f"The dead: {c['total']} — {c['bodies']} walking about, {sum(h['count'] for h in c['hordes'])} in "
+             f"{len(c['hordes'])} hordes, the rest in the districts."]
+    for zid, types in sorted(c["pools"].items()):
+        act = sum(v[0] for v in types.values())
+        dorm = sum(v[1] for v in types.values())
+        lines.append(f"  {_zone_name(tx, zid)}: {act} on their feet, {dorm} still")
+    for h in c["hordes"]:
+        lines.append(f"  Horde {h['horde_id']} ({h['kind']}): {h['count']} at {_name(tx, h['place_id'])}, {h['status']}")
+    for st in tx.query("SELECT settlement_id, name FROM settlements ORDER BY settlement_id"):
+        cs = population.census(tx, st[0])
+        lines.append(f"The living at {st[1]}: {cs.total} ({len(cs.named)} named)")
+    return True, f"counted {c['total']} dead", "\n".join(lines), []
+
+
+def _zone_name(tx, zid):
+    r = tx.query_one("SELECT name FROM zones WHERE zone_id=?", (zid,))
+    return r[0] if r else zid
+
+
+class _Refuse(Exception):
+    """A command that turned out not to be possible after something was written: the transaction
+    is rolled back and the persona line says why."""
+
+
+HANDLERS = {"give": _give, "heal": _heal, "god": _god, "tp": _tp, "set": _set, "time": _time, "weather": _weather,
+            "rep": _rep, "spawn": _spawn, "despawn": _despawn, "kill": _kill, "revive": _revive, "reveal": _reveal,
+            "mind": _mind, "brief": _brief, "noise": _noise, "off": _off,
+            "will": _will, "forget": _forget, "infect": _infect, "cure": _cure, "horde": _horde, "mega": _mega,
+            "census": _census}

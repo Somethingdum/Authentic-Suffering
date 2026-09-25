@@ -106,6 +106,18 @@ line (§5) and a plain detail line.
 | `/brief <person>` | Puts the current truth about your place, the people present and the known factions into that person's head as beliefs | `/brief Fredrick` |
 | `/noise <db> [here\|at <anchor>]` | A sound of that loudness (40–180 dB). The dead remember gunfire-level noise | `/noise 160` · `/noise 90 at "back door"` |
 
+### 3a. The owner's additions (D-78, D-101)
+
+| Command | Does | Example |
+|---|---|---|
+| `/will <person> "<what they now want>"` | Overwrites a person's will: that is what they want now, as their own — their old goals and plans are dropped. Others notice only what they then do. Never your own character | `/will Mara "get out of the city tonight"` |
+| `/forget <person> about <person or place>` | Cuts someone or somewhere out of a person's memory: those memories are sealed away, those beliefs go, they no longer know the name, and what they meant to do about it is dropped. What is left is a gap they can't account for | `/forget June about Mara` |
+| `/infect <person> [with <strain>]` | Gives a person the strain (default: wet) wherever they are — a council in the middle of its meeting included | `/infect "the Top-Hat" with wet` |
+| `/cure <person>` | Cures anyone who is not fully undead. On one that has already risen, the cure takes the infection and the body dies at once. The world itself still has no cure | `/cure Nita` |
+| `/horde <n> [at <place>]` | Calls up to n of a district's own dead into a crowd heading for that place (default: yours) | `/horde 40` |
+| `/mega` | Sends the Mega Horde now | `/mega` |
+| `/census` | Counts the dead (walking, in hordes, in the districts) and the living in each settlement | `/census` |
+
 What the commands cannot do (CHEAT-07):
 
 - rewrite the past — the event log is append-only; `/kill` and `/revive` are new events;
@@ -155,6 +167,13 @@ or the laptop is off, a canned line is used — never the same canned line twice
 | `/mind` | "Peeking inside. Wipe your feet." · "Here's what's rattling around in there." |
 | `/brief` | "Briefed. They now know what you'd have to be a god to know." · "Knowledge injected. They'll think they worked it out themselves." |
 | `/noise` | "Made a racket. Hope that was the plan." · "Loud enough? Everything nearby agrees it was." |
+| `/will` | "Will rewritten. They'll swear it was their idea." · "New want installed. The old one's in the bin." |
+| `/forget` | "Snipped. There's a hole where that used to be." · "Gone from their head. The world still remembers." |
+| `/infect` | "Delivered. They won't feel it for a while." · "One more for the strain. Nobody saw a thing." |
+| `/cure` | "Clean. Don't tell the lore." · "Cured. Nature's keeping the receipt." |
+| `/horde` | "They're coming, Boss. Lots of them." · "Crowd called. Try to be somewhere else." |
+| `/mega` | "The big one's on the road. You asked for this." · "End of days, on schedule. Yours." |
+| `/census` | "Heads counted. Living and otherwise." · "Here's the tally. Don't do the maths out loud." |
 
 The machine copy of this table is `cheats/commands.py::CANNED_LINES`; the two must match (a test
 compares them).

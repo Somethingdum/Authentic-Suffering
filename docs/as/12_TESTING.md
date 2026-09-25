@@ -284,7 +284,7 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `test_portrayal.py` | a blow is judged before it lands by a call that did not make it; out of character, she decides once more with the reasons and what she then decides stands; a second misfit stands and is logged; no second asking once the repair is spent; the rest are judged after the fact and leave a note in her next prompt |
 | `test_eval_ablation.py` | an ablated call never reaches the model; switching off writeback is measured (memory jobs fail, the world goes on); a call whose ablation changes nothing is named for removal |
 
-### 3.18 The cheat console (P12a; D-100)
+### 3.18 The cheat console (P12a, P12b; D-100, D-101)
 
 `p12_surfaces/conftest.py` makes both kits importable (P7 slice_kit, P8 protocol_kit) and gives a
 GameService on the fake model, the metal_fence run on disk, and the night with a session whose
@@ -295,6 +295,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `test_cheat_console.py` | the word is a standalone number; waking it consumes the line and marks nothing; every command is on the record and makes the run a Sandbox for good (/off is not logged); heal and god mode (per body); tp (not a MOVE), set, time, weather, rep; unknown names change nothing; spawn (infected and Fredrick, quarantined, an ally), the retired camper van, despawn only what the console made; kill and revive cure nothing; reveal and mind stay in the console, brief goes through perception; noise; canned persona lines never repeat; the hard line refuses and logs; cheat packs are not in a run |
 | `test_cheat_protocol.py` | the word in any box, commands and parse errors through the GameService; before the word a '/' line is only words; a cheat question gets the world back, after the word nothing is hidden; a dead character can be revived; Fredrick is briefed the turn he thinks and nobody else learns anything; what the console says reaches no model call |
 | `test_cheat_twin.py` | CHEAT-02: a Sandbox twin with Fredrick and a crate of ammunition, run a day beside the clean night, holds the same world once the cheat-made things are left out |
+| `test_cheat_owner.py` | the owner's commands: a will overwritten (never the player's); a memory cut out (sealed, beliefs retired, the name gone, a gap left); the strain put in a council member mid-meeting, then cured; the cure kills what rose; a horde from its own district (the count holds), the Mega Horde sent early (only one at a time), the census in the console only |
 | `test_cheat_secrecy.py` | CHEAT-03: no actor or narrator prompt and no play screen knows the word, the voice or a command; CHEAT-09: CANNED_LINES is CHEATS.md §5 |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)

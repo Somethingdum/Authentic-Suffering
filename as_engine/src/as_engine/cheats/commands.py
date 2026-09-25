@@ -121,6 +121,42 @@ async execute(session, command) -> CheatResult   (CHEAT-04..08)
     anchor of its place named by 'at' (resolved like a name)}.
   off: CHEAT_DEACTIVATED (writer 'kernel.meta') setting cheat_active '0'; the line is
     DEACTIVATION_LINE; the Sandbox mark stays.
+  The owner's additions (P12b; D-78, docs/as/CHEATS.md §3a). A command found impossible after it
+  wrote something raises inside the transaction: everything is rolled back and the line says why.
+  will <person> "<want>": never the PC ("That one's yours already, Boss."), a living actor ->
+    CHEAT_OVERRIDE (mind.actor) setting actors.goal_text = want and UPSERTing plans {goal_text: want,
+    steps [], standing_orders [], updated_at}; its open 'goal' / 'plan' loops close 'abandoned'
+    (mind.mind.close_loop); a new open loop 'goal' f"I want: {want}" strength 3 (mind.mind.open_loop)
+    — it wants it now, as its own. Others notice only what it then does.
+    parse: {person: the first token, want: the rest}.
+  forget <person> about <person or place>: a living actor forgets someone or somewhere (the subject
+    resolves as a person, else as a place): a CHEAT_OVERRIDE (writer 'cheats') cause; its episodes
+    not yet quarantined whose subject_ids hold the subject or whose place is it -> quarantined 1
+    (mind.memory: kept as evidence, never reached again, MEM-18); its live holdings whose
+    proposition's subject_id or object_value is the subject -> superseded by themselves (mind.
+    perception: no longer believed-live, never deleted, W15); its acquaintance row toward the
+    subject deleted; its open loops naming the subject close 'abandoned'; and a new open loop
+    'question' "There's a gap in my memory I can't account for." strength 1 — what a reflection can
+    make of the gap. Outcome counts the memories, beliefs and loops. parse: {person, about} split at
+    the word 'about'.
+  infect <person> [with <strain>]: a living human or lurker, the pathway (default 'wet'; canon
+    'pathway' by bare id) it does not already carry -> a CHEAT_OVERRIDE (writer 'cheats') cause, then
+    an infections row {exposed_at at, stage = the pathway's first stage, cause_event = that cause,
+    known_to_self 0} (physical.bodies) — wherever they are; when one of its groups is in session
+    (world.factions.in_session) the outcome says " — in the middle of the council's meeting".
+  cure <person> (D-78: anyone not fully undead): a living body with infections -> every infections
+    row deleted (physical.bodies); a dead person whose risen body (infected_state.risen_from) still
+    walks -> that body dies at once (physical.bodies.kill, cause 'cured', core_intact 0); nothing
+    to cure -> "Nothing in them to cure, Boss." (a dead body with no risen one: "Dead and staying
+    dead, Boss. Nothing to cure.").
+  horde <n 1..500> [at <place>]: the place (default the PC's) and its zone; up to n of that zone's
+    ACTIVE dead, by type in (active desc, type id) order -> world.hordes.form(tx, 'drawn', zone,
+    that composition, the place, at, T, a CHEAT_OVERRIDE cause) — the district's own dead (HRD-15
+    holds); none -> "No dead to call up around there, Boss."
+  mega: world.hordes.mega(tx, rng, at, T, a CHEAT_OVERRIDE cause) (HRD-12 without the day's chance);
+    one already walking -> "One's already coming, Boss. Patience."; none possible -> refused.
+  census: detail = the dead by world.hordes.census (total, walking, in hordes; each district's
+    standing and still; each horde) and the living by society.population.census per settlement.
 brief_beliefs(tx, holder, place) -> list[BeliefFromPercept]: for each living body in the place but
   the holder (by body_id): ('body', id, 'location', f"{name} is here, in {place name}.", place)
   and, when it has a goal, ('body', id, 'wants', f"{name} wants: {goal}"); for each faction group
@@ -159,7 +195,8 @@ from ..contracts.common import SkillDomain
 ACTIVATION_RE = re.compile(r"(?<!\d)2508(?!\d)")
 
 CommandName = Literal["help", "off", "give", "heal", "god", "tp", "set", "time", "weather", "rep",
-                      "spawn", "despawn", "kill", "revive", "reveal", "mind", "brief", "noise"]
+                      "spawn", "despawn", "kill", "revive", "reveal", "mind", "brief", "noise",
+                      "will", "forget", "infect", "cure", "horde", "mega", "census"]
 
 SANDBOX_EXEMPT: frozenset[str] = frozenset({"help", "off"})
 
@@ -173,14 +210,20 @@ USAGE: dict[str, str] = {
     "spawn": "/spawn <what> [x<n>] [ally]", "despawn": "/despawn <person or item>", "kill": "/kill <person>",
     "revive": "/revive <person>", "reveal": "/reveal", "mind": "/mind <person>", "brief": "/brief <person>",
     "noise": "/noise <db> [here|at <anchor>]",
+    "will": '/will <person> "<what they now want>"', "forget": "/forget <person> about <person or place>",
+    "infect": "/infect <person> [with <strain>]", "cure": "/cure <person>", "horde": "/horde <n> [at <place>]",
+    "mega": "/mega", "census": "/census",
 }
 HELP_TEXT = ("The keyring, Boss:\n" + "\n".join(USAGE[c] for c in ("give", "heal", "god", "tp", "set", "time", "weather",
                                                                    "rep", "spawn", "despawn", "kill", "revive", "reveal",
-                                                                   "mind", "brief", "noise", "off")))
+                                                                   "mind", "brief", "noise", "will", "forget",
+                                                                   "infect", "cure", "horde", "mega", "census",
+                                                                   "off")))
 
 COMMAND_NAMES: tuple[str, ...] = ("help", "off", "give", "heal", "god", "tp", "set", "time", "weather",
                                   "rep", "spawn", "despawn", "kill", "revive", "reveal", "mind",
-                                  "brief", "noise")
+                                  "brief", "noise", "will", "forget", "infect", "cure", "horde", "mega",
+                                  "census")
 
 ACTIVATION_LINE = ("Alright, alright, settle down. 'Mr. Cheater Man' reporting for duty, Boss. Systems "
                    "unlocked, safeties vaporized. You now wield the digital thunder. What reality shall "
@@ -230,6 +273,20 @@ CANNED_LINES: dict[str, tuple[str, str]] = {
               "Knowledge injected. They'll think they worked it out themselves."),
     "noise": ("Made a racket. Hope that was the plan.",
               "Loud enough? Everything nearby agrees it was."),
+    "will": ("Will rewritten. They'll swear it was their idea.",
+             "New want installed. The old one's in the bin."),
+    "forget": ("Snipped. There's a hole where that used to be.",
+               "Gone from their head. The world still remembers."),
+    "infect": ("Delivered. They won't feel it for a while.",
+               "One more for the strain. Nobody saw a thing."),
+    "cure": ("Clean. Don't tell the lore.",
+             "Cured. Nature's keeping the receipt."),
+    "horde": ("They're coming, Boss. Lots of them.",
+              "Crowd called. Try to be somewhere else."),
+    "mega": ("The big one's on the road. You asked for this.",
+             "End of days, on schedule. Yours."),
+    "census": ("Heads counted. Living and otherwise.",
+               "Here's the tally. Don't do the maths out loud."),
     "off": (DEACTIVATION_LINE, DEACTIVATION_LINE),
 }
 
