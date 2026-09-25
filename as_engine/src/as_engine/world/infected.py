@@ -22,8 +22,9 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     takes no steps); the dead that RISE are this module's (rise).
   INF-05 An infected never targets an infected body.
   INF-06 A body with a 'lurker_deep' infections row past its first stage is never a target.
-  INF-07 A body with a 'wet' infection at least R.wet_ignore_after_h hours old is not SEEN as prey
-    (sound still draws infected to where it is).
+  INF-07 A body with a 'wet' infection at least R.wet_ignore_after_h hours old draws less of their
+    eye, not none (W1, D-77; CODEX §5): it is SEEN as prey only within half the type's
+    vision_range_m (sound still draws infected to where it is).
   INF-08 Quirks are seeded per body (seed_quirks, stream 'quirks'): the same seed gives the same
     quirks to the same body.
   INF-09 Noise steers: a sound above a body's threshold makes it walk toward the sound's place
@@ -102,7 +103,8 @@ threshold(store, body_id) -> float; speed(store, body_id) -> float: the type's s
   state's speed_mult (0 when dormant).
 sees(store, body_id, target_id, at) -> bool   (INF-02, INF-05..07, INF-14)
   False unless the target is a living body whose awareness is not 'unconscious' (a sleeper lies in
-  plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-07 / INF-14.
+  plain view) in the same place, not of kind 'infected', not excluded by INF-06 / INF-14, and — a
+  week-three wet host (INF-07) — within half the type's vision range.
   Then the type's senses: distance (straight line, physical.space.point_distance) <= vision_range_m and
   vision_mode 'motion_contrast' -> the target moved in (at - R.motion_window_s s, at]: a MOVE with
   actor_id = the target, or an ACTION_START with actor_id = the target whose payload verb is not in

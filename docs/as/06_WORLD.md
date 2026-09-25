@@ -457,6 +457,20 @@ character, whose hands stay the player's). The fourth week kills; the host rises
 Pathways: air (everyone; behavioural), wet (bite, saliva), cold start (the unbitten dead), lurker
 deep (slash and leave; timeline `proposed` until the owner confirms it). **No cure.**
 
+**As the owner told it (W1, D-77, D-80).** From day three EVERY fluid of a host carries the strain —
+blood, saliva, mucus — and the dead's fluids too (`physical.bodies.contagious`): whoever treats a
+host's wound has their blood on the hands (`fluid_contact`), a blow that opens one up splashes it
+into the attacker's eyes and mouth (`fluid_splash`), food a host ate from carries it like a bottle.
+The urge is not to share but to **contaminate**: to spit into water and food, and into the mouths of
+people asleep (`mouth_contact_direct`) — sleeper first, then handing over what their mouth touched,
+then spitting into water or food at hand. In the second week it only wants to (an 'urge' on record;
+holding back drains Resolve); from the third it happens, code-owned, and the host is sickened by
+what it did (stress, `self_disgust`); and it comes ever more often — the gap shrinks with the hours
+(10 minutes at two weeks, 5 at four, never under 2). The player's character is not exempt any more:
+what you type mostly happens, but from the third week a share of your actions (1 in 5, then 2 in
+5) comes out as the urge instead, and the story says it was not your choice. The dead pay a
+week-three host less mind, not none: they see it only within half their range (INF-07).
+
 ## 6. Information spread (P9 rumours; the other channels as noted)
 
 Channels: exact witness · partial witness · overhearing · failed overhearing (P3–P5 perception) ·

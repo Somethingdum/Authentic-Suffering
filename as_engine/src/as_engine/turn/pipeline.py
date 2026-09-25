@@ -86,7 +86,8 @@ simulate — stages 0-12 in ONE store transaction:
     S5 afford: affs = {a: enumerate_affordances(tx, a, canon affordances, wave_at, T) for a in
        plan.lod}.
     S6 cognition: intents = await turn.cognition.decide(tx, session, plan, affs, T, wave_at,
-       reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = pc_intent (the PC's intent goes through the
+       reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = (W1, D-80)
+       turn.cognition.urge_pc(tx, rng, pc, pc_intent, T, wave_at) (the PC's intent goes through the
        same barrier and resolver as everyone's, L12). asks = {a: turn.cognition.asks_for(tx, a, T,
        answered) for a in sorted(intents)}.
     S7 barrier: action.intent.barrier(tx, [intents[a] for a in sorted(intents)]).

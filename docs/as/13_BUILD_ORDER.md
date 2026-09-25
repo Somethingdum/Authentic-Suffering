@@ -143,6 +143,17 @@ machine yet, so start here, not at P0 task 1:
      dead within the window), `attract`'s busy rule, `rise`'s devoured rule
      (`world/_impl_p10.py`); the feeding bite in `action/_impl_effects.py` (FEED_ANATOMY, the
      count, the escalation, the scream, the draw, the taint) — `p10_world/test_feeding.py`.
+   The owner's wet strain (W1: every fluid, the urge to contaminate, the player's hand; D-77, D-80;
+   06 §5.4) the same way:
+   - P4: `mind/_impl_affordance.py` — a def with `requires.reflex_only` is never enumerated (until it
+     is in, the compulsion's spit defs sit on every menu; `p10_world/test_wet_fluids.py` pins it).
+   - P5: the `spit` handler in `action/_impl_effects.py` (`test_effects.py`'s handler coverage needs
+     it; what it does is pinned in `p10_world/test_wet_fluids.py`).
+   - P10: `physical/bodies.contagious`; treat_wound's `fluid_contact` and the melee `fluid_splash` in
+     `action/_impl_effects.py`; decide step 3 rewritten and `urge_pc` (`turn/_impl_cognition.py`),
+     the pipeline's S6 line (`turn/_impl_pipeline.py`), `URGE_LINE` in the narrator's pc_state_lines
+     (`narration/_impl_narrator.py`); INF-07's half range in `world/_impl_p10.py` (sees) —
+     `p10_world/test_wet_fluids.py`, `test_wet_strain.py`, `test_infected.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.

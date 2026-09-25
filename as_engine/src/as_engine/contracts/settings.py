@@ -162,6 +162,7 @@ class ResolveRules(Strict):
         "witness_bonded_death": 2, "sustained_fear_scene": 1, "humiliated_publicly": 1, "severe_pain": 1,
         "betrayed": 2, "first_kill": 1, "killed_child": 3, "starving_day": 1, "sleepless_night": 1,
         "lost_dependent": 3, "made_to_watch": 2, "coerced": 1, "held_temper": 1,
+        "self_disgust": 1, "resisting_urge": 1,
     })
     recover_per_safe_night: int = 1
     recover_fulfilled_obligation: int = 1
@@ -289,6 +290,10 @@ class InfectedRules(Strict):
     saliva_hours: float = 12.0     # [SAND] a spreader's mouth on a bottle stays infective this long
     sign_range_m: float = 3.0      # a host's stage signs (fever, spreader signs, a bite) are seen this close
     compulsion_cooldown_min: int = 10   # a week-3 spreader's involuntary offer, at most once per this
+    # W1 (D-77): the urge grows without limit — the gap shrinks as the hours go by (turn.cognition step 3)
+    compulsion_min_gap_min: float = 2.0  # [SAND] never more often than this
+    pc_urge_share: dict[str, float] = Field(default_factory=lambda: {   # [SAND] D-80: how often the player's
+        "living_spreader_week3": 0.2, "terminal_kill_phase_week4": 0.4})  # action comes out as the urge instead
     # F1b gore camouflage (INF-14): a living body caked in gore moves among them as one of them
     gore_mask_min: int = 4         # [SAND] bodies.gore at or above this masks the living
     mask_window_s: int = 30        # [SAND] giving yourself away is remembered this long

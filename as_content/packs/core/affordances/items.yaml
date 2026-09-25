@@ -178,3 +178,29 @@
   noise_db: 30
   effect: butcher
   tags: [food, work]
+# W1 (D-77): the wet strain's compulsion — never on a menu (reflex_only); turn.cognition builds them.
+- schema: as.affordance.v1
+  id: spit_into
+  verb: manipulate
+  label: "Spit into {item}"
+  ui_label: "Spit into the {item}"
+  binds: none
+  range: self
+  requires: {reflex_only: true}
+  duration: {base_s: 2}
+  noise_db: 10
+  effect: spit
+  tags: [compulsion]
+- schema: as.affordance.v1
+  id: spit_in_mouth
+  verb: manipulate
+  label: "Spit into {target}'s mouth"
+  ui_label: "Spit into {target}'s mouth"
+  binds: body
+  range: touch
+  requires: {reflex_only: true, target_kinds: [human]}
+  duration: {base_s: 3}
+  noise_db: 5
+  effect: spit
+  tags: [compulsion]
+

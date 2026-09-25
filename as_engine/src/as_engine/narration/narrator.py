@@ -39,7 +39,9 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    physical.bodies.effective_bleed > 0 + '.'; then, when impairment > 0,
                    f"{pc} is {location.impairment_word(impairment)}."; then (P10) the non-empty
                    ``felt`` sentence of each stage physical.bodies.stages(pc) returns, in pathway
-                   order (second person, as written: the prose puts it in the PC's body).
+                   order (second person, as written: the prose puts it in the PC's body); then (W1,
+                   D-80) when an INVOLUNTARY of the PC with payload kind 'compulsion' was committed
+                   this turn: URGE_LINE ("Your body did it before you could stop it.").
   comprehension    'low' when attr_mod(P) + attr_mod(I) <= 4, 'high' when >= 8, else 'average'
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of
@@ -99,6 +101,7 @@ if TYPE_CHECKING:
     from ..kernel.store import Tx
     from ..lanes.client import LaneClient
 
+URGE_LINE = "Your body did it before you could stop it."   # W1 (D-80): pc_state_lines
 CHANNEL_KIND: dict[str, str] = {"visual": "sight", "auditory": "sound", "speech": "speech", "tactile": "touch",
                                 "olfactory": "smell", "vibration": "sound"}
 BAND_TEXT: dict[str, str] = {"clean": "It goes cleanly.", "cost": "It works, at a cost.", "fail": "It doesn't work.",

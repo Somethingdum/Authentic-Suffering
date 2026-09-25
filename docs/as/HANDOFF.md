@@ -68,6 +68,11 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   devoured never rise, nothing draws a feeder off; six animals as prey (never infected); lasting
   taint in water near a feeding and in meat from what they fed on; butchering; witness stress; the
   narrator writes it without looking away, and never a child's body.
+- **The wet strain as the owner told it. W1 is SPECIFIED** (D-77, D-80; 06 §5.4; tests 12 §3.8): every
+  fluid from day three, and the dead's; blood on the hands that treat, blood in the eyes from a blow;
+  the urge to contaminate (a sleeper's mouth, the bottle handed over, water and food spat into) that
+  grows ever more often and sickens the host; the player's hand taken now and then from week three,
+  and the story says so; week-three hosts seen by the dead at half range.
 - **Group dynamics with weight** (step 6 expanded): witnessed grave harm (scaled by what was seen: unarmed,
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own
@@ -75,8 +80,7 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   answer with Authentic Suffering, never a lecture.
 - **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
   group talk, distinct voices.
-- **The wet strain corrections** (D-77, D-80) and **Willis / the cheat cure** (D-78, D-79) — with P12's
-  cheat system.
+- **Willis / the cheat cure** (D-78, D-79) — with P12's cheat system.
 
 Known fault for step 6 (B6): CAS-012 (a witnessed theft becomes a rumour) can never fire — an
 ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a contract change.

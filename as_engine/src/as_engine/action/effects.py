@@ -174,7 +174,10 @@ Per effect (result strings in quotes; 'done' unless noted):
                      world.infected.feed(tx, attacker,
                      land_at, the HARM id, turn_index), world.infected.taint_water(tx, target,
                      attacker, land_at, the HARM id, turn_index), the attacker's NOISE as before;
-                     'hit'. BREAK (attacker lost):
+                     'hit'. W1 (D-77): any other melee wound of severity 'significant' or worse
+                     landed on a contagious body (physical.bodies.contagious) -> bodies.expose(tx,
+                     rng, attacker, 'wet', 'fluid_splash', land_at, the HARM id, turn_index): their
+                     blood in your eyes and mouth. BREAK (attacker lost):
                      the attacker's posture becomes 'crouched' ('stumbled').
   grapple            opposed S + brawling vs target A + brawling; attacker wins -> grip_event.
                      'grabbed' / 'slipped'.
@@ -214,7 +217,11 @@ Per effect (result strings in quotes; 'done' unless noted):
                      (FAIL and BREAK 'no_progress': medicine failures cost time, not blood).
                      The wound must be unhealed and its body within touch ('out_of_reach').
                      Medical items are not used up in P5 (P9 adds wear).
-  apply_tourniquet   bodies.treat(..., 'tourniquet').
+                     W1 (D-77): when the wound's body is not the actor and is contagious
+                     (physical.bodies.contagious) and the treatment went on (a TREATMENT was
+                     committed) -> bodies.expose(tx, rng, actor, 'wet', 'fluid_contact', land_at,
+                     the TREATMENT id, turn_index): a host's blood on the hands that stop it.
+  apply_tourniquet   bodies.treat(..., 'tourniquet'); W1 as treat_wound.
   eat / drink        objects.destroy(item, qty=1) (cause = the start event), then
                      bodies.refresh_need(actor, 'hunger' | 'thirst'); result 'ate' / 'drank'.
                      P10, drink is mouth contact (lore §3.2), BEFORE the destroy: c =
@@ -242,6 +249,14 @@ Per effect (result strings in quotes; 'done' unless noted):
                      the actor of the first such bite's cause event, land_at, the start event,
                      turn_index, lasting=True) — it looks and smells like any meat; result
                      'butchered'.
+  spit               (W1, D-77 — the wet strain's compulsion; defs tagged 'compulsion' are
+                     reflex_only: never on a menu, built by turn.cognition step 3). spit_into: the
+                     bound item (water or food) must still be in the actor's hand or lying loose
+                     within touch — objects.contaminate(tx, item, 'wet', actor, land_at, the start
+                     event, turn_index) (a passing mark: saliva). spit_in_mouth: the target must be
+                     asleep and within touch — bodies.expose(tx, rng, target, 'wet',
+                     'mouth_contact_direct', land_at, the start event, turn_index). Otherwise
+                     'missed'; result 'spat'. Quiet (the def's noise_db).
   throw_distraction  objects.transfer to the destination anchor; NOISE 70 dB 'something clattering'
                      at the LANDING POINT (not the thrower).
 
@@ -301,7 +316,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "grapple", "break_grip", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
-    "throw_distraction", "shove_toward", "butcher",
+    "throw_distraction", "shove_toward", "butcher", "spit",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -328,6 +343,8 @@ SEEN: dict[str, str | None] = {
     "infected_grab": "lunges and grabs at {target}",
     "infected_bite": "sinks its teeth into {target}",
     "butcher_carcass": "cuts into {target} with a knife",
+    "spit_into": "leans low over {item}",
+    "spit_in_mouth": "bends over {target}'s sleeping face",
     "break_grip": "twists against {target}'s grip",
     "shove": "shoves {target}",
     "disarm": "grabs for {target}'s weapon",

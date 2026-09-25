@@ -193,6 +193,14 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p07_slice/test_narration_horror.py` | the narrator does not look away from the dead feeding, never describes a child's body, and the perceived-only rules still come first |
 | `p10_world/test_feeding.py` | once it has you it does not let go, overfed or not; never the head or the neck, first deep then torn; he screams and the rest of them come; busy eating it is not drawn off; they stay on what they killed, then leave it; the devoured do not rise; a dog is prey, never infected, never risen; expose takes only people; what comes out of them fouls the water near it for good, a passing mark still dries; every bite seen wears you down (INF-15..19, CAS-024) |
 
+### 3.8 The wet strain as the owner told it (W1; D-77, D-80)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_wet_fluids.py` | from day three everything that comes out of a host carries it, and the dead's fluids too; blood on the hands that stop it; their blood in your eyes from a blow that opens them (a nick splashes nothing), a clean man's blood nothing; the sleeper first, and what it does to a sleeper (never to someone awake); nothing else at hand, the food on the table; the urge comes ever more often; the host is sickened by it; what the player types mostly happens, now and then the urge instead, and the story says so; week two the player only feels it; the urge is never on a menu |
+| `p10_world/test_wet_strain.py` (amended) | week two only wants to — an urge on record and Resolve spent holding back; alone with a bottle, a host fouls its own water |
+| `p10_world/test_infected.py` (amended) | INF-07: a week-three host is seen within half the range, not beyond |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

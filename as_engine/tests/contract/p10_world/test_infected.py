@@ -271,9 +271,9 @@ def test_the_dead_coming_near_are_news(scenario):
 
 
 def test_the_infected_leave_their_own_alone(scenario):
-    """INF-06: a Lurker-to-be past its first stage is never a target, by sight or by sound. INF-07:
-    a wet host R.wet_ignore_after_h into it is not seen as prey — but a sound it makes still draws
-    them to where it is."""
+    """INF-06: a Lurker-to-be past its first stage is never a target, by sight or by sound. INF-07
+    (W1): a wet host R.wet_ignore_after_h into it is seen as prey only within half the type's
+    range — and a sound it makes still draws them to where it is."""
     w = stage(scenario, keep=("pc", "mara"))
     put(w, "pc", "sales_floor", 6.0, 4.0)
     put(w, "mara", "sales_floor", 8.0, 4.0)
@@ -293,7 +293,9 @@ def test_the_infected_leave_their_own_alone(scenario):
         assert infected.attract(tx, run, w.id("pc"), now(w), None, 0, reason="noise") is None
     R = w.store.rules.infected
     infect(w, "mara", "wet", "living_spreader_week3", hours_ago=R.wet_ignore_after_h)
-    assert not infected.sees(w.store, run, w.id("mara"), now(w)), "INF-07"
+    assert infected.sees(w.store, run, w.id("mara"), now(w)), "INF-07 (W1): less of their eye, not none — 4 m of 12"
+    put(w, "mara", "sales_floor", 4.0, 4.0)
+    assert not infected.sees(w.store, run, w.id("mara"), now(w)), "INF-07: 8 m is past half a Runner's 12"
     with w.store.transaction() as tx:
         ev = infected.attract(tx, run, w.id("mara"), now(w), None, 0, reason="noise")
     assert ev is not None and ev.payload["target_kind"] == "body", "a sound still draws them"

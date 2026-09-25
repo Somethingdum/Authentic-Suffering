@@ -148,6 +148,9 @@ class AffordanceRequires(Strict):
     actor_kinds: list[str] | None = Field(default=None, description="Body kinds that may attempt this (physical gate), e.g. ['infected'] for bite; None = any kind that has hands for the option.")
     can_run: bool = Field(default=False, description="H1: the actor must be able to run (physical.bodies capacity "
                           "can_run: no leg or foot wound that hobbles it).")
+    reflex_only: bool = Field(default=False, description="W1: never offered on a menu (mind.affordance drops it "
+                              "before the gates); only code builds it — the wet strain's compulsion (turn.cognition "
+                              "step 3).")
     infected_within_m: float | None = Field(default=None, gt=0, description="H1: offered only while the actor sees "
                                             "one of the dead (a visual percept this turn, clear or partial, of an "
                                             "infected body) within this many metres of it.")

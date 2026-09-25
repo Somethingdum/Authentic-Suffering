@@ -149,6 +149,11 @@ rise(tx, corpse_id, type_id, at, cause_event_id, turn_index) -> str   (world.inf
   cause_event_id, looks = looks_of(corpse) (F1a: the face people knew)) — the corpse stays a dead
   body (its history is its own); the new body is what got up. Returns the new body id.
   (world.infected moves it into the corpse's place and gives it the corpse's things.)
+contagious(store, body_id) -> bool   (W1, D-77: from day three EVERY fluid of a host carries the
+  strain — blood, saliva, mucus — and the dead's fluids too) True for a body of kind 'infected'
+  (alive or destroyed: what comes out of them carries it), and for a living human or lurker with a
+  'wet' infections row whose stage (stages()) has saliva_infectious; else False. Who touches their
+  blood or has it in the eyes or mouth is exposed (action.effects treat_wound / strike_melee).
 stages(store, body_id) -> list[tuple[str, InfectionStage]]   (what each infection is doing to the
   host now: mind.cues signs, the packet's and the narrator's felt lines, action.effects mouth
   contact, turn.cognition compulsion)
@@ -799,6 +804,10 @@ def rise(tx: "Tx", corpse_id: str, type_id: str, at: int, cause_event_id: str | 
     return create(tx, kind="infected", sex=c["sex"], age_years=c["age_years"], height_cm=c["height_cm"],
                   mass_kg=c["mass_kg"], special={k: (v.lo + v.hi) // 2 for k, v in t.special.items()}, at=at,
                   turn_index=turn_index, origin="reanimation", cause_event_id=cause_event_id)
+
+
+def contagious(store: "Store | Tx", body_id: str) -> bool:
+    raise NotImplementedError("P10")
 
 
 def stages(store: "Store | Tx", body_id: str) -> list[tuple[str, "InfectionStage"]]:

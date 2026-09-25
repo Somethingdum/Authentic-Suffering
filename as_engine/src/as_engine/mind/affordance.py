@@ -55,7 +55,8 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
               kind), target_kinds, portal_kinds (the bound portal's kind; P10), target_alive
               (PERCEIVED: a target is 'still' when its posture is lying/prone and it is
               unconscious, dead or false-dead — what anyone can see), admits() for
-              move_through_portal; (H1) requires.can_run (capacity can_run), requires.infected_within_m
+              move_through_portal; (W1) a def with requires.reflex_only is never enumerated at all
+              (not in options, pool or rejected); (H1) requires.can_run (capacity can_run), requires.infected_within_m
               (a visual percept of this turn, up to ``at``, at clear or partial, of a body of kind
               'infected' whose point — space.point_distance — is within that many metres of the actor)
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def

@@ -4,7 +4,7 @@ will that weakens until, by week three, nothing stops compliance; week four is f
 collapse. Rules: the wet pathway's stages (felt, signs), physical.bodies.stages,
 physical.objects.contaminate / contaminated, action.effects drink (mouth contact), mind.cues
 (bite_wound_seen and stage signs), mind.packet body_lines, the narrator's pc_state_lines,
-turn.cognition step 3 (the compulsion, never the PC).
+turn.cognition step 3 (the compulsion, never the PC) — W1 (D-77, D-80) in test_wet_fluids.py.
 """
 
 from __future__ import annotations
@@ -255,8 +255,8 @@ def test_by_week_three_the_bottle_is_offered(scenario):
     assert (it.bound.def_id, it.bound.target_id, it.bound.item_id, it.source, it.speech) == (
         "give_item", w.id("pc"), b, "reflex", None)
     [inv] = events(w, "INVOLUNTARY")
-    assert inv["payload"] == {"actor_id": w.id("alice"), "kind": "compulsion", "pathway": "wet", "item_id": b,
-                              "target_id": w.id("pc")} and inv["actor_id"] == w.id("alice")
+    assert inv["payload"] == {"actor_id": w.id("alice"), "kind": "compulsion", "pathway": "wet", "act": "give",
+                              "item_id": b, "target_id": w.id("pc")} and inv["actor_id"] == w.id("alice")
     again = _decide(w, ["alice"], t + MIN)[w.id("alice")]
     assert again.bound.def_id != "give_item" and len(events(w, "INVOLUNTARY")) == 1
     later = _decide(w, ["alice"], t + w.store.rules.infected.compulsion_cooldown_min * MIN)[w.id("alice")]
@@ -264,22 +264,34 @@ def test_by_week_three_the_bottle_is_offered(scenario):
 
 
 def test_week_two_only_wants_to(scenario):
+    """W1 (D-77): week two it only wants to — an 'urge' on record, and holding back costs Resolve;
+    what it decided stands."""
     w = scenario("metal_fence")
     infect(w, "alice", 200)
-    bottle(w, "alice")
+    b = bottle(w, "alice")
     it = _decide(w, ["alice"], now(w))[w.id("alice")]
-    assert it.bound.def_id != "give_item" and events(w, "INVOLUNTARY") == []
+    assert it.bound.def_id != "give_item" and it.source != "reflex"
+    [urge] = events(w, "INVOLUNTARY")
+    assert urge["payload"] == {"actor_id": w.id("alice"), "kind": "urge", "pathway": "wet", "act": "give", "item_id": b,
+                               "target_id": w.id("pc")}
+    [cost] = [e for e in events(w, "RESOLVE_CHANGE") if e["payload"].get("reason") == "resisting_urge"]
+    assert cost["cause_event_id"] == urge["event_id"] and cost["actor_id"] == w.id("alice")
 
 
-def test_nothing_in_hand_or_nobody_near_nothing_happens(scenario):
+def test_nothing_at_hand_nothing_happens_and_alone_it_fouls_its_own_water(scenario):
+    """W1: a bottle in the pack is not at hand; alone at the front window with a bottle in her hand,
+    Mara spits into it — the supply is fouled for whoever drinks next."""
     w = scenario("metal_fence")
     infect(w, "alice", 400)
     bottle(w, "alice", slot="pack")
     assert _decide(w, ["alice"], now(w))[w.id("alice")].bound.def_id != "give_item"
-    infect(w, "mara", 400)
-    bottle(w, "mara")                                # nobody within 1.5 m of the front window
-    assert _decide(w, ["mara"], now(w))[w.id("mara")].bound.def_id != "give_item"
     assert events(w, "INVOLUNTARY") == []
+    infect(w, "mara", 400)
+    b = bottle(w, "mara")                            # nobody within 1.5 m of the front window
+    it = _decide(w, ["mara"], now(w))[w.id("mara")]
+    assert (it.bound.def_id, it.bound.item_id, it.source) == ("spit_into", b, "reflex")
+    [inv] = events(w, "INVOLUNTARY")
+    assert inv["payload"]["act"] == "spit" and inv["payload"]["target_id"] is None
 
 
 def test_the_pc_is_never_compelled(scenario):

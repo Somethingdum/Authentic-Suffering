@@ -68,22 +68,36 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
      answer that does not read, or one that still echoes — the ORIGINAL intent stands, speech and
      all ('echo_reject', not repaired: a quality issue on record; Actor Spec §11 — a repair that
      fails is not a reason to silence a person, and no committed speech is rewritten).
-  3. P10 — the wet strain's compulsion (lore §3.2: by week three "training, discipline, morality
-     and force of will no longer stop compliance"; 05_ACTORS §7: an involuntary act is caused,
-     timed and owned by code). Actors in sorted order, never the PC (the player's hand on their
-     character is never taken; the PC feels the urge in the narration instead): a stage from
-     physical.bodies.stages(actor) with compulsion 3; an item of kind 'water' in one of its hands
-     (holder_slot hand_l, then hand_r); no INVOLUNTARY event with actor_id = actor and payload kind
-     'compulsion' less than RulesConfig.infected.compulsion_cooldown_min minutes before ``at``;
-     the nearest living human body in its place within 1.5 m (space.point_distance; ties by
-     body_id) -> INVOLUNTARY {actor_id, kind: 'compulsion', pathway: 'wet', item_id, target_id}
-     (writer 'turn.pipeline', actor_id, at) and the actor's intent becomes a give_item built from
-     the core affordance def (not from its menu: the act is code's, like a reflex): BoundAffordance(
-     def_id 'give_item', its verb, label / ui_label with {item} = the item's canon name and
-     {target} = 'someone', target_id, item_id, est_duration_s = duration.base_s, noise_db, check,
-     tags from the def), source 'reflex', speech None, manner '', goal '', private_reason '', the
-     same lod — what it had decided is dropped. Nothing in hand, nobody that close, or a cooldown
-     -> its intent stands (its packet already told it how much it wants to).
+  3. P10 / W1 — the wet strain's compulsion (the owner, D-77: the urge is to CONTAMINATE — spit
+     into water and food, and into the mouths of people asleep; the host is sickened by it, and it
+     grows without limit until death. Lore §3.2: by week three nothing stops compliance; 05_ACTORS
+     §7: an involuntary act is caused, timed and owned by code). Actors in sorted order, never the
+     PC (for the player, urge_pc below): a 'wet' stage from physical.bodies.stages(actor) with
+     compulsion >= 2; h = hours since that infection's exposed_at; gap = max(R.compulsion_min_gap_min,
+     R.compulsion_cooldown_min x 336 / max(h, 1)) minutes (it comes ever more often as the weeks
+     go by); no INVOLUNTARY with actor_id = actor and payload kind 'compulsion' or 'urge' within
+     gap minutes before ``at``. The act, the first that is at hand (R = RulesConfig.infected):
+       mouth  the nearest living human body in its place within 1.5 m whose awareness is 'asleep'
+              (space.point_distance; ties by body_id) -> the core 'spit_in_mouth' def at it;
+       give   an item of kind 'water' in one of its hands (hand_l, then hand_r) and the nearest
+              living human body within 1.5 m -> the core 'give_item' def (as before: {item} = the
+              item's canon name, {target} = 'someone');
+       spit   an item of kind 'water' or 'food' in one of its hands (hand_l, then hand_r), else one
+              lying loose in its place within 1.5 m of it (by item_id) -> the core 'spit_into' def
+              with that item;
+     nothing at hand -> nothing happens (its packet already told it how much it wants to).
+     Compulsion 3 (weeks three and four): it happens — INVOLUNTARY {actor_id, kind: 'compulsion',
+     pathway: 'wet', act, item_id, target_id} (writer 'turn.pipeline', actor_id, at; item_id /
+     target_id None where the act has none) and the actor's intent becomes that def built from the
+     core affordance record, not its menu: BoundAffordance(def_id, its verb, label / ui_label with
+     {item} = the item's canon name and {target} = 'someone', target_id, item_id, est_duration_s
+     = duration.base_s, noise_db, check, tags from the def), source 'reflex', speech None, manner
+     '', goal '', private_reason '', the same lod — what it had decided is dropped. And it is
+     sickened by what it did: mind.actor.adjust_stress(tx, actor, +1, the INVOLUNTARY, at,
+     turn_index) and mind.resolve.drain(tx, actor, 'self_disgust', the INVOLUNTARY, at,
+     turn_index). Compulsion 2 (week two): it only wants to — INVOLUNTARY {actor_id, kind: 'urge',
+     pathway: 'wet', act, item_id, target_id} and mind.resolve.drain(tx, actor, 'resisting_urge',
+     that event, at, turn_index): holding back costs; its intent stands.
   4. H1 — breaking points (mind.temper TEMPER-06). Actors of plan.lod in sorted order with an
      INVOLUNTARY event of this turn at ``at`` whose actor_id is the actor and payload kind is
      'outburst' (never the PC: take_in never snaps it); T = its toward_id. A snap is code's act, like the
@@ -113,6 +127,15 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
                intent this wave (it stays, seething).
        tears   'rest' (est_duration_s = duration.base_s): it sits down and breaks down.
   Every call is logged by the pipeline through LaneClient.on_call; nothing here writes lm_calls.
+
+urge_pc(tx, rng, pc_id, intent, turn_index, at) -> Intent   (W1, D-80: actions pass through)
+  What the player typed mostly happens. The PC with a 'wet' stage of compulsion 3, outside step 3's
+  gap, with an act at hand (step 3's order) -> rng.chance(tx, 'mind', f"pc_urge:{pc_id}:{at}",
+  RulesConfig.infected.pc_urge_share.get(that stage's name, 0.0)): true -> the act happens exactly
+  as step 3's compulsion 3 (INVOLUNTARY with payload pc: true as well, the stress and the
+  self_disgust drain) and it returns the act's reflex Intent (source 'reflex', lod = intent.lod);
+  the story says it was not their choice (narration.narrator pc_state_lines). Otherwise, or with no
+  stage, no act or the gap not passed, it returns ``intent`` unchanged.
 
 cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMRequest
   call class ACTOR_REACTION when reaction else ACTOR_COGNITION; json_schema =
@@ -192,6 +215,7 @@ if TYPE_CHECKING:
     from ..contracts.lanes import LMRequest
     from ..contracts.mind import SkullPacket
     from ..contracts.settings import EngineConfig
+    from ..kernel.rng import Rng
     from ..kernel.store import Tx
     from ..lanes.scheduler import CognitionPlan
     from ..mind.affordance import AffordanceSet
@@ -227,6 +251,10 @@ async def decide(tx: "Tx", session: "Session", plan: "CognitionPlan", affs: dict
 def cognition_request(config: "EngineConfig", packet: "SkullPacket", lod: "LOD", lane: "Lane", *, reaction: bool,
                       turn_index: int) -> "LMRequest":
     raise NotImplementedError("P7")
+
+
+def urge_pc(tx: "Tx", rng: "Rng", pc_id: str, intent: "Intent", turn_index: int, at: int) -> "Intent":
+    raise NotImplementedError("P10")
 
 
 def consequential(tx: "Tx", actor_id: str, affordances: "AffordanceSet", turn_index: int, answered: set) -> bool:

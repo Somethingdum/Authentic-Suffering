@@ -31,6 +31,8 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | quarrel | an off-screen row between two people of a settlement who resent each other; a brawler's comes to blows (`QUARREL`, STL-15) | a row, a fight | — |
 | feeding | one of the dead eating a body it holds, alive or freshly dead (INF-15/16); a feeder is not drawn off (INF-17) | being eaten alive | — |
 | animal | a body of kind 'animal' from an AnimalDef: prey for the dead, meat for the living, never infected, never risen (INF-18) | a dog, a horse… | — |
+| contagious | what comes out of this body carries the wet strain: one of the dead, or a host from day three (`physical.bodies.contagious`; W1) | — | — |
+| urge | the wet strain's pull to contaminate: in week two only wanted (INVOLUNTARY 'urge'), from week three done (INVOLUNTARY 'compulsion'; W1) | — | — |
 | lasting mark | contamination that never dries: the dead's fluids in meat or loose water (`props.contaminated.lasting`; INF-18/19) | tainted | — |
 | carcass | a dead animal, butchered or not (`bodies.special.butchered`) | a carcass | — |
 | odour | what a body smells of now: kind (the dead, death, blood, unwashed) and strength 1–5, from its condition or, for a corpse, the hours since death (`sense.olfaction.odour_of`, SMELL-01) | "reeks of the dead", "smells of blood" | — |
