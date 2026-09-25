@@ -3,8 +3,9 @@
 
   python tools/as/setup.py            install as_engine (editable) with test extras into the ACTIVE
                                       Python environment, copy as_config.example.yaml -> as_config.yaml
-                                      when missing, add the AS lines to .gitignore, write the harness
-                                      hook files, then run the doctor
+                                      when missing, fetch the NLTK punkt tokenizer Talemate uses (the
+                                      sealed server never downloads, D-104), add the AS lines to
+                                      .gitignore, write the harness hook files, then run the doctor
   python tools/as/setup.py --hooks    only (re)write the hook files for the active Python
 
 Use Talemate's own virtual environment (the game's backend imports as_engine from it):
@@ -102,6 +103,14 @@ def _installer() -> list[str] | None:
     return None
 
 
+def fetch_punkt() -> None:
+    """Talemate's tokenizer data, fetched now while installing: the sealed server (D-104) never
+    goes online to get it."""
+    code = "import nltk; ok = nltk.download('punkt', quiet=True) and nltk.download('punkt_tab', quiet=True); raise SystemExit(0 if ok else 1)"
+    if subprocess.run([sys.executable, "-c", code]).returncode != 0:
+        print("note: the NLTK punkt tokenizer could not be fetched; Talemate's workshop tools may miss it.")
+
+
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("-h", "--help"):
         print(__doc__)
@@ -123,6 +132,7 @@ def main(argv: list[str]) -> int:
     if r.returncode != 0:
         print("pip install failed; see the output above.")
         return r.returncode
+    fetch_punkt()
     cfg, example = ROOT / "as_config.yaml", ROOT / "as_config.example.yaml"
     if not cfg.exists() and example.exists():
         shutil.copyfile(example, cfg)

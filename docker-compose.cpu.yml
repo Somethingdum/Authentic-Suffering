@@ -2,8 +2,8 @@ services:
   talemate:
     image: ghcr.io/vegu-ai/talemate:latest
     ports:
-      - "${TALEMATE_FRONTEND_PORT:-8082}:${TALEMATE_FRONTEND_PORT:-8082}"
-      - "${TALEMATE_BACKEND_PORT:-5050}:${TALEMATE_BACKEND_PORT:-5050}"
+      - "127.0.0.1:${TALEMATE_FRONTEND_PORT:-8082}:${TALEMATE_FRONTEND_PORT:-8082}"
+      - "127.0.0.1:${TALEMATE_BACKEND_PORT:-5050}:${TALEMATE_BACKEND_PORT:-5050}"
     volumes:
       - ./config.yaml:/app/config.yaml
       - ./secrets:/app/secrets

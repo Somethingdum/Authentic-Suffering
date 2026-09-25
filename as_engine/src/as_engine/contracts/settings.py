@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from .common import CallClass, Difficulty, Era, Lane, Strict, WorldDetail
 
@@ -32,6 +32,14 @@ class LaneConfig(Strict):
     thinking_mode: Literal["native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "none"] = "native"
     structured_mode: Literal["json_schema", "prompt_only"] = "json_schema"
     structured_with_thinking: Literal["supported", "unsupported", "unknown"] = "unknown"
+
+    @field_validator("base_url")
+    @classmethod
+    def _on_the_owner_s_machines(cls, v: str) -> str:
+        """SEAL-01 (D-104): a model on this machine or its home network, or the config does not load."""
+        from ..lanes.seal import check_lane_url
+        check_lane_url(v)
+        return v
 
 
 def default_lanes() -> dict[Lane, LaneConfig]:

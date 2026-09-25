@@ -1,5 +1,18 @@
 print("Talemate starting.")
 print("Startup may take a moment to initialize some dependencies, please be patient...")
+
+# Authentic Suffering (D-104, SEAL-04): nothing leaves the owner's own machines. Sealed before
+# anything else is imported or started; a config that cannot be read seals to this machine alone.
+from as_engine.lanes import seal  # noqa: E402
+
+try:
+    from as_engine.config_loader import load_engine_config  # noqa: E402
+
+    seal.install_from_config(load_engine_config("as_config.yaml"))
+except Exception as _seal_problem:  # noqa: BLE001
+    seal.install([])
+    print(f"as_config.yaml: {_seal_problem} -- only this machine is reachable until it is fixed.")
+
 import time
 
 t_import_start = time.perf_counter()
@@ -237,7 +250,8 @@ def run_server(args):
     migrate_scene_assets_to_library()
 
     # start task to unstall punkt
-    loop.create_task(install_punkt())
+    if not seal.sealed():  # sealed: tools/as/setup.py fetched punkt at install (D-104)
+        loop.create_task(install_punkt())
 
     def _on_frontend_started():
         if args.frontend_port == 8082:

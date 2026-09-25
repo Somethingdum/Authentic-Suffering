@@ -63,6 +63,10 @@ keep the rules legible without cluttering the story.
 Copy `as_config.example.yaml` to `as_config.yaml` (git-ignored). The Play UI's Models screen edits
 the `lanes` section for you; everything else is for tuning.
 
+A lane's `base_url` must be this machine or your home network (SEAL-01, 02 §9): `localhost`, a
+private address such as `192.168.1.20`, or a home name such as `laptop` or `msi.local`. Anything
+else is refused, and a file naming one does not load.
+
 ```yaml
 schema: as.config.v1
 runs_dir: as_runs

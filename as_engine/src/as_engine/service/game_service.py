@@ -98,7 +98,10 @@ Handlers (P8):
     in handle step 2). new config = config with those lanes / background_cognition;
     config_loader.save_engine_config(new, config_path); config = new; client = LaneClient(new,
     transport); a loaded session gets session.config = session.config with the same lanes /
-    background_cognition (its frozen rules stay) and session.client.config = session.config.
+    background_cognition (its frozen rules stay) and session.client.config = session.config. When
+    the process is sealed (lanes.seal.sealed()), it re-seals with the new lanes
+    (seal.install_from_config(new); SEAL-04, D-104). A lane address outside the owner's machines is
+    refused by LaneConfig itself (SEAL-01) -> bad_request.
     Regimes are not settable here: a regime change alters every later request and so breaks
     re-simulation (DET-02). -> [config].
   on_packs_list: every folder of config.content_dir holding a pack.yaml, sorted by folder name ->

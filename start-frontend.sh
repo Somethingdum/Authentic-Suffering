@@ -6,4 +6,4 @@ activate_embedded_node
 
 cd talemate_frontend
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-corepack pnpm run serve --host 0.0.0.0 --port "${TALEMATE_FRONTEND_PORT:-8082}"
+corepack pnpm run serve --host 127.0.0.1 --port "${TALEMATE_FRONTEND_PORT:-8082}"

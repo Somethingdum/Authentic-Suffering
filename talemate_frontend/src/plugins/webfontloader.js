@@ -1,15 +1,8 @@
 /**
  * plugins/webfontloader.js
  *
- * webfontloader documentation: https://github.com/typekit/webfontloader
+ * Authentic Suffering (D-104, SEAL-05): the sealed build loads nothing from outside this machine.
+ * Talemate asked Google Fonts for Roboto here on every page load; the system font is used instead.
  */
 
-export async function loadFonts () {
-  const webFontLoader = await import(/* webpackChunkName: "webfontloader" */'webfontloader')
-
-  webFontLoader.load({
-    google: {
-      families: ['Roboto:100,300,400,500,700,900&display=swap'],
-    },
-  })
-}
+export async function loadFonts () {}

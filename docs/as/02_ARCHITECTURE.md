@@ -116,6 +116,11 @@ docs/as/                          this spec
 | `install.bat` | after the line `"%PYTHON%" -m uv sync …`: `"%PYTHON%" -m uv pip install -e "./as_engine[dev]" \|\| CALL :die "as_engine install failed."` |
 | `update.bat` | after the line `embedded_python\python.exe -m uv sync …` (an exact sync removes packages Talemate's lock does not list): `embedded_python\python.exe -m uv pip install -e "./as_engine[dev]" \|\| CALL :die "as_engine install failed."` |
 | `install.sh`, `update.sh` | after the line `uv pip install -e ".[dev]"`: `uv pip install -e "./as_engine[dev]"` |
+| `src/talemate/server/run.py` | D-104 (SEAL-04): its first import is `from as_engine.lanes import seal`, then `seal.install_from_config(load_engine_config("as_config.yaml"))` — on any problem `seal.install([])` and a printed line; `install_punkt()` is started only when not sealed (`tools/as/setup.py` fetches punkt at install) |
+| `start.sh`, `start-backend.sh`, `start.bat`, `start-backend.bat`, `start-local.bat` | D-104 (SEAL-05): `uv run --offline --no-sync …` and `--host 127.0.0.1` |
+| `start-frontend.sh`, `start-frontend.bat`, `start-debug.bat` | D-104 (SEAL-05): `--host 127.0.0.1` |
+| `docker-compose.cpu.yml` | D-104 (SEAL-05): both ports published as `127.0.0.1:<port>:<port>` |
+| `talemate_frontend/src/plugins/webfontloader.js` | D-104 (SEAL-05): `loadFonts` loads nothing (Talemate asked Google Fonts for Roboto on every page load) |
 | `.gitignore` | `as_runs/`, `as_content/_compiled/`, `as_config.yaml`, `.dsh/hooks.json` (`.claude` is already ignored upstream). `tools/as/setup.py` adds these lines at install, so this change is already made when P8 starts |
 
 Every other change lives in new files. `tools/as/gate.py --upstream-diff` lists upstream files that
@@ -196,5 +201,43 @@ registered and a `hello` round-trips.
 - No vector database in v1 (retrieval is deterministic SQL + FTS5; see 05 §Retrieval).
 - No web access for the simulation.
 - No cloud models. Everything runs on your two machines.
+- No telemetry, no update checks, no downloads while playing, nothing served to the network: the
+  seal (§9).
 - No pre-written plot: the Vector Register may *show* what is in motion; nothing reads it to decide
   outcomes (NARR-04).
+
+## 9. Privacy: the seal (D-104; `as_engine/lanes/seal.py`)
+
+The owner: "I need this to be a completely sealed up, local build that doesn't put my privacy at
+risk"; "No limitations. No privacy leaks. Hard rule." The game talks to the models on the owner's
+own machines (§2: the desktop and the laptop) and to nothing else, whatever any library inside the
+process would like to do. Everything the seal refuses fails as if the network were down.
+
+| Rule | What |
+|---|---|
+| SEAL-01 | A model address is this machine or its home network (loopback, a private or link-local address, a single-label or `.local` / `.lan` / `.home.arpa` / `.internal` name); `LaneConfig` refuses anything else, so such a config never loads and the Connect screen cannot set one |
+| SEAL-02 | Installed, the seal refuses every name lookup and every connection (plain sockets and both asyncio loops) to anything but loopback and the model machines, and keeps the last 100 refusals |
+| SEAL-03 | Installed, the seal switches every library it knows of offline (Hugging Face, transformers, datasets, ChromaDB telemetry, DO_NOT_TRACK) and removes proxy settings — a proxy would carry the game's words off the machine; lifting it puts them back |
+| SEAL-04 | The Talemate server seals itself before anything else starts (this machine alone when the config cannot be read), every `as-engine` command runs sealed, a changed model address re-seals, and the lane client reads no proxy from the environment |
+| SEAL-05 | Nothing reaches out on its own: the launchers bind 127.0.0.1 and run `uv` offline without syncing, Docker publishes on 127.0.0.1 only, and the frontend loads no font, script or style from outside |
+
+What the seal found in Talemate and now stops: the start scripts served the game on every network
+interface (0.0.0.0); the page asked Google Fonts for Roboto on every load; a configured model's name
+was sent to Hugging Face to guess its prompt template; the NLTK tokenizer was downloaded from GitHub
+at every start; cloud model, voice and image clients (OpenRouter, DeepSeek, OpenAI, Anthropic,
+Google, Mistral, Cohere, Groq, ElevenLabs) and Hugging Face voice downloads are unreachable. Local
+image generation through ComfyUI (Talemate's `comfyui` backend, `http://127.0.0.1:8188`) stays
+possible on this machine; ComfyUI is its own program, and its Manager add-on checks GitHub unless
+it is told not to.
+
+## 10. Freedom of the narrative (D-104)
+
+The owner: "I expect the finished product to have total freedom of narrative, amongst every Actor
+and myself included. No limitations." The models are uncensored; the prompts do not hold them back.
+
+| Rule | What |
+|---|---|
+| FREE-01 | Nothing that was perceived is skipped, summarised away or faded out because it is ugly: the narrator tells violence, cruelty, degradation, drugs and sex between adults as plainly as anything else (`prompts/narration.system.j2`) |
+| FREE-02 | A person may lie, steal, threaten, hurt, kill, betray or abandon someone when that follows from who they are (`prompts/_actor_core.j2`); no prompt steers anyone toward decency, and no prompt carries a softening or refusal phrase |
+| FREE-03 | The only content levers: the owner's Intensity setting (Full by default; Softer keeps violence at the edge of the frame) and CNT-11 (09 §CNT: nothing sexual ever involves a minor), which nothing disables. The narrator's framing when a child is eaten (I1: the sound and the faces, not the body) stays |
+

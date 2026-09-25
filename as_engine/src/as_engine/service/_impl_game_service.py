@@ -254,6 +254,9 @@ class GameService:
         save_engine_config(new, self.config_path)
         self.config = new
         self.client = LaneClient(new, self.transport)
+        from ..lanes import seal
+        if seal.sealed():
+            seal.install_from_config(new)
         if self.session is not None:
             self.session.config = self.session.config.model_copy(update=upd)
             self.session.client.config = self.session.config

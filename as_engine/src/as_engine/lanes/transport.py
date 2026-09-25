@@ -29,6 +29,8 @@ HttpTransport request (OpenAI-compatible, LM Studio):
   message.reasoning or None; usage.prompt_tokens / completion_tokens (0 when absent).
   HTTP errors / connection refused -> LaneUnavailable; timeout (request.deadline_s) -> LaneTimeout.
 GET {base_url}/models -> [m["id"] for m in data]. health = list_models succeeds within 5 s.
+The client never reads proxies or certificates from the environment (httpx trust_env False; SEAL-04,
+D-104): a proxy would carry the game's words off the machine.
 """
 
 from __future__ import annotations
@@ -54,7 +56,8 @@ class HttpTransport:
 
     def __init__(self, transport: object | None = None) -> None:
         import httpx
-        self._c = httpx.AsyncClient(transport=transport) if transport is not None else httpx.AsyncClient()
+        self._c = (httpx.AsyncClient(transport=transport, trust_env=False) if transport is not None
+                   else httpx.AsyncClient(trust_env=False))
 
     async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse:
         import httpx, time

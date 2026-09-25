@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-687 ids; 436 with their own statement, 251 named only in context.
+695 ids; 444 with their own statement, 251 named only in context.
 
 
 ## ABUSE
@@ -207,7 +207,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CNT-08 | "sotry" anywhere (error); retired names from the GLOSSARY tombstones (warning) | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-09 | a plausibility expression that does not parse | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/world/worldgen/conditions.py` | `contract/p02_space_bodies/test_conditions_parse.py`, `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_params.py` |
 | CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/people.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/action/effects.py`, `as_engine/audit/release.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py`, `as_engine/mind/affordance.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p04_one_actor/test_care_menu.py`, `contract/p05_many_actors/test_care.py`, `contract/p11_audits/test_release.py` |
+| CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/action/effects.py`, `as_engine/audit/release.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py`, `as_engine/mind/affordance.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p04_one_actor/test_care_menu.py`, `contract/p05_many_actors/test_care.py`, `contract/p11_audits/test_release.py`, `contract/p12_surfaces/test_freedom.py` |
 | CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p02_space_bodies/test_looks.py` |
 | CNT-13 | an infected type listing a quirk that is not written for it, or an override that changes which creature a type or quirk id means | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-14 | a `generation: cheat` dossier outside a pack whose id starts with `cheat_` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/cheat_admin/actors/fredrick.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
@@ -356,6 +356,14 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py` |
 | FOCUS-02 | Eyes on one thing: it is seen one step better, everything else one step worse, until the next attempt (`sense.optics.visibility`). | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/resolve.py`, `as_engine/sense/optics.py` | `contract/p05_many_actors/test_gestures.py` |
+
+## FREE
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| FREE-01 | Nothing that was perceived is skipped, summarised away or faded out because it is ugly: the narrator tells violence, cruelty, degradation, drugs and sex between adults as plainly as anything else (`prompts/narration.sys… | 02_ARCHITECTURE §10 | — | `contract/p12_surfaces/test_freedom.py` |
+| FREE-02 | A person may lie, steal, threaten, hurt, kill, betray or abandon someone when that follows from who they are (`prompts/_actor_core.j2`); no prompt steers anyone toward decency, and no prompt carries a softening or refus… | 02_ARCHITECTURE §10 | — | `contract/p12_surfaces/test_freedom.py` |
+| FREE-03 | The only content levers: the owner's Intensity setting (Full by default; Softer keeps violence at the edge of the frame) and CNT-11 (09 §CNT: nothing sexual ever involves a minor), which nothing disables. The narrator's… | 02_ARCHITECTURE §10 | — | `contract/p12_surfaces/test_freedom.py` |
 
 ## GATE
 
@@ -907,6 +915,16 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | SCOPE-01 | *Table ownership (rule STORE-02 / SCOPE-01).* | as_engine/kernel/ownership.py | `as_engine/kernel/ownership.py` | `contract/p00_substrate/test_ownership.py` |
+
+## SEAL
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| SEAL-01 | A model address is this machine or its home network (loopback, a private or link-local address, a single-label or `.local` / `.lan` / `.home.arpa` / `.internal` name); `LaneConfig` refuses anything else, so such a confi… | 02_ARCHITECTURE §9 | `as_engine/contracts/settings.py`, `as_engine/lanes/seal.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_seal.py` |
+| SEAL-02 | Installed, the seal refuses every name lookup and every connection (plain sockets and both asyncio loops) to anything but loopback and the model machines, and keeps the last 100 refusals | 02_ARCHITECTURE §9 | `as_engine/lanes/seal.py` | `contract/p12_surfaces/test_seal.py` |
+| SEAL-03 | Installed, the seal switches every library it knows of offline (Hugging Face, transformers, datasets, ChromaDB telemetry, DO_NOT_TRACK) and removes proxy settings — a proxy would carry the game's words off the machine;… | 02_ARCHITECTURE §9 | `as_engine/lanes/seal.py` | `contract/p12_surfaces/test_seal.py` |
+| SEAL-04 | The Talemate server seals itself before anything else starts (this machine alone when the config cannot be read), every `as-engine` command runs sealed, a changed model address re-seals, and the lane client reads no pro… | 02_ARCHITECTURE §9 | `as_engine/cli.py`, `as_engine/lanes/seal.py`, `as_engine/lanes/transport.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_seal.py` |
+| SEAL-05 | Nothing reaches out on its own: the launchers bind 127.0.0.1 and run `uv` offline without syncing, Docker publishes on 127.0.0.1 only, and the frontend loads no font, script or style from outside | 02_ARCHITECTURE §9 | `as_engine/lanes/seal.py` | `contract/p12_surfaces/test_seal.py` |
 
 ## SEG
 

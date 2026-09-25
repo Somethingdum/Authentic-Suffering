@@ -10,6 +10,8 @@ compiled_dir: as_content/_compiled # compiled canon cache
 # Both models are picked from ONE list: the LM Studio server on this machine. With LM Link on, the
 # other machine's models are in that list too, so both lanes use the same address. The easy way to
 # choose is the game's Connect / Settings → Models screen; you should not need to edit this block.
+# The game only talks to models on this machine or your home network (the seal, 02 §9): an address
+# anywhere else is refused and the config does not load.
 lanes:
   A:   # the main model: the thinking decisions of the people who matter most, and the narration
     name: Main model — Nemotron Cascade 2 30B-A3B

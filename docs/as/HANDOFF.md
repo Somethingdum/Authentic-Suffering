@@ -31,7 +31,9 @@ replaces "the rest will remain uncoded"). What is left:
    reality exception, his wonders and gifts, his temper, the Wild Card), and so is the owner's
    rework of the cheats into plain words (D-103: the Cheat field takes any sentence — "Make that
    infected jig joyously" — through `cheats/interpret.py`; the Play input is Act / Say / Cheat,
-   `turn_compose`, with Ask as a '?' button); still to do: the rest below. The owner's list was: overwriting an
+   `turn_compose`, with Ask as a '?' button), and so is the seal (D-104, 02 §9: nothing leaves the
+   owner's machines — the Talemate server seals itself first thing; keep it that way when you
+   build the P8 plugin); still to do: the rest below. The owner's list was: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

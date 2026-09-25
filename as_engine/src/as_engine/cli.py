@@ -4,7 +4,8 @@ returns an exit code and prints plain lines to stdout; nothing raises to the she
 problem.
 
 Global: --config PATH (default 'as_config.yaml'): config_loader.load_engine_config(PATH) (a
-missing file means the defaults; relative paths resolve against the file's folder).
+missing file means the defaults; relative paths resolve against the file's folder). Every command
+then runs sealed: lanes.seal.install_from_config(config) (SEAL-04, D-104).
 Parsing: argparse with prog 'as-engine' and one required sub-command (argparse's own usage errors
 exit 2 as argparse does).
 

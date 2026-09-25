@@ -49,6 +49,8 @@ def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     args = _parser().parse_args(argv)
     cfg = load_engine_config(args.config)
+    from .lanes import seal
+    seal.install_from_config(cfg)
     if args.command == "content-check":
         from .content.pack import load_canon
         dirs = [Path(cfg.content_dir) / "core"] + [Path(d) for d in args.pack]
