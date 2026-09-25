@@ -233,7 +233,7 @@ CREATE TABLE places (
   place_id     TEXT PRIMARY KEY,
   zone_id      TEXT REFERENCES zones(zone_id),
   parent_id    TEXT REFERENCES places(place_id),
-  kind         TEXT NOT NULL CHECK (kind IN ('building','room','street','outdoor','vehicle','tunnel')),
+  kind         TEXT NOT NULL CHECK (kind IN ('building','room','street','outdoor','vehicle','tunnel','roof')),   -- roof: D-108
   name         TEXT NOT NULL,
   archetype_ref TEXT,
   width_m      REAL NOT NULL DEFAULT 10,
@@ -244,7 +244,8 @@ CREATE TABLE places (
   ambient_db   REAL NOT NULL DEFAULT 30,
   layout_generated INTEGER NOT NULL DEFAULT 0,   -- rooms generated on first observation (PLMP, discovery)
   held         INTEGER NOT NULL DEFAULT 0,   -- 1 = the structure held through the Fall (WG-32): no interior damage pass
-  props        TEXT NOT NULL DEFAULT '{}'
+  props        TEXT NOT NULL DEFAULT '{}',
+  elevation_m  REAL NOT NULL DEFAULT 0      -- D-108 PARKOUR-01: the floor's height above the street
 );
 
 -- OWNER physical.space
@@ -280,7 +281,9 @@ CREATE TABLE portals (
   seal_db       REAL NOT NULL DEFAULT 25,
   open_loss_db  REAL NOT NULL DEFAULT 3,
   transparent   INTEGER NOT NULL DEFAULT 0,
-  height_cm     INTEGER NOT NULL DEFAULT 0     -- obstacle height for climbing fences/walls/windows (0 = not climbable)
+  height_cm     INTEGER NOT NULL DEFAULT 0,    -- obstacle height for climbing fences/walls/windows (0 = not climbable); a climb's or a drop's height
+  gap_cm        INTEGER NOT NULL DEFAULT 0,    -- D-108: a 'gap' portal's width across
+  below_id      TEXT REFERENCES places(place_id)   -- D-108: where a body lands when it falls off a gap or an edge (NULL: the lower place)
 );
 
 -- OWNER physical.space

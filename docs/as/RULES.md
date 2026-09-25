@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-728 ids; 476 with their own statement, 252 named only in context.
+738 ids; 486 with their own statement, 252 named only in context.
 
 
 ## ABUSE
@@ -374,6 +374,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | FAC-05 | FAC-05 Where the decon team goes (world.worldmove OPS-02 for kind 'decon'; the killer = operations.target_id): at 'arrive' the team goes where the killer IS now (world.hordes.target(its place)); the killer outside the a… | as_engine/world/factions.py | `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py` |
 | FAC-06 | FAC-06 Nothing here makes a Ghost appear where nobody could be: teams are materialised at the enclave (from its counted people, CONSERVE-04) and walk there like any operation. | as_engine/world/factions.py | `as_engine/world/factions.py` | — |
 
+## FALL
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| FALL-01 | FALL-01 (D-108) e = max(0, height_m - landing_m) (a good landing takes metres off). By e: < 2 nothing (a stumble); < 4 a minor blunt wound to a foot; < 7 a significant blunt wound to a leg and a minor one to an arm; < 1… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+
 ## FOCUS
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -586,6 +592,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INF-17 | INF-17 (I1) Busy eating. A feeder — it holds a grip on a living body, or it is inside INF-16's window on a corpse — is not drawn away: attract() returns None for it unless the new target is the body it is eating. Noise… | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_feeding.py` |
 | INF-18 | INF-18 (I1) Anything that moves. Animals (bodies of kind 'animal': a dog, a cat, a deer, a horse) are prey like people: seen, drawn to, grabbed, bitten and eaten the same way. Only humans take the strain: a bite never i… | as_engine/world/infected.py | `as_engine/action/effects.py`, `as_engine/contracts/content.py`, `as_engine/physical/bodies.py`, `as_engine/physical/objects.py`, `as_engine/testing/scenario.py`, `as_engine/world/infected.py`, `as_content/packs/core/animals/animals.yaml` | `contract/p10_world/test_feeding.py` |
 | INF-19 | INF-19 (I1) Fluids foul water. A water item lying loose in a place (not held or carried) within R.taint_radius_m of a bite that lands, or of an infected body when it is destroyed or false-dies, is contaminated — physica… | as_engine/world/infected.py | `as_engine/world/infected.py` | `contract/p10_world/test_feeding.py` |
+| INF-20 | INF-20 (P12, D-108) The dead that climb. A type whose InfectedTypeDef.parkour is set (runners: "uses climbs and short parkour lines, misjudges distances"; "a 25-40% chance of a spectacular fall on any complex maneuver")… | as_engine/world/infected.py | `as_engine/physical/space.py`, `as_engine/world/infected.py`, `as_content/packs/core/infected/runner.yaml` | `contract/p12_surfaces/test_parkour.py` |
 
 ## INFO
 
@@ -759,6 +766,19 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | OPS-06 | OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event] (the loyalty plan acted on) Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose created_at <= at - W.defect_after_day… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p04_one_actor/test_knowledge_menus.py` |
 | OPS-07 | OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs (by wound_id) that i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
 | OPS-08 | OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *, target_id=None) -> str (OPS-01's daily plan and world.factions FAC-04 DECON) op_id = tx.mint('ops'); FACTION_OPERATION {op_i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_operations.py` |
+
+## PARKOUR
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| PARKOUR-01 | PARKOUR-01 Height. places.elevation_m is the floor's height above the street (the ground 0; a roof its building's height; a room its storey's). A place of kind 'roof' is open air on top of a building. PARKOUR_KINDS = ('… | as_engine/physical/space.py | `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-02 | PARKOUR-02 drop_m(store, portal_id, from_place) -> float: how far a body falls off this portal from ``from_place``: max(0, elevation(from_place) - elevation(landing)), landing = below_id, else the lower of the two place… | as_engine/physical/space.py | `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-03 | PARKOUR-03 path(..., parkour=None): with parkour = {climb_cm, gap_cm, edge_m} the search may also cross a 'climb' of height_cm <= climb_cm (either way), a 'gap' of gap_cm <= gap_cm, an 'edge' downward when its drop <= e… | as_engine/physical/space.py | `as_engine/contracts/settings.py`, `as_engine/physical/space.py`, `as_engine/world/infected.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-04 | PARKOUR-04 Climbing a face: action.effects climb_face (A + athletics against climb.class; one less going down); a BREAK falls half the height. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-05 | PARKOUR-05 Jumping a gap: action.effects jump_gap (against gap.class); a FAIL balks at the edge, a BREAK falls into the gap's landing place. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-06 | PARKOUR-06 Dropping off an edge: action.effects drop_down (against drop.class) — always a fall, and a good roll takes metres off it (physical.bodies FALL-01). | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-07 | PARKOUR-07 Her feet decide first: action.effects flee — a body tagged 'parkour' goes up first when its place has a way up. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-08 | PARKOUR-08 Roofs in the world: discover_layout steps 4 and 5 (a building's roof, its ways up and down, the gaps between the roofs of a block). | as_engine/physical/space.py | `as_engine/contracts/settings.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
 
 ## PARSE
 

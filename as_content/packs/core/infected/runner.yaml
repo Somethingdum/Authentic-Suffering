@@ -25,6 +25,9 @@
   reanimation_window_h: [8.0, 16.0]
   true_kill: [destroy_brainstem_spinal_junction, denature_or_pulp_core_tissue]
   quirks: [RUN_GREETING_MASK, RUN_OVERSHOOT, RUN_FULLFED_APATHY, RUN_NAME_STICKING]
+  # D-108 (world.infected INF-20): short climbs and short gaps, and "a 25-40% chance of a spectacular
+  # fall on any complex maneuver".
+  parkour: {climb_cm: 450, gap_cm: 180, edge_m: 6.0, fall_pct: [25, 40]}
   player_facing:
     - Sees better than a Shambler; still near-sighted and error-prone at range.
     - Runs hard, trips often and gets overstimulated — crashes into obstacles or falls off things.

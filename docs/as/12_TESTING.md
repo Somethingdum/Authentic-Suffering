@@ -327,6 +327,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p12_surfaces/test_doom_deep.py` | DOOM-09..15, RES-06..07, RESOLVE-07: the screaming starts a short while before the end, not at the doom, and some never scream; everyone knows the scream and nothing more (lore, cue, no word of why); what the talk leaves — shattered, broken, held — and that it never comes back further; a shattered mind's first hours; a broken mind feels it and knows nothing (its packet); words come out in pieces, the player's too; the Voice dooms some at the bite (four weeks, the despair checks set) and not all; it tells the bitten "about 4 weeks"; the dust moves again on what is left; they can't take it (a check a day, the revolver she carries, a gunshot, DEATH 'suicide'); or they go through all of it (no means: nothing, a check every day); the player decides for themselves; ending it is on the menu only at the end of the rope, and only for what is in hand; the player can end it (the frozen moment even then; "You took your own life."); an empty gun only clicks; Willis cannot end himself |
 
+### 3.23 Parkour (P12; D-108)
+
+| File | What it proves |
+|---|---|
+| `p12_surfaces/test_parkour.py` (world `rooftops`) | PARKOUR-01..08, FALL-01, INF-20: the roofs have height (elevations, drops, rises) and nobody walks a climb, a gap or an edge; Addison sees the lines on her menu (the pipe, the gap, the edge) and nothing to open or walk through; the Where panel says how high, how far and which way; how hard each line is (climb, gap and drop classes, up and down); she makes the jump (CLEAN), balks at the edge (FAIL), falls short into the alley (BREAK: a leg and an arm, down, the noise of it); a roll takes the drop out, a bad one takes all of it, the worst lands head first; down the drainpipe is easier; how a fall hurts by height, and twenty metres kills; her feet decide first (fleeing means up); the dead below cannot follow — a shambler never, a runner by the drainpipe, anyone by the fire escape; the runner climbs and sometimes falls; roofs come with their buildings (hatch, drainpipe, edge) and the block's roofs get a gap |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

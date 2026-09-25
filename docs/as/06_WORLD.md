@@ -76,6 +76,10 @@ replaced by measured values after `bench`).
 seeded by `layout:<place_id>`, and are permanent afterwards.
 Buildings that did not hold through the Fall get the Fall-damage pass at discovery (damaged or open
 exterior doors, picked-over loot, an "old damage" trace); held buildings keep their interiors (GEO-04).
+A building whose archetype has a roof gets it at discovery too (D-108, PARKOUR-08): open air at its
+height, a hatch from inside, a drainpipe or a fire escape outside, an edge down; the roofs of
+neighbouring buildings in a zone get a gap between them more often than not (70–300 cm) — the
+lines a runner-scavenger like Addison Flores lives on, above the dead.
 
 ### 1.4 Worlds are files, not seeds (RUN-09)
 The seed fixes every code-side draw, but model-written history and people differ between runs, so a

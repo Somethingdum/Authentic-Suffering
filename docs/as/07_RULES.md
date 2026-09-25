@@ -45,7 +45,10 @@ FAIL 20 %. The world is hard on the untrained, as intended.
 `target.attr_mod.<X>` · `range_band` (≤5 m 0, ≤15 m 1, ≤30 m 2, ≤60 m 3, beyond effective range 5)
 plus target cover (0–3) plus 1 if the target moved · `obstacle.class` (low fence 1, high fence 3,
 wall 5) · `container.lock_quality` · `wound.severity` (medicine: minor 0, significant 1, severe 2,
-catastrophic 4) · `observer.best_perception` (stealth: best observer's attr_mod(P), +1 if alert).
+catastrophic 4) · `observer.best_perception` (stealth: best observer's attr_mod(P), +1 if alert) ·
+(D-108) `climb.class` (a face: ≤2.5 m 1, ≤4 m 2, ≤7 m 3, ≤10 m 4, higher 5; down one less) ·
+`gap.class` (≤1 m 1, ≤1.5 m 2, ≤2 m 3, ≤2.5 m 4, ≤3 m 5, wider 6; +1 landing more than 0.5 m higher,
+−1 landing 1 m or more lower) · `drop.class` (≤2 m 0, ≤3.5 m 1, ≤5 m 2, ≤7 m 3, higher 4).
 
 ### 1.3 Opposed checks
 Both sides draw; higher margin wins; difference ≥ 3 clean, 1–2 winner pays a cost, 0 → established
@@ -84,6 +87,7 @@ Speech takes words ÷ 2.5 seconds (min 1 s) and never freezes anyone else.
 | eat / drink | 300 / 30 | 20 |
 | take cover / hide / crouch / stand / go prone | 2 / 4 / 1 / 1 / 2 | 30 |
 | climb a low / high fence | 4 / 8 | 50 |
+| vault a low obstacle / climb a face / jump a gap / drop off an edge (D-108) | 1.5 / 15 / 3 / 2 | 40 / 35 / 45 / 40 |
 | 9 mm shot / shotgun / rifle (unsuppressed) | 0.5 | 160 / 165 / 165 |
 | melee strike / scream | 1 / 2 | 60 / 95 |
 
@@ -207,6 +211,25 @@ sound always crosses them (seal loss); sight crosses only a `transparent` one (a
 never a wall). Body clearance: shoulder width 30–65 cm from mass (Lurkers ×0.5); upright
 needs aperture height ≥ 0.9 × body height; crawling needs ≥ 45 cm and takes 4× time. Rooms are
 generated on first observation and are permanent afterwards (GEO-03).
+
+**Height and parkour (D-108, PARKOUR-01..08).** Places have an elevation above the street; a roof
+is open air on top of a building. Three portal kinds are crossed only by a move, never walked: a
+**climb** (a drainpipe, a wall with holds, a stack of crates — its height), a **gap** (between two
+roofs or ledges — its width; the elevations say up or down) and an **edge** (where a higher place
+drops to a lower one). Each knows where a body lands when it falls off it. The moves — vault a low
+obstacle, climb a face, jump a gap, drop off an edge — are A + athletics checks (+2 for the
+`parkour` tag, and `climber` for climbing) against the classes above: CLEAN and COST get there (COST
+with a scrape or a hard landing), FAIL gets nowhere (you balk at the edge, you can't find the next
+hold), BREAK falls. A drop is always a fall; a good roll takes 3 m off it (1.5 m on a COST), a BREAK
+lands head first. **Falls** (FALL-01) by the height left: under 2 m nothing; under 4 m a foot; under
+7 m a leg and an arm, and you are down; under 10 m a crushed leg and your chest; under 15 m a
+crushed chest; higher, your head. Addison Flores (A 9, athletics 3, parkour) clears most lines
+cleanly and falls about one jump in five on a 2.5 m gap; an untrained adult should not try.
+Someone tagged `parkour` who flees goes up first when there is a way up (PARKOUR-07). The dead: a
+shambler or a crawler never follows you up; a runner climbs short faces and jumps short gaps when
+it has no other way to you — and falls on 25–40 % of them (INF-20). Roofs come with buildings whose
+archetype has one (a hatch inside, a drainpipe or a fire escape outside, an edge down), and the
+roofs of a block have gaps between them (PARKOUR-08).
 
 ## 8. Effect handlers
 The complete list and each handler's contract are in `action/effects.py`. Every handler emits

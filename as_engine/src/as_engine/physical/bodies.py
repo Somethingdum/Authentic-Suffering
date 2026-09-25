@@ -219,6 +219,18 @@ end_own_life(tx, rng, body_id, item_id, at, turn_index, cause_event_id) -> list[
   else cause_event_id). The DOOM-05 safety net dies of 'infection' for an 'infection' or 'bitten'
   doom.
 
+fall(tx, rng, body_id, height_m, at, turn_index, cause_event_id, *, landing_m=0.0,
+     head_first=False) -> list[Event]
+  FALL-01 (D-108) e = max(0, height_m - landing_m) (a good landing takes metres off). By e:
+  < 2 nothing (a stumble); < 4 a minor blunt wound to a foot; < 7 a significant blunt wound to a leg
+  and a minor one to an arm; < 10 a severe crush to a leg and a significant blunt wound to the
+  chest; < 15 a catastrophic crush to the chest and a severe one to a leg; else a catastrophic blunt
+  wound to the head. head_first moves it one band up (to the head at < 15 too). Left or right:
+  rng.chance(tx, 'resolve', f"fall:{body_id}:{at}", 0.5). Each through apply_harm (cause
+  cause_event_id; its death test); posture 'lying' when e >= 4 and it lives; a NOISE {source_db
+  min(110, 55 + 3 x e), kind 'fall', text 'a heavy fall'} at the body's point first (when e >= 2).
+  The reality exception: nothing ([]).
+
 Treatment (``treat``): method in {'pressure','packing','tourniquet','bandage','suture','clean'};
   tourniquet only on a limb (ValueError otherwise); suture only on a minor or significant wound
   (ValueError otherwise); 'clean' lowers contamination by 1 (min 0). The method is appended to
@@ -1035,6 +1047,51 @@ def end_own_life(tx: "Tx", rng: "Rng", body_id: str, item_id: str, at: int, turn
     if doomed(tx, body_id) is None:
         out.append(_doom(tx, b, "instant", at, at, at, turn_index, cause, cause, rng))
     out.append(_death_ev(tx, body_id, at, turn_index, "suicide", cause, rng=rng, detail={"method": method, "item_id": item_id}))
+    return out
+
+
+FALL_BANDS: tuple[tuple[float, tuple[tuple[str, str, str], ...]], ...] = (   # FALL-01 (D-108): (below e metres, wounds)
+    (2.0, ()),
+    (4.0, (("foot", "blunt", "minor"),)),
+    (7.0, (("leg", "blunt", "significant"), ("arm", "blunt", "minor"))),
+    (10.0, (("leg", "crush", "severe"), ("chest", "blunt", "significant"))),
+    (15.0, (("chest", "crush", "catastrophic"), ("leg", "crush", "severe"))),
+    (float("inf"), (("head", "blunt", "catastrophic"),)),
+)
+
+
+def fall(tx: "Tx", rng: "Rng", body_id: str, height_m: float, at: int, turn_index: int, cause_event_id: str | None, *,
+         landing_m: float = 0.0, head_first: bool = False) -> list[Event]:
+    from ..contracts.events import Event, EventType
+    b = _b(tx, body_id)
+    if not b["alive"] or excepted(tx, body_id):
+        return []
+    e = max(0.0, height_m - landing_m)
+    band = next(i for i, (lim, _w) in enumerate(FALL_BANDS) if e < lim)
+    if head_first and band > 0:
+        band = min(band + 1, len(FALL_BANDS) - 1)
+    wounds = FALL_BANDS[band][1]
+    if not wounds:
+        return []
+    out = []
+    pos = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (body_id,))
+    cause = cause_event_id
+    if pos is not None:
+        n = tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=at, turn_index=turn_index, actor_id=body_id,
+            cause_event_id=cause_event_id, place_id=pos[0],
+            payload={"source_db": min(110.0, 55.0 + 3.0 * e), "kind": "fall", "text": "a heavy fall", "place_id": pos[0],
+                     "x_m": pos[1], "y_m": pos[2]}))
+        out.append(n)
+        cause = n.event_id
+    side = "l" if rng.chance(tx, "resolve", f"fall:{body_id}:{at}", 0.5) else "r"
+    for where, typ, sev in wounds:
+        anatomy = where if where in ("head", "chest") else f"{where}_{side}"
+        out += apply_harm(tx, body_id, WoundSpec(anatomy, typ, sev, 0), at, cause, turn_index, rng)
+        if not _b(tx, body_id)["alive"]:
+            return out
+    bb = _b(tx, body_id)
+    if e >= 4.0 and bb["alive"] and bb["awareness"] not in ("unconscious", "dead") and bb["posture"] != "lying":
+        out.append(posture_event(tx, body_id, "lying", at, cause, turn_index))
     return out
 
 

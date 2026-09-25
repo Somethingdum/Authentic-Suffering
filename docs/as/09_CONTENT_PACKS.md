@@ -333,7 +333,15 @@ holds it.
   is broken, the menu never pretends it cannot be.
 - **Buildings** are room-by-room archetypes with anchors (cover/concealment 0–3), portals (doors,
   windows, walls — a wall is a portal with aperture 0 that only carries sound) and loot tables.
-  Rooms are generated the first time anyone sees inside.
+  Rooms are generated the first time anyone sees inside. (D-108) A building may have a `roof`:
+  its `elevation_m`, size and anchors, a `hatch` from one room (a hole or a door), `faces` from the
+  grounds — `climb` (a drainpipe, a wall with holds, stacked crates: its height is the roof's) or
+  `stairs` (a fire escape anyone can walk) — and an `edge_name` for the drop back down. The roofs of
+  neighbouring buildings get gaps between them at discovery. Affordances may use the resistance
+  keys `climb.class`, `gap.class` and `drop.class`; the capability tag `parkour` adds +2 to them.
+- **The dead that climb** (D-108): an infected type may carry `parkour: {climb_cm, gap_cm, edge_m,
+  fall_pct: [lo, hi]}` — how high it climbs, how far it jumps, how far it drops, and its chance in
+  percent of falling each time (the Runner: 450 cm, 180 cm, 6 m, 25–40 %).
 - **Cascade rules** are the declarative "and then" of the world: trigger event type + filters +
   preconditions → effects, each with a `CAS-###` id that every resulting event cites (G10). The
   canonical chain (injured worker → missed shift → cover → efficiency → shortage → rations →

@@ -264,6 +264,14 @@ class AnimalDef(Strict):
     model_config = Strict.model_config | {"populate_by_name": True}
 
 
+class InfectedParkour(Strict):
+    """D-108: how far one of the dead goes up or across, and its chance (percent) of a spectacular fall."""
+    climb_cm: int = Field(ge=0, le=1200)
+    gap_cm: int = Field(ge=0, le=400)
+    edge_m: float = Field(default=6.0, ge=0, le=30)
+    fall_pct: tuple[int, int] = Field(description="lo, hi: the chance of a fall on each crossing, drawn per crossing")
+
+
 class InfectedTypeDef(Strict):
     schema_id: Literal["as.infected.v1"] = Field(alias="schema", default="as.infected.v1")
     id: str = Field(pattern=r"^[A-Z][A-Z0-9_]+$", description="Stable canon id, e.g. ZOMBIE_ARCHETYPE_SHAMBLER01")
@@ -284,6 +292,8 @@ class InfectedTypeDef(Strict):
     codex_truth: list[str] = Field(min_length=1)
     tactics: list[str] = Field(default_factory=list)
     weaknesses: list[str] = Field(default_factory=list)
+    parkour: InfectedParkour | None = Field(default=None, description="D-108 (world.infected INF-20): the dead "
+                                              "that climb and jump, and how often they fall; None = never.")
     model_config = Strict.model_config | {"populate_by_name": True}
 
 
@@ -416,7 +426,8 @@ class AnchorTemplate(Strict):
 
 class PortalTemplate(Strict):
     to_room: str
-    kind: Literal["door", "window", "hole", "stairs", "gate", "vent", "drain", "curtain", "opening", "wall", "fence"]
+    kind: Literal["door", "window", "hole", "stairs", "gate", "vent", "drain", "curtain", "opening", "wall", "fence",
+                  "climb", "gap", "edge"]
     name: str
     lockable: bool = False
     lock_quality: int = Field(default=0, ge=0, le=4)
@@ -426,7 +437,9 @@ class PortalTemplate(Strict):
     open_loss_db: float = Field(default=3.0, ge=0, le=20)
     transparent: bool = False
     starts_open: bool = False
-    height_cm: int = Field(default=0, ge=0, le=600, description="Obstacle height for fences/walls/windows (climb); 0 = not climbable.")
+    height_cm: int = Field(default=0, ge=0, le=3000, description="Obstacle height for fences/walls/windows (climb); 0 = not "
+                           "climbable. D-108: a 'climb' face's height (a roof's faces take it from the roof).")
+    gap_cm: int = Field(default=0, ge=0, le=1000, description="D-108: a 'gap' portal's width across.")
 
 
 class RoomTemplate(Strict):
@@ -442,6 +455,20 @@ class RoomTemplate(Strict):
     loot_table: str | None = None
 
 
+class RoofTemplate(Strict):
+    """D-108 (physical.space discover_layout step 4): the top of a building — open air, up high."""
+    name: str = "Roof"
+    elevation_m: float = Field(gt=0, le=200, description="Its height above the street.")
+    width_m: float = Field(gt=0)
+    depth_m: float = Field(gt=0)
+    anchors: list[AnchorTemplate] = Field(min_length=1)
+    hatch_room: str | None = Field(default=None, description="The room a hatch or stair comes up from (None: no way up inside).")
+    hatch: PortalTemplate | None = Field(default=None, description="That hatch or stair (to_room names the room).")
+    faces: list[PortalTemplate] = Field(default_factory=list, description="Ways up the outside from the grounds: kind "
+                                        "'climb' (a drainpipe, a wall with holds) or 'stairs' (a fire escape).")
+    edge_name: str = "roof edge"
+
+
 class BuildingArchetype(Strict):
     schema_id: Literal["as.building.v1"] = Field(alias="schema", default="as.building.v1")
     id: str = Field(pattern=SLUG_PATTERN)
@@ -451,6 +478,7 @@ class BuildingArchetype(Strict):
     entrance_room: str
     exterior_portals: list[PortalTemplate] = Field(min_length=1)
     description: str = Field(min_length=10)
+    roof: RoofTemplate | None = Field(default=None, description="D-108: its roof, when it has one anyone could get onto.")
     model_config = Strict.model_config | {"populate_by_name": True}
 
 

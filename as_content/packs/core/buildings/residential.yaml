@@ -88,6 +88,16 @@
     - {to_room: kitchen, kind: door, name: back door, lockable: true, lock_quality: 1, aperture_w_cm: 85, aperture_h_cm: 205, seal_db: 20}
     - {to_room: garage, kind: gate, name: garage door, lockable: true, lock_quality: 1, aperture_w_cm: 250, aperture_h_cm: 210, seal_db: 18}
     - {to_room: bedroom_small, kind: window, name: bedroom window, aperture_w_cm: 90, aperture_h_cm: 90, seal_db: 16, transparent: true, height_cm: 100}
+  roof:   # D-108: a low pitched roof, walkable along the ridge
+    elevation_m: 3.6
+    width_m: 12
+    depth_m: 9
+    anchors:
+      - {name: roof ridge, kind: vantage, x_m: 6, y_m: 4.5}
+      - {name: gutter by the porch, kind: feature, x_m: 1, y_m: 0.5}
+    faces:
+      - {to_room: living_room, kind: climb, name: gutter downpipe, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 2}
+    edge_name: gutter edge
 - schema: as.building.v1
   id: apartment_walkup_unit
   name: Walk-up apartment
@@ -140,3 +150,16 @@
   exterior_portals:
     - {to_room: stair_landing, kind: stairs, name: stairwell, aperture_w_cm: 110, aperture_h_cm: 220, seal_db: 0, starts_open: true}
     - {to_room: front_room, kind: window, name: street window, aperture_w_cm: 120, aperture_h_cm: 140, seal_db: 16, transparent: true, height_cm: 600}
+  roof:   # D-108: the walk-up's flat roof, four storeys up
+    elevation_m: 11.0
+    width_m: 16
+    depth_m: 12
+    anchors:
+      - {name: roof door, kind: door_side, x_m: 2, y_m: 2}
+      - {name: parapet over the street, kind: vantage, x_m: 8, y_m: 0.5, cover: 1, concealment: 1}
+      - {name: top of the fire escape, kind: feature, x_m: 15.5, y_m: 11}
+    hatch_room: stair_landing
+    hatch: {to_room: stair_landing, kind: door, name: roof door, aperture_w_cm: 80, aperture_h_cm: 200, seal_db: 25}
+    faces:
+      - {to_room: stair_landing, kind: stairs, name: fire escape, aperture_w_cm: 80, aperture_h_cm: 200, seal_db: 5, starts_open: true}
+    edge_name: roof parapet

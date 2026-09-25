@@ -186,7 +186,9 @@ def describe(tx, pc_id, at, refs=None):
         pr = dict(pr)
         other = pr["place_b"] if pr["place_a"] == place["place_id"] else pr["place_a"]
         st = []
-        if pr["kind"] != "fence":
+        if pr["kind"] in ("climb", "gap", "edge"):   # D-108: how hard, not open or closed
+            st.append(_parkour_words(tx, pr, place["place_id"]))
+        elif pr["kind"] != "fence":
             st.append("open" if pr["is_open"] else "closed")
         tried = tx.query_one("SELECT 1 FROM events e WHERE e.type='ACTION_COMPLETE' AND e.actor_id=? AND json_extract(e.payload,'$.result')='blocked_by_lock' "
                              "AND e.cause_event_id IN (SELECT event_id FROM events WHERE type='ACTION_START' AND actor_id=? "
@@ -221,3 +223,24 @@ PROVENANCE_WORDS = {"witnessed": "you saw it", "overheard": "you overheard it", 
 
 def impairment_word(n):
     return "clear-headed" if n <= 0 else "slowed" if n == 1 else "impaired" if n <= 3 else "badly impaired" if n <= 5 else "barely functioning"
+
+
+def _parkour_words(tx, pr, here):
+    """D-108: a climb, a gap or an edge, in the words of someone looking at it."""
+    from ..physical import space
+    other = pr["place_b"] if pr["place_a"] == here else pr["place_a"]
+    eh = tx.query_one("SELECT elevation_m FROM places WHERE place_id=?", (here,))[0]
+    eo = tx.query_one("SELECT elevation_m FROM places WHERE place_id=?", (other,))[0]
+    if pr["kind"] == "climb":
+        return f"a climb of about {max(1, int(pr['height_cm'] / 100 + 0.5))} metres"
+    if pr["kind"] == "gap":
+        w = f"about {pr['gap_cm'] / 100:.1f} metres across"
+        if eo - eh >= 0.5:
+            w += ", higher on the far side"
+        elif eh - eo >= 0.5:
+            w += ", lower on the far side"
+        return w
+    d = space.drop_m(tx, pr["portal_id"], here)
+    if d > 0:
+        return f"a drop of about {max(1, int(d + 0.5))} metres"
+    return f"about {max(1, int(pr['height_cm'] / 100 + 0.5))} metres up, out of reach"

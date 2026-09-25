@@ -1,0 +1,106 @@
+# "Up and away" — Addison's rooftops (D-108). PROTECTED. A block of Hardy Street, Hattiesburg,
+# about nine years after the Fall. Addison Flores is on the market roof at the top of the drainpipe
+# she came up; one of the dead is at its foot, and a runner is in the street. The market roof
+# (4.5 m) is 1.6 m from the warehouse roof (6 m), which is 2.8 m from the apartment roof (6.5 m);
+# the apartments have a fire escape anyone can walk. Checks by hand (07_RULES §1, 13 §4 D-108):
+# Addison A 9 (+5), athletics 3, parkour +2 -> 10 before resistance, clamped to 9.
+schema: as.scenario.v1
+name: rooftops
+description: Addison Flores on the roofs of a block, the dead in the street below (D-108)
+seed: 2020
+start: {day: 3400, time: "07:40:00"}
+weather: {kind: clear, wind_level: 0}
+settings: {turn_depth: balanced, difficulty: normal}
+places:
+  - id: street
+    name: Hardy Street
+    kind: street
+    width_m: 30
+    depth_m: 12
+    indoor: false
+    material: open_air
+    light: 3
+    ambient_db: 35
+    anchors:
+      - {id: pipe_foot, name: foot of the drainpipe, kind: feature, x: 2, y: 0.3}
+      - {id: market_front, name: market front, kind: feature, x: 6, y: 0.5}
+      - {id: warehouse_front, name: warehouse loading door, kind: door_side, x: 15, y: 0.5}
+      - {id: escape_foot, name: foot of the fire escape, kind: feature, x: 26, y: 0.5}
+      - {id: street_middle, name: middle of the street, kind: feature, x: 12, y: 6}
+  - id: alley
+    name: Alley between the buildings
+    kind: outdoor
+    width_m: 4
+    depth_m: 20
+    indoor: false
+    material: open_air
+    light: 2
+    ambient_db: 30
+    anchors:
+      - {id: alley_floor, name: alley floor, kind: feature, x: 2, y: 10}
+  - id: market_roof
+    name: Market roof
+    kind: roof
+    elevation_m: 4.5
+    width_m: 12
+    depth_m: 10
+    indoor: false
+    material: open_air
+    light: 3
+    ambient_db: 30
+    anchors:
+      - {id: pipe_top, name: top of the drainpipe, kind: feature, x: 0.5, y: 0.5}
+      - {id: market_east, name: east edge of the market roof, kind: feature, x: 11.5, y: 5}
+      - {id: market_front_edge, name: front edge of the market roof, kind: vantage, x: 6, y: 0.3}
+      - {id: water_tank, name: old water tank, kind: hiding_spot, x: 3, y: 7, cover: 2, concealment: 2}
+  - id: warehouse_roof
+    name: Warehouse roof
+    kind: roof
+    elevation_m: 6.0
+    width_m: 20
+    depth_m: 15
+    indoor: false
+    material: open_air
+    light: 3
+    ambient_db: 30
+    anchors:
+      - {id: warehouse_west, name: west edge of the warehouse roof, kind: feature, x: 0.5, y: 7}
+      - {id: skylight, name: broken skylight, kind: feature, x: 10, y: 7}
+      - {id: warehouse_east, name: east edge of the warehouse roof, kind: feature, x: 19.5, y: 7}
+      - {id: warehouse_front_edge, name: front edge of the warehouse roof, kind: vantage, x: 10, y: 0.3}
+  - id: apartment_roof
+    name: Apartment roof
+    kind: roof
+    elevation_m: 6.5
+    width_m: 12
+    depth_m: 12
+    indoor: false
+    material: open_air
+    light: 3
+    ambient_db: 30
+    anchors:
+      - {id: apartment_west, name: west edge of the apartment roof, kind: feature, x: 0.5, y: 6}
+      - {id: stair_head, name: top of the fire escape, kind: feature, x: 10, y: 11.5}
+portals:
+  - {id: drainpipe, a: street, b: market_roof, anchor_a: pipe_foot, anchor_b: pipe_top, kind: climb, name: drainpipe, w: 0, h: 0, seal_db: 2, transparent: true, height: 450}
+  - {id: market_edge, a: market_roof, b: street, anchor_a: market_front_edge, anchor_b: market_front, kind: edge, name: front edge of the market roof, w: 0, h: 0, seal_db: 2, transparent: true, height: 450, below: street}
+  - {id: market_gap, a: market_roof, b: warehouse_roof, anchor_a: market_east, anchor_b: warehouse_west, kind: gap, name: gap between the roofs, w: 0, h: 0, seal_db: 2, transparent: true, gap: 160, below: alley}
+  - {id: warehouse_edge, a: warehouse_roof, b: street, anchor_a: warehouse_front_edge, anchor_b: warehouse_front, kind: edge, name: front edge of the warehouse roof, w: 0, h: 0, seal_db: 2, transparent: true, height: 600, below: street}
+  - {id: long_gap, a: warehouse_roof, b: apartment_roof, anchor_a: warehouse_east, anchor_b: apartment_west, kind: gap, name: long gap to the apartments, w: 0, h: 0, seal_db: 2, transparent: true, gap: 280, below: alley}
+  - {id: fire_escape, a: street, b: apartment_roof, anchor_a: escape_foot, anchor_b: stair_head, kind: stairs, name: fire escape, open: true, w: 80, h: 200, seal_db: 5}
+bodies:
+  - id: pc
+    dossier: core:pc/addison_flores
+    controller: human
+    place: market_roof
+    anchor: pipe_top
+  - id: shambler
+    infected: ZOMBIE_ARCHETYPE_SHAMBLER01
+    controller: policy
+    place: street
+    anchor: pipe_foot
+  - id: runner
+    infected: ZOMBIE_VARIANT_ID_RUNNER01
+    controller: policy
+    place: street
+    anchor: street_middle

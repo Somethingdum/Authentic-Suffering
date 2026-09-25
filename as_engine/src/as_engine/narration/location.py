@@ -53,7 +53,13 @@ describe(tx, pc_id, at, refs=None) -> LocationView
     PersonChip(ref for the internal id f"figure:{percept_id}", label 'a figure', [], known False).
   exits: every portal of the place except walls, by portal_id -> ExitView(ref, label = portal
     name, state_words, leads_to = the far place's name when the PC has a known_places row for it,
-    else 'unknown'). state_words, orthogonal (GEO-01): 'open' / 'closed' (not for fences);
+    else 'unknown'). state_words, orthogonal (GEO-01): 'open' / 'closed' (not for fences, nor the
+    D-108 kinds, which say how hard instead: a 'climb' f"a climb of about {n} metres" (n = height_cm
+    / 100, rounded half up, at least 1), a 'gap' f"about {g} metres across" (g = gap_cm / 100 to one
+    decimal) plus ", higher on the far side" / ", lower on the far side" when the far place is 0.5 m
+    or more higher / lower, an 'edge' f"a drop of about {n} metres" (space.drop_m from here, rounded,
+    at least 1; from its lower side f"about {n} metres up, out of reach" (n from height_cm) — nobody
+    climbs an edge);
     'locked' only when is_locked AND the PC has an ACTION_COMPLETE with result 'blocked_by_lock'
     caused by an ACTION_START of the PC targeting this portal (you learn a lock by trying it);
     'barricaded' when barricade > 0; 'broken' when damage >= 2.

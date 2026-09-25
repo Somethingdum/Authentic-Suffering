@@ -247,6 +247,8 @@ def resistance(tx, intent, key, land_at):
     if key == "obstacle.class":
         h = _portal(tx, b.target_id)["height_cm"]
         return 1 if h <= 120 else 3 if h <= 200 else 5
+    if key in ("climb.class", "gap.class", "drop.class"):   # D-108
+        return _parkour_class(tx, key, b.target_id, _pos(tx, intent.actor_id)["place_id"])
     if key == "wound.severity":
         w = _row(tx, "SELECT severity FROM wounds WHERE wound_id=?", (b.target_id,))
         return {"minor": 0, "significant": 1, "severe": 2, "catastrophic": 4}[w["severity"]]
@@ -472,6 +474,12 @@ def h_leave_place(tx, rng, intent, land_at, ctx, d):
 def h_flee(tx, rng, intent, land_at, ctx, d):
     from ..physical.space import distance_to_point
     threat = intent.bound.target_id
+    up = _way_up(tx, intent.actor_id)   # PARKOUR-07 (D-108): her feet decide first
+    if up is not None:
+        spec = _def(tx, "climb_obstacle").check
+        landing, band = _climb_across(tx, rng, intent, land_at, ctx, d, up, spec=spec, res_key="climb.class", noise="flee")
+        if band != CheckBand.FAIL:
+            return landing
     ex = _exits(tx, intent.actor_id)
     if ex:
         def far_from_threat(e):
@@ -493,10 +501,122 @@ def h_flee(tx, rng, intent, land_at, ctx, d):
     return _done("done")
 
 
+def _way_up(tx, actor):
+    """A 'climb' portal from the actor's place to a higher one, for a body tagged 'parkour'."""
+    if not tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (actor,)):
+        return None
+    from ..mind.actor import fused
+    if "parkour" not in fused(tx, actor).capability.tags:
+        return None
+    here = _pos(tx, actor)["place_id"]
+    for p in tx.query("SELECT * FROM portals WHERE (place_a=? OR place_b=?) AND kind='climb' ORDER BY portal_id", (here, here)):
+        other = p["place_b"] if p["place_a"] == here else p["place_a"]
+        if _elev(tx, other) > _elev(tx, here):
+            return p["portal_id"]
+    return None
+
+
 def _dist_body_point(tx, body, place, x, y):
     from ..physical.space import distance_to_point
     v = distance_to_point(tx, body, place, x, y)
     return 999.0 if v is None else v
+
+
+def _parkour_class(tx, key, portal_id, place):
+    """climb.class / gap.class / drop.class (action.effects resistance keys, D-108)."""
+    from ..physical.space import drop_m, rise_m
+    p = _portal(tx, portal_id)
+    if key == "climb.class":
+        h = p["height_cm"]
+        c = 1 if h <= 250 else 2 if h <= 400 else 3 if h <= 700 else 4 if h <= 1000 else 5
+        return c - 1 if rise_m(tx, portal_id, place) == 0 else c
+    if key == "gap.class":
+        g = p["gap_cm"]
+        c = 1 if g <= 100 else 2 if g <= 150 else 3 if g <= 200 else 4 if g <= 250 else 5 if g <= 300 else 6
+        other = _far(tx, portal_id, place)
+        down = _elev(tx, place) - _elev(tx, other)
+        c += 1 if rise_m(tx, portal_id, place) > 0.5 else -1 if down >= 1.0 else 0
+        return max(0, c)
+    m = drop_m(tx, portal_id, place)
+    return 0 if m <= 2 else 1 if m <= 3.5 else 2 if m <= 5 else 3 if m <= 7 else 4
+
+
+def _elev(tx, place):
+    return float(_row(tx, "SELECT elevation_m FROM places WHERE place_id=?", (place,))["elevation_m"])
+
+
+def _climb_across(tx, rng, intent, land_at, ctx, d, portal_id, *, spec=None, res_key="climb.class", noise="climb_face"):
+    """Up or down a 'climb' face (also flee's way up)."""
+    import dataclasses
+
+    from ..physical.bodies import WoundSpec, apply_harm, fall
+    ci = intent if intent.bound.target_id == portal_id else \
+        dataclasses.replace(intent, bound=dataclasses.replace(intent.bound, target_id=portal_id))
+    r = _check(tx, rng, ci, d, land_at, ctx, spec=spec, res_key=res_key)
+    here = _pos(tx, intent.actor_id)["place_id"]
+    far = _far(tx, portal_id, here)
+    _noise(tx, intent, noise, d.noise_db, land_at, ctx)
+    if r.band in (CheckBand.CLEAN, CheckBand.COST):
+        pl, an, x, y = _portal_side_point(tx, portal_id, far)
+        _move(tx, intent.actor_id, pl, an, x, y, land_at, ctx)
+        if r.band == CheckBand.COST:
+            apply_harm(tx, intent.actor_id, WoundSpec("hand_r", "cut", "minor", 0), land_at, ctx.start_event_id, ctx.turn_index, rng)
+        return _done("done", r.band), r.band
+    if r.band == CheckBand.FAIL:
+        return _done("no_progress", r.band), r.band
+    lower = here if _elev(tx, here) <= _elev(tx, far) else far
+    pl, an, x, y = _portal_side_point(tx, portal_id, lower)
+    _move(tx, intent.actor_id, pl, an, x, y, land_at, ctx)
+    fall(tx, rng, intent.actor_id, abs(_elev(tx, here) - _elev(tx, far)) / 2, land_at, ctx.turn_index, ctx.start_event_id)
+    return _done("fell", r.band), r.band
+
+
+def h_climb_face(tx, rng, intent, land_at, ctx, d):
+    return _climb_across(tx, rng, intent, land_at, ctx, d, intent.bound.target_id)[0]
+
+
+def h_jump_gap(tx, rng, intent, land_at, ctx, d):
+    """Across a gap."""
+    from ..physical.bodies import WoundSpec, apply_harm, fall
+    from ..physical.space import _landing, drop_m
+    pid = intent.bound.target_id
+    here = _pos(tx, intent.actor_id)["place_id"]
+    r = _check(tx, rng, intent, d, land_at, ctx)
+    _noise(tx, intent, "jump_gap", d.noise_db, land_at, ctx)
+    if r.band in (CheckBand.CLEAN, CheckBand.COST):
+        pl, an, x, y = _portal_side_point(tx, pid, _far(tx, pid, here))
+        _move(tx, intent.actor_id, pl, an, x, y, land_at, ctx)
+        if r.band == CheckBand.COST:
+            leg = "leg_l" if rng.chance(tx, "resolve", f"landing:{intent.actor_id}:{land_at}", 0.5) else "leg_r"
+            apply_harm(tx, intent.actor_id, WoundSpec(leg, "blunt", "minor", 0), land_at, ctx.start_event_id, ctx.turn_index, rng)
+        return _done("done", r.band)
+    if r.band == CheckBand.FAIL:
+        return _done("balked", r.band)
+    height = drop_m(tx, pid, here)
+    below = _landing(tx, _portal(tx, pid))
+    x, y = _place_centre(tx, below)
+    _move(tx, intent.actor_id, below, None, x, y, land_at, ctx)
+    fall(tx, rng, intent.actor_id, height, land_at, ctx.turn_index, ctx.start_event_id)
+    return _done("fell", r.band)
+
+
+def h_drop_down(tx, rng, intent, land_at, ctx, d):
+    """Off an edge."""
+    from ..physical.bodies import fall
+    from ..physical.space import _landing, drop_m
+    pid = intent.bound.target_id
+    here = _pos(tx, intent.actor_id)["place_id"]
+    r = _check(tx, rng, intent, d, land_at, ctx)
+    height = drop_m(tx, pid, here)
+    below = _landing(tx, _portal(tx, pid))
+    pl, an, x, y = _portal_side_point(tx, pid, below) if below in (_portal(tx, pid)["place_a"], _portal(tx, pid)["place_b"]) \
+        else (below, None, *_place_centre(tx, below))
+    _move(tx, intent.actor_id, pl, an, x, y, land_at, ctx)
+    _noise(tx, intent, "drop_down", d.noise_db, land_at, ctx)
+    landing = {CheckBand.CLEAN: 3.0, CheckBand.COST: 1.5}.get(r.band, 0.0)
+    hurt = fall(tx, rng, intent.actor_id, height, land_at, ctx.turn_index, ctx.start_event_id, landing_m=landing,
+                head_first=r.band == CheckBand.BREAK)
+    return _done("fell" if any(e.type == EventType.HARM for e in hurt) else "done", r.band)
 
 
 def h_climb(tx, rng, intent, land_at, ctx, d):
@@ -1465,6 +1585,7 @@ HANDLERS = {
     "treat_wound": h_treat, "apply_tourniquet": h_treat, "eat": h_eat, "drink": h_eat, "throw_distraction": h_throw,
     "wonder_smite": h_wonder_smite, "wonder_hurt": h_wonder_hurt, "wonder_gift": h_wonder_gift, "wonder_vanish": h_wonder_vanish,
     "end_own_life": h_end_own_life,
+    "climb_face": h_climb_face, "jump_gap": h_jump_gap, "drop_down": h_drop_down,
 }
 
 

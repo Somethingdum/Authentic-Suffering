@@ -77,7 +77,11 @@ Checks (action.checks.roll at land_at; CHECK_RESOLVED committed before the state
   target moved in the last 1000 ms + 2 for defs tagged 'head'; 'portal.lock_quality',
   'portal.barricade', 'portal.lock_and_barricade' from the portals row; 'target.attr_mod.<X>'
   from the target body; 'obstacle.class' by the portal height_cm (<= 120 -> 1, <= 200 -> 3,
-  else 5); 'wound.severity' (minor 0, significant 1, severe 2, catastrophic 4);
+  else 5); (D-108) 'climb.class' by the portal height_cm (<= 250 -> 1, <= 400 -> 2, <= 700 -> 3,
+  <= 1000 -> 4, else 5; one less going down: space.rise_m 0); 'gap.class' by gap_cm (<= 100 -> 1,
+  <= 150 -> 2, <= 200 -> 3, <= 250 -> 4, <= 300 -> 5, else 6; + 1 when space.rise_m > 0.5, - 1 when
+  the far place is 1 m or more lower; never below 0); 'drop.class' by space.drop_m (<= 2 -> 0,
+  <= 3.5 -> 1, <= 5 -> 2, <= 7 -> 3, else 4); 'wound.severity' (minor 0, significant 1, severe 2, catastrophic 4);
   'observer.best_perception' = the highest attr_mod(P) among conscious bodies that can see the
   actor's destination point now (optics against the actor as it will stand), + 1 if that body
   perceived a sound of this turn at PARTIAL or better; 0 with no observer.
@@ -101,10 +105,29 @@ Per effect (result strings in quotes; 'done' unless noted):
                      (ties: portal_id): MOVE to its far side. None -> 'portal_closed'.
   flee               like leave_place but choosing the portal whose far-side point is farthest from
                      the threat (target); none -> MOVE to the anchor of the place farthest from it.
+                     (D-108, PARKOUR-07) A body whose fused capability tags hold 'parkour' goes up
+                     first: when its place has a 'climb' portal to a higher place it climbs it as
+                     climb_face does (with climb_obstacle's check spec) — "her feet decide first";
+                     FAIL: the flee above; BREAK: the fall.
   end_own_life       (D-107) physical.bodies.end_own_life(tx, rng, actor, the bound item, land_at, T,
                      the start event): 'done' when it killed, 'click' when the gun was empty (they are
                      still here), 'blocked' when nothing happened (the reality exception, god mode).
-  climb              A + athletics check vs obstacle.class. CLEAN/COST: MOVE to the far side (COST
+  climb_face         (D-108, PARKOUR-04) up or down a 'climb' portal: the def's check (A + athletics,
+                     climb.class). CLEAN/COST: MOVE to the other place at the portal's point there
+                     (COST: a minor cut to hand_r); FAIL: 'no_progress'; BREAK: 'fell' —
+                     physical.bodies.fall(half the height between the two places), landing in the
+                     lower place at the portal's point there.
+  jump_gap           (D-108, PARKOUR-05) across a 'gap': the def's check (A + athletics, gap.class).
+                     CLEAN: MOVE across; COST: MOVE across and a hard landing (a minor blunt wound to
+                     a leg); FAIL: 'balked' — pulled up at the edge, no progress; BREAK: 'fell' —
+                     fall(space.drop_m off it) into its landing place (below_id), at that place's
+                     centre.
+  drop_down          (D-108, PARKOUR-06) off an 'edge' from its higher side: the def's check (A +
+                     athletics, drop.class), then MOVE to the landing place at the portal's point
+                     there and fall(drop_m, landing_m = CLEAN 3.0, COST 1.5, FAIL 0; BREAK 0 and
+                     head first). 'done', or 'fell' when the fall wounded.
+  climb              A + athletics check vs obstacle.class (vault_obstacle is the same effect over
+                     a low one, D-108). CLEAN/COST: MOVE to the far side (COST
                      also a minor 'cut' to hand_r instead of the time cost); FAIL: 'no_progress';
                      BREAK: 'fell' — a blunt wound to leg_l, significant when height_cm > 200 else
                      minor, and posture 'lying'. Ignores admits(): climbing is how a fence is crossed.
@@ -392,6 +415,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
     "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
     "strip", "wonder_smite", "wonder_hurt", "wonder_gift", "wonder_vanish", "end_own_life",
+    "climb_face", "jump_gap", "drop_down",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -472,6 +496,10 @@ SEEN: dict[str, str | None] = {
     "leave_place": "heads for the way out",
     "flee_threat": "runs from {target}",
     "climb_obstacle": "climbs {target}",
+    "vault_obstacle": "vaults {target}",
+    "climb_face": "climbs {target}",
+    "jump_gap": "jumps {target}",
+    "drop_down": "drops off {target}",
     "take_cover": "takes cover at {destination}",
     "hide": "slips toward {destination}",
     "crouch": "crouches",
@@ -515,6 +543,7 @@ SEEN: dict[str, str | None] = {
 NOISE_TEXT: dict[str, str] = {
     "move_to_anchor": "footsteps", "move_through_portal": "footsteps", "follow_body": "footsteps",
     "leave_place": "footsteps", "flee": "running feet", "climb": "metal rattling",
+    "climb_face": "scraping and scrabbling", "jump_gap": "a running jump and a landing", "drop_down": "a thud of feet landing",
     "open_portal": "a door opening", "close_portal": "a door closing", "lock_portal": "a lock turning",
     "unlock_portal": "a lock turning", "barricade_portal": "hammering and scraping",
     "unbarricade_portal": "boards being pulled away", "force_portal": "something slamming against a door",

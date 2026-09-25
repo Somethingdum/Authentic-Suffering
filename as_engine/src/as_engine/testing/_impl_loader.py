@@ -158,7 +158,8 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
         for p in spec.places:
             ws = [W("places", {"place_id": ids[p.id], "parent_id": I(p.parent), "kind": p.kind, "name": p.name, "width_m": p.width_m,
                                "depth_m": p.depth_m, "indoor": int(p.indoor), "material": p.material, "light_level": p.light,
-                               "ambient_db": p.ambient_db, "layout_generated": 1, "held": int(p.held), "props": {}})]
+                               "ambient_db": p.ambient_db, "layout_generated": 1, "held": int(p.held), "props": {},
+                               "elevation_m": p.elevation_m})]
             for a in p.anchors:
                 ws.append(W("anchors", {"anchor_id": ids[a.id], "place_id": ids[p.id], "name": a.name, "kind": a.kind, "x_m": a.x, "y_m": a.y,
                                         "cover": a.cover, "concealment": a.concealment, "capacity": 4}))
@@ -168,7 +169,8 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
             ws.append(W("portals", {"portal_id": ids[pt.id], "place_a": ids[pt.a], "place_b": ids[pt.b], "anchor_a": I(pt.anchor_a), "anchor_b": I(pt.anchor_b),
                                     "kind": pt.kind, "name": pt.name, "is_open": int(pt.open), "is_locked": int(pt.locked), "lock_quality": pt.lock_quality,
                                     "barricade": pt.barricade, "damage": pt.damage, "aperture_w_cm": pt.w, "aperture_h_cm": pt.h, "seal_db": pt.seal_db,
-                                    "open_loss_db": pt.open_loss_db, "transparent": int(pt.transparent), "height_cm": pt.height}))
+                                    "open_loss_db": pt.open_loss_db, "transparent": int(pt.transparent), "height_cm": pt.height,
+                                    "gap_cm": pt.gap, "below_id": I(pt.below)}))
         if ws:
             E(EventType.PLACE_DISCOVERED, "physical.space", ws, {"portals": len(ws), "source": "scenario"})
         # bodies

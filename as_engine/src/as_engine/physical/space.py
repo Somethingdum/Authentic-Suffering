@@ -87,9 +87,60 @@ discover_layout(tx, rng, building_place_id, at, turn_index) -> list[Event]   (P1
     for it (the bulk already inside + this item's bulk x qty <= capacity_bulk), else lying at the
     room's first anchor; a def that is not stackable with qty > 1 becomes qty separate items of 1,
     each placed the same way.
+  4 (P12, D-108, PARKOUR-08) The roof, when the archetype has one (a.roof): a place {kind 'roof',
+    parent_id = the building, zone_id, name = roof.name, or f"{the building's name} roof" when that is
+    the default 'Roof', width_m, depth_m, indoor 0, material
+    'open_air', light_level 2, ambient_db 30, elevation_m = roof.elevation_m, layout_generated 1,
+    held = the building's} with its anchors, in the same PLACE_DISCOVERED; roof.hatch (when given):
+    a portal between roof.hatch_room and the roof (its template's fields; closed); each of
+    roof.faces: a portal between the grounds and the roof (anchor_a = the grounds' first anchor,
+    anchor_b = the roof's first anchor; kind 'climb' -> height_cm = round(elevation_m x 100),
+    transparent 1, seal 2; kind 'stairs' — a fire escape — open, as given); and one 'edge' (name
+    roof.edge_name, roof <-> grounds, below_id = the grounds, height_cm = round(elevation_m x 100),
+    transparent 1, seal 2).
+  5 (PARKOUR-08) The roofs of a block: the building sites of the building's zone in place_id order;
+    its neighbours are the site just before and just after it. For each neighbour whose roof already
+    exists, one draw on stream f"layout:{lo}:{hi}" (lo, hi = the two sites sorted): rng.chance(…,
+    'gap', ParkourRules.gap_chance) -> a 'gap' portal (name 'gap between the roofs', place_a = lo's
+    roof, place_b = hi's roof, gap_cm = rng.range_int(…, 'gap_cm', *ParkourRules.gap_cm), below_id =
+    lo's grounds, transparent 1, seal 2, anchors = each roof's first anchor). Whichever of the two
+    is discovered second makes it, so the order of discovery changes nothing.
   Returns every event committed, in seq order. The Fall-damage TRACE of an unheld building ("Old
   damage: this place was picked over long ago.", kind 'damage', in the entrance room) is created by
   the caller, world.worldmove.on_arrival (physical does not write world tables).
+
+P12, D-108 — height, and the lines only a few can take (PARKOUR-01..08). The owner: "You also have to
+account for how to simulate Addison Flores. She parkours." Her card: "Goes up and away — to a ledge,
+a fence, a roof — before she has decided anything; her feet decide first."
+PARKOUR-01 Height. places.elevation_m is the floor's height above the street (the ground 0; a roof
+  its building's height; a room its storey's). A place of kind 'roof' is open air on top of a
+  building. PARKOUR_KINDS = ('climb', 'gap', 'edge') are three portal kinds nobody walks through
+  (aperture 0; admits() -> (False, 'wall'); ``path`` never crosses them unless asked, PARKOUR-03):
+  'climb' — a face between a lower and a higher place that can be climbed (a drainpipe, a wall with
+  holds, a loading-dock stack), height_cm = the climb; 'gap' — the space between two ledges or roofs,
+  gap_cm across (the places' elevations say up or down); 'edge' — where a higher place drops to a
+  lower one, height = the drop. All three are open air: transparent 1 (you see across and down), a
+  small seal. A portal's below_id is the place a body lands in when it falls off it (the alley under
+  a gap, the street under an edge); NULL -> the lower of its two places.
+PARKOUR-02 drop_m(store, portal_id, from_place) -> float: how far a body falls off this portal from
+  ``from_place``: max(0, elevation(from_place) - elevation(landing)), landing = below_id, else the
+  lower of the two places. rise_m(store, portal_id, from_place) -> float: max(0, elevation(the other
+  place) - elevation(from_place)).
+PARKOUR-03 path(..., parkour=None): with parkour = {climb_cm, gap_cm, edge_m} the search may also
+  cross a 'climb' of height_cm <= climb_cm (either way), a 'gap' of gap_cm <= gap_cm, an 'edge'
+  downward when its drop <= edge_m, and a 'fence' / 'wall' / 'window' with 0 < height_cm <= climb_cm
+  (over it) — each crossing costs its crossing distance plus 4 m (what it takes). world.infected
+  uses it for the dead that climb (INF-20).
+PARKOUR-04 Climbing a face: action.effects climb_face (A + athletics against climb.class; one less
+  going down); a BREAK falls half the height.
+PARKOUR-05 Jumping a gap: action.effects jump_gap (against gap.class); a FAIL balks at the edge, a
+  BREAK falls into the gap's landing place.
+PARKOUR-06 Dropping off an edge: action.effects drop_down (against drop.class) — always a fall, and
+  a good roll takes metres off it (physical.bodies FALL-01).
+PARKOUR-07 Her feet decide first: action.effects flee — a body tagged 'parkour' goes up first when
+  its place has a way up.
+PARKOUR-08 Roofs in the world: discover_layout steps 4 and 5 (a building's roof, its ways up and
+  down, the gaps between the roofs of a block).
 
 P10 — putting bodies and changing places outside a turn:
 place_body(tx, body_id, place_id, anchor_id, x_m, y_m, at, cause_event_id, turn_index, *,
@@ -181,11 +232,15 @@ def _fits(store, p, body_id):
     return False, "too_low"
 
 
+PARKOUR_KINDS: tuple[str, ...] = ("climb", "gap", "edge")   # D-108 PARKOUR-01
+NOWALK_KINDS: tuple[str, ...] = ("wall", "fence") + PARKOUR_KINDS
+
+
 def admits(store: "Store | Tx", portal_id: str, body_id: str) -> tuple[bool, str]:
     """(True, 'upright'|'crawl') or (False, reason) where reason in
     {'wall','closed','too_narrow','too_low'}."""
     p = _row(store, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
-    if p["kind"] in ("wall", "fence"):
+    if p["kind"] in NOWALK_KINDS:
         return False, "wall"
     if not p["is_open"]:
         return False, "closed"
@@ -193,7 +248,7 @@ def admits(store: "Store | Tx", portal_id: str, body_id: str) -> tuple[bool, str
 
 
 def _traversable(store, p, body_id, allow_closed, allow_locked=False):
-    if p["kind"] in ("wall", "fence"):
+    if p["kind"] in NOWALK_KINDS:
         return False
     ok, why = admits(store, p["portal_id"], body_id)
     if ok:
@@ -205,7 +260,44 @@ def _traversable(store, p, body_id, allow_closed, allow_locked=False):
     return False
 
 
-def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal):
+def _elev(store, place_id):
+    r = _row(store, "SELECT elevation_m FROM places WHERE place_id=?", (place_id,))
+    return float(r["elevation_m"]) if r is not None else 0.0
+
+
+def _landing(store, p):
+    if p["below_id"]:
+        return p["below_id"]
+    return p["place_a"] if _elev(store, p["place_a"]) <= _elev(store, p["place_b"]) else p["place_b"]
+
+
+def drop_m(store: "Store | Tx", portal_id: str, from_place: str) -> float:
+    p = _row(store, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
+    return max(0.0, _elev(store, from_place) - _elev(store, _landing(store, p)))
+
+
+def rise_m(store: "Store | Tx", portal_id: str, from_place: str) -> float:
+    p = _row(store, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
+    other = p["place_b"] if p["place_a"] == from_place else p["place_a"]
+    return max(0.0, _elev(store, other) - _elev(store, from_place))
+
+
+def _parkour_ok(store, p, place, lim):
+    """May a body with these limits cross this portal from ``place`` (D-108)?"""
+    k = p["kind"]
+    if k == "climb":
+        return p["height_cm"] <= lim.get("climb_cm", 0)
+    if k == "gap":
+        return p["gap_cm"] <= lim.get("gap_cm", 0)
+    if k == "edge":
+        other = p["place_b"] if p["place_a"] == place else p["place_a"]
+        return _elev(store, place) > _elev(store, other) and drop_m(store, p["portal_id"], place) <= lim.get("edge_m", 0)
+    if k in ("fence", "wall"):
+        return 0 < p["height_cm"] <= lim.get("climb_cm", 0)
+    return False
+
+
+def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal, extra=None):
     portals = [dict(r) for r in store.query("SELECT * FROM portals ORDER BY portal_id")]
     # entries: (cost, done_flag, seq, n, place, point, legs); done entries (flag 0) win ties
     n = 0
@@ -226,7 +318,7 @@ def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal):
         for p in portals:
             if place not in (p["place_a"], p["place_b"]) or p["place_a"] == p["place_b"]:
                 continue
-            if not ok_portal(p):
+            if not ok_portal(p, place):
                 continue
             other = p["place_b"] if p["place_a"] == place else p["place_a"]
             if other == start_place or any(pl == other for _, pl, _ in legs):
@@ -235,7 +327,7 @@ def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal):
             there = portal_point(store, p["portal_id"], other)
             if (other, there) in settled:
                 continue
-            d = distance_m(*pt, *here)
+            d = distance_m(*pt, *here) + (extra(p) if extra else 0.0)
             n += 1
             _heapq.heappush(heap, (cost + d, 1, seq + (p["portal_id"],), n, other, there, legs + ((p["portal_id"], other, d),)))
     return None
@@ -247,7 +339,7 @@ def _body_pt(store, body_id):
 
 
 def path(store: "Store | Tx", body_id: str, to_place: str, to_anchor: str | None = None,
-         *, allow_closed: bool = False, allow_locked: bool = False) -> list[PathLeg] | None:
+         *, allow_closed: bool = False, allow_locked: bool = False, parkour: dict | None = None) -> list[PathLeg] | None:
     """Shortest traversable route by distance (Dijkstra, ties broken by portal_id). With
     allow_closed=True closed-but-unlocked, unbarricaded portals count as traversable (the mover
     will have to open them). P10: with allow_locked=True every closed portal counts, locked or
@@ -260,7 +352,13 @@ def path(store: "Store | Tx", body_id: str, to_place: str, to_anchor: str | None
         if a is None or a["place_id"] != to_place:
             raise ValueError("anchor not in place")
         goal = (a["x_m"], a["y_m"])
-    r = _dijkstra(store, place, pt, to_place, goal, lambda p: _traversable(store, p, body_id, allow_closed, allow_locked))
+    if parkour:   # PARKOUR-03 (D-108)
+        extra_m = store.rules.parkour.crossing_extra_m if getattr(store, "rules", None) is not None else 4.0
+        r = _dijkstra(store, place, pt, to_place, goal,
+                      lambda p, pl: _traversable(store, p, body_id, allow_closed, allow_locked) or _parkour_ok(store, p, pl, parkour),
+                      extra=lambda p: extra_m if p["kind"] in NOWALK_KINDS else 0.0)
+    else:
+        r = _dijkstra(store, place, pt, to_place, goal, lambda p, _pl: _traversable(store, p, body_id, allow_closed, allow_locked))
     return None if r is None else r[1]
 
 
@@ -271,7 +369,7 @@ def point_distance(store: "Store | Tx", a_body: str, b_body: str) -> float | Non
     pb, ptb = _body_pt(store, b_body)
     if pa == pb:
         return distance_m(*pta, *ptb)
-    r = _dijkstra(store, pa, pta, pb, ptb, lambda p: True)
+    r = _dijkstra(store, pa, pta, pb, ptb, lambda p, _pl: True)
     return None if r is None else r[0]
 
 
@@ -327,7 +425,7 @@ def portal_change_event(tx: "Tx", portal_id: str, changes: dict, at: int, actor_
     if not changes or set(changes) - allowed:
         raise ValueError(f"portal changes limited to {sorted(allowed)}")
     p = _row(tx, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
-    if p["kind"] in ("wall", "fence") and set(changes) - {"damage", "strain_min"}:
+    if p["kind"] in NOWALK_KINDS and set(changes) - {"damage", "strain_min"}:
         raise ValueError("a wall or fence can only be damaged")
     after = {**p, **{k: int(v) for k, v in changes.items()}}
     if after["is_open"] and after["barricade"] > 0:
@@ -388,6 +486,8 @@ def discover_layout(tx: "Tx", rng, building_place_id: str, at: int, turn_index: 
             is_open, locked = rng.chance(tx, stream, f"open:{i}", 0.3), False
         ws.append(WriteRecord(op=WriteOp.INSERT, table="portals", values=portal_vals(
             pt, building_place_id, room_ids[pt.to_room], front["anchor_id"] if front else None, is_open, locked, dmg)))
+    if a.roof is not None:
+        ws += _roof_writes(tx, rng, b, a, room_ids, front["anchor_id"] if front else None, portal_vals)
     ws.append(WriteRecord(op=WriteOp.UPDATE, table="places", key={"place_id": building_place_id}, values={"layout_generated": 1}))
     ev = tx.commit_event(Event(type=EventType.PLACE_DISCOVERED, writer="physical.space", at=at, turn_index=turn_index,
                                place_id=building_place_id, writes=ws,
@@ -429,6 +529,64 @@ def discover_layout(tx: "Tx", rng, building_place_id: str, at: int, turn_index: 
                     holder = objects.Holder("place", room_ids[r.id], anchor_id=anchors_of[r.id][0][0])
                 out.append(objects.create(tx, e.item, q, holder, "loot", {}, at, ev.event_id, turn_index, condition=cond))
     return out
+
+
+def _roof_writes(tx, rng, b, a, room_ids, grounds_anchor, portal_vals):
+    """discover_layout steps 4-5 (D-108): the roof, its ways up and down, the gaps of the block."""
+    from ..contracts.events import WriteOp, WriteRecord
+    R = a.roof
+    site = b["place_id"]
+    roof_id = tx.mint("plc")
+    roof_name = f"{b['name']} roof" if R.name == "Roof" else R.name
+    ws = [WriteRecord(op=WriteOp.INSERT, table="places", values={
+        "place_id": roof_id, "zone_id": b["zone_id"], "parent_id": site, "kind": "roof", "name": roof_name, "archetype_ref": None,
+        "width_m": R.width_m, "depth_m": R.depth_m, "indoor": 0, "material": "open_air", "light_level": 2, "ambient_db": 30.0,
+        "layout_generated": 1, "held": b["held"], "props": {}, "elevation_m": R.elevation_m})]
+    first = None
+    for an in R.anchors:
+        aid = tx.mint("anc")
+        first = first or aid
+        ws.append(WriteRecord(op=WriteOp.INSERT, table="anchors", values={
+            "anchor_id": aid, "place_id": roof_id, "name": an.name, "kind": an.kind, "x_m": an.x_m, "y_m": an.y_m,
+            "cover": an.cover, "concealment": an.concealment, "capacity": 4}))
+    height = round(R.elevation_m * 100)
+    if R.hatch is not None and R.hatch_room in room_ids:
+        ws.append(WriteRecord(op=WriteOp.INSERT, table="portals", values=portal_vals(
+            R.hatch, room_ids[R.hatch_room], roof_id, None, R.hatch.starts_open, False, 0)))
+    for pt in R.faces:
+        v = portal_vals(pt, site, roof_id, grounds_anchor, pt.kind == "stairs" or pt.starts_open, False, 0)
+        v["anchor_b"] = first
+        if pt.kind == "climb":
+            v.update(height_cm=height, transparent=1, seal_db=2.0, aperture_w_cm=0, aperture_h_cm=0, is_open=0)
+        ws.append(WriteRecord(op=WriteOp.INSERT, table="portals", values=v))
+    ws.append(WriteRecord(op=WriteOp.INSERT, table="portals", values={
+        "portal_id": tx.mint("prt"), "place_a": roof_id, "place_b": site, "anchor_a": first, "anchor_b": grounds_anchor,
+        "kind": "edge", "name": R.edge_name, "is_open": 0, "is_locked": 0, "lock_quality": 0, "barricade": 0, "damage": 0,
+        "aperture_w_cm": 0, "aperture_h_cm": 0, "seal_db": 2.0, "open_loss_db": 0.0, "transparent": 1, "height_cm": height,
+        "gap_cm": 0, "below_id": site}))
+    P = tx.rules.parkour
+    sites = [r[0] for r in tx.query("SELECT place_id FROM places WHERE zone_id=? AND kind='building' AND parent_id IS NULL "
+                                    "ORDER BY place_id", (b["zone_id"],))] if b["zone_id"] else [site]
+    i = sites.index(site)
+    for nb in [s for s in (sites[i - 1] if i > 0 else None, sites[i + 1] if i + 1 < len(sites) else None) if s]:
+        their = _row(tx, "SELECT place_id, name FROM places WHERE parent_id=? AND kind='roof'", (nb,))
+        if their is None:
+            continue
+        lo, hi = sorted((site, nb))
+        stream = f"layout:{lo}:{hi}"
+        if not rng.chance(tx, stream, "gap", P.gap_chance):
+            continue
+        width = rng.range_int(tx, stream, "gap_cm", P.gap_cm[0], P.gap_cm[1])
+        roof_of = {site: roof_id, nb: their["place_id"]}
+        anchor_of = {site: first, nb: _row(tx, "SELECT anchor_id FROM anchors WHERE place_id=? ORDER BY anchor_id LIMIT 1",
+                                         (their["place_id"],))["anchor_id"]}
+        ws.append(WriteRecord(op=WriteOp.INSERT, table="portals", values={
+            "portal_id": tx.mint("prt"), "place_a": roof_of[lo], "place_b": roof_of[hi], "anchor_a": anchor_of[lo],
+            "anchor_b": anchor_of[hi], "kind": "gap", "name": "gap between the roofs",
+            "is_open": 0, "is_locked": 0, "lock_quality": 0, "barricade": 0, "damage": 0, "aperture_w_cm": 0,
+            "aperture_h_cm": 0, "seal_db": 2.0, "open_loss_db": 0.0, "transparent": 1, "height_cm": 0, "gap_cm": width,
+            "below_id": lo}))
+    return ws
 
 
 def place_body(tx: "Tx", body_id: str, place_id: str, anchor_id: str | None, x_m: float, y_m: float, at: int,
@@ -507,5 +665,5 @@ def distance_to_point(store: "Store | Tx", body_id: str, place_id: str, x_m: flo
     pa, pta = _body_pt(store, body_id)
     if pa == place_id:
         return distance_m(*pta, x_m, y_m)
-    r = _dijkstra(store, pa, pta, place_id, (x_m, y_m), lambda p: True)
+    r = _dijkstra(store, pa, pta, place_id, (x_m, y_m), lambda p, _pl: True)
     return None if r is None else r[0]

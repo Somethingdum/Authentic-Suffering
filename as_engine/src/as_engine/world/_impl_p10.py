@@ -389,6 +389,38 @@ def _press_portal(tx, body, portal_id, pos, at, turn_index, cause):
     return out
 
 
+def _parkour_leg(tx, rng, b, pr, leg, at, turn_index, cause):
+    """Across a climb, a gap, an edge or a fence — or the fall (D-108)."""
+    from ..kernel import clock
+    from ..physical import bodies, space
+    R = tx.rules.infected
+    pk = _canon(tx).find("infected", _inf(tx, b)["type_id"]).parkour
+    here = _row(tx, "SELECT place_id FROM positions WHERE body_id=?", (b,))["place_id"]
+    out = []
+    lo, hi = pk.fall_pct if pk is not None else (100, 100)
+    pct = rng.range_int(tx, "infected", f"parkour_p:{b}:{at}", lo, hi)
+    if rng.chance(tx, "infected", f"parkour:{b}:{at}", pct / 100):
+        other = leg["to_place"]
+        if pr["kind"] in ("gap", "edge"):
+            land = space._landing(tx, pr)
+            height = space.drop_m(tx, pr["portal_id"], here)
+            p = _row(tx, "SELECT width_m, depth_m FROM places WHERE place_id=?", (land,))
+            x, y = p["width_m"] / 2, p["depth_m"] / 2
+        else:
+            eh = _row(tx, "SELECT elevation_m FROM places WHERE place_id=?", (here,))["elevation_m"]
+            eo = _row(tx, "SELECT elevation_m FROM places WHERE place_id=?", (other,))["elevation_m"]
+            land = here if eh <= eo else other
+            height = abs(eh - eo) / 2 if pr["kind"] == "climb" else pr["height_cm"] / 100 / 2
+            x, y = space.portal_point(tx, pr["portal_id"], land)
+        out.append(tx.commit_event(space.move_event(tx, b, land, None, x, y, at, cause, turn_index)))
+        out += bodies.fall(tx, rng, b, height, at, turn_index, out[-1].event_id)
+    else:
+        out.append(tx.commit_event(space.move_event(tx, b, leg["to_place"], None, leg["x_m"], leg["y_m"], at, cause, turn_index)))
+    if active(tx, b):
+        clock.schedule(tx, at + round(R.step_min_s * 1000), "INFECTED_STEP", b, {"body_id": b}, out[-1].event_id)
+    return out
+
+
 def step(tx, rng, row, fired, turn_index):
     from ..action.intent import Intent
     from ..action.resolve import resolve_wave
@@ -423,6 +455,8 @@ def step(tx, rng, row, fired, turn_index):
         ok = True
         if leg.get("portal_id"):
             pr = _row(tx, "SELECT * FROM portals WHERE portal_id=?", (leg["portal_id"],))
+            if pr is not None and pr["kind"] in ("climb", "gap", "edge", "fence"):   # INF-20 (D-108)
+                return out + _parkour_leg(tx, rng, b, pr, leg, at, turn_index, cause)
             ok = bool(pr and pr["is_open"] and space.admits(tx, leg["portal_id"], b))
         if ok:
             out.append(tx.commit_event(space.move_event(tx, b, leg["to_place"], None, leg["x_m"], leg["y_m"], at, cause,
@@ -524,6 +558,9 @@ def step(tx, rng, row, fired, turn_index):
     if delay is None:
         pth = space.path(tx, b, dest) or space.path(tx, b, dest, allow_closed=True) or \
             space.path(tx, b, dest, allow_locked=True)
+        pk = _canon(tx).find("infected", r["type_id"]).parkour if not pth else None
+        if pk is not None:   # INF-20 (D-108): the dead that climb
+            pth = space.path(tx, b, dest, parkour={"climb_cm": pk.climb_cm, "gap_cm": pk.gap_cm, "edge_m": pk.edge_m})
         if not pth:
             out.append(_state_ev(tx, b, {"target_id": None}, {"target_id": target}, at, turn_index, cause))
             return out

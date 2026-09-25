@@ -28,8 +28,13 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
                    (always known); open_portal is_open 0 and barricade 0; close_portal is_open 1;
                    lock/unlock/pick_lock kinds door/gate/window, is_open 0; barricade_portal
                    is_open 0 and barricade < 3; unbarricade_portal barricade > 0; force_portal
-                   is_open 0; climb_obstacle height_cm > 0; peek_portal is_open 0 (a gap);
-                   watch_portal any.
+                   is_open 0; climb_obstacle height_cm > 0 and kind fence or window;
+                   peek_portal is_open 0 (a gap); watch_portal any. (D-108) Nothing opens, closes,
+                   locks, barricades, forces, peeks through or walks through a fence, a 'climb',
+                   a 'gap' or an 'edge'; vault_obstacle a fence or window with 0 < height_cm <=
+                   130; climb_face a 'climb' (destination: the other place); jump_gap a 'gap'
+                   (the other place); drop_down an 'edge' from its higher side (space.drop_m > 0;
+                   destination: the landing place).
     body           every known body (not the actor).
     item_held      items in hand_l / hand_r.  item_carried  its items in worn/pocket/pack slots
                    and inside containers it carries (never a firearm's loaded magazine).
@@ -113,7 +118,8 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
                       anyone may be unarmed; never read off the record (AFF-11);
     abandon_post      see duty;
     abandon_dependent an option that takes the actor out of its place (move_through_portal,
-                      leave_place, flee_threat, climb_obstacle) while a KNOWN body (above) it is
+                      leave_place, flee_threat, climb_obstacle, and D-108 vault_obstacle,
+                      climb_face, jump_gap, drop_down) while a KNOWN body (above) it is
                       guardian_of stands in that place and a threat was perceived this turn — a
                       dependent it has not perceived this turn does not hold it back (it does not
                       know he is there);

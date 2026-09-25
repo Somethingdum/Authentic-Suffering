@@ -7,7 +7,9 @@ import math
 from ..contracts.common import ANATOMY_GROUP, Verb, age_band_for
 from .affordance import AffordanceSet, BoundAffordance, Rejection, duration_words
 
-MOVE_OUT = {"move_through_portal", "leave_place", "flee_threat", "climb_obstacle"}
+MOVE_OUT = {"move_through_portal", "leave_place", "flee_threat", "climb_obstacle",
+            "vault_obstacle", "climb_face", "jump_gap", "drop_down"}   # D-108
+_NOWALK = ("fence", "climb", "gap", "edge")   # D-108: nobody walks through (physical.space NOWALK_KINDS; walls are not listed)
 _ANAT = {"head": "head", "neck": "neck", "chest": "chest", "abdomen": "belly", "back": "back", "arm_l": "left arm", "arm_r": "right arm",
          "hand_l": "left hand", "hand_r": "right hand", "leg_l": "left leg", "leg_r": "right leg", "foot_l": "left foot", "foot_r": "right foot"}
 ATTACK_GROUP_VERBS = {Verb.ATTACK}
@@ -175,27 +177,37 @@ def _bindings(c, d):
     elif b == "portal":
         for p in c.portals:
             f = d.id
-            if f == "open_portal" and not (p["is_open"] == 0 and p["barricade"] == 0 and p["kind"] != "fence"):
+            if f == "open_portal" and not (p["is_open"] == 0 and p["barricade"] == 0 and p["kind"] not in _NOWALK):
                 continue
-            if f == "close_portal" and not p["is_open"]:
+            if f == "close_portal" and not (p["is_open"] and p["kind"] not in _NOWALK):
                 continue
             if f in ("lock_portal", "unlock_portal", "pick_lock") and not (p["kind"] in ("door", "gate", "window") and p["is_open"] == 0):
                 continue
-            if f == "barricade_portal" and not (p["is_open"] == 0 and p["barricade"] < 3 and p["kind"] != "fence"):
+            if f == "barricade_portal" and not (p["is_open"] == 0 and p["barricade"] < 3 and p["kind"] not in _NOWALK):
                 continue
             if f == "unbarricade_portal" and not p["barricade"] > 0:
                 continue
-            if f == "force_portal" and not (p["is_open"] == 0 and p["kind"] != "fence"):
+            if f == "force_portal" and not (p["is_open"] == 0 and p["kind"] not in _NOWALK):
                 continue
-            if f == "climb_obstacle" and not p["height_cm"] > 0:
+            if f == "climb_obstacle" and not (p["height_cm"] > 0 and p["kind"] in ("fence", "window")):
                 continue
-            if f == "peek_portal" and not (p["is_open"] == 0 and p["kind"] != "fence"):
+            if f == "vault_obstacle" and not (0 < p["height_cm"] <= 130 and p["kind"] in ("fence", "window")):   # D-108
                 continue
-            if f == "move_through_portal" and p["kind"] == "fence":
+            if f == "climb_face" and p["kind"] != "climb":
+                continue
+            if f == "jump_gap" and p["kind"] != "gap":
+                continue
+            if f == "drop_down" and not (p["kind"] == "edge" and space.drop_m(c.tx, p["portal_id"], c.place) > 0):
+                continue
+            if f == "peek_portal" and not (p["is_open"] == 0 and p["kind"] not in _NOWALK):
+                continue
+            if f == "move_through_portal" and p["kind"] in _NOWALK:
                 continue
             pt = space.portal_point(c.tx, p["portal_id"], c.place)
             other = p["place_b"] if p["place_a"] == c.place else p["place_a"]
-            out.append({"target_id": p["portal_id"], "destination_id": other if f in ("move_through_portal", "climb_obstacle") else None,
+            if f == "drop_down":
+                other = space._landing(c.tx, p)
+            out.append({"target_id": p["portal_id"], "destination_id": other if f in MOVE_OUT else None,
                         "dist": _dist_pt(c, *pt)})
     elif b == "body":
         cands = c.threats if d.id == "flee_threat" else c.known_bodies

@@ -145,6 +145,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | what the talk left | the mark the Voice leaves on a doomed mind: shattered, broken or held (dooms.mind, DOOM-10, RES-06/07) | — | trauma level |
 | the bitten doom | the Voice's cruelty: a doom at the bite, four weeks to live with it (DOOM-12) | — | — |
 | despair | a doomed mind's daily reckoning (turn.cognition.despair) and the end of the rope (requires.despair) that puts ending it on the menu (DOOM-14/15) | "End it with the …" | — |
+| elevation | a place's floor height above the street (places.elevation_m, PARKOUR-01) | — | altitude, floor number |
+| roof | a place of kind 'roof': open air on top of a building (PARKOUR-01/08) | the building's name + "roof" | rooftop |
+| climb / gap / edge | the three portal kinds nobody walks: a face you climb, the space between two ledges, a drop (PARKOUR-01) | "a climb of about N metres", "about N metres across", "a drop of about N metres" (from below: "about N metres up, out of reach") | ledge portal |
+| parkour | the capability tag (+2 to climbing, jumping and dropping checks) and the moves: vault, climb a face, jump a gap, drop off an edge (D-108) | — | freerunning |
+| fall | what height does to a body that comes off it (FALL-01) | "a heavy fall" | fall damage |
 | seal | the guard that lets the game talk only to this machine and the owner's model machines (02 §9, SEAL-01..05) | — | firewall, sandbox |
 | Act / Say / Cheat | the Play input's three fields, sent together as `turn_compose`; Cheat only while the console is open (D-103) | "Act", "Say", "Cheat" | Do box |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |

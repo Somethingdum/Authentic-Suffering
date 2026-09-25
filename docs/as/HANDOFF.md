@@ -39,7 +39,9 @@ replaces "the rest will remain uncoded"). What is left:
    world stops; Willis comes and is taken; a voice with no name walks the dead through their
    chain; the doomed scream and cannot tell why; the console is Willis's power on loan; D-107: the
    screaming is public knowledge and nothing more, the talk shatters or breaks most minds, the Voice
-   sometimes dooms at the bite, and some can't take it); still to do: a new life here and the rest below. The owner's list was: overwriting an
+   sometimes dooms at the bite, and some can't take it), and so is parkour (D-108: the world has
+   height — roofs, drainpipes, gaps between buildings, edges — and Addison Flores moves on it; falls
+   hurt by height; runners follow her up and often fall); still to do: a new life here and the rest below. The owner's list was: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

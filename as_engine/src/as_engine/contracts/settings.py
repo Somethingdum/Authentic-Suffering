@@ -430,6 +430,13 @@ class SocietyRules(Strict):
     grief_ease_days: int = 7
 
 
+class ParkourRules(Strict):
+    """D-108 (physical.space PARKOUR-03 / PARKOUR-08): the roofs of a block, and what a line costs a path."""
+    gap_chance: float = 0.6                   # neighbouring roofs with a gap one can try to jump
+    gap_cm: tuple[int, int] = (70, 300)       # how wide those gaps are
+    crossing_extra_m: float = 4.0             # a climb, a jump or a drop costs a path this much more than walking
+
+
 class HordeRules(Strict):
     """P10 the region's dead in numbers, hordes, the exterior and the Mega Horde (world.hordes
     HRD-01..17; fidelity E01-E03, W04). Per-difficulty / per-era keys are Difficulty / Era values."""
@@ -502,6 +509,7 @@ class RulesConfig(Strict):
     infected: InfectedRules = Field(default_factory=InfectedRules)
     background: BackgroundRules = Field(default_factory=BackgroundRules)
     hordes: HordeRules = Field(default_factory=HordeRules)
+    parkour: ParkourRules = Field(default_factory=ParkourRules)
 
 
 class EngineConfig(Strict):

@@ -110,6 +110,61 @@
   check: {attribute: A, skill: athletics, tags: [parkour, climber], resistance: obstacle.class}
   effect: climb
   tags: [move, climb]
+# D-108 — parkour (Addison Flores: "Goes up and away — to a ledge, a fence, a roof — before she has
+# decided anything; her feet decide first"). A + athletics; the tags parkour / climber add +2. The
+# Where panel says how high and how far (narration.location). Falls: physical.bodies.fall.
+- schema: as.affordance.v1
+  id: vault_obstacle
+  verb: move
+  label: "Vault over {target} (about {duration})"
+  ui_label: "Vault {target}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true, can_run: true, hands_free: 1, skill: {domain: athletics, min_rank: 1}}
+  duration: {base_s: 1.5}
+  noise_db: 40
+  check: {attribute: A, skill: athletics, tags: [parkour, climber], resistance: obstacle.class}
+  effect: climb
+  tags: [move, climb, parkour]
+- schema: as.affordance.v1
+  id: climb_face
+  verb: move
+  label: "Climb {target} to {destination} (about {duration})"
+  ui_label: "Climb {target}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true, hands_free: 2, skill: {domain: athletics, min_rank: 1}}
+  duration: {base_s: 15}
+  noise_db: 35
+  check: {attribute: A, skill: athletics, tags: [parkour, climber], resistance: climb.class}
+  effect: climb_face
+  tags: [move, climb, parkour]
+- schema: as.affordance.v1
+  id: jump_gap
+  verb: move
+  label: "Take a run at {target} and jump to {destination}"
+  ui_label: "Jump {target}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true, can_run: true, fear_exposure: true, skill: {domain: athletics, min_rank: 1}}
+  duration: {base_s: 3}
+  noise_db: 45
+  check: {attribute: A, skill: athletics, tags: [parkour], resistance: gap.class}
+  effect: jump_gap
+  tags: [move, parkour]
+- schema: as.affordance.v1
+  id: drop_down
+  verb: move
+  label: "Drop off {target} down to {destination}"
+  ui_label: "Drop down to {destination}"
+  binds: portal
+  range: same_place
+  requires: {mobile: true, fear_exposure: true}
+  duration: {base_s: 2}
+  noise_db: 40
+  check: {attribute: A, skill: athletics, tags: [parkour], resistance: drop.class}
+  effect: drop_down
+  tags: [move, parkour]
 - schema: as.affordance.v1
   id: take_cover
   verb: take_cover

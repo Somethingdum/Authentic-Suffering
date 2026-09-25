@@ -46,7 +46,7 @@ def archetype(s, place_id):
 
 
 def rooms_of(s, place_id) -> list[dict]:
-    return all_rows(s, "SELECT * FROM places WHERE parent_id = ? ORDER BY place_id", (place_id,))
+    return all_rows(s, "SELECT * FROM places WHERE parent_id = ? AND kind = 'room' ORDER BY place_id", (place_id,))
 
 
 def anchors_of(s, place_id) -> list[dict]:

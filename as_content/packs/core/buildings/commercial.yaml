@@ -54,6 +54,19 @@
     - {to_room: sales_floor, kind: window, name: front window, aperture_w_cm: 240, aperture_h_cm: 150, seal_db: 18, transparent: true, height_cm: 60}
     - {to_room: storeroom, kind: door, name: back door, lockable: true, lock_quality: 2, aperture_w_cm: 90, aperture_h_cm: 205, seal_db: 30}
     - {to_room: storeroom, kind: wall, name: back wall, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 45}
+  roof:   # D-108: flat tar and gravel behind a low parapet
+    elevation_m: 4.5
+    width_m: 14
+    depth_m: 14
+    anchors:
+      - {name: roof hatch, kind: feature, x_m: 10, y_m: 11}
+      - {name: front parapet, kind: vantage, x_m: 7, y_m: 0.5, cover: 1, concealment: 1}
+      - {name: old water tank, kind: hiding_spot, x_m: 3, y_m: 10, cover: 2, concealment: 2}
+    hatch_room: storeroom
+    hatch: {to_room: storeroom, kind: hole, name: roof hatch, aperture_w_cm: 70, aperture_h_cm: 70, seal_db: 20}
+    faces:
+      - {to_room: storeroom, kind: climb, name: drainpipe, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 2}
+    edge_name: front parapet
 - schema: as.building.v1
   id: gas_station
   name: Gas station
@@ -99,3 +112,14 @@
   exterior_portals:
     - {to_room: kiosk, kind: door, name: glass door, lockable: true, lock_quality: 1, aperture_w_cm: 90, aperture_h_cm: 210, seal_db: 15, transparent: true}
     - {to_room: service_bay, kind: gate, name: roll-up door, lockable: true, lock_quality: 2, aperture_w_cm: 300, aperture_h_cm: 280, seal_db: 20}
+  roof:   # D-108: the pump canopy, flat sheet metal
+    name: Pump canopy
+    elevation_m: 4.5
+    width_m: 12
+    depth_m: 8
+    anchors:
+      - {name: canopy edge, kind: vantage, x_m: 6, y_m: 0.5}
+      - {name: canopy middle, kind: feature, x_m: 6, y_m: 4}
+    faces:
+      - {to_room: back_room, kind: climb, name: crates stacked against the back wall, aperture_w_cm: 0, aperture_h_cm: 0, seal_db: 2}
+    edge_name: canopy edge

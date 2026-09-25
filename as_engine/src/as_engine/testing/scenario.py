@@ -213,7 +213,7 @@ class AnchorSpec(Strict):
 class PlaceSpec(Strict):
     id: LocalId
     name: str
-    kind: Literal["building", "room", "street", "outdoor", "vehicle", "tunnel"] = "room"
+    kind: Literal["building", "room", "street", "outdoor", "vehicle", "tunnel", "roof"] = "room"
     parent: LocalId | None = None
     width_m: float = Field(default=10, gt=0)
     depth_m: float = Field(default=10, gt=0)
@@ -222,6 +222,7 @@ class PlaceSpec(Strict):
     light: int = Field(default=2, ge=0, le=4)
     ambient_db: float = 30.0
     held: bool = False
+    elevation_m: float = Field(default=0.0, ge=0, le=200, description="D-108: the floor's height above the street")
     anchors: list[AnchorSpec] = Field(default_factory=list)
 
 
@@ -229,7 +230,8 @@ class PortalSpec(Strict):
     id: LocalId
     a: LocalId
     b: LocalId
-    kind: Literal["door", "window", "hole", "stairs", "gate", "vent", "drain", "curtain", "opening", "wall", "fence"]
+    kind: Literal["door", "window", "hole", "stairs", "gate", "vent", "drain", "curtain", "opening", "wall", "fence",
+                  "climb", "gap", "edge"]
     name: str
     anchor_a: LocalId | None = None
     anchor_b: LocalId | None = None
@@ -243,11 +245,14 @@ class PortalSpec(Strict):
     seal_db: float = Field(default=25.0, ge=0, le=60)
     open_loss_db: float = Field(default=3.0, ge=0, le=20)
     transparent: bool = False
-    height: int = Field(default=0, ge=0, le=600, description="obstacle height cm for climb (fences, walls, windows)")
+    height: int = Field(default=0, ge=0, le=3000, description="obstacle height cm for climb (fences, walls, windows); "
+                        "D-108: a climb's or an edge's height")
+    gap: int = Field(default=0, ge=0, le=1000, description="D-108: a 'gap' portal's width in cm")
+    below: LocalId | None = Field(default=None, description="D-108: where a body lands when it falls off a gap or an edge")
 
     @model_validator(mode="after")
     def _walls_are_closed(self) -> "PortalSpec":
-        if self.kind in ("wall", "fence") and (self.w != 0 or self.open):
+        if self.kind in ("wall", "fence", "climb", "gap", "edge") and (self.w != 0 or self.open):
             raise ValueError(f"portal {self.id}: a {self.kind} has aperture 0 and is never open")
         return self
 

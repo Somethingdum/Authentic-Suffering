@@ -95,6 +95,18 @@ infected_state row and NO actors row: code drives them, always, the same way on-
     barrel. taint_water(tx, point_body_id, infected_id, at, cause_event_id, turn_index) -> list[Event]
     does it (called from the bite and from physical.bodies' destruction / false death of an
     infected body).
+  INF-20 (P12, D-108) The dead that climb. A type whose InfectedTypeDef.parkour is set (runners:
+    "uses climbs and short parkour lines, misjudges distances"; "a 25-40% chance of a spectacular
+    fall on any complex maneuver") paths, when it has no walking path at all, with
+    physical.space.path(..., parkour={climb_cm, gap_cm, edge_m}) (PARKOUR-03); shamblers and
+    crawlers never — the living who go up are out of their reach. Its leg across a portal of kind
+    climb / gap / edge / fence (the leg's portal_id): p = rng.range_int(tx, 'infected',
+    f"parkour_p:{body}:{at}", *fall_pct), then rng.chance(tx, 'infected', f"parkour:{body}:{at}",
+    p / 100) -> it falls: MOVE to the landing place (a gap or an edge: its landing place at its
+    centre; a climb or a fence: the lower of the two places at the portal's point there) and
+    physical.bodies.fall(the drop — space.drop_m off a gap or an edge, half the height between the
+    places for a climb, the fence's height_cm / 100 / 2) — the fall's wounds, its false death, its
+    noise; else the MOVE across.
 
 active(store, body_id) -> bool: bodies.kind 'infected', alive 1, core_intact 1, awareness not
   'unconscious' (false-dead), an infected_state row with folded_at NULL (P10: a body folded back
