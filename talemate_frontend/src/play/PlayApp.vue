@@ -14,6 +14,7 @@ import { computed, provide } from 'vue'
 import SettingsDialog from './components/SettingsDialog.vue'
 import ConnectScreen from './screens/ConnectScreen.vue'
 import ContentScreen from './screens/ContentScreen.vue'
+import DeathScreen from './screens/DeathScreen.vue'
 import HomeScreen from './screens/HomeScreen.vue'
 import LaterScreen from './screens/LaterScreen.vue'
 import PlayScreen from './screens/PlayScreen.vue'
@@ -25,6 +26,6 @@ const props = defineProps({ store: { type: Object, required: true } })
 const store = props.store
 provide('playStore', store)
 const SCREENS = { connect: ConnectScreen, home: HomeScreen, content: ContentScreen, play: PlayScreen,
-  wizard: WizardScreen, worldgen: WorldgenScreen }
+  wizard: WizardScreen, worldgen: WorldgenScreen, dead: DeathScreen }
 const current = computed(() => SCREENS[store.screen] || LaterScreen)
 </script>

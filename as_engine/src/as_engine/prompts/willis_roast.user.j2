@@ -1,0 +1,12 @@
+{% set f = ctx.facts %}The dead: {{ f.pc_name }}. They lasted {{ f.lived }} ({{ f.turns }} moment{% if f.turns != 1 %}s{% endif %} of their own).
+How they died: {{ f.cause_text }}
+{% if f.choices %}Their own choices on the way here, newest first:
+{% for c in f.choices %}- {{ c }}
+{% endfor %}{% endif %}{% if f.typed %}What they said they would do, in their own words, oldest first:
+{% for t in f.typed %}- "{{ t }}"
+{% endfor %}{% endif %}{% if f.bent_rules %}They had bent reality's rules with the console. It did not help.
+{% endif %}{% if f.ironman %}This was their only life. There is no going back to an earlier save.
+{% endif %}{% if f.rises %}They will get up again in a few hours, as one of the dead.
+{% endif %}{% if f.met_him %}They had met you in the world. You remember them.
+{% endif %}{% if f.by_his_hand %}You killed them yourself.
+{% endif %}

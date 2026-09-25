@@ -84,6 +84,8 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | worldgen_history / actor / opening | A | history & opening yes | JSON (stage schemas) | worldgen only | — (off the turn path) |
 | dossier_intake / pc_quickmake | A | no | JSON | content tools | — |
 | cheat_persona | B | no | text | cheat commands | falls back to canned persona lines |
+| cheat_interpret | A | no | CheatPlan | a plain-words line in the Cheat field (D-103) | the console would understand only /commands |
+| willis_roast | A | no | WillisRoast | every death of the PC (D-105) | falls back to service.death.fallback_roast: Willis still comes, in fewer words |
 | probe | A/B | per probe | JSON/text | Connect screen, bench | — |
 
 **Ablation duty** (plan §17.3 LAW): `tools/as/eval.py --ablate <call_class>` runs the canonical

@@ -35,6 +35,7 @@ export function createPlayStore(socket, { download } = {}) {
   s.closeSettings = () => { s.settingsOpen = false }
   s.clearError = () => { s.error = null }
   s.listPcs = () => send('pcs_list')
+  s.revealDeath = () => send('death_reveal')   // P12 (DEATH-10): the truth, only when asked
   s.enterCode = (code) => { s.codeResult = null; send('code_enter', { code }) }   // P12, CHEAT-12: the menu's code box
   s.newLife = (pcRef, settings, worldId = null) => {
     send('run_new', worldId ? { pc_ref: pcRef, settings, world_id: worldId } : { pc_ref: pcRef, settings })
@@ -66,6 +67,7 @@ export function createPlayStore(socket, { download } = {}) {
   on('view', (d) => { s.view = d.view; s.lanes = d.view?.lanes ?? s.lanes })
   on('story', (d) => { s.story = d.entries })
   on('pcs', (d) => { s.pcs = d.cards })
+  on('death', (d) => { s.death = d.death; s.screen = 'dead' })   // P12, D-105: sent twice — at once, then with Willis
   on('code_result', (d) => {   // taken or not, and nothing about what a code does (CHEATS §2)
     s.codeResult = d.accepted ? 'accepted' : 'rejected'
     if (d.accepted) s.pcs = []   // the New Life list asks again (CHEAT-12)

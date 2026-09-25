@@ -24,14 +24,18 @@ describe('PlayApp.vue', () => {
     sock.emit(fixture('view_rich'))
     await flush()
     expect(has(w, 'play-screen')).toBe(true)
-    // P10 built the New Life wizard and the Worldgen screen; death and saved worlds arrive with P12
+    // P10 built the New Life wizard and the Worldgen screen; P12 the death screen (D-105); saved
+    // worlds arrive later in P12
     store.go('wizard')
     await flush()
     expect(has(w, 'wizard-screen')).toBe(true)
     store.go('worldgen')
     await flush()
     expect(has(w, 'worldgen-screen')).toBe(true)
-    for (const later of ['dead', 'worlds']) {
+    sock.emit(fixture('death_willis'))
+    await flush()
+    expect(has(w, 'death-screen')).toBe(true)
+    for (const later of ['worlds']) {
       store.go(later)
       await flush()
       expect(has(w, 'later-screen'), later).toBe(true)

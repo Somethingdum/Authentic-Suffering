@@ -166,7 +166,7 @@ class LanesView(Strict):
 
 class StoryEntry(Strict):
     turn_index: int
-    kind: Literal["narration", "player", "guide", "notice", "cheat"]
+    kind: Literal["narration", "player", "guide", "notice", "cheat", "willis"]   # willis: D-105, Willis at a death
     text: str
     mode: Literal["do", "say", "ask"] | None = None
 
@@ -250,6 +250,8 @@ class DeathView(Strict):
     last_turns: list[str] = Field(default_factory=list, max_length=3)
     contributing: list[str] = Field(default_factory=list, description="Decisions that led here, from the PC's own record.")
     truth_reveal: list[str] = Field(default_factory=list, description="Shown only after the player clicks 'Show me everything'.")
+    willis: list[str] = Field(default_factory=list, max_length=6, description="D-105: Willis, roasting the dead (service.death.roast).")
+    willis_pending: bool = Field(default=False, description="D-105: Willis is on his way (his lines follow in another death message).")
     can_new_life_here: bool = Field(default=True, description="False in Ironman runs: death ends that run (RUN-08).")
     can_load: bool = Field(default=True, description="False in Ironman runs.")
     world_id: str | None = Field(default=None, description="The run's world, for 'Start fresh in this world'.")

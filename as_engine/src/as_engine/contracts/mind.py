@@ -462,6 +462,12 @@ class CheatPlan(Strict):
     summary: str = Field(default="", max_length=200)
 
 
+class WillisRoast(Strict):
+    """WILLIS_ROAST output (D-105): what Willis says to the dead, line by line."""
+
+    lines: list[str] = Field(min_length=1, max_length=6)
+
+
 class SayMyWayOutput(Strict):
     line: str = Field(min_length=1, max_length=400)
     survived: Literal["intact", "softened", "garbled", "withheld"]

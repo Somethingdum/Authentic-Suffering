@@ -62,6 +62,7 @@ from ..contracts.mind import (
     ReflectionOutput,
     RumourDistortion,
     SayMyWayOutput,
+    WillisRoast,
     WritebackOutput,
 )
 from ..contracts.narration import RenderLintJudgement
@@ -89,6 +90,7 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.PC_QUICKMAKE: None,
     CallClass.CHEAT_PERSONA: None,
     CallClass.CHEAT_INTERPRET: CheatPlan,
+    CallClass.WILLIS_ROAST: WillisRoast,
     CallClass.PROBE: None,
 }
 

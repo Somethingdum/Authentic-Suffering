@@ -81,4 +81,21 @@ export const TEXT = {
   barCount: (done, total) => `${done} of ${total}`,
   barElapsed: (s) => time(s, ' so far'),
   barEta: (s) => `About ${time(s, ' left')}`,
+  // P12 (D-105): the death screen, and Willis at every death
+  death: {
+    title: (name) => `${name} is dead.`,
+    when: (day, time) => `Day ${day}, ${time}`,
+    willis: 'Willis',
+    willisArriving: 'Somebody is laughing.',
+    lastMoments: 'The last moments',
+    choices: 'What led here',
+    reveal: 'Show me everything',
+    revealWarning: 'This shows what really happened: who was where, who chose what, and what you never saw. '
+      + 'It can spoil this world if you live in it again.',
+    revealConfirm: 'Show me',
+    revealCancel: 'Not yet',
+    ironman: 'This life is over. The world is still out there.',
+    load: 'Load a save',
+    newWorld: 'A new life in a new world',
+  },
 }

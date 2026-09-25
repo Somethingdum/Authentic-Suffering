@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-695 ids; 444 with their own statement, 251 named only in context.
+699 ids; 449 with their own statement, 250 named only in context.
 
 
 ## ABUSE
@@ -263,7 +263,11 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DEATH-04 | *DEATH-01..05) would already have killed:* | as_engine/audit/abuse.py | `as_engine/audit/abuse.py`, `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_bodies.py` |
 | DEATH-05 | (named only by tests) |  | — | `contract/p02_space_bodies/test_bodies.py` |
 | DEATH-06 | DEATH-06 (fidelity C10, Actor v2 B5c: every wound that bled is a cause) a DEATH whose cause is blood_loss carries links (contracts.events.EventLink, role 'contributed', kernel.store STORE-12) to the cause_event of every… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p02_space_bodies/test_bodies.py` |
-| DEATH-10 | *which is shown after the player explicitly clicks 'Show me everything' (DEATH-10).* | as_engine/service/death.py | `as_engine/service/death.py` | — |
+| DEATH-10 | DEATH-10 The canonical account of the final scene and what led to it, shown only when asked for (GameService.on_death_reveal). At most 30 lines: - who was where: every body in the PC's place at its death and in the plac… | as_engine/service/death.py | `as_engine/contracts/calls.py`, `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-11 | DEATH-11 From the newest DEATH event whose payload body_id is pc_id (ValueError "no death for {pc_id}" when there is none): - cause_text = CAUSE_WORDS.get(cause, "You died.") and then, each after one space, what the PC… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-12 | DEATH-12 What Willis has to work with — the dead person's own record only (never kernel.truth: the world's secrets wait for 'Show me everything', DEATH-10). This life began at the first PLAYER_INPUT after the PC's lates… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-13 | DEATH-13 Willis at every death of the PC — regardless of the Wild Card, the console, the difficulty or Ironman. A stored roast is returned as it is (no call). Otherwise ONE WILLIS_ROAST call (lane A; lanes.requests.buil… | as_engine/service/death.py | `as_engine/service/death.py`, `as_engine/service/game_service.py` | `contract/p12_surfaces/test_death.py` |
+| DEATH-14 | DEATH-14 Willis without a model, built from the facts only, in this order: "Ha! Oh, that was beautiful. Do it again."; with typed: the last one in double quotes, then " — that's what you went with. Incredible."; the fir… | as_engine/service/death.py | `as_engine/service/death.py` | `contract/p12_surfaces/test_death.py` |
 
 ## DEGRADE
 

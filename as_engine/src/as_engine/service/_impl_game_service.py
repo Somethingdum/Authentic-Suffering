@@ -472,6 +472,7 @@ class GameService:
         s = self.session
         T = s.store.query_one("SELECT turn_index FROM world_clock")[0] + 1
         cancelled = False
+        died = False
 
         from ..contracts.protocol import OUT_MODELS
         from . import progress as pv2
@@ -519,10 +520,8 @@ class GameService:
                                                                  notices=o.notices, degraded=o.degraded)))
                 await self.push(out("story", OutStory(entries=self._story())))
                 if o.died:
-                    try:
-                        await self.on_death()
-                    except NotImplementedError:
-                        await self.push(out("error", OutError(code="not_built_yet", message=G.NOT_BUILT_DEATH)))
+                    died = True
+                    await self.on_death()
                 elif self.config.background_cognition and s.store.query_one(
                         "SELECT alive FROM bodies WHERE body_id=?", (s.pc_id,))[0] == 1:
                     self.background.start(s)
@@ -539,7 +538,7 @@ class GameService:
             self.turn_task = None
             self.turn_stage = None
             if not cancelled:
-                await self.push(self._state("play"))
+                await self.push(self._state("dead" if died else "play"))
 
     async def on_turn_cancel(self, msg):
         G = _G()
@@ -729,7 +728,17 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death_reveal(self, msg):
-        raise NotImplementedError("P12")
+        from ..contracts.protocol import OutDeath
+        from . import death
+        G = _G()
+        if self.session is None:
+            raise G.ServiceError("no_run", G.NO_RUN)
+        s = self.session
+        if s.store.query_one("SELECT alive FROM bodies WHERE body_id=?", (s.pc_id,))[0] == 1:
+            raise G.ServiceError("bad_request", G.BAD_REQUEST.format(where="death_reveal", problem="nobody has died"))
+        dv = death.build_death_view(s.store, s.pc_id)
+        dv = dv.model_copy(update={"truth_reveal": death.truth_reveal(s.store, s.pc_id)})
+        return [out("death", OutDeath(death=dv))]
 
     async def on_new_life_here(self, msg):
         raise NotImplementedError("P12")
@@ -744,7 +753,15 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death(self):
-        raise NotImplementedError("P12")
+        from ..contracts.protocol import OutDeath, OutStory
+        from . import death
+        s = self.session
+        dv = death.build_death_view(s.store, s.pc_id)
+        await self.push(out("death", OutDeath(death=dv)))
+        if dv.willis_pending:
+            await death.roast(s)
+            await self.push(out("death", OutDeath(death=death.build_death_view(s.store, s.pc_id))))
+            await self.push(out("story", OutStory(entries=self._story())))
 
 
 def get_service(config=None, transport=None):

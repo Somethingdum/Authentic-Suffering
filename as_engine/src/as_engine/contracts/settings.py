@@ -86,6 +86,7 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.PC_QUICKMAKE: CallRegime(lane=A, temperature=0.8, max_tokens=4000, deadline_s=300),
         CallClass.CHEAT_PERSONA: CallRegime(lane=B, temperature=0.9, max_tokens=150, deadline_s=15),
         CallClass.CHEAT_INTERPRET: CallRegime(lane=A, temperature=0.2, max_tokens=900, deadline_s=60),
+        CallClass.WILLIS_ROAST: CallRegime(lane=A, temperature=0.95, max_tokens=700, deadline_s=45),
         CallClass.PROBE: CallRegime(lane=B, temperature=0.0, max_tokens=64, deadline_s=30),
     }
 

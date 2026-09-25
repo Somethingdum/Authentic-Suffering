@@ -254,6 +254,11 @@ feel about you, and he is in your groups. Beside anyone else he is a stranger wh
 
 ## 6b. Willis (D-79, D-102; his card: `docs/as/sources/WILLIS.md`)
 
+**At every death (D-105).** Whoever the Boss plays, whatever the house rules — Wild Card or not,
+console or not, Ironman or not — the death screen opens on Willis, delighted, roasting the dead over
+their own mistakes (`service/death.py`, DEATH-13). He works only from what the dead person did and
+typed; he knows the rest and keeps it to himself until 'Show me everything'.
+
 `as_content/packs/cheat_admin/pcs/willis.yaml` is the owner's own cheat entity — a grinning man in an
 immaculate tuxedo and top hat with a villainous mustache and a cup of black coffee, who is not human,
 is older than the fibres of the universe, knows everything, and can do anything he likes. His

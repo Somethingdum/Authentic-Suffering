@@ -307,6 +307,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p12_surfaces/test_seal.py` | SEAL-01..05: sealed, this machine and the model machines answer and nothing else does — a public name is refused before any DNS question, a public address or a home address with no model on it is refused on plain sockets and on the event loop, and every refusal is logged; the libraries are switched offline and proxies removed, and lifting the seal puts them back; a model address outside the home never loads (LaneConfig, EngineConfig, the Connect screen's config_set) and a bad install changes nothing; the lane client reads no proxy; the Talemate server's first import is the seal and it never fetches punkt while sealed; every CLI command runs sealed; a changed model address re-seals; the launchers bind 127.0.0.1 and run uv offline, Docker publishes on 127.0.0.1, and the frontend loads no font or script from outside |
 | `p12_surfaces/test_freedom.py` | FREE-01..03: the narrator fades nothing out (and CNT-11 is said where it reads it); a person may do anything that follows from who they are; no prompt carries a softening or refusal phrase; Intensity is Full unless the owner picks Softer |
 
+### 3.20 The death screen and Willis (P12; D-105)
+
+| File | What it proves |
+|---|---|
+| `p12_surfaces/test_death.py` | DEATH-10..14: the screen tells the dead person's own story (the cause as they felt it, the last three moments, their own choices) with Willis on his way; one WILLIS_ROAST call with their own record (the words they typed, how long they lasted) whose lines are kept in the story and never asked for twice; with the model down Willis still comes, from the facts; whatever the settings (the console used, Ironman: no loading back); nothing but their own record goes to him, and the reveal names who was where by their true names; he remembers meeting them and owns the killing when it was his; how long they lasted in words; through the GameService: the screen at once, Willis a moment later, the story, screen 'dead', the truth only when asked and nothing to reveal while alive |
+| vitest `death.spec.js` | the Death screen: Willis laughing at once and his lines when they come; title, time, cause, last moments, choices; the truth only after a warning, sent as `death_reveal`; Ironman hides Load; the clarity rules |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

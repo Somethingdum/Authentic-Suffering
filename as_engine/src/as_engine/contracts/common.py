@@ -50,6 +50,7 @@ class CallClass(StrEnum):
     PC_QUICKMAKE = "pc_quickmake"
     CHEAT_PERSONA = "cheat_persona"
     CHEAT_INTERPRET = "cheat_interpret"   # P12, D-103: plain-words cheats (cheats.interpret)
+    WILLIS_ROAST = "willis_roast"         # P12, D-105: Willis at every death (service.death.roast)
     PROBE = "probe"
 
 

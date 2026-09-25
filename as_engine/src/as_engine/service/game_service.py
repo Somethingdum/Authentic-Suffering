@@ -197,12 +197,13 @@ Handlers (P8):
           turn_result / turn_rejected); on an exception or a cancel tr.done(False).
         outcome = await turn.pipeline.run_turn(session, msg, progress).
         ok -> push turn_result {turn_index, narration, view = view(), notices, degraded}; push
-          story {story()}; outcome.died -> await self.on_death() — a P12 stub: its
-          NotImplementedError is pushed as error {not_built_yet, NOT_BUILT_DEATH}.
+          story {story()}; outcome.died -> await self.on_death() (P12, D-105: the death screen
+          and Willis).
         not ok -> push turn_rejected {reason_code = rejected_code, message = rejected_message,
           clarify}.
         Finally (also after an exception): turn_task = None, turn_stage = None; unless the task
-        was cancelled, push state {screen 'play', run_id, busy False}. An exception escaping
+        was cancelled, push state {screen 'dead' when the PC died in this turn, else 'play',
+        run_id, busy False}. An exception escaping
         run_turn is logged and pushed as error {internal, INTERNAL}.
   on_turn_cancel   (PROTO-06; the Stop button)
     no turn_task -> ServiceError('nothing_to_cancel', NOTHING_TO_CANCEL); turn_stage is not None
@@ -268,8 +269,9 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     on_run_new first await background.cancel().
 
 Later phases (PROTO-09; stubs raising NotImplementedError until then, so handle() answers
-not_built_yet): on_content_import, on_intake_start, on_quickmake_pc, on_death_reveal, on_new_life_here,
-on_worlds_list, on_world_export, on_world_import, on_death (P12). In P8 a new run is made with
+not_built_yet): on_content_import, on_intake_start, on_quickmake_pc, on_new_life_here,
+on_worlds_list, on_world_export, on_world_import (P12). Built in P12 (D-105): on_death and
+on_death_reveal (below). In P8 a new run is made with
 `as-engine new-scenario <scenario.yaml>` and opened with Continue / Load.
 
 Pushes: push(msg) awaits every subscriber in subscription order; a subscriber that raises is
@@ -300,8 +302,6 @@ BAD_REQUEST = "That request had a missing or wrong value ({where}: {problem}). R
 INTERNAL = ("Something went wrong inside the game. Nothing in your world changed; try again. The details are in "
             "the game's log.")
 NOT_BUILT = "That part of the game isn't built yet. It arrives in a later build."
-NOT_BUILT_DEATH = ("Your character has died. The death screen arrives in a later build; for now, load a save to go "
-                   "on.")
 NO_RUN = "No game is loaded. Continue or load a run first."
 BUSY = "Your last move is still being worked out. Wait for it to finish, then try again."
 DEAD = "Your character is dead. Load a save or start a new life."
@@ -485,7 +485,10 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death_reveal(self, msg):
-        """P12: service.death, truth_reveal filled."""
+        """P12 (DEATH-10, D-105): no session -> ServiceError('no_run', NO_RUN); the PC alive ->
+        ServiceError('bad_request', BAD_REQUEST.format(where='death_reveal', problem='nobody has
+        died')). Otherwise [death {service.death.build_death_view(store, pc_id) with truth_reveal =
+        service.death.truth_reveal(store, pc_id)}] — the truth only now, because the player asked."""
         raise NotImplementedError("P12")
 
     async def on_new_life_here(self, msg):
@@ -505,7 +508,11 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_death(self):
-        """P12: after a turn in which the PC died, push death {DeathView} and state {screen 'dead'}."""
+        """P12 (DEATH-11, DEATH-13, D-105): after a turn in which the PC died. Push death
+        {service.death.build_death_view(store, pc_id)} at once; when its willis_pending is true,
+        await service.death.roast(session) (Willis, at every death, whatever the settings) and push
+        death again with his lines (willis filled, willis_pending false) and story {story()} (his
+        lines are in it, kind 'willis'). The turn task's own final state push says screen 'dead'."""
         raise NotImplementedError("P12")
 
 

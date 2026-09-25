@@ -121,6 +121,29 @@ class CheatPersonaContext(Strict):
                          "he takes the voice for a demon in his head.")
 
 
+class RoastFacts(Strict):
+    """D-105 (service.death.roast_facts): what Willis has to work with — the dead person's own record
+    only; the world's secrets wait for 'Show me everything' (DEATH-10)."""
+
+    pc_name: str
+    lived: str = Field(description="How long this life lasted: '2 days', '5 hours', '40 minutes'.")
+    turns: int = Field(ge=0, description="Moments the player played in this life.")
+    cause_text: str
+    choices: list[str] = Field(default_factory=list, max_length=5, description="Their own choices that led here, newest first.")
+    typed: list[str] = Field(default_factory=list, max_length=5, description="What the player typed last, oldest first.")
+    bent_rules: bool = Field(default=False, description="The run is a Sandbox: the console was used.")
+    ironman: bool = False
+    rises: bool = Field(default=False, description="The body will get up again.")
+    met_him: bool = Field(default=False, description="The dead person had met Willis in the world.")
+    by_his_hand: bool = Field(default=False, description="Willis himself is on the chain of events that killed them.")
+
+
+class WillisRoastContext(Strict):
+    """WILLIS_ROAST input (D-105)."""
+
+    facts: RoastFacts
+
+
 class WorldgenContext(Strict):
     """Generic context for worldgen calls; ``brief`` is code-built plain English."""
 

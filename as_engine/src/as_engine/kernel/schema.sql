@@ -975,7 +975,7 @@ CREATE TABLE echo_ledger (
 CREATE TABLE story_log (
   entry_id   INTEGER PRIMARY KEY,
   turn_index INTEGER NOT NULL,
-  kind       TEXT NOT NULL CHECK (kind IN ('narration','player','guide','notice','cheat')),
+  kind       TEXT NOT NULL CHECK (kind IN ('narration','player','guide','notice','cheat','willis')),   -- willis: D-105, his lines at a death
   mode       TEXT,
   text       TEXT NOT NULL
 );

@@ -1,0 +1,32 @@
+{
+  "type": "as_game",
+  "action": "death",
+  "data": {
+    "death": {
+      "pc_name": "Owen Marsh",
+      "cause_text": "You bled to death. Teeth close on your forearm and tear.",
+      "day": 212,
+      "time_text": "06:05",
+      "last_turns": [
+        "You shoulder the back door and the alley opens up, grey and wet.",
+        "Something moves behind the dumpster. It is already on you.",
+        "The pressure on the arm goes loose, and then everything does."
+      ],
+      "contributing": [
+        "Walk into the alley",
+        "Open the back door"
+      ],
+      "truth_reveal": [],
+      "willis": [
+        "Ha! Oh, that was beautiful. Do it again.",
+        "\"I go see what the noise is.\" That's what you went with. Incredible.",
+        "You opened a door in a world full of the dead to find out what the noise was. The noise was lunch. You were lunch.",
+        "Anyway. Coffee's getting cold. Go on, try again. I'll be watching."
+      ],
+      "willis_pending": false,
+      "can_new_life_here": true,
+      "can_load": true,
+      "world_id": null
+    }
+  }
+}

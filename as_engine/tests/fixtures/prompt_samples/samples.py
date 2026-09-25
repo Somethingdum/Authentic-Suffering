@@ -23,10 +23,12 @@ from as_engine.contracts.calls import (
     ProbeContext,
     ReflectionContext,
     RepairContext,
+    RoastFacts,
     RumourContext,
     SayMyWayContext,
     SceneEntry,
     SummaryContext,
+    WillisRoastContext,
     WorldgenContext,
 )
 from as_engine.contracts.common import LOD, CallClass, Channel, Fidelity, OpenLoopKind, Standing, UtteranceForm, Verb, Volume
@@ -148,5 +150,9 @@ def render_kwargs() -> dict[CallClass, dict]:
                                         places=[SceneEntry(handle="L0", label="Sales floor", kind="room")],
                                         makeable=["box of .38 rounds"], spawnable=["Shambler"], strains=["wet"],
                                         weather=["clear", "rain"]))},
+        CallClass.WILLIS_ROAST: {"ctx": WillisRoastContext(facts=RoastFacts(
+            pc_name="Owen Marsh", lived="2 days", turns=41, cause_text="You bled to death. The shambling figure bites your forearm.",
+            choices=["Open the back door", "Walk into the alley"], typed=["I open the back door.", "I go see what the noise is."],
+            bent_rules=False, ironman=True, rises=True))},
         CallClass.PROBE: {"ctx": ProbeContext(probe="hello")},
     }
