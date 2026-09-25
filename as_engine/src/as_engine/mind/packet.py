@@ -75,6 +75,10 @@ Fields (second person, plain English):
                     knowledge.does_not_know, who knows a secret, reflexes, counts that go stale —
                     reaches no field of the packet (IDN-02).
   recent_lines      mind.actor.recent_lines(n = PacketRules.max_recent_lines).
+  unprocessed       (B5, MEM-19) the texts of mind.memory.unprocessed(tx, actor_id), turn by turn in
+                    order, flattened — what happened to them that no summary has settled yet (a
+                    failed writeback never makes a person forget what they just said or saw).
+                    The prompt shows them under 'Still raw from before' when there are any.
   body_lines        in this order, each a full sentence:
                     * per unhealed wound (created_at, wound_id): f'{SEVERITY_WORDS[severity]
                       capitalised} {type} wound to your {ANATOMY_WORDS[anatomy]}{", bleeding" when
@@ -205,17 +209,18 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   over PacketRules.token_budget[key], drop ONE item and re-render, in this order: memories (last
   first), lessons (last first), beliefs (last first), relationship lines whose entity is not a
   source of this turn's percepts (last first), refusals created more than 7 days before ``at``
-  whose requester is not a source of this turn's percepts (oldest first), uncertainty lines (last
+  whose requester is not a source of this turn's percepts (oldest first), (B5) the unprocessed
+  lines of every unsettled turn but the latest (the oldest line first), uncertainty lines (last
   first). Never dropped (Actor Spec AC16: what bears on this decision is pinned, never cut for
   age or length): identity (the card), recent_lines, body, position, perceived_now, utterances,
   entities, affordances, commitments, stakes, resources, open loops, what a consultation brought
-  back (looked_up), and every refusal whose requester is a source of this turn's percepts
-  (someone here or speaking now). Every item
+  back (looked_up), the latest unsettled turn's unprocessed lines, and every refusal whose
+  requester is a source of this turn's percepts (someone here or speaking now). Every item
   dropped is recorded, in drop order, in ``omitted`` (never rendered: an audit of what was cut):
   'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
-  text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'uncertainty: ' + the
-  line — e.g. 'refusal: You refused: hand me the revolver.' When nothing droppable is left the
-  packet is returned over budget (the scheduler logs it).
+  text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'unprocessed: ' + the
+  line, 'uncertainty: ' + the line — e.g. 'refusal: You refused: hand me the revolver.' When
+  nothing droppable is left the packet is returned over budget (the scheduler logs it).
 No instruction to forget anything is ever added (L1): what must not be used is absent.
 """
 

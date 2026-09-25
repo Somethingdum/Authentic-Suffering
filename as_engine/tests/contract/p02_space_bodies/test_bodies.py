@@ -1,4 +1,4 @@
-"""Bodies, wounds, needs, infection, death (P2). Rules HARM-01..07, DEATH-01..05 (physical/bodies.py).
+"""Bodies, wounds, needs, infection, death (P2). Rules HARM-01..07, DEATH-01..06 (physical/bodies.py).
 
 No hit points: a body bleeds a percentage per minute, clots, gets treated, heals only with time and
 treatment, and dies when a threshold is crossed. Numbers come from RulesConfig defaults
@@ -13,6 +13,7 @@ import pytest
 
 from as_engine.contracts.common import Anatomy, WoundSeverity, WoundType
 from as_engine.contracts.events import Event, EventType, WriteOp, WriteRecord
+from as_engine.kernel import events
 from as_engine.kernel.clock import MS_PER_DAY, MS_PER_H, MS_PER_MIN
 from as_engine.physical import bodies
 from as_engine.physical.bodies import WoundSpec
@@ -189,6 +190,24 @@ def test_bleeding_out_unconscious_then_dead(lab):
     assert not bodies.is_alive(lab.store, lab.id("subj"))
     later = advance(lab, "subj", 60, from_ms=START)
     assert not [e for e in later if e.type in (EventType.DEATH, EventType.AWARENESS_CHANGE)], "nobody dies twice"
+
+
+def test_every_wound_that_bled_is_a_cause(lab):
+    """DEATH-06 (fidelity C10, Actor v2 B5c): the attack that killed is the parent; every other
+    wound that bled — the nick that clotted long before too — is linked as a contributing cause."""
+    _, worst = hit(lab, "subj", "abdomen", "stab", "severe", by="pc")
+    _, arm = hit(lab, "subj", "arm_l", "cut", "significant", by="pc")
+    _, nick = hit(lab, "subj", "leg_r", "scratch", "minor")
+    (death,) = [e for e in advance(lab, "subj", 30) if e.type == EventType.DEATH]
+    assert death.cause_event_id == worst
+    assert [(x.event_id, x.role) for x in death.links] == [(arm, "contributed"), (nick, "contributed")]
+    assert events.causes(lab.store, death.event_id) == [(worst, "primary"), (arm, "contributed"), (nick, "contributed")]
+
+
+def test_one_wound_is_one_cause(lab):
+    _, cause = hit(lab, "subj", "abdomen", "stab", "severe", by="pc")
+    (death,) = [e for e in advance(lab, "subj", 20) if e.type == EventType.DEATH]
+    assert (death.cause_event_id, death.links) == (cause, [])
 
 
 @pytest.mark.parametrize("anatomy,cause", [("head", "head_wound"), ("neck", "neck_wound")])

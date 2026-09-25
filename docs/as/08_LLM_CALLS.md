@@ -71,7 +71,7 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | actor_cognition (WARM) | B | no | ActorReplyV2 | other Actors in budget | same, for more people per turn at no wall-clock cost |
 | actor_reaction | B | no | ActorReplyV2 (a decision; no consultation) | reaction waves | Actors could not respond within the same instant |
 | intent_repair | B | no | ActorReplyV2 (a decision only) | one per failed structured call | a malformed answer would cost the Actor its turn |
-| writeback | B | no | WritebackOutput | per holder / identical group, after commit | memory becomes objective; two people remember the same thing |
+| writeback | B | no | WritebackOutput | per holder (each a memory job, retried when it fails), after commit | memory becomes objective; two people remember the same thing; a failed call forgets |
 | portrayal_audit | B | no | PortrayalVerdict | targeted pre-check + retrospective | "would they do that?" answered by the one who did it |
 | narration | A | no | prose | every turn | the renderer would see hidden state |
 | render_lint | B | no | RenderLintJudgement | every narration draft | leaks and invented dialogue would ship |

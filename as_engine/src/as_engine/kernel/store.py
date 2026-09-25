@@ -14,6 +14,13 @@ Rules enforced here:
            inside an open transaction and every later BEGIN fails.
   STORE-08 ``events`` is append-only: UPDATE/DELETE on it raise StoreError.
   STORE-11 a write value equal to EVENT_SELF becomes the committing event's own id (below).
+  STORE-12 (fidelity C10, Actor v2 B5c) ``event.links`` — the causes besides the primary parent
+           ``cause_event_id`` — are checked before anything is written: every link's event_id
+           names an event already in the log (committed earlier, this transaction included),
+           none is the event's own cause_event_id, none appears twice, and every role is in
+           contracts.events.LINK_ROLES; else StoreError(rule 'STORE-12') and nothing is written.
+           The events row stores ``links`` = canonical_json([link.model_dump(mode='json') ...]) in
+           the given order, and kernel.events reads them back, so replay re-commits them unchanged.
 
 Connection settings: ``isolation_level=None`` (manual BEGIN), ``PRAGMA journal_mode=WAL``,
 ``PRAGMA foreign_keys=ON``, ``PRAGMA synchronous=NORMAL``, ``row_factory=sqlite3.Row``.

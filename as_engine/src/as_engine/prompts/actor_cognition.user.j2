@@ -7,6 +7,13 @@ Things you said lately:
 - "{{ l }}"
 {% endfor %}
 {% endif %}
+{% if p.unprocessed %}
+
+Still raw from before (what you did and saw, not yet settled in your mind):
+{% for l in p.unprocessed %}
+- {{ l }}
+{% endfor %}
+{% endif %}
 {% if p.beliefs or p.memories or p.lessons %}
 
 What you remember

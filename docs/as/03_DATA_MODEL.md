@@ -24,15 +24,20 @@ memory are views over events and mind tables, never extra copies of reality.
 ## 3. Events and write records
 
 ```python
-Event(at, type, writer, actor_id, target_ids, place_id, cause_event_id, payload,
+Event(at, type, writer, actor_id, target_ids, place_id, cause_event_id, links, payload,
       writes: list[WriteRecord], rule_cited, turn_index, origin)
+EventLink(event_id, role: contributed|answered)
 WriteRecord(op: insert|update|upsert|delete, table, key: {pk cols}, values: {cols})
 ```
 
-- `EventType` has 103 values in 8 classes (`contracts/events.py`); an unknown type is rejected
+- `EventType` has 142 values in 8 classes (`contracts/events.py`); an unknown type is rejected
   (STORE-05).
 - `cause_event_id` links consequences to causes. `kernel.events.cause_chain` walks it; the death
   screen uses it to list the player's contributing choices.
+- `links` (fidelity C10, Actor v2 B5c, STORE-12) name the other causes: 'contributed' — another
+  cause of the same outcome (every wound that bled, for a death by blood loss, DEATH-06);
+  'answered' — the ask a reply answers (a promise, an unmet yes). The store checks them before
+  writing; `kernel.events.causes` lists every cause of an event, `effects` every event naming it.
 - `rule_cited` is mandatory for cascade events (G10) and for anything a validator produced (L14).
 - `origin`: `sim` (normal play), `worldgen`, `cheat` (quarantine + sandbox), `migration`, `system`
   (scenario setup, maintenance).
@@ -74,7 +79,9 @@ with provenance `told_by:X`), never Y.
 Resolve, stress, goal, duty post, accepted authority, quarantine) · `dossiers` (full baseline JSON)
 · `dossier_deltas` · `voice_lines` · `plans` · `tasks` · `relationships` (6 axes, per-axis cause) ·
 `refusals` · `open_loops` (promises, debts, grudges, goals, desires, fears, questions, plans, kept
-secrets) · `lessons` · `episodes` (+ FTS) · `acquaintance` (what a holder calls another body) ·
+secrets) · `lessons` · `episodes` (+ FTS; `self_event_ids`, `quarantined`) · `memory_jobs` (a
+writeback per holder and turn, never lost to a failed call) · `acquaintance` (what a holder calls
+another body) ·
 `known_places`.
 
 `actors.controller` is `human` for the player character, `model` for minds that get model calls,

@@ -11,8 +11,11 @@ recover(tx, actor_id, reason, ...) -> Event | None   reasons: safe_night -> reco
   recover_protected_dependent (else ValueError); clamp at resolve_max; no change -> None.
 
 gate(resolve_cur, definition, authority_name=None) -> (allowed: bool, cost_note: str | None)  (RES-03)
-  0: allowed only verbs FLEE, ESCAPE, SURRENDER, WAIT, and defs tagged 'protect_dependent' or
-     'comply_under_threat'.
+  0: (Actor Spec §10, AC08: zero Resolve is fear and impairment, never obedience) allowed only
+     verbs FLEE, ESCAPE, SURRENDER, WAIT, OBSERVE, SPEAK, TAKE_COVER and HIDE (retreat, escape,
+     surrender, silence and freezing, keeping your eyes open, your own voice, protecting
+     yourself), and defs tagged 'protect_dependent', 'comply_under_threat' or 'low_exposure'.
+     Compliance is one option among these, never chosen for anyone.
   1: everything EXCEPT defs with requires.fear_exposure = true.
   2: everything; defs tagged 'opposes_authority' get cost_note
      f"It means going against {authority_name or 'the people in charge'}."

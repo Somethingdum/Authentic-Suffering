@@ -158,8 +158,12 @@ class ResponseClass(StrEnum):
     COUNTER_OFFER = "counter_offer"
     REFUSAL = "refusal"
     ENTRENCHED_REFUSAL = "entrenched_refusal"
-    FALSE_COMPLIANCE = "false_compliance"
+    FALSE_COMPLIANCE = "false_compliance"      # never produced since AC09 (kept so old ledgers read)
     COERCED_COMPLIANCE = "coerced_compliance"
+    DEFERRED_ASSENT = "deferred_assent"        # AC09: "yes, after I finish this" — a conditional yes
+    CLARIFYING = "clarifying"                  # AC09: "okay, what exactly do you mean?" — not an answer yet
+    PREPARING = "preparing"                    # AC09: a yes and a step toward it
+    UNRESOLVED_ASSENT = "unresolved_assent"    # AC09: a yes and something else, reason unknown — never a lie by itself
 
 
 class Volume(StrEnum):

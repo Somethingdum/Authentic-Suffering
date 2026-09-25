@@ -84,7 +84,8 @@ CREATE TABLE events (
   state_delta    TEXT NOT NULL DEFAULT '[]',   -- JSON list of WriteRecord
   rule_cited     TEXT,
   turn_index     INTEGER NOT NULL,
-  origin         TEXT NOT NULL DEFAULT 'sim' CHECK (origin IN ('sim','worldgen','cheat','migration','system'))
+  origin         TEXT NOT NULL DEFAULT 'sim' CHECK (origin IN ('sim','worldgen','cheat','migration','system')),
+  links          TEXT NOT NULL DEFAULT '[]'    -- C10 (STORE-12): JSON list of {event_id, role}, the causes besides cause_event_id
 );
 CREATE INDEX ev_at ON events(at);
 CREATE INDEX ev_cause ON events(cause_event_id);
@@ -175,7 +176,7 @@ CREATE TABLE error_repair_log (
   entry_id   TEXT PRIMARY KEY,
   turn_index INTEGER NOT NULL,
   at_ms      INTEGER NOT NULL,
-  kind       TEXT NOT NULL,          -- grammar_fail|schema_fail|hallucinated_ref|lane_down|timeout|lint_fail|rollback|degraded|migration|budget_overrun
+  kind       TEXT NOT NULL,          -- grammar_fail|schema_fail|hallucinated_ref|lane_down|timeout|lint_fail|rollback|degraded|migration|budget_overrun|unknown_name (B5 MEM-18)
   stage      INTEGER,
   rule_id    TEXT,
   detail     TEXT NOT NULL DEFAULT '{}',
@@ -637,7 +638,7 @@ CREATE TABLE refusals (
   created_event   TEXT NOT NULL,
   created_at      INTEGER NOT NULL,
   times_asked     INTEGER NOT NULL DEFAULT 1,
-  status          TEXT NOT NULL DEFAULT 'standing' CHECK (status IN ('standing','reopened','expired'))
+  status          TEXT NOT NULL DEFAULT 'standing' CHECK (status IN ('standing','reopened','expired','revised'))
 );
 
 -- OWNER mind.mind
@@ -681,9 +682,21 @@ CREATE TABLE episodes (
   percept_ids TEXT NOT NULL DEFAULT '[]',
   subject_ids TEXT NOT NULL DEFAULT '[]',
   anchor     INTEGER NOT NULL DEFAULT 0,  -- anchor memory: never decays
-  decayed    INTEGER NOT NULL DEFAULT 0
+  decayed    INTEGER NOT NULL DEFAULT 0,
+  self_event_ids TEXT NOT NULL DEFAULT '[]',   -- B5 AC10: the holder's own events the memory cites (O#)
+  quarantined INTEGER NOT NULL DEFAULT 0       -- B5 AC13 (MEM-18): names someone the holder cannot know; never retrieved
 );
 CREATE INDEX episodes_holder ON episodes(holder_id, at);
+
+-- OWNER mind.memory
+CREATE TABLE memory_jobs (                     -- B5 MEM-19 (fidelity C10): a writeback is never lost to a failed call
+  job_key     TEXT PRIMARY KEY,                -- f'{holder_id}:{turn_index}'
+  holder_id   TEXT NOT NULL,
+  turn_index  INTEGER NOT NULL,
+  status      TEXT NOT NULL CHECK (status IN ('pending','done','failed')),
+  attempts    INTEGER NOT NULL DEFAULT 0,
+  updated_at  INTEGER NOT NULL
+);
 CREATE VIRTUAL TABLE episodes_fts USING fts5(summary, content='episodes', content_rowid='rowid');
 -- derived index maintenance (not state; excluded from the state hash; rebuilt after replay)
 CREATE TRIGGER episodes_ai AFTER INSERT ON episodes BEGIN

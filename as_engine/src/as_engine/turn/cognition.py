@@ -176,7 +176,9 @@ perceived_entities(tx, actor_id, turn_index) -> dict[str, str]
   this order: the actor's acquaintance rows by subject_id (known_name, then description); the
   anchors of its place by anchor_id (name); the portals of its place by portal_id (name); the
   items it perceived this turn (percept source_id 'itm_…', by id) then the items it holds (by id),
-  each by its ItemDef name.
+  each by its ItemDef name. (B5) Besides, every anchor and portal of its place also under
+  f'anchor|{name}' / f'portal|{name}' (by id, first entry wins within each kind) — what
+  request_signature needs when a door and its anchors share a name.
 record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> list[tuple]
   Called right after stage 8 resolved the wave (``first_seq`` = the last event seq before it).
   For each actor in sorted(asks) with an intent, for each of its asks in order: form =
@@ -189,16 +191,28 @@ record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> lis
   line; the duty gate rejects nothing, C05 — (False when the actor has no AffordanceSet);
   response = firewall.classify_response(signature, intent.bound, the intent's speech text or
   None, actors.resolve_cur, effective, entrenched_block=…, resolve_drained_this_turn = a
-  RESOLVE_CHANGE event of this turn by the actor with payload.delta < 0) -> (actor, event_id,
-  response.value), and:
+  RESOLVE_CHANGE event of this turn by the actor with payload.delta < 0, steps_toward = (AC09) where
+  the signature's target is: a portal's anchor_a and anchor_b, the anchor_id of a body's position
+  or of an item lying loose; empty for '*') -> (actor, event_id, response.value), and:
     REFUSAL / ENTRENCHED_REFUSAL -> firewall.record_refusal(tx, actor, speaker, signature,
       perception.norm_text(words) (the summary: 'hand me the revolver'), reason, [event_id],
       intent.private_reason[:200] (the cost it cites), entrenched = ENTRENCHED_REFUSAL, wave_at,
       turn_index, event_id), reason = the blocking gate for an entrenched refusal; else 'fear'
       when the actor's relationship toward the speaker has fear >= 2; else 'distrust' when it has
       no relationship row toward the speaker or trust <= -1 (a stranger); else 'cost'.
-    FALSE_COMPLIANCE -> firewall.record_lie(tx, actor, speaker, signature, the speech text, the
-      actor's first SPEECH event with seq > first_seq, wave_at, turn_index) (when there is one).
+    (AC09 — the words are recorded first; no yes is a lie by itself)
+    READY / RELUCTANT / COERCED_COMPLIANCE -> firewall.revise_refusal(tx, actor, speaker, signature,
+      wave_at, turn_index, event_id) (a person can change their mind: WILL-12).
+    DEFERRED_ASSENT -> mind.mind.open_loop(tx, actor, 'promise_made', f'I said I would:
+      {perception.norm_text(words)} — "{the speech text}"', [speaker], strength 1, cause = the
+      actor's first SPEECH event with seq > first_seq (else the ask's event), wave_at,
+      turn_index, links = [EventLink(the ask's event id, 'answered')] when the cause is that SPEECH
+      (B5c, C10)): their own understanding of what they promised (Actor Spec §12; the asker's
+      understanding is the asker's).
+    UNRESOLVED_ASSENT -> firewall.record_unmet_assent(tx, actor, speaker, signature, the speech
+      text, intent.bound.def_id, that SPEECH event's id, wave_at, turn_index, ask_event_id = the
+      ask's event id).
+    CLARIFYING, PREPARING -> nothing more (the ledger has them).
   The pipeline adds (actor, event_id) to its answered set (an ask is answered once, in the wave
   its hearer first decided after hearing it) and writes the list into turn_ledger stage 8 detail
   {'responses': [[actor, event_id, response], ...]}.

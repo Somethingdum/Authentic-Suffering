@@ -180,6 +180,7 @@ class SkullPacket(Strict):
     world_time_text: str
     identity: IdentityCard
     recent_lines: list[str] = Field(default_factory=list)
+    unprocessed: list[str] = Field(default_factory=list, description="B5 MEM-19: raw experience no writeback has settled yet.")
     body_lines: list[str] = Field(min_length=1)
     resolve_cur: int = Field(ge=0)
     resolve_max: int = Field(ge=1)
@@ -342,7 +343,7 @@ class BeliefWrite(Strict):
     about: str = Field(description="Entity handle, 'self' or 'place'.")
     claim: str = Field(min_length=3, max_length=300)
     confidence: int = Field(ge=0, le=3)
-    because: list[str] = Field(min_length=1, description="Percept handles S#.")
+    because: list[str] = Field(min_length=1, description="Percept handles S#, or O# for what you did yourself.")
 
 
 class RelationWrite(Strict):
@@ -383,6 +384,14 @@ class WritebackOutput(Strict):
     lesson: LessonWrite | None = None
 
 
+class SelfExperience(Strict):
+    """B5 (Actor Spec §13, AC10): what the holder did and felt itself — 'I said…', 'I chose to…',
+    'It did not work.' — evidence a memory can cite (O#), never more than was felt."""
+
+    handle: str = Field(pattern=r"^O\d+$")
+    text: str
+
+
 class AftermathPacket(Strict):
     """Built by mind.memory.build_aftermath: ONLY this holder's percepts of committed events (L8)."""
 
@@ -390,6 +399,7 @@ class AftermathPacket(Strict):
     turn_index: int
     identity: IdentityCard
     percepts: list[PerceivedItem] = Field(default_factory=list)
+    self_experiences: list[SelfExperience] = Field(default_factory=list)
     utterances: list[UtteranceView] = Field(default_factory=list)
     entities: list[PacketEntity] = Field(default_factory=list)
     own_action_text: str | None = None

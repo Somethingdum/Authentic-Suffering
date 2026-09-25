@@ -100,6 +100,11 @@ Death test (DEATH-01..05) runs whenever harm lands and at every progress step, f
   progress-step trigger), awareness 'dead', posture 'lying'; payload {body_id, cause, cause_event_id}
   with cause in blood_loss | head_wound | neck_wound | thirst | hunger | cold | heat | infection |
   offscreen (P10: ``die``).
+  DEATH-06 (fidelity C10, Actor v2 B5c: every wound that bled is a cause) a DEATH whose cause is
+  blood_loss carries links (contracts.events.EventLink, role 'contributed', kernel.store STORE-12)
+  to the cause_event of every wound of the body with healed_at NULL and bleed_pct_per_min > 0
+  (clotted or not) whose cause_event names an event in the log and is not the DEATH's own
+  cause_event_id — each once, by (created_at, wound_id). Any other DEATH has no links.
   P10 — the dead rise (INF-04, CMG §42.16): after the DEATH of a body of kind 'human', when it has
   no unhealed catastrophic head or neck wound, pathway = 'wet' when it has a 'wet' infections row
   whose pathway death_at_h has been reached, else 'cold_start'; (lo, hi) = that canon pathway's

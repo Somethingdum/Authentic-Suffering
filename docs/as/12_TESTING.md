@@ -222,6 +222,31 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p05_many_actors/test_gestures.py` | a gesture goes out with the attempt; she sees it pointed at her; nobody hears a gesture; eyes on one thing miss others, and the next attempt ends it; watching a door is watching whoever stands in it |
 | `p01_lanes/test_schemas.py`, `p04_one_actor/test_intent.py`, `test_intent_v2.py`, `test_packet.py`, `p05_many_actors/test_effects.py`, `test_resolve.py` (amended) | the offered G / F handles are the schema's only values; words' time by SEG-02; an unoffered G99 / F99 is refused; G and F handles are handles like the rest; the start carries its attention; a SPEECH says which segment of which utterance it is |
 
+### 3.11 Zero Resolve, answers and reconsidering (Actor v2 B5a; D-88)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_resolve.py` (amended) | at zero Resolve voice, silence, eyes, cover, hiding, protecting someone and surrender stay; what needs nerve goes; a low-exposure attempt stays |
+| `p04_one_actor/test_firewall.py` (amended) | a yes is not a lie by itself: a question back, a yes with a condition or a delay, a yes and a step toward it, an unresolved yes; open the back door means the door, guard it means where you stand |
+| `p06_memory/test_refusals.py` (amended) | a person can change their mind (the refusal revised and kept); a yes and something else is recorded, not judged |
+| `p07_slice/test_answers.py` | Owen asks Mara to open the yard door: a promise she holds, preparing, a question back, a yes and something else recorded without blame, and a refusal she now reverses |
+
+### 3.12 Self-experience, own readings, unknown names, memory jobs (Actor v2 B5b; D-89)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_memory_v2.py` | what June did and said is evidence (O handles), felt by how it went and never why; a promise can be caused by her own words and the memory keeps them; a name she could not know quarantines the memory (kept, never recalled, never looked up) and drops the belief; a name she knows is fine; a failed summary keeps its job, her raw experience is in her next packet, and a done job is never applied twice; short of room, older raw turns go first and the latest stays |
+| `p07_slice/test_memory_jobs.py` | the night at Delgado's with June's writeback timing out: her job is kept failed, "Still raw from before" is in her next prompt, and the next turn asks again and writes the memory |
+| `p06_memory/test_memory.py` (amended), `p10_world/test_background.py` (amended) | every named person reads the same crash as themselves; a held-back memory is never thought over |
+
+### 3.13 Several causes (Actor v2 B5c; D-90)
+
+| File | What it proves |
+|---|---|
+| `p00_substrate/test_event_links.py` | links are kept with the event in their order and read back; every cause, the parent first; what an event caused, whichever way it is named, each once; a link to nothing, to the parent, twice or of an unknown role writes nothing; replay keeps every link |
+| `p02_space_bodies/test_bodies.py` (amended) | the attack that killed is the parent and every other wound that bled is a contributing cause; one wound is one cause |
+| `p07_slice/test_answers.py` (amended) | a promise and an unmet yes link the ask they answer |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

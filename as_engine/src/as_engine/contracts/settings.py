@@ -185,6 +185,12 @@ class SchedulerRules(Strict):
     })
 
 
+class MemoryRules(Strict):
+    """B5 memory jobs (mind.memory MEM-19; turn.pipeline S14)."""
+    writeback_retries: int = 3     # a failed writeback is tried again this many times, at later turns
+    max_retry_jobs: int = 4        # at most this many retries join one turn's calls
+
+
 class PacketRules(Strict):
     # [SAND] Actor Spec §5: 6000 deliberating, 4000 routine, 3000 a reaction, fixed text included
     token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 6000, "warm": 4000, "reaction": 3000})
@@ -448,6 +454,7 @@ class RulesConfig(Strict):
     acoustics: AcousticRules = Field(default_factory=AcousticRules)
     olfaction: OlfactionRules = Field(default_factory=OlfactionRules)
     condition: ConditionRules = Field(default_factory=ConditionRules)
+    memory: MemoryRules = Field(default_factory=MemoryRules)
     temper: TemperRules = Field(default_factory=TemperRules)
     harm: HarmRules = Field(default_factory=HarmRules)
     needs: NeedsRules = Field(default_factory=NeedsRules)

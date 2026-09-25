@@ -136,9 +136,9 @@ def opt(def_id, verb=Verb.MANIPULATE, target=None, dest=None, item=None, cost=No
                            destination_id=dest, item_id=item, cost_note=cost)
 
 
-def classify(sig, chosen, speech=None, resolve_cur=3, form=F.REQUEST, block=False, drained=False):
+def classify(sig, chosen, speech=None, resolve_cur=3, form=F.REQUEST, block=False, drained=False, steps_toward=frozenset()):
     return firewall.classify_response(sig, chosen, speech, resolve_cur, form, entrenched_block=block,
-                                      resolve_drained_this_turn=drained)
+                                      resolve_drained_this_turn=drained, steps_toward=steps_toward)
 
 
 def test_compliance_classes():
@@ -159,8 +159,8 @@ def test_refusal_classes():
     sig = "drop_item:*"
     assert classify(sig, other) == ResponseClass.REFUSAL
     assert classify(sig, other, speech="No.") == ResponseClass.REFUSAL
-    assert classify(sig, other, speech="Yeah, okay, in a second.") == ResponseClass.FALSE_COMPLIANCE
-    assert classify(sig, other, speech="I'll do it.") == ResponseClass.FALSE_COMPLIANCE
+    assert classify(sig, other, speech="Yeah, okay, in a second.") == ResponseClass.DEFERRED_ASSENT
+    assert classify(sig, other, speech="I'll do it.") == ResponseClass.UNRESOLVED_ASSENT
     assert classify(sig, other, speech="Yesterday you said the same.") == ResponseClass.REFUSAL, "'yes' is a whole word"
     assert classify(sig, other, speech="I'll give you the nails instead.") == ResponseClass.COUNTER_OFFER
     assert classify(sig, other, block=True, speech="Sure.") == ResponseClass.ENTRENCHED_REFUSAL
@@ -170,3 +170,32 @@ def test_an_unreadable_ask_is_never_complied_with_by_accident():
     """'*:*' matches nothing — not even an option whose def happens to be anything."""
     for chosen in (opt("wait_here", verb=Verb.WAIT), opt("open_portal", target="prt_000001")):
         assert classify("*:*", chosen) == ResponseClass.REFUSAL
+
+
+def test_a_yes_is_not_a_lie_by_itself():
+    """WILL-09 (AC09): a yes and something else is preparation, a condition, a delay, a question back
+    or simply unresolved — never FALSE_COMPLIANCE, which nothing produces any more."""
+    sig = "open_portal:prt_000001"
+    work = opt("keep_working", verb=Verb.CONTINUE_TASK)
+    walk = opt("move_to_anchor", verb=Verb.MOVE, dest="anc_000004")
+    assert classify(sig, work, speech="Okay, what exactly do you mean?") == ResponseClass.CLARIFYING
+    assert classify(sig, work, speech="Why?") == ResponseClass.CLARIFYING
+    assert classify(sig, work, speech="Yes, after I finish this.") == ResponseClass.DEFERRED_ASSENT
+    assert classify(sig, work, speech="Sure, once the cans are counted.") == ResponseClass.DEFERRED_ASSENT
+    assert classify(sig, walk, speech="Okay.", steps_toward=frozenset({"anc_000004"})) == ResponseClass.PREPARING
+    assert classify(sig, walk, speech="Okay.") == ResponseClass.UNRESOLVED_ASSENT, "a walk somewhere else"
+    assert classify(sig, work, speech="Sure.") == ResponseClass.UNRESOLVED_ASSENT
+    assert classify(sig, work, speech="Yes, and I'll give you the nails for it.") == ResponseClass.UNRESOLVED_ASSENT
+    assert classify(sig, work, speech="I'll give you the nails instead.") == ResponseClass.COUNTER_OFFER
+    assert classify(sig, work) == ResponseClass.REFUSAL
+
+
+def test_open_the_door_means_the_door_guard_it_means_where_you_stand():
+    """WILL-08 (B5 fix): a door and the anchors at it often share a name; the kind the ask acts on
+    decides which one it means."""
+    ents = {"back door": "anc_000007", "anchor|back door": "anc_000007", "portal|back door": "prt_000003"}
+    assert firewall.request_signature("Open the back door.", "act_000001", "act_000002", ents) == "open_portal:prt_000003"
+    assert firewall.request_signature("Close the back door.", "act_000001", "act_000002", ents) == "close_portal:prt_000003"
+    assert firewall.request_signature("Guard the back door.", "act_000001", "act_000002", ents) == "guard_anchor:anc_000007"
+    assert firewall.request_signature("Open the back door.", "act_000001", "act_000002", {"back door": "prt_000003"}) == \
+        "open_portal:prt_000003", "plain keys still work"

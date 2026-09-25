@@ -62,7 +62,7 @@ def next_turn(w, hours: float = 1.0) -> int:
 
 
 def episode(w, who: str, *, salience: int = 20, anchor: int = 0, at: int | None = None,
-            summary: str | None = None) -> str:
+            summary: str | None = None, quarantined: int = 0) -> str:
     """One memory for ``who`` in the current turn, as mind.memory writes it after a turn."""
     at = now(w) if at is None else at
     t = turn(w)
@@ -70,7 +70,7 @@ def episode(w, who: str, *, salience: int = 20, anchor: int = 0, at: int | None 
         eid = tx.mint("epi")
         values = {"episode_id": eid, "holder_id": w.id(who), "at": at, "turn_index": t, "place_id": None,
                   "summary": summary or f"Something {who} saw at {at}.", "salience": salience,
-                  "percept_ids": [], "subject_ids": [], "anchor": anchor, "decayed": 0}
+                  "percept_ids": [], "subject_ids": [], "anchor": anchor, "decayed": 0, "quarantined": quarantined}
         tx.commit_event(Event(type=EventType.EPISODE_WRITTEN, writer="mind.memory", at=at, turn_index=t,
                               actor_id=w.id(who), payload={"episode_id": eid, "holder_id": w.id(who),
                                                            "salience": salience, "anchor": anchor},
@@ -148,6 +148,22 @@ def test_an_anchor_memory_is_material_whatever_its_salience(scenario):
     T = next_turn(w)
     e = episode(w, "mara", salience=5, anchor=1)
     assert bg.jobs(w.store, T) == [reflection(w, "mara", f"m:{e}")]
+
+
+def test_a_held_back_memory_is_never_thought_over(scenario, fake):
+    """BG-02 (Actor v2 B5b, MEM-18): a quarantined memory — it names someone the person never
+    learned the name of — is no new experience, and it never reaches the call."""
+    w = scenario("metal_fence")
+    T = next_turn(w)
+    t = now(w)
+    episode(w, "june", salience=90, at=t, summary="Dale Pruitt was out back.", quarantined=1)
+    assert bg.jobs(w.store, T) == []
+    e = episode(w, "june", salience=75, at=t + 1000, summary="Something crashed out back.")
+    assert bg.jobs(w.store, T) == [reflection(w, "june", f"m:{e}")]
+    fake.script(CallClass.REFLECTION, REFLECTED, actor_id=w.id("june"))
+    asyncio.run(bg.run_job(w.session(), bg.jobs(w.store, T)[0]))
+    [req] = fake.calls(CallClass.REFLECTION)
+    assert req.context.recent_episodes == ["Something crashed out back."]
 
 
 def test_an_ordinary_day_waits_for_a_nights_sleep(scenario):

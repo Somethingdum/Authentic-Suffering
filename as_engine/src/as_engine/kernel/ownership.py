@@ -56,6 +56,7 @@ TABLE_OWNERS: dict[str, str] = {
     "lessons": "mind.mind",
     "tempers": "mind.temper",
     "episodes": "mind.memory",
+    "memory_jobs": "mind.memory",
     "groups": "society.group",
     "group_members": "society.group",
     "group_standing": "society.group",

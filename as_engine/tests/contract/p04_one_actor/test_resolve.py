@@ -93,12 +93,18 @@ def _custom(**over):
 
 
 def test_gate_at_zero(canon):
+    """RES-03 at 0 (AC08): fear and impairment, never obedience — they keep their voice, silence,
+    their eyes, retreat, cover, hiding, protecting someone and surrender; complying under threat is
+    one option among them. What needs nerve they do not have is gone."""
     ok = lambda bare: resolve.gate(0, _def(canon, bare))[0]  # noqa: E731
     assert ok("surrender") and ok("wait_here") and ok("shield_dependent")
+    assert ok("speak") and ok("observe_area") and ok("take_cover") and ok("hide")
     assert ok("give_item") or ok("drop_item"), "comply_under_threat defs stay open"
-    assert not ok("shoot_center_mass") and not ok("observe_area") and not ok("move_to_anchor")
+    assert not ok("shoot_center_mass") and not ok("move_to_anchor") and not ok("punch")
     for bare in ("surrender", "wait_here"):
         assert _def(canon, bare).verb in (Verb.SURRENDER, Verb.WAIT)
+    low = _def(canon, "move_to_anchor").model_copy(update={"tags": ["low_exposure"]})
+    assert resolve.gate(0, low) == (True, None), "an attempt the content marks low_exposure stays open"
 
 
 def test_gate_at_one_blocks_fear_exposure_only(canon):

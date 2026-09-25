@@ -6,7 +6,11 @@ WHAT THEY PERCEIVED
 {% else %}- Nothing clear.
 {% endfor %}{% for u in a.utterances %}- {{ u.handle }}: {{ u.speaker_handle or "someone" }} said{{ " to them" if u.addressed_to_me else "" }}: {{ ('"' ~ u.words ~ '"') if u.words else "(only the tone)" }}
 {% endfor %}
-{% if a.own_action_text %}WHAT THEY DID
+{% if a.self_experiences %}WHAT THEY DID AND FELT THEMSELVES (cite these too)
+{% for o in a.self_experiences %}- {{ o.handle }}: {{ o.text }}
+{% endfor %}{% if a.own_expectation_text %}What they expected: {{ a.own_expectation_text }}
+{% endif %}
+{% elif a.own_action_text %}WHAT THEY DID
 {{ a.own_action_text }}{{ (" What they expected: " ~ a.own_expectation_text) if a.own_expectation_text else "" }}
 
 {% endif %}PEOPLE

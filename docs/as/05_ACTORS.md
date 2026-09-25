@@ -174,14 +174,17 @@ place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dep
 
 | Resolve | Options generated |
 |---|---|
-| 0 | only flee, escape, surrender, wait (freeze), protect-a-dependent, comply-under-threat |
+| 0 | only flee, escape, surrender, wait (freeze), watch, speak, take cover, hide, protect-a-dependent, comply-under-threat, low-exposure attempts |
 | 1 | everything except options needing sustained exposure to the fear source |
 | 2 | everything; options opposing an authority they accept carry a cost note |
 | 3+ | everything |
 
 A hard refusal is made of Resolve: coercion drains it; an Actor with Resolve left can refuse
-indefinitely; at 0 they comply — and the compliance is logged as **coerced**, becoming grievance,
-fear and an open loop, never consent (WILL-08).
+indefinitely. At 0 fear and impairment stay, but nothing makes them obey (Actor Spec §10, AC08):
+they can still speak, keep silent, freeze, retreat, hide, protect someone and surrender, and
+complying under threat is one of those options, never chosen for them. When they do comply under
+threat it is logged as **coerced**, becoming grievance, fear and an open loop, never consent
+(WILL-08).
 
 ## 6. The Request Firewall
 
@@ -200,8 +203,12 @@ fear and an open loop, never consent (WILL-08).
 4. **The response ladder** is computed *after* the choice by comparing the chosen option with the
    request's signature: ready compliance · reluctant compliance · counter-offer · refusal ·
    entrenched refusal (the requested option was removed by the moral gate — one of their own
-   immutable lines, unmovable by persuasion; only a change in the world can move it) · false compliance (says yes, does something
-   else — logged as a lie) · coerced compliance.
+   immutable lines, unmovable by persuasion; only a change in the world can move it) · coerced
+   compliance — and, for a yes followed by something else (AC09), a question back ("what exactly do
+   you mean?") · a yes with a condition or a delay (a promise the person now holds) · a yes and a
+   step toward it · an unresolved yes (recorded as said; never judged a lie by code — whether it
+   was one is the asker's interpretation). A person who does what they refused has changed their
+   mind: the refusal is marked revised and kept (WILL-12).
 5. **Threats are not persuasion.** Coercion never routes through a social check; it drains
    Resolve, raises fear and resentment, and the fear-response options (comply-and-resent,
    comply-and-lie, flee, freeze, pre-emptive violence, seek allies) are what the menu offers.
@@ -321,6 +328,16 @@ cite a percept the mind does not have are dropped and logged (G14). Two people r
 event differently because they perceived it differently; a partial overhear produces a partially
 wrong belief by design.
 
+Actor v2 B5b (D-89; `mind/memory.py` MEM-01, MEM-03, MEM-18, MEM-19; Actor Spec §13, AC10,
+AC11, AC13; fidelity C10):
+
+| Rule | What holds |
+|---|---|
+| Self-experience (AC10) | The packet also carries what the person did and felt, as O handles: 'I said: "…"', 'I chose to keep watch.', and how it went ('It did not work.', 'I could not do it.'), never why. A memory, belief, promise or grudge may cite them like a percept: a promise can be caused by the person's own words |
+| Each reads it as themselves (AC11) | Every named person gets their own writeback, even when several heard the same crash. Only the raw percepts are shared; meaning, salience, trust and goals stay each person's own |
+| A name they could not know (AC13) | A memory naming someone the person never learned the name of is kept as raw evidence but quarantined: never recalled, never looked up, waiting for review (P11). A belief naming them is dropped. Both are logged ('unknown_name') |
+| A failed summary is never a lost memory (C10) | Each person's writeback is a memory job (`memory_jobs`, key holder:turn). A failed call leaves the job 'failed'; later turns try it again (up to `RulesConfig.memory.writeback_retries`). Until it is done, what they did and saw is in their next decision's packet under "Still raw from before"; a done job is never applied twice |
+
 ### 9.2 Reflection (quiet hours, background)
 
 Between turns, while the player reads (`service/background.py`, BG-01..07; Actor Spec AC12), a
@@ -340,7 +357,8 @@ The model never decides what it receives. `mind/retrieval.py` computes a key set
 state (place, perceived entities, names in perceived speech, open-loop subjects, current target)
 and ranks beliefs, episodes (SQLite FTS5 on the perceived speech's content words), lessons, loops
 and refusals deterministically, within `PacketRules` caps and the packet token budget. Anchor
-memories (salience ≥ 90, or a bonded person's death) never decay and are always eligible.
+memories (salience ≥ 90, or a bonded person's death) never decay and are always eligible. A
+quarantined memory (§9.1) is never retrieved or looked up.
 
 ### 9.4 Forgetting
 

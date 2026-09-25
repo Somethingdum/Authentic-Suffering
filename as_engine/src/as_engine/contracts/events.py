@@ -88,12 +88,15 @@ class EventType(StrEnum):
     LESSON_LEARNED = "LESSON_LEARNED"
     ANCHOR_MEMORY = "ANCHOR_MEMORY"
     EPISODE_WRITTEN = "EPISODE_WRITTEN"
+    MEMORY_JOB = "MEMORY_JOB"   # MEM-19: a writeback queued, done or failed (mind.memory)
     REFLECTION = "REFLECTION"
     PLAN_CHANGE = "PLAN_CHANGE"
     # social
     SPEECH = "SPEECH"
     SPEECH_CUT = "SPEECH_CUT"   # SEG-04: where an utterance stopped (action.resolve)
     GESTURE = "GESTURE"         # GEST-03: a gesture made with an attempt (action.resolve; seen, never heard)
+    ASSENT_UNMET = "ASSENT_UNMET"          # WILL-13: said yes, did something else (mind.mind; no judgement)
+    REFUSAL_REVISED = "REFUSAL_REVISED"    # WILL-12: a person changed their mind about a refusal (mind.mind)
     REQUEST = "REQUEST"
     ORDER = "ORDER"
     THREAT = "THREAT"
@@ -187,10 +190,10 @@ _groups: dict[EventClass, list[str]] = {
                       "IMPAIRMENT_CHANGE", "RESOLVE_CHANGE", "POSTURE_CHANGE"],
     EventClass.ACTION: ["ACTION_START", "ACTION_COMPLETE", "ACTION_INTERRUPT", "ACTION_BLOCKED",
                         "TASK_STEP", "CONTROL_ESTABLISH", "CONTROL_RELEASE", "CHECK_RESOLVED", "INVOLUNTARY"],
-    EventClass.MIND: ["PERCEIVE", "BELIEF_FORM", "BELIEF_REVISE", "RELATION_CHANGE", "TEMPER_CHANGE", "REFUSAL", "PROMISE",
+    EventClass.MIND: ["PERCEIVE", "BELIEF_FORM", "BELIEF_REVISE", "RELATION_CHANGE", "TEMPER_CHANGE", "REFUSAL", "REFUSAL_REVISED", "ASSENT_UNMET", "PROMISE",
                       "PROMISE_KEPT", "PROMISE_BROKEN", "LOOP_OPENED", "LOOP_CLOSED", "LOOP_STRENGTH", "LIE_TOLD",
                       "LIE_DISCOVERED", "PERSONA_PIERCED", "LESSON_LEARNED", "ANCHOR_MEMORY",
-                      "EPISODE_WRITTEN", "REFLECTION", "PLAN_CHANGE"],
+                      "EPISODE_WRITTEN", "MEMORY_JOB", "REFLECTION", "PLAN_CHANGE"],
     EventClass.SOCIAL: ["SPEECH", "SPEECH_CUT", "GESTURE", "REQUEST", "ORDER", "THREAT", "OFFER", "DELIBERATE_QUOTATION",
                         "TENSION_CHANGE", "ESCALATION", "DEFECTION", "LEADERSHIP_CHALLENGE",
                         "RECONCILIATION", "RUMOUR_SPREAD", "LOYALTY_CHECK", "STANDING_CHANGE",
@@ -241,6 +244,18 @@ class WriteRecord(Strict):
     values: dict[str, Any] = Field(default_factory=dict)
 
 
+LINK_ROLES: tuple[str, ...] = ("contributed", "answered")
+
+
+class EventLink(Strict):
+    """C10 (Actor v2 B5c, kernel.store STORE-12): a cause besides the primary parent
+    ``cause_event_id``. 'contributed' — another cause of the same outcome (every wound that bled,
+    for a death by blood loss); 'answered' — the ask this event is a reply to."""
+
+    event_id: str
+    role: Literal["contributed", "answered"]
+
+
 class Event(Strict):
     event_id: str | None = Field(default=None, description="Minted by the store on commit (kind 'evt').")
     seq: int | None = Field(default=None, description="Global order, assigned by the store.")
@@ -251,6 +266,7 @@ class Event(Strict):
     target_ids: list[str] = Field(default_factory=list)
     place_id: str | None = None
     cause_event_id: str | None = None
+    links: list[EventLink] = Field(default_factory=list, description="C10: the other causes (STORE-12).")
     payload: dict[str, Any] = Field(default_factory=dict)
     writes: list[WriteRecord] = Field(default_factory=list)
     rule_cited: str | None = None

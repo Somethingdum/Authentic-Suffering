@@ -228,9 +228,10 @@ A degraded turn is honest and recorded; a guessed turn is corruption (plan §5.3
 
 - **Aftermath** (13): per holder, only its own percepts of this transaction's events; holders
   with nothing perceived get no packet.
-- **Writeback** (14): identical aftermath packets with no private content share one call
-  (MEM-03); the PC gets writeback too (its Journal and recap come from it). A failed call writes
-  nothing for its group and is logged.
+- **Writeback** (14): every person gets their own call (MEM-03, Actor v2 B5b); the PC gets
+  writeback too (its Journal and recap come from it). Each is a memory job (MEM-19): a failed call
+  writes nothing, is logged, and is tried again at later turns, and until it is done the person's
+  next packet carries what they did and saw raw.
 - **Audits** (15): the leak scan is a SQL query — every `claim_holdings` row acquired this
   window (inferences aside) cites an event its holder has a percept of; `audit_log` rows with
   producer ≠ judge. The retrospective portrayal audit is P11.

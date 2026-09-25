@@ -18,10 +18,15 @@ and the frontend toolchain are not built — the DSH builder builds them (13_BUI
 DeepSeek's to build. The kit-maker writes contracts, tests, docs and instructions only. What is left:
 1. **Actor v2 steps 4–6** — the Actor Specification's remaining parts. **Step 4 (B4) is SPECIFIED**
    (D-87; 05 §7.2; 13 §4.0 step 1; tests 12 §3.10): words in segments on the clock, cut when the
-   speaker stops; gestures by free hands, seen and never heard; one attention point. Left: memory,
-   firewall and promises — AC08–AC13, fidelity C10; the
-   society and wake fixes — C04, C06, C08) as contracts and tests amending the built phases. Each
-   amended function is named, so the builder knows which bodies to change.
+   speaker stops; gestures by free hands, seen and never heard; one attention point. **B5a is
+   SPECIFIED** (D-88; 05 §5, §6; tests 12 §3.11): zero Resolve keeps a person's voice, eyes and
+   retreat; a yes is sorted, never judged a lie; a refusal can be revised. **B5b is SPECIFIED** (D-89;
+   05 §9.1; tests 12 §3.12): own words and attempts are evidence, everyone reads as themselves, an
+   unknowable name quarantines a memory, and a failed writeback is a memory job tried again. **B5c
+   is SPECIFIED** (D-90; 03 §3; tests 12 §3.13): an event can name several causes (links). Left:
+   B5d — promises as each person understands them (Actor Spec §12); B6 — the society and wake
+   fixes (C04, C06, C08), as contracts and tests amending the built phases. Each amended function
+   is named, so the builder knows which bodies to change.
 2. **P11** — the audits (§5).
 3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
@@ -32,9 +37,6 @@ DeepSeek's to build. The kit-maker writes contracts, tests, docs and instruction
    that name no session; tests in p08 `test_sessions.py`, p10 `test_world_names_no_run.py`, vitest
    `sessions.spec.js`.
 5. **The final pass** — docs coherence, RULES regenerated, the manifest, the handoff.
-Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo
-(git stash / scratch patch) — the content filter kept stopping replies while its tests were being
-written; resume it with neutral wording (a speaker who faints, not one who dies).
 Owner requirements queued (2026-09-24, in the owner's words where it matters; specify in this order):
 - **Appearance, smell, condition, clothing** (new senses work, amends P2 bodies/items, P3 perception, P4 packet
   and cues, P10 infected): everyone and everything has a visual identity in high detail (hair, faces, marks,

@@ -62,6 +62,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | provenance | where a belief came from (witnessed, told_by:X …) | "how you know" | source tag |
 | event | one committed change with a cause | — | log entry, delta |
 | event log | the append-only `events` table | — | EVENT_STREAM, EVENT_HISTORY, RECENT EVENTS |
+| link | a cause of an event besides its `cause_event_id`: 'contributed' or 'answered' (`EventLink`, STORE-12) | — | secondary cause, co-cause |
 | store | the run's SQLite database | "your save" | MEMORY_LOG, save file, world state, the logs |
 | run | one life in one world | "a life" / run card | campaign (in code) |
 | sessions browser | the Your lives screen: every run, ended ones too, with a one-step delete that wipes the run (RUN-12) | "Your lives" | Load list |
@@ -106,6 +107,9 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | open loop | promise, debt, grudge, goal, desire, fear, question, plan, kept secret | Journal entries | objective (for all of these) |
 | lesson | a belief about what works, from experience | "lessons" | — |
 | episode | one memory in the holder's own voice | — | memory entry |
+| self-experience | what a person did and felt themselves ('I said…', 'It did not work.'), evidence a memory may cite as O# (MEM-01, Actor v2 B5b) | — | — |
+| memory job | one person's writeback for one turn, kept in `memory_jobs` until done; a failed call is tried again (MEM-19) | — | — |
+| quarantined episode | a memory naming someone its holder never learned the name of: kept as raw evidence, never recalled, awaiting review (MEM-18) | — | — |
 | anchor memory | an episode that never decays | — | — |
 | persistence lock | a subject decay never removes | — | PERSISTENCE_LOCK |
 | place | a node in the place graph (room, street …) | the place's name | LSDL location (as geometry) |
@@ -120,7 +124,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | narrator packet | what the narrator receives: only the PC's percepts | — | — |
 | echo ledger | n-grams the model must not repeat back | — | — |
 | Sandbox | a run where a cheat changed or revealed something | "Sandbox" tag | — |
-| quarantine | cheat-origin entities excluded from balance maths | — | — |
+| quarantine | cheat-origin entities excluded from balance maths (not a quarantined episode) | — | — |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |
 | pool | a district's counted dead by type, active or dormant (`infected_pools`) | — | encounter rating, spawn table |
 | frontage | where a building site meets its street: an anchor of the hub along one side or the other ("the front of the Yazzie house"); the next building is a walk down the street (WG1, D-64) | "the front of the Yazzie house" | — |

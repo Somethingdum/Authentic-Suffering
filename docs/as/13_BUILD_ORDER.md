@@ -184,6 +184,33 @@ machine yet, so start here, not at P0 task 1:
      GESTURE (SENSORY_TYPES and `_perceive_event`); `sense/optics.visibility` — FOCUS-02 —
      `p05_many_actors/test_speech_segments.py`, `test_gestures.py`.
    - P7: `turn/_impl_cognition.py` `_schema` passes the packet's G and F handles.
+   Actor v2 B5a — zero Resolve, answers and reconsidering (AC08, AC09; D-88; 05 §5, §6) the same way:
+   - P4: `mind/_impl_p4a.py` — `gate` at 0 (RES-03), `classify_response` (WILL-09's new classes and
+     `steps_toward`), `request_signature` (WILL-08's kind-aware lookup) — `p04_one_actor/test_resolve.py`,
+     `test_firewall.py`.
+   - P6: `mind/firewall.revise_refusal` and `record_unmet_assent` (write them in place or bind them
+     from `_impl_p6.py`) — `p06_memory/test_refusals.py`.
+   - P7: `turn/_impl_cognition.py` — `record_responses` (steps_toward; what each class does) and
+     `perceived_entities` (the anchor| / portal| keys) — `p07_slice/test_answers.py`.
+   Actor v2 B5b — self-experience, own readings, unknown names, memory jobs (AC10, AC11, AC13, C10;
+   D-89; 05 §9.1) the same way:
+   - P4: `mind/_impl_packet.py` — 'unprocessed' and its place in SKULL-09's drop order (the prompt
+     is written) — `p06_memory/test_memory_v2.py` (it needs P6's `unprocessed`).
+   - P6: `mind/_impl_p6.py` — `build_aftermath` self_experiences (MEM-01), `writeback_groups` (MEM-03),
+     `apply_writeback` (O handles, the unknown-name checks, `self_event_ids`, `quarantined`, a done
+     job), `retrieve` (MEM-14); `mind/memory.unknown_names`, `queue_writeback`, `finish_writeback`,
+     `unprocessed` (write them in place); `mind/perception.infer` (the holder's own event ids);
+     `mind/_impl_consult.py` `recall` (CONSULT-05) — `p06_memory/test_memory_v2.py`, `test_memory.py`.
+   - P7: `turn/_impl_pipeline.py` — S13's jobs and retries, S14's finish — `p07_slice/test_memory_jobs.py`.
+   - P10: `service/_impl_background.py` — `new_episodes` (BG-02) — `p10_world/test_background.py`.
+   Actor v2 B5c — several causes (fidelity C10; D-90; 03 §3) the same way:
+   - P0: `kernel/store.py` `Tx.commit_event` — STORE-12 (check the links, store the column);
+     `kernel/events.py` — `_row_to_event` reads `links`, `causes`, `effects` —
+     `p00_substrate/test_event_links.py`.
+   - P2: `physical/bodies.py` — DEATH-06 (the links of a death by blood loss) — `p02_space_bodies/test_bodies.py`.
+   - P6: `mind/_impl_p6.py` `open_loop` (links); `mind/firewall.record_unmet_assent` (ask_event_id).
+   - P7: `turn/_impl_cognition.py` `record_responses` (the ask a promise or an unmet yes answers) —
+     `p07_slice/test_answers.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.

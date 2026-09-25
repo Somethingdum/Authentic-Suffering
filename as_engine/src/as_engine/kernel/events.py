@@ -1,4 +1,8 @@
-"""Event log readers and event-apply replay (P0). Rules DET-01, DET-02."""
+"""Event log readers and event-apply replay (P0). Rules DET-01, DET-02; STORE-12 (links).
+
+Every reader returns events with their ``links`` (fidelity C10, Actor v2 B5c): the events row's
+``links`` column parsed back into EventLinks, so replay re-commits them unchanged.
+"""
 
 from __future__ import annotations
 
@@ -35,7 +39,8 @@ def children(store: "Store", cause_event_id: str) -> list[Event]:
 
 
 def cause_chain(store: "Store", event_id: str) -> list[Event]:
-    """The event and its causes up to the root (first element = the event itself)."""
+    """The event and its causes up to the root (first element = the event itself), following the
+    primary parent ``cause_event_id`` only (the other causes are links: ``causes``)."""
     out = []
     cur = event_id
     while cur:
@@ -43,6 +48,19 @@ def cause_chain(store: "Store", event_id: str) -> list[Event]:
         out.append(e)
         cur = e.cause_event_id
     return out
+
+
+def causes(store: "Store", event_id: str) -> list[tuple[str, str]]:
+    """C10 (STORE-12): every recorded cause of the event, as (event id, role): (cause_event_id,
+    'primary') first when it is set, then (link.event_id, link.role) for each link in stored
+    order."""
+    raise NotImplementedError("P0")
+
+
+def effects(store: "Store", event_id: str) -> list[Event]:
+    """C10 (STORE-12): every event that names ``event_id`` as a cause — its cause_event_id or one
+    of its links — by seq, each once."""
+    raise NotImplementedError("P0")
 
 
 def replay_world(src: "Store", dst_path: str | Path | None = None) -> "Store":

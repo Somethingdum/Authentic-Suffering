@@ -42,12 +42,12 @@ CONSULT-04 more_actions(affordances, family, subject_ids, defs) -> list[BoundAff
 CONSULT-05 recall(tx, packet, query, subject_ids, turn_index, at) -> list[str]
   Up to MAX_RECALL of the holder's own records that the packet does not already show, one line
   each, with where it came from and how long ago (the age worded as mind.packet words a belief's):
-    episodes of the holder with decayed 0 that are not values of packet.handles, matching when a
-      subject_id is in their subject_ids or, with a query, their rowid is in SELECT rowid FROM
-      episodes_fts WHERE episodes_fts MATCH <the query's content words: lowercase runs of letters
-      and apostrophes of 4 or more letters not in mind.retrieval.STOPWORDS, first occurrence kept,
-      each double-quoted, joined with ' OR '> — ordered (salience desc, at desc, episode_id):
-      f'You remember ({age}): {summary}';
+    episodes of the holder with decayed 0 and (B5, MEM-18) quarantined 0 that are not values of
+      packet.handles, matching when a subject_id is in their subject_ids or, with a query, their
+      rowid is in SELECT rowid FROM episodes_fts WHERE episodes_fts MATCH <the query's content
+      words: lowercase runs of letters and apostrophes of 4 or more letters not in
+      mind.retrieval.STOPWORDS, first occurrence kept, each double-quoted, joined with ' OR '> —
+      ordered (salience desc, at desc, episode_id): f'You remember ({age}): {summary}';
     then the holder's live believed holdings (believed 1, superseded_by NULL; text and subject as
       mind.retrieval reads them — the proposition's, or a claims row's '<predicate> <value>' and
       subject_id) whose text is not the text of a packet belief, matching when their subject is in

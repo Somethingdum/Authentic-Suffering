@@ -109,7 +109,8 @@ infer(tx, holder_id, *, about, text, confidence, because, at, turn_index) -> str
   besides grant, that claim_holdings rows appear. ``about`` is ('body', body_id), ('self', None)
   -> ('body', holder_id), or ('place', None) -> ('place', the holder's place now, positions).
   ``because`` = the percept ids the belief cites: non-empty, every one a percept_log row of THIS
-  holder — else ValueError. Commits BELIEF_FORM (writer 'mind.perception', actor_id = holder,
+  holder — or (B5, AC10) the id of an event THIS holder committed itself (what it said or
+  attempted: read as an exact percept of that event) — else ValueError. Commits BELIEF_FORM (writer 'mind.perception', actor_id = holder,
   cause_event_id = committed_or_none(the first cited percept's event_id)) holding:
     * propositions INSERT: prop id kind 'prp', subject_type / subject_id from ``about``,
       predicate = 'inferred:' + norm_text(text), object_value NULL, text = text.strip(),

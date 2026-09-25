@@ -147,26 +147,33 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
   the calls; they are recorded in the stage-17 transaction.
   S13 aftermath: holders = the distinct holders of this turn's percepts whose bodies are alive
     (sorted); packet = mind.memory.build_aftermath(tx, h, T, now) each; only packets with at least
-    one percept or utterance go on. Ledger 13 {holders: the sorted holders that go on}.
+    one percept or utterance go on. (B5, MEM-19) Each holder that goes on has its job queued:
+    key = mind.memory.queue_writeback(tx, h, T, now). The retries: the memory_jobs rows with status
+    'failed', attempts < RulesConfig.memory.writeback_retries and turn_index < T, ordered
+    (turn_index, holder_id), at most RulesConfig.memory.max_retry_jobs, each with its packet
+    build_aftermath(tx, holder_id, its turn_index, now) — the raw evidence is still there.
+    Ledger 13 {holders: the sorted holders that go on}.
   S16 PC compile: npk = narration.narrator.build_narrator_packet(tx, pc, T, t0, settings); names =
     narration.narrator.known_names(tx). Ledger 16 {lines: len(npk.lines)}.
   S17+S18 narrate + lint (lane A) run CONCURRENTLY with the S14 writeback calls (lane B)
     (asyncio.gather): narration.narrator.narrate(client, npk, canon style 'narration',
     rules.style, config=config, all_known_names=names, turn_index=T) -> (prose, findings,
     attempts, passed); writeback: one Job per mind.memory.writeback_groups(packets) group
-    (packet = the group's first holder's): request = lanes.requests.build_request(config,
-    WRITEBACK, turn_index=T, actor_id = the group's first holder, context=WritebackContext(
+    (packet = the group's first holder's), then (B5) one per S13 retry in its order (packet = the
+    retry's; its group is [its job key]): request = lanes.requests.build_request(config,
+    WRITEBACK, turn_index=T, actor_id = the packet's holder, context=WritebackContext(
     aftermath=packet), json_schema = lanes.schemas.writeback_schema(its percept handles + its
-    utterance handles, entity handles, open-loop handles), a=packet, cue_ids = the sorted ids of
-    every canon cue); Job(job_id = the first holder, call_class WRITEBACK, request, output_model
-    WritebackOutput, lane_pref = request.lane, est_s = SchedulerRules.estimated_call_s
-    ['writeback']). All jobs -> ONE lanes.scheduler.run_jobs call.
+    utterance handles + (B5) its self-experience O handles, entity handles, open-loop handles),
+    a=packet, cue_ids = the sorted ids of every canon cue); Job(job_id = the group's first entry,
+    call_class WRITEBACK, request, output_model WritebackOutput, lane_pref = request.lane, est_s =
+    SchedulerRules.estimated_call_s['writeback']). All jobs -> ONE lanes.scheduler.run_jobs call.
   S14 apply (own transaction, groups in order): an answer whose parse_status is not 'ok' ->
     audit.log.repair(kind = 'timeout' | 'lane_down' | the parse status for grammar/schema failures |
-    'degraded', 14, 'MEM-02', {holders, status}) and that group writes nothing; otherwise
-    mind.memory.apply_writeback(tx, h, WritebackOutput, packets[h], now, T, cue_ids=…) for every
-    holder of the group. Ledger 14 'degraded' when a group failed, else 'ok'; detail {groups,
-    failed: the first holders of the failed groups}.
+    'degraded', 14, 'MEM-02', {holders: [the packet's holder], status}) and that group writes
+    nothing but (B5, MEM-19) mind.memory.finish_writeback(tx, its job key, False, now, T);
+    otherwise mind.memory.apply_writeback(tx, holder, WritebackOutput, its packet, now, T,
+    cue_ids=…) then finish_writeback(tx, its job key, True, now, T). Ledger 14 'degraded' when a
+    group failed, else 'ok'; detail {groups, failed: the first entries of the failed groups}.
   S15 audits: the leak scan (a query): claim_holdings rows with acquired_at >= t0 and provenance
     != 'inferred' whose holder has no percept_log row for acquired_via ->
     audit.log.record(tx, 'G15-leak', 'mind.perception', 'fail' | 'pass', [{holder_id, claim_id}],

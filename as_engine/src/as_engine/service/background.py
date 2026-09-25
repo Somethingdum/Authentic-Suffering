@@ -27,8 +27,10 @@ BG-02 jobs(store, turn_index) -> list[Job]   (pure read; order is the run order)
   actors.controller not 'human'.
   Reflection (AC12: after a material experience or a night's sleep, once per eligibility key),
   for each eligible actor holding an episode: prev = the actor's newest REFLECTION event (by seq)
-  of a turn before T, or none. NEW episodes = the actor's episodes (holder_id) whose turn_index is
-  greater than prev's turn_index (all of them when there is no prev), by (at, episode_id). The
+  of a turn before T, or none. NEW episodes = the actor's episodes (holder_id) with quarantined 0
+  (Actor v2 B5b, MEM-18: a memory naming someone they never learned the name of is never thought
+  over) whose turn_index is greater than prev's turn_index (all of them when there is no prev), by
+  (at, episode_id). The
   actor reflects when
     material: a new episode has salience >= R.material_salience or anchor 1 -> eligibility key
       'm:' + the episode_id of the newest such episode (by (at, episode_id)); else

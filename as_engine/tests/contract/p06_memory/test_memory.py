@@ -189,25 +189,16 @@ def test_the_aftermath_lists_only_open_loops_strongest_first(scenario):
 
 
 # =========================================================================== MEM-03 groups
-def test_only_identical_packets_without_private_content_share_a_call(scenario):
-    """MEM-03: shareable = no own action, no loops, no relationship lines, and the same percepts,
-    words and people in order (people compared by who they are, not by handle)."""
+def test_every_named_person_reads_it_as_themselves(scenario):
+    """MEM-03 (B5, Actor Spec §13, AC11): no two people share one reading, even of the very same
+    sound — every holder is a group of one, in holder id order."""
     w = scenario("metal_fence")
     t, crash, call = crash_and_call(w)
     base = aftermath(w, "stranger", t + 2000)
-    assert base.own_action_text is None and not base.open_loops and not base.relationships
     twin = base.model_copy(update={"holder_id": "act_900001"})
     twin2 = base.model_copy(update={"holder_id": "act_900000"})
-    private = base.model_copy(update={"holder_id": "act_900002", "own_action_text": 'Said: "Hey."'})
-    other_text = base.model_copy(update={"holder_id": "act_900003",
-                                         "percepts": [p.model_copy(update={"text": p.text + " Twice."}) for p in base.percepts]})
-    groups = memory.writeback_groups({x.holder_id: x for x in (base, twin, twin2, private, other_text)})
-    assert sorted(map(tuple, groups)) == sorted([tuple(sorted([base.holder_id, "act_900000", "act_900001"])),
-                                                ("act_900002",), ("act_900003",)])
-    assert groups == sorted(groups, key=lambda g: g[0]) and all(g == sorted(g) for g in groups)
-    if base.entities:
-        swapped = base.model_copy(update={"holder_id": "act_900004", "handles": {**base.handles, "P1": w.id("eli")}})
-        assert ["act_900004"] in memory.writeback_groups({"act_900001": twin, "act_900004": swapped})
+    groups = memory.writeback_groups({x.holder_id: x for x in (base, twin, twin2)})
+    assert groups == [[h] for h in sorted([base.holder_id, "act_900000", "act_900001"])]
 
 
 def test_relationship_lines_are_private(scenario):

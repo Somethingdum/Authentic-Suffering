@@ -206,3 +206,41 @@ def test_false_compliance_is_a_recorded_lie(scenario):
     assert ev.payload == {"liar_id": w.id("mara"), "to_id": w.id("pc"), "signature": f"follow_body:{w.id('pc')}",
                           "words": "Sure, I'll come."}
     assert w.store.query_one("SELECT COUNT(*) FROM events")[0] == n + 1
+
+
+# --------------------------------------------------------------------------- WILL-12 / WILL-13 (AC09)
+def test_a_person_can_change_their_mind(scenario):
+    """WILL-12: asking again is never better — but doing what you refused marks the refusal revised,
+    and the row and its history stay."""
+    w = scenario("metal_fence")
+    t = now(w)
+    rid = refuse(w, at=t)
+    sig = SIG.format(pc=w.id("pc"))
+    with w.store.transaction() as tx:
+        ev = firewall.revise_refusal(tx, w.id("mara"), w.id("pc"), sig, t + 60_000, 0, None)
+    assert (ev.type, ev.writer, ev.actor_id) == (EventType.REFUSAL_REVISED, "mind.mind", w.id("mara"))
+    assert ev.payload == {"refusal_id": rid, "actor_id": w.id("mara"), "requester_id": w.id("pc"), "signature": sig}
+    r = row(w, rid)
+    assert r["status"] == "revised" and r["times_asked"] == 1 and r["request_summary"] == "hand over the revolver"
+    with w.store.transaction() as tx:
+        assert firewall.revise_refusal(tx, w.id("mara"), w.id("pc"), sig, t + 70_000, 0, None) is None, "nothing left standing"
+        assert firewall.revise_refusal(tx, w.id("june"), w.id("pc"), sig, t + 70_000, 0, None) is None, "June refused nothing"
+
+
+def test_a_yes_and_something_else_is_recorded_not_judged(scenario):
+    """WILL-13: ASSENT_UNMET says what was said and what was done — no lie, no lost trust, no
+    resentment manufactured from it."""
+    w = scenario("metal_fence")
+    t = now(w)
+    with w.store.transaction() as tx:
+        sp = tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=t, turn_index=0, actor_id=w.id("mara"),
+                                   payload={"words": "Sure.", "volume": "normal", "to": [w.id("pc")], "source_db": 60}))
+    before = (rel(w, "pc", "mara", "trust"), rel(w, "pc", "mara", "resentment"))
+    sig = f"follow_body:{w.id('pc')}"
+    with w.store.transaction() as tx:
+        ev = firewall.record_unmet_assent(tx, w.id("mara"), w.id("pc"), sig, "Sure.", "keep_working", sp.event_id, t + 10, 0)
+    assert (ev.type, ev.writer, ev.actor_id, ev.cause_event_id, ev.writes) == \
+        (EventType.ASSENT_UNMET, "mind.mind", w.id("mara"), sp.event_id, [])
+    assert ev.payload == {"actor_id": w.id("mara"), "to_id": w.id("pc"), "signature": sig, "words": "Sure.",
+                          "chosen_def_id": "keep_working"}
+    assert events(w, "LIE_TOLD") == [] and (rel(w, "pc", "mara", "trust"), rel(w, "pc", "mara", "resentment")) == before

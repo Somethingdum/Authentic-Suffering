@@ -25,13 +25,15 @@ REL-05 relate never changes ``kind`` (content, households and worldgen set kinds
 Open loops (what hangs over a mind: goals, desires, grudges, fears, questions, plans, promises,
 debts, kept secrets — OpenLoopKind)
 LOOP-01 open_loop(tx, holder_id, kind, text, subject_ids, strength, cause, at, turn_index,
-  due_at=None) -> loop_id (kind 'olp'). ``kind`` must be an OpenLoopKind value, ``text`` non-empty
+  due_at=None, links=()) -> loop_id (kind 'olp'). ``kind`` must be an OpenLoopKind value, ``text`` non-empty
   after strip, ``strength`` 1..3 — else ValueError. When ``text`` contains '{subject}' and
   subject_ids is not empty, '{subject}' is replaced by the holder's word for subject_ids[0]
   (mind.perception.word_for) — cascade content writes texts like '{subject} broke a promise to
   you.' — and the stored text is stripped with its first letter upper-cased. Event: PROMISE for kinds promise_made / promise_owed, LOOP_OPENED otherwise; payload
   {loop_id, holder_id, kind, text, subject_ids, strength, due_at}; writes open_loops INSERT
   (status 'open', created_event = the event id, created_at = at, subject_ids as given, in order).
+  (Actor v2 B5c, C10) The event carries ``links`` (EventLinks, STORE-12) as given: a promise made
+  in answer to an ask links it 'answered' (turn.cognition record_responses).
 LOOP-02 A mind does not hold the same loop twice: when the holder already has an OPEN loop with
   the same kind, the same subject_ids (as a set) and the same text after
   mind.perception.norm_text, open_loop returns that loop's id and commits nothing (its strength
@@ -86,7 +88,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..contracts.common import OpenLoopKind, RelationAxis
-from ..contracts.events import Event
+from ..contracts.events import Event, EventLink
 
 if TYPE_CHECKING:
     from ..kernel.store import Store, Tx
@@ -99,7 +101,7 @@ def relate(tx: "Tx", from_id: str, to_id: str, axis: RelationAxis, delta: int, c
 
 def open_loop(tx: "Tx", holder_id: str, kind: OpenLoopKind, text: str, subject_ids: list[str],
               strength: int, cause: str | None, at: int, turn_index: int,
-              due_at: int | None = None) -> str:
+              due_at: int | None = None, links: "tuple[EventLink, ...] | list[EventLink]" = ()) -> str:
     raise NotImplementedError("P6")
 
 

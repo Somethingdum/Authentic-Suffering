@@ -27,7 +27,7 @@ MEM-13 beliefs: the holder's live believed holdings (believed 1, superseded_by N
   recency_bonus(hours since acquired_at) + (15 when subject is in K); ordered (score desc,
   claim_id asc); the first max_beliefs. Entries {claim_id, text, confidence, provenance,
   acquired_at, score}; text as mind.packet words a belief.
-MEM-14 episodes: the holder's episodes with decayed 0.
+MEM-14 episodes: the holder's episodes with decayed 0 and (B5, MEM-18) quarantined 0.
   Anchors (anchor 1) come first and always: ordered (salience desc, at desc, episode_id), at most 2.
   Then the rest by score = salience + (20 when any subject_id is in K) + (15 when the episode
   matches the speech query) + recency_bonus(hours since episode.at), ordered (score desc,

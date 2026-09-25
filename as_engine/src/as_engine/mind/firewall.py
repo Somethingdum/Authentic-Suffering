@@ -1,4 +1,4 @@
-"""The Request Firewall (P4). Rules WILL-00..11, L6, L7. docs/as/05_ACTORS.md §Firewall.
+"""The Request Firewall (P4). Rules WILL-00..13, L6, L7. docs/as/05_ACTORS.md §Firewall.
 
 A request never becomes an action. It becomes an event perceived by an Actor, who then
 independently chooses a response.
@@ -45,24 +45,39 @@ request_signature(text, speaker_id, receiver_id, perceived_entities) -> str   (W
   REQUEST_PATTERNS entry (a regex over the normalised text) gives '<def_id>:<target>', where
   {speaker} is speaker_id and {x} is lookup(x): perceived_entities maps lowercase phrases (names,
   descriptions, item / portal / anchor names the receiver knows) to ids; lookup returns the id of
-  the longest key equal to x or contained in x, else '*'. Unmatched -> '*:*'.
+  the longest key equal to x or contained in x, else '*'. (B5, a fix) A door and the anchors at it
+  often share a name ('back door' in the corner market): for the open_portal / close_portal
+  templates the lookup first tries only the keys f'portal|{phrase}', for guard_anchor only the
+  keys f'anchor|{phrase}' (the same longest-match rule over their phrases), and falls back to the
+  plain keys — 'open the back door' is the door, 'guard the back door' is where you stand.
+  Unmatched -> '*:*'.
 
-classify_response(signature, chosen: BoundAffordance, speech_text, resolve_cur, entrenched_block)
-  -> ResponseClass  (WILL-09):
+classify_response(signature, chosen: BoundAffordance, speech_text, resolve_cur, form, *, entrenched_block,
+  resolve_drained_this_turn, steps_toward=frozenset()) -> ResponseClass  (WILL-09):
   chosen matches signature (same def_id; the target part equals the option's target, destination
   or item id; '*' in either part matches anything — but the unmatched signature '*:*' never
   matches, because an ask the code could not read cannot be complied with by accident):
      COERCED_COMPLIANCE if the utterance form was THREAT and resolve_cur == 0,
      READY_COMPLIANCE   if resolve was not drained this turn and no cost_note,
      else RELUCTANT_COMPLIANCE
-  not matching:
+  not matching (AC09, Actor Spec §10: the words are recorded first, and a yes that is not followed at
+  once is not a lie by itself — it can be preparation, a condition, a delay or a misunderstanding;
+  the classifier is a routing hint, never proof of motive), first true wins:
      ENTRENCHED_REFUSAL if the requested def was removed by the moral gate (entrenched_block;
                         the duty gate removes nothing, C05)
-     FALSE_COMPLIANCE   if speech_text contains an ASSENT_TOKENS entry as a whole word or phrase
-                        (case-insensitive, regex word boundaries: 'yes' matches "Yes, sure." but
-                        not "yesterday") — deception is logged (LIE_TOLD, P6)
+     CLARIFYING         speech_text ends with '?' ("Okay, what exactly do you mean?" is not a yes)
+     then, when speech_text contains an ASSENT_TOKENS entry as a whole word or phrase
+     (case-insensitive, regex word boundaries: 'yes' matches "Yes, sure." but not "yesterday"):
+     DEFERRED_ASSENT    it also contains a CONDITION_TOKENS entry the same way ("Yeah, okay, in a
+                        second." — "Yes, after I finish this.")
+     PREPARING          the chosen option's target_id or destination_id is the signature's target
+                        or in ``steps_toward`` (turn.cognition passes where that target is: a
+                        portal's two anchors, the anchor a body or an item is at) — a step toward
+                        it
+     UNRESOLVED_ASSENT  otherwise (a yes and something else; why is unknown to the code)
      COUNTER_OFFER      if speech_text classifies as OFFER
      REFUSAL            otherwise
+  FALSE_COMPLIANCE is never produced (kept in the enum so older ledgers read).
 Refusals and lies (P6; events written with writer 'mind.mind', the owner of refusals; "the event
 id" in a row is kernel.store.EVENT_SELF, STORE-11).
 WILL-07 record_refusal(tx, actor_id, requester_id, signature, summary, reason_code,
@@ -92,10 +107,25 @@ WILL-05 negotiable_target_penalty(times_asked) = -(times_asked - 1) for times_as
   and status 'standing' or 'reopened' (no such row: no penalty). Someone who has already said no
   to you is harder to talk round, whatever you ask next.
 WILL-11 record_lie(tx, liar_id, to_id, signature, words, speech_event_id, at, turn_index) -> Event
-  A FALSE_COMPLIANCE response (says yes, does something else) is a lie: LIE_TOLD {liar_id, to_id,
-  signature, words} (writer 'mind.mind', actor_id = liar_id, cause_event_id = the liar's SPEECH
-  event; no table writes — the world records "X claimed Y"; being caught is LIE_DISCOVERED,
-  later phases).
+  LIE_TOLD {liar_id, to_id, signature, words} (writer 'mind.mind', actor_id = liar_id,
+  cause_event_id = the liar's SPEECH event; no table writes — the world records "X claimed Y";
+  being caught is LIE_DISCOVERED, later phases). (AC09) Nothing calls it on a classification any
+  more: a lie needs a supported difference between what the speaker said and what they believed,
+  and whether someone deceived someone is an interpretation in a mind, never a fact broadcast.
+WILL-12 (AC09, Actor Spec §10: asking again is never better, but a person can reconsider)
+  revise_refusal(tx, actor_id, requester_id, signature, at, turn_index, cause_event_id) -> Event |
+  None: the refusal row of (actor_id, requester_id, request_signature = signature) with status
+  'standing' or 'reopened' becomes status 'revised' — REFUSAL_REVISED {refusal_id, actor_id,
+  requester_id, signature} (writer 'mind.mind', cause as given) updating refusals.status; the row
+  and its history stay. None when there is no such row. (turn.cognition calls it when the person
+  does what they had refused.)
+WILL-13 (AC09) record_unmet_assent(tx, actor_id, to_id, signature, words, chosen_def_id,
+  speech_event_id, at, turn_index, ask_event_id=None) -> Event: ASSENT_UNMET {actor_id, to_id,
+  signature, words, chosen_def_id} (writer 'mind.mind', actor_id = the speaker of the yes, cause =
+  its SPEECH; (B5c, C10) links [EventLink(ask_event_id, 'answered')] when ask_event_id is given and
+  is not that cause; no table writes): "they said yes and did this" — no lie, no resentment and no betrayal are
+  manufactured from it; what the one who asked makes of it is theirs (what they perceive,
+  mind.memory writeback).
 """
 
 from __future__ import annotations
@@ -140,6 +170,9 @@ REASON_CODES: tuple[str, ...] = ("duty", "dependent", "resource", "fear", "moral
 ASSENT_TOKENS: tuple[str, ...] = ("yes", "sure", "okay", "ok", "fine", "alright", "all right",
                                   "on my way", "i will", "i'll do it")
 
+CONDITION_TOKENS: tuple[str, ...] = ("after", "once", "when", "first", "as soon as", "in a second", "in a minute",
+                                     "in a moment", "later", "if", "soon", "then")   # AC09: a yes with a condition or a delay
+
 
 def classify_form(text: str, *, weapon_pointed_at_receiver: bool = False) -> UtteranceForm:
     raise NotImplementedError("P4")
@@ -163,7 +196,7 @@ def request_signature(text: str, speaker_id: str, receiver_id: str,
 
 def classify_response(signature: str, chosen: "BoundAffordance", speech_text: str | None,
                       resolve_cur: int, form: UtteranceForm, *, entrenched_block: bool,
-                      resolve_drained_this_turn: bool) -> ResponseClass:
+                      resolve_drained_this_turn: bool, steps_toward: frozenset[str] = frozenset()) -> ResponseClass:
     raise NotImplementedError("P4")
 
 
@@ -180,6 +213,17 @@ def negotiable_target_penalty(times_asked: int) -> int:
 
 def record_lie(tx: "Tx", liar_id: str, to_id: str, signature: str, words: str, speech_event_id: str,
                at: int, turn_index: int) -> "Event":
+    raise NotImplementedError("P6")
+
+
+def revise_refusal(tx: "Tx", actor_id: str, requester_id: str, signature: str, at: int, turn_index: int,
+                   cause_event_id: str | None) -> "Event | None":
+    raise NotImplementedError("P6")
+
+
+def record_unmet_assent(tx: "Tx", actor_id: str, to_id: str, signature: str, words: str, chosen_def_id: str,
+                        speech_event_id: str | None, at: int, turn_index: int,
+                        ask_event_id: str | None = None) -> "Event":
     raise NotImplementedError("P6")
 from ._impl_p4a import classify_form, classify_standing, request_signature, classify_response  # noqa
 from ._impl_p6 import record_refusal, negotiable_target_penalty, record_lie  # noqa
