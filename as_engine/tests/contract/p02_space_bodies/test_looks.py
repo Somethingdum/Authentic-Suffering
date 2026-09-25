@@ -234,9 +234,9 @@ def test_create_writes_looks_and_the_dead_start_filthy(hall):
                              special={k: 5 for k in "SPECIAL"}, at=now(w), turn_index=0, origin="materialize")
     assert bodies.looks_of(w.store, man) == looks.model_copy(update={"outfit": []})
     assert w.store.query("SELECT 1 FROM items WHERE holder_body = ?", (man,)) == [], "create dresses nobody"
-    assert bodies.condition_of(w.store, man) == bodies.BodyCondition(0, 0, 0, 0, 0)
+    assert bodies.condition_of(w.store, man) == bodies.BodyCondition(0, 0, 0, 0, now(w)), "(F1c) a new body starts clean, now"
     assert bodies.looks_of(w.store, dead) is None
-    assert bodies.condition_of(w.store, dead) == bodies.BodyCondition(grime=5, blood=3, gore=5, wet=0, washed_at=0)
+    assert bodies.condition_of(w.store, dead) == bodies.BodyCondition(grime=5, blood=3, gore=5, wet=0, washed_at=now(w))
 
 
 def condition(w, local):
@@ -266,7 +266,8 @@ def test_soil_clamps_and_says_what_changed(hall):
     assert same is None and nothing is None, "wet is already at its top; nothing changes, no event"
     assert down.payload == {"body_id": vic, "grime": 0, "blood": 0, "gore": 4, "wet": 3, "source": "smeared"}
     assert down.cause_event_id == ev.event_id
-    assert bodies.condition_of(w.store, vic) == bodies.BodyCondition(grime=0, blood=0, gore=4, wet=3, washed_at=0)
+    assert bodies.condition_of(w.store, vic) == bodies.BodyCondition(grime=0, blood=0, gore=4, wet=3, washed_at=t), \
+        "soil never washes: washed_at stays when the scenario began (F1c)"
 
 
 # --------------------------------------------------------------------------- LOOK-02 clothes

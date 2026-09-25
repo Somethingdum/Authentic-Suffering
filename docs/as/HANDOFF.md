@@ -48,11 +48,14 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   people and Fredrick have looks. **F1b is SPECIFIED** (D-83, SMELL-01..06, INF-14): smell as a people's sense
   (the dead, death, blood, sweat and dirt; range by strength, halved in the open air, never your own; with the
   look for someone seen, one smell per kind unseen; smell cues) and gore camouflage against the common dead (the
-  lore's "they smell you" stays false). Left of this item: **F1a-2** generated people (worldgen people and
-  `society.population.materialise`) get looks and outfits, and the narrator and the Play UI show how people
-  look and smell; **F1c** washing, changing, smearing gore (with the D-77 exposure; a belief cue for it),
-  rain, grime that builds, nakedness's consequences and people's reactions — keeping away from someone who
-  reeks is group dynamics.
+  lore's "they smell you" stays false). **F1c is SPECIFIED** (D-86, LOOK-07..09, TEMPER-09; 07 §4.2; 13
+  §4.0 step 1; tests 12 §3.9): wounds, blows, treating and butchering bloody people; days unwashed make
+  them grimy; rain soaks them and rinses the gore off; a wash takes water, a wipe less; smearing on the
+  dead carries the strain; clothes come off, go on and off people who cannot stop you, never a child's;
+  clothes keep people warm and the cold can kill; the reek of the dead and a naked adult in sight wear on
+  people; settlements have a decency law. Left of this item: **F1a-2** generated people (worldgen people
+  and `society.population.materialise`) get looks and outfits fit for their climate, and the narrator
+  and the Play UI show how people look and smell.
 - **Human people** (the owner: smart, but human smart; everybody has a breaking point; bickering,
   brawls, betrayal). **H1 is SPECIFIED** (D-84, TEMPER-01..08, LOOP-07, STL-15; 05 §7.1; 13 §4.0 step
   1; tests 12 §3.6): stress that deaths, hunger and blows build and sleep eases; a temper per person on

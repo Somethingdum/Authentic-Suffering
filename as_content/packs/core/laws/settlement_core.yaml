@@ -63,3 +63,14 @@
   enforcement: Whoever notices a mismatch between what's held and what's logged raises it with the quartermaster or leadership directly.
   punishment: First offense from a member — the item is returned or its value worked off, and trust with that household takes visible damage. Repeat offense — banishment is on the table.
   belief_text: "We don't lock much up in here, because we don't have to. Steal from your own people and you'll wish the fence had kept you out instead."
+- schema: as.law.v1
+  id: public_decency
+  name: Public Decency
+  kind: decency
+  text: Inside the wall everyone stays clothed where others can see them; washing and changing are done in the wash house or behind a closed door.
+  affordance_effects:
+    - {affordance_tag: undress, effect: cost, applies_to: members, cost_note: "Stripping where people can see you gets you marched to the wash house by the watch and talked about for a week."}
+    - {affordance_tag: undress, effect: cost, applies_to: visitors, cost_note: "A stranger who strips inside the wall is taken for sick in the head or worse, and put back outside the gate."}
+  enforcement: Anyone who sees it tells the watch; the watch covers the person up, takes them to the wash house, and brings it to leadership if it happens again.
+  punishment: First time — a blanket, the wash house and a warning, and every tongue in the settlement wagging. Again — confined to quarters while the medic checks them for fever and bites. A visitor is put outside the gate.
+  belief_text: "Nobody walks around bare in here. First thing anyone thinks is fever, or the wet kind, and the second thing is worse."

@@ -154,6 +154,21 @@ machine yet, so start here, not at P0 task 1:
      the pipeline's S6 line (`turn/_impl_pipeline.py`), `URGE_LINE` in the narrator's pc_state_lines
      (`narration/_impl_narrator.py`); INF-07's half range in `world/_impl_p10.py` (sees) —
      `p10_world/test_wet_fluids.py`, `test_wet_strain.py`, `test_infected.py`.
+   The owner's washing, clothes and cold (F1c: LOOK-07..09, TEMPER-09; D-86; 07 §4.2) the same way:
+   - P2: `physical/bodies.py` — `create` sets washed_at = at; `apply_harm` soils the wounded body
+     (LOOK-07: committed after the HARM, not returned); `_needs_of` counts cold_stage (HARM-07);
+     `physical/objects.warmth`; the scenario loader's washed_at = start (`testing/_impl_loader.py`)
+     — `p02_space_bodies/test_bloodied.py`, `test_looks.py`.
+   - P4: `mind/_impl_affordance.py` — item_carried for wash / take_off / change_into (with the
+     CNT-11 coverage rule), AFF-02's strip_clothing binding; `mind/_impl_packet.py` body_lines —
+     COLD_LINES and BARE_LINES — `p04_one_actor/test_care_menu.py`.
+   - P5: `physical/bodies.wash`; `action/_impl_effects.py` — the handlers wash, smear, take_off,
+     change_into and strip (`test_effects.py`'s handler coverage needs all five), `_DEAD_OK` gains
+     smear_gore and strip_clothing, and the soiling in the melee splash, treat_wound and butcher;
+     `mind/temper.exposures` and take_in's use of it — `p05_many_actors/test_care.py`.
+   - P7: the narrator's pc_state_lines (`narration/_impl_narrator.py`) — `p07_slice/test_narration_care.py`.
+   - P10: `physical/bodies.cold_need`, and progress's step 2 (LOOK-08 grime and weather, LOOK-09
+     chill; their boundaries join the jump) — `p10_world/test_weather_and_cold.py`.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.

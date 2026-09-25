@@ -310,13 +310,32 @@ class TemperRules(Strict):
     """H1 breaking points (mind.temper; TEMPER-02..06)."""
     provocation_heat: dict[str, int] = Field(default_factory=lambda: {   # [SAND] heat each provocation adds
         "struck": 4, "shoved": 3, "grabbed": 3, "threatened": 3, "harmed_bonded": 4, "stole_from": 3,
-        "insulted": 2, "ordered_about": 1, "quarreled": 3,
+        "insulted": 2, "ordered_about": 1, "quarreled": 3, "reeked": 1, "bared": 2,
     })
-    stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1})
+    stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1,
+                                                                 "bared": 1})
     heat_decay_min: int = 60       # [SAND] anger fades by one point per this many minutes
     hold_per_resolve: float = 0.1  # [SAND] the chance to swallow it, per point of Resolve left
     hold_max: float = 0.8          # [SAND] nobody always holds it in
     fists_reach_m: float = 1.5
+
+
+class ConditionRules(Strict):
+    """F1c what is on a body over time, and the cold (physical.bodies LOOK-07..09; action.effects wash)."""
+    blood_from_wound: dict[str, int] = Field(default_factory=lambda: {   # LOOK-07: the wounded body's blood
+        "minor": 0, "significant": 1, "severe": 2, "catastrophic": 3})
+    grime_every_h: float = 24.0    # [SAND] unwashed, grime rises one a day ...
+    grime_unwashed_max: int = 3    # ... to 'grimy' at most (filthy takes dirt, not days)
+    weather_step_min: int = 20     # [SAND] out in the rain: wet +1, blood -1, gore -1 per step; else dries one per step
+    wash_full_ml: int = 5000       # [SAND] this much water washes you clean; less only wipes (grime -1, blood -2, gore -2)
+    smear_gore: int = 4            # a smear of the dead is enough to walk among them (INF-14 gore >= 4)
+    cold_need: dict[str, int] = Field(default_factory=lambda: {"cold": 3, "mild": 1, "hot": 0})   # [SAND] outdoors, by day
+    shelter: int = 2               # [SAND] indoors asks this much less (never below 0)
+    cold_step_min: int = 60        # chill is counted on the hour
+    chill_per_stage: int = 4       # [SAND] a cold stage per this much chill (stage 6 kills: bodies death test)
+    warm_per_step: int = 4         # [SAND] chill lost per hour when warm enough
+    reek_every_min: int = 10       # TEMPER-09: how often the reek of the dead on someone grates again
+    bared_every_min: int = 30      # TEMPER-09: how often a naked adult in sight shocks again
 
 
 class OlfactionRules(Strict):
@@ -428,6 +447,7 @@ class RulesConfig(Strict):
     checks: CheckRules = Field(default_factory=CheckRules)
     acoustics: AcousticRules = Field(default_factory=AcousticRules)
     olfaction: OlfactionRules = Field(default_factory=OlfactionRules)
+    condition: ConditionRules = Field(default_factory=ConditionRules)
     temper: TemperRules = Field(default_factory=TemperRules)
     harm: HarmRules = Field(default_factory=HarmRules)
     needs: NeedsRules = Field(default_factory=NeedsRules)

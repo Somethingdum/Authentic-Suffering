@@ -403,7 +403,8 @@ it, and the dead who walk on out of sight go back into the crowd.
   still draws them to where it is, and one already hunting it keeps on. A Lurker reads heat
   straight through it (CODEX). The dead do not track by smell (their lore's false belief); people
   do — whoever wears the dead reeks of them (sense.olfaction), and the fluids carry the wet strain
-  (D-77; smearing is F1c's).
+  (D-77): smearing yourself with them is an exposure (F1c, action.effects smear), and the rain takes
+  the gore off you in the open (physical.bodies LOOK-08).
 - **They eat people alive** (INF-15..19, the owner's I1, D-85). The dead do not bite and wander
   off, and they do not go for the kill: once one has hold of someone it does not let go (the
   overfed only fumble before they have you), and it bites every step — never the head or the

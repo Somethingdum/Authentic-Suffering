@@ -41,7 +41,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    ``felt`` sentence of each stage physical.bodies.stages(pc) returns, in pathway
                    order (second person, as written: the prose puts it in the PC's body); then (W1,
                    D-80) when an INVOLUNTARY of the PC with payload kind 'compulsion' was committed
-                   this turn: URGE_LINE ("Your body did it before you could stop it.").
+                   this turn: URGE_LINE ("Your body did it before you could stop it."); then (F1c)
+                   the cold and what the PC has on, exactly as mind.packet's body_lines words them
+                   (mind.packet.COLD_LINES, BARE_LINES) — the prose knows when the PC is freezing
+                   or naked, and what the people who see it make of it is theirs.
   comprehension    'low' when attr_mod(P) + attr_mod(I) <= 4, 'high' when >= 8, else 'average'
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of

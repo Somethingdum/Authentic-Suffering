@@ -204,3 +204,64 @@
   effect: spit
   tags: [compulsion]
 
+# F1c (D-86): washing, the dead's gore, and clothes. The water a wash takes is water nobody drinks.
+- schema: as.affordance.v1
+  id: wash_self
+  verb: manipulate
+  label: "Wash yourself with {item} (about {duration})"
+  ui_label: "Wash with the {item}"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 300}
+  noise_db: 30
+  effect: wash
+  tags: [care, water]
+- schema: as.affordance.v1
+  id: smear_gore
+  verb: manipulate
+  label: "Smear yourself with the gore of {target} (about {duration})"
+  ui_label: "Smear yourself with the {target}'s gore"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, target_kinds: [infected], target_alive: false}
+  duration: {base_s: 120}
+  noise_db: 25
+  effect: smear
+  tags: [care, disguise]
+- schema: as.affordance.v1
+  id: take_off_clothing
+  verb: manipulate
+  label: "Take off {item}"
+  ui_label: "Take off the {item}"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 20}
+  noise_db: 15
+  effect: take_off
+  tags: [clothing, undress]
+- schema: as.affordance.v1
+  id: change_into
+  verb: manipulate
+  label: "Change into {item} (about {duration})"
+  ui_label: "Put on the {item}"
+  binds: item_carried
+  range: self
+  requires: {hands_free: 1}
+  duration: {base_s: 60}
+  noise_db: 15
+  effect: change_into
+  tags: [clothing]
+- schema: as.affordance.v1
+  id: strip_clothing
+  verb: manipulate
+  label: "Take {item} off {target} (about {duration})"
+  ui_label: "Take the {item} off {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, target_kinds: [human], target_alive: false}
+  duration: {base_s: 60}
+  noise_db: 15
+  effect: strip
+  tags: [clothing, undress, loot]

@@ -78,6 +78,10 @@ Fields (second person, plain English):
                     * needs, thirst then hunger then fatigue: stage 2-3 'You are thirsty.' /
                       'You are hungry.' / 'You are tired.'; stage 4-6 'You are desperately
                       thirsty.' / 'You are starving.' / 'You are exhausted.';
+                    * (F1c) the cold: COLD_LINES[needs.cold_stage] when the stage is >= 1; then
+                      what you have on, when bodies.looks is recorded: physical.objects.coverage
+                      lacks 'torso' and 'groin' -> BARE_LINES[0], lacks 'torso' only ->
+                      BARE_LINES[1];
                     * impairment: 1-2 'Everything is harder than it should be.', 3-4 'You are
                       struggling to function.', 5-6 'You can barely function.';
                     * P10: per physical.bodies.stages(actor) (pathway order), the stage's ``felt``
@@ -213,6 +217,13 @@ if TYPE_CHECKING:
     from ..kernel.store import Tx
     from .affordance import AffordanceSet
     from .consult import Consulted
+
+
+COLD_LINES: dict[int, str] = {     # F1c (physical.bodies LOOK-09): needs.cold_stage -> what the body says
+    1: "You are cold.", 2: "You are cold.", 3: "You are shivering hard.", 4: "You are shivering hard.",
+    5: "You are freezing to death.", 6: "You are freezing to death.",
+}
+BARE_LINES: tuple[str, str] = ("You have nothing on.", "You are bare to the waist.")   # F1c
 
 
 def build_packet(tx: "Tx", actor_id: str, lod: LOD, affordances: "AffordanceSet", turn_index: int,

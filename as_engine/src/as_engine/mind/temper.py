@@ -59,7 +59,7 @@ TEMPER-04 provoke(tx, holder_id, toward_id, kind, event_id, at, turn_index) -> E
   Returns the TEMPER_CHANGE.
 TEMPER-05 take_in(tx, rng, holder_id, turn_index, at) -> Outburst | None   (turn.pipeline stage 3b:
   every conscious perceiver of the wave, sorted, the PC included)
-  provoke() for each provocation (TEMPER-03, in order). None when there were none, or when the holder
+  provoke() for each provocation (TEMPER-03, in order, then TEMPER-09's). None when there were none, or when the holder
   is the PC (meta pc_actor_id: its anger is real and on record, but the player's hand is never
   taken). Otherwise T =
   the provoked person with the highest heat now (ties: the one provoked last); heat(T) <
@@ -99,6 +99,23 @@ TEMPER-08 What the person knows of their own state goes into their packet (mind.
   outburst of outlet 'words' this wave (TEMPER-05, INVOLUNTARY at ``at``) -> SkullPacket.outburst =
   f"You snap. You are going to have it out with {the P-handle of T} — now, to their face."; else
   None.
+TEMPER-09 (F1c, D-86) What people cannot stand to be near — the owner: smeared in the dead "I'm going
+  to smell like hell, look like hell. And people aren't gonna want to be around me for very long
+  till I shower"; and walking around naked "should be an issue for most people. Like 'What the
+  fuck?'". exposures(tx, holder_id, turn_index, at) -> list[Provocation]: for a holder of kind
+  'human', per other living body S of kind 'human' (sorted by body_id), each kind at most once:
+    reeked  sense.olfaction.smells(tx, holder, S, at) == 'exact' and odour_of(S, at).kind == 'dead'
+            (the reek of the dead on a living person, close enough to gag on)
+    bared   a visual percept of the holder, of this turn or the one before (as TEMPER-03), at <=
+            ``at``, fidelity exact or partial, whose source_id is S, where S's age_years >= 18,
+            bodies.looks is not NULL and physical.objects.coverage(S) has neither 'torso' nor
+            'groin' — a naked adult in plain sight (mind.cues 'naked')
+  event_id None. A kind is skipped when a TEMPER_CHANGE of this holder toward S of that kind was
+  committed at > at - C.reek_every_min ('reeked') / C.bared_every_min ('bared') minutes (C =
+  RulesConfig().condition): standing next to it grates again every few minutes, and the reek
+  builds heat faster than it fades. provoke() takes event_id None (cause None). What they do with
+  it is theirs (the packet already says how the person looks and smells, and how they feel about
+  them, TEMPER-08) — until it boils over like any heat.
 Off-screen friction between the people of a settlement is society.settlement STL-15 (P9).
 
 INSULT_WORDS is implemented data (a routing hint, TEMPER-03).
@@ -124,8 +141,8 @@ INSULT_WORDS: tuple[str, ...] = (
 @dataclass(frozen=True)
 class Provocation:
     toward_id: str
-    kind: str        # struck | shoved | grabbed | threatened | ordered_about | insulted | harmed_bonded | stole_from
-    event_id: str
+    kind: str        # struck | shoved | grabbed | threatened | ordered_about | insulted | harmed_bonded | stole_from | reeked | bared
+    event_id: str | None     # None for TEMPER-09's (what they are, not something they did)
 
 
 @dataclass(frozen=True)
@@ -151,7 +168,11 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
     raise NotImplementedError("P5")
 
 
-def provoke(tx: "Tx", holder_id: str, toward_id: str, kind: str, event_id: str, at: int,
+def exposures(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Provocation]:
+    raise NotImplementedError("P5")
+
+
+def provoke(tx: "Tx", holder_id: str, toward_id: str, kind: str, event_id: str | None, at: int,
             turn_index: int) -> "Event":
     raise NotImplementedError("P5")
 

@@ -13,6 +13,8 @@
     fluid_contact: 0.15            # [SAND] W1 (D-77): a host's or the dead's blood on the hands that treat it
     fluid_splash: 0.05             # [SAND] W1: their blood in your eyes and mouth from a blow that opens them
     mouth_contact_direct: 0.6      # [SAND] W1: a host spitting into the mouth of someone asleep
+    gore_smear: 0.05               # [SAND] F1c: the dead smeared on whole skin (eyes and mouth are the way in)
+    gore_in_wound: 0.5             # [SAND] F1c: the dead smeared into an open, unbandaged wound
   # felt: what the host feels (second person, never the stage's name); signs: cues an observer who
   # sees the host clearly and close gets (mind.cues). Compulsion 3 = the involuntary offer
   # (turn.cognition, P10).

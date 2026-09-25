@@ -256,7 +256,9 @@ makes the snap, when it comes, code's act:
   them — struck, shoved, grabbed, threatened, ordered about by someone they don't answer to,
   insulted, their own people hurt, their things taken — each once, and fades an hour at a time;
   a grudge keeps it warm. The breaking point is `fuse x 2 - stress // 3`: the more stressed, the
-  shorter.
+  shorter. (F1c, TEMPER-09) Heat also builds from what someone *is*, not only what they did: the
+  reek of the dead on a person close by grates again every ten minutes, faster than it fades; a
+  naked adult in plain sight is a jolt of strain and heat, again every half hour.
 - **The packet says it**: "You are close to breaking." / "You are at the end of your rope."; beside
   each person, "they are getting under your skin", "you are furious with them", "you hold a grudge
   against them". The actor core now says it plainly: you are a person, not a planner; you can lose

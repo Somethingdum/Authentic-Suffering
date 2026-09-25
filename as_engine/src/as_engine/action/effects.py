@@ -41,7 +41,7 @@ Legality at landing (EFF-02) — the state as it stands NOW (earlier landings al
                  destination not in the actor's place
   'target_dead'  a body target that is dead (alive 0), for every def except finish_downed,
                  watch_target and (I1) infected_bite (the dead feed on the dead: world.infected,
-                 rule INF-16) and butcher_carcass
+                 rule INF-16) and butcher_carcass, and (F1c) smear_gore and strip_clothing
   'item_gone'    the bound item is no longer where it was bound (held/carried by the actor for
                  item_held / item_carried; lying at the bound place/anchor for item_reachable;
                  inside the container for take_from)
@@ -177,7 +177,10 @@ Per effect (result strings in quotes; 'done' unless noted):
                      'hit'. W1 (D-77): any other melee wound of severity 'significant' or worse
                      landed on a contagious body (physical.bodies.contagious) -> bodies.expose(tx,
                      rng, attacker, 'wet', 'fluid_splash', land_at, the HARM id, turn_index): their
-                     blood in your eyes and mouth. BREAK (attacker lost):
+                     blood in your eyes and mouth. F1c (LOOK-07): any such wound (significant or
+                     worse, bite excepted) also soils the attacker — bodies.soil(attacker, gore = 1
+                     when the target is of kind 'infected', else blood = 1, source 'splashed', cause
+                     the HARM) — after the exposure. BREAK (attacker lost):
                      the attacker's posture becomes 'crouched' ('stumbled').
   grapple            opposed S + brawling vs target A + brawling; attacker wins -> grip_event.
                      'grabbed' / 'slipped'.
@@ -221,7 +224,10 @@ Per effect (result strings in quotes; 'done' unless noted):
                      (physical.bodies.contagious) and the treatment went on (a TREATMENT was
                      committed) -> bodies.expose(tx, rng, actor, 'wet', 'fluid_contact', land_at,
                      the TREATMENT id, turn_index): a host's blood on the hands that stop it.
-  apply_tourniquet   bodies.treat(..., 'tourniquet'); W1 as treat_wound.
+                     F1c (LOOK-07): a treatment that went on to a wound of severity 'significant'
+                     or worse on someone else soils the actor: bodies.soil(actor, blood = 1,
+                     source 'treated', cause the TREATMENT) — after the exposure.
+  apply_tourniquet   bodies.treat(..., 'tourniquet'); W1 and F1c as treat_wound.
   eat / drink        objects.destroy(item, qty=1) (cause = the start event), then
                      bodies.refresh_need(actor, 'hunger' | 'thirst'); result 'ate' / 'drank'.
                      P10, drink is mouth contact (lore §3.2), BEFORE the destroy: c =
@@ -247,8 +253,9 @@ Per effect (result strings in quotes; 'done' unless noted):
                      with 'butchered': true (the body stays: a carcass). When the carcass carries any HARM of type 'bite'
                      (the dead fed on it) the new meat is tainted: objects.contaminate(meat, 'wet',
                      the actor of the first such bite's cause event, land_at, the start event,
-                     turn_index, lasting=True) — it looks and smells like any meat; result
-                     'butchered'.
+                     turn_index, lasting=True) — it looks and smells like any meat; then (F1c)
+                     bodies.soil(actor, blood = 2, source 'butchered', cause the start event);
+                     result 'butchered'.
   spit               (W1, D-77 — the wet strain's compulsion; defs tagged 'compulsion' are
                      reflex_only: never on a menu, built by turn.cognition step 3). spit_into: the
                      bound item (water or food) must still be in the actor's hand or lying loose
@@ -257,6 +264,39 @@ Per effect (result strings in quotes; 'done' unless noted):
                      asleep and within touch — bodies.expose(tx, rng, target, 'wet',
                      'mouth_contact_direct', land_at, the start event, turn_index). Otherwise
                      'missed'; result 'spat'. Quiet (the def's noise_db).
+  wash               (F1c, D-86) the bound item (a water item, carried or held) — its ItemDef.water
+                     .ml >= C.wash_full_ml (C = RulesConfig().condition) is a full wash, less is a
+                     wipe. The water is tried first as mouth contact is: c = objects.contaminated(
+                     item, land_at), c with c.by != actor -> bodies.expose(tx, rng, actor,
+                     c.pathway, 'fluid_contact', land_at, the start event, turn_index) (their fluids
+                     all over you, in the eyes and the mouth). Then objects.destroy(item, qty=1)
+                     (cause = the start event) and bodies.wash(actor, full=...); result 'washed' /
+                     'wiped'.
+  smear              (F1c; the owner's trick: covered in the dead to walk among them) the target is
+                     a dead body of kind 'infected' (alive 0) within touch — else
+                     'nothing_to_smear'. bodies.soil(actor, gore = C.smear_gore, blood = 1, grime =
+                     1, source 'smeared', cause = the start event); then the strain (D-77: the dead's
+                     fluids carry it) — bodies.expose(tx, rng, actor, 'wet', 'gore_in_wound' when the
+                     actor has an unhealed wound whose treatment has no 'bandage' (it goes in
+                     through the wound), else 'gore_smear', land_at, the BODY_CONDITION id,
+                     turn_index); result 'smeared'.
+  take_off           (F1c) the bound worn clothing piece goes to the actor's first free hand (hand_r,
+                     then hand_l), else its pack slot (objects.transfer; Holder('body', actor,
+                     'pack')); result 'took_off'. CNT-11: when the actor's age_years is not >= 18
+                     and physical.objects.coverage without the piece lacks 'torso' or 'groin',
+                     nothing moves — result 'kept_on' (nobody under 18 is ever left bare; the menu
+                     never offers it either, mind.affordance).
+  change_into        (F1c) the bound clothing piece (carried, not worn) goes on — objects.transfer
+                     to Holder('body', actor, 'worn') — after every worn clothing piece at the same
+                     slot and layer comes off to where the new piece was (its hand, else the pack),
+                     in item_id order: one action, never bare in between. The same CNT-11 guard on
+                     the coverage after the change -> 'kept_on'. Result 'changed'.
+  strip              (F1c; clothes off the dead, and off those who cannot stop you) the target must
+                     be a human with age_years >= 18 (CNT-11: never anyone younger, alive or dead,
+                     and never a body of unknown age) that is dead, unconscious or false-dead,
+                     within touch, and the bound item still worn by it — else
+                     'kept_on'. The piece goes to the actor's first free hand, else its pack
+                     slot; result 'stripped'.
   throw_distraction  objects.transfer to the destination anchor; NOISE 70 dB 'something clattering'
                      at the LANDING POINT (not the thrower).
 
@@ -316,7 +356,8 @@ EFFECT_IDS: tuple[str, ...] = (
     "grapple", "break_grip", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
-    "throw_distraction", "shove_toward", "butcher", "spit",
+    "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
+    "strip",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -345,6 +386,11 @@ SEEN: dict[str, str | None] = {
     "butcher_carcass": "cuts into {target} with a knife",
     "spit_into": "leans low over {item}",
     "spit_in_mouth": "bends over {target}'s sleeping face",
+    "wash_self": "washes with {item}",
+    "smear_gore": "smears the gore of {target} over themselves",
+    "take_off_clothing": "takes off {item}",
+    "change_into": "changes into {item}",
+    "strip_clothing": "pulls {item} off {target}",
     "break_grip": "twists against {target}'s grip",
     "shove": "shoves {target}",
     "disarm": "grabs for {target}'s weapon",
@@ -420,6 +466,8 @@ NOISE_TEXT: dict[str, str] = {
     "apply_tourniquet": "a sharp breath", "eat": "eating", "drink": "drinking", "sleep": "a sigh",
     "rest": "a sigh", "continue_task": "someone working", "surrender": "something dropping",
     "throw_distraction": "something clattering", "click": "a dry click",
+    "wash": "water splashing", "smear": "a wet slapping", "take_off": "a rustle of clothes",
+    "change_into": "a rustle of clothes", "strip": "a rustle of clothes",
 }
 
 

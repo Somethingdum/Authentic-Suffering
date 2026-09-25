@@ -123,6 +123,23 @@ never your own. Someone seen clearly or partly is smelled with how they look ("R
 on the line under them); what is not seen reaches you as one smell per kind ("The reek of the
 dead, close by.").
 
+### 4.2 What gets on people, what comes off, and the cold (`physical/bodies.py` LOOK-07..09, F1c)
+
+A wound bloodies the one who took it (significant +1, severe +2, catastrophic +3); a blow that opens
+someone splashes the one who struck (their blood, or the dead's gore); treating a bad wound on
+someone else (+1) and butchering (+2) are bloody work. Unwashed, grime rises one a day to 3 — never
+past 'grimy' by days alone. In the rain in the open every 20 minutes soaks you (+1 wet) and takes one
+of blood and one of gore off; out of it you dry one step every 20 minutes. Five litres of water
+wash you clean (and set the day you last washed); less only wipes (grime −1, blood −2, gore −2).
+Smearing yourself with the dead puts gore 4 on you (enough to walk among them, INF-14) — and the
+strain with it, far worse into an open, unbandaged wound.
+Cold: the place asks 1 in the open by day in a mild country (3 in a cold one, 0 in a hot one), one
+more at night, two less under a roof, and one more when you are soaked; take away what you wear
+(each piece's warmth). What is left is chill, counted on the hour; every 4 chill is a cold stage;
+stage 3 costs an impairment step like thirst or hunger, stage 6 is death. Warm enough, the chill
+falls by 4 an hour. These three rules apply to people whose looks are recorded; nobody under 18 is
+ever undressed or left bare (CNT-11).
+
 ## 5. Harm, bleeding, death (`physical/bodies.py`)
 
 No hit points. A wound: anatomy, type, severity, bleed rate, pain, contamination, function loss,

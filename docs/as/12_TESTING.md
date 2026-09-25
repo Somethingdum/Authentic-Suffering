@@ -201,6 +201,17 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p10_world/test_wet_strain.py` (amended) | week two only wants to — an urge on record and Resolve spent holding back; alone with a bottle, a host fouls its own water |
 | `p10_world/test_infected.py` (amended) | INF-07: a week-three host is seen within half the range, not beyond |
 
+### 3.9 Washing, clothes and the cold (F1c; D-86)
+
+| File | What it proves |
+|---|---|
+| `p02_space_bodies/test_bloodied.py` | a wound bloodies the one who took it by its depth (a nick leaves nothing), up to soaked, and apply_harm still returns only the HARM; a new body starts clean, now; warmth is what they have on; the cold stage counts toward impairment |
+| `p02_space_bodies/test_looks.py` (amended) | washed_at is the moment a body is made (the scenario's start), and soil never washes |
+| `p04_one_actor/test_care_menu.py` | wash for what holds water, take_off for what is worn, change_into for clothes carried; the gore of the dead only once they are down; off someone out cold, the outermost piece at each slot; nothing ever offers to bare a child (CNT-11); the decency law prices undressing, not changing or washing; the packet says when you have nothing on or are bare to the waist, and how cold you are |
+| `p05_many_actors/test_care.py` | a jug washes you clean and is gone, a bottle only wipes; fouled water is their fluids on you; smeared with the dead to walk among them, 'gore_smear' on whole skin and 'gore_in_wound' into an open one; one still standing is not smeared; clothes to a free hand then the pack; changing is one move; a child is never left bare; clothes off an adult out cold, never a child's, never someone awake; the splash, treating and butchering are bloody work; the reek of the dead grates every ten minutes and boils over; a naked adult in sight is a jolt and heat every half hour; bare to the waist is not naked; the player feels it and keeps their hand |
+| `p07_slice/test_narration_care.py` | the story knows when the player has nothing on or is bare to the waist, and when they are freezing |
+| `p10_world/test_weather_and_cold.py` | a day at a time to grimy and no further; a wash starts the count again; the rain soaks and rinses the gore off (the camouflage with it), never under a roof; out of it you dry; what the place, the night and a soaking ask; a night in the open by what each wears, and no claim for a body never dressed; the cold impairs; naked on a wet night in a cold country kills; warm again the chill goes |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

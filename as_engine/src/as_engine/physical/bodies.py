@@ -25,7 +25,7 @@ Wounds (HARM-01..06) — no hit points:
 Impairment (HARM-07) = clamp(pain // 2 + blood steps + needs steps, 0, H.impairment_max), where
   blood steps = the value of the highest H.impairment_from_blood_loss threshold <= blood_loss_pct
   (0 below the first) and needs steps = the value of the highest N.impairment_at_stage key <=
-  max(thirst_stage, hunger_stage, fatigue_stage) (0 below 3). (Intoxication, concussion and
+  max(thirst_stage, hunger_stage, fatigue_stage, cold_stage (F1c, LOOK-09)) (0 below 3). (Intoxication, concussion and
   exhaustion terms join this sum when their systems exist; until then they are 0.)
   bodies.impairment is rewritten whenever pain, blood loss or a need stage changes, by the event
   that changed it.
@@ -53,6 +53,7 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
      there are no world_params), N.hunger_stage_every_h, N.fatigue_stage_every_h; a changed stage
      -> NEED_STAGE {body_id, need, stage}; fatigue reaching 6 while conscious -> AWARENESS_CHANGE
      {body_id, awareness: 'asleep', from} with posture 'lying' (collapse; fatigue never kills);
+     then (F1c) the condition over time (LOOK-08) and the cold (LOOK-09);
   3. infection: each infections row's stage = the last pathway stage whose starts_at_h <= hours
      since exposed_at; a change -> INFECTION_STAGE {body_id, pathway, stage};
   4. false death: an infected body whose bodies.false_dead_until <= step end and core_intact = 1
@@ -68,7 +69,8 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
      need and infection deaths have cause_event_id NULL.
   The results must equal stepping minute by minute, but an implementation may jump over steps in
   which nothing can change (no bleeding wound, no stage or timer boundary) — a 6-hour off-screen
-  tick must not cost 360 database round trips per body.
+  tick must not cost 360 database round trips per body. (F1c: for a body LOOK-08/09 apply to, the
+  weather and cold steps and the next day of grime are boundaries too.)
   Heal checks run once, at to_ms. Returned events are committed, in the order produced.
   The call ends with one physical.bodies event at to_ms that writes progressed_at (and pain /
   impairment when they changed): IMPAIRMENT_CHANGE {body_id, impairment} when impairment changed —
@@ -127,8 +129,8 @@ create(tx, *, kind, sex, age_years, height_cm, mass_kg, special, at, turn_index,
   core_intact 1, origin} — and (F1a) looks = ``looks`` (a contracts.dossier.Looks) as canonical JSON
   of its model_dump(mode='json') with outfit [] (NULL when None; the outfit is items, dressed by
   physical.objects.dress), and for kind 'infected' grime 5, blood 3, gore 5 (the dead are filthy
-  and caked in gore, LOOK-04; every other kind starts at 0) — and, for kinds human, lurker and animal, needs {body_id, all stages 0,
-  last_drink_ms = last_meal_ms = last_sleep_ms = at}. origin in bodies.origin's CHECK values
+  and caked in gore, LOOK-04; every other kind starts at 0), washed_at = at (F1c) — and, for kinds human, lurker and animal, needs {body_id, all stages 0,
+  chill 0, last_drink_ms = last_meal_ms = last_sleep_ms = at}. origin in bodies.origin's CHECK values
   (ValueError otherwise). Returns body_id.
 expose(tx, rng, body_id, pathway, exposure, at, cause_event_id, turn_index) -> Event | None
   (action.effects bite, world.infected.) The canon pathway record ``pathway`` (ValueError when it has
@@ -179,7 +181,42 @@ LOOK-04 Condition: bodies.grime / blood / gore (0..5) and wet (0..3) — what is
     values; writer 'physical.bodies', actor_id = body_id, cause as given) updating bodies. ``source``
     is a short reason ('harm', 'rain', 'smeared', 'washed'). A new body starts at 0 everywhere, an
     infected one at grime 5, blood 3, gore 5 (create).
-  (Who gets bloodied by what, grime that builds while unwashed, rain, washing and changing: F1c.)
+F1c (D-86) — what gets on people, what comes off, and the cold. C = RulesConfig().condition.
+LOOK-07 Who gets bloodied: apply_harm, after the HARM and before the death test, soils the wounded
+  body: blood += C.blood_from_wound[severity] (source 'harm', cause = the HARM; nothing when that is
+  0; committed, not returned: apply_harm's list stays HARM then the death test's event). The rest is what people do (action.effects: a blow that opens someone splashes the one who
+  struck; treating a wound, butchering and smearing yourself with the dead).
+  wash(tx, body_id, *, full, at, cause_event_id, turn_index) -> Event | None   (action.effects
+    wash) full: grime, blood and gore to 0, wet + 1 (max 3), washed_at = at, source 'washed'; not
+    full (a wipe): grime - 1, blood - 2, gore - 2 (never below 0), wet + 1, washed_at unchanged,
+    source 'wiped'. One BODY_CONDITION {body_id, grime, blood, gore, wet, source} (as soil) — also
+    when nothing but wet changed; None only for no such body.
+LOOK-08 Condition over time (P10; progress step 2): for a living body of kind 'human' whose looks
+  are recorded (bodies.looks not NULL: a body the world has never dressed makes no claim about what
+  time does to it), at each progress step [t, end]:
+    unwashed  g = min(C.grime_unwashed_max, (end - washed_at) // (C.grime_every_h hours)); grime < g
+              -> soil(grime = g - grime, source 'unwashed', at = end, cause None). (Days of no wash
+              make anyone grimy; filthy takes dirt, not days.)
+    weather   n = end // W - t // W (W = C.weather_step_min minutes in ms: the whole steps of the
+              clock crossed); n >= 1: out in it — world.decay.wet(tx) and world.decay.exposed(the
+              body's place) -> soil(wet = +n, blood = -n, gore = -n, source 'rain'): the rain soaks
+              you and takes the blood and the gore off you (INF-14's camouflage washes away in the
+              open); else wet > 0 -> soil(wet = -n, source 'dried').
+  create gives every body washed_at = at (a new body starts clean).
+LOOK-09 Cold (P10; progress step 2, after LOOK-08; the same bodies): warmth is
+  physical.objects.warmth(body) (what they wear). cold_need(store, body_id, at) -> int = what the
+  body's place and weather ask: base = C.cold_need[band], band 'cold' when world_params
+  climate_heat <= 3, 'hot' when >= 8, else 'mild' (climate_heat 5 without world_params); in an
+  exposed place (world.decay.exposed) base + 1 at night (kernel.clock.world_time(at).part_of_day
+  'night' or 'late night'); indoors max(0, base - C.shelter); then + 1 when bodies.wet >= 2 (a
+  soaked body loses its heat anywhere). A body LOOK-08 does not apply to -> 0.
+  At each progress step: n = end // K - t // K (K = C.cold_step_min minutes in ms); n >= 1: d =
+  cold_need(end) - warmth; chill' = needs.chill + n x d when d > 0, else max(0, needs.chill - n x
+  C.warm_per_step); stage' = min(N.death_stage, chill' // C.chill_per_stage); chill' != chill ->
+  NEED_STAGE {body_id, need: 'cold', stage: stage', chill: chill'} updating needs.chill and
+  cold_stage. The cold stage counts toward impairment (HARM-07) and stage 6 is death by cold (the
+  death test): naked outdoors on a mild night that is about twelve hours; in a cold country with
+  the clothes soaked, a few.
 """
 
 from __future__ import annotations
@@ -314,7 +351,8 @@ def apply_harm(tx: "Tx", body_id: str, wound: WoundSpec, at: int, cause_event_id
     else null (infected bites, animals, falls).
     HARM payload (cascades filter on it): {wound_id, body_id, actor_id (null for infected/animals),
     anatomy, anatomy_group ('head'|'neck'|'torso'|'arm'|'hand'|'leg'|'foot'), type, severity,
-    function_loss, bleed_pct_per_min, contamination}."""
+    function_loss, bleed_pct_per_min, contamination}. (F1c LOOK-07: then the wounded body's blood,
+    a BODY_CONDITION committed right after the HARM and NOT in the returned list.)"""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     R = _rules(tx)
     wid = tx.mint("wnd")
@@ -841,3 +879,12 @@ def condition_of(store: "Store | Tx", body_id: str) -> BodyCondition:
 def soil(tx: "Tx", body_id: str, *, grime: int = 0, blood: int = 0, gore: int = 0, wet: int = 0, source: str,
          at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
     raise NotImplementedError("P2")
+
+
+def wash(tx: "Tx", body_id: str, *, full: bool, at: int, cause_event_id: str | None,
+         turn_index: int) -> "Event | None":
+    raise NotImplementedError("P5")
+
+
+def cold_need(store: "Store | Tx", body_id: str, at: int) -> int:
+    raise NotImplementedError("P10")

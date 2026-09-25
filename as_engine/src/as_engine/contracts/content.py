@@ -377,7 +377,7 @@ class LawDef(Strict):
     name: str
     kind: Literal[
         "curfew", "weapons", "ration", "trade", "quarantine", "theft", "burial", "child_labour",
-        "visitors", "noise", "patrol", "succession", "intake", "contamination",
+        "visitors", "noise", "patrol", "succession", "intake", "contamination", "decency",
     ]
     text: str = Field(min_length=10)
     affordance_effects: list[LawEffect] = Field(default_factory=list)

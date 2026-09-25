@@ -89,6 +89,8 @@ worn(store, body_id) -> list[dict]: the body's worn items as {item_id, def_ref, 
   else None.
 coverage(store, body_id) -> set[str]: the union of ``covers`` of the worn clothing (a torn piece
   still covers).
+warmth(store, body_id) -> int   (F1c, physical.bodies LOOK-09) the sum of ClothingProps.warmth over
+  the body's worn clothing (0 with nothing on).
 visible_gear(store, body_id) -> list[str]: the item ids anyone looking at the body can see, in
   this order — the items in hand_l, then hand_r; then the worn items without a clothing block,
   by item_id, except that one whose ItemDef.bulk <= 2 (a holstered handgun, a knife on a belt)
@@ -480,6 +482,10 @@ def worn(store: "Store | Tx", body_id: str) -> list[dict]:
 
 
 def coverage(store: "Store | Tx", body_id: str) -> set[str]:
+    raise NotImplementedError("P2")
+
+
+def warmth(store: "Store | Tx", body_id: str) -> int:
     raise NotImplementedError("P2")
 
 

@@ -367,7 +367,8 @@ CREATE TABLE needs (
   last_meal_ms  INTEGER NOT NULL,
   last_sleep_ms INTEGER NOT NULL,
   cold_stage   INTEGER NOT NULL DEFAULT 0,
-  heat_stage   INTEGER NOT NULL DEFAULT 0
+  heat_stage   INTEGER NOT NULL DEFAULT 0,
+  chill        INTEGER NOT NULL DEFAULT 0     -- F1c LOOK-09: cold counted on the hour; cold_stage = chill // chill_per_stage
 );
 
 -- OWNER physical.bodies

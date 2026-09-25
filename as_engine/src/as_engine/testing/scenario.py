@@ -89,6 +89,7 @@ Row details (what the P2 loader tests read):
     height_cm / mass_kg from the def, special {}; no actors row and no dossier —
     they are prey and meat, not minds (world.infected INF-18; action.effects butcher);
     awareness / posture / blood_loss_pct / pain from the spec; progressed_at = start;
+    (F1c) washed_at = start (everyone starts the scenario clean — LOOK-08 counts from it);
     impairment = physical.bodies.impairment() of the loaded body; origin 'scenario'.
   needs: stage from the spec; last_drink_ms = start - thirst x thirst_stage_every_h hours, and the
     same for last_meal_ms (hunger) and last_sleep_ms (fatigue).

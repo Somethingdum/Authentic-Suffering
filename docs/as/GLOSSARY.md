@@ -37,6 +37,13 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | carcass | a dead animal, butchered or not (`bodies.special.butchered`) | a carcass | — |
 | odour | what a body smells of now: kind (the dead, death, blood, unwashed) and strength 1–5, from its condition or, for a corpse, the hours since death (`sense.olfaction.odour_of`, SMELL-01) | "reeks of the dead", "smells of blood" | — |
 | gore camouflage | a living body caked in the dead's gore goes unpicked by the common dead until it gives itself away (`world.infected` INF-14) | — | — |
+| warmth | what a person's worn clothes keep in: the sum of their clothing blocks' warmth (`physical.objects.warmth`, LOOK-09) | heat, insulation | — |
+| cold need | what the place, the time of day and a soaking ask of a body's warmth (`physical.bodies.cold_need`, LOOK-09) | cold demand | — |
+| chill | the cold a body has taken in, counted on the hour; every 4 is a cold stage (`needs.chill`, LOOK-09) | hypothermia points | — |
+| wash / wipe | a wash (5 litres or more) takes everything off and resets the day you last washed; a wipe (less) takes some off (`physical.bodies.wash`) | shower, clean up | — |
+| smear | covering yourself in the dead's gore to walk among them (`action.effects` smear; D-77 exposure) | camouflage up, gore up | — |
+| strip | taking a worn piece off an adult who cannot stop you — out cold or dead (`action.effects` strip; never anyone under 18, CNT-11) | loot clothes | — |
+| reeked / bared | TEMPER-09's provocations: the reek of the dead on a person close by; a naked adult in plain sight (`mind.temper.exposures`) | disgusted, offended | — |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | decision | an Actor's answer that attempts something: one offered option, its pace, speech, goal, private reason (`ActorReplyV2` kind decision) | what they do | — |

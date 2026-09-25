@@ -36,7 +36,12 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
                    Per effect: eat -> items whose def has a ``food`` block; drink -> a ``water``
                    block; equip -> any carried item except kind clothing and worn containers;
                    throw_distraction -> held items with bulk <= 3 that are not firearms (nobody throws
-                   their gun to make a noise); reload -> held firearms.
+                   their gun to make a noise); reload -> held firearms. (F1c) wash -> items with a
+                   ``water`` block; take_off -> its worn clothing; change_into -> clothing it
+                   carries or holds that is not worn. CNT-11: for an actor whose age_years is not
+                   >= 18, take_off offers only a piece without which physical.objects.coverage
+                   still has 'torso' and 'groin', and change_into only a piece after which it
+                   still has both (nobody under 18 is ever left bare).
     item_reachable known items lying in its place (seen or believed).
     container      container items (def has ``container``) lying in its place or carried.
     speech         one option addressed to 'everyone' (target None) plus one per known body
@@ -185,6 +190,10 @@ enumerate it too, one option per combination (then capped by the selection rules
   reload_firearm       held firearm x a carried magazine or ammo matching its caliber tag
   shoot_*, strike_*, finish_downed   body x the held weapon (item = the weapon)
   punch, grapple, shove, disarm, break_grip, calm_person, signal, watch_target  body only
+  strip_clothing       (F1c) body x each worn clothing piece of it that no other worn piece of it
+                       covers from outside (none at the same slot in an outer layer — what can be
+                       pulled off first), in worn() order; only a body of kind 'human' with
+                       age_years >= 18 (CNT-11: never anyone younger, nor a body of unknown age)
   bandage/tourniquet/suture/clean/pressure  wound (own, or of a body within touch) x the carried
                        medical item whose tags match (pressure needs no item)
   keep_working         only when the actor has an active task; {target} = the task label
