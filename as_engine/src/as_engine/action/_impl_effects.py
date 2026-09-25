@@ -183,8 +183,6 @@ def situation(tx, intent, land_at):
     if intent.bound.def_id == "force_portal" and any("pry" in _idef(tx, h).tags for h in _held(tx, intent.actor_id)):
         s += 1
     if intent.bound.def_id == "pick_lock":
-        for r in tx.query("SELECT item_id FROM items", ()):
-            pass
         if any("lockpick" in _canon(tx).get(r[0]).tags for r in _carried_defs(tx, intent.actor_id)):
             s += 1
     t = intent.bound.target_id

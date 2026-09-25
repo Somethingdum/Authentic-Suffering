@@ -87,8 +87,10 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | probe | A/B | per probe | JSON/text | Connect screen, bench | — |
 
 **Ablation duty** (plan §17.3 LAW): `tools/as/eval.py --ablate <call_class>` runs the canonical
-eval scenarios with that call disabled (fallback path) and reports what degrades. A call whose
-ablation shows no measurable degradation is removed.
+eval scenarios plain and with that call disabled — the lane client's `ablated` set (LANE-09): the
+call comes back 'cancelled' without reaching the model and every caller takes its fallback path —
+and reports what changed. A call whose ablation shows no measurable degradation is removed.
+`--fake` runs it on the fake model (a smoke run; P11 D-98).
 
 ## 5. Budget and latency
 

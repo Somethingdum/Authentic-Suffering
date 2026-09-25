@@ -1,4 +1,4 @@
-# HANDOFF — state of the kit (read before continuing: the Actor v2 amendments, P11, P12)
+# HANDOFF — state of the kit (read before continuing: the Actor v2 amendments, P12)
 
 This file is for whoever continues writing the kit (a person or another model). It says exactly
 what is finished, what is half-finished and what does not exist yet. It is not a build document for
@@ -23,7 +23,8 @@ replaces "the rest will remain uncoded"). What is left:
    a boiling-over feud becomes a grudge the person decides about, far sounds are heard, the
    witnessed-theft rumour fires). Left: Actor Spec §12's plans with stable keys and delegation (a
    leader's orders the recipient decides on) and §11's conversations.
-2. **P11** — the audits (§5).
+2. **P11** — BUILT (D-95..D-99; tests 12 §3.17): the 58-bit fault proof and BIT_STAGE, the narrator's
+   continuity, the abuse battery, the release audit, the portrayal audit, ablation (§5).
 3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
@@ -181,15 +182,15 @@ the 58-bit gate. Keep doing this for every phase: build a world, play it, read w
 - Hostile-human openings do nothing with the fake model (it keeps everyone waiting); with real
   models the raiders decide. The live suite should play one.
 
-## 5. P11 and P12 — NOT STARTED at contract level
+## 5. P11 built; P12 not started at contract level
 
-**P11 Audits** (13_BUILD_ORDER §4): every commit-gate bit exactly as described with BIT_STAGE per
-bit; `audit/portrayal.py` (targeted pre-check + retrospective); `audit/abuse.py`;
-`narration/style.py`; `tools/as/eval.py --ablate`. Test `p11_audits/test_commit_gate_bits.py`
-(AUDIT-02: each of the 58 injected faults drops exactly its bit) is the key test. Also carried here
-from P10: the release audit re-runs `checks.assert_world` on the genesis snapshot (D-45), checks the
-census conservation (HRD-15: the dead change only by rising and destruction), and fails a build that
-still records `timer_unbuilt` / `cascade_unbuilt`. (No trace ratio: C11 retired the quota, D-52.)
+**P11 Audits** — BUILT with their contracts (D-92): `audit/commit_gate.py` (AUDIT-03 BIT_STAGE),
+`audit/abuse.py` (ABUSE-01..08), `audit/release.py` (REL-01..06: WG-35 again on the run's turn-0
+snapshot — genesis has no PC, D-95 — census conservation over days off-screen, the battery,
+unbuilt rules, CNT-11 over packs and the world's dossiers, soak statistics), `audit/portrayal.py`
+(PORT-01..07), `narration/style.py` (NARR-09), `lanes/client.py` (LANE-09 ablation) and
+`tools/as/eval.py --ablate [--fake]`. Tests: `p11_audits/` (12 §3.17). The DSH builder has nothing
+to build here; the P11 gate records the evidence.
 
 **P12 Surfaces**: `cheats/commands.py` + GameService routing + the `cheat_admin` pack (CHEATS.md —
 the owner's "bonus dev-cheats" document, extended with the owner's session-8 asks in §0);
@@ -209,33 +210,14 @@ without asking anyone. For every phase that means nine things exist and agree wi
 | R1 | Contract docstrings for every function the phase builds: inputs, outputs, every rule, every error, exact event types and payloads, rng streams and purposes, row shapes. Bodies stay `raise NotImplementedError("P<n>")` | `as_engine/src/as_engine/**` |
 | R2 | Protected contract tests that fail on the stubs and pass on a correct build | `as_engine/tests/contract/p<nn>_*/` |
 | R3 | Fixtures the tests need (scenarios, packs, fake-model scripts, vectors) | `as_engine/tests/fixtures/`, `testing/fake_lm.py` |
-| R4 | Proof: until P10 a scratch reference passed R2 and every earlier phase's tests. From now on no implementation is written: each test is reviewed line by line against its docstring, every earlier test still passes on the committed engine (a new test of a built function must pass on it), and the builder files SPEC_ISSUES for anything inconsistent | the review; the suite |
+| R4 | Proof: a working implementation passes R2 and every earlier phase's tests; since the owner's 2026-09-25 instruction (D-92) that implementation is committed as the built system, not thrown away, and the builder files SPEC_ISSUES for anything inconsistent | the suite |
 | R5 | Design docs rewritten to match R1 (the docs explain; the docstrings rule) | `docs/as/0x_*.md` |
 | R6 | The phase's task list, gate and forbidden list in `13_BUILD_ORDER.md` §4, in build order | docs |
 | R7 | Records: DECISIONS rows, CHANGELOG row, GLOSSARY terms, RULES.md regenerated, PROGRESS row, SPEC_ISSUES for anything left open | docs |
 | R8 | Tooling passes: `gate.py --docstrings --scan --write-rules`, `protect.py --write-manifest` then `--verify`, lines <= 100 | `tools/as/` |
 | R9 | Delivery: full-kit zip + patch zip vs the previous delivery, merge-simulated against a built previous phase, fresh-unzip test run | outputs |
 
-### P11 — Audits (nothing below exists yet)
-R1 contracts to write:
-- `audit/commit_gate.py`: every one of the 58 bits already has a one-line check; each needs the
-  exact query, what "this turn" means for it, its BIT_STAGE (the stage to rerun), and its fault
-  (the single DB edit that must drop exactly that bit). Genesis rules for generated worlds (P10).
-- `audit/portrayal.py`: `precheck(...)` (before commit, which actors, prompt context, verdict model,
-  regenerate-once flow) and `retrospective(...)`; the PortrayalAudit context and answer models; the
-  judge-call-id ≠ producer-call-id rule; what is logged.
-- `audit/abuse.py`: one function per ABUSE-01..08 with inputs, pass condition and plain failure text.
-- `narration/style.py`: load / save / update_after_turn (noun-phrase extraction exact enough to
-  test); wire into narrator packet (images not to reuse) — the anti-repetition the owner asked for.
-- Release audit (new module, e.g. `audit/release.py`): re-run `checks.assert_world` on genesis,
-  census conservation over a long off-screen run (HRD-15), no `timer_unbuilt` / `cascade_unbuilt`
-  rows, CNT-11 over all content, soak statistics. (No trace-ratio check: D-52.)
-- `tools/as/eval.py --ablate`: which call classes, what is measured, pass thresholds.
-R2 tests: `p11_audits/test_commit_gate_bits.py` (58 parametrised faults, each drops exactly one
-bit — AUDIT-02, the most important test in the suite), portrayal flow with scripted verdicts,
-abuse battery on clean + deliberately broken worlds, style persistence across save/load, release
-audit on a generated world, eval ablation smoke run.
-R3–R9 as above; docs 04 §3.3/§5, 07, 12, CHANGELOG, DECISIONS.
+### P11 — Audits: built (13_BUILD_ORDER §4 P11; DECISIONS D-95..D-99; tests 12 §3.17)
 
 ### P12 — Surfaces (stubs exist; contracts not finished)
 R1 contracts to write or finish:

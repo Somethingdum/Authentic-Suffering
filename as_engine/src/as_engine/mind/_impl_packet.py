@@ -396,8 +396,13 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         affordances=opts, uncertainty=unc, handles=handles, gestures=gests, attention_points=pts, hands_free=hf,
         unprocessed=[t for _tix, lines in unprocessed_raw for t in lines],
         families=fams, consult_kinds=kinds, looked_up=list(consulted.lines) if consulted is not None else [],
-        outburst=_outburst_line(tx, actor_id, ph, at))
+        outburst=_outburst_line(tx, actor_id, ph, at), portrayal_note=_portrayal_note(tx, actor_id, turn_index))
     return fields, present, refusal_rows, unprocessed_raw
+
+
+def _portrayal_note(tx, actor_id, turn_index):
+    from ..audit.portrayal import note_for
+    return note_for(tx, actor_id, turn_index)
 
 
 def _tokens(packet, reaction):

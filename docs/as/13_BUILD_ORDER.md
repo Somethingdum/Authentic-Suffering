@@ -73,13 +73,14 @@ The engine side of P0–P10 is **built**, and so is everything added to it since
 2026-09-25: the kit-maker's working implementations go into the final system): Actor v2 B1–B6
 (the identity card, knowledge-built menus, the reply protocol, speech timing, gestures and
 attention, answers, memory that is never lost, several causes, promises, work output, feuds, far
-sounds, witnessed theft) and the
+sounds, witnessed theft), P11's audits (the 58-bit fault proof, the narrator's continuity, the abuse
+battery, the release audit, the portrayal audit, ablation) and the
 owner's F1a looks (and F1a-2: generated people's looks and clothes, shown in the prose and the
 UI), F1b smell, H1 human people, I1 the dead who feed, W1 the wet strain and F1c washing, clothes
 and the cold. Every contract function of those has a body — in the `_impl_*.py`
 file beside its module or built in place (AGENTS.md §4) — and every engine contract test passes
 except the owner's sessions browser and a world that names no run (D-76, steps 2 and 3). What
-each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-94. Nothing has been gated
+each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-99. Nothing has been gated
 on your machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
@@ -97,7 +98,8 @@ on your machine yet, so start here, not at P0 task 1:
    Play UI tests and the upstream check). P10 first needs `kernel/store.Store.backup_to(...,
    as_world=)` and the GENESIS step of `world/worldgen/pipeline` using it (D-76) —
    `test_world_names_no_run.py`.
-4. Then stop and write "waiting for the kit update (P11, P12)" in PROGRESS.
+4. `gate.py --phase 11` (P11 is built: it records the evidence). Then stop and write "waiting for
+   the kit update (P12)" in PROGRESS.
 
 The phase lists below stay as the map of what each module does and which tests pin it.
 
@@ -347,7 +349,7 @@ no compulsion. Nothing is deleted for being unimportant (C02); nobody dies of a 
 
 ### P11 — Audits
 Read: 04 §3.3, §5, `audit/*`, `narration/style.py`.
-1. Every commit-gate bit exactly as described; `BIT_STAGE` refined per bit. 2. `audit/portrayal.py` (targeted pre-check + retrospective). 3. `audit/abuse.py`. 4. `narration/style.py`. 5. `tools/as/eval.py --ablate` against the fake model.
+BUILT (D-95..D-99; tests 12 §3.17): 1. every commit-gate bit exactly as described, `BIT_STAGE` per bit (AUDIT-03). 2. `audit/portrayal.py` (PORT-01..07: the targeted pre-check in `turn/cognition` step 1b, the retrospective at S14/S15, the note in the next packet). 3. `audit/abuse.py` (ABUSE-01..08). 4. `narration/style.py` (NARR-09). 5. `lanes/client.py` LANE-09 and `tools/as/eval.py --ablate [--fake]`. 6. `audit/release.py` (REL-01..06; `world/worldgen/checks.reassert`).
 Gate: `p11_audits` green — AUDIT-02 (each of 58 faults drops exactly its bit) is the most important test in the suite.
 **Forbidden:** nothing. This phase may reach anywhere, because its job is to be adversarial.
 

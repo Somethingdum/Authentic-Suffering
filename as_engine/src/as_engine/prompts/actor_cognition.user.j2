@@ -93,6 +93,10 @@ Where you are: {{ p.position_text }}
 
 {{ p.outburst }}
 {% endif %}
+{% if p.portrayal_note %}
+
+{{ p.portrayal_note }}
+{% endif %}
 
 What reaches you
 {% for s in p.perceived_now %}

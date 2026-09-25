@@ -173,11 +173,14 @@ moving to within 20 m is news to whoever sees it, and it ends the player's watch
   decided is classified by the firewall (form, standing, signature); a refusal is recorded
   (`REFUSAL`, WILL-07), a "yes" with a different action is a recorded lie (WILL-11). The model is
   never told it "refused" — it chose, and code reads the choice (`turn/cognition.record_responses`).
-- **Targeted portrayal pre-check (deviation D-07, P11):** when a HOT or WARM actor chooses an affordance
-  with moral tags, an ATTACK, or a refusal/compliance to a request with standing VALID_ORDER, one
-  PORTRAYAL_AUDIT call (lane B) judges it before the barrier. `out_of_character` → the intent is
-  regenerated once with the reasons appended. All other audits are retrospective (stage 15) and
-  feed a *portrayal note* into that actor's next packet instead of rewriting the past.
+- **Targeted portrayal pre-check (deviation D-07, P11, PORT-01..07; D-97):** when a HOT or WARM actor's
+  model decision is an option with a moral tag, an ATTACK, or the answer to a request with standing
+  VALID_ORDER, one PORTRAYAL_AUDIT call (lane B) judges it before the barrier (`turn/cognition` step
+  1b). `out_of_character` → the person decides once more with the reasons appended — that is the
+  decision's one repair, so a spent repair means no second asking — and what they decide then
+  stands (a second misfit is logged, `portrayal_fail`). Every other HOT decision, and a WARM one
+  with words, is judged after the fact (stage 14's lane-B jobs, recorded at stage 15) and a misfit
+  feeds a *portrayal note* into that person's next packets instead of rewriting the past.
 
 ### 3.4 Mandatory set and salience (stage 4, `turn/select.py`)
 
@@ -235,7 +238,7 @@ A degraded turn is honest and recorded; a guessed turn is corruption (plan §5.3
   next packet carries what they did and saw raw.
 - **Audits** (15): the leak scan is a SQL query — every `claim_holdings` row acquired this
   window (inferences aside) cites an event its holder has a percept of; `audit_log` rows with
-  producer ≠ judge. The retrospective portrayal audit is P11.
+  producer ≠ judge. The retrospective portrayal audit (P11) records its verdicts here (G15-portrayal).
 - **PC compile / narrate / lint** (16–18): see 05 §Narration and 07 §Style metrics. Up to three
   drafts; the code lint first, then the RENDER_LINT judge (lane B) on a draft the code passed —
   the judge can only add faults. No draft at all: the code tells the moment plainly.

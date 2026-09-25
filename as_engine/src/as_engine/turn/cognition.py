@@ -1,9 +1,12 @@
 """Stage 6 (cognition) and the stage-8 reading of answers (P7). Rules LOD-01/02, LANE-06, INTENT-02,
 ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
 
-decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset()) -> dict[actor_id, Intent]
+decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), audits=None) -> dict[actor_id, Intent]
   ``answered`` = the pipeline's set of (actor, speech event) pairs already answered this turn (HOLD-02
-  reads it).
+  reads it). ``audits`` (P11): a list the pipeline keeps; when given, every actor whose final
+  intent has source 'model' is appended at the end, in sorted order, as audit.portrayal.Judged(
+  actor, plan.lod[actor], its last packet, its decision's request (the second one after a
+  consultation), the intent, prechecked = step 1b judged it) — what PORT-06 may judge later.
   One intent for every actor in plan.lod, keyed by actor id — except an actor held in place
   by HOLD-01, which has none this wave (nothing is attempted for it).
   1. Requests, actors in sorted order: COLD -> none. HOT / WARM -> packet = mind.packet.build_packet(
@@ -59,6 +62,12 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
      something it has not answered (asks_for(tx, actor_id, turn_index, answered) is not empty) or
      it perceived a threat this turn (affs[actor].threats is not empty) — a new moment where
      consent, refusal, surrender or violence could be at stake, which only the person may decide.
+  1b. (P11, D-07) PORT-05, for every model intent (repaired included), actors in sorted order:
+     reason = audit.portrayal.high_stakes(tx, actor, intent, turn_index, answered); not None ->
+     intent = await audit.portrayal.precheck(tx, session.client, session.config, actor, its
+     packet, its request, intent, reason, regenerate, turn_index, at), where regenerate is None
+     when the decision's repair is spent, else the decision's one repair (as above: raw and error
+     as precheck gives them; it returns the repaired Intent, or None when the answer does not read).
   2. ECHO-02, for every model intent (repaired included) that carries speech: hits =
      narration.lint.check_line(tx, speech.text, RulesConfig.style); non-empty and the decision's
      repair not yet spent -> one repair call (as above; raw = the speech text, error = 'Do not
@@ -267,7 +276,7 @@ class DecisionHeld(Rejected):
 
 
 async def decide(tx: "Tx", session: "Session", plan: "CognitionPlan", affs: dict, turn_index: int, at: int, *,
-                 reaction: bool, answered: set | frozenset = frozenset()) -> dict[str, "Intent"]:
+                 reaction: bool, answered: set | frozenset = frozenset(), audits: list | None = None) -> dict[str, "Intent"]:
     raise NotImplementedError("P7")
 
 

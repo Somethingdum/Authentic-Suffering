@@ -7,7 +7,7 @@ where 06_WORLD.md records a deviation.
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field
 
@@ -110,6 +110,12 @@ class WorldgenCommit(Strict):
     opening: OpeningPressure
     qc_result: Literal["pass", "patched", "aborted"]
     qc_patches: list[str] = Field(default_factory=list)
+    skeleton: dict[str, Any] | None = Field(default=None, description=(
+        "P11 (D-95): what WG9 checked the world against, so the release audit can check it again on "
+        "the run's turn-0 snapshot (world.worldgen.checks.reassert): {start_zone_id, zones, exterior, "
+        "routes, groups, settlements, opening} — dataclasses.asdict of the Region's Zones and Routes, "
+        "the PolityPlan's PlannedGroups and PlannedSettlements, and the Opening without its "
+        "OpeningPressure (which is `opening` above)."))
 
 
 class WorldgenProgress(Strict):

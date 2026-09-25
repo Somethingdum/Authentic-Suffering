@@ -18,6 +18,12 @@ Behaviour:
 
 Model-swap guard (LANE-05): ``check_models()`` lists models on each lane and raises ModelSwapped
 if the configured model id is not present. The turn pipeline calls it before T0.
+
+Ablation (LANE-09, P11; 08 §4 ablation duty): ``client.ablated`` is a set of CallClass (empty by
+default). A call of an ablated class never reaches the transport: it returns parse_status
+'cancelled' with error 'ablated' at once, logged through ``on_call`` like any other call, so every
+caller takes the fallback path it already has for a call that did not come back
+(tools/as/eval.py --ablate).
 """
 
 from __future__ import annotations
@@ -39,12 +45,16 @@ class LaneClient:
         self.transport = transport
         self.on_call = on_call
         self._down: set = set()
+        self.ablated: set = set()
 
     async def call(self, request: LMRequest, output_model: type[BaseModel] | None = None) -> LMResponse:
         import asyncio, time
         from .errors import LaneTimeout, LaneUnavailable
         from .parse import strip_think, extract_json, validate
         base = dict(call_class=request.call_class, lane=request.lane)
+        if request.call_class in self.ablated:
+            resp = LMResponse(**base, parse_status="cancelled", error="ablated")
+            self._log(request, resp); return resp
         if self.is_down(request.lane):
             resp = LMResponse(**base, parse_status="lane_error", error="lane down")
             self._log(request, resp); return resp

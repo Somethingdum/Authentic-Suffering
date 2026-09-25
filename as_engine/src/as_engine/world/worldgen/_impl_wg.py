@@ -1667,9 +1667,16 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
     # 8 commit json
     arch = places[start]["archetype_ref"]
     district = canon.get(arch).name if arch else places[start]["kind"]
+    from dataclasses import asdict
+    skeleton = {"start_zone_id": region.start_zone_id, "zones": [asdict(z) for z in region.zones],
+                "exterior": [asdict(z) for z in region.exterior], "routes": [asdict(r) for r in region.routes],
+                "groups": [asdict(g) for g in plan.groups], "settlements": [asdict(x) for x in plan.settlements],
+                "opening": {"pc_body": body, "start_place_id": start, "contacts": list(contacts), "threat_kind": tkind,
+                            "threat_place_id": tplace, "threat_ids": list(threat_ids), "magnets": list(magnets),
+                            "telegraph_trace_id": trace_id}}
     wc = WorldgenCommit(run_id=run_id, seed=seed, pc_ref=pc_ref, params=params, placement=placement, start_zone_type=sz.kind,
                         start_district_type=district[:40], opening=opening,
-                        qc_result="patched" if patches else "pass", qc_patches=patches)
+                        qc_result="patched" if patches else "pass", qc_patches=patches, skeleton=skeleton)
     commit(tx, EventType.WORLDGEN_STAGE, "world.worldgen", at, [
         W("world_params", {"commit_json": canonical_json(wc.model_dump(mode="json"))}, WriteOp.UPDATE, {"id": 1})],
         {"stage": "WG8", "commit": True})

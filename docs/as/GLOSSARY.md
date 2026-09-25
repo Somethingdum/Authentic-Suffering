@@ -164,6 +164,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | magnet | a place worth the risk that the PC has a lead on (WG8, WG-35) | "a lead" (Journal) | — |
 | home settlement | the settlement the PC starts in or beside (WG2) | its name | — |
 | story | — | — | **sotry** (error) |
+| portrayal note | what a retrospective portrayal audit leaves a person whose choice did not fit them: a line in their next packets (PORT-07) | — | — |
+| abuse battery | the eight code checks against the author: stat bands, mortality, check caps, gear limits, a way in, no farming, clock sync, cheat leakage (ABUSE-01..08) | — | — |
+| release audit | the developer's check of a generated run before a release: the world as it began, days off-screen with the dead counted, the battery, unbuilt rules, CNT-11 (REL-01..06) | — | — |
+| ablation | switching one call class off (LANE-09) to measure what it is for | — | — |
+| world skeleton | what WG9 checked a world against, kept in the worldgen commit (`WorldgenCommit.skeleton`) | — | — |
 
 ## Player-facing words (the only words play screens use for these things)
 

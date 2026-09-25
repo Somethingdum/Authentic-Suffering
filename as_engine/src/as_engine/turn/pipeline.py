@@ -167,7 +167,11 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
     utterance handles + (B5) its self-experience O handles, entity handles, open-loop handles),
     a=packet, cue_ids = the sorted ids of every canon cue); Job(job_id = the group's first entry,
     call_class WRITEBACK, request, output_model WritebackOutput, lane_pref = request.lane, est_s =
-    SchedulerRules.estimated_call_s['writeback']). All jobs -> ONE lanes.scheduler.run_jobs call.
+    SchedulerRules.estimated_call_s['writeback']). (P11, PORT-06) Then, for the i-th entry of
+    retro = audit.portrayal.jobs(config, the Judged decisions every wave's decide collected
+    (decide(..., audits=…)), T) — computed before the gather — Job(job_id = f'portrayal:{i}',
+    PORTRAYAL_AUDIT, its request, PortrayalVerdict, lane_pref = request.lane, est_s =
+    estimated_call_s['portrayal_audit']). All jobs -> ONE lanes.scheduler.run_jobs call.
   S14 apply (own transaction, groups in order): an answer whose parse_status is not 'ok' ->
     audit.log.repair(kind = 'timeout' | 'lane_down' | the parse status for grammar/schema failures |
     'degraded', 14, 'MEM-02', {holders: [the packet's holder], status}) and that group writes
@@ -178,9 +182,11 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
   S15 audits: the leak scan (a query): claim_holdings rows with acquired_at >= t0 and provenance
     != 'inferred' whose holder has no percept_log row for acquired_via ->
     audit.log.record(tx, 'G15-leak', 'mind.perception', 'fail' | 'pass', [{holder_id, claim_id}],
-    T). Ledger 15 {leaks: the count}.
-    (The retrospective portrayal audit is P11.)
-  S17+S18 write: narration.narrator.write_narration(tx, T, prose, npk, passed, attempts); story
+    T); then (P11) audit.portrayal.record_retrospective(tx, judged, request, the job's answer, T)
+    for each retro entry in order. Ledger 15 {leaks: the count}.
+  S17+S18 write: narration.narrator.write_narration(tx, T, prose, npk, passed, attempts); the
+    narrator's continuity (P11, NARR-09): narration.style.save(tx, style.update_after_turn(
+    style.load(tx), prose, style.scene_type(npk)), T); story
     (service.session.append_story): kind 'player' with player_inputs.raw_text (mode 'say' for a
     say, else 'do'), kind 'notice' for each notice, then kind 'narration'; not passed ->
     audit.log.repair('lint_fail', 18, 'NARR-07', {findings: each finding's model_dump}); ledger

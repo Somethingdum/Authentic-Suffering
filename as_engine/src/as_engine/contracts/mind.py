@@ -215,6 +215,8 @@ class SkullPacket(Strict):
                                  "(mind.consult), shown under 'What you looked up'.")
     outburst: str | None = Field(default=None, description="H1 (TEMPER-08): you have snapped at someone this "
                                  "moment and are going to have it out with them; None otherwise.")
+    portrayal_note: str | None = Field(default=None, description="P11 PORT-07 (D-07): what someone who knows "
+                                       "you would say about something you did lately that was not like you; None otherwise.")
 
 
 # ---------------------------------------------------------------------------

@@ -85,8 +85,9 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     anchor 1, subject_ids [the PC]} (ANCHOR_MEMORY, writer 'mind.memory').
   8 world_params.commit_json = WorldgenCommit(run_id, seed, pc_ref, params, placement,
     start_zone_type = the start zone's kind, start_district_type = the start place's archetype name
-    or kind, opening, qc_result, qc_patches) (WORLDGEN_STAGE {stage: 'WG8', commit: true}, writer
-    'world.worldgen').
+    or kind, opening, qc_result, qc_patches, skeleton — P11, D-95: the region, the plan and this
+    Opening as contracts.worldgen.WorldgenCommit.skeleton describes) (WORLDGEN_STAGE {stage: 'WG8',
+    commit: true}, writer 'world.worldgen').
   Opening(pc_body, start_place_id, contacts, threat_kind, threat_place_id, threat_ids, magnets,
   telegraph_trace_id, opening: OpeningPressure).
 

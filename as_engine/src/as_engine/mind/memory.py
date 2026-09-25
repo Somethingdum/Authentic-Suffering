@@ -128,8 +128,8 @@ MEM-18 (B5, Actor Spec §13, AC13: valid handle syntax alone does not make an in
   text has unknown names is still written (the raw evidence stays) with quarantined = 1, and
   audit.log.repair(kind 'unknown_name', stage 14, rule_id 'MEM-18', detail {holder_id, item
   'episode', names}); a quarantined episode is never retrieved (mind.retrieval), looked up
-  (mind.consult) or reflected on (service.background) — it waits for review (P11's portrayal
-  audit).
+  (mind.consult) or reflected on (service.background) — it stays as evidence, and the mind never
+  reads it.
 MEM-19 (B5, fidelity C10; Actor Spec §13) A memory job is never lost to a failed call. Owner
   'mind.memory' (memory_jobs: job_key PRIMARY KEY = f'{holder_id}:{turn_index}', holder_id,
   turn_index, status 'pending' | 'done' | 'failed', attempts, updated_at).

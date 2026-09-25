@@ -62,7 +62,7 @@ def consequential(tx, actor_id, affordances, turn_index, answered):
     return bool(asks_for(tx, actor_id, turn_index, answered)) or bool(getattr(affordances, "threats", []))
 
 
-async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), calls_ok=True):
+async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), calls_ok=True, audits=None):
     # Returns {actor_id: Intent} for every actor in plan.lod but those held in place (HOLD-01).
     from ..action.intent import plan_continuation
     from ..audit.log import repair as log_repair
@@ -157,6 +157,23 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
             got = await settle(a, kind, val, results2[a])
             if got is not None and got != "consult":
                 out[a] = got
+    # 1b PORT-05: the targeted portrayal pre-check (D-07), before the barrier
+    from ..audit import portrayal
+    prechecked = set()
+    for a in sorted(out):
+        it = out[a]
+        if a not in st or it is None or it.source != "model":
+            continue
+        why = portrayal.high_stakes(tx, a, it, turn_index, answered)
+        if why is None:
+            continue
+        prechecked.add(a)
+
+        async def regen(err, raw, a=a):
+            it2, _why = await repair(a, err, raw)
+            return it2
+        out[a] = await portrayal.precheck(tx, session.client, cfg, a, st[a]["pkt"], st[a]["req"], it, why,
+                                          None if st[a]["repair"] else regen, turn_index, at)
     # ECHO-02: one repair if the decision's repair is unspent; a failed one keeps the original words
     for a in sorted(out):
         it = out[a]
@@ -175,6 +192,10 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
         log_repair(tx, "echo_reject", 6, "ECHO-02", {"actor_id": a, "ngrams": sorted(hits)}, turn_index, at)
     _compel(tx, out, affs, at, turn_index)
     await _snap(tx, out, affs, at, turn_index, plan, st, repair)
+    if audits is not None:   # PORT-06: what the retrospective audit may judge
+        for a in sorted(out):
+            if a in st and out[a] is not None and out[a].source == "model":
+                audits.append(portrayal.Judged(a, plan.lod[a], st[a]["pkt"], st[a]["req"], out[a], a in prechecked))
     return out
 
 

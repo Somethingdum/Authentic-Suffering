@@ -270,6 +270,20 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p10_world/test_materialise.py` (amended) | generated people look like someone (hair by age, no beard on a woman or a boy, no tattoo on a child, the prose agrees) and not like each other; they dress for the climate (warm and coated where cold, no coat where hot, a medic's scrubs), one piece per slot and layer; nobody steps out of the count naked; a generated world is dressed |
 | `p07_slice/test_narration_looks.py` | the prose is given how someone looks and smells as they come in, and only then, never the player; the scene's people chip carries it |
 
+### 3.17 The audits (P11; D-95..D-99)
+
+`p11_audits/conftest.py` puts the P7 helpers on the path and makes one generated world per session
+(the P10 one: Owen Marsh, Established, Normal, the smallest tier, seed 7), copied for each test.
+
+| File | What it proves |
+|---|---|
+| `test_commit_gate_bits.py` | AUDIT-02 (§8): the night as played passes all 58 bits; each bit's fault drops exactly that bit; every bit names the stage that writes what it checks (AUDIT-03) |
+| `test_style.py` | the narrator's own pictures are remembered (never quoted speech, never a name, never a verb), the last 30 kept and a reused one moved to the end; the scene type; a played turn saves them and the next prompt names them; nothing new writes nothing |
+| `test_abuse.py` | an honest night, an honest climb (a real check) and a generated world pass the battery; each of the eight exploits, planted on its own, is named by its rule alone in plain words; bands bind generated people only; god mode belongs to a sandbox; a cheat-made person is quarantined there |
+| `test_release.py` | a generated world passes its release audit, which works on copies; the world as it began is checked again (a missing threat is caught; no skeleton, no check); a step that loses the dead is caught (HRD-15); rules nobody built are named once each; a child's record with the words is caught (CNT-11) |
+| `test_portrayal.py` | a blow is judged before it lands by a call that did not make it; out of character, she decides once more with the reasons and what she then decides stands; a second misfit stands and is logged; no second asking once the repair is spent; the rest are judged after the fact and leave a note in her next prompt |
+| `test_eval_ablation.py` | an ablated call never reaches the model; switching off writeback is measured (memory jobs fail, the world goes on); a call whose ablation changes nothing is named for removal |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
@@ -421,12 +435,13 @@ to find the A-handle of an option in a packet, `percepts_of(store, holder_id, tu
 
 ## 8. The 58-bit fault-injection test (AUDIT-02, P11)
 
-`tests/contract/p11_audits/test_commit_gate_bits.py` builds the metal-fence world after one clean
-committed turn, asserts all 58 bits are 1, then for each bit applies exactly one fault from
-`FAULTS[bit_id]` (a function that corrupts the store the way that bit's description says — e.g.
-`W08`: set a portal to open and barricaded) inside a savepoint, recomputes the gate and asserts that
-**exactly that bit** dropped and no other, then rolls the fault back. A bit whose fault does not
-drop it, or drops a different bit, fails the test. A check that cannot fail is not a check.
+`tests/contract/p11_audits/test_commit_gate_bits.py` plays the night at Delgado's for two turns and
+asserts all 58 bits are 1. Then, for each bit, on a fresh copy of that world, it applies exactly
+one fault from `FAULTS[bit_id]` — written straight into the database with foreign keys off, the
+way a bug would leave it (e.g. `W08`: a portal open and barricaded) — recomputes the gate and
+asserts that **exactly that bit** dropped and no other. A bit whose fault does not drop it, or
+drops a different bit, fails the test: a check that cannot fail is not a check. It also pins
+`BIT_STAGE` (AUDIT-03): every bit names the pipeline stage that writes what it checks, never 12.
 
 ## 9. When you think a test or the spec is wrong
 
@@ -462,6 +477,9 @@ Runs anywhere, no models needed, and prints one plain line per check:
 - `tests/live/test_json_compliance_live.py`: 20 cognition calls per lane against real packets from
   the metal-fence scenario; ≥ 95 % parse and validate without repair.
 - `tools/as/bench.py --n 5`: per call class latency on each lane → `reports/bench.json`.
-- `tools/as/eval.py --scenario metal_fence --turns 10 [--ablate <call_class>]`: plays with real models
-  and reports refusal rates, echo rejections, lint failures per 10 turns, leak findings, prose
-  metrics, repair rate, turn wall-clock. The ablation mode is the plan's ablation duty (08 §4).
+- `tools/as/eval.py --scenario metal_fence --turns 10 [--ablate <call_class>] [--fake]`: plays with
+  real models (or the fake one) and reports the measures in its docstring. With --ablate it plays
+  plain and with that call class switched off (LANE-09) and names what changed; a class whose
+  ablation changes nothing measurable is a removal candidate — the plan's ablation duty (08 §4).
+- `audit.release.release_audit(config, run_id, days=30)`: the release audit on a generated run
+  (REL-01..06) — run it on a world the fake made and on one your models made, before a release.

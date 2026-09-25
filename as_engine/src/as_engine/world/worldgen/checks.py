@@ -21,7 +21,16 @@ WG-35 assert_world(store, region, plan, opening) -> list[str]   (plain sentences
 WG-36 The seven world checks name nothing from the story: which people will betray, die or befriend
   the player is never decided here or anywhere in worldgen (WG-30).
 WG-37 The continuous re-assertion of these invariants every in-game day is not built in v1 (P11's
-  release audit re-runs assert_world on the genesis snapshot instead; DECISIONS D-45).
+  release audit re-runs assert_world on the run's turn-0 snapshot instead; DECISIONS D-45, D-95:
+  not the world's genesis, which is taken before the PC is placed, so the opening checks 1-4 could
+  not run on it).
+reassert(store) -> list[str]   (P11, WG-37)
+  WG-35 again, on a store that holds a generated world: skeleton = world_params.commit_json's
+  'skeleton' (contracts.worldgen.WorldgenCommit.skeleton); no world_params row, or no skeleton ->
+  ["There is no generated world here to check."]. Otherwise region = Region(zones, routes,
+  start_zone_id, exterior=exterior) with each Zone / Route rebuilt from its dict (lists become
+  tuples), plan = PolityPlan(groups, settlements) likewise, opening = Opening(**skeleton opening,
+  opening = the commit's OpeningPressure) -> assert_world(store, region, plan, opening).
 """
 
 from __future__ import annotations
@@ -37,4 +46,27 @@ if TYPE_CHECKING:
 
 def assert_world(store: "Store | Tx", region: "Region", plan: "PolityPlan", opening: "Opening") -> list[str]:
     raise NotImplementedError("P10")
+
+
+def reassert(store: "Store | Tx") -> list[str]:
+    import json
+
+    from ...contracts.worldgen import OpeningPressure
+    from .history import PlannedGroup, PlannedSettlement, PolityPlan
+    from .opening import Opening
+    from .region import Region, Route, Zone
+    row = store.query_one("SELECT commit_json FROM world_params WHERE id=1")
+    wc = json.loads(row[0]) if row is not None else {}
+    sk = wc.get("skeleton")
+    if not sk:
+        return ["There is no generated world here to check."]
+
+    def zone(d):
+        return Zone(**{**d, "site_ids": tuple(d["site_ids"])})
+    region = Region(zones=tuple(zone(z) for z in sk["zones"]), routes=tuple(Route(**r) for r in sk["routes"]),
+                    start_zone_id=sk["start_zone_id"], exterior=tuple(zone(z) for z in sk["exterior"]))
+    plan = PolityPlan(groups=tuple(PlannedGroup(**g) for g in sk["groups"]),
+                      settlements=tuple(PlannedSettlement(**x) for x in sk["settlements"]))
+    opening = Opening(**sk["opening"], opening=OpeningPressure.model_validate(wc["opening"]))
+    return assert_world(store, region, plan, opening)
 from ._impl_wg import assert_world  # noqa

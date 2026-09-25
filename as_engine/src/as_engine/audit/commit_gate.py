@@ -14,10 +14,12 @@ compute(tx, turn_index) -> GateResult(session, world, entities, global_, failure
   passes it — the P0 framework test computes all 58 bits = 1 on a fresh store at turn 0.
   failures lists the ids of the zero bits, in ALL_BITS order.
 Turn pipeline behaviour (G12): all 58 must be 1 or the transaction does not commit. On a zero:
-  identify the failing stage (BIT_STAGE), roll back, rerun from that stage once in strict mode
-  (repair calls on, reactions capped at 1), recompute; if a bit is still 0, write
-  error_repair_log(kind='rollback', rule_id=bit id), leave the world at the previous committed
-  state, and report the failure to the UI (turn_rejected / error, player input NOT consumed).
+  roll back and rerun the turn once in strict mode (repair calls on, reactions capped at 1),
+  recompute; if a bit is still 0, write error_repair_log(kind='rollback', stage = BIT_STAGE of the
+  first failing bit, rule_id = that bit id), leave the world at the previous committed state, and
+  report the failure to the UI (turn_rejected / error, player input NOT consumed).
+AUDIT-03 (P11) BIT_STAGE maps every bit to the pipeline stage that writes what it checks (never 12,
+  the gate itself): where the fault came from and what the rollback log names.
 """
 
 from __future__ import annotations
@@ -117,7 +119,20 @@ ERROR_KINDS: tuple[str, ...] = ("grammar_fail", "schema_fail", "hallucinated_ref
 REQUIRED_META_KEYS: tuple[str, ...] = ("run_id", "seed", "schema_version", "created_at_real",
                                        "content_hash", "settings_json", "rules_json", "pc_actor_id",
                                        "sandbox", "cheat_active", "world_epoch_text")
-BIT_STAGE: dict[str, int] = {b.id: 12 for b in ALL_BITS}  # refine per bit when implementing
+# AUDIT-03: the pipeline stage that writes what each bit checks — where a failure is repaired and
+# what the rollback log names (turn.pipeline G12). 0 timers, 1 intake, 3 perceive, 6 cognition,
+# 8 resolve, 9 propagate, 10 cascade, 11 reactions, 14 writeback, 17 narrate.
+BIT_STAGE: dict[str, int] = {
+    "S01": 0, "S02": 0, "S03": 1, "S04": 6, "S05": 6, "S06": 0, "S07": 17, "S08": 0, "S09": 8, "S10": 8, "S11": 6,
+    "S12": 11,
+    "W01": 8, "W02": 8, "W03": 8, "W04": 8, "W05": 8, "W06": 8, "W07": 10, "W08": 8, "W09": 3, "W10": 0, "W11": 0,
+    "W12": 8, "W13": 0, "W14": 17, "W15": 9, "W16": 8,
+    "E01": 1, "E02": 14, "E03": 8, "E04": 10, "E05": 8, "E06": 0, "E07": 0, "E08": 8, "E09": 8, "E10": 10, "E11": 17,
+    "E12": 10, "E13": 0, "E14": 8, "E15": 8, "E16": 0,
+    "G01": 0, "G02": 0, "G03": 0, "G04": 8, "G05": 0, "G06": 0, "G07": 8, "G08": 8, "G09": 8, "G10": 0, "G11": 8,
+    "G12": 8, "G13": 0, "G14": 6,
+}
+assert set(BIT_STAGE) == {b.id for b in ALL_BITS}
 
 
 @dataclass
@@ -169,12 +184,7 @@ def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
     checks["S02"] = T < 1 or not q("SELECT 1 FROM turn_ledger WHERE turn_index=? AND status='failed'", (T,))
     r = q1("SELECT received_hash, raw_text FROM player_inputs WHERE turn_index=?", (T,))
     checks["S03"] = r is None or r[0] == sha(r[1])
-    bad = False
-    for tbl, col in (("voice_lines", "text"), ("episodes", "text"), ("propositions", "text")):
-        pass
     ok = True
-    for tbl, col, turncol in (("voice_lines", "text", None), ("episodes", "summary", "turn_index"), ("propositions", "text", None)):
-        pass
     for r in q("SELECT text FROM voice_lines v JOIN events e ON e.event_id=v.event_id WHERE e.turn_index=?", (T,)):
         ok = ok and not has_exhaust(r[0])
     for r in q("SELECT summary FROM episodes WHERE turn_index=?", (T,)):

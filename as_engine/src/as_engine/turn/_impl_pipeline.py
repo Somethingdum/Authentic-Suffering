@@ -22,6 +22,7 @@ class Ctx:
     info: dict = field(default_factory=dict)
     calls: list = field(default_factory=list)
     answered: set = field(default_factory=set)
+    judged: list = field(default_factory=list)   # PORT-06: audit.portrayal.Judged, every wave
     ledger: dict = field(default_factory=dict)
     progress: object = None
     final: int = 0
@@ -149,7 +150,8 @@ async def simulate(ctx):
             affs = {a: enumerate_affordances(tx, a, catalog, wave_at, T) for a in plan.lod}
             # 6 cognition
             await _progress(ctx, 6)
-            intents = await cognition.decide(tx, s, plan, affs, T, wave_at, reaction=wave_idx > 0, answered=ctx.answered)
+            intents = await cognition.decide(tx, s, plan, affs, T, wave_at, reaction=wave_idx > 0, answered=ctx.answered,
+                                             audits=ctx.judged)
             if wave_idx == 0:
                 intents[s.pc_id] = cognition.urge_pc(tx, rng, s.pc_id, ctx.pc_intent, T, wave_at)
             asks = {a: cognition.asks_for(tx, a, T, ctx.answered) for a in sorted(intents)}
@@ -327,8 +329,10 @@ async def run_turn(session, submit, progress=None):
                         reuse.setdefault(request_hash(q), []).append(r.raw or r.text)
                 if attempt == 2:
                     rule = e.failures[0] if isinstance(e, GateFailed) else getattr(e, "rule", None)
+                    from ..audit.commit_gate import BIT_STAGE
+                    stage = BIT_STAGE.get(rule) if isinstance(e, GateFailed) else None   # AUDIT-03
                     with session.store.transaction() as tx:
-                        log_repair(tx, "rollback", None, rule, {"error": f"{type(e).__name__}: {e}"[:500],
+                        log_repair(tx, "rollback", stage, rule, {"error": f"{type(e).__name__}: {e}"[:500],
                                                                "first": f"{type(errors[0]).__name__}: {errors[0]}"[:500]}, cur + 1,
                                    clock.now(tx))
                     return TurnOutcome(ok=False, turn_index=cur, rejected_code="turn_failed", rejected_message=REJECT_FAILED)
@@ -420,9 +424,17 @@ async def after_commit(ctx, notices):
                                     a=a, cue_ids=cue_ids)
                 jobs.append(Job(job_id=g[0], call_class=CallClass.WRITEBACK, request=req, output_model=WritebackOutput,
                                 lane_pref=req.lane, est_s=store.rules.scheduler.estimated_call_s["writeback"]))
+            from ..audit import portrayal
+            from ..contracts.mind import PortrayalVerdict
+            for i, (_j, q) in enumerate(retro):
+                jobs.append(Job(job_id=f"portrayal:{i}", call_class=CallClass.PORTRAYAL_AUDIT, request=q,
+                                output_model=PortrayalVerdict, lane_pref=q.lane,
+                                est_s=store.rules.scheduler.estimated_call_s["portrayal_audit"]))
             res = await run_jobs(s.client, jobs) if jobs else {}
             return groups, res
 
+        from ..audit import portrayal as _portrayal
+        retro = _portrayal.jobs(s.config, ctx.judged, T)   # PORT-06: judged after the fact, on lane B
         (prose, findings, attempts, passed), (groups, wres) = await asyncio.gather(do_narrate(), do_writeback())
         # 14 writeback apply
         await _progress(ctx, 14)
@@ -454,11 +466,15 @@ async def after_commit(ctx, notices):
                 "(SELECT 1 FROM percept_log p WHERE p.holder_id=h.holder_id AND p.event_id=h.acquired_via)", (ctx.t0,))]
             from ..audit.log import record
             record(tx, "G15-leak", "mind.perception", "fail" if leaks else "pass", leaks, T)
+            for i, (j, q) in enumerate(retro):
+                _portrayal.record_retrospective(tx, j, q, wres[f"portrayal:{i}"], T)
             _ledger(tx, T, 15, "ok", {"leaks": len(leaks)})
         # 17/18 write narration + story
         with store.transaction() as tx:
+            from ..narration import style as nstyle
             from ..narration.narrator import write_narration
             write_narration(tx, T, prose, npk, passed, attempts)
+            nstyle.save(tx, nstyle.update_after_turn(nstyle.load(tx), prose, nstyle.scene_type(npk)), T)
             pin = tx.query_one("SELECT mode, raw_text FROM player_inputs WHERE turn_index=?", (T,))
             if pin is not None:
                 append_story(tx, T, "player", pin[1], "say" if pin[0] == "say" else "do")

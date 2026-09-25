@@ -50,11 +50,11 @@ ROW = {
 
 
 @pytest.fixture
-def row(fixture_packs, core_pack_dir):
+def row(fixture_packs, core_pack_dir, fake):
     worlds = []
 
     def _load():
-        w = load_scenario(copy.deepcopy(ROW), packs_root=fixture_packs, core_pack_dir=core_pack_dir)
+        w = load_scenario(copy.deepcopy(ROW), packs_root=fixture_packs, core_pack_dir=core_pack_dir, transport=fake)
         worlds.append(w)
         return w
     yield _load
