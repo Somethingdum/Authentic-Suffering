@@ -75,14 +75,14 @@
   cites: [docs/as/05_ACTORS.md]
 - schema: as.cascade.v1
   id: CAS-012
-  description: A theft that somebody witnessed becomes a rumour among the witness's household and crew.
+  description: Whoever saw someone take what they know belongs to another now carries it as a rumour, and talk spreads it from them.
   trigger_event: ITEM_TRANSFER
-  where: {moral_tag: steal}
-  preconditions: ["trigger.payload.witness_count >= 1"]
+  where: {}
+  preconditions: []
   effects:
     - kind: create_rumour
-      target: witnesses_of(trigger.event_id)
-      payload: {about: "$trigger.payload.actor_id", claim: took_what_was_not_theirs}
+      target: theft_witnesses_of(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: took_what_was_not_theirs}
   delay_s: 0
   cites: [docs/as/06_WORLD.md#2.6]
 - schema: as.cascade.v1

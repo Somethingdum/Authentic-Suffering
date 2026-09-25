@@ -31,15 +31,25 @@ WORK-05 cycle(tx, rng, row, fired, turn_index) -> list[Event]   (the PRODUCTION_
   1 crew = crew(w, start, at); staffed = staffed_fraction(w.required_roles, crew).
   2 spite = society.group.animosity(tx, rng, [actor ids of crew], w, at, turn_index,
     fired.event_id) (1.0 when no pair qualifies).
-  3 condition_factor = 1.0 when machinery_condition >= R.condition_full_at, else 0.5 +
-    machinery_condition / 100. factor = efficiency * staffed * condition_factor * spite (in that
-    order). output = {res: floor(base * factor + 1e-9)} for each outputs entry, sorted by name.
+  3 (Actor v2 B6, fidelity C04: working machinery and what it runs on come before any condition
+    multiplier) condition_factor = min(1.0, machinery_condition / R.condition_full_at) — at
+    condition 0 the machinery is broken and makes nothing. input_factor = 1.0 when the workplace
+    has no inputs, else the smallest, over its inputs (by name), of min(1.0, have / amount) where
+    have = the settlement's stores[resource] (0 without a settlement or that resource). factor =
+    efficiency * staffed * input_factor * condition_factor * spite (in that order). output =
+    {res: floor(base * factor + 1e-9)} for each outputs entry, sorted by name. inputs_used =
+    {res: round(amount * staffed * input_factor, 2)} for each inputs entry whose value is > 0 —
+    what running took — and {} when the machinery is broken (nobody runs it).
   4 PRODUCTION_CYCLE {workplace_id, settlement_id, site_type, crew: [[actor, role], ...], staffed,
-    efficiency, condition_factor, spite, output, window_start: start, window_end: at} (cause
-    fired) writing workplaces next_due_at = at + cycle_h * H and stall_reasons = ['unstaffed']
-    when staffed == 0, else [].
-  5 when any output value > 0 and the workplace has a settlement: society.settlement.receive(tx,
-    settlement_id, {res: value > 0 ...}, 'production', at, turn_index, the PRODUCTION_CYCLE id).
+    efficiency, input_factor, condition_factor, spite, output, inputs_used, window_start: start,
+    window_end: at} (cause fired) writing workplaces next_due_at = at + cycle_h * H and
+    stall_reasons = each that applies, in this order: 'unstaffed' (staffed == 0), 'broken'
+    (machinery_condition == 0), f'no_{res}' per input (by name) whose have is 0; else [].
+  5 One ledger: when inputs_used is not empty, society.settlement.receive(tx, settlement_id, {res:
+    -used ...}, 'production_input', at, turn_index, the PRODUCTION_CYCLE id) — what running took is
+    drawn from the stores exactly once, as a STORES_CHANGE like any other; then, when any output
+    value > 0 and the workplace has a settlement: society.settlement.receive(tx, settlement_id,
+    {res: value > 0 ...}, 'production', at, turn_index, the PRODUCTION_CYCLE id).
   6 covers end: for each covering row (covering_for NOT NULL) at this workplace, in key order,
     whose covered actor is able for the role again: ROLE_RELEASED {workplace_id, role, actor_id,
     shift_start_hh, covering_for, reason: 'returned'} deleting the row, then society.settlement.

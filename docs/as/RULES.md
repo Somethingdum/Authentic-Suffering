@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-665 ids; 414 with their own statement, 251 named only in context.
+666 ids; 415 with their own statement, 251 named only in context.
 
 
 ## ABUSE
@@ -43,7 +43,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *Belief cues (AFF-10): a cue is HELD by an actor when a lessons row for that holder carries the cue* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
-| AFF-11 | AFF-11 (Actor v2, Actor Spec AC06: a menu built from what the person knows) Two worlds that differ | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_content/packs/core/affordances/items.yaml` | `contract/p04_one_actor/test_knowledge_menus.py` |
+| AFF-11 | AFF-11 (Actor v2, Actor Spec AC06: a menu built from what the person knows) Two worlds that differ | as_engine/mind/affordance.py | `as_engine/action/cascade.py`, `as_engine/mind/affordance.py`, `as_content/packs/core/affordances/items.yaml` | `contract/p04_one_actor/test_knowledge_menus.py`, `contract/p09_society/test_theft_seen.py` |
 
 ## AUD
 
@@ -112,7 +112,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-01 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-010 | Catching someone in a lie costs them trust with whoever caught them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-011 | A broken promise costs trust with the person it was made to and leaves them a grievance they carry. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/mind.py`, `as_engine/mind/promise.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p06_memory/test_mind.py` |
-| CAS-012 | A theft that somebody witnessed becomes a rumour among the witness's household and crew. | as_content/packs/core/cascade/people.yaml | `as_engine/world/rumours.py`, `as_content/packs/core/cascade/people.yaml` | — |
+| CAS-012 | Whoever saw someone take what they know belongs to another now carries it as a rumour, and talk spreads it from them. | as_content/packs/core/cascade/people.yaml | `as_engine/world/rumours.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_theft_seen.py` |
 | CAS-013 | A death off-screen leaves a corpse where it happened and a rumour among the people who would hear of it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/propagate.py`, `as_engine/world/rumours.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p10_world/test_world_day.py` |
 | CAS-014 | Starting a different action while in the middle of a counted task pauses the task where it stands instead of resetting it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/tasks.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p05_many_actors/test_tasks.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | CAS-015 | A bite wound seen by a settlement member brings the contamination law into force for the bitten person. | as_content/packs/core/cascade/people.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/people.yaml` | — |
@@ -128,7 +128,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-024 | Every bite someone sees the dead take out of a person or an animal wears them down; watching a whole feeding breaks people. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p10_world/test_feeding.py` |
 | CAS-03 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
-| CAS-05 | CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>, trigger.actor_id, trigger.event_id). Each selector returns 0..n entity ids, deterministically ordered by id; the… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_timers_society.py` |
+| CAS-05 | CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>, trigger.actor_id, trigger.event_id). Each selector returns 0..n entity ids, deterministically ordered by id; the… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_theft_seen.py`, `contract/p09_society/test_timers_society.py` |
 | CAS-06 | CAS-06 schedule_event, and any rule with delay_s > 0, enqueues a CASCADE_EFFECT queue row (kernel.clock.QUEUE_TYPES) instead of emitting now: kernel.clock.schedule(tx, due, 'CASCADE_EFFECT', target, {rule_id, effect_ind… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/turn/timers.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_timers_society.py` |
 | CAS-07 | CAS-07 an effect whose target resolves to no ids is a no-op, not an error; the rule still counts as fired for the decision audit. | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
@@ -457,7 +457,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | HOR-01 | HOR-01 horizon(tx, pc_intent, t0) -> int (the end of the simulation window, ms) The PC's def is looked up in canon (tx.canon.find('affordance', def_id)). condition-ended (duration.condition_ended: watch, wait, guard…):… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
 | HOR-02 | HOR-02..04 pull(horizon_ms, trigger_at, last_event_at) -> int min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at)). When the PC holds a MATERIAL percept (action.reactions.material_holders) at trigger_at, th… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| HOR-03 | *horizon). Rules SEL-01..06, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| HOR-03 | *horizon). Rules SEL-01..07, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | HOR-04 | *(HOR-03: G04 must hold), and a pull never lengthens the window (HOR-04). The pipeline applies* | as_engine/turn/select.py | `as_engine/turn/select.py` | — |
 
 ## HRD
@@ -908,6 +908,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SEL-04 | SEL-04 salience(flags, is_mandatory, weights) -> float sum(weights[flag] for true flags) + weights['mandatory'] when mandatory (SchedulerRules .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by act… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-05 | SEL-05 conscious(tx, actor_id) -> bool bodies.alive = 1 and awareness in ('awake', 'drowsy'). Only conscious candidates are planned, offered options, or asked to decide. | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-06 | SEL-06 The PC is never a candidate, never planned and never reacts: the player decides for the PC (the pipeline passes exclude={pc} to action.reactions.next_wave). | as_engine/turn/select.py | `as_engine/society/group.py`, `as_engine/society/routine.py`, `as_engine/turn/select.py` | `contract/p09_society/test_routine.py`, `contract/p09_society/test_work.py` |
+| SEL-07 | SEL-07 (Actor v2 B6, fidelity C08: wake distant recipients by causal reach) reached(tx, events, turn_index) -> list[str] (sorted actor ids) The active area is where the moment is; a sound goes as far as it goes. For eac… | as_engine/turn/select.py | `as_engine/turn/pipeline.py`, `as_engine/turn/select.py` | `contract/p07_slice/test_far_hearing.py` |
 
 ## SET
 

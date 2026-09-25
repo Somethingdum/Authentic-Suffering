@@ -35,6 +35,18 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               (the same group; two names for readability)
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
+    theft_witnesses_of(<path>)                (B6, AFF-11: whether a taking is theft is for those who
+                                              see it and what they know) for an ITEM_TRANSFER into its
+                                              actor's own hands or carry (payload.to is a body holder
+                                              whose id is the event's actor): the holders other than
+                                              the actor of an EXACT or PARTIAL percept of it (they saw
+                                              who took it) who believe the item belongs to someone
+                                              else — a live believed holding (believed 1, superseded_by
+                                              NULL) of a proposition with subject ('object',
+                                              payload.item_id) and predicate 'owner' whose
+                                              object_value is not the actor, a household it belongs to
+                                              or a group it has a group_members row in, as
+                                              mind.affordance reads 'owned'. Any other event -> none
     place_of(<path>)                          the body's current place
     who_would_hear_of(<path>)                 the living members of the body's households and of every
                                               group it belongs to (status member / probation), plus
@@ -125,7 +137,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
 CAS-05 selectors built by phase: P5 actor, place_of, witnesses_of, active_task_of,
   infected_within_hearing_of; P9 household_of, settlement_of, workplace_of, work_assignments_of,
   cover_candidate_for, heads_of_households_with_dependents, head_of_worst_hit_household,
-  leadership_of, group_of, who_would_hear_of. An unbuilt selector counts as unbuilt dispatch.
+  leadership_of, group_of, who_would_hear_of, theft_witnesses_of (B6). An unbuilt selector counts
+  as unbuilt dispatch.
   Precondition paths (P9): settlement_of(<path>).<column> reads a settlements column or the derived
   days_of_<resource> / has_shortage_<resource> (society.settlement.days_of / has_shortage);
   workplace_of(<path>).<column> reads a workplaces column.

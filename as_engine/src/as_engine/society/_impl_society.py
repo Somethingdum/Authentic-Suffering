@@ -490,16 +490,26 @@ def cycle(tx, rng, row, fired, turn_index):
     cr = crew(tx, wid, start, at)
     staffed = staffed_fraction(_j(w["required_roles"]), cr)
     spite = animosity(tx, rng, [a for a, _ in cr], wid, at, turn_index, fired.event_id)
-    cf = 1.0 if w["machinery_condition"] >= R.condition_full_at else 0.5 + w["machinery_condition"] / 100
-    factor = w["efficiency"] * staffed * cf * spite
+    # WORK-05 step 3 (B6, C04): broken machinery makes nothing; a workplace runs on what it has
+    broken = w["machinery_condition"] <= 0
+    cf = min(1.0, w["machinery_condition"] / R.condition_full_at) if R.condition_full_at > 0 else (0.0 if broken else 1.0)
+    inputs = dict(sorted((_j(w["inputs"]) or {}).items()))
+    stores = (_j(_stl(tx, w["settlement_id"])["stores"]) or {}) if w["settlement_id"] else {}
+    have = {k: float(stores.get(k, 0) or 0) for k in inputs}
+    input_factor = min([min(1.0, have[k] / v) if v > 0 else 1.0 for k, v in inputs.items()] or [1.0])
+    factor = w["efficiency"] * staffed * input_factor * cf * spite
     output = {k: math.floor(v * factor + 1e-9) for k, v in sorted((_j(w["outputs"]) or {}).items())}
+    used = {} if broken else {k: round(v * staffed * input_factor, 2) for k, v in inputs.items() if round(v * staffed * input_factor, 2) > 0}
+    stalls = (["unstaffed"] if staffed == 0 else []) + (["broken"] if broken else []) + [f"no_{k}" for k in inputs if have[k] <= 0]
     ev = _commit(tx, type=EventType.PRODUCTION_CYCLE, writer="society.work", at=at, turn_index=turn_index, place_id=w["place_id"],
                  cause_event_id=fired.event_id,
                  payload={"workplace_id": wid, "settlement_id": w["settlement_id"], "site_type": w["site_type"],
-                          "crew": [[a, r] for a, r in cr], "staffed": staffed, "efficiency": w["efficiency"], "condition_factor": cf,
-                          "spite": spite, "output": output, "window_start": start, "window_end": at},
-                 writes=[_W(WriteOp.UPDATE, "workplaces", {"next_due_at": at + span, "stall_reasons": ["unstaffed"] if staffed == 0 else []},
-                            {"workplace_id": wid})])
+                          "crew": [[a, r] for a, r in cr], "staffed": staffed, "efficiency": w["efficiency"], "input_factor": input_factor,
+                          "condition_factor": cf, "spite": spite, "output": output, "inputs_used": used, "window_start": start,
+                          "window_end": at},
+                 writes=[_W(WriteOp.UPDATE, "workplaces", {"next_due_at": at + span, "stall_reasons": stalls}, {"workplace_id": wid})])
+    if w["settlement_id"] and used:
+        receive(tx, w["settlement_id"], {k: -v for k, v in used.items()}, "production_input", at, turn_index, ev.event_id)
     if w["settlement_id"] and any(v > 0 for v in output.values()):
         receive(tx, w["settlement_id"], {k: v for k, v in output.items() if v > 0}, "production", at, turn_index, ev.event_id)
     covers = sorted(_rows(tx, "SELECT * FROM work_assignments WHERE workplace_id=? AND covering_for IS NOT NULL", (wid,)), key=_key)
@@ -1047,6 +1057,11 @@ def adjust_tension(tx, a_id, b_id, delta, cause_text, at, turn_index, cause_even
             other = b_id if _is_actor(tx, b_id) else (leader_of(tx, b_id) if _row(tx, "SELECT 1 AS x FROM groups WHERE group_id=?", (b_id,)) else None)
             if other and other != a_id and _alive(tx, other):
                 relate(tx, a_id, other, RelationAxis.RESENTMENT, 1, esc.event_id, at, turn_index)
+                ctl = _row(tx, "SELECT controller FROM actors WHERE actor_id=?", (a_id,))
+                if ctl is not None and ctl["controller"] != "human":
+                    from ..mind.mind import open_loop
+                    open_loop(tx, a_id, "grudge", "Things between {subject} and me are about to boil over.", [other], 1,
+                              esc.event_id, at, turn_index)
     return _since(tx, first)
 
 

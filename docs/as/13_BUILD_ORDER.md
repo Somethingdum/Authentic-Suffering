@@ -70,14 +70,15 @@ right after the slice (P8) so the human can play and judge it early.
 ### 4.0 Where this copy starts (2026-09-25)
 
 The engine side of P0–P10 is **built**, and so is everything added to it since (owner,
-2026-09-25: the kit-maker's working implementations go into the final system): Actor v2 steps
-1–5 (B1–B5d: the identity card, knowledge-built menus, the reply protocol, speech timing,
-gestures and attention, answers, memory that is never lost, several causes, promises) and the
+2026-09-25: the kit-maker's working implementations go into the final system): Actor v2 B1–B6
+(the identity card, knowledge-built menus, the reply protocol, speech timing, gestures and
+attention, answers, memory that is never lost, several causes, promises, work output, feuds, far
+sounds, witnessed theft) and the
 owner's F1a looks, F1b smell, H1 human people, I1 the dead who feed, W1 the wet strain and F1c
 washing, clothes and the cold. Every contract function of those has a body — in the `_impl_*.py`
 file beside its module or built in place (AGENTS.md §4) — and every engine contract test passes
 except the owner's sessions browser and a world that names no run (D-76, steps 2 and 3). What
-each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-91. Nothing has been gated
+each change did and where is in CHANGELOG_AS.md and DECISIONS D-77..D-93. Nothing has been gated
 on your machine yet, so start here, not at P0 task 1:
 1. Record the gates in order: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`,
    one at a time; each writes its evidence row. A red gate is a real fault on your machine: triage
@@ -95,7 +96,7 @@ on your machine yet, so start here, not at P0 task 1:
    Play UI tests and the upstream check). P10 first needs `kernel/store.Store.backup_to(...,
    as_world=)` and the GENESIS step of `world/worldgen/pipeline` using it (D-76) —
    `test_world_names_no_run.py`.
-4. Then stop and write "waiting for the kit update (Actor v2 B6, P11, P12)" in PROGRESS.
+4. Then stop and write "waiting for the kit update (P11, P12)" in PROGRESS.
 
 The phase lists below stay as the map of what each module does and which tests pin it.
 

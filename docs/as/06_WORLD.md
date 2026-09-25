@@ -132,12 +132,16 @@ Workplaces run `PRODUCTION_CYCLE` timers every `cycle_h`. An assignment works a 
 daily shift shares any time with the cycle window. Per cycle:
 ```
 staffed          = filled required roles / required roles  (able + qualified crew only)
-condition_factor = 1.0 when machinery_condition >= 50, else 0.5 + machinery_condition / 100
+input_factor     = the scarcest input's share on hand: min over inputs of min(1, stores / per cycle)
+condition_factor = min(1, machinery_condition / 50) — 0 at condition 0: broken machinery makes nothing
 spite            = the animosity result for this crew (2.5), 1.0 when nobody resents anybody
-output[res]      = floor(base_output[res] × efficiency × staffed × condition_factor × spite)
+output[res]      = floor(base_output[res] × efficiency × staffed × input_factor × condition_factor × spite)
 ```
-Output goes into the settlement's stores (`STORES_CHANGE`); an unstaffed workplace records the
-stall reason `unstaffed`. **Cover**: a missed shift pulls the least-worked qualified, able,
+(Actor v2 B6, fidelity C04.) What running took (inputs × staffed × input_factor; nothing when the
+machinery is broken) comes out of the settlement's stores once, as a `STORES_CHANGE` like every
+other draw — one ledger for what is made, used and eaten; rationing is who gets what, never a
+second draw. Output goes into the stores (`STORES_CHANGE`); the stall reasons say why a workplace
+stood: `unstaffed`, `broken`, `no_<input>`. **Cover**: a missed shift pulls the least-worked qualified, able,
 non-human teen or adult whose own shifts do not overlap (`pick_cover`); the cover's own post loses
 0.25 efficiency (core CAS-003) and regains 0.25 per cycle once nobody of that post is covering
 elsewhere; the cover is released (`ROLE_RELEASED`) when the covered worker is able again. A dead
@@ -195,11 +199,15 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Tension** is directional, per actor or group toward an actor or group (0–100, boiling point
   70). Crossing the boiling point upward is an `ESCALATION` (form `verbal` in P9; physical forms
   from dossiers arrive with doctrine, P10) and adds 1 resentment toward the other side — for a
-  group, its leader. Tension untouched for a day decays by 5.
+  group, its leader — and (B6, fidelity C06) a grudge the person now carries, "Things between them
+  and me are about to boil over": what they do about it is their own decision, made like any
+  other (never for the player, whose feelings are the player's). Tension untouched for a day
+  decays by 5.
 - **Animosity at work**: for each crew pair where one resents the other at ≥ 2, the one who
   resents rolls an I check against resistance = resentment, situation from their current Resolve.
   `fail` → the cycle's output ×0.9 and +10 tension; `break` → ×0.75 and +20 tension. The PC never
-  rolls for this.
+  rolls for this. The roll costs composure and execution only: no die ever chooses a refusal,
+  sabotage, a betrayal or a change of values (C06).
 - **Drift without the PC** (SOC-02): once a day, every pair of non-human members who share a
   household, a workplace or a friendship drifts, one axis step at a time — a sour tie (resentment
   ≥ 1 or trust ≤ −1) may sour further (30 %), a healthy tie may gain trust (25 %) and housemates
@@ -481,7 +489,8 @@ universally known nor confined to the conversation partner.
 
 **Rumours** (`world/rumours.py`, INFO-01..07). A rumour is a proposition passed from mind to mind —
 "X claims Y", never a truth (INFO-03). It starts with a *seed*: someone who saw or overheard it
-(provenance `overheard`, confidence 3 by default; core CAS-012 seeds one from a witnessed theft,
+(provenance `overheard`, confidence 3 by default; core CAS-012 seeds one in whoever saw someone take
+what they know belongs to another — B6, the `theft_witnesses_of` selector —,
 CAS-013 from an off-screen death). Every hop after that is **told**, through the single knowledge
 writer (`mind.perception.grant`): the listener gets a speech percept and a claim holding with
 provenance `told_by:<teller>` and confidence one lower than the teller's (INFO-02; SKULL-05 — C

@@ -6,10 +6,12 @@ Skill decides who can cover a post; an injury decides who cannot.
 
 from __future__ import annotations
 
+import json
 import math
 
 import pytest
 
+from as_engine.contracts.events import Event, EventType, WriteOp, WriteRecord
 from as_engine.kernel import clock
 from as_engine.society import work
 
@@ -92,7 +94,44 @@ def test_worn_machinery_makes_less(settle):
     assert (e.payload["old"], e.payload["new"], e.payload["reason"]) == (70, 30, "cascade")
     run(w, 1.5)
     p = [r for r in rows(w, "PRODUCTION_CYCLE") if r["payload"]["site_type"] == "water_pump"][0]["payload"]
-    assert p["condition_factor"] == 0.8 and p["output"] == {"water": math.floor(31 * 0.8 + 1e-9)}
+    assert p["condition_factor"] == 0.6 and p["output"] == {"water": math.floor(31 * 0.6 + 1e-9)}, \
+        "B6 (C04): 30 of the 50 full output needs is three fifths, never half for nothing"
+
+
+def test_broken_machinery_makes_nothing(settle):
+    """WORK-05 (B6, fidelity C04): at condition 0 the pump is broken — no water, nothing burned,
+    and the stall says why."""
+    w = settle
+    with w.store.transaction() as tx:
+        work.adjust(tx, w.id("pump"), "machinery_condition", -500, now(w), 0, None)
+    run(w, 1.5)
+    first = [r for r in rows(w, "PRODUCTION_CYCLE") if r["payload"]["site_type"] == "water_pump"][0]
+    assert (first["payload"]["condition_factor"], first["payload"]["output"], first["payload"]["inputs_used"]) == (0.0, {"water": 0}, {})
+    assert json.loads(workplace(w, "pump")["stall_reasons"]) == ["broken"]
+    assert not [r for r in rows(w, "STORES_CHANGE") if r["cause_event_id"] == first["event_id"]]
+
+
+def test_a_pump_runs_on_what_it_has(settle):
+    """WORK-05 (B6, fidelity C04): a fuelled pump burns its fuel out of the settlement's stores —
+    one draw, in the same ledger as everything else — makes what the fuel allows, and stops when
+    the fuel is gone."""
+    w = settle
+    with w.store.transaction() as tx:
+        tx.commit_event(Event(type=EventType.WORKPLACE_CHANGE, writer="society.work", at=now(w), turn_index=0,
+                              payload={"workplace_id": w.id("pump"), "field": "inputs", "reason": "test"},
+                              writes=[WriteRecord(op=WriteOp.UPDATE, table="workplaces", key={"workplace_id": w.id("pump")},
+                                                  values={"inputs": {"fuel": 30}})]))
+    run(w, 30)
+    cyc = [r for r in rows(w, "PRODUCTION_CYCLE") if r["payload"]["site_type"] == "water_pump"][:3]
+    got = [(c["payload"]["input_factor"], c["payload"]["inputs_used"], c["payload"]["output"]) for c in cyc]
+    third = round(10 / 30, 10)
+    assert [(round(f, 10), u, o) for f, u, o in got] == [
+        (1.0, {"fuel": 30.0}, {"water": 31}),
+        (third, {"fuel": 10.0}, {"water": math.floor(31 * (10 / 30) + 1e-9)}),
+        (0.0, {}, {"water": 0})], "40 fuel: a full cycle, a third of one, then nothing"
+    drawn = [r["payload"]["changes"] for r in rows(w, "STORES_CHANGE") if r["payload"]["reason"] == "production_input"]
+    assert drawn == [{"fuel": -30}, {"fuel": -10}]
+    assert json.loads(workplace(w, "pump")["stall_reasons"]) == ["no_fuel"]
 
 
 def test_adjust_clamps_and_refuses(settle):

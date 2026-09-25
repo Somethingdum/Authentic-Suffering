@@ -183,3 +183,26 @@ def horizon(tx, pc_intent, t0):
 
 def pull(horizon_ms, trigger_at, last_event_at):
     return min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at))
+
+
+def reached(tx, events, turn_index):
+    # SEL-07 (B6, C08): who a wave's sounds reach, wherever they are
+    from ..contracts.common import Fidelity
+    from ..sense import acoustics
+    rules = tx.rules.acoustics
+    heard = set()
+    for e in sorted(events, key=lambda x: x.seq or 0):
+        if str(e.type) not in ("NOISE", "SPEECH") or e.payload.get("source_db") is None:
+            continue
+        try:
+            src = acoustics.source_point(tx, e.payload, e.actor_id)
+        except ValueError:
+            continue
+        for rec in acoustics.receptions(tx, e.payload["source_db"], src, e.at, rules,
+                                        exclude={e.actor_id} if e.actor_id else set()):
+            if rec.fidelity != Fidelity.NONE or rec.wakes:
+                heard.add(rec.listener_id)
+    if not heard:
+        return []
+    people = {r[0] for r in tx.query("SELECT actor_id FROM actors")}
+    return sorted(heard & people)

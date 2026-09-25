@@ -633,6 +633,33 @@ def evaluate_precondition(tx, expr, trigger):
     return True
 
 
+def _theft_witnesses(tx, event_id):
+    # CAS-05 (B6): who saw the taking clearly and knows the thing is someone else's
+    ev = _row(tx, "SELECT type, actor_id, payload FROM events WHERE event_id=?", (event_id,))
+    if ev is None or ev["type"] != "ITEM_TRANSFER" or not ev["actor_id"]:
+        return []
+    pl = json.loads(ev["payload"])
+    taker = ev["actor_id"]
+    to = pl.get("to") or {}
+    if to.get("kind") != "body" or to.get("id") != taker:
+        return []
+    theirs = {taker}
+    theirs |= {r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (taker,))}
+    theirs |= {r[0] for r in tx.query("SELECT group_id FROM group_members WHERE actor_id=?", (taker,))}
+    out = []
+    for (holder,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND fidelity IN ('exact','partial') "
+                              "ORDER BY holder_id", (event_id,)):
+        if holder == taker:
+            continue
+        owners = [r[0] for r in tx.query(
+            "SELECT p.object_value FROM claim_holdings h JOIN propositions p ON p.prop_id=h.claim_id WHERE h.holder_id=? "
+            "AND h.superseded_by IS NULL AND h.believed=1 AND p.subject_type='object' AND p.subject_id=? AND p.predicate='owner'",
+            (holder, pl.get("item_id")))]
+        if any(o and o not in theirs for o in owners):
+            out.append(holder)
+    return out
+
+
 def select(tx, selector, trigger):
     m = re.match(r"^(\w+)\((.*)\)$", selector.strip())
     if not m:
@@ -648,6 +675,8 @@ def select(tx, selector, trigger):
         return [r["place_id"]] if r else []
     if fn == "witnesses_of":
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
+    if fn == "theft_witnesses_of":
+        return _theft_witnesses(tx, v)
     if fn == "active_task_of":
         from ._impl_p5a import active_task
         t = active_task(tx, v)

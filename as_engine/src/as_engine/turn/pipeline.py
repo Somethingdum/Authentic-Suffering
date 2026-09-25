@@ -98,7 +98,8 @@ simulate — stages 0-12 in ONE store transaction:
     S9 propagate: += action.propagate.propagate(tx, events, wave_at, T).
     S10 cascade: += action.cascade.sweep(tx, events, canon cascade rules, wave_at, T).
     S11 reactions: EVERYONE = select.candidates(...) + the PC + this wave's perceivers. perceive(E):
-       perception.compile_aftermath(tx, h, E, max(e.at for e in E, t0), T) for each of EVERYONE,
+       perception.compile_aftermath(tx, h, E, max(e.at for e in E, t0), T) for each of EVERYONE
+       and (B6, SEL-07) each of select.reached(tx, E, T) — whoever E's sounds reach, anywhere,
        then the PC-material pull as in S3. perceive(the wave's events); (next_at, holders) =
        NEXT(the wave's events). Then the timers inside the window, one at a time: while
        clock.due_between(tx, -1, next_at or horizon) is not empty: fire its first row, dispatch it

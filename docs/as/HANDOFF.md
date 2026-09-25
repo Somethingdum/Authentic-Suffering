@@ -10,7 +10,7 @@ the DSH builder; delete it when P12 ships.
 2026-09-24: "Commit all of your working code"; 2026-09-25: "If you're making implementations,
 throw them into the final system, don't waste compute."). The bodies are the `_impl_*.py` files
 bound at the end of each contract module (AGENTS.md §4), plus the modules built in place. Built:
-P0–P10, the sim soak, Actor v2 B1–B5d (D-87..D-91) and the owner's F1a, F1b, H1, I1, W1 and F1c
+P0–P10, the sim soak, Actor v2 B1–B6 (D-87..D-93) and the owner's F1a, F1b, H1, I1, W1 and F1c
 (D-77, D-80, D-82..D-86). Every engine contract test passes except the seven D-76 items (the
 sessions browser and a world that names no run), which the DSH builder builds. The P10 screens of
 the Play UI are in `talemate_frontend/src/play/`; the P8 screens, the Talemate plugin and the
@@ -19,9 +19,10 @@ frontend toolchain are not built — the DSH builder builds them (13_BUILD_ORDER
 **From here on the kit-maker writes contracts, tests, docs — and, where it implements to prove
 them, the implementation itself, committed with them** (the owner's 2026-09-25 instruction
 replaces "the rest will remain uncoded"). What is left:
-1. **Actor v2 step 6** — B6, the society and wake fixes (fidelity C04, C06, C08; the known
-   CAS-012 fault below); then Actor Spec §12's plans with stable keys and delegation (a leader's
-   orders the recipient decides on) and §11's conversations.
+1. **Actor v2** — B6 is BUILT (D-93; tests 12 §3.15: work output gated by machinery and inputs,
+   a boiling-over feud becomes a grudge the person decides about, far sounds are heard, the
+   witnessed-theft rumour fires). Left: Actor Spec §12's plans with stable keys and delegation (a
+   leader's orders the recipient decides on) and §11's conversations.
 2. **P11** — the audits (§5).
 3. **P12** — the surfaces (§5), with the **full cheat system** the owner described: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
@@ -84,8 +85,6 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   group talk, distinct voices.
 - **Willis / the cheat cure** (D-78, D-79) — with P12's cheat system.
 
-Known fault for step 6 (B6): CAS-012 (a witnessed theft becomes a rumour) can never fire — an
-ITEM_TRANSFER payload has no moral_tag or witness_count. Write the fix as a contract change.
 
 ## 1. How the kit is made (the method to keep using)
 

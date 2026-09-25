@@ -124,7 +124,8 @@ for each wave w (0..cap; cap 3, 1 in the strict retry):
     S3 perceive  -> S4 select -> S5 afford -> S6 cognition (the PC's intent joins at wave 0)
     -> S7 barrier -> S8 resolve (+ how each mind answered what it was asked)
     -> S9 propagate -> S10 cascade
-    S11: everyone in the area perceives the wave's events (compile_aftermath); the PC's material
+    S11: everyone in the area — and, B6 (SEL-07, fidelity C08), whoever the wave's sounds reach,
+         wherever they are — perceives the wave's events (compile_aftermath); the PC's material
          percepts pull the horizon; holders with MATERIAL new percepts (reactions.material_holders,
          the PC excluded — the player answers next turn) react at trigger + 150–250 ms (+400 ms
          drowsy or focused); timers due before that (or before the horizon) fire first, one at a

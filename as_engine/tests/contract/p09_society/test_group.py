@@ -42,13 +42,26 @@ def test_tension_rises_boils_over_and_leaves_resentment(settle):
     assert group.tension_of(w.store, b, a) == 0                               # tension is one-way
     with w.store.transaction() as tx:
         ev = group.adjust_tension(tx, a, b, 15, "he did it again", now(w), 0, None)
-    assert [e.type for e in ev] == [EventType.TENSION_CHANGE, EventType.ESCALATION, EventType.RELATION_CHANGE]
+    assert [e.type for e in ev] == [EventType.TENSION_CHANGE, EventType.ESCALATION, EventType.RELATION_CHANGE,
+                                    EventType.LOOP_OPENED]
     assert ev[1].payload == {"a_id": a, "b_id": b, "form": "verbal", "score": 75} and ev[1].cause_event_id == ev[0].event_id
     assert rel(w, "jude", "amos")["resentment"] == 1
+    # B6 (fidelity C06): boiling over is something Jude now carries and decides about, not a dice-chosen act
+    assert (ev[3].payload["kind"], ev[3].payload["subject_ids"], ev[3].cause_event_id) == ("grudge", [b], ev[1].event_id)
+    assert ev[3].payload["text"].startswith("Things between ") and ev[3].payload["text"].endswith(" and me are about to boil over.")
     with w.store.transaction() as tx:
         assert group.adjust_tension(tx, a, b, 50, "x", now(w), 0, None)[0].payload["new"] == 100
         assert group.adjust_tension(tx, a, b, 5, "x", now(w), 0, None) == []   # already at 100
         assert [e.type for e in group.adjust_tension(tx, a, b, -40, "x", now(w), 0, None)] == [EventType.TENSION_CHANGE]
+
+
+def test_the_players_feelings_are_the_players(settle):
+    """GRP-02 (B6): the PC boils over like anyone — the resentment is recorded — but no grudge
+    is opened for them: what the player carries is the player's."""
+    w = settle
+    with w.store.transaction() as tx:
+        ev = group.adjust_tension(tx, w.id("pc"), w.id("amos"), 80, "he shoved me", now(w), 0, None)
+    assert [e.type for e in ev] == [EventType.TENSION_CHANGE, EventType.ESCALATION, EventType.RELATION_CHANGE]
 
 
 def test_boiling_over_toward_a_group_turns_on_its_leader(settle):

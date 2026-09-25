@@ -1,5 +1,5 @@
 """Who takes part in a wave, who must think, and how long the turn runs (P7, stage 4 and the
-horizon). Rules SEL-01..06, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
+horizon). Rules SEL-01..07, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.
 Pure reads (nothing here commits an event). May read any table: selection is scheduling, not a
 mind, so the Skull law does not apply here — but nothing here is ever shown to a mind.
 
@@ -23,6 +23,18 @@ SEL-01 candidates(tx, pc_id, turn_index, horizon_ms) -> list[str]   (sorted acto
   perceives).
 SEL-06 The PC is never a candidate, never planned and never reacts: the player decides for the PC
   (the pipeline passes exclude={pc} to action.reactions.next_wave).
+
+SEL-07 (Actor v2 B6, fidelity C08: wake distant recipients by causal reach) reached(tx, events,
+  turn_index) -> list[str]   (sorted actor ids)
+  The active area is where the moment is; a sound goes as far as it goes. For each NOISE or SPEECH
+  event of ``events`` with a payload.source_db, in seq order: sense.acoustics.receptions(tx,
+  source_db, sense.acoustics.source_point(tx, payload, event.actor_id), event.at, the run's
+  acoustic rules, exclude = {event.actor_id}) — each listener whose fidelity is not NONE, or who
+  wakes — keeping those with an actors row (people, not the dead or the infected), each once.
+  A sound with no source point reaches nobody. Only what a sound reaches is looked at: nobody
+  thinks for the whole city. The pipeline perceives each wave's events for these people too
+  (turn.pipeline S11), so a gunshot three streets away reaches the people who hear it, and
+  action.reactions decides whether they react.
 
 SEL-05 conscious(tx, actor_id) -> bool
   bodies.alive = 1 and awareness in ('awake', 'drowsy'). Only conscious candidates are planned,
@@ -97,6 +109,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ..action.intent import Intent
+    from ..contracts.events import Event
     from ..kernel.store import Tx
 
 MANDATORY_CUES: tuple[str, ...] = ("weapon_pointed", "infected_close", "grabbed_from_behind", "addressed_by_name",
@@ -138,6 +151,10 @@ def horizon(tx: "Tx", pc_intent: "Intent", t0: int) -> int:
 
 
 def pull(horizon_ms: int, trigger_at: int, last_event_at: int) -> int:
+    raise NotImplementedError("P7")
+
+
+def reached(tx: "Tx", events: list["Event"], turn_index: int) -> list[str]:
     raise NotImplementedError("P7")
 from ._impl_select import *  # noqa
 from ._impl_select import _row  # noqa

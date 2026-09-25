@@ -254,6 +254,15 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p06_memory/test_promises.py` | the words (categories, statuses, what an ask promises); each holds their own understanding, once; nobody holds what they never heard, words someone else said, or anything but words; an agreement only when both understandings agree, and then both stand accepted; different understandings make none; a status moves only forward; taking it back is withdrawn; kept against broken is disputed on both sides, with no liar and the promisee's own PROMISE_BROKEN; the packet line says how it stands; what Owen took from Mara's words is his own understanding, and a promise he never said is the loop alone |
 | `p07_slice/test_answers.py` (amended) | a yes with a condition is her accepted promise about the door, on its condition; a yes and a step toward it is under way; a question back and an unresolved yes promise nothing |
 
+### 3.15 Work output, feuds, far sounds, witnessed theft (Actor v2 B6; D-93)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_work.py` (amended) | worn machinery makes its share of full output, never half for nothing; broken machinery makes nothing and burns nothing; a fuelled pump draws its fuel once, in the same ledger, makes what the fuel allows and stops when it is gone |
+| `p09_society/test_group.py` (amended) | boiling over leaves a grudge the person carries; the player's feelings are the player's |
+| `p07_slice/test_far_hearing.py` | the moment ends at the street but a shot reaches the shop, never the sealed cellar; the one in the shop perceives it in a played turn |
+| `p09_society/test_theft_seen.py` | only who saw the taking and knows whose it is carries the rumour; talk spreads from them; taking one's own, or moving a thing, is no theft |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

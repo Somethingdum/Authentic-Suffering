@@ -221,7 +221,7 @@ async def _after_wave(ctx, tx, evs, wave_idx, max_waves, perceivers):
 
     def perceive(events):
         last = max([e.at for e in events] + [ctx.t0])
-        for h in everyone:
+        for h in sorted(set(everyone) | set(select.reached(tx, events, T))):   # SEL-07 (B6, C08)
             perception.compile_aftermath(tx, h, events, last, T)
         for h, trig in reactions.material_holders(tx, events, T):
             if h == s.pc_id:

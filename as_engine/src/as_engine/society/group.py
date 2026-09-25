@@ -20,7 +20,11 @@ GRP-02 adjust_tension(tx, a_id, b_id, delta, cause_text, at, turn_index, cause_e
   Crossing upward (old < boiling_point <= new): ESCALATION {a_id, b_id, form: 'verbal', score}
   (cause = the TENSION_CHANGE); then, when a_id is an actor and the other side is a living actor
   — b_id itself, or the group's leader_of when b_id is a group — and they differ:
-  mind.mind.relate(tx, a_id, other, 'resentment', 1, the ESCALATION id, at, turn_index).
+  mind.mind.relate(tx, a_id, other, 'resentment', 1, the ESCALATION id, at, turn_index); then
+  (Actor v2 B6, fidelity C06: tension makes a decision, never a dice-chosen act) when a_id is not
+  human-controlled: mind.mind.open_loop(tx, a_id, 'grudge', 'Things between {subject} and me are
+  about to boil over.', [other], 1, the ESCALATION id, at, turn_index) — the person now carries it
+  and decides what to do about it (LOOP-02 keeps one; the player's feelings are the player's).
   Returns the events committed, in seq order.
 GRP-03 contacts(store, actor_id, group_id) -> list[str]: living members of the group other than
   the actor who share a household with them (society.household), or have a work_assignments row
@@ -72,7 +76,9 @@ GRP-09 animosity(tx, rng, actor_ids, workplace_id, at, turn_index, cause_event_i
   clamp(actors.resolve_cur - 3, -3, 3), resistance = resentment, at=at, turn_index=turn_index,
   cause_event_id=cause_event_id). Band 'fail' -> spite *= 0.9 and adjust_tension(x, y, 10,
   'forced to work together', ...); 'break' -> spite *= 0.75 and adjust_tension(x, y, 20, ...).
-  Returns round(spite, 2).
+  Returns round(spite, 2). (B6, fidelity C06) The roll only costs composure (tension) and
+  execution (the crew's output); it never chooses a refusal, sabotage, betrayal or a change of
+  values — what a person does about someone they resent is their own decision (GRP-02's grudge).
 GRP-10 day(tx, rng, row, fired, turn_index) -> list[Event]   (the GROUP_DAY handler, daily at
   R.group_hour). g = row['subject_id'], at = row['due_at']. GD = GROUP_DAY {group_id, members:
   living members, pairs: len(pairs)} (cause = fired) writing groups.next_due_at = at + DAY. Then,
