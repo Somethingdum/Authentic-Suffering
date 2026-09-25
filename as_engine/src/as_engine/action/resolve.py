@@ -1,4 +1,4 @@
-"""Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents
+"""Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents
 turn into state change (L2). Writer of ACTION_START / ACTION_COMPLETE / ACTION_BLOCKED /
 ACTION_INTERRUPT / CHECK_RESOLVED: 'action.resolve' (no table writes of its own).
 
@@ -59,6 +59,14 @@ say_pending(tx, row, turn_index) -> list[Event]   (SEG-03..04)
   segment in row.payload is said (one SPEECH, cause = the utterance's start) when SEG-04 allows;
   else the SPEECH_CUT, and the utterance's later SPEECH_SEGMENT rows are cancelled (reason
   'speech_cut'). Returns the events committed.
+broken_words(tx, rng, speaker, text, at) -> str
+  RESOLVE-07 (D-107) "They have little capacity to speak ... rationally." When the speaker speaks
+  broken (physical.bodies.speaks_broken(tx, speaker, at) — a shattered mind, or a broken one in its
+  first hours) step 1 splits and says this instead of the intent's words: words = text.split()
+  (none -> text as it is); keep = rng.range_int(tx, 'doom', f"words:{speaker}:{at}", 1,
+  max(1, min(4, (len(words) + 1) // 2))); pieces = the first ``keep`` words, each stripped of
+  , . ; : ! ? and quotes, and the last one said again when rng.chance(tx, 'doom',
+  f"again:{speaker}:{at}", 0.5); -> "— ".join(pieces) + "—" ("Mara— the— the—").
 land_pending(tx, rng, row, turn_index, *, horizon_ms) -> list[Event]
   The ACTION_LAND handler (kernel.clock dispatch; the caller has already committed TIMER_FIRED
   via clock.fire): rebuild the Intent from row.payload, land it at row.due_at exactly as step 2
@@ -88,4 +96,9 @@ def say_pending(tx: "Tx", row: dict, turn_index: int) -> list["Event"]:
 
 def land_pending(tx: "Tx", rng: "Rng", row: dict, turn_index: int, *, horizon_ms: int) -> list["Event"]:
     raise NotImplementedError("P5")
+
+
+def broken_words(tx: "Tx", rng: "Rng", speaker: str, text: str, at: int) -> str:
+    raise NotImplementedError("P12")
 from ._impl_p5b import resolve_wave, land_pending  # noqa
+from ._impl_p5b import broken_words  # noqa

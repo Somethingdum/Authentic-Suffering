@@ -328,8 +328,11 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
             from .intent import segments as _segs
             R = tx.rules.acoustics
             vol = i.speech.volume.value if hasattr(i.speech.volume, "value") else i.speech.volume
-            segs = _segs(i.speech.text)
-            nwords = len(i.speech.text.split())
+            from ..physical.bodies import speaks_broken
+            text = broken_words(tx, rng, i.actor_id, i.speech.text, wave_at) if speaks_broken(tx, i.actor_id, wave_at) \
+                else i.speech.text   # RESOLVE-07 (D-107)
+            segs = _segs(text)
+            nwords = len(text.split())
             say_at = wave_at
             if i.speech.timing == "after" and d.effect != "speak":
                 la = wave_at if d.duration.condition_ended else land_ms(wave_at, i.bound.est_duration_s - nwords / 2.5)
@@ -380,6 +383,18 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
             if not _say(tx, speaker, pl, sid, due, turn_index):
                 cut_off.add(pl["utterance_id"])
     return _events_since(tx, first)
+
+
+def broken_words(tx, rng, speaker, text, at):
+    """What comes out of a broken mind (RESOLVE-07, D-107)."""
+    words = text.split()
+    if not words:
+        return text
+    keep = rng.range_int(tx, "doom", f"words:{speaker}:{at}", 1, max(1, min(4, (len(words) + 1) // 2)))
+    pieces = [w.strip(",.;:!?\"'") or w for w in words[:keep]]
+    if rng.chance(tx, "doom", f"again:{speaker}:{at}", 0.5):
+        pieces.append(pieces[-1])
+    return "\u2014 ".join(pieces) + "\u2014"
 
 
 def _say(tx, speaker, pl, sid, due, turn_index):

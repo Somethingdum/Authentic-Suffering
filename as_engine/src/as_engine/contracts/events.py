@@ -52,6 +52,7 @@ class EventType(StrEnum):
     INFECTION_STAGE = "INFECTION_STAGE"
     DEATH = "DEATH"
     DOOM = "DOOM"   # D-106: the moment a person's death became certain (physical.bodies DOOM-01..05)
+    DOOM_CHANGE = "DOOM_CHANGE"   # D-107: the screaming starts, a shattered mind's first hours pass (DOOM-09, DOOM-11)
     FALSE_DEATH = "FALSE_DEATH"
     REANIMATION = "REANIMATION"
     AWARENESS_CHANGE = "AWARENESS_CHANGE"
@@ -190,7 +191,7 @@ _groups: dict[EventClass, list[str]] = {
                           "WEATHER_CHANGE", "PLACE_DISCOVERED", "PLACE_CHANGE", "ITEM_WEAR",
                           "ITEM_CONTAMINATED"],
     EventClass.BODY: ["HARM", "WOUND_PROGRESS", "TREATMENT", "NEED_STAGE", "INFECTION_EXPOSURE",
-                      "INFECTION_STAGE", "DEATH", "DOOM", "FALSE_DEATH", "REANIMATION", "AWARENESS_CHANGE", "BODY_CONDITION",
+                      "INFECTION_STAGE", "DEATH", "DOOM", "DOOM_CHANGE", "FALSE_DEATH", "REANIMATION", "AWARENESS_CHANGE", "BODY_CONDITION",
                       "IMPAIRMENT_CHANGE", "RESOLVE_CHANGE", "POSTURE_CHANGE"],
     EventClass.ACTION: ["ACTION_START", "ACTION_COMPLETE", "ACTION_INTERRUPT", "ACTION_BLOCKED",
                         "TASK_STEP", "CONTROL_ESTABLISH", "CONTROL_RELEASE", "CHECK_RESOLVED", "INVOLUNTARY"],

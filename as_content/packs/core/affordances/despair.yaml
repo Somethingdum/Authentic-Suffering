@@ -1,0 +1,31 @@
+# The end of the rope (D-107). The owner: "they can't take it and kill themselves (real reaction)."
+# Offered only to someone who can't take any more: a doomed mind the talk has marked, or anyone at
+# Resolve 0 (requires.despair) — and allowed at Resolve 0 (tag 'despair', mind.resolve RES-03). A
+# model's choice of it is judged before it lands (moral tag end_own_life, audit.portrayal); a
+# dossier can refuse it outright (wont_tags). physical.bodies.end_own_life is the act.
+- schema: as.affordance.v1
+  id: end_life_firearm
+  verb: manipulate
+  label: "Put {item} to your head and end it"
+  ui_label: "End it with the {item}"
+  binds: item_held
+  range: self
+  requires: {held_item_tags: [firearm], despair: true}
+  moral_tags: [end_own_life]
+  duration: {base_s: 3}
+  noise_db: 0
+  effect: end_own_life
+  tags: [despair]
+- schema: as.affordance.v1
+  id: end_life_blade
+  verb: manipulate
+  label: "Turn {item} on yourself and end it"
+  ui_label: "End it with the {item}"
+  binds: item_held
+  range: self
+  requires: {held_item_tags: [blade], despair: true}
+  moral_tags: [end_own_life]
+  duration: {base_s: 30}
+  noise_db: 10
+  effect: end_own_life
+  tags: [despair]

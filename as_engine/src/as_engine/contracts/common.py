@@ -194,6 +194,7 @@ class MoralTag(StrEnum):
     EAT_HUMAN = "eat_human"
     LIE_TO_FAMILY = "lie_to_family"
     FEED_TO_DEAD = "feed_to_dead"   # H1: shove someone to the dead, or leave them for them, to save yourself
+    END_OWN_LIFE = "end_own_life"   # D-107: the one thing left to someone who can't take any more
 
 
 # ---------------------------------------------------------------------------

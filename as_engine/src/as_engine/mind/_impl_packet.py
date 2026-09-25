@@ -150,8 +150,12 @@ def _body_lines(tx, actor_id):
     if 1 <= i <= 2: out.append("Everything is harder than it should be.")
     elif 3 <= i <= 4: out.append("You are struggling to function.")
     elif i >= 5: out.append("You can barely function.")
-    from ..physical.bodies import stages
+    from ..physical.bodies import mind_of, stages
     out += [st.felt for _pw, st in stages(tx, actor_id) if st.felt]
+    m = mind_of(tx, actor_id)
+    if m is not None:   # D-107
+        from .packet import MIND_LINES
+        out.append(MIND_LINES[m])
     out = out or ["Unhurt."]
     st = _row(tx, "SELECT stress FROM actors WHERE actor_id=?", (actor_id,))
     s = st["stress"] if st else 0

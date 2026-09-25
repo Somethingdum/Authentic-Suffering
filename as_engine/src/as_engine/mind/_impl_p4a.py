@@ -58,7 +58,7 @@ def recent_lines(store, actor_id, n):
 
 # ---------------------------------------------------------------- resolve
 _RECOVER = {"safe_night": "recover_per_safe_night", "fulfilled_obligation": "recover_fulfilled_obligation",
-            "protected_dependent": "recover_protected_dependent"}
+            "protected_dependent": "recover_protected_dependent", "shock_passes": "recover_shock_passes"}
 
 
 def _resolve_change(tx, actor_id, new, delta, reason, cause, at, ti):
@@ -84,16 +84,39 @@ def recover(tx, actor_id, reason, cause_event_id, at, turn_index):
         raise ValueError(f"unknown recovery {reason}")
     a = _row(tx, "SELECT resolve_cur, resolve_max FROM actors WHERE actor_id=?", (actor_id,))
     new = min(a["resolve_max"], a["resolve_cur"] + getattr(R, _RECOVER[reason]))
+    cap = ceiling(tx, actor_id)
+    if cap is not None:
+        new = min(new, max(cap, a["resolve_cur"]))
     if new == a["resolve_cur"]:
         return None
     return _resolve_change(tx, actor_id, new, new - a["resolve_cur"], reason, cause_event_id, at, turn_index)
+
+
+def the_talk(tx, actor_id, mind, cause_event_id, at, turn_index):
+    a = tx.query_one("SELECT resolve_cur FROM actors WHERE actor_id=?", (actor_id,))
+    if a is None:
+        return None
+    cur = a[0]
+    new = {"shattered": 0, "broken": min(cur, 1)}.get(mind, max(0, cur - tx.rules.resolve.drains["the_talk"]))
+    if new == cur:
+        return None
+    return _resolve_change(tx, actor_id, new, new - cur, "the_talk", cause_event_id, at, turn_index)
+
+
+def ceiling(store_or_tx, actor_id):
+    d = store_or_tx.query_one("SELECT mind, shock_over FROM dooms WHERE body_id=?", (actor_id,))
+    if d is None:
+        return None
+    if d[0] == "shattered":
+        return 1 if d[1] else 0
+    return 1 if d[0] == "broken" else None
 
 
 def gate(resolve_cur, definition, authority_name=None):
     tags = set(definition.tags)
     if resolve_cur <= 0:
         ok = definition.verb in (Verb.FLEE, Verb.ESCAPE, Verb.SURRENDER, Verb.WAIT, Verb.OBSERVE, Verb.SPEAK, Verb.TAKE_COVER,
-                                 Verb.HIDE) or bool(tags & {"protect_dependent", "comply_under_threat", "low_exposure"})
+                                 Verb.HIDE) or bool(tags & {"protect_dependent", "comply_under_threat", "low_exposure", "despair"})
         return ok, None
     if resolve_cur == 1:
         return (not definition.requires.fear_exposure), None

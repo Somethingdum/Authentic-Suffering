@@ -141,6 +141,10 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | the Doom scene | what the PC lives through at its doom: the frozen moment, Willis, the thing that takes him, the Voice (VOICE-01) | — | cutscene |
 | the Voice | the one who speaks in the Doom scene after Willis is taken: unnamed on every screen and in every prompt (canon: `docs/as/sources/THE_VOICE.md`) | — | narrator, god |
 | the loan | the console's power used by anyone but Willis: it is his; he mocks them twice as hard and collects after the death (D-106) | — | — |
+| the screaming | since the Fall most people scream a short while before they die, and nobody knows why — the public knowledge of the Doom (DOOM-09; lore the_screaming) | "the scream people make before they die" | death rattle |
+| what the talk left | the mark the Voice leaves on a doomed mind: shattered, broken or held (dooms.mind, DOOM-10, RES-06/07) | — | trauma level |
+| the bitten doom | the Voice's cruelty: a doom at the bite, four weeks to live with it (DOOM-12) | — | — |
+| despair | a doomed mind's daily reckoning (turn.cognition.despair) and the end of the rope (requires.despair) that puts ending it on the menu (DOOM-14/15) | "End it with the …" | — |
 | seal | the guard that lets the game talk only to this machine and the owner's model machines (02 §9, SEAL-01..05) | — | firewall, sandbox |
 | Act / Say / Cheat | the Play input's three fields, sent together as `turn_compose`; Cheat only while the console is open (D-103) | "Act", "Say", "Cheat" | Do box |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |

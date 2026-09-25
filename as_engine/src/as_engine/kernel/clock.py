@@ -92,6 +92,7 @@ QUEUE_TYPES: dict[str, str] = {
     "LOYALTY_CHECK": "society.group",     # payload {actor_id, group_id, reason} (group benefit check at a crisis)
     "ACTION_LAND": "action.resolve",      # payload {intent: action.intent.intent_to_dict(...), start_event_id} (P5)
     "SPEECH_SEGMENT": "action.resolve",   # payload {the SPEECH payload of one segment} (P5, SEG-03: action.resolve.say_pending)
+    "DESPAIR": "turn.cognition",          # payload {body_id} (D-107 DOOM-14: can a doomed mind take another day of it)
 }
 
 # P9: the background life of a place — a settlement's shifts, draws, routines and group days, and
@@ -104,6 +105,7 @@ BACKGROUND_QUEUE_TYPES: frozenset[str] = frozenset({
     "ROUTINE_STEP", "PRODUCTION_CYCLE", "SETTLEMENT_DAY", "GROUP_DAY", "LOYALTY_CHECK",
     "CASCADE_EFFECT", "TRACE_DECAY",
     "WORLD_DAY", "OPERATION_STEP", "INFECTED_STEP", "REANIMATION", "HORDE_STEP", "POOL_RISE", "COUNCIL",
+    "DESPAIR",
 })
 
 

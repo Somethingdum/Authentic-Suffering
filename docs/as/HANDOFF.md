@@ -37,7 +37,9 @@ replaces "the rest will remain uncoded"). What is left:
    the dead felt it, their choices, Willis roasting them from their own record, the truth only on
    the button), and so are the Doom and the Voice (D-106: the moment a death becomes certain the
    world stops; Willis comes and is taken; a voice with no name walks the dead through their
-   chain; the doomed scream and cannot tell why; the console is Willis's power on loan); still to do: a new life here and the rest below. The owner's list was: overwriting an
+   chain; the doomed scream and cannot tell why; the console is Willis's power on loan; D-107: the
+   screaming is public knowledge and nothing more, the talk shatters or breaks most minds, the Voice
+   sometimes dooms at the bite, and some can't take it); still to do: a new life here and the rest below. The owner's list was: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

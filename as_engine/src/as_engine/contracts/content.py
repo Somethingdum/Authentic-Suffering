@@ -156,6 +156,8 @@ class AffordanceRequires(Strict):
     infected_within_m: float | None = Field(default=None, gt=0, description="H1: offered only while the actor sees "
                                             "one of the dead (a visual percept this turn, clear or partial, of an "
                                             "infected body) within this many metres of it.")
+    despair: bool = Field(default=False, description="D-107: offered only to someone who can't take any more — a "
+                          "doomed mind the talk has marked (physical.bodies.mind_of) or Resolve at 0.")
 
 
 class DurationSpec(Strict):

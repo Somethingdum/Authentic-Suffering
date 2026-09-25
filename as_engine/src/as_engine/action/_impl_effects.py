@@ -1439,6 +1439,17 @@ def refill(tx, rng, container_id, at, cause_event_id, turn_index):
                   cause_event_id, turn_index)
 
 
+def h_end_own_life(tx, rng, intent, land_at, ctx, d):
+    """D-107: the act (physical.bodies.end_own_life)."""
+    from ..physical.bodies import end_own_life
+    evs = end_own_life(tx, rng, intent.actor_id, intent.bound.item_id, land_at, ctx.turn_index, ctx.start_event_id)
+    if not evs:
+        return _done("blocked")
+    if evs[-1].type == EventType.NOISE:
+        return _done("click")
+    return _done("done")
+
+
 HANDLERS = {
     "move_to_anchor": h_move_to_anchor, "move_through_portal": h_move_through_portal, "follow_body": h_follow_body,
     "leave_place": h_leave_place, "flee": h_flee, "climb": h_climb,
@@ -1453,6 +1464,7 @@ HANDLERS = {
     "continue_task": h_continue, "speak": h_speak, "signal": h_signal, "surrender": h_surrender,
     "treat_wound": h_treat, "apply_tourniquet": h_treat, "eat": h_eat, "drink": h_eat, "throw_distraction": h_throw,
     "wonder_smite": h_wonder_smite, "wonder_hurt": h_wonder_hurt, "wonder_gift": h_wonder_gift, "wonder_vanish": h_wonder_vanish,
+    "end_own_life": h_end_own_life,
 }
 
 

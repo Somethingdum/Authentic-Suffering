@@ -33,6 +33,7 @@ dispatch(tx, rng, row, fired, turn_index, horizon_ms) -> list[Event]
     HORDE_STEP      world.hordes.step(tx, rng, row, fired, turn_index)                     (P10)
     POOL_RISE       world.hordes.rise(tx, rng, row, fired, turn_index)                     (P10)
     COUNCIL         world.factions.step(tx, rng, row, fired, turn_index)                   (P10)
+    DESPAIR         turn.cognition.despair(tx, rng, row, fired, turn_index)                (P12, D-107)
     any other type  (a type whose owner is not built) -> audit.log.record(tx, 'G0-timers', 'turn.pipeline', 'warn',
                     [{kind: 'timer_unbuilt', type, queue_id}], turn_index) and nothing else. The row
                     has already been fired, so the gate's S08 still holds; the P11 release audit

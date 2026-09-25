@@ -111,6 +111,7 @@ CAUSE_WORDS: dict[str, str] = {
     "heat": "The heat killed you.",
     "infection": "The infection killed you.",
     "offscreen": "You died.",
+    "suicide": "You took your own life.",   # D-107 (physical.bodies DOOM-15)
 }
 
 

@@ -119,8 +119,14 @@ Every Actor:
   wet strain's last minutes, or the killing blow itself — the world stops for the one who will die:
   the dust hangs, the lights go out, Willis wanders in to mock them and is taken by something out of
   the dark, and a voice with no name walks them through every cause that led here and tells them how
-  long they have, never how. Nothing undoes it. Then the world moves again and they are screaming:
-  everybody dies this way, and nobody in the world knows why.
+  long they have, never how. Nothing undoes it. Then the world moves again. Everybody dies this
+  way, and nobody in the world knows why — what the world knows (D-107) is only that since the Fall
+  most people start screaming a short while before they die. The talk usually breaks the mind:
+  shattered, broken, or — rarely, for the strong — held; the broken can barely speak (their words
+  come out in pieces) or bring themselves to do anything but hide, flee, freeze or wait. And the
+  Voice is cruel: sometimes it comes at the bite, and the bitten live the strain's four weeks
+  knowing — or can't take it, and end it (a check a day for everyone else's mind; the player decides
+  for themselves, with a gun or a blade in hand, only at the end of their rope).
 - **When you die**: an honest death scene, then a death screen with the cause, your last three
   turns and the choices that led there (from your own record). One button more — **"Show me
   everything"** — reveals the truth you never perceived: who was behind the wall, what they

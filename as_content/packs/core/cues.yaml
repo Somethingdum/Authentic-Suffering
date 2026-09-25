@@ -60,6 +60,7 @@ cues:
   - {id: knows_runner_stamina, description: "Believes runners burn out if you keep them chasing."}
   - {id: knows_cold_start, description: "Believes the unbitten dead can rise after about three days."}
   - {id: knows_no_sharing, description: "Holds to the rule of never sharing bottles, utensils or cigarettes."}
+  - {id: knows_the_screaming, description: "Knows that since the Fall most people scream a short while before they die, and that nobody knows why (D-107)."}
   # Infected policy cues (quirk trigger_cue values, infected/quirks.yaml). Evaluated by the
   # infected policy, never by a human mind.
   - {id: infected_idle, description: "An infected with no stimulus above its hearing threshold for at least a minute."}

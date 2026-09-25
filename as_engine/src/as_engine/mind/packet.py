@@ -102,6 +102,8 @@ Fields (second person, plain English):
                       struggling to function.', 5-6 'You can barely function.';
                     * P10: per physical.bodies.stages(actor) (pathway order), the stage's ``felt``
                       sentence when it is not empty — what the host feels, never what it has;
+                    * (D-107) what the talk left, by physical.bodies.mind_of(actor): MIND_LINES
+                      [mind] — how it feels from inside, never what happened or why (DOOM-06);
                     nothing to say -> ['Unhurt.'].
   resolve_cur / resolve_max   the actors row.
   position_text     f'{at_phrase(anchor name)} in {place_phrase(place name)}' ('at the counter in
@@ -240,6 +242,13 @@ if TYPE_CHECKING:
     from .affordance import AffordanceSet
     from .consult import Consulted
 
+
+# D-107: how a doomed mind feels from inside (mind.packet body_lines). Nothing about what it heard.
+MIND_LINES: dict[str, str] = {
+    "shattered": "Something in you has come apart. Thoughts won't hold together, and words come out in pieces.",
+    "broken": "Something in you is broken. You can't hold a thought for long, and you can't face much of anything.",
+    "held": "Something happened to you that you cannot put into words. You are holding on. Barely.",
+}
 
 COLD_LINES: dict[int, str] = {     # F1c (physical.bodies LOOK-09): needs.cold_stage -> what the body says
     1: "You are cold.", 2: "You are cold.", 3: "You are shivering hard.", 4: "You are shivering hard.",

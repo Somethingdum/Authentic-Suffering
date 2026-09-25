@@ -233,6 +233,18 @@ record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> lis
   The pipeline adds (actor, event_id) to its answered set (an ask is answered once, in the wave
   its hearer first decided after hearing it) and writes the list into turn_ledger stage 8 detail
   {'responses': [[actor, event_id, response], ...]}.
+
+despair(tx, rng, row, fired, turn_index) -> list[Event]
+  DOOM-14 (P12, D-107) — the owner: "Either that, or they can't take it and kill themselves (real
+  reaction)." The DESPAIR row of a doomed body comes due (physical.bodies DOOM-14): body =
+  payload.body_id; at = row.due_at. Nothing when the body is dead or has no dooms row, or its
+  mind is NULL. The player's body decides for itself (mind.actor.controller 'human': nothing, and
+  no next check — this is the one place the player is told apart, SYM-01). Otherwise the next check
+  first — kernel.clock.schedule(DESPAIR at at + harm.doom_despair_every_h hours, source fired) when
+  the doom's death_by is later than that — then rng.chance(tx, 'doom', f"despair:{body}:{at}",
+  harm.doom_despair_chance[mind]) and physical.bodies.means(tx, body) not empty ->
+  physical.bodies.end_own_life(tx, rng, body, means[0], at, turn_index, fired.event_id). Returns what
+  it committed.
 """
 
 from __future__ import annotations
@@ -304,4 +316,8 @@ def perceived_entities(tx: "Tx", actor_id: str, turn_index: int) -> dict[str, st
 def record_responses(tx: "Tx", intents: dict[str, "Intent"], affs: dict, asks: dict[str, list[dict]], turn_index: int,
                      wave_at: int, first_seq: int) -> list[tuple[str, str, Any]]:
     raise NotImplementedError("P7")
+
+
+def despair(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> list["Event"]:
+    raise NotImplementedError("P12")
 from ._impl_cognition import *  # noqa

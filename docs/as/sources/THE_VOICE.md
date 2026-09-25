@@ -1,6 +1,6 @@
 # The Doom and the Voice — the owner's words
 
-Kept whole, as the owner said them (voice messages, transcribed), for D-106. The engine's terms are
+Kept whole, as the owner said them (voice messages, transcribed), for D-106 and D-107. The engine's terms are
 in `as_engine/src/as_engine/service/voice.py` (VOICE-01..09), `physical/bodies.py` (DOOM-01..05),
 `turn/intake.py` (DOOM-07), `service/death.py` (DEATH-12..14) and CHEATS.md §6b; the decision is
 DECISIONS D-106.
@@ -39,3 +39,17 @@ nobody can say why.
 ## 6. How it goes
 
 > So, uh, more details just for funsies. Um, here's how it would necessarily go. Uh, you could either be literally just about to face the thing that's gonna kill you. Like, you are um, about to try to shove a zombie off of you, and it's going to nick your wrist with its teeth. You're gonna get fucked by that. Or, uh, you could be 30 seconds, 2 minutes, 5 minutes, half an hour from death. And suddenly, everything freezes. The dust particles in the air. Your hand... Not your hand. You, you could still move, but not in real space. You, it's an outside-of-body event. The thing you were fighting off, if you were fighting off something, the air itself ceases to move. The planet stops rotating. You know why? It's because this is a private conversation between you and me, and I want to keep it real uh, under-stimulating. So you understand. Maybe three seconds, if it can be called that, since everything freezes, the lights go out. Lights that weren't even there, the sun goes out. Everything's black. There's only the faintest glow of the room you're in, and you can hear something walking towards you. It's Willis. He gives his spiel. He talks about going my debt or something. Um, or maybe he just says, oh, man, I, I didn't even know this fucker existed. Like, if you don't have seats, I'll just be like, why am I here? I, I, I don't know you. or it's like, oh, it's you from earlier. Yeah, this is going to be neat. Uh, luckily for you, you're not in debt or some shit, you know, don't don't take my voice for an example on that. I haven't written for uh, Willis in a very, very long time. Um, and then, suddenly, the vague figure of Willis, who is partially obstructed by the dark, gets snatched up by what looks like a fucking giant mantis. You can't see it, though. It's maybe, like, 250 milliseconds. before you cannot see him. He gets snatched up by something bug-like. Giant. You you hear a crack when it swipes him up, as if he's just been preyed upon. And then nothing. And then there is nothing. It is just you. And then you hear it. Codex. The god above all gods gives its speech. A creator that has meticulously designed every single facet of your life since the very atoms in the universe has decided to say, fuck you in particular. Why? It's actually not you in particular. It's everyone that I've killed. You know why I killed them? I want you to imagine. You're really good at something. You're the best that there ever was or could ever possibly be. And it's all you do. Your hobby... Your job, it's all you do. Say you're an architect. You fucking love making buildings, right? Well, after you make the same building, I don't know, 11 trillion times, you get a little bored of it, so you make a new building. And a new one. Eventually, you go over nearly every possible building that could ever exist. A few times. Well, eventually, you get fucking sick of it. The feeling's wretched. You get just ill in your stomach. It's disgusting. And all you want to do is destroy it. So imagine this, like a game of dominoes. The most fun game of dominoes there ever was and or will be. Until my next game of dominoes, when there's none of you left. And it goes something like that, you know. Um, I obviously gave better speech examples previously, but uh, the content within the poor speech is golden.
+
+## 7. The screaming, the broken, the bitten (D-107)
+
+> Nobody knows why the people scream before dying. It has no in world explanation. But it only started after the Fall.
+> It's a bizarre unexplained occurrence that happens to most people, some short period before they die.
+>
+>
+> The talk with Codex usually breaks the mind of the victim. They have little capacity to speak or act rationally.
+>
+> Codex is a cruel god, and had on numerous occasions "Doomed" someone after being bitten. So they have to go through all 4 weeks after seeing Willis and Codex. Either that, or the can't take it and kill themselves (real reaction).
+>
+>
+>
+> Build on the idea till it's fully fleshed out, and interesting

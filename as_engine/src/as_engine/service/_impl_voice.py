@@ -220,7 +220,11 @@ def when_words(seconds):
     if s < 5400:
         m = round(s / 60)
         return "about a minute" if m == 1 else f"about {m} minutes"
-    return f"about {round(s / 3600)} hours"
+    if s < 172800:
+        return f"about {round(s / 3600)} hours"
+    if s < 1209600:
+        return f"about {round(s / 86400)} days"
+    return f"about {round(s / 604800)} weeks"
 
 
 def _and(xs):
@@ -285,6 +289,7 @@ def scene(store, pc_id, willis_lines, voice_paragraphs):
         FIGHT_TEXT,
         FREEZE_TEXT,
         RESUME_INSTANT_TEXT,
+        RESUME_MIND_TEXT,
         RESUME_TEXT,
         SNATCH_PAUSE_MS,
         SNATCH_TEXT,
@@ -299,7 +304,13 @@ def scene(store, pc_id, willis_lines, voice_paragraphs):
     beats += [DoomBeat(kind="snatch", text=SNATCH_TEXT, pause_ms=SNATCH_PAUSE_MS),
               DoomBeat(kind="scene", text=ALONE_TEXT, pause_ms=2000)]
     beats += [DoomBeat(kind="voice", text=p, pause_ms=1200) for p in voice_paragraphs]
-    beats.append(DoomBeat(kind="scene", text=RESUME_INSTANT_TEXT if d and d["kind"] == "instant" else RESUME_TEXT, pause_ms=1500))
+    if d and d["kind"] == "instant":
+        last = RESUME_INSTANT_TEXT
+    elif d is None or d["screaming"] or d["mind"] is None:
+        last = RESUME_TEXT
+    else:
+        last = RESUME_MIND_TEXT[d["mind"]]
+    beats.append(DoomBeat(kind="scene", text=last, pause_ms=1500))
     return beats
 
 

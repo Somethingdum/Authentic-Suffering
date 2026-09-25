@@ -152,6 +152,22 @@ class HarmRules(Strict):
     doom_horizon_min: float = 30.0          # D-106 DOOM-01: certain death this close is a doom (up to half an hour)
     doom_infection_lead_min: float = 5.0    # D-106 DOOM-02: the strain's death is known this far ahead
     doom_overdue_min: float = 2.0           # D-106 DOOM-05: the safety net's slack after death_by
+    # D-107: the screaming — most people, a short while before they die (DOOM-09)
+    doom_scream_chance: float = 0.85
+    doom_scream_lead_s: tuple[int, int] = (15, 240)
+    # D-107: what the talk leaves (DOOM-10): held is rare and comes with Resolve; the rest shatter or break
+    doom_held_base: float = 0.05
+    doom_held_per_resolve: float = 0.03     # per point of resolve_max above 4
+    doom_held_max: float = 0.30
+    doom_shatter_share: float = 0.6         # of those who do not hold
+    doom_shock_h: float = 6.0               # a shattered mind's first hours; a broken mind's words break for as long
+    # D-107: Codex's cruelty — sometimes the doom comes at the bite (DOOM-12)
+    doom_bite_chance: float = 0.25
+    # D-107: they can't take it (DOOM-14): a check a day while the doom runs, by what the talk left
+    doom_despair_every_h: float = 24.0
+    doom_despair_chance: dict[str, float] = Field(default_factory=lambda: {
+        "shattered": 0.05, "broken": 0.025, "held": 0.005,
+    })
     impairment_from_blood_loss: list[tuple[float, int]] = Field(default_factory=lambda: [(15.0, 1), (25.0, 2)])
     impairment_max: int = 6
     pain_per_severity: dict[str, int] = Field(default_factory=lambda: {
@@ -178,8 +194,10 @@ class ResolveRules(Strict):
         "betrayed": 2, "first_kill": 1, "killed_child": 3, "starving_day": 1, "sleepless_night": 1,
         "lost_dependent": 3, "made_to_watch": 2, "coerced": 1, "held_temper": 1,
         "self_disgust": 1, "resisting_urge": 1,
+        "the_talk": 2,   # D-107 RES-06: what the talk costs a mind that holds
     })
     recover_per_safe_night: int = 1
+    recover_shock_passes: int = 1   # D-107 RES-07: a shattered mind's first hours pass
     recover_fulfilled_obligation: int = 1
     recover_protected_dependent: int = 1
 

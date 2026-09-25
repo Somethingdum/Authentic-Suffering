@@ -101,6 +101,9 @@ Per effect (result strings in quotes; 'done' unless noted):
                      (ties: portal_id): MOVE to its far side. None -> 'portal_closed'.
   flee               like leave_place but choosing the portal whose far-side point is farthest from
                      the threat (target); none -> MOVE to the anchor of the place farthest from it.
+  end_own_life       (D-107) physical.bodies.end_own_life(tx, rng, actor, the bound item, land_at, T,
+                     the start event): 'done' when it killed, 'click' when the gun was empty (they are
+                     still here), 'blocked' when nothing happened (the reality exception, god mode).
   climb              A + athletics check vs obstacle.class. CLEAN/COST: MOVE to the far side (COST
                      also a minor 'cut' to hand_r instead of the time cost); FAIL: 'no_progress';
                      BREAK: 'fell' — a blunt wound to leg_l, significant when height_cm > 200 else
@@ -388,7 +391,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
     "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
-    "strip", "wonder_smite", "wonder_hurt", "wonder_gift", "wonder_vanish",
+    "strip", "wonder_smite", "wonder_hurt", "wonder_gift", "wonder_vanish", "end_own_life",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -504,6 +507,8 @@ SEEN: dict[str, str | None] = {
     "wonder_hurt": "glances at {target}",
     "wonder_gift": "produces something impossible for {target}",
     "wonder_vanish": "is suddenly not there",
+    "end_life_firearm": "puts {item} to their own head",
+    "end_life_blade": "turns {item} on themselves",
     "forced_act": None,   # D-103: the act itself (the bound label) is what is seen
 }
 

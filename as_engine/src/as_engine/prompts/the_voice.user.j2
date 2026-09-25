@@ -1,5 +1,5 @@
 {% set f = ctx.facts %}{{ f.pc_name }}. Alive for {{ f.lived }}.
-{% if ctx.moment == "before" %}{% set s = f.seconds_left %}Time they have left: {% if s == 0 %}none — it is happening this very instant{% elif s < 10 %}a few seconds{% elif s < 90 %}about {{ s }} seconds{% elif s < 5400 %}about {{ (s / 60) | round | int }} minutes{% else %}about {{ (s / 3600) | round | int }} hours{% endif %}.
+{% if ctx.moment == "before" %}{% set s = f.seconds_left %}Time they have left: {% if s == 0 %}none — it is happening this very instant{% elif s < 10 %}a few seconds{% elif s < 90 %}about {{ s }} seconds{% elif s < 5400 %}about {{ (s / 60) | round | int }} minutes{% elif s < 172800 %}about {{ (s / 3600) | round | int }} hours{% elif s < 1209600 %}about {{ (s / 86400) | round | int }} days{% else %}about {{ (s / 604800) | round | int }} weeks{% endif %}.
 {% endif %}The chain, oldest first (choice = what they chose, and what they typed; consequence = what came of it; unseen = what they never saw; clue = what they noticed and could not place):
 {% for b in f.chain %}- {{ b.when }} [{{ b.kind }}] {{ b.text }}{% if b.said %} — they typed: "{{ b.said }}"{% endif %}
 {% else %}- (nothing recorded but the end itself)

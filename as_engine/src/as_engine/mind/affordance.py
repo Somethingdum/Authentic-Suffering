@@ -64,7 +64,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
               (not in options, pool or rejected); (P12, D-102) requires.capability_tags (every one in the
               actor's fused dossier capability.tags: "not something they can do"); (H1) requires.can_run (capacity can_run), requires.infected_within_m
               (a visual percept of this turn, up to ``at``, at clear or partial, of a body of kind
-              'infected' whose point — space.point_distance — is within that many metres of the actor)
+              'infected' whose point — space.point_distance — is within that many metres of the actor);
+              (P12, D-107) requires.despair (physical.bodies.mind_of(tx, actor) is not None, or
+              resolve_cur 0: "not at the end of their rope")
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def
               with only skill_or_belief_cue needs the cue)
     belief    (every requires.belief_cues held — e.g. 'knows_headshot_rule')
@@ -190,6 +192,8 @@ enumerate it too, one option per combination (then capped by the selection rules
   throw_distraction    item_held with bulk <= 3, not a firearm, x each anchor visible within 15 m
                        (destination)
   reload_firearm       held firearm x a carried magazine or ammo matching its caliber tag
+  end_life_firearm / end_life_blade   (D-107) only the held items whose def carries every
+                       requires.held_item_tags (the gun, the blade — never the other hand's thing)
   shoot_*, strike_*, finish_downed   body x the held weapon (item = the weapon)
   punch, grapple, shove, disarm, break_grip, calm_person, signal, watch_target  body only
   strip_clothing       (F1c) body x each worn clothing piece of it that no other worn piece of it

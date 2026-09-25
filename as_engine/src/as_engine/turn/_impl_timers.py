@@ -86,6 +86,9 @@ def dispatch(tx, rng, row, fired, turn_index, horizon_ms):
     elif t == "COUNCIL":
         from ..world import factions
         factions.step(tx, rng, row, fired, turn_index)
+    elif t == "DESPAIR":
+        from .cognition import despair
+        despair(tx, rng, row, fired, turn_index)
     else:
         record(tx, "G0-timers", "turn.pipeline", "warn", [{"kind": "timer_unbuilt", "type": t, "queue_id": row["queue_id"]}], turn_index)
     return _ev_model(tx, first)

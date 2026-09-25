@@ -558,3 +558,31 @@ def record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq):
                     firewall.record_unmet_assent(tx, a, p["speaker"], sig, it.speech.text, it.bound.def_id, sp[0] if sp else None,
                                                  wave_at, turn_index, ask_event_id=p["event_id"])
     return out
+
+
+def despair(tx, rng, row, fired, turn_index):
+    """Can a doomed mind take another day of it (DOOM-14, D-107)."""
+    import json
+
+    from ..action._impl_p5b import _events_since
+    from ..kernel import clock
+    from ..mind.actor import controller
+    from ..physical import bodies
+    first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    pl = json.loads(row["payload"]) if isinstance(row["payload"], str) else dict(row["payload"])
+    body, at = pl["body_id"], row["due_at"]
+    b = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (body,))
+    d = bodies.doomed(tx, body)
+    if b is None or not b[0] or d is None or d["mind"] is None:
+        return []
+    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (body,)) is not None and controller(tx, body) == "human":
+        return []
+    H = tx.rules.harm
+    nxt = at + int(H.doom_despair_every_h * 3_600_000)
+    if d["death_by"] > nxt:
+        clock.schedule(tx, nxt, "DESPAIR", body, {"body_id": body}, fired.event_id)
+    if rng.chance(tx, "doom", f"despair:{body}:{at}", H.doom_despair_chance[d["mind"]]):
+        m = bodies.means(tx, body)
+        if m:
+            bodies.end_own_life(tx, rng, body, m[0], at, turn_index, fired.event_id)
+    return _events_since(tx, first)

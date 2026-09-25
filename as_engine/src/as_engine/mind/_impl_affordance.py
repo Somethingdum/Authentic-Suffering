@@ -241,6 +241,9 @@ def _bindings(c, d):
                         dd = _dist_pt(c, a["x_m"], a["y_m"])
                         if dd <= 15 and a["anchor_id"] != c.pos["anchor_id"]:
                             out.append({"item_id": it["item_id"], "destination_id": a["anchor_id"], "dist": 0.0})
+            elif d.effect == "end_own_life":   # D-107: only the held thing that can do it
+                if set(d.requires.held_item_tags) <= _tags_of(c, it["item_id"]):
+                    out.append({"item_id": it["item_id"], "dist": 0.0})
             elif d.id == "reload_firearm":
                 fd = c.canon.get(it["def_ref"]).firearm
                 if fd is None:
@@ -388,6 +391,10 @@ def _physical(c, d, o):
                 break
         if not near:
             return "the dead are not close"
+    if q.despair:   # D-107
+        from ..physical.bodies import mind_of
+        if mind_of(c.tx, c.me) is None and c.actor["resolve_cur"] > 0:
+            return "not at the end of their rope"
     if c.cap.hands_free < q.hands_free:
         return "hands full"
     if not _range_ok(c, d, o):

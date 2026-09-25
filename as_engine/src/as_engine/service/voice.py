@@ -22,7 +22,9 @@ VOICE-01 scene(store, pc_id, willis_lines, voice_paragraphs) -> list[DoomBeat], 
   5. 'snatch' SNATCH_TEXT, pause SNATCH_PAUSE_MS (a quarter of a second);
   6. 'scene' ALONE_TEXT, pause 2000;
   7. 'voice' one beat per paragraph of voice_paragraphs, pause 1200 each;
-  8. 'scene' RESUME_TEXT (the doom kind 'instant': RESUME_INSTANT_TEXT), pause 1500.
+  8. 'scene', pause 1500: the doom kind 'instant' -> RESUME_INSTANT_TEXT; the screaming already
+     started (dooms.screaming 1, physical.bodies DOOM-09) -> RESUME_TEXT; else what the talk left
+     (dooms.mind, DOOM-10) -> RESUME_MIND_TEXT[mind].
 
 VOICE-02 Willis in the frozen moment: service.death.roast (DEATH-13) — who he is to them decides
   what he says: in his debt (the console used this life, the PC not Willis) he mocks them twice as
@@ -86,8 +88,9 @@ fallback_voice(moment, facts) -> list[str]
   you are going to die. I won't tell you how. You should have paid more attention. Like I did."
   'after': one paragraph: f"And that is how. {manner} Every piece had a cause. Every piece was mine."
 when_words(seconds) -> str: 0 -> 'this very instant'; < 10 -> 'a few seconds'; < 90 -> f'about
-  {s} seconds'; < 5400 -> f'about {round(s / 60)} minutes' ('about a minute' for 1); else f'about
-  {round(s / 3600)} hours'.
+  {s} seconds'; < 5400 -> f'about {round(s / 60)} minutes' ('about a minute' for 1); < 172800 ->
+  f'about {round(s / 3600)} hours'; < 1209600 -> f'about {round(s / 86400)} days'; else f'about
+  {round(s / 604800)} weeks' (D-107: a doom at the bite runs for weeks).
 
 async doom_scene(session) -> list[DoomBeat]
   VOICE-07 For the first turn that ends with the PC doomed and its scene not yet played (scene_turn
@@ -126,6 +129,11 @@ SNATCH_TEXT = ("Something huge and jointed takes him out of the dark. A quarter 
 ALONE_TEXT = "Then nothing. There is nothing. It is just you."
 RESUME_TEXT = "Then the dust moves again. You are screaming."
 RESUME_INSTANT_TEXT = "Then the dust moves again."
+RESUME_MIND_TEXT: dict[str, str] = {   # D-107: what the talk left (physical.bodies DOOM-10)
+    "shattered": "Then the dust moves again. Something in you has come apart, and it is not coming back together.",
+    "broken": "Then the dust moves again. You can't hold a thought. The words won't line up.",
+    "held": "Then the dust moves again. You are still you. Barely.",
+}
 DARK_PAUSE_MS = 3000
 SNATCH_PAUSE_MS = 250
 ARCHITECT = ("You want to know why. Everyone does. Imagine you are the best there ever was at one thing, and it is all "

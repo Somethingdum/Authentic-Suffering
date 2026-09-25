@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-716 ids; 466 with their own statement, 250 named only in context.
+728 ids; 476 with their own statement, 252 named only in context.
 
 
 ## ABUSE
@@ -317,9 +317,16 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DOOM-03 | DOOM-03 instant: the death test is about to kill the person and it has no dooms row: kind 'instant', doomed_at = expected_at = death_by = at, cause_event = the death's cause, committed just before the DEATH. | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
 | DOOM-04 | DOOM-04 A doom commits DOOM {body_id, kind, expected_at, death_by, cause_event_id} (writer 'physical.bodies', actor_id = body_id, cause_event_id = the death test's) inserting dooms {body_id, doomed_at = at, expected_at,… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/turn/_impl_pipeline.py`, `as_engine/turn/pipeline.py` | `contract/p12_surfaces/test_doom.py` |
 | DOOM-05 | DOOM-05 Nothing undoes a doom (the console refuses to heal, cure or god-mode a doomed body: cheats.commands, rule DOOM-08). As a safety net that must never fire, a doomed body the death test finds alive at or after deat… | as_engine/physical/bodies.py | `as_engine/cheats/commands.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
-| DOOM-06 | DOOM-06 Only the doomed know, and only in the frozen moment: the Doom scene is the player's alone (service.voice) and stands only in the story (bookkeeping, outside both state hashes); no event, percept, belief, claim o… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-06 | DOOM-06 Only the doomed know, and only in the frozen moment: the Doom scene is the player's alone (service.voice) and stands only in the story (bookkeeping, outside both state hashes); no event, percept, belief, claim o… | as_engine/physical/bodies.py | `as_engine/mind/packet.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py`, `contract/p12_surfaces/test_doom_deep.py` |
 | DOOM-07 | DOOM-07 (1b, D-106) The doomed cannot tell. When the PC is alive and doomed (physical.bodies.doomed(tx, pc) is not None), submit.mode is 'do' or 'say' and the text is not empty: one DOOM_GUARD call (lane B; build_reques… | as_engine/turn/intake.py | `as_engine/contracts/calls.py`, `as_engine/physical/bodies.py`, `as_engine/turn/_impl_intake.py`, `as_engine/turn/intake.py` | `contract/p12_surfaces/test_doom.py` |
 | DOOM-08 | DOOM-08 (D-106) The console cannot undo a doom (physical.bodies DOOM-05) — the power is Willis's, and what dooms is above him: heal, cure and god on of a living body that has a dooms row change nothing and answer DOOM_R… | as_engine/cheats/commands.py | `as_engine/cheats/_impl_cheats.py`, `as_engine/cheats/commands.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom.py` |
+| DOOM-09 | DOOM-09 The screaming. rng.chance(tx, 'doom', f"scream:{body_id}", harm.doom_scream_chance) — most people — and then lead = rng.range_int(tx, 'doom', f"scream_lead:{body_id}", *harm.doom_scream_lead_s) seconds: scream_a… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-10 | DOOM-10 The talk breaks the mind. held with p = min(harm.doom_held_max, harm.doom_held_base + harm.doom_held_per_resolve x max(0, resolve_max - 4)) (the actors row's resolve_max; no row -> the base), rolled rng.chance(t… | as_engine/physical/bodies.py | `as_engine/mind/resolve.py`, `as_engine/physical/bodies.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-11 | DOOM-11 A shattered mind's first hours: at the start of the first progress step at or after doomed_at + harm.doom_shock_h hours (a step ends there): DOOM_CHANGE {body_id, shock_over: 1}, then mind.resolve.recover(tx, bo… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-12 | DOOM-12 Codex's cruelty. When ``expose`` infects through a 'bite' with a pathway that kills (death_at_h not None) a person with no dooms row who can be doomed: rng.chance(tx, 'doom', f"bite:{body_id}:{cause_event_id}",… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-13 | DOOM-13 mind_of(store, body_id) -> str / None: the dooms row's mind. speaks_broken(store, body_id, at) -> bool: that mind is 'shattered', or 'broken' and at < doomed_at + harm.doom_shock_h hours — their words come out i… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-14 | DOOM-14 Despair. A doom whose death_by is more than harm.doom_despair_every_h hours after ``at`` schedules DESPAIR {body_id} at max(at, now) + doom_despair_every_h hours (kernel.clock.schedule, source the DOOM). Whether… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py`, `as_engine/turn/_impl_cognition.py`, `as_engine/turn/cognition.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| DOOM-15 | DOOM-15 The act. Nothing for a body that is dead, in the reality exception or in god mode ([]). A firearm: physical.objects.fire(tx, item, at, body, cause, T); empty -> NOISE {source_db 20, kind 'click', text 'a click'}… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
 
 ## DOS
 
@@ -860,20 +867,25 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RES-01 | *Resolve pool (P4). Rules RES-01..05. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
-| RES-02 | *Resolve pool (P4). Rules RES-01..05. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
-| RES-03 | *Resolve pool (P4). Rules RES-01..05. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
-| RES-04 | *Resolve pool (P4). Rules RES-01..05. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
+| RES-01 | *Resolve pool (P4; D-107). Rules RES-01..07. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
+| RES-02 | *Resolve pool (P4; D-107). Rules RES-01..07. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
+| RES-03 | *Resolve pool (P4; D-107). Rules RES-01..07. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py`, `as_content/packs/core/affordances/despair.yaml` | `contract/p04_one_actor/test_resolve.py`, `contract/p12_surfaces/test_doom_deep.py` |
+| RES-04 | *Resolve pool (P4; D-107). Rules RES-01..07. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | `contract/p04_one_actor/test_resolve.py` |
+| RES-05 | *Resolve pool (P4; D-107). Rules RES-01..07. Resolve gates affordances; it never modifies a roll.* | as_engine/mind/resolve.py | `as_engine/mind/resolve.py` | — |
+| RES-06 | RES-06 (D-107) What the Voice leaves in a doomed mind (physical.bodies DOOM-10): 'shattered' -> resolve_cur 0; 'broken' -> min(resolve_cur, 1); 'held' -> the drain 'the_talk' (drains['the_talk']). One RESOLVE_CHANGE (wr… | as_engine/mind/resolve.py | `as_engine/mind/resolve.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| RES-07 | RES-07 (D-107) How far a doomed mind can come back: its dooms row's mind 'shattered' -> 0 until shock_over is 1, then 1; 'broken' -> 1; otherwise (held, instant, no doom) None — no ceiling. | as_engine/mind/resolve.py | `as_engine/mind/resolve.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
 
 ## RESOLVE
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RESOLVE-01 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-02 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-03 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-04 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-05 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-01 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-02 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-03 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-04 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-05 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-06 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | — |
+| RESOLVE-07 | RESOLVE-07 (D-107) "They have little capacity to speak ... rationally." When the speaker speaks broken (physical.bodies.speaks_broken(tx, speaker, at) — a shattered mind, or a broken one in its first hours) step 1 split… | as_engine/action/resolve.py | `as_engine/action/_impl_p5b.py`, `as_engine/action/resolve.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
 
 ## ROUT
 
@@ -1071,7 +1083,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SYM-01 | *from; simulation modules must never call this (SYM-01).* | as_engine/mind/actor.py | `as_engine/mind/actor.py`, `as_engine/physical/bodies.py` | `contract/p00_substrate/test_boundaries.py` |
+| SYM-01 | *from; simulation modules must never call this (SYM-01).* | as_engine/mind/actor.py | `as_engine/mind/actor.py`, `as_engine/physical/bodies.py`, `as_engine/turn/cognition.py` | `contract/p00_substrate/test_boundaries.py`, `contract/p12_surfaces/test_doom_deep.py` |
 | SYM-02 | *``manner`` is colour only (the PC's dossier colouring, SYM-02, and the narrator): nothing* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/dossier.py`, `as_engine/turn/intake.py` | — |
 
 ## TASK
@@ -1178,9 +1190,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| VOICE-01 | VOICE-01 scene(store, pc_id, willis_lines, voice_paragraphs) -> list[DoomBeat], in this order: 1. 'scene' FREEZE_TEXT (+ ' ' + FIGHT_TEXT when the PC holds a grip on a body or a body holds one on it: grips), pause 0; 2.… | as_engine/service/voice.py | `as_engine/contracts/protocol.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-01 | VOICE-01 scene(store, pc_id, willis_lines, voice_paragraphs) -> list[DoomBeat], in this order: 1. 'scene' FREEZE_TEXT (+ ' ' + FIGHT_TEXT when the PC holds a grip on a body or a body holds one on it: grips), pause 0; 2.… | as_engine/service/voice.py | `as_engine/contracts/protocol.py`, `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py`, `contract/p12_surfaces/test_doom_deep.py` |
 | VOICE-02 | VOICE-02 Willis in the frozen moment: service.death.roast (DEATH-13) — who he is to them decides what he says: in his debt (the console used this life, the PC not Willis) he mocks them twice as hard; met him before: "oh… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
-| VOICE-03 | VOICE-03 Everything the Voice brags with, from the record. doom = physical.bodies.doomed(store, pc_id) (ValueError f"no doom for {pc_id}" when there is none): - pc_name = the PC's actors.display_name; lived = service.de… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
+| VOICE-03 | VOICE-03 Everything the Voice brags with, from the record. doom = physical.bodies.doomed(store, pc_id) (ValueError f"no doom for {pc_id}" when there is none): - pc_name = the PC's actors.display_name; lived = service.de… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py`, `contract/p12_surfaces/test_doom_deep.py` |
 | VOICE-04 | VOICE-04 The chain, oldest first, at most 24 beats: the events reached walking back from the doom's cause_event (cause_event_id and links, breadth first, at most 300 events), and the PC's own last 5 ACTION_STARTs before… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
 | VOICE-05 | VOICE-05 upper_hand: the names of the weapons the PC holds or carries (canon firearm or melee), then the known names of the living people in its place whom it knows by name (not the threat); at most 8. | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |
 | VOICE-06 | VOICE-06 ONE THE_VOICE call (lane A; lanes.requests.build_request(config, THE_VOICE, turn_index = the current turn, actor_id = None, context = ctx = VoiceContext(moment, voice_facts(store, pc_id, moment)), json_schema =… | as_engine/service/voice.py | `as_engine/service/voice.py` | `contract/p12_surfaces/test_doom.py` |

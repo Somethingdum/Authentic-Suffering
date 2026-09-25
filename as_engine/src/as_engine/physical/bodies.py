@@ -143,29 +143,81 @@ DOOM-03 instant: the death test is about to kill the person and it has no dooms 
   just before the DEATH.
 DOOM-04 A doom commits DOOM {body_id, kind, expected_at, death_by, cause_event_id} (writer
   'physical.bodies', actor_id = body_id, cause_event_id = the death test's) inserting dooms
-  {body_id, doomed_at = at, expected_at, death_by, kind, cause_event, turn_index}. For 'bleeding'
-  and 'infection' the doomed then start screaming, and nobody ever learns why: NOISE {source_db:
-  RulesConfig.infected.scream_db, kind 'screaming', text 'someone screaming', place_id / x_m / y_m:
-  the body's point} (writer 'action.propagate', actor_id = the body, cause = the DOOM) — only when
-  ``at`` is not before the world clock's now (a doom found in catch-up, at a moment already past,
-  screams unheard: nothing may react in the past). It is not propagated here: a doom that lands in
-  a wave is one of the wave's events (turn.pipeline S9-S11 draw the dead to it and let everyone
-  hear it); one found in a body's progress at S12 is heard there (turn.pipeline) and draws nobody,
-  because that window's timers are spent; mind.perception.grant(body, the DOOM, channel 'auditory',
-  fidelity 'exact', text "You are screaming.", source None); force_act(body, 'screams', death_by
-  + harm.doom_overdue_min minutes, origin 'sim') — a mind does nothing else until it dies
-  (turn.cognition and world.infected obey forced acts; the player's body is not a mind, so the
-  input still works, but a doomed player cannot tell anyone: turn.intake DOOM-07). No mind is
-  ever told why (no belief, no claim): the doomed can no longer make words about it.
+  {body_id, doomed_at = at, expected_at, death_by, kind, cause_event, turn_index, mind, scream_at}
+  (DOOM-09, DOOM-10). Its scream (DOOM-09) is a NOISE {source_db: RulesConfig.infected.scream_db,
+  kind 'screaming', text 'the scream people make before they die', place_id / x_m / y_m: the body's
+  point} (writer 'action.propagate', actor_id = the body, cause = the DOOM) — only when its moment is
+  not before the world clock's now (a doom found in catch-up, at a moment already past, screams
+  unheard: nothing may react in the past). It is not propagated here: a scream that starts in a
+  wave is one of the wave's events (turn.pipeline S9-S11 draw the dead to it and let everyone hear
+  it); one that starts in a body's progress at S12 is heard there (turn.pipeline) and draws nobody,
+  because that window's timers are spent. The screaming body: mind.perception.grant(body, the DOOM,
+  channel 'auditory', fidelity 'exact', text "You are screaming.", source None); force_act(body,
+  'screams', death_by + harm.doom_overdue_min minutes, origin 'sim') — a mind does nothing else
+  until it dies (turn.cognition and world.infected obey forced acts; the player's body is not a
+  mind, so the input still works, but a doomed player cannot tell anyone: turn.intake DOOM-07). No
+  mind is ever told why (no belief, no claim): the doomed can no longer make words about it.
 DOOM-05 Nothing undoes a doom (the console refuses to heal, cure or god-mode a doomed body:
   cheats.commands, rule DOOM-08). As a safety net that must never fire, a doomed body the death
   test finds alive at or after death_by + harm.doom_overdue_min minutes dies there of the doom's own
-  cause ('infection' for an infection doom, else 'blood_loss'), after audit.log.repair(kind
+  cause ('infection' for an infection or bitten doom, else 'blood_loss'), after audit.log.repair(kind
   'degraded', rule 'DOOM-05', detail {body_id, death_by}) — a bug to fix, never a feature.
 DOOM-06 Only the doomed know, and only in the frozen moment: the Doom scene is the player's alone
   (service.voice) and stands only in the story (bookkeeping, outside both state hashes); no event,
   percept, belief, claim or memory of anyone else says why a person screamed.
 doomed(store, body_id) -> dict | None: the dooms row as a dict (None when there is none).
+
+D-107 — the Doom, deepened (DOOM-09..15). The owner: "Nobody knows why the people scream before
+dying. It has no in world explanation. But it only started after the Fall. It's a bizarre
+unexplained occurrence that happens to most people, some short period before they die." "The talk
+with Codex usually breaks the mind of the victim. They have little capacity to speak or act
+rationally." "Codex is a cruel god, and had on numerous occasions 'Doomed' someone after being
+bitten. So they have to go through all 4 weeks ... Either that, or they can't take it and kill
+themselves." For every doom but 'instant' (there is no time left for any of this):
+DOOM-09 The screaming. rng.chance(tx, 'doom', f"scream:{body_id}", harm.doom_scream_chance) — most
+  people — and then lead = rng.range_int(tx, 'doom', f"scream_lead:{body_id}", *harm.doom_scream_lead_s)
+  seconds: scream_at = max(at, expected_at - lead x 1000); the others never scream (scream_at NULL).
+  It starts at once when scream_at <= at, else in ``progress`` at the start of the first step at or
+  after scream_at (a step ends there). Starting: DOOM_CHANGE {body_id, screaming: 1} (writer
+  'physical.bodies', updating dooms screaming 1); the NOISE of DOOM-04 with text 'the scream people
+  make before they die' (everyone knows that scream: lore 'the_screaming', cue knows_the_screaming —
+  and nothing more; the same rule: only when not before the clock's now, never propagated here); the
+  percept "You are screaming."; force_act(body, 'screams', death_by + harm.doom_overdue_min minutes,
+  origin 'sim'). Until then nothing shows but what the talk left.
+DOOM-10 The talk breaks the mind. held with p = min(harm.doom_held_max, harm.doom_held_base +
+  harm.doom_held_per_resolve x max(0, resolve_max - 4)) (the actors row's resolve_max; no row -> the
+  base), rolled rng.chance(tx, 'doom', f"mind:{body_id}", p); else shattered with
+  rng.chance(tx, 'doom', f"shatter:{body_id}", harm.doom_shatter_share); else broken. Stored in the
+  dooms row (mind); then mind.resolve.the_talk(tx, body, mind, the DOOM, at, T) (RES-06): shattered
+  0, broken at most 1, held two less — and it never comes back further (RES-07).
+DOOM-11 A shattered mind's first hours: at the start of the first progress step at or after
+  doomed_at + harm.doom_shock_h hours (a step ends there): DOOM_CHANGE {body_id, shock_over: 1},
+  then mind.resolve.recover(tx, body, 'shock_passes', …) — it can come back to 1, never further.
+DOOM-12 Codex's cruelty. When ``expose`` infects through a 'bite' with a pathway that kills
+  (death_at_h not None) a person with no dooms row who can be doomed:
+  rng.chance(tx, 'doom', f"bite:{body_id}:{cause_event_id}", harm.doom_bite_chance) -> a doom of
+  kind 'bitten' right then (after the INFECTION_EXPOSURE): expected_at = death_by = exposed_at +
+  death_at_h hours, cause_event = the exposure's cause. About four weeks to live with it — or not
+  (DOOM-14). The strain runs its course; the death, at its time, is the infection's.
+DOOM-13 mind_of(store, body_id) -> str | None: the dooms row's mind. speaks_broken(store, body_id,
+  at) -> bool: that mind is 'shattered', or 'broken' and at < doomed_at + harm.doom_shock_h hours —
+  their words come out in pieces (action.resolve RESOLVE-07).
+DOOM-14 Despair. A doom whose death_by is more than harm.doom_despair_every_h hours after ``at``
+  schedules DESPAIR {body_id} at max(at, now) + doom_despair_every_h hours (kernel.clock.schedule,
+  source the DOOM). Whether they can take it is a mind's decision (turn.cognition.despair, SYM-01);
+  the body only has the means and the act.
+means(store, body_id) -> list[str]: the item_ids the body holds (hand_r, then hand_l) and then
+  carries (on it or in what it wears, by item_id) whose def is tagged 'firearm', then those tagged
+  'blade'; [] when there are none.
+end_own_life(tx, rng, body_id, item_id, at, turn_index, cause_event_id) -> list[Event]
+  DOOM-15 The act. Nothing for a body that is dead, in the reality exception or in god mode ([]).
+  A firearm: physical.objects.fire(tx, item, at, body, cause, T); empty -> NOISE {source_db 20,
+  kind 'click', text 'a click'} and nothing more (-> [that NOISE]); fired -> NOISE {the firearm's
+  noise_db, kind 'shoot', text 'a gunshot'}. A blade: no sound. Then, when the body has no dooms
+  row, the doom 'instant' of DOOM-03 (even this is certain an instant before — and the Voice has its
+  say), and DEATH {cause 'suicide', method 'firearm' | 'blade', item_id} (cause event: the NOISE,
+  else cause_event_id). The DOOM-05 safety net dies of 'infection' for an 'infection' or 'bitten'
+  doom.
 
 Treatment (``treat``): method in {'pressure','packing','tourniquet','bandage','suture','clean'};
   tourniquet only on a limb (ValueError otherwise); suture only on a minor or significant wound
@@ -682,13 +734,13 @@ def kill(tx: "Tx", body_id: str, cause: str, at: int, turn_index: int, rng: "Rng
     return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=extra, rng=rng)
 
 
-def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rng=None):
+def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rng=None, detail=None):
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     pathway = _rise_pathway(tx, body_id, at) if rng is not None else None
     vals = {"alive": 0, "dead_at": at, "death_event": cause_event_id, "awareness": "dead", "posture": "lying"}
     if extra:
         vals.update(extra)
-    payload = {"body_id": body_id, "cause": cause, "cause_event_id": cause_event_id}
+    payload = {"body_id": body_id, "cause": cause, "cause_event_id": cause_event_id, **(detail or {})}
     if pathway is not None:
         payload["rise_pending"] = True
     links = []
@@ -766,16 +818,16 @@ def death_test(tx: "Tx", body_id: str, at: int, turn_index: int, rng: "Rng",
                     cause = "infection"
     if cause:
         if person and doomed(tx, body_id) is None:
-            _doom(tx, b, "instant", at, at, at, turn_index, cause_event_id, cause_event_id)
+            _doom(tx, b, "instant", at, at, at, turn_index, cause_event_id, cause_event_id, rng)
         return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, rng=rng)
     if person:
         d = doomed(tx, body_id)
         if d is None:
-            _doom_check(tx, b, at, turn_index, cause_event_id)
+            _doom_check(tx, b, at, turn_index, cause_event_id, rng)
         elif at >= d["death_by"] + H.doom_overdue_min * MIN:
             from ..audit.log import repair
             repair(tx, "degraded", None, "DOOM-05", {"body_id": body_id, "death_by": d["death_by"]}, turn_index, at)
-            return _death_ev(tx, body_id, at, turn_index, "infection" if d["kind"] == "infection" else "blood_loss",
+            return _death_ev(tx, body_id, at, turn_index, "infection" if d["kind"] in ("infection", "bitten") else "blood_loss",
                              cause_event_id, rng=rng)
     if b["blood_loss_pct"] >= H.unconscious_at_blood_loss_pct and b["awareness"] != "unconscious":
         return tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
@@ -797,7 +849,7 @@ def _doomable(tx, body_id):
     return not (g is not None and body_id in _god_list(g[0]))
 
 
-def _doom_check(tx, b, at, turn_index, cause_event_id):
+def _doom_check(tx, b, at, turn_index, cause_event_id, rng):
     """DOOM-01 / DOOM-02: a doom when this person's death has become certain."""
     H = _rules(tx).harm
     body_id = b["body_id"]
@@ -825,7 +877,7 @@ def _doom_check(tx, b, at, turn_index, cause_event_id):
             t_now = max(0.0, (to_lose - minor_now) / rate_now) if rate_now > 0 else t_best
             death_by = at + _math.ceil(t_best * 60) * 1000
             expected = min(death_by, at + _math.ceil(t_now * 60) * 1000)
-            return _doom(tx, b, "bleeding", at, expected, death_by, turn_index, cause_event_id, worst["cause_event"])
+            return _doom(tx, b, "bleeding", at, expected, death_by, turn_index, cause_event_id, worst["cause_event"], rng)
     lead = H.doom_infection_lead_min * MIN
     for inf in tx.query("SELECT * FROM infections WHERE body_id=? AND pathway='wet'", (body_id,)):
         pw = _canon(tx).find("pathway", "wet")
@@ -833,35 +885,157 @@ def _doom_check(tx, b, at, turn_index, cause_event_id):
             continue
         dt = inf["exposed_at"] + int(pw.death_at_h * 3_600_000)
         if at <= dt <= at + lead:
-            return _doom(tx, b, "infection", at, dt, dt, turn_index, cause_event_id, inf["cause_event"])
+            return _doom(tx, b, "infection", at, dt, dt, turn_index, cause_event_id, inf["cause_event"], rng)
     return None
 
 
-def _doom(tx, b, kind, at, expected, death_by, turn_index, cause_event_id, cause_event):
-    """DOOM-03 / DOOM-04: the DOOM, and for a doom that leaves time, the scream."""
+def _doom(tx, b, kind, at, expected, death_by, turn_index, cause_event_id, cause_event, rng):
+    """DOOM-03 / DOOM-04: the DOOM; for a doom that leaves time, what the talk leaves (DOOM-10), when
+    the screaming starts (DOOM-09) and the despair checks (DOOM-14)."""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     body_id = b["body_id"]
+    H = _rules(tx).harm
+    mind = scream_at = None
+    if kind != "instant":
+        r = rng
+        a = tx.query_one("SELECT resolve_max FROM actors WHERE actor_id=?", (body_id,))
+        p_held = min(H.doom_held_max, H.doom_held_base + H.doom_held_per_resolve * max(0, (a[0] if a else 4) - 4))
+        if r.chance(tx, "doom", f"mind:{body_id}", p_held):
+            mind = "held"
+        else:
+            mind = "shattered" if r.chance(tx, "doom", f"shatter:{body_id}", H.doom_shatter_share) else "broken"
+        if r.chance(tx, "doom", f"scream:{body_id}", H.doom_scream_chance):
+            lead = r.range_int(tx, "doom", f"scream_lead:{body_id}", H.doom_scream_lead_s[0], H.doom_scream_lead_s[1])
+            scream_at = max(at, expected - lead * 1000)
     ev = tx.commit_event(Event(type=EventType.DOOM, writer="physical.bodies", at=at, turn_index=turn_index, actor_id=body_id,
         target_ids=[body_id], cause_event_id=cause_event_id,
         writes=[WriteRecord(op=WriteOp.INSERT, table="dooms", values={
             "body_id": body_id, "doomed_at": at, "expected_at": expected, "death_by": death_by, "kind": kind,
-            "cause_event": cause_event, "turn_index": turn_index})],
+            "cause_event": cause_event, "turn_index": turn_index, "mind": mind, "scream_at": scream_at})],
         payload={"body_id": body_id, "kind": kind, "expected_at": expected, "death_by": death_by, "cause_event_id": cause_event}))
     if kind == "instant":
         return ev
+    from ..kernel import clock
+    from ..mind import resolve
+    resolve.the_talk(tx, body_id, mind, ev.event_id, at, turn_index)
+    if scream_at is not None and scream_at <= at:
+        _scream(tx, body_id, at, turn_index)
+    every = int(H.doom_despair_every_h * 3_600_000)
+    if death_by - at > every:
+        clock.schedule(tx, max(at, clock.now(tx)) + every, "DESPAIR", body_id, {"body_id": body_id}, ev.event_id)
+    return ev
+
+
+def _scream(tx, body_id, t, turn_index):
+    """DOOM-09: the screaming starts."""
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     from ..mind import perception
     R = _rules(tx)
+    d = doomed(tx, body_id)
+    ch = tx.commit_event(Event(type=EventType.DOOM_CHANGE, writer="physical.bodies", at=t, turn_index=turn_index, actor_id=body_id,
+        target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="dooms", key={"body_id": body_id}, values={"screaming": 1})],
+        payload={"body_id": body_id, "screaming": 1}))
+    doom_ev = tx.query_one("SELECT event_id FROM events WHERE type='DOOM' AND actor_id=? ORDER BY seq DESC LIMIT 1", (body_id,))[0]
     pos = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (body_id,))
-    now = tx.query_one("SELECT now_ms FROM world_clock WHERE id=1")[0]
-    if pos is not None and at >= now:   # a doom found in catch-up, at a moment already past, screams unheard
-        tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=at, turn_index=turn_index,
-            actor_id=body_id, cause_event_id=ev.event_id, place_id=pos[0],
-            payload={"source_db": R.infected.scream_db, "kind": "screaming", "text": "someone screaming", "place_id": pos[0],
-                     "x_m": pos[1], "y_m": pos[2]}))
-    perception.grant(tx, body_id, event_id=ev.event_id, channel="auditory", fidelity="exact", text="You are screaming.",
-                     source_id=None, at=at, turn_index=turn_index)
-    force_act(tx, body_id, "screams", death_by + int(R.harm.doom_overdue_min * MIN), at, turn_index, ev.event_id, origin="sim")
-    return ev
+    if pos is not None and t >= tx.query_one("SELECT now_ms FROM world_clock WHERE id=1")[0]:
+        tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=t, turn_index=turn_index,
+            actor_id=body_id, cause_event_id=doom_ev, place_id=pos[0],
+            payload={"source_db": R.infected.scream_db, "kind": "screaming", "text": "the scream people make before they die",
+                     "place_id": pos[0], "x_m": pos[1], "y_m": pos[2]}))
+    perception.grant(tx, body_id, event_id=doom_ev, channel="auditory", fidelity="exact", text="You are screaming.",
+                     source_id=None, at=t, turn_index=turn_index)
+    force_act(tx, body_id, "screams", d["death_by"] + int(R.harm.doom_overdue_min * MIN), t, turn_index, doom_ev, origin="sim")
+    return ch
+
+
+def _doom_step(tx, body_id, t, turn_index):
+    """DOOM-09 / DOOM-11 at a progress step's start: the screaming, a shattered mind's first hours."""
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    d = doomed(tx, body_id)
+    if d is None or d["kind"] == "instant":
+        return
+    if d["scream_at"] is not None and not d["screaming"] and t >= d["scream_at"]:
+        _scream(tx, body_id, t, turn_index)
+    shock_end = d["doomed_at"] + int(_rules(tx).harm.doom_shock_h * 3_600_000)
+    if d["mind"] == "shattered" and not d["shock_over"] and t >= shock_end:
+        from ..mind import resolve
+        ev = tx.commit_event(Event(type=EventType.DOOM_CHANGE, writer="physical.bodies", at=t, turn_index=turn_index, actor_id=body_id,
+            target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="dooms", key={"body_id": body_id}, values={"shock_over": 1})],
+            payload={"body_id": body_id, "shock_over": 1}))
+        if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (body_id,)) is not None:
+            resolve.recover(tx, body_id, "shock_passes", ev.event_id, t, turn_index)
+
+
+def _doom_times(tx, body_id):
+    """The moments at which _doom_step has something to do (step boundaries for progress)."""
+    d = doomed(tx, body_id)
+    if d is None or d["kind"] == "instant":
+        return []
+    out = []
+    if d["scream_at"] is not None and not d["screaming"]:
+        out.append(d["scream_at"])
+    if d["mind"] == "shattered" and not d["shock_over"]:
+        out.append(d["doomed_at"] + int(_rules(tx).harm.doom_shock_h * 3_600_000))
+    return out
+
+
+def mind_of(store: "Store | Tx", body_id: str) -> "str | None":
+    r = store.query_one("SELECT mind FROM dooms WHERE body_id=?", (body_id,))
+    return r[0] if r is not None else None
+
+
+def speaks_broken(store: "Store | Tx", body_id: str, at: int) -> bool:
+    d = store.query_one("SELECT mind, doomed_at FROM dooms WHERE body_id=?", (body_id,))
+    if d is None:
+        return False
+    if d[0] == "shattered":
+        return True
+    return d[0] == "broken" and at < d[1] + int(_rules(store).harm.doom_shock_h * 3_600_000)
+
+
+def means(store: "Store | Tx", body_id: str) -> list[str]:
+    canon = _canon(store)
+    held = [r[0] for r in store.query("SELECT item_id FROM items WHERE holder_body=? AND holder_slot IN ('hand_r','hand_l') "
+                                      "ORDER BY CASE holder_slot WHEN 'hand_r' THEN 0 ELSE 1 END", (body_id,))]
+    carried = [r[0] for r in store.query("SELECT item_id FROM items WHERE holder_body=? AND holder_slot NOT IN ('hand_r','hand_l') "
+                                         "UNION SELECT i.item_id FROM items i JOIN items c ON i.container_id=c.item_id "
+                                         "WHERE c.holder_body=? ORDER BY 1", (body_id, body_id))]
+    items = held + [i for i in carried if i not in held]
+
+    def tags(i):
+        r = store.query_one("SELECT def_ref FROM items WHERE item_id=?", (i,))
+        return set(canon.get(r[0]).tags) if r else set()
+    return [i for i in items if "firearm" in tags(i)] + [i for i in items if "blade" in tags(i) and "firearm" not in tags(i)]
+
+
+def end_own_life(tx: "Tx", rng: "Rng", body_id: str, item_id: str, at: int, turn_index: int,
+                 cause_event_id: str | None) -> list[Event]:
+    from ..contracts.events import Event, EventType
+    b = _b(tx, body_id)
+    if not b["alive"] or not _doomable(tx, body_id):
+        return []
+    r = tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (item_id,))
+    d = _canon(tx).get(r[0])
+    pos = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (body_id,))
+
+    def noise(db, kind, text):
+        return tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=at, turn_index=turn_index, actor_id=body_id,
+            cause_event_id=cause_event_id, place_id=pos[0] if pos else None,
+            payload={"source_db": db, "kind": kind, "text": text, **({"place_id": pos[0], "x_m": pos[1], "y_m": pos[2]} if pos else {})}))
+    out, cause, method = [], cause_event_id, "blade"
+    if "firearm" in d.tags:
+        from .objects import fire
+        method = "firearm"
+        shot, _ev = fire(tx, item_id, at, body_id, cause_event_id, turn_index)
+        if not shot:
+            return [noise(20, "click", "a click")]
+        n = noise(d.firearm.noise_db, "shoot", "a gunshot")
+        out.append(n)
+        cause = n.event_id
+    if doomed(tx, body_id) is None:
+        out.append(_doom(tx, b, "instant", at, at, at, turn_index, cause, cause, rng))
+    out.append(_death_ev(tx, body_id, at, turn_index, "suicide", cause, rng=rng, detail={"method": method, "item_id": item_id}))
+    return out
 
 
 def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
@@ -871,7 +1045,7 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
     for w in _wounds(tx, body_id):
         if _eff_bleed(H, w) > 0:
             return None
-    cands = [to_ms]
+    cands = [to_ms] + [x for x in _doom_times(tx, body_id) if x > t]   # D-107: the screaming, the shock passing
     if b["kind"] in ("human", "lurker", "animal"):
         n = tx.query_one("SELECT * FROM needs WHERE body_id=?", (body_id,))
         if n is not None:
@@ -927,10 +1101,15 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
         if not b["alive"]:
             break
         if b["kind"] in ("human", "lurker") and doomed(tx, body_id) is None and _doomable(tx, body_id):
-            _doom_check(tx, b, t, turn_index, None)   # DOOM-01 / DOOM-02 at the step's start, before it can kill
+            _doom_check(tx, b, t, turn_index, None, rng)   # DOOM-01 / DOOM-02 at the step's start, before it can kill
+        if b["kind"] in ("human", "lurker"):
+            _doom_step(tx, body_id, t, turn_index)          # DOOM-09 / DOOM-11
         jump = _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H)
         if jump is not None and jump > end:
             end = jump
+        for x in _doom_times(tx, body_id):   # D-107: a step ends where the screaming starts or the shock passes
+            if t < x < end:
+                end = x
         # 1 blood
         add = 0.0
         for w in _wounds(tx, body_id):
@@ -1228,9 +1407,14 @@ def expose(tx: "Tx", rng: "Rng", body_id: str, pathway: str, exposure: str, at: 
         ws.append(WriteRecord(op=WriteOp.INSERT, table="infections", values={
             "body_id": body_id, "pathway": pathway, "exposed_at": at, "stage": rec.stages[0].name,
             "cause_event": cause_event_id or "", "known_to_self": 0}))
-    return tx.commit_event(Event(type=EventType.INFECTION_EXPOSURE, writer="physical.bodies", at=at, turn_index=turn_index,
-                                 actor_id=body_id, target_ids=[body_id], cause_event_id=cause_event_id, writes=ws,
-                                 payload={"body_id": body_id, "pathway": pathway, "exposure": exposure, "infected": infected}))
+    ev = tx.commit_event(Event(type=EventType.INFECTION_EXPOSURE, writer="physical.bodies", at=at, turn_index=turn_index,
+                               actor_id=body_id, target_ids=[body_id], cause_event_id=cause_event_id, writes=ws,
+                               payload={"body_id": body_id, "pathway": pathway, "exposure": exposure, "infected": infected}))
+    if infected and exposure == "bite" and rec.death_at_h is not None and doomed(tx, body_id) is None and _doomable(tx, body_id) \
+            and rng.chance(tx, "doom", f"bite:{body_id}:{cause_event_id}", _rules(tx).harm.doom_bite_chance):   # DOOM-12
+        end = at + int(rec.death_at_h * 3_600_000)
+        _doom(tx, _b(tx, body_id), "bitten", at, end, end, turn_index, ev.event_id, cause_event_id, rng)
+    return ev
 
 
 def die(tx: "Tx", rng: "Rng", body_id: str, at: int, cause_event_id: str | None, turn_index: int, *,
