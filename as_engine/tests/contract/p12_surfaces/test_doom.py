@@ -221,6 +221,22 @@ def test_revived_the_doom_is_spent(night, fake):
     assert not w.store.query("SELECT 1 FROM error_repair_log WHERE rule_id = 'DOOM-05'"), "no safety net"
 
 
+def test_a_doom_off_screen_leaves_nothing_in_the_past(night, fake):
+    """DOOM-04: a doom found while the world runs off-screen (a body's progress, after that window's
+    timers) screams, but nothing is scheduled in a window already spent."""
+    from as_engine.turn import timers
+    w, s = night
+    mara = w.id("mara")
+    cut(w, s, mara, "arm_l", "severe", blood=30)
+    assert bodies.doomed(w.store, mara) is None, "a tourniquet could still save her"
+    with w.store.transaction() as tx:
+        timers.run_offscreen(tx, s.rng, now(w) + 3_600_000, 0)
+    d = bodies.doomed(w.store, mara)
+    assert d is not None and d["kind"] == "bleeding"
+    assert w.store.query_one("SELECT alive FROM bodies WHERE body_id = ?", (mara,))[0] == 0
+    assert not w.store.query("SELECT 1 FROM event_queue WHERE status = 'pending' AND due_at < ?", (now(w),))
+
+
 def test_the_safety_net_is_a_bug_when_it_fires(night, fake):
     """DOOM-05: a doomed body the world somehow spared still dies — and the log says it was a bug."""
     w, s = night

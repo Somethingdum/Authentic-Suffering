@@ -146,8 +146,12 @@ DOOM-04 A doom commits DOOM {body_id, kind, expected_at, death_by, cause_event_i
   {body_id, doomed_at = at, expected_at, death_by, kind, cause_event, turn_index}. For 'bleeding'
   and 'infection' the doomed then start screaming, and nobody ever learns why: NOISE {source_db:
   RulesConfig.infected.scream_db, kind 'screaming', text 'someone screaming', place_id / x_m / y_m:
-  the body's point} (writer 'action.propagate', actor_id = the body, cause = the DOOM) and its
-  action.propagate.propagate percepts; mind.perception.grant(body, the DOOM, channel 'auditory',
+  the body's point} (writer 'action.propagate', actor_id = the body, cause = the DOOM) — only when
+  ``at`` is not before the world clock's now (a doom found in catch-up, at a moment already past,
+  screams unheard: nothing may react in the past). It is not propagated here: a doom that lands in
+  a wave is one of the wave's events (turn.pipeline S9-S11 draw the dead to it and let everyone
+  hear it); one found in a body's progress at S12 is heard there (turn.pipeline) and draws nobody,
+  because that window's timers are spent; mind.perception.grant(body, the DOOM, channel 'auditory',
   fidelity 'exact', text "You are screaming.", source None); force_act(body, 'screams', death_by
   + harm.doom_overdue_min minutes, origin 'sim') — a mind does nothing else until it dies
   (turn.cognition and world.infected obey forced acts; the player's body is not a mind, so the
@@ -845,16 +849,15 @@ def _doom(tx, b, kind, at, expected, death_by, turn_index, cause_event_id, cause
         payload={"body_id": body_id, "kind": kind, "expected_at": expected, "death_by": death_by, "cause_event_id": cause_event}))
     if kind == "instant":
         return ev
-    from ..action.propagate import propagate
     from ..mind import perception
     R = _rules(tx)
     pos = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (body_id,))
-    if pos is not None:
-        noise = tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=at, turn_index=turn_index,
+    now = tx.query_one("SELECT now_ms FROM world_clock WHERE id=1")[0]
+    if pos is not None and at >= now:   # a doom found in catch-up, at a moment already past, screams unheard
+        tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", at=at, turn_index=turn_index,
             actor_id=body_id, cause_event_id=ev.event_id, place_id=pos[0],
             payload={"source_db": R.infected.scream_db, "kind": "screaming", "text": "someone screaming", "place_id": pos[0],
                      "x_m": pos[1], "y_m": pos[2]}))
-        propagate(tx, [noise], at, turn_index)
     perception.grant(tx, body_id, event_id=ev.event_id, channel="auditory", fidelity="exact", text="You are screaming.",
                      source_id=None, at=at, turn_index=turn_index)
     force_act(tx, body_id, "screams", death_by + int(R.harm.doom_overdue_min * MIN), at, turn_index, ev.event_id, origin="sim")
