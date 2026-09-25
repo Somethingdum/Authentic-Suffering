@@ -171,6 +171,10 @@ def _temper_feeling(tx, holder, body, at):
         return "you are furious with them"
     if 0 < h and h >= th // 2:
         return "they are getting under your skin"
+    lk = tx.query_one("SELECT last_kind FROM tempers WHERE holder_id=? AND toward_id=?", (holder, body))
+    if lk is not None and lk[0] == "wish_forgiven":                                          # TEMPER-10
+        return ("they asked you for a wonder as if you were a genie; you let it pass this once — tell them, "
+                "seriously and without harm, never again")
     for r in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND kind='grudge' AND status='open'", (holder,)):
         if body in _j.loads(r[0]):
             return "you hold a grudge against them"

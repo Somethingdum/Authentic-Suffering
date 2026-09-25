@@ -210,14 +210,18 @@ Handlers (P8):
 
 Handlers (P10: the New Life wizard, worldgen and the quiet hours):
   on_pcs_list: canon = content.pack.load_canon over every pack folder of config.content_dir (core
-    first, then by folder name). Per canon record of kind 'pc' (by ref): PCCardView(ref,
+    first, then by folder name) — P12 (CHEAT-10, CHEAT-12): leaving out the 'cheat_' folders until
+    the code was taken (codes_unlocked). Per canon record of kind 'pc' (by ref): PCCardView(ref,
     display_name = card.display_name, one_line_identity, survives_by = card.pc_card_survival,
     starts_as = world.worldgen.tables.STARTS_AS[faction_start_type], note =
     card.pc_selection_note, source 'pack', warnings [], world_age_days = [lo, hi] of
     days_since_fall_range or None, world_age_note = f"{first name}'s story needs a world {lo //
     365}-{hi // 365} years after the Fall." or None) -> [pcs {cards}]. Allowed while busy.
   on_run_new(InRunNew): busy (a turn or a worldgen running) -> BUSY. world_id given ->
-    ServiceError('not_built_yet', NOT_BUILT) until P12. The background runner is cancelled and a
+    ServiceError('not_built_yet', NOT_BUILT) until P12. P12 (CHEAT-12): a pc_ref whose pack id
+    starts with 'cheat_', once codes_unlocked, has that pack appended to settings.pack_ids (when
+    missing); before the code, settings stay as sent and create_run answers not_found like for any
+    unknown character. The background runner is cancelled and a
     loaded session closed (as on_run_close). worldgen_task = asyncio.create_task(the worldgen job)
     -> [state {screen 'worldgen', run_id None, busy True}]. The worldgen job: session = await
     service.runs.create_run(config, pc_ref, settings, transport, progress = a callback pushing
@@ -235,6 +239,13 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     'bad_settings', message: its message} then the same state; any other exception ->
     logged, error {internal, INTERNAL}, the same state; cancelled -> nothing is pushed but the
     bar's progress_done {ok False} (on_worldgen_cancel answers). Finally worldgen_task = None.
+  on_code_enter(InCodeEnter) (P12, D-79, D-102, CHEAT-12; the menu's "Enter a code" box). A session
+    loaded and busy -> BUSY (nothing changes). cheats.commands.detect_activation(code) false ->
+    [code_result {accepted False}]
+    and nothing else. True -> codes_unlocked = True for as long as this service runs (never
+    saved: the New Life list forgets it on restart) -> [code_result {accepted True}]; and, with a
+    session loaded, the word acts as if typed in the story box: + [cheat_activated, story] exactly
+    as on_turn_submit's activation (cheats.commands.activate; no turn is played).
   on_worldgen_cancel: no worldgen_task -> ServiceError('nothing_to_cancel', NO_WORLDGEN).
     worldgen_task.cancel() and await it (CancelledError swallowed; create_run removed every partial
     folder) -> [state {screen 'wizard', run_id None, busy False}].
@@ -436,6 +447,12 @@ class GameService:
     async def on_pcs_list(self, msg):
         """P10: PC cards from every loaded pack (and P12: imported / quick-made drafts)."""
         raise NotImplementedError("P10")
+
+    codes_unlocked = False    # P12 (CHEAT-12): the code was taken in the "Enter a code" box
+
+    async def on_code_enter(self, msg):
+        """P12: the menu's "Enter a code" box (CHEAT-12)."""
+        raise NotImplementedError("P12")
 
     async def on_content_import(self, msg):
         """P12: content.importers."""

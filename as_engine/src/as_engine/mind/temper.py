@@ -85,6 +85,9 @@ TEMPER-06 What an outburst does — turn.cognition applies it (its step 4). Like
     cold    walk out ('leave_place'), else to the far end of the place from T ('move_to_anchor')
     flight  as cold
     tears   sit down and break down ('rest')
+    wrath   (D-102, TEMPER-10) nothing stops it, at any distance: T is someone the holder gave a gift
+            (gifted_by) -> the 'wonder_smite' def on T (T dies); anyone else -> 'wonder_hurt' on T (a
+            severe wound). No def of that id in the run's canon -> as 'words'.
 TEMPER-07 A breaking point leaves a grudge unless temper.grudge is 0: the first open 'grudge' loop
   of the holder naming T (by created_at, loop_id) deepens — mind.mind.strengthen_loop(tx, it, +1,
   the outburst) (max 3); with none, mind.mind.open_loop(tx, holder, 'grudge',
@@ -116,6 +119,29 @@ TEMPER-09 (F1c, D-86) What people cannot stand to be near — the owner: smeared
   builds heat faster than it fades. provoke() takes event_id None (cause None). What they do with
   it is theirs (the packet already says how the person looks and smells, and how they feel about
   them, TEMPER-08) — until it boils over like any heat.
+TEMPER-10 (P12, D-79, D-102 — the owner, on Willis: "he's completely unphased by most blatant
+  disrespect ... unless he has on his own whim provided you with something valuable"; "he hates being
+  asked for magical gifts, it feels demeaning ... he also HATES being worshipped. He will hurt people for
+  either. He may allow one stray request, but with a very serious correction (non harmful)").
+  A holder's temper (TEMPER-01) may carry shrugs_off (kinds) and rages_at ('worshipped', 'wished_upon').
+  gifted_by(store, giver_id, person_id) -> bool: an ITEM_CREATED whose payload.props.gift_from is the
+    giver and whose props.gift_to holds the person (action.effects wonder_gift).
+  In provocations (TEMPER-03), for a speech percept addressed to the holder from a person source:
+    worshipped   'worshipped' in rages_at and the words hold an entry of WORSHIP_WORDS (whole words);
+    wished_upon  'wished_upon' in rages_at, the words hold an entry of WISH_WORDS, and the source has
+                 seen what the holder can do: a percept_log row of the source whose event is an
+                 ACTION_START of the holder with a def_id starting 'wonder' (a wonder, or /wonder's).
+                 The first from each source (no earlier TEMPER_CHANGE of the holder toward it of kind
+                 'wish_forgiven') is 'wish_forgiven' instead: no heat, and the packet says so (TEMPER-08).
+  Then every provocation whose kind is in shrugs_off: from a source gifted_by the holder -> kind
+  'ingratitude' (once per event); from anyone else -> dropped (no heat, no record). Order within an
+  event: the TEMPER-03 order, then worshipped, wished_upon, wish_forgiven, ingratitude.
+  In take_in (TEMPER-05): when the last provocation by T is 'worshipped', 'wished_upon' or 'ingratitude'
+  there is no holding it in (no rng draw). TEMPER-08: a tempers row toward the entity whose last_kind is
+  'wish_forgiven' and whose heat is below threshold // 2 -> feeling "they asked you for a wonder as if you
+  were a genie; you let it pass this once — tell them, seriously and without harm, never again".
+WORSHIP_WORDS and WISH_WORDS are implemented data (routing hints, like INSULT_WORDS).
+
 Off-screen friction between the people of a settlement is society.settlement STL-15 (P9).
 
 INSULT_WORDS is implemented data (a routing hint, TEMPER-03).
@@ -132,6 +158,16 @@ if TYPE_CHECKING:
     from ..kernel.rng import Rng
     from ..kernel.store import Store, Tx
 
+WORSHIP_WORDS: tuple[str, ...] = (
+    "worship", "we worship", "praise you", "praise be", "all hail", "hail willis", "my lord", "our lord", "my god",
+    "our god", "almighty", "divine one", "holy one", "we pray", "pray to you", "bless us", "blessed one", "kneel",
+    "bow before", "your holiness", "lord willis", "god willis", "deity",
+)
+WISH_WORDS: tuple[str, ...] = (
+    "grant", "wish", "magic", "miracle", "conjure", "summon", "make me", "make us", "give me", "give us",
+    "poof", "snap your fingers", "use your power", "use your powers", "do your thing", "zap", "make it rain",
+    "turn this into", "bring back", "fix it with", "can you make",
+)
 INSULT_WORDS: tuple[str, ...] = (
     "idiot", "moron", "stupid", "dumbass", "coward", "useless", "pathetic", "worthless", "loser", "freak",
     "shut up", "screw you", "fuck you", "fuck off", "asshole", "bastard", "bitch", "prick", "piece of shit",
@@ -203,6 +239,11 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
     aa = tx.query_one("SELECT accepted_authority FROM actors WHERE actor_id=?", (holder_id,))
     authority = set(_j.loads(aa[0])) if aa else set()
     rels = {r[0]: r[1] for r in tx.query("SELECT to_id, affection FROM relationships WHERE from_id=?", (holder_id,))}
+    tm = temper_of(tx, holder_id)
+    rages = set(tm.rages_at)
+    forgiven = {r[0] for r in tx.query("SELECT json_extract(payload,'$.toward_id') FROM events WHERE type='TEMPER_CHANGE' "
+                                       "AND actor_id=? AND json_extract(payload,'$.kind')='wish_forgiven'", (holder_id,))} \
+        if "wished_upon" in rages else set()
     out = []
     got = set()
 
@@ -248,6 +289,14 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 add(src, "ordered_about", eid)
             if any(_words_have(words, x) for x in INSULT_WORDS):
                 add(src, "insulted", eid)
+            if "worshipped" in rages and any(_words_have(words, x) for x in WORSHIP_WORDS):      # TEMPER-10
+                add(src, "worshipped", eid)
+            if "wished_upon" in rages and any(_words_have(words, x) for x in WISH_WORDS) and _has_seen_wonder(tx, src, holder_id):
+                if src in forgiven:
+                    add(src, "wished_upon", eid)
+                else:
+                    add(src, "wish_forgiven", eid)
+                    forgiven.add(src)
         if ch == "visual" and typ == "HARM":
             who = pl.get("actor_id")
             if (pl.get("body_id") and rels.get(pl["body_id"], 0) >= 2 and who and who != holder_id
@@ -261,13 +310,41 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 (holder_id, item))] if item else []
             if holder_id in owners:
                 add(src, "stole_from", eid)
+    if tm.shrugs_off:                                                   # TEMPER-10
+        kept, grateful = [], {}
+        for pv in out:
+            if pv.kind not in tm.shrugs_off:
+                kept.append(pv)
+                continue
+            if pv.toward_id not in grateful:
+                grateful[pv.toward_id] = gifted_by(tx, holder_id, pv.toward_id)
+            if grateful[pv.toward_id] and ("ingratitude", pv.event_id) not in got:
+                got.add(("ingratitude", pv.event_id))
+                kept.append(Provocation(pv.toward_id, "ingratitude", pv.event_id))
+        out = kept
     order = {k: i for i, k in enumerate(("struck", "shoved", "grabbed", "threatened", "ordered_about", "insulted",
-                                          "harmed_bonded", "stole_from"))}
+                                          "harmed_bonded", "stole_from", "worshipped", "wished_upon", "wish_forgiven",
+                                          "ingratitude"))}
     # per event, kinds in the documented order; events in percept order
     firsts = {}
     for i, pv in enumerate(out):
         firsts.setdefault(pv.event_id, i)
     return sorted(out, key=lambda pv: (firsts[pv.event_id], order[pv.kind]))
+
+
+def gifted_by(store: "Store | Tx", giver_id: str, person_id: str) -> bool:
+    import json as _j
+    for (to,) in store.query("SELECT json_extract(payload,'$.props.gift_to') FROM events WHERE type='ITEM_CREATED' "
+                             "AND json_extract(payload,'$.props.gift_from')=?", (giver_id,)):
+        if to and person_id in (_j.loads(to) if isinstance(to, str) else to):
+            return True
+    return False
+
+
+def _has_seen_wonder(tx, who, holder_id):
+    return tx.query_one("SELECT 1 FROM percept_log p JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? "
+                        "AND e.type='ACTION_START' AND e.actor_id=? AND json_extract(e.payload,'$.def_id') LIKE 'wonder%' "
+                        "LIMIT 1", (who, holder_id)) is not None
 
 
 def provoke(tx: "Tx", holder_id: str, toward_id: str, kind: str, event_id: str, at: int,
@@ -326,7 +403,9 @@ def take_in(tx: "Tx", rng: "Rng", holder_id: str, turn_index: int, at: int) -> O
     E = last[T][1]
     R = tx.rules.temper
     res = tx.query_one("SELECT resolve_cur FROM actors WHERE actor_id=?", (holder_id,))[0]
-    if rng.chance(tx, "mind", f"hold:{holder_id}:{E}", min(R.hold_max, R.hold_per_resolve * res)):
+    last_kind = next(pv.kind for pv in reversed(provs) if pv.toward_id == T)
+    no_hold = last_kind in ("worshipped", "wished_upon", "ingratitude")          # TEMPER-10
+    if not no_hold and rng.chance(tx, "mind", f"hold:{holder_id}:{E}", min(R.hold_max, R.hold_per_resolve * res)):
         drain(tx, holder_id, "held_temper", E, at, turn_index)
         return None
     tm = temper_of(tx, holder_id)

@@ -97,6 +97,8 @@ async def simulate(ctx):
                                   payload={"reaction_id": r["reaction_id"], "actor_id": r["actor_id"], "status": "resolved"},
                                   writes=[WriteRecord(op=WriteOp.UPDATE, table="pending_reactions", key={"reaction_id": r["reaction_id"]},
                                                       values={"status": "resolved"})]))
+        from ..cheats.commands import take_wonder
+        take_wonder(tx, s.pc_id, T, t0)          # CHEAT-14: the Boss's wonder, seen from wave 0
         _ledger(tx, T, 0, "ok", {"lanes_up": sorted(l.value for l in ctx.lanes_up), "timers_fired": fired_n,
                                  "pending_reactions": sorted(forced)}, 2 if ctx.strict else 1)
         # ---------------- 1 intake

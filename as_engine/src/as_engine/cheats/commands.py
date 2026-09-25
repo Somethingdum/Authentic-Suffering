@@ -1,4 +1,4 @@
-"""Cheat activation, parsing and execution (P12). Rules CHEAT-01..11. Owner 'cheats' (cheat_log).
+"""Cheat activation, parsing and execution (P12). Rules CHEAT-01..15. Owner 'cheats' (cheat_log).
 docs/as/CHEATS.md is the bonus document (voice, examples); this docstring is the machine contract.
 Every state change is an event with origin 'cheat' of type CHEAT_OVERRIDE whose writer is the
 module that owns what it writes (bodies -> 'physical.bodies', positions -> 'physical.space', meta
@@ -33,6 +33,7 @@ parse(text) -> CheatCommand | CheatParseError   (only for a line that starts wit
     spawn <what> [x<n 1..20>] [ally] (in any order after what): {what, n (1), ally (False)}
     despawn <person or item>: {target}; kill / revive / mind / brief <person>: {person}
     noise <db 40..180> [here | at <anchor>]: {db, anchor?}
+    wonder <what he does> (one quoted token or the rest of the line): {what}
   CheatCommand(name, args, raw = the stripped text).
 
 resolve(tx, pc_id, kind, name) -> (id, None) | (None, persona line)   (§4 Names)
@@ -92,12 +93,25 @@ async execute(session, command) -> CheatResult   (CHEAT-04..08)
     as above, the outfit created worn (origin 'cheat'), mind.actor.create(..., source 'cheat',
     content_ref, event_origin 'cheat'), actors quarantine = 1 and accepted_authority = [the PC]
     for 'ally' else [] (CHEAT_OVERRIDE, mind.actor), and a known_places row for where it stands.
+    (D-102) A dossier whose capability.tags hold 'reality_exception' (Willis) -> physical.bodies.
+    grant_exception(tx, body, at, T, origin 'cheat'); one whose tags hold 'fickle' ->
+    mind.mind.add_fickle(tx, body, at, T, origin 'cheat') (REL-06). A dossier tagged 'cheat_companion'
+    (Fredrick) while the PC is in the reality exception (a life as Willis: D-79, "Fredrick blends
+    in whenever Willis is blending in") -> blends in: every holder of an acquaintance row toward
+    the PC (by holder_id) gets one toward it (PERCEIVE, writer 'mind.perception', origin 'cheat':
+    known_name = its display name, description = mind.perception.describe_dossier of its dossier,
+    first_met = last_seen = at, last_seen_place = the PC's place) and, when the holder has a
+    relationships row toward the PC, the same six axes toward it (RELATION_CHANGE, writer
+    'mind.mind', origin 'cheat', kind 'acquaintance', updated_at = at); and it joins every group
+    the PC is a member of (group_members {group_id, actor_id, role 'member', standing 0, since at,
+    status 'member'}, CHEAT_OVERRIDE writer 'society.group').
   despawn: a person whose body has origin 'cheat' -> bodies alive 0, dead_at = at, awareness
     'dead', posture 'lying' (physical.bodies) and its positions row deleted (physical.space): gone
     from the world; an item of origin 'cheat' -> physical.objects.destroy. Anything else -> "Only
     what I made, Boss. That one was here before me."
   kill: a living body -> physical.bodies.kill(tx, body, 'cheat', at, T, rng) (DEATH, cause
-    'cheat'); dead already -> 'Already dead, Boss. Thorough, though.'
+    'cheat'); dead already -> 'Already dead, Boss. Thorough, though.'; a body in the reality
+    exception (physical.bodies.excepted, D-102) -> "Reality lost that argument a long time ago, Boss."
   revive: a dead human, lurker or animal body -> the heal writes plus alive 1, dead_at /
     death_event / false_dead_until NULL, awareness 'awake', posture 'standing'; its pending
     REANIMATION timers cancelled (kernel.clock.cancel, reason 'revived'); its infections stay
@@ -157,6 +171,18 @@ async execute(session, command) -> CheatResult   (CHEAT-04..08)
     one already walking -> "One's already coming, Boss. Patience."; none possible -> refused.
   census: detail = the dead by world.hordes.census (total, walking, in hordes; each district's
     standing and still; each horde) and the living by society.population.census per settlement.
+  wonder (D-79, D-102, CHEAT-14): the Boss's freeform wonder, his alone — the PC must be in the
+    reality exception (physical.bodies.excepted), else "You're not him, Boss.". what = the text
+    stripped, braces removed, a trailing '.' dropped, then a leading 'Willis ' or 'he '
+    (case-insensitive) dropped; it must read the way people would see it, a present-tense verb
+    phrase ('walks straight through the wall'): empty, or starting with 'I ', "I'm ", "I'll " or
+    'my ' (case-insensitive) -> "Say it the way they'd see it, Boss: /wonder walks through the
+    wall". A wonder already waiting (meta 'pending_wonder' not empty) -> "One wonder at a time,
+    Boss. The last one hasn't happened yet." Else CHEAT_OVERRIDE (kernel.meta) UPSERTing meta
+    'pending_wonder' = what; outcome f"{what}, as the next moment begins". The wonder itself is
+    take_wonder's, at the next turn's S0: people see it happen, remember it and the story tells it
+    (his card: "an explicit power event is its own provenance source"); it changes nothing else —
+    what lasts is the other commands' work (/tp, /give, /spawn, /set, /kill, ...).
 brief_beliefs(tx, holder, place) -> list[BeliefFromPercept]: for each living body in the place but
   the holder (by body_id): ('body', id, 'location', f"{name} is here, in {place name}.", place)
   and, when it has a goal, ('body', id, 'wants', f"{name} wants: {goal}"); for each faction group
@@ -164,7 +190,8 @@ brief_beliefs(tx, holder, place) -> list[BeliefFromPercept]: for each living bod
   f"{group}: {aims}").
 async persona(session, tx, name, outcome) -> str   (CHEAT-09)
   One CHEAT_PERSONA call (lane B) with CheatPersonaContext(command f'/{name}', outcome,
-  recent_lines = the last five non-empty cheat_log persona lines, newest first), recorded with
+  recent_lines = the last five non-empty cheat_log persona lines, newest first, willis = the PC is
+  in the reality exception (D-79: Willis takes the voice for a demon in his head)), recorded with
   lanes.calllog.record. Its first line, stripped, when the call is 'ok', not empty and not one of
   those lines (at most 300 characters); else a canned line from CANNED_LINES[name] that is not
   the newest logged line — rng.choice(tx, 'cheats', f"canned:{name}:{count}:{at}", …) — so a
@@ -178,6 +205,27 @@ standing_brief(tx, actor_id, turn_index, at) -> int   (CHEAT-11)
   {standing_brief: actor}); no cheat_log row (the spawn already logged). Returns the belief count
   (0 for anyone else). turn.pipeline calls it once per turn, for such an actor the first wave it
   is HOT or WARM, before its packet is built.
+start_life(tx, pc_id, record) -> list[Event]   (D-79, D-102, CHEAT-12: a life begun as a cheat_
+  pack's character — service.runs.create_run calls it once worldgen is done, at world_clock now,
+  turn 0.) CHEAT_ACTIVATED (writer 'kernel.meta', origin 'cheat', payload {start: true}) setting
+  meta cheat_active '1' — the console is open from the first moment, with no shimmer and no story
+  line; CHEAT_OVERRIDE (kernel.meta, payload {sandbox: true}) setting meta sandbox '1' (the one
+  playing is himself a cheat entity); CHEAT_OVERRIDE (mind.actor) setting the PC's actors
+  quarantine 1 (CHEAT-05); when record.capability.tags hold 'reality_exception',
+  physical.bodies.grant_exception(tx, pc_id, at, 0, origin 'cheat'); when record.tags hold 'fickle',
+  mind.mind.add_fickle(tx, pc_id, at, 0, origin 'cheat'); and one cheat_log row
+  {command 'start', outcome f"began a life as {record.identity.name}", persona_line '', event_id =
+  the CHEAT_ACTIVATED} (CHEAT_OVERRIDE, writer 'cheats'). Returns the events in that order. (The
+  body and dossier already carry origin / source 'cheat': world.worldgen.opening.place_pc gives a
+  generation 'cheat' record those.)
+take_wonder(tx, pc_id, turn_index, at) -> Event | None   (CHEAT-14; turn.pipeline S0)
+  meta 'pending_wonder' absent or empty -> None. Else ACTION_START (writer 'action.resolve',
+  origin 'cheat', actor_id = pc_id, at) {actor_id, def_id 'wonder', verb 'wonder', target_id,
+  destination_id, item_id: None, est_duration_s 0, visible True, seen = the text, continues_task
+  False, label = the text, goal '', attention None}, then CHEAT_OVERRIDE (kernel.meta, payload
+  {wonder: 'done'}) setting meta 'pending_wonder' ''. Returns the ACTION_START (the pipeline
+  propagates it at once: whoever can see him sees it happen, mind.perception; the narrator tells
+  it, narration.narrator).
 Quarantine (CHEAT-05): cheat-made bodies and items keep origin 'cheat'; cheat-made actors have
   quarantine 1; worldgen, threat scaling, faction balance and the abuse battery leave them out.
 Hard line (CHEAT-08): no command, argument or spawned dossier may produce sexual content involving
@@ -196,7 +244,7 @@ ACTIVATION_RE = re.compile(r"(?<!\d)2508(?!\d)")
 
 CommandName = Literal["help", "off", "give", "heal", "god", "tp", "set", "time", "weather", "rep",
                       "spawn", "despawn", "kill", "revive", "reveal", "mind", "brief", "noise",
-                      "will", "forget", "infect", "cure", "horde", "mega", "census"]
+                      "will", "forget", "infect", "cure", "horde", "mega", "census", "wonder"]
 
 SANDBOX_EXEMPT: frozenset[str] = frozenset({"help", "off"})
 
@@ -212,18 +260,18 @@ USAGE: dict[str, str] = {
     "noise": "/noise <db> [here|at <anchor>]",
     "will": '/will <person> "<what they now want>"', "forget": "/forget <person> about <person or place>",
     "infect": "/infect <person> [with <strain>]", "cure": "/cure <person>", "horde": "/horde <n> [at <place>]",
-    "mega": "/mega", "census": "/census",
+    "mega": "/mega", "census": "/census", "wonder": '/wonder "<what he does, as they would see it>"',
 }
 HELP_TEXT = ("The keyring, Boss:\n" + "\n".join(USAGE[c] for c in ("give", "heal", "god", "tp", "set", "time", "weather",
                                                                    "rep", "spawn", "despawn", "kill", "revive", "reveal",
                                                                    "mind", "brief", "noise", "will", "forget",
                                                                    "infect", "cure", "horde", "mega", "census",
-                                                                   "off")))
+                                                                   "wonder", "off")))
 
 COMMAND_NAMES: tuple[str, ...] = ("help", "off", "give", "heal", "god", "tp", "set", "time", "weather",
                                   "rep", "spawn", "despawn", "kill", "revive", "reveal", "mind",
                                   "brief", "noise", "will", "forget", "infect", "cure", "horde", "mega",
-                                  "census")
+                                  "census", "wonder")
 
 ACTIVATION_LINE = ("Alright, alright, settle down. 'Mr. Cheater Man' reporting for duty, Boss. Systems "
                    "unlocked, safeties vaporized. You now wield the digital thunder. What reality shall "
@@ -287,6 +335,8 @@ CANNED_LINES: dict[str, tuple[str, str]] = {
              "End of days, on schedule. Yours."),
     "census": ("Heads counted. Living and otherwise.",
                "Here's the tally. Don't do the maths out loud."),
+    "wonder": ("Reality took the note, Boss. It didn't even argue.",
+               "Done. The universe has filed it under 'fine, apparently'."),
     "off": (DEACTIVATION_LINE, DEACTIVATION_LINE),
 }
 
@@ -348,6 +398,14 @@ def standing_brief(tx, actor_id: str, turn_index: int, at: int) -> int:
     raise NotImplementedError("P12")
 
 
+def start_life(tx, pc_id: str, record) -> list:
+    raise NotImplementedError("P12")
+
+
+def take_wonder(tx, pc_id: str, turn_index: int, at: int):
+    raise NotImplementedError("P12")
+
+
 def is_cheat_question(text: str) -> bool:
     """Ask-mode deflection trigger (CHEAT-03): any of 'cheat', 'god mode', 'godmode', 'noclip',
     'infinite ammo', 'console', 'dev mode', 'developer', 'mr. cheater', 'code' + 'unlock'.
@@ -357,3 +415,4 @@ def is_cheat_question(text: str) -> bool:
             "developer", "mr. cheater", "mr cheater")
     return any(k in t for k in keys) or ("code" in t and "unlock" in t)
 from ._impl_cheats import activate, parse, resolve, execute, brief_beliefs, persona, god_bodies, standing_brief  # noqa
+from ._impl_cheats import start_life, take_wonder  # noqa

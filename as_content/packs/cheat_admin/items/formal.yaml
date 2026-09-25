@@ -1,0 +1,160 @@
+# Willis's clothes (D-79; docs/as/sources/WILLIS.md): cheat-only items, spotless on purpose.
+- schema: as.item.v1
+  id: tuxedo_jacket
+  name: tuxedo jacket
+  plural: tuxedo jackets
+  kind: clothing
+  mass_g: 900
+  bulk: 2
+  tags: [clothing]
+  barter_value: 6
+  description: An immaculate black dinner jacket with satin lapels, somehow never creased.
+  clothing: {slot: torso, layer: outer, covers: [torso, arms], words: tuxedo jacket, colour: black, style: [formal], warmth: 1}
+- schema: as.item.v1
+  id: dress_shirt
+  name: dress shirt
+  plural: dress shirts
+  kind: clothing
+  mass_g: 250
+  bulk: 1
+  tags: [clothing]
+  barter_value: 3
+  description: A perfectly clean white shirt with a starched collar.
+  clothing: {slot: torso, layer: mid, covers: [torso, arms], words: dress shirt, colour: white, style: [formal]}
+- schema: as.item.v1
+  id: bow_tie
+  name: bow tie
+  plural: bow ties
+  kind: clothing
+  mass_g: 20
+  bulk: 0
+  tags: [clothing]
+  barter_value: 1
+  description: A black silk bow tie, tied by hand and never crooked.
+  clothing: {slot: neck, layer: outer, covers: [neck], words: bow tie, colour: black, style: [formal]}
+- schema: as.item.v1
+  id: dress_trousers
+  name: pair of dress trousers
+  plural: pairs of dress trousers
+  kind: clothing
+  mass_g: 500
+  bulk: 1
+  tags: [clothing]
+  barter_value: 3
+  description: Black formal trousers with a satin stripe down each leg.
+  clothing: {slot: legs, layer: outer, covers: [groin, legs], words: dress trousers, colour: black, plural: true, style: [formal]}
+- schema: as.item.v1
+  id: dress_shoes
+  name: pair of dress shoes
+  plural: pairs of dress shoes
+  kind: clothing
+  mass_g: 800
+  bulk: 1
+  tags: [clothing]
+  barter_value: 3
+  description: Polished black formal shoes that no mud ever seems to reach.
+  clothing: {slot: feet, layer: outer, covers: [feet], words: dress shoes, colour: black, plural: true, style: [formal]}
+- schema: as.item.v1
+  id: top_hat
+  name: top hat
+  plural: top hats
+  kind: clothing
+  mass_g: 300
+  bulk: 1
+  tags: [clothing]
+  barter_value: 4
+  description: A tall black top hat, brushed smooth.
+  clothing: {slot: head, layer: outer, covers: [head], words: top hat, colour: black, style: [formal]}
+- schema: as.item.v1
+  id: coffee_cup
+  name: coffee cup
+  plural: coffee cups
+  kind: container
+  mass_g: 300
+  bulk: 1
+  tags: [container, endless, "refill:coffee"]
+  barter_value: 0
+  container: {capacity_bulk: 1, access_time_s: 1}
+  description: An ordinary-looking coffee cup that is never empty for longer than a sip (D-102, the owner — "he's also a raging coffee addict").
+- schema: as.item.v1
+  id: black_coffee
+  name: black coffee
+  plural: black coffees
+  kind: water
+  mass_g: 300
+  bulk: 1
+  tags: [drink, coffee]
+  barter_value: 2
+  water: {ml: 300}
+  description: Black coffee, hot, strong and excellent, whatever the hour and wherever it came from.
+
+# His gifts (D-102): what action.effects wonder_gift draws from (tag willis_gift). The owner's
+# example, spelled his way: a literally limitless plate of randomized samiches. Each time one from it
+# is eaten another appears on it (tags endless, refill:samich) — only eating refills it, and only
+# when it is empty, so there is no samich mountain.
+- schema: as.item.v1
+  id: plate_of_samiches
+  name: plate of samiches
+  plural: plates of samiches
+  kind: container
+  mass_g: 400
+  bulk: 1
+  tags: [container, willis_gift, endless, "refill:samich"]
+  barter_value: 1
+  container: {capacity_bulk: 1, access_time_s: 1}
+  description: A plain white plate that always has exactly one samich on it, and never the same samich twice.
+- schema: as.item.v1
+  id: samich_blt
+  name: BLT samich
+  plural: BLT samiches
+  kind: food
+  mass_g: 250
+  bulk: 1
+  tags: [food, samich]
+  barter_value: 4
+  food: {kcal: 520}
+  description: Crisp bacon, lettuce and tomato on toast that is somehow still warm.
+- schema: as.item.v1
+  id: samich_pbj
+  name: peanut butter and jelly samich
+  plural: peanut butter and jelly samiches
+  kind: food
+  mass_g: 200
+  bulk: 1
+  tags: [food, samich]
+  barter_value: 4
+  food: {kcal: 450}
+  description: Thick peanut butter and grape jelly, crusts cut off with surgical care.
+- schema: as.item.v1
+  id: samich_club
+  name: club samich
+  plural: club samiches
+  kind: food
+  mass_g: 350
+  bulk: 1
+  tags: [food, samich]
+  barter_value: 5
+  food: {kcal: 700}
+  description: Three layers of turkey, ham and cheese, held together with a cocktail stick.
+- schema: as.item.v1
+  id: samich_grilled_cheese
+  name: grilled cheese samich
+  plural: grilled cheese samiches
+  kind: food
+  mass_g: 220
+  bulk: 1
+  tags: [food, samich]
+  barter_value: 4
+  food: {kcal: 480}
+  description: Golden, buttery, and oozing — fresh off a pan nobody can see.
+- schema: as.item.v1
+  id: samich_meatball
+  name: meatball samich
+  plural: meatball samiches
+  kind: food
+  mass_g: 400
+  bulk: 1
+  tags: [food, samich]
+  barter_value: 5
+  food: {kcal: 760}
+  description: Meatballs in red sauce and melted cheese on a split roll, still steaming.

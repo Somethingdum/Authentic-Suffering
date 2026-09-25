@@ -41,7 +41,8 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
          {world_id, title = f"{climate_descriptor capitalised} — {atlas.ERA_LABELS[era]}, day {dsf}", difficulty,
          era, day_at_genesis: dsf, climate_text, factions: [planned faction names], created_real:
          kernel.store.wall_clock_iso(), source 'generated', seed, detail} (sorted keys, 2-space indent).
-    WG8  opening = await opening.place_pc(...).
+    WG8  opening = await opening.place_pc(...); then (P12, CHEAT-15) opening.place_wild_card(tx, rng,
+         pc, opening.pc_body, settings, config.content_dir, at) in the same transaction.
     WG9  failures = checks.assert_world(...); any -> WorldgenAborted('invariant', "The world did not
          hold together: " + "; ".join(each failure without its final full stop) + ".").
     COMMIT WORLDGEN_STAGE {stage 'COMMIT', world_id}.

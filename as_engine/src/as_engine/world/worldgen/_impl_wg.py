@@ -1066,6 +1066,8 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
     pack = []
     cyc = 0
     for ref in canon.refs("actor"):
+        if ref.startswith("cheat_"):                 # CHEAT-10: only /spawn brings them
+            continue
         rec = canon.get(ref)
         rr = rec.days_since_fall_range
         if rr and not (rr[0] <= dsf <= rr[1]):
@@ -1428,23 +1430,25 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
         start = bl[0] if bl else ol[0] if ol else sz.hub_id
     # 2 the PC
     pcd = pc.model_dump(mode="json", by_alias=True)
+    made_by = "cheat" if pc.generation == "cheat" else "worldgen"      # D-102, CHEAT-12
     body = bodies.create(tx, kind="human", sex=pc.identity.sex, age_years=pc.identity.age, height_cm=pc.appearance.height_cm,
                          mass_kg=pc.appearance.mass_kg, special=pc.capability.special.model_dump(mode="json"), at=at,
-                         turn_index=0, origin="worldgen", content_ref=pc_ref, looks=pc.appearance.looks)
+                         turn_index=0, origin=made_by, content_ref=pc_ref, looks=pc.appearance.looks)
     if kinds[start]["kind"] == "building" and not kinds[start]["layout_generated"]:
         space.discover_layout(tx, rng, start, at, 0)
     P._place_at_first_anchor(tx, body, start, at, None, 0)
     space.change_place(tx, start, {"props": {"populated": True}}, "populated", at, None, 0)
-    P.actor_create(tx, body, pcd, "pack", at, 0, content_ref=pc_ref, mind_kind="human", event_origin="worldgen")
+    P.actor_create(tx, body, pcd, "cheat" if made_by == "cheat" else "pack", at, 0, content_ref=pc_ref, mind_kind="human",
+                   event_origin="worldgen")
     labels = {}
     grants = list(pc.starting_inventory)
     for g in [g for g in grants if not g.container] + [g for g in grants if g.container]:
         to = objects.Holder("container", labels[g.container]) if g.container else objects.Holder("body", body, g.slot)
-        ev = objects.create(tx, g.item, g.qty, to, "worldgen", dict(g.props), at, None, 0, event_origin="worldgen")
+        ev = objects.create(tx, g.item, g.qty, to, made_by, dict(g.props), at, None, 0, event_origin="worldgen")
         if g.label:
             labels[g.label] = ev.payload["item_id"]
     if pc.appearance.looks is not None:
-        objects.dress(tx, body, pc.appearance.looks.outfit, at, None, 0, "worldgen")
+        objects.dress(tx, body, pc.appearance.looks.outfit, at, None, 0, made_by)
     road_touch = [r.road_id for r in region.routes if region.start_zone_id in (r.a_zone, r.b_zone)]
     zpl = [r[0] for r in tx.query("SELECT place_id FROM places WHERE zone_id=? AND parent_id IS NULL ORDER BY place_id",
                                   (sz.zone_id,))]
@@ -1737,6 +1741,55 @@ def assert_world(store, region, plan, opening):
     return out
 
 
+# ------------------------------------------------------------------------------------------ the Wild Card (D-102)
+def place_wild_card(tx, rng, pc, pc_body, settings, content_dir, at):
+    from ...contracts.events import Event, EventType
+    from ...mind.mind import add_fickle
+    from ...physical import bodies, objects
+    from .. import _impl_p10 as P
+    if not getattr(settings, "wild_card", False) or "reality_exception" in pc.capability.tags:
+        return None
+    canon = tx.canon
+    refs = sorted(r for k in ("pc", "actor") for r in canon.refs(k)
+                  if r.startswith("cheat_") and "wild_card" in (canon.get(r).tags or []))
+    if not refs:
+        return None
+    ref = refs[0]
+    rec = canon.get(ref)
+    zone_of = "SELECT p.zone_id FROM positions q JOIN places p ON p.place_id = q.place_id WHERE q.body_id=?"
+    pz = tx.query_one(zone_of, (pc_body,))
+    pz = pz[0] if pz else None
+    here = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (pc_body,))
+    here = here[0] if here else None
+    tops = [tuple(r) for r in tx.query("SELECT place_id, zone_id FROM places WHERE parent_id IS NULL ORDER BY place_id")]
+    far = [p for p, z in tops if z != pz] or [p for p, _z in tops if p != here]
+    if not far:
+        return None
+    place = rng.choice(tx, "worldgen:opening", "wild_card", far)
+    d = rec.model_dump(mode="json", by_alias=True)
+    body = bodies.create(tx, kind="human", sex=rec.identity.sex, age_years=rec.identity.age, height_cm=rec.appearance.height_cm,
+                         mass_kg=rec.appearance.mass_kg, special=rec.capability.special.model_dump(mode="json"), at=at,
+                         turn_index=0, origin="wildcard", content_ref=ref, looks=rec.appearance.looks)
+    P._place_at_first_anchor(tx, body, place, at, None, 0)
+    for g in [g for g in rec.starting_inventory if not g.container]:
+        objects.create(tx, g.item, g.qty, objects.Holder("body", body, g.slot), "wildcard", dict(g.props), at, None, 0,
+                       event_origin="worldgen")
+    if rec.appearance.looks is not None:
+        objects.dress(tx, body, rec.appearance.looks.outfit, at, None, 0, "wildcard")
+    P.actor_create(tx, body, d, "wildcard", at, 0, content_ref=ref, mind_kind="model", event_origin="worldgen")
+    tx.commit_event(Event(type=EventType.MATERIALIZE, writer="mind.actor", origin="worldgen", at=at, turn_index=0, actor_id=body,
+                          payload={"actor_id": body, "source": "wildcard", "quarantine": True},
+                          writes=[W("actors", {"quarantine": 1}, WriteOp.UPDATE, {"actor_id": body})]))
+    commit(tx, EventType.PERCEIVE, "mind.perception", at, [
+        W("known_places", {"holder_id": body, "place_id": place, "first_seen": at, "last_seen": at, "visited": 1})],
+        {"holder_id": body, "seed": True}, actor_id=body)
+    if "reality_exception" in rec.capability.tags:
+        bodies.grant_exception(tx, body, at, 0, origin="worldgen")
+    if "fickle" in (rec.tags or []):
+        add_fickle(tx, body, at, 0, origin="worldgen")
+    return body
+
+
 # ------------------------------------------------------------------------------------------ pipeline
 STAGE_STREAMS = {"WG0": ("worldgen:params", "worldgen:placement"), "WG1": ("worldgen:region",),
                  "WG2": ("worldgen:history", "worldgen:placement"), "WG4": ("worldgen:polity",),
@@ -1886,6 +1939,7 @@ async def run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id
         async def wg8(tx):
             ctx["opening"] = await opening_mod.place_pc(client, rng, tx, pc_ref, pc, params, ctx["placement"], plan, region, people, canon,
                                             run_id, seed, ctx["qc"], at)
+            opening_mod.place_wild_card(tx, rng, pc, ctx["opening"].pc_body, settings, config.content_dir, at)   # CHEAT-15
         await run_stage("WG8", wg8)
         opening = ctx["opening"]
         if opening.opening is not None:

@@ -355,7 +355,7 @@ Gate: `p11_audits` green — AUDIT-02 (each of 58 faults drops exactly its bit) 
 
 ### P12 — Surfaces
 Read: CHEATS.md, 09 §8, 10 §2.6, `cheats/*`, `content/importers.py`, `service/death.py`, `service/runs.py` (worlds).
-1. BUILT (D-100; tests 12 §3.18): `cheats/commands.py` (activate, parse, resolve, execute, the persona, god mode in `physical.bodies.apply_harm`, the standing brief at S4) + GameService routing + the guide's deflection + the `cheat_admin` pack. 1b. The owner's additions (D-78, D-79: will overwrite, memory wipe, remote infection, horde and census commands, the cure, Willis, Wild Card). 2. `content/importers.py` (files, character cards, docx, dossier intake). 3. `service/death.py`. 4. Worlds (list/export/import, `create_run(world_id=…)`). 5. Migration framework (`kernel/migrations/`, consent flow). 6. Read aloud via Talemate TTS.
+1. BUILT (D-100; tests 12 §3.18): `cheats/commands.py` (activate, parse, resolve, execute, the persona, god mode in `physical.bodies.apply_harm`, the standing brief at S4) + GameService routing + the guide's deflection + the `cheat_admin` pack. 1b. The owner's additions (D-78, D-79: will overwrite, memory wipe, remote infection, horde and census commands, the cure — BUILT, D-101), Willis and the Wild Card (BUILT, D-102: the code box, the reality exception, the wonders, the endless plate, TEMPER-10, REL-06, WORLD-07). 2. `content/importers.py` (files, character cards, docx, dossier intake). 3. `service/death.py`. 4. Worlds (list/export/import, `create_run(world_id=…)`). 5. Migration framework (`kernel/migrations/`, consent flow). 6. Read aloud via Talemate TTS.
 Gate: `p12_surfaces` green.
 
 ## 5. Phase acceptance details

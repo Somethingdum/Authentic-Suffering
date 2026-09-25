@@ -22,14 +22,40 @@ def _j(v):
 _AXES = ("trust", "fear", "respect", "affection", "resentment", "obligation")
 
 
+def _fickle_list(tx):
+    r = tx.query_one("SELECT value FROM meta WHERE key='fickle'")
+    try:
+        return set(_j(r[0]) or []) if r is not None else set()
+    except (TypeError, ValueError):
+        return set()
+
+
+def _fickle(tx, actor_id):
+    return actor_id in _fickle_list(tx)
+
+
+def add_fickle(tx, actor_id, at, turn_index, *, origin):
+    import json as _json
+    have = _fickle_list(tx)
+    if actor_id in have:
+        return None
+    return tx.commit_event(Event(type=EventType.SETTINGS_CHANGE, writer="kernel.meta", origin=origin, at=at,
+                                 turn_index=turn_index, payload={"source": "fickle", "actor_id": actor_id},
+                                 writes=[WriteRecord(op=WriteOp.UPSERT, table="meta", key={"key": "fickle"},
+                                                     values={"key": "fickle", "value": _json.dumps(sorted(have | {actor_id}))})]))
+
+
 def relate(tx, from_id, to_id, axis, delta, cause, at, turn_index):
     axis = RelationAxis(axis)
     if from_id == to_id:
         raise ValueError("nobody has a relationship with themselves")
     lo, hi = RELATION_AXIS_RANGE[axis]
+    if axis.value in ("affection", "obligation") and _fickle(tx, from_id):      # REL-06
+        from .mind import FICKLE_AFFECTION_MAX
+        hi = FICKLE_AFFECTION_MAX if axis.value == "affection" else 0
     r = _row(tx, "SELECT * FROM relationships WHERE from_id=? AND to_id=?", (from_id, to_id))
     old = r[axis.value] if r else 0
-    new = max(lo, min(hi, old + delta))
+    new = max(lo, min(max(hi, old), old + delta))
     if new == old:
         return None
     causes = _j(r["causes"]) if r else {}

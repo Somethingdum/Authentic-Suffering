@@ -793,7 +793,11 @@ def h_eat(tx, rng, intent, land_at, ctx, d):
             expose(tx, rng, intent.actor_id, c["pathway"], "mouth_contact_item", land_at, ctx.start_event_id, ctx.turn_index)
         if any(pw == "wet" and st.saliva_infectious for pw, st in stages(tx, intent.actor_id)):
             contaminate(tx, intent.bound.item_id, "wet", intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+    src = _row(tx, "SELECT props FROM items WHERE item_id=?", (intent.bound.item_id,))
+    plate = (json.loads(src["props"]) if src and isinstance(src["props"], str) else (src["props"] if src else {}) or {}).get("refills")
     destroy(tx, intent.bound.item_id, land_at, ctx.start_event_id, ctx.turn_index, qty=1)
+    if plate:                                        # D-102: the endless plate — eating is the only way to a new one
+        refill(tx, rng, plate, land_at, ctx.start_event_id, ctx.turn_index)
     refresh_need(tx, intent.actor_id, "hunger" if d.effect == "eat" else "thirst", land_at, ctx.start_event_id, ctx.turn_index)
     _noise(tx, intent, d.effect, d.noise_db, land_at, ctx)
     return _done("ate" if d.effect == "eat" else "drank")
@@ -1347,6 +1351,94 @@ def h_strip(tx, rng, intent, land_at, ctx, d):
     return _done("stripped")
 
 
+# ---- P12 (D-102): Willis's wonders — no check, nothing stops them
+def h_wonder_smite(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import excepted, kill
+    t = intent.bound.target_id
+    b = _body(tx, t)
+    if b is None or not b["alive"] or excepted(tx, t):
+        return _done("unmoved")
+    kill(tx, t, "wonder", land_at, ctx.turn_index, rng, cause_event_id=ctx.start_event_id)
+    return _done("smitten")
+
+
+def h_wonder_hurt(tx, rng, intent, land_at, ctx, d):
+    from ..action.effects import CENTRE_MASS
+    t = intent.bound.target_id
+    b = _body(tx, t)
+    if b is None or not b["alive"]:
+        return _done("unmoved")
+    anatomy = rng.weighted(tx, "resolve", f"wonder_hurt:{intent.actor_id}:{ctx.start_event_id}", list(CENTRE_MASS))
+    _wound(tx, rng, intent, t, anatomy, "blunt", "severe", land_at, ctx)
+    return _done("hurt")
+
+
+def h_wonder_gift(tx, rng, intent, land_at, ctx, d):
+    from ..physical.objects import Holder, create
+    t = intent.bound.target_id
+    canon = _canon(tx)
+    gifts = sorted(r for r in canon.refs("item") if "willis_gift" in canon.get(r).tags)
+    if not gifts or _body(tx, t) is None:
+        return _done("nothing")
+    ref = rng.choice(tx, "loot", f"wonder_gift:{intent.actor_id}:{ctx.start_event_id}", gifts)
+    mine = _body(tx, intent.actor_id)["origin"]
+    origin = mine if mine in ("cheat", "wildcard") else "cheat"
+    to = {t}
+    for g in tx.query("SELECT group_id FROM group_members WHERE actor_id=? AND status='member' ORDER BY group_id", (t,)):
+        for m in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id "
+                          "WHERE m.group_id=? AND m.status='member' AND b.alive=1", (g[0],)):
+            to.add(m[0])
+    free = [s for s in ("hand_r", "hand_l")
+            if _row(tx, "SELECT 1 FROM items WHERE holder_body=? AND holder_slot=?", (t, s)) is None]
+    if free:
+        holder = Holder("body", t, free[0])
+    else:
+        p = _pos(tx, t)
+        holder = Holder("place", p["place_id"], anchor_id=p["anchor_id"])
+    create(tx, ref, 1, holder, origin, {"gift_from": intent.actor_id, "gift_to": sorted(to)}, land_at,
+           ctx.start_event_id, ctx.turn_index)
+    return _done("given")
+
+
+def h_wonder_vanish(tx, rng, intent, land_at, ctx, d):
+    from ..physical.space import place_body, remove_body
+    me = intent.actor_id
+    here = _pos(tx, me)["place_id"]
+    places = [r[0] for r in tx.query("SELECT place_id FROM places WHERE parent_id IS NULL AND place_id != ? ORDER BY place_id",
+                                     (here,))]
+    if not places:
+        return _done("stayed")
+    to = rng.choice(tx, "resolve", f"wonder_vanish:{me}:{ctx.start_event_id}", places)
+    remove_body(tx, me, land_at, ctx.start_event_id, ctx.turn_index)
+    a = _row(tx, "SELECT anchor_id, x_m, y_m FROM anchors WHERE place_id=? ORDER BY anchor_id LIMIT 1", (to,))
+    if a is not None:
+        place_body(tx, me, to, a["anchor_id"], a["x_m"], a["y_m"], land_at, ctx.start_event_id, ctx.turn_index)
+    else:
+        p = _row(tx, "SELECT width_m, depth_m FROM places WHERE place_id=?", (to,))
+        place_body(tx, me, to, None, p["width_m"] / 2, p["depth_m"] / 2, land_at, ctx.start_event_id, ctx.turn_index)
+    return _done("gone")
+
+
+def refill(tx, rng, container_id, at, cause_event_id, turn_index):
+    from ..physical.objects import Holder, create
+    c = _row(tx, "SELECT def_ref, origin FROM items WHERE item_id=?", (container_id,))
+    if c is None:
+        return None
+    canon = _canon(tx)
+    tags = canon.get(c["def_ref"]).tags
+    tag = next((x.split(":", 1)[1] for x in tags if x.startswith("refill:")), None)
+    if "endless" not in tags or not tag:
+        return None
+    if _row(tx, "SELECT 1 FROM items WHERE container_id=?", (container_id,)) is not None:
+        return None
+    pool = sorted(r for r in canon.refs("item") if tag in canon.get(r).tags)
+    if not pool:
+        return None
+    ref = rng.choice(tx, "loot", f"refill:{container_id}:{cause_event_id}", pool)
+    return create(tx, ref, 1, Holder("container", container_id), c["origin"], {"refills": container_id}, at,
+                  cause_event_id, turn_index)
+
+
 HANDLERS = {
     "move_to_anchor": h_move_to_anchor, "move_through_portal": h_move_through_portal, "follow_body": h_follow_body,
     "leave_place": h_leave_place, "flee": h_flee, "climb": h_climb,
@@ -1360,6 +1452,7 @@ HANDLERS = {
     "go_prone": h_posture, "observe": h_hold, "wait": h_hold, "guard": h_hold, "sleep": h_hold, "rest": h_hold,
     "continue_task": h_continue, "speak": h_speak, "signal": h_signal, "surrender": h_surrender,
     "treat_wound": h_treat, "apply_tourniquet": h_treat, "eat": h_eat, "drink": h_eat, "throw_distraction": h_throw,
+    "wonder_smite": h_wonder_smite, "wonder_hurt": h_wonder_hurt, "wonder_gift": h_wonder_gift, "wonder_vanish": h_wonder_vanish,
 }
 
 

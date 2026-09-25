@@ -83,7 +83,9 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         sec = max(0, e["at"] - t0) / 1000
         text = None
         kind = "outcome"
-        if e["type"] == "ACTION_START" and pl.get("def_id") != "speak":
+        if e["type"] == "ACTION_START" and pl.get("def_id") == "wonder":     # CHEAT-14: it simply happens
+            text = f"{pc} {pl.get('seen') or pl.get('label')}."
+        elif e["type"] == "ACTION_START" and pl.get("def_id") != "speak":
             lbl = TRAILING_PAREN.sub("", pl.get("label") or pl.get("def_id", ""))
             text = f"{pc} chose to {lbl[:1].lower() + lbl[1:]}."
         elif e["type"] == "SPEECH":

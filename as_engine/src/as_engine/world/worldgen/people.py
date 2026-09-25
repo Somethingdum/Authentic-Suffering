@@ -7,7 +7,9 @@ params.days_since_fall; round = params.rnd.
 
 The HOME settlement = history.home_settlement(plan, region.start_zone_id).
 
-WG-26 Pack actors. The canon actor records (not PCs), by ref. Skipped, and listed in the worldgen
+WG-26 Pack actors. The canon actor records (not PCs), by ref — never one from a 'cheat_' pack
+  (CHEAT-10: a life as a cheat_ pack's character has that pack in its canon, and its other people
+  stay in it until /spawn; D-102). Skipped, and listed in the worldgen
   report with the reason, when: days_since_fall_range excludes dsf ("needs a world <a>-<b> years
   after the Fall", WG-34); or it has faction memberships (social.memberships with a faction ref) and
   none of those factions is planned ("their faction is not in this region"). The rest are placed:

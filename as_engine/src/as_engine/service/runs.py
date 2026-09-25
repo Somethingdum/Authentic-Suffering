@@ -163,7 +163,10 @@ async def create_run(config: "EngineConfig", pc_ref: str, settings: "RunSettings
     """Worldgen path (P10, RUN-11); world_id reuse path (P12, RUN-09).
 
     world_id given -> NotImplementedError('P12'). canon = content.pack.load_canon([content_dir /
-    'core'] + [content_dir / p for p in settings.pack_ids if p != 'core']) (an error-severity issue
+    'core'] + [content_dir / p for p in settings.pack_ids if p != 'core' — P12 (CHEAT-10, CHEAT-12):
+    a 'cheat_' pack only when it is pc_ref's own pack] + (CHEAT-15) with settings.wild_card, every
+    cheat_ pack holding a record tagged 'wild_card' (content.pack.cheat_records; his clothes and his
+    wonders are in it), by id, when not already there) (an error-severity issue
     -> RunError('content_missing', "A content pack this run needs has errors; check it on the
     Content screen.")). pc = the canon record at pc_ref, which must be of kind 'pc' (none, or
     another kind -> RunError('not_found', f"There is no character called {pc_ref}.")). seed = settings.seed, else int(sha256((wall_clock_iso() +
@@ -178,7 +181,9 @@ async def create_run(config: "EngineConfig", pc_ref: str, settings: "RunSettings
     config, run_id=run_id, world_id=world_id, world_dir = runs_dir / '_worlds' / world_id,
     progress=progress). One kernel.meta event SETTINGS_CHANGE {source: 'worldgen', world_id}
     (at kernel.clock.now, turn_index 0, origin 'system') writes meta UPSERT {key 'world_id', value
-    world_id}. Every model call worldgen made is in lm_calls (turn 0). Then
+    world_id}. P12 (D-102, CHEAT-12): a pc of generation 'cheat' then gets
+    cheats.commands.start_life(tx, meta.pc_actor_id, pc) in one more transaction (the console is
+    open and the life a Sandbox from its first moment). Every model call worldgen made is in lm_calls (turn 0). Then
     store.backup_to(run_dir / 'turn0.sqlite'); the store is closed; the session is opened as
     "Opening a session" says, with extras['pack_dirs'] = the pack dirs used, extras['notices'] =
     one plain line per report.skipped_actors entry (f"{name} is not in this world: {reason}.",

@@ -369,6 +369,8 @@ def _physical(c, d, o):
     q = d.requires
     if not c.cap.conscious:
         return "not conscious"
+    if q.capability_tags and not set(q.capability_tags) <= set(c.dossier.capability.tags):     # D-102
+        return "not something they can do"
     if q.mobile and not c.cap.mobile:
         return "cannot move"
     if q.can_run and not c.cap.can_run:

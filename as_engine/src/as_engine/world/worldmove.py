@@ -1,4 +1,4 @@
-"""Off-screen motion (P10). Owner 'world.worldmove' (operations). Rules WORLD-02..06, OPS-01..07.
+"""Off-screen motion (P10). Owner 'world.worldmove' (operations). Rules WORLD-02..07, OPS-01..07.
 docs/as/06_WORLD.md §3. The world moves without the player: people go out for supplies, walk
 patrols, trade, raid and leave; they are hurt, go hungry and die of what happens to them; and what
 they do leaves the marks it leaves (WORLD-03). Code only, COLD, no model call. W =
@@ -16,6 +16,8 @@ WORLD-04 The active area: off-screen code never kills, moves or sends away a bod
 WORLD-05 Named characters are not protected during play: an off-screen death can take anyone the
   player is not with.
 WORLD-06 The narrator never writes 'while you were gone' (narration lint); the world shows it.
+WORLD-07 (P12, D-102) The Wild Card is never where you left him: day() step 4b moves him each world
+  day he is not in the active area.
 
 ensure_timers(tx, at, turn_index) -> list[str]: no pending WORLD_DAY row -> kernel.clock.schedule(
   tx, society.settlement.next_hour(at, W.world_hour), 'WORLD_DAY', None, {}, None).
@@ -41,6 +43,11 @@ day(tx, rng, row, fired, turn_index) -> list[Event]   (the WORLD_DAY handler)
     already turned the DEATH into grief and a vacancy).
   3 Operations (OPS-01): plan_operations(tx, rng, at, turn_index, WD).
   4 Departures (OPS-06): depart(tx, rng, at, turn_index, WD).
+  4b (P12, D-102, WORLD-07) The Wild Card goes where he likes: every living body of origin 'wildcard'
+    (by body_id) whose place is outside the active area -> physical.space.remove_body, then place_body
+    at the first anchor (none: the centre) of a top-level place drawn with rng.choice(tx, 'offscreen',
+    f"wildcard:{body}:{d}", every top-level place outside the active area but his own, by place_id)
+    — no route, no traces, nobody sees him go. Beside the player he stays as long as he likes.
   5 world.decay.day(tx, rng, at, turn_index, WD) (physical wear); 6 world.infected.day(tx, rng, at,
     turn_index, WD), then world.hordes.day(tx, rng, at, turn_index, WD) (the dead in numbers:
     lifecycle, drifting crowds, the Mega Horde).

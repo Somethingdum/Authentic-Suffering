@@ -59,7 +59,10 @@ simulate — stages 0-12 in ONE store transaction:
     fired and dispatched only). Then
     every pending_reactions row with status 'pending' (by reaction_id): its actor joins FORCED and
     PENDING_REACTION {reaction_id, actor_id, status: 'resolved'} (writer 'turn.pipeline', at t0,
-    event actor_id = that actor) updates the row. Ledger 0 {lanes_up: sorted lane values,
+    event actor_id = that actor) updates the row. P12 (D-102, CHEAT-14): then
+    cheats.commands.take_wonder(tx, the PC, T, t0) — a waiting wonder becomes the PC's own visible
+    ACTION_START at t0, so wave 0's scene (S3, compile_scene step 2) shows it to whoever can see
+    him, and the narrator's packet tells it. Ledger 0 {lanes_up: sorted lane values,
     timers_fired: how many rows fired, pending_reactions: sorted FORCED ids}.
   S1 intake: (pc_intent, info) = await turn.intake.intake(tx, session, submit, T, t0).
     Ledger 1 {signature, source}.

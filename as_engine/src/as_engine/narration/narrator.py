@@ -19,7 +19,9 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
     * the PC's own events of this turn (events.actor_id = the PC), kind 'outcome' unless noted:
         ACTION_START (not the 'speak' def) f"{pc} chose to {label}." — label = payload.label (else
           payload.def_id) with a trailing parenthetical removed (TRAILING_PAREN) and its first
-          letter lower-cased ("Owen chose to climb over the high chain-link fence.");
+          letter lower-cased ("Owen chose to climb over the high chain-link fence."); the 'wonder' def
+          (P12, CHEAT-14: the Boss's wonder, cheats.commands.take_wonder) f"{pc} {seen}." — it is
+          not chosen and tried, it happens ("Willis walks straight through the wall.");
         SPEECH  kind 'speech', text f'{pc} says, "{words}"', speaker pc, words = payload.words;
         CHECK_RESOLVED  BAND_TEXT[payload.band] (bands not listed: no line);
         ACTION_COMPLETE  RESULT_TEXT[payload.result].format(pc=pc) (results not listed: no line);

@@ -80,7 +80,7 @@ const TIERS = ['bitch_mode', 'easy', 'normal', 'realism', 'actually_hell', 'fuck
 const ERAS = ['early', 'established', 'mature']
 const DETAILS = ['gotta_go_to_work_soon', 'quick_look', 'standard', 'settle_in', 'not_using_my_laptop_today']
 const COMMON = ['save_mode', 'turn_depth', 'narration_length', 'intensity', 'show_mechanics']
-const MORE = ['narration_person', 'narration_tense', 'pc_voice', 'read_aloud', 'autosave_ring']
+const MORE = ['narration_person', 'narration_tense', 'pc_voice', 'read_aloud', 'wild_card', 'autosave_ring']
 
 const store = inject('playStore')
 const d = store.wizard

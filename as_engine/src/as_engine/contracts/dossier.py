@@ -304,15 +304,23 @@ class Temper(Strict):
     fuse: int = Field(default=3, ge=1, le=5, description="How much provocation it takes before they snap: "
                       "1 = a hair trigger, 5 = a saint on a good day (mind.temper: the breaking point is fuse x 2 "
                       "heat, lower the more strained they are).")
-    outlet: Literal["fists", "words", "cold", "flight", "tears"] = Field(
+    outlet: Literal["fists", "words", "cold", "flight", "tears", "wrath"] = Field(
         default="words", description="How they blow when they do: swing at whoever pushed them; tear into them "
-        "out loud; go ice-cold and cut them off; storm off; break down.")
+        "out loud; go ice-cold and cut them off; storm off; break down; (D-102, Willis) hurt them with what they "
+        "can do — no reach, no hands, nothing stops it (mind.temper TEMPER-06).")
     grudge: int = Field(default=1, ge=0, le=3, description="How long they carry it: 0 = over it by the evening, "
                         "3 = never forgets.")
     pet_peeves: list[str] = Field(default_factory=list, description="Small things that get under their skin out "
                                   "of all proportion — fair or not: 'people who whistle', 'being called kid'.")
     cools_down_by: str = Field(default="", description="What actually settles them: 'a cigarette alone', "
                                "'hitting something that isn't a person', 'Eli asleep and safe'.")
+    shrugs_off: list[str] = Field(default_factory=list, description="D-102 (TEMPER-10): provocation kinds that give "
+                                  "them no heat at all ('struck', 'insulted', ...) — except from someone they gave a "
+                                  "gift: that is ingratitude.")
+    rages_at: list[Literal["worshipped", "wished_upon"]] = Field(default_factory=list, description="D-102 "
+                                  "(TEMPER-10): what sends them straight past their breaking point: being worshipped; "
+                                  "being asked for wonders by someone who has seen what they can do (the first time "
+                                  "from each person is let pass, with a correction).")
 
 
 class ActorDossier(Strict):

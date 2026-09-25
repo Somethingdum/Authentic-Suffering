@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import ConnectScreen from '../screens/ConnectScreen.vue'
 import ContentScreen from '../screens/ContentScreen.vue'
 import HomeScreen from '../screens/HomeScreen.vue'
+import { TEXT } from '../words.js'
 import { byId, field, fixture, flush, has, mountWith, one, storeWith } from './helpers.js'
 
 describe('Connect', () => {
@@ -112,6 +113,24 @@ describe('Home', () => {
     expect(has(w, 'run-card')).toBe(false)
     await one(w, 'home-sessions').trigger('click')
     expect(store.screen).toBe('sessions')
+  })
+
+  test('Enter a code (P12, CHEAT-12): the box sends the code and answers in words, never saying what codes do', async () => {
+    const { store, sock } = storeWith('welcome_home', 'runs')
+    const w = mountWith(HomeScreen, { store })
+    await flush()
+    expect(one(w, 'home-code-label').text()).toContain(TEXT.codeLabel)
+    await field(w, 'home-code').setValue('1234')
+    sock.sent.length = 0
+    await one(w, 'home-code-enter').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'code_enter', code: '1234' }])
+    sock.emit({ type: 'as_game', action: 'code_result', data: { accepted: false } })
+    await flush()
+    expect(one(w, 'home-code-result').text()).toBe(TEXT.codeRejected)
+    sock.emit({ type: 'as_game', action: 'code_result', data: { accepted: true } })
+    await flush()
+    expect(one(w, 'home-code-result').text()).toBe(TEXT.codeAccepted)
+    expect(store.pcs).toEqual([])   // the New Life list asks again
   })
 
   test('the other buttons go where they say', async () => {

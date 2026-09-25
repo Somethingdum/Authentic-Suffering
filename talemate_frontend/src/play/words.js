@@ -50,6 +50,8 @@ export const SETTINGS_TEXT = {
   dev_mode: { label: 'Developer mode', help: 'Shows what the game did behind the scenes. It changes nothing.',
     choices: { false: 'Off', true: 'On' } },
   autosave_ring: { label: 'Autosave slots', help: 'How many autosaves are kept, newest first.' },
+  wild_card: { label: 'Wild Card', help: 'A grinning man in a tuxedo walks this world as a person of his own. Chosen now; it cannot change later.',
+    choices: { false: 'Off', true: 'On' } },
 }
 
 const time = (s, tail) => (s < 60 ? `${Math.round(s)} s${tail}` : `${Math.round(s / 60)} min${tail}`)
@@ -64,6 +66,10 @@ export const TEXT = {
   survivesBy: 'Survives by', startsAs: 'Starts as', note: 'Note',
   difficulty: 'Difficulty', era: 'Era', detail: 'World detail', days: 'Days since the Fall', seed: 'Seed',
   moreOptions: 'More options',
+  codeLabel: 'Enter a code',
+  codeEnter: 'Enter',
+  codeAccepted: 'Accepted.',
+  codeRejected: 'Nothing happens.',
   buildTime: (m) => `About ${m} minutes to build`,
   daysHint: (lo, hi) => `Leave it empty, or pick a day from ${lo} to ${hi}.`,
   daysRange: (lo, hi) => `That world has to be ${lo} to ${hi} days after the Fall.`,

@@ -7,6 +7,7 @@ export const CLIENT_VERSION = '0.1.0'
 export const HOUSE_RULES = {
   save_mode: 'free', turn_depth: 'balanced', narration_length: 'medium', intensity: 'full', show_mechanics: 'summary',
   narration_person: 'third_limited', narration_tense: 'past', pc_voice: 'exact', read_aloud: false, autosave_ring: 5,
+  wild_card: false,
 }
 
 export function freshDraft() {
@@ -22,7 +23,7 @@ export function createPlayStore(socket, { download } = {}) {
     lanes: null, models: {}, laneTests: {}, config: null, runs: [], pcs: [], packs: [], contentReport: null, view: null,
     story: [], progress: null, rejection: null, settings: null, changeable: [], ironman: false, sandbox: false,
     notices: [], death: null, worldgen: null, worlds: [], devData: {}, cheatShimmer: false, error: null, saved: null,
-    composeText: '', mode: 'do', settingsOpen: false, bar: null, wizard: freshDraft(),
+    composeText: '', mode: 'do', settingsOpen: false, bar: null, wizard: freshDraft(), codeResult: null,
   })
   const send = (action, fields = {}) => socket.send({ action, ...fields })
   const on = (action, fn) => socket.on(action, (data) => fn(data || {}))
@@ -34,6 +35,7 @@ export function createPlayStore(socket, { download } = {}) {
   s.closeSettings = () => { s.settingsOpen = false }
   s.clearError = () => { s.error = null }
   s.listPcs = () => send('pcs_list')
+  s.enterCode = (code) => { s.codeResult = null; send('code_enter', { code }) }   // P12, CHEAT-12: the menu's code box
   s.newLife = (pcRef, settings, worldId = null) => {
     send('run_new', worldId ? { pc_ref: pcRef, settings, world_id: worldId } : { pc_ref: pcRef, settings })
     s.screen = 'worldgen'
@@ -64,6 +66,10 @@ export function createPlayStore(socket, { download } = {}) {
   on('view', (d) => { s.view = d.view; s.lanes = d.view?.lanes ?? s.lanes })
   on('story', (d) => { s.story = d.entries })
   on('pcs', (d) => { s.pcs = d.cards })
+  on('code_result', (d) => {   // taken or not, and nothing about what a code does (CHEATS §2)
+    s.codeResult = d.accepted ? 'accepted' : 'rejected'
+    if (d.accepted) s.pcs = []   // the New Life list asks again (CHEAT-12)
+  })
   on('turn_progress', (d) => {
     s.busy = true
     s.progress = { turnIndex: d.turn_index, stage: d.stage, label: d.label, pct: d.pct, elapsed: d.elapsed_s }

@@ -1,0 +1,54 @@
+# Willis's wonders (DECISIONS D-79, D-102; docs/as/sources/WILLIS.md). Offered only to a body whose
+# dossier holds the capability tag reality_exception (requires.capability_tags, CHEAT-13). No check,
+# no contest: nothing stops them (action.effects wonder_*). His temper's 'wrath' outlet builds the
+# first two when he snaps (mind.temper TEMPER-06/10). What he does with them is his own mind's
+# choice — or, when he is played, the Boss's.
+- schema: as.affordance.v1
+  id: wonder_smite
+  verb: attack
+  label: "End {target}, just like that"
+  ui_label: "End {target}"
+  binds: body
+  range: visible
+  requires: {capability_tags: [reality_exception], target_alive: true}
+  moral_tags_if_target: {human: [kill_human], infant: [kill_child], child: [kill_child], preteen: [kill_child], teen: [kill_child]}
+  duration: {base_s: 1}
+  noise_db: 0
+  effect: wonder_smite
+  tags: [attack, lethal, wonder]
+- schema: as.affordance.v1
+  id: wonder_hurt
+  verb: attack
+  label: "Hurt {target} badly without lifting a finger"
+  ui_label: "Hurt {target}"
+  binds: body
+  range: visible
+  requires: {capability_tags: [reality_exception], target_alive: true}
+  duration: {base_s: 1}
+  noise_db: 0
+  effect: wonder_hurt
+  tags: [attack, wonder]
+- schema: as.affordance.v1
+  id: wonder_gift
+  verb: manipulate
+  label: "Give {target} something impossible, because you feel like it"
+  ui_label: "Give {target} something impossible"
+  binds: body
+  range: visible
+  requires: {capability_tags: [reality_exception], target_alive: true}
+  duration: {base_s: 2}
+  noise_db: 0
+  effect: wonder_gift
+  tags: [wonder, gift]
+- schema: as.affordance.v1
+  id: wonder_vanish
+  verb: move
+  label: "Simply be somewhere else"
+  ui_label: "Vanish"
+  binds: none
+  range: self
+  requires: {capability_tags: [reality_exception]}
+  duration: {base_s: 1}
+  noise_db: 0
+  effect: wonder_vanish
+  tags: [wonder, move, leave]

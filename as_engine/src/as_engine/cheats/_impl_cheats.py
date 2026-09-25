@@ -157,6 +157,10 @@ def parse(text):
             args["place"] = " ".join(rest[2:])
     elif name in ("mega", "census"):
         pass
+    elif name == "wonder":
+        if not rest:
+            return bad()
+        args["what"] = " ".join(rest)
     elif name == "noise":
         if not rest or not rest[0].isdigit() or not 40 <= int(rest[0]) <= 180:
             return bad()
@@ -410,20 +414,10 @@ async def _rep(tx, s, a, at, T):
 
 
 def _cheat_records(session):
-    """Every actor / pc record of the cheat_ packs under config.content_dir (CHEAT-10: loaded only
-    here, validated by content.pack.load_pack) -> {ref: record}."""
-    from pathlib import Path
-
-    from ..content.pack import load_pack
-    out = {}
-    root = Path(session.config.content_dir)
-    for d in sorted(root.glob("cheat_*")) if root.exists() else []:
-        pack, _issues = load_pack(d)
-        if pack is None or not pack.manifest.id.startswith("cheat_"):
-            continue
-        for kind in ("actor", "pc"):
-            out.update(pack.records.get(kind, {}))
-    return out
+    """Every actor / pc record of the cheat_ packs under config.content_dir (CHEAT-10:
+    content.pack.cheat_records) -> {ref: record}."""
+    from ..content.pack import cheat_records
+    return cheat_records(session.config.content_dir)
 
 
 def _spawn_ref(tx, session, what):
@@ -514,6 +508,13 @@ async def _spawn(tx, s, a, at, T):
         tx.commit_event(Event(type=EventType.PERCEIVE, writer="mind.perception", origin="cheat", at=at, turn_index=T, actor_id=bid,
                               writes=[_W("known_places", {"holder_id": bid, "place_id": place, "first_seen": at, "last_seen": at,
                                                           "visited": 1}, "insert")], payload={"holder_id": bid, "seed": True}))
+        if "reality_exception" in (cap.get("tags") or []):
+            bodies.grant_exception(tx, bid, at, T, origin="cheat")
+        if "fickle" in (d.get("tags") or []):
+            from ..mind.mind import add_fickle
+            add_fickle(tx, bid, at, T, origin="cheat")
+        if "cheat_companion" in (d.get("tags") or []) and bodies.excepted(tx, s.pc_id):
+            evs += _blend_in(tx, bid, s.pc_id, place, d, at, T)
         made.append(bid)
     return True, f"{idn['name']} x{a['n']} at your place{' (ally)' if a['ally'] else ''}", "", evs, made
 
@@ -549,6 +550,8 @@ async def _kill(tx, s, a, at, T):
     alive, _k = _alive(tx, who)
     if not alive:
         return False, "Already dead, Boss. Thorough, though.", "", []
+    if bodies.excepted(tx, who):
+        return False, "Reality lost that argument a long time ago, Boss.", "", []
     ev = bodies.kill(tx, who, "cheat", at, T, s.rng)
     return True, f"killed {_name(tx, who)}", "", [ev]
 
@@ -704,7 +707,8 @@ async def persona(session, tx, name, outcome):
     from ..lanes.requests import build_request
     from .commands import CANNED_LINES
     recent = [r[0] for r in tx.query("SELECT persona_line FROM cheat_log WHERE persona_line != '' ORDER BY rowid DESC LIMIT 5")]
-    ctx = CheatPersonaContext(command=f"/{name}", outcome=outcome, recent_lines=recent)
+    from ..physical.bodies import excepted
+    ctx = CheatPersonaContext(command=f"/{name}", outcome=outcome, recent_lines=recent, willis=excepted(tx, session.pc_id))
     req = build_request(session.config, CallClass.CHEAT_PERSONA, turn_index=None, context=ctx, ctx=ctx)
     resp = await session.client.call(req)
     record(tx, req, resp)
@@ -999,3 +1003,97 @@ HANDLERS = {"give": _give, "heal": _heal, "god": _god, "tp": _tp, "set": _set, "
             "mind": _mind, "brief": _brief, "noise": _noise, "off": _off,
             "will": _will, "forget": _forget, "infect": _infect, "cure": _cure, "horde": _horde, "mega": _mega,
             "census": _census}
+
+
+# ------------------------------------------------------------------------------------------ Willis (D-79, D-102)
+def _blend_in(tx, bid, pc, place, d, at, T):
+    """Fredrick blends in whenever Willis is blending in: whoever knows the PC knows him, and feels
+    about him as they feel about the PC; he joins the PC's groups."""
+    from ..contracts.events import Event, EventType
+    from ..mind.perception import describe_dossier
+    name = tx.query_one("SELECT display_name FROM actors WHERE actor_id=?", (bid,))[0]
+    desc = describe_dossier(d)
+    axes = ("trust", "fear", "respect", "affection", "resentment", "obligation")
+    evs = []
+    for (holder,) in [tuple(r) for r in tx.query("SELECT holder_id FROM acquaintance WHERE subject_id=? AND holder_id != ? "
+                                                 "ORDER BY holder_id", (pc, bid))]:
+        evs.append(tx.commit_event(Event(type=EventType.PERCEIVE, writer="mind.perception", origin="cheat", at=at, turn_index=T,
+                                         actor_id=holder, payload={"holder_id": holder, "seed": True, "blend_in": bid},
+                                         writes=[_W("acquaintance", {"holder_id": holder, "subject_id": bid, "known_name": name,
+                                                                     "description": desc, "first_met": at, "last_seen": at,
+                                                                     "last_seen_place": place}, "upsert",
+                                                    {"holder_id": holder, "subject_id": bid})])))
+        r = tx.query_one(f"SELECT {', '.join(axes)} FROM relationships WHERE from_id=? AND to_id=?", (holder, pc))
+        if r is not None:
+            vals = {"from_id": holder, "to_id": bid, **{a: r[i] for i, a in enumerate(axes)}, "kind": "acquaintance",
+                    "causes": {}, "updated_at": at}
+            evs.append(tx.commit_event(Event(type=EventType.RELATION_CHANGE, writer="mind.mind", origin="cheat", at=at,
+                                             turn_index=T, actor_id=holder,
+                                             payload={"from_id": holder, "to_id": bid, "blend_in": True},
+                                             writes=[_W("relationships", vals, "upsert", {"from_id": holder, "to_id": bid})])))
+    gs = [r[0] for r in tx.query("SELECT group_id FROM group_members WHERE actor_id=? AND status='member' ORDER BY group_id", (pc,))]
+    ws = [_W("group_members", {"group_id": g, "actor_id": bid, "role": "member", "standing": 0, "since": at, "status": "member"},
+             "upsert", {"group_id": g, "actor_id": bid}) for g in gs]
+    if ws:
+        evs.append(_ev(tx, "society.group", ws, {"command": "spawn", "actor_id": bid, "blend_in": gs}, at, T))
+    return evs
+
+
+_WONDER_ME = re.compile(r"^(i|i'm|i'll|my)\b", re.I)
+_WONDER_HIM = re.compile(r"^(willis|he)\s+", re.I)
+
+
+async def _wonder(tx, s, a, at, T):
+    from ..physical import bodies
+    if not bodies.excepted(tx, s.pc_id):
+        return False, "You're not him, Boss.", "", []
+    what = a["what"].strip().replace("{", "").replace("}", "").strip()
+    what = _WONDER_HIM.sub("", what.rstrip(".").strip()).strip()
+    if not what or _WONDER_ME.match(what):
+        return False, "Say it the way they'd see it, Boss: /wonder walks through the wall", "", []
+    if _meta(tx, "pending_wonder"):
+        return False, "One wonder at a time, Boss. The last one hasn't happened yet.", "", []
+    ev = _ev(tx, "kernel.meta", [_W("meta", {"key": "pending_wonder", "value": what}, "upsert", {"key": "pending_wonder"})],
+             {"command": "wonder", "what": what}, at, T)
+    return True, f"{what}, as the next moment begins", "", [ev]
+
+
+HANDLERS["wonder"] = _wonder
+
+
+def take_wonder(tx, pc_id, turn_index, at):
+    from ..contracts.events import Event, EventType
+    what = _meta(tx, "pending_wonder")
+    if not what:
+        return None
+    ev = tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", origin="cheat", at=at, turn_index=turn_index,
+                               actor_id=pc_id,
+                               payload={"actor_id": pc_id, "def_id": "wonder", "verb": "wonder", "target_id": None,
+                                        "destination_id": None, "item_id": None, "est_duration_s": 0, "visible": True,
+                                        "seen": what, "continues_task": False, "label": what, "goal": "", "attention": None}))
+    _ev(tx, "kernel.meta", [_W("meta", {"key": "pending_wonder", "value": ""}, "upsert", {"key": "pending_wonder"})],
+        {"wonder": "done"}, at, turn_index)
+    return ev
+
+
+def start_life(tx, pc_id, record):
+    from ..contracts.events import Event, EventType
+    from ..physical import bodies
+    at, T = _now(tx), 0
+    evs = [tx.commit_event(Event(type=EventType.CHEAT_ACTIVATED, writer="kernel.meta", origin="cheat", at=at, turn_index=T,
+                                 payload={"start": True},
+                                 writes=[_W("meta", {"key": "cheat_active", "value": "1"}, "upsert", {"key": "cheat_active"})]))]
+    evs.append(_ev(tx, "kernel.meta", [_W("meta", {"key": "sandbox", "value": "1"}, "upsert", {"key": "sandbox"})],
+                   {"sandbox": True}, at, T))
+    evs.append(_ev(tx, "mind.actor", [_W("actors", {"quarantine": 1}, "update", {"actor_id": pc_id})],
+                   {"command": "start", "actor_id": pc_id}, at, T))
+    if "reality_exception" in record.capability.tags:
+        evs.append(bodies.grant_exception(tx, pc_id, at, T, origin="cheat"))
+    if "fickle" in (record.tags or []):
+        from ..mind.mind import add_fickle
+        evs.append(add_fickle(tx, pc_id, at, T, origin="cheat"))
+    evs.append(_ev(tx, "cheats", [_W("cheat_log", {"entry_id": tx.mint("cht"), "turn_index": T, "command": "start",
+                                                   "outcome": f"began a life as {record.identity.name}", "persona_line": "",
+                                                   "event_id": evs[0].event_id}, "insert")],
+                   {"command": "start", "raw": "start", "outcome": f"began a life as {record.identity.name}"}, at, T))
+    return [e for e in evs if e is not None]

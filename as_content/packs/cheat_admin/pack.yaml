@@ -4,6 +4,8 @@ name: Authentic Suffering — cheat admin
 version: 1.0.0
 description: >-
   Cheat-only content (CHEAT-10): compiled with every other pack, invisible to worldgen and the
-  New Life wizard, reachable only through /spawn after activation. Ships Fredrick.
+  New Life wizard, reachable through /spawn after activation. Ships Fredrick, and Willis with
+  his clothes: his life opens only after the code (CHEAT-12), and the Wild Card house rule may
+  place him in a normal world (CHEAT-15).
 depends_on: [core]
 authors: [SomethingDum, AS build spec v1]

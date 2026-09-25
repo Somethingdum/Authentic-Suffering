@@ -123,6 +123,12 @@ compile_packs(pack_dirs, out_path) -> CompileReport
   identical hash on every machine; any record change changes it. ok = no error issues; when not
   ok, canon.sqlite is NOT written (a half-valid canon never reaches a run).
   counts = {kind: number of records}.
+
+cheat_records(content_dir) -> dict[str, record]   (P12: CHEAT-10, D-102 — the one way into a cheat_ pack)
+  Every actor and pc record of each folder under ``content_dir`` whose name starts with 'cheat_'
+  (sorted by folder), loaded with load_pack and kept only when its manifest id starts with
+  'cheat_' too: {ref: record}. cheats.commands (/spawn) and world.worldgen.opening (the Wild Card)
+  read cheat packs through this and nothing else; a missing folder -> {}.
 """
 
 from __future__ import annotations
@@ -455,6 +461,18 @@ def _toposort(packs, issues):
     for p in sorted(packs, key=lambda p: p.manifest.id):
         visit(p.manifest.id, [])
     return order
+
+
+def cheat_records(content_dir: str | Path) -> dict:
+    out = {}
+    root = Path(content_dir)
+    for d in sorted(root.glob("cheat_*")) if root.exists() else []:
+        pack, _issues = load_pack(d)
+        if pack is None or not pack.manifest.id.startswith("cheat_"):
+            continue
+        for kind in ("actor", "pc"):
+            out.update(pack.records.get(kind, {}))
+    return out
 
 
 def load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:

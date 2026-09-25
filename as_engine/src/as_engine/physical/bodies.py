@@ -222,6 +222,33 @@ LOOK-09 Cold (P10; progress step 2, after LOOK-08; the same bodies): warmth is
   cold_stage. The cold stage counts toward impairment (HARM-07) and stage 6 is death by cold (the
   death test): naked outdoors on a mild night that is about twelve hours; in a cold country with
   the clothes soaked, a few.
+
+P12 (D-79, D-102) — the reality exception (CHEAT-13; docs/as/sources/WILLIS.md: "reality does not
+meaningfully resist him"). Per body, like god mode, never by who controls it:
+excepted(store, body_id) -> bool: body_id is in meta 'reality_exception' (a JSON list; absent,
+  empty or unreadable -> nobody).
+grant_exception(tx, body_id, at, turn_index, *, origin, cause_event_id=None) -> Event | None
+  Already listed -> None. Else SETTINGS_CHANGE {source: 'reality_exception', body_id} (writer
+  'kernel.meta', event origin = ``origin``: 'cheat' in a life the code opened or a /spawn,
+  'worldgen' for the Wild Card) upserting meta 'reality_exception' = the sorted list with it added.
+For a body in the exception: apply_harm writes nothing and returns [] (a blow, a bite, a bullet
+  may land; none of them has any say over it); progress moves only progressed_at (no bleeding, no
+  need stage, no infection stage, no condition or cold step, no healing check, no death test);
+  expose returns None and commits nothing; soil returns None (impossibly clean); cold_need is 0;
+  die returns None; capacity counts no grip (restrained is ignored: contact happens, it restrains
+  nothing). Everything else about the body — where it is, what it looks like, what it holds, who
+  sees it — is ordinary, and every other body keeps every rule.
+  Unwinnable (the owner: "every fight with Willis is unwinnable. Even if you win, it's because he
+  thought it was more fun to let you think you did ... he may produce corpses, and respawn somewhere
+  else"): a blow on him that would kill anyone else — severity 'catastrophic', or 'severe' to the
+  head or neck — is, when rng.chance(tx, 'mind', f"decoy:{body}:{cause_event_id}", DECOY_CHANCE),
+  his whim to seem to die: a new body (create: kind, sex, age, height, mass, special, looks and
+  content_ref as his, origin = his) at his exact position, wearing fresh copies of what he wears
+  (physical.objects.create, origin = his, holder slot 'worn'), dies of it (kill(tx, it, 'harm', at,
+  T, rng, cause_event_id)); he is taken out of the place (physical.space.remove_body) and set down
+  at the first anchor (none: the centre) of a top-level place drawn with rng.choice(tx, 'resolve',
+  f"respawn:{body}:{cause_event_id}", every top-level place but his own, by place_id) — nobody sees
+  where. apply_harm still returns []: the blow had no say over him.
 """
 
 from __future__ import annotations
@@ -363,6 +390,9 @@ def apply_harm(tx: "Tx", body_id: str, wound: WoundSpec, at: int, cause_event_id
     g = tx.query_one("SELECT value FROM meta WHERE key='god_bodies'")
     if g is not None and body_id in _god_list(g[0]):
         return []
+    if excepted(tx, body_id):                 # D-102: no say over him — and he may play dead
+        _decoy(tx, body_id, wound, at, cause_event_id, turn_index, rng)
+        return []
     R = _rules(tx)
     wid = tx.mint("wnd")
     vals = _wound_values(R, wound.anatomy, wound.type, wound.severity, wound.contamination, at, cause_event_id)
@@ -414,6 +444,78 @@ def _god_list(raw):
         return set(_json.loads(raw or "[]"))
     except (ValueError, TypeError):
         return set()
+
+
+DECOY_CHANCE = 0.5
+
+
+def _decoy(tx, body_id, wound, at, cause_event_id, turn_index, rng):
+    from ..physical import objects, space
+    grp = ANATOMY_GROUP[str(wound.anatomy)]
+    sev = str(wound.severity)
+    if not (sev == "catastrophic" or (sev == "severe" and grp in ("head", "neck"))):
+        return
+    if not rng.chance(tx, "mind", f"decoy:{body_id}:{cause_event_id}", DECOY_CHANCE):
+        return
+    b = _b(tx, body_id)
+    pos = tx.query_one("SELECT place_id, anchor_id, x_m, y_m FROM positions WHERE body_id=?", (body_id,))
+    if pos is None:
+        return
+    import json as _json
+    special = b["special"] if isinstance(b["special"], dict) else _json.loads(b["special"] or "{}")
+    corpse = create(tx, kind=b["kind"], sex=b["sex"], age_years=b["age_years"], height_cm=b["height_cm"], mass_kg=b["mass_kg"],
+                    special=special, at=at, turn_index=turn_index, origin=b["origin"], cause_event_id=cause_event_id,
+                    content_ref=b["content_ref"], looks=looks_of(tx, body_id))
+    space.place_body(tx, corpse, pos[0], pos[1], pos[2], pos[3], at, cause_event_id, turn_index)
+    item_origin = b["origin"] if b["origin"] in objects.ORIGINS else "cheat"
+    for (ref,) in [tuple(r) for r in tx.query("SELECT def_ref FROM items WHERE holder_body=? AND holder_slot='worn' ORDER BY item_id",
+                                              (body_id,))]:
+        objects.create(tx, ref, 1, objects.Holder("body", corpse, "worn"), item_origin, {}, at, cause_event_id, turn_index)
+    kill(tx, corpse, "harm", at, turn_index, rng, cause_event_id=cause_event_id)
+    places = [r[0] for r in tx.query("SELECT place_id FROM places WHERE parent_id IS NULL AND place_id != ? ORDER BY place_id",
+                                     (pos[0],))]
+    if not places:
+        return
+    to = rng.choice(tx, "resolve", f"respawn:{body_id}:{cause_event_id}", places)
+    space.remove_body(tx, body_id, at, cause_event_id, turn_index)
+    a = tx.query_one("SELECT anchor_id, x_m, y_m FROM anchors WHERE place_id=? ORDER BY anchor_id LIMIT 1", (to,))
+    if a is not None:
+        space.place_body(tx, body_id, to, a[0], a[1], a[2], at, cause_event_id, turn_index)
+    else:
+        p = tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (to,))
+        space.place_body(tx, body_id, to, None, p[0] / 2, p[1] / 2, at, cause_event_id, turn_index)
+
+
+def excepted(store: "Store | Tx", body_id: str) -> bool:
+    r = store.query_one("SELECT value FROM meta WHERE key='reality_exception'")
+    return r is not None and body_id in _god_list(r[0])
+
+
+def grant_exception(tx: "Tx", body_id: str, at: int, turn_index: int, *, origin: str,
+                    cause_event_id: str | None = None) -> "Event | None":
+    import json as _json
+
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    r = tx.query_one("SELECT value FROM meta WHERE key='reality_exception'")
+    listed = _god_list(r[0]) if r is not None else set()
+    if body_id in listed:
+        return None
+    return tx.commit_event(Event(type=EventType.SETTINGS_CHANGE, writer="kernel.meta", origin=origin, at=at,
+                                 turn_index=turn_index, cause_event_id=cause_event_id,
+                                 payload={"source": "reality_exception", "body_id": body_id},
+                                 writes=[WriteRecord(op=WriteOp.UPSERT, table="meta", key={"key": "reality_exception"},
+                                                     values={"key": "reality_exception",
+                                                             "value": _json.dumps(sorted(listed | {body_id}))})]))
+
+
+def _clock_only(tx, body_id, b, to_ms, turn_index):
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    if to_ms > b["progressed_at"]:
+        tx.commit_event(Event(type=EventType.WOUND_PROGRESS, writer="physical.bodies", at=to_ms, turn_index=turn_index,
+                              target_ids=[body_id], payload={"body_id": body_id, "change": "clock"},
+                              writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id},
+                                                  values={"progressed_at": to_ms})]))
+    return []
 
 
 def kill(tx: "Tx", body_id: str, cause: str, at: int, turn_index: int, rng: "Rng", *,
@@ -567,6 +669,8 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
     b = _b(tx, body_id)
     t = b["progressed_at"]
     imp0 = b["impairment"]
+    if excepted(tx, body_id):                # D-102: nothing wears on it; only the clock moves
+        return _clock_only(tx, body_id, b, to_ms, turn_index)
     params = _params(tx)
     heat = 1 + (params["climate_heat"] - 5) * 0.08
     periods = {"thirst": N.thirst_stage_every_h * heat, "hunger": N.hunger_stage_every_h, "fatigue": N.fatigue_stage_every_h}
@@ -694,7 +798,7 @@ def capacity(store: "Store | Tx", body_id: str) -> Capacity:
     ws = _wounds(store, body_id)
     conscious = bool(b["alive"]) and b["awareness"] in ("alert", "awake", "drowsy")
     legs = {ANATOMY_SIDE[w["anatomy"]] for w in ws if ANATOMY_GROUP[w["anatomy"]] in ("leg",) and w["function_loss"] >= 2}
-    mobile = conscious and not b["restrained"] and len(legs) < 2
+    mobile = conscious and not (b["restrained"] and not excepted(store, body_id)) and len(legs) < 2
     free = 0
     for side, slot in (("l", "hand_l"), ("r", "hand_r")):
         disabled = any(ANATOMY_GROUP[w["anatomy"]] in ("arm", "hand") and ANATOMY_SIDE.get(w["anatomy"]) == side and w["function_loss"] >= 2 for w in ws)
@@ -834,7 +938,7 @@ def create(tx: "Tx", *, kind: str, sex: str | None, age_years: int | None, heigh
            looks: "Looks | None" = None) -> str:
     from ..contracts.common import age_band_for
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
-    if origin not in ("worldgen", "birth", "materialize", "cheat", "reanimation", "scenario"):
+    if origin not in ("worldgen", "birth", "materialize", "cheat", "reanimation", "scenario", "wildcard"):
         raise ValueError(f"unknown body origin {origin}")
     bid = tx.mint("act")
     vals = {"body_id": bid, "kind": kind, "content_ref": content_ref, "sex": sex, "age_years": age_years,
@@ -866,7 +970,7 @@ def expose(tx: "Tx", rng: "Rng", body_id: str, pathway: str, exposure: str, at: 
     if exposure not in rec.exposure:
         raise ValueError(f"pathway {pathway} has no exposure {exposure}")
     b = _b(tx, body_id)
-    if not b["alive"] or b["kind"] not in ("human", "lurker"):
+    if not b["alive"] or b["kind"] not in ("human", "lurker") or excepted(tx, body_id):
         return None
     if tx.query_one("SELECT 1 FROM infections WHERE body_id=? AND pathway=?", (body_id, pathway)) is not None:
         return None
@@ -884,7 +988,7 @@ def expose(tx: "Tx", rng: "Rng", body_id: str, pathway: str, exposure: str, at: 
 def die(tx: "Tx", rng: "Rng", body_id: str, at: int, cause_event_id: str | None, turn_index: int, *,
         cause: str = "offscreen") -> Event | None:
     b = _b(tx, body_id)
-    if not b["alive"]:
+    if not b["alive"] or excepted(tx, body_id):
         return None
     return _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, rng=rng)
 
@@ -946,6 +1050,8 @@ def condition_of(store: "Store | Tx", body_id: str) -> BodyCondition:
 def soil(tx: "Tx", body_id: str, *, grime: int = 0, blood: int = 0, gore: int = 0, wet: int = 0, source: str,
          at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    if excepted(tx, body_id):
+        return None
     c = condition_of(tx, body_id)
     new = {"grime": max(0, min(5, c.grime + grime)), "blood": max(0, min(5, c.blood + blood)),
            "gore": max(0, min(5, c.gore + gore)), "wet": max(0, min(3, c.wet + wet))}
@@ -985,7 +1091,7 @@ def cold_need(store: "Store | Tx", body_id: str, at: int) -> int:
     from ..world.decay import exposed
     C = _rules(store).condition
     b = _b(store, body_id)
-    if not _care_subject(store, b):
+    if not _care_subject(store, b) or excepted(store, body_id):
         return 0
     heat = _params(store)["climate_heat"]
     band = "cold" if heat <= 3 else ("hot" if heat >= 8 else "mild")

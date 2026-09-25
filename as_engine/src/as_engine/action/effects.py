@@ -301,6 +301,36 @@ Per effect (result strings in quotes; 'done' unless noted):
   throw_distraction  objects.transfer to the destination anchor; NOISE 70 dB 'something clattering'
                      at the LANDING POINT (not the thrower).
 
+P12 (D-79, D-102, CHEAT-13) — Willis's wonders. Affordances of the cheat_admin pack whose
+requires.capability_tags hold 'reality_exception' (mind.affordance: only he is offered them); no check
+and no contest — nothing stops them. turn.cognition's 'wrath' outburst (mind.temper TEMPER-06) builds
+the first two.
+  wonder_smite   a living target dies: physical.bodies.kill(tx, target, 'wonder', land_at, T, rng,
+                 cause_event_id = the ACTION_START) -> 'smitten'; a target itself in the reality exception
+                 (bodies.excepted) -> 'unmoved', nothing happens.
+  wonder_hurt    one 'severe' 'blunt' wound on the target at an anatomy drawn with rng.weighted(tx,
+                 'resolve', f"wonder_hurt:{actor}:{the start id}", CENTRE_MASS) through
+                 physical.bodies.apply_harm -> 'hurt'.
+  wonder_gift    gift = rng.choice(tx, 'loot', f"wonder_gift:{actor}:{the start id}", the canon items tagged
+                 'willis_gift', by ref) (none -> 'nothing'); physical.objects.create(gift, 1, into the target's
+                 free hand (hand_r, then hand_l), else its place at its anchor and point, origin = the giver's
+                 bodies.origin when that is an item origin ('cheat' / 'wildcard'), else 'cheat', props
+                 {gift_from: the giver, gift_to: sorted(the target and every living member, status 'member',
+                 of the target's groups)}) -> 'given' (an endless gift arrives full: physical.objects.create).
+                 mind.temper reads gifts: to the giver, disrespect from anyone in gift_to is ingratitude
+                 (TEMPER-10).
+  wonder_vanish  the actor is simply elsewhere: physical.space.remove_body, then place_body at the first
+                 anchor (by anchor_id; none: the centre) of a top-level place (parent_id NULL) drawn with
+                 rng.choice(tx, 'resolve', f"wonder_vanish:{actor}:{the start id}", every one but its own, by
+                 place_id) — a MOVE from nowhere: nobody sees where he went -> 'gone'.
+  The endless container (the owner's plate of samiches; D-102): refill(tx, rng, container_id, at,
+    cause_event_id, turn_index) -> Event | None — the container item exists, holds nothing, and its
+    def tags hold 'endless' and 'refill:<tag>' -> one item drawn with rng.choice(tx, 'loot',
+    f"refill:{container}:{cause}", the canon items tagged <tag>, by ref) created inside it (origin = the
+    container's, props {refills: container_id}); else None. h_eat calls it after the destroy for an
+    eaten item whose props hold 'refills'. Only eating refills, and only an empty container: one taken
+    off and kept makes no new one — the plate never holds or makes more than one at a time.
+
 CENTRE_MASS = [('chest', 30), ('abdomen', 20), ('arm_l', 10), ('arm_r', 10), ('leg_l', 10),
                ('leg_r', 10), ('head', 10)]
 WEAPON_WOUNDS[damage_class][band]: light {clean: significant, cost: minor}; medium {clean: severe,
@@ -358,7 +388,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
     "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
-    "strip",
+    "strip", "wonder_smite", "wonder_hurt", "wonder_gift", "wonder_vanish",
 )
 
 CENTRE_MASS: tuple[tuple[str, int], ...] = (
@@ -470,6 +500,10 @@ SEEN: dict[str, str | None] = {
     "wait_here": None,
     "guard_anchor": "takes up a guard at {destination}",
     "keep_working": None,
+    "wonder_smite": "flicks a finger at {target}",
+    "wonder_hurt": "glances at {target}",
+    "wonder_gift": "produces something impossible for {target}",
+    "wonder_vanish": "is suddenly not there",
 }
 
 NOISE_TEXT: dict[str, str] = {
@@ -532,4 +566,10 @@ def range_band(distance_m: float, effective_range_m: float) -> int:
 def land_ms(start_ms: int, est_duration_s: float) -> int:
     """start + ceil(seconds x 1000) (implemented; every duration rounds UP to the next ms)."""
     return start_ms + math.ceil(est_duration_s * 1000)
+
+
+def refill(tx: "Tx", rng: "Rng", container_id: str, at: int, cause_event_id: str | None, turn_index: int) -> "Event | None":
+    """P12 (D-102): the endless container — see the module docstring."""
+    raise NotImplementedError("P12")
 from ._impl_effects import land, situation, resistance  # noqa
+from ._impl_effects import refill  # noqa

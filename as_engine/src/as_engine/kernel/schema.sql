@@ -336,7 +336,7 @@ CREATE TABLE bodies (
   gore         INTEGER NOT NULL DEFAULT 0 CHECK (gore BETWEEN 0 AND 5),    -- the fluids of the dead on skin and clothes
   wet          INTEGER NOT NULL DEFAULT 0 CHECK (wet BETWEEN 0 AND 3),
   washed_at    INTEGER NOT NULL DEFAULT 0,
-  origin       TEXT NOT NULL DEFAULT 'worldgen' CHECK (origin IN ('worldgen','birth','materialize','cheat','reanimation','scenario'))
+  origin       TEXT NOT NULL DEFAULT 'worldgen' CHECK (origin IN ('worldgen','birth','materialize','cheat','reanimation','scenario','wildcard'))
 );
 
 -- OWNER physical.bodies
@@ -435,7 +435,7 @@ CREATE TABLE items (
   anchor_id   TEXT REFERENCES anchors(anchor_id),
   lot_id      TEXT,
   props       TEXT NOT NULL DEFAULT '{}',   -- e.g. {"rounds": 15, "chambered": true}
-  origin      TEXT NOT NULL DEFAULT 'worldgen' CHECK (origin IN ('worldgen','scenario','production','loot','cheat','craft','drop')),
+  origin      TEXT NOT NULL DEFAULT 'worldgen' CHECK (origin IN ('worldgen','scenario','production','loot','cheat','craft','drop','wildcard')),
   -- exactly one location: held by a body, inside a container, or lying in a place
   CHECK ( (holder_body IS NOT NULL) + (container_id IS NOT NULL) + (place_id IS NOT NULL) = 1 )
 );
@@ -479,7 +479,7 @@ CREATE TABLE actors (
 CREATE TABLE dossiers (
   dossier_id    TEXT PRIMARY KEY,
   actor_id      TEXT,
-  source        TEXT NOT NULL CHECK (source IN ('pack','generated','imported','cheat','quickmade','fixture')),
+  source        TEXT NOT NULL CHECK (source IN ('pack','generated','imported','cheat','quickmade','fixture','wildcard')),
   content_ref   TEXT,
   baseline_json TEXT NOT NULL,       -- full ActorDossier/PCDossier JSON. NEVER trimmed.
   content_hash  TEXT NOT NULL

@@ -33,7 +33,7 @@ INBOUND_ACTIONS = (
     "packs_list", "pcs_list", "content_validate", "content_import", "intake_start",
     "quickmake_pc", "run_new", "worldgen_cancel", "runs_list", "run_load", "run_delete", "run_save", "run_close",
     "turn_submit", "turn_cancel", "view_get", "story_get", "death_reveal", "new_life_here",
-    "dev_get", "worlds_list", "world_export", "world_import", "settings_get", "settings_set",
+    "dev_get", "worlds_list", "world_export", "world_import", "settings_get", "settings_set", "code_enter",
 )
 
 OUTBOUND_ACTIONS = (
@@ -41,7 +41,7 @@ OUTBOUND_ACTIONS = (
     "import_result", "intake_progress", "intake_result", "quickmake_result", "worldgen_progress",
     "runs", "run_deleted", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
-    "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done",
+    "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done", "code_result",
 )
 
 Screen = Literal["connect", "home", "wizard", "worldgen", "play", "dead"]
@@ -135,6 +135,12 @@ class InWorldExport(Strict):
 class InWorldImport(Strict):
     filename: str = Field(description="*.asworld (a zip holding genesis.sqlite + world.json).")
     data_b64: str
+
+
+class InCodeEnter(Strict):
+    """P12 (D-79, D-102, CHEAT-12): the menu's plainly labelled "Enter a code" box."""
+
+    code: str = Field(min_length=1, max_length=40)
 
 
 class OutWelcome(Strict):
@@ -278,6 +284,12 @@ class OutCheat(Strict):
     detail: str = ""
 
 
+class OutCodeResult(Strict):
+    """Whether the code was taken — and nothing about what a code does (CHEATS §2)."""
+
+    accepted: bool
+
+
 class OutError(Strict):
     code: str
     message: str
@@ -357,6 +369,7 @@ IN_MODELS: dict[str, type[Strict] | None] = {
     "run_close": None, "turn_submit": InTurnSubmit, "turn_cancel": None, "view_get": None, "story_get": None,
     "death_reveal": None, "new_life_here": InNewLifeHere, "dev_get": InDevGet, "worlds_list": None,
     "world_export": InWorldExport, "world_import": InWorldImport, "settings_get": None, "settings_set": InSettingsSet,
+    "code_enter": InCodeEnter,
 }
 
 OUT_MODELS: dict[str, type[Strict] | None] = {
@@ -368,4 +381,5 @@ OUT_MODELS: dict[str, type[Strict] | None] = {
     "death": OutDeath, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
     "dev_data": OutDevData, "error": OutError, "worlds": OutWorlds, "world_file": OutWorldFile, "settings": OutSettings,
     "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone,
+    "code_result": OutCodeResult,
 }

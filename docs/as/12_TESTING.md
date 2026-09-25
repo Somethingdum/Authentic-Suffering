@@ -284,7 +284,7 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `test_portrayal.py` | a blow is judged before it lands by a call that did not make it; out of character, she decides once more with the reasons and what she then decides stands; a second misfit stands and is logged; no second asking once the repair is spent; the rest are judged after the fact and leave a note in her next prompt |
 | `test_eval_ablation.py` | an ablated call never reaches the model; switching off writeback is measured (memory jobs fail, the world goes on); a call whose ablation changes nothing is named for removal |
 
-### 3.18 The cheat console (P12a, P12b; D-100, D-101)
+### 3.18 The cheat console (P12a, P12b; D-100, D-101, D-102)
 
 `p12_surfaces/conftest.py` makes both kits importable (P7 slice_kit, P8 protocol_kit) and gives a
 GameService on the fake model, the metal_fence run on disk, and the night with a session whose
@@ -297,6 +297,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `test_cheat_twin.py` | CHEAT-02: a Sandbox twin with Fredrick and a crate of ammunition, run a day beside the clean night, holds the same world once the cheat-made things are left out |
 | `test_cheat_owner.py` | the owner's commands: a will overwritten (never the player's); a memory cut out (sealed, beliefs retired, the name gone, a gap left); the strain put in a council member mid-meeting, then cured; the cure kills what rose; a horde from its own district (the count holds), the Mega Horde sent early (only one at a time), the census in the console only |
 | `test_cheat_secrecy.py` | CHEAT-03: no actor or narrator prompt and no play screen knows the word, the voice or a command; CHEAT-09: CANNED_LINES is CHEATS.md §5 |
+| `test_willis.py` | CHEAT-12..15, TEMPER-10, REL-06, WORLD-07 (D-102): the code box answers only taken or not and opens the New Life list; his life is asked for with his pack only after the code; it starts with the console open, a Sandbox, and him in the reality exception, fickle, dressed, coffee in hand and among people who know him; no wound, need, strain, dirt, cold or grip touches him while the man beside him keeps every rule; the console cannot kill him; every fight is unwinnable (a lookalike corpse, and he is elsewhere); /wonder is his alone, happens as the next turn opens, is seen and told; the voice knows he thinks it a demon; Fredrick blends in beside him; only he is offered the wonders, and nothing stops them; the endless plate of samiches (no samich mountain); insults are nothing to him, worship is wrath, one stray wish is let pass with a correction, ingratitude for his gift is wrath that kills; the Wild Card walks a normal world away from you, friendly at best and never a friend, never where you left him |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

@@ -54,6 +54,7 @@ class GameService:
         self._subscribers = []
         self.worldgen_task = None
         self._background = None
+        self.codes_unlocked = False
 
     @property
     def background(self):
@@ -560,6 +561,10 @@ class GameService:
         self._not_busy()
         if msg.world_id is not None:
             raise G.ServiceError("not_built_yet", G.NOT_BUILT)
+        pack = msg.pc_ref.split(":", 1)[0]
+        if pack.startswith("cheat_") and self.codes_unlocked and pack not in msg.settings.pack_ids:   # CHEAT-12
+            msg = msg.model_copy(update={"settings": msg.settings.model_copy(
+                update={"pack_ids": [*msg.settings.pack_ids, pack]})})
         await self.background.cancel()
         self._close()
         self.worldgen_task = asyncio.create_task(self._worldgen(msg))
@@ -648,7 +653,8 @@ class GameService:
         from ..contracts.view import PCCardView
         from ..world.worldgen.tables import STARTS_AS
         core = Path(self.config.content_dir) / "core"
-        dirs = [core] + [d for d in self._pack_dirs() if d.resolve() != core.resolve()]
+        dirs = [core] + [d for d in self._pack_dirs() if d.resolve() != core.resolve()
+                         and (self.codes_unlocked or not d.name.startswith("cheat_"))]     # CHEAT-10, CHEAT-12
         canon, _issues = load_canon(dirs)
         cards = []
         for ref in canon.refs("pc"):
@@ -662,6 +668,21 @@ class GameService:
                                     world_age_note=(f"{first}'s story needs a world {r[0] // 365}-{r[1] // 365} years after the Fall."
                                                     if r else None)))
         return [out("pcs", OutPCs(cards=cards))]
+
+    async def on_code_enter(self, msg):
+        from ..cheats import commands as cheats
+        from ..contracts.protocol import OutCheat, OutCodeResult, OutStory
+        if self.session is not None:
+            self._not_busy()
+        if not cheats.detect_activation(msg.code):
+            return [out("code_result", OutCodeResult(accepted=False))]
+        self.codes_unlocked = True
+        replies = [out("code_result", OutCodeResult(accepted=True))]
+        if self.session is not None:
+            r = cheats.activate(self.session)
+            replies += [out("cheat_activated", OutCheat(persona_line=r.persona_line, ok=r.ok, detail=r.detail)),
+                        out("story", OutStory(entries=self._story()))]
+        return replies
 
     async def on_content_import(self, msg):
         raise NotImplementedError("P12")

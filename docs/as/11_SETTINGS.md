@@ -50,6 +50,7 @@ Difficulty descriptions (CMG §61 Part II, shown verbatim in the wizard):
 | **Read aloud** | `read_aloud` | **Off** · On | Uses Talemate's text-to-speech agent for narration (P12). |
 | **Developer mode** | `dev_mode` | **Off** · On | Shows the Developer panel (stage timings, every person's options and choice, events, gate bits, raw model traffic). It shows hidden information and changes nothing in the world. The Play UI puts this one under Settings → Advanced. |
 | **Autosave slots** | `autosave_ring` | 1–50, **5** | Size of the autosave ring. |
+| **Wild Card** | `wild_card` | **Off** · On | P12 (D-79, D-102; CHEAT-15): Willis — a grinning man in a tuxedo who can do anything he likes — walks this world as a person of his own, never where you left him. Chosen when the life starts; it cannot change during it. The life is no Sandbox. |
 
 ### 1.3 Why these defaults
 

@@ -872,12 +872,28 @@ def worldmove_day(tx, rng, row, fired, turn_index):
           {"body_id": body, "place_id": place, "cause": pl.get("cause")}, cause=r["event_id"], actor_id=body, place_id=place)
     plan_operations(tx, rng, at, turn_index, WD)
     depart(tx, rng, at, turn_index, WD)
+    _wild_card_wanders(tx, rng, at, d, turn_index, WD, area)          # WORLD-07 (D-102)
     decay_mod.day(tx, rng, at, turn_index, WD)
     infected_day(tx, rng, at, turn_index, WD)
     from . import hordes
     hordes.day(tx, rng, at, turn_index, WD)
     clock.schedule(tx, at + DAY, "WORLD_DAY", None, {}, WD)
     return _since(tx, first)
+
+
+def _wild_card_wanders(tx, rng, at, d, turn_index, cause, area):
+    from ..physical import space
+    for (b,) in [tuple(r) for r in tx.query("SELECT body_id FROM bodies WHERE origin='wildcard' AND alive=1 ORDER BY body_id")]:
+        here = _place_of(tx, b)
+        if here is None or here in area:
+            continue
+        cands = [r[0] for r in tx.query("SELECT place_id FROM places WHERE parent_id IS NULL ORDER BY place_id")
+                 if r[0] != here and r[0] not in area]
+        if not cands:
+            continue
+        to = rng.choice(tx, "offscreen", f"wildcard:{b}:{d}", cands)
+        space.remove_body(tx, b, at, cause, turn_index)
+        _place_at_first_anchor(tx, b, to, at, cause, turn_index)
 
 
 def _work_hours(tx, actor):

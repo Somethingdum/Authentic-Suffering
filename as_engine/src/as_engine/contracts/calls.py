@@ -83,6 +83,8 @@ class CheatPersonaContext(Strict):
     command: str
     outcome: str
     recent_lines: list[str] = Field(default_factory=list, max_length=5, description="Persona lines already used; must not be repeated.")
+    willis: bool = Field(default=False, description="D-79: the Boss is playing Willis (the PC is in the reality exception); "
+                         "he takes the voice for a demon in his head.")
 
 
 class WorldgenContext(Strict):

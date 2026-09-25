@@ -273,7 +273,13 @@ async def create_run(config, pc_ref, settings, transport, progress=None, world_i
     if world_id is not None:
         raise NotImplementedError("P12")
     cd = Path(config.content_dir)
-    dirs = [cd / "core"] + [cd / p for p in settings.pack_ids if p != "core"]
+    own = pc_ref.split(":", 1)[0]
+    dirs = [cd / "core"] + [cd / p for p in settings.pack_ids
+                            if p != "core" and (not p.startswith("cheat_") or p == own)]      # CHEAT-10, CHEAT-12
+    if settings.wild_card:                                                                   # CHEAT-15
+        from ..content.pack import cheat_records
+        wild = sorted({r.split(":", 1)[0] for r, rec in cheat_records(cd).items() if "wild_card" in (rec.tags or [])})
+        dirs += [cd / p for p in wild if cd / p not in dirs]
     canon, issues = load_canon(dirs)
     if any(i.severity == "error" for i in issues):
         raise RunError("content_missing", "A content pack this run needs has errors; check it on the Content screen.")
@@ -305,6 +311,10 @@ async def create_run(config, pc_ref, settings, transport, progress=None, world_i
                                   payload={"source": "worldgen", "world_id": wid},
                                   writes=[WriteRecord(op=WriteOp.UPSERT, table="meta", key={"key": "world_id"},
                                                       values={"key": "world_id", "value": wid})]))
+        if pc.generation == "cheat":                                 # D-102: a life the code opened
+            from ..cheats.commands import start_life
+            with store.transaction() as tx:
+                start_life(tx, tx.query_one("SELECT value FROM meta WHERE key='pc_actor_id'")[0], pc)
         store.backup_to(rd / "turn0.sqlite")
         store.close()
         store = None

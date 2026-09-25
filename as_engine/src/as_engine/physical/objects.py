@@ -127,7 +127,7 @@ class Holder:
 import json as _json
 
 SLOT_ORDER = ("hand_l", "hand_r", "worn", "pocket", "pack")
-ORIGINS = ("worldgen", "scenario", "production", "loot", "cheat", "craft")
+ORIGINS = ("worldgen", "scenario", "production", "loot", "cheat", "craft", "wildcard")
 
 
 def _item(s, item_id):
@@ -211,8 +211,11 @@ def _check_destination(tx, def_ref, qty, to, moving_id=None):
 def create(tx: "Tx", def_ref: str, qty: int, to: Holder, origin: str, props: dict, at: int,
            cause_event_id: str | None, turn_index: int, *, event_origin: str = "sim", condition: int = 100) -> Event:
     """ITEM_CREATED. ``origin`` is the ITEM's origin column (worldgen, scenario, production, loot,
-    cheat, craft); ``event_origin`` is the Event.origin (the scenario loader passes 'system',
-    worldgen 'worldgen', cheats 'cheat')."""
+    cheat, craft, wildcard); ``event_origin`` is the Event.origin (the scenario loader passes 'system',
+    worldgen 'worldgen', cheats 'cheat'). P12 (D-102): an endless container (def tags 'endless' and
+    'refill:<tag>') is created full — then one more ITEM_CREATED (same origins, cause = the
+    container's) puts the first canon item tagged <tag> (by ref) inside it, props {refills: its id};
+    the container's event is the one returned. Later refills are action.effects.refill's."""
     from ..contracts.events import EventType, WriteOp, WriteRecord
     if origin not in ORIGINS:
         raise ValueError(f"item origin {origin!r} not allowed")
@@ -226,10 +229,18 @@ def create(tx: "Tx", def_ref: str, qty: int, to: Holder, origin: str, props: dic
     iid = tx.mint("itm")
     vals = {"item_id": iid, "def_ref": def_ref, "qty": qty, "condition": condition, "lot_id": None,
             "props": props, "origin": origin, **_cols(to)}
-    return tx.commit_event(Event(type=EventType.ITEM_CREATED, writer="physical.objects", at=at, turn_index=turn_index,
-                                 cause_event_id=cause_event_id, origin=event_origin, target_ids=[iid],
-                                 writes=[WriteRecord(op=WriteOp.INSERT, table="items", values=vals)],
-                                 payload={"item_id": iid, "def_ref": def_ref, "qty": qty, "origin": origin, "props": props or {}, "to": _hd(to)}))
+    ev = tx.commit_event(Event(type=EventType.ITEM_CREATED, writer="physical.objects", at=at, turn_index=turn_index,
+                               cause_event_id=cause_event_id, origin=event_origin, target_ids=[iid],
+                               writes=[WriteRecord(op=WriteOp.INSERT, table="items", values=vals)],
+                               payload={"item_id": iid, "def_ref": def_ref, "qty": qty, "origin": origin, "props": props or {}, "to": _hd(to)}))
+    tag = next((x.split(":", 1)[1] for x in d.tags if x.startswith("refill:")), None) if "endless" in d.tags else None
+    if tag:                                           # D-102: an endless container starts full
+        canon = _canon(tx)
+        first = next((r for r in sorted(canon.refs("item")) if tag in canon.get(r).tags), None)
+        if first is not None:
+            create(tx, first, 1, Holder("container", iid), origin, {"refills": iid}, at, ev.event_id, turn_index,
+                   event_origin=event_origin)
+    return ev
 
 
 def _create_with_id(tx, iid, def_ref, qty, to, origin, props, at, cause_event_id, turn_index, event_origin="sim", condition=100):

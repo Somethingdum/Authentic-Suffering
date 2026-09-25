@@ -21,6 +21,17 @@ REL-04 A relationship is one-directional: relate(from, to) never reads or writes
   row. from_id == to_id -> ValueError (nobody has a relationship with themselves).
 REL-05 relate never changes ``kind`` (content, households and worldgen set kinds); an existing
   row keeps its kind.
+REL-06 (P12, D-102, CHEAT-15) Fickle minds: meta 'fickle' is a JSON list of actor ids (absent or
+  unreadable: none). For a from_id on it — the owner, on Willis: "he can be friendly, he can even
+  REALLY help. But he's not a friend ... he cares about you like you do the ant you picked up and
+  played with" — affection never goes above FICKLE_AFFECTION_MAX (1) and obligation never above 0:
+  the upper bound of REL-02's clamp becomes max(that cap, the current value) for those two axes (a
+  value already above it never rises and may fall). Trust, respect, fear and resentment move as for
+  anyone; every relationship toward him is untouched. (Written by whoever brings a record tagged
+  'fickle' into the world: world.worldgen.opening.place_wild_card, cheats /spawn, cheats.start_life.)
+  add_fickle(tx, actor_id, at, turn_index, *, origin) -> Event | None: already listed -> None; else
+  SETTINGS_CHANGE {source: 'fickle', actor_id} (writer 'kernel.meta', origin as given) upserting meta
+  'fickle' = the sorted list with it added.
 
 Open loops (what hangs over a mind: goals, desires, grudges, fears, questions, plans, promises,
 debts, kept secrets — OpenLoopKind)
@@ -96,6 +107,13 @@ if TYPE_CHECKING:
     from ..kernel.store import Store, Tx
 
 
+FICKLE_AFFECTION_MAX = 1
+
+
+def add_fickle(tx: "Tx", actor_id: str, at: int, turn_index: int, *, origin: str) -> "Event | None":
+    raise NotImplementedError("P12")
+
+
 def relate(tx: "Tx", from_id: str, to_id: str, axis: RelationAxis, delta: int, cause: str | None,
            at: int, turn_index: int) -> Event | None:
     raise NotImplementedError("P6")
@@ -141,4 +159,5 @@ def adjust_group_standing(tx: "Tx", group_id: str, actor_id: str, delta: int, ca
                           at: int, turn_index: int) -> Event | None:
     raise NotImplementedError("P9")
 from ._impl_p6 import relate, open_loop, close_loop, learn  # noqa
+from ._impl_p6 import add_fickle  # noqa
 from ._impl_p9 import standing_toward, adjust_group_standing  # noqa

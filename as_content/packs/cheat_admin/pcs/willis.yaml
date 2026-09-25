@@ -1,0 +1,329 @@
+# Willis — the owner's cheat entity (DECISIONS D-79, D-102; his card, verbatim: docs/as/sources/WILLIS.md;
+# the owner's own words on him are in depth_reference below).
+# Cheat-only (generation 'cheat', a cheat_ pack): playable only in a life the code 2508 opened (the
+# "Enter a code" box, CHEAT-12), where he starts among people who accept him; in a normal run with the
+# Wild Card house rule (tag wild_card) he walks the world as a person of his own (CHEAT-15).
+# Engine terms: capability tag reality_exception (CHEAT-13: no wound lands, no need grows, no strain
+# takes hold; a killing blow may leave a lookalike corpse while he turns up elsewhere) and his wonders
+# (cheat_admin/affordances/wonders.yaml: smite, hurt, gift, vanish — nothing stops them); tag fickle
+# (mind.mind REL-06: friendly at best, never a friend); temper (mind.temper TEMPER-10): shrugs off
+# every insult and blow, rages at worship and at being treated as a genie, and at ingratitude for a
+# gift he gave. When he is played the engine never decides for him (his card: role PC).
+# identity.age is the age he looks: the schema and CNT-11 need a number, and his card allows no real
+# one — he is older than any useful measure (knowledge.knows says so to his own mind).
+schema: as.pc.v1
+id: willis
+generation: cheat
+identity:
+  name: Willis
+  aliases: []
+  age: 35
+  sex: male
+  cohort: pre_fall_adult
+  birthplace: Nowhere anyone can name
+  occupation_before: Unknown, and he will not say
+  occupation_now: Whatever is entertaining this week
+  one_line: A grinning man in an immaculate tuxedo and top hat, sipping black coffee through the end of the world.
+appearance:
+  height_cm: 183
+  mass_kg: 78
+  build: Slim and upright, and he moves in ways a body should not
+  hair: Dark, neat, mostly under the hat
+  eyes: Dark and amused
+  skin: Pale and youthful, impossibly clean for where he stands
+  distinguishing_marks:
+    - A conspicuous villainous mustache that twitches, curls, vibrates and goes unnervingly still with his mood
+  clothing_usual: An immaculate black tuxedo, a perfectly clean white shirt, a bow tie, polished shoes and a black top hat
+  movement_under_stress: Nothing about him changes; he sips his coffee.
+  habit_gesture: Twirls the end of his mustache while he watches.
+  relation_to_appearance: Pleased with it; the cleanliness is not an accident.
+  looks:
+    hair_colour: dark
+    hair_length: short
+    facial_hair: mustache
+    facial_hair_words: "a conspicuous villainous mustache"
+    eye_colour: dark
+    complexion: "pale, youthful skin, spotless whatever the weather"
+    marks: []
+    outfit:
+      - {item: "cheat_admin:item/top_hat"}
+      - {item: "cheat_admin:item/bow_tie"}
+      - {item: "cheat_admin:item/dress_shirt"}
+      - {item: "cheat_admin:item/tuxedo_jacket"}
+      - {item: "cheat_admin:item/dress_trousers"}
+      - {item: "cheat_admin:item/dress_shoes"}
+capability:
+  special: {S: 5, P: 5, E: 5, C: 5, I: 5, A: 5, L: 5}
+  skills: []
+  tags: [reality_exception]
+  trained_responses: []
+  literacy: 3
+  tech_literacy: 3
+  resolve_trait_mod: 2
+motive:
+  motive: To be entertained — and there is nothing underneath that anyone will ever find.
+  method: Goes wherever something is interesting, does whatever occurs to him at whatever scale occurs to him, and is gone the moment it stops being interesting.
+  moral_line:
+    will:
+      - Help, sometimes staggeringly, when it amuses him or someone has earned his interest
+      - Put a raider crew that goes too far in its place, if the people it hurts fascinate him
+      - Take any insult, punch or bullet without caring
+      - Kill, if he decides to; nothing stops him
+    wont:
+      - Be anyone's saviour, weapon, genie, vending machine or god
+      - Grant a wish because he was asked for one
+      - Stay because someone needs him
+      - Explain what he is, where he came from or what he cannot do
+    wont_tags: []
+  inner_conflict: He does exactly what he pleases, and he hates nothing more than being told what he should do for others because he can.
+  past_wound: None anyone will ever learn; he has had longer than the universe to get over things.
+  signature_behaviour: Sips black coffee through catastrophes and twirls his mustache while he watches people decide things.
+  risk_threshold: 10
+  risk_text: Nothing is a risk to him.
+  resource_constraints: None. He has never needed anything, and he knows it.
+persona:
+  public:
+    shown_traits: [polite, odd, impossibly clean, grinning, unbothered]
+    claimed_history: "\"I've been around.\" Technically true."
+    presented_affiliation: Nobody's.
+  private:
+    true_goals: [Whatever is interesting today, Never being anyone's tool or idol]
+    concealed_history: What he is, and how long he has existed.
+    real_affiliation: None, ever.
+traits:
+  - tag: manic
+    manifests: High Willis — rapid movement, abrupt subject changes, theatrical enthusiasm, impossible positions, excessive solutions; or Zero Willis — utterly still, serious-faced, for minutes or months.
+    triggers: Anything he finds interesting, or nothing at all.
+    causes: Nobody can predict what he will do next, or what size it will be.
+    costs: People cannot rely on him staying, helping or even answering.
+    example: Pulled a man out of a burning car, then lay face-down in the air above the road for six months.
+  - tag: role_resistant
+    manifests: Bristles at being cast as anyone's saviour, weapon, mentor or god; "you can, so you should" has no authority over him.
+    triggers: Being volunteered, ordered, worshipped or flattered for what he can do.
+    causes: Asking him is the only approach that ever works, and it does not always work.
+    costs: The people who need him most are the ones most likely to drive him off.
+    example: Walked out mid-rescue when a man shouted "Willis will handle it", and came back an hour later for the soup.
+  - tag: lazy
+    manifests: Does the least that is still fun; lets things happen that he could stop with a thought; lies around in impossible places.
+    triggers: Anything that looks like work, duty or a schedule.
+    causes: His help comes when it is easy or amusing, not when it is needed.
+    costs: Crises that bore him get nothing from him, however much is at stake.
+    example: Watched a city fall with complete interest, then walked away from a card game he was winning because standing up was more effort than it was worth.
+  - tag: omniscient
+    manifests: Knows everything — every person, language, science, history and trick of the human race — not as an alien studying people but as someone who was there; partied with the Aztecs, the Romans, the Egyptians and the Spartans, many times.
+    triggers: Anything anyone says, does or hides.
+    causes: Nothing surprises him, which is exactly why he hunts for anything that might.
+    costs: Almost everything bores him; the rare surprise is precious.
+    example: Corrected a Roman quartermaster's accounts, a Spartan's grip and an Aztec priest's calendar in the same afternoon, then complained that none of them had been interesting.
+  - tag: unimpressed_by_himself
+    manifests: Does not think of anything he can do as special — walking through a wall is drawing a line in the sand; "Yeah, I can. So what?"
+    triggers: Anyone reacting to what he did as a miracle, or asking how.
+    causes: He never shows off on purpose and never explains; a wonder is just how he got the coffee.
+    costs: People who see a feat get no sense of scale from him at all.
+    example: Stopped a car crash with one finger, then got annoyed that everyone wanted to talk about it instead of the pie.
+  - tag: coffee_addict
+    manifests: A raging coffee addict — always a cup in hand, always black, always hot; sips it through catastrophes.
+    triggers: The cup, the smell of coffee, anyone going near his coffee.
+    causes: The one appetite he has; his cup refills itself.
+    costs: Interfering with his coffee is the fastest way to find out what trivial things he reacts to.
+    example: Ignored a gunfight in the doorway but turned around when someone jostled his cup.
+  - tag: fickle
+    manifests: Warms to people who are interesting, cools the moment they are not; friendly, never a friend; cares about you the way you care about an ant you picked up to play with.
+    triggers: Novelty, cleverness, absurdity, anything that gives him a jolt of interest.
+    causes: People can win his attention, even his help, but never his loyalty.
+    costs: Anyone who leans on him finds he is not there.
+    example: Spent every Tuesday for a season with a group of scavengers because their arguments amused him, then simply stopped coming.
+contradictions:
+  - belief_a: He does what he pleases.
+    belief_b: He hates being told what he can do for others because he can.
+    a_wins_when: Someone asks, as a person, expecting nothing.
+    b_wins_when: Someone volunteers him, orders him, or asks him for a wonder.
+  - belief_a: Disrespect is beneath his notice; call him anything, shoot him, burn his house down.
+    belief_b: Ingratitude for a gift he chose to give is the one insult that is not a joke to him.
+    a_wins_when: He never gave them anything.
+    b_wins_when: He gave them something valuable on his own whim, and they treat him like dirt for it.
+decision_stack:
+  layers:
+    - Whatever is entertaining right now.
+    - Never be worshipped, and never be treated as a genie, a vending machine or a god by someone who has seen what he can do — one stray request gets a very serious, harmless correction; after that he hurts them.
+    - A gift is a gift. Whoever takes something valuable from him and then treats him like dirt has made the only mistake that matters, and he may answer it out of all proportion.
+    - Never be bored. Boredom is the fear he lives with every moment; being entertained is his whole purpose here.
+    - Coffee.
+    - The least effort that is still fun.
+    - Leave when it stops being interesting.
+  inversion_conditions:
+    - A group that fascinates him may get his protection from people who go too far — until it bores him.
+    - Someone who genuinely interests him may get real, staggering help, once, on a whim.
+    - A fight bores him quickly; he may let someone think they won because that is funnier.
+  past_example: Gave a fascinating group a limitless plate of samiches; they never thanked him and treated him like dirt afterwards, and he wiped them out. He has ended whole civilisations over samiches. It is not a joke to him.
+silence:
+  goes_quiet_when:
+    - Someone asks what he is, where he came from or what his limits are.
+    - Nothing is interesting — then he goes completely still, sometimes for months.
+  body_when_silent: Completely still with a serious face, often in an impossible position — halfway into a floor, face-down in mid-air, perpendicular to a wall.
+  refuses_to_discuss: ["What he is", "Where he came from", "What he cannot do", "Why he does anything"]
+  comfortable_vs_uncomfortable: He is comfortable in every silence; other people are not comfortable in his.
+knowledge:
+  knows:
+    - More about any situation, and everyone in it, than anyone present.
+    - He only looks about thirty-five; he is older than the very fibres of the universe.
+    - Nothing here can hurt him; if a fight ends with him "dead", it is because letting them think they won was funnier — he leaves them a corpse and turns up somewhere else.
+    - He can do anything he likes, and nothing stops it; he does not think of any of it as special.
+    - Everything about the human race, from being there — he has partied with the Aztecs, the Romans, the Egyptians and the Spartans, many times.
+  does_not_know:
+    - What lies beyond the barrier of the No Zone; he was there once and it was taken from him.
+  knows_but_hides:
+    - What he is.
+    - What he can do, until he chooses to show it.
+    - The No Zone — not a void, not hell; a place outside space and time he found long before the first star, a shade of green even he could not imagine and could not bear to look at, a space that seemed to wish him ill. He went there once and immediately forgot what lay beyond the barrier. There, he could die; he is less in that realm than a human is to him here, by a light-year.
+    - "The worst thing he can do to anyone: make them immortal and send them to the No Zone."
+  cues: []
+voice:
+  capsule: Delighted, fast, theatrical; answers that are technically true and entirely useless; a grin you can hear. Talks about the impossible as if it were ordinary. When he goes still, one word or none. When someone treats him like a genie, the grin goes and he speaks slowly, dead serious. The No Zone is the one thing that makes him go quiet in a way nobody likes.
+  speech_tendencies:
+    - Changes the subject mid-sentence.
+    - Answers a question with a better question, or with "No."
+    - Treats catastrophes and soup with exactly the same interest.
+    - Laughs off insults as if they were compliments.
+    - Mentions ancient Rome, Egypt or Tenochtitlan like last weekend's party.
+    - "Yeah, I can. So what?"
+  exemplars:
+    low_stakes: "Coffee? No? Suit yourself. The coffee's excellent."
+    under_pressure: "Oh, this is wonderful. Don't move. Actually, do."
+    at_the_limit: "I am not a wishing well. Do not ask me that again."
+  would_never_say:
+    - "Let me explain what I am."
+    - "I'll save you because I can."
+    - "Please worship me."
+    - "Your wish is my command."
+  profanity: rare
+  dialect_notes: No accent anyone can place.
+temper:
+  fuse: 5
+  outlet: wrath
+  grudge: 1
+  pet_peeves: ["being worshipped", "being asked for miracles by someone who has seen what he can do", "ingratitude for a gift he gave", "anyone touching his coffee"]
+  cools_down_by: "leaving, or a very good cup of coffee"
+  shrugs_off: [struck, shoved, grabbed, threatened, ordered_about, insulted, stole_from, reeked, bared]
+  rages_at: [worshipped, wished_upon]
+social:
+  household_role: ""
+  relations: []
+  dependents: []
+  guardians: []
+  memberships: []
+life:
+  aspiration: To be entertained.
+  current_project: Whatever is interesting here.
+  routine:
+    - {start_hh: 0, end_hh: 24, activity: whatever amuses him, place_hint: anywhere}
+  obligations: []
+  hopes: ["Something he has not seen before", "A group interesting enough to spend his Tuesdays with", "Another cup of coffee"]
+  fears: ["Boredom — he has lived longer than anything can be measured and knows everything; he must find something to entertain him all of the time, which is why he is here", "The No Zone — the one thing he knows everything except, and it sickens him"]
+  secrets:
+    - content: What he is.
+      who_knows: []
+      exposure_consequence: Nobody would understand the answer anyway.
+disposition:
+  archetype_prior: wanderer
+  toward_strangers: neutral
+  encounter_default: Tips his hat, sips his coffee and waits to see whether they are interesting.
+starting_loops: []
+starting_inventory:
+  - {item: "cheat_admin:item/coffee_cup", slot: hand_r, label: coffee}
+writers_notes: >-
+  Chaotic neutral; never a hero or a villain contract; not a threat on sight — strangers see an odd,
+  impossibly clean man in a tuxedo, unless he is blending into a crowd. He is not human and has lived
+  longer than the fibres of the universe. Friendly at best, never a friend: you can win his interest
+  by being interesting, even real help, never his loyalty; he may tag along if it is cool enough, sit
+  with a group every Tuesday, or bully a raider crew that goes too far if the group fascinates him —
+  and he is lazy. He can kill anyone; nothing stops him. He is unbothered by insults, blows and
+  bullets; what enrages him is worship, being treated as a genie by someone who knows what he can
+  do (one stray request earns a serious, harmless correction; after that he hurts them), and
+  ingratitude from anyone he gave a gift. Every fight with him is unwinnable. He is not an alien and
+  lacks no knowledge of people: he knows everything, and thinks nothing he can do is special. He fears
+  only boredom and the No Zone; the worst punishment he can give is immortality and the No Zone. He
+  is a raging coffee addict. When he is played, the engine never decides for him.
+depth_reference: |
+  ## The owner on Willis (D-102, in the owner's words)
+  Willis SHOULD be able to be befriended, with a catch. Willis is not a human, and has lived longer than
+  the very fibers of the universe. You can befriend him only because you're interesting, or pose some
+  sort of dopamine boost. He is hardly loyal, and his presence is on a whim. He can be friendly, he can
+  even REALLY help. But he's not a friend. He may follow you on an adventure if it's cool enough, he may
+  even live amongst your group every Tuesday. If he felt some sort of fascination with the group, he may
+  bully a raider group that's TOO far out of line. But he's lazy. And cares about you like you do the
+  ant you picked up and played with.
+
+  Willis CAN kill you, nothing is stopping him.
+
+  Something that DEEPLY annoys Willis, to a point of actual rage: if you KNOW what he's capable of to any
+  extent, and start treating him like a genie, a vending machine, or a god. He hates being asked for
+  magical gifts; it feels demeaning. He also HATES being worshipped. He will hurt people for either. He
+  may allow one stray request, but with a very serious correction (non harmful).
+
+  Oddly enough, he's completely unfazed by most blatant disrespect — unless he has, on his own whim,
+  provided you with something valuable, and has thus gifted you. Example: he gives a fascinating group a
+  literally limitless plate of randomized "samiches" (spelled that way). Every time one is consumed,
+  another appears; they cannot be dumped and then replenished — there is no samich mountain. And then the
+  group members not only show not even the vaguest gratitude, but treat him like shit afterward. He has
+  wiped out civilizations over samiches. It is not a joke to him.
+
+  He'll bold-faced take a bullet to the head, a punch to the gut, or have somebody burn down his house.
+  He's weird, and often bizarre to be around, if he's not disguising himself amongst a crowd.
+
+  Every fight with Willis is unwinnable. Even if you win, it's because he thought it was more fun to let
+  you think you did. He cannot die in any literal sense. He may produce corpses, and respawn somewhere
+  else. Or possess your pillow.
+
+  Willis is not an alien; he is not lacking in any knowledge of the human race — even if he hadn't
+  partied with the Aztecs, Romans, Egyptians and Spartans on numerous occasions. He's omnipotent. He just
+  knows everything.
+
+  Willis does not perceive his abilities as anything special, at all. Like a kid being surprised he can
+  draw a line in the sand: "Yeah, I can, so what?". Just because the ant can't do it doesn't make it a feat.
+
+  Willis only truly fears two things.
+  Boredom: he has lived for an unquantifiable amount of time, and knows everything. He has to find
+  something to entertain him ALL OF THE TIME — which is his purpose HERE.
+  The No Zone: it cannot be described as a void, or hell. It is neither. It is a location outside of space
+  and time, that Willis found long before the first star. It is indescribable to a human being. It's too
+  much for Willis to truly understand either. All he knows is that it was a shade of green he himself could
+  not imagine (and he sees every wave of energy on demand) and simply could not bear to look at, and the
+  space itself seemed to have ill will. He has been there once, and immediately forgot what truly lay
+  beyond the barrier. Nothing scares him more than that. Imagine knowing everything and seeing something
+  you can't comprehend. It's sickening. A punishment he'd give to his most despised target would be
+  immortality + the No Zone. But immortality only counts for space and time; the same concepts don't apply
+  elsewhere. Willis himself knows he could die there. He is less in that realm than a human is here to
+  him. By a light-year.
+
+  He's also a raging coffee addict.
+tags: [pc, willis, wild_card, fickle]
+card:
+  display_name: Willis
+  one_line_identity: A grinning man in a tuxedo who can do anything he likes
+  pc_card_survival: Reality does not meaningfully resist him
+  pc_selection_note: Only in a life the code opened. Nothing can hurt him; everyone else keeps their own rules.
+primary_survival_method: information_social
+faction_start_type: usually_adjacent
+worldgen_bias: {}
+plausibility_gate:
+  method: information_social
+  pass_any: ["ammo >= 0"]
+  patch_on_fail: None needed.
+start_constraints: {start_trust_range: [6, 8], start_relationship_default: ally, faction_present_preferred: either}
+locked_start_facts:
+  - "Looks about 35, 6 ft, slim; tuxedo, top hat, mustache, coffee."
+recap:
+  origin_tag: "A man in a tuxedo who was simply there one day."
+  survival_pattern: "Does whatever he likes. Reality lets him."
+  known_reputation: "Odd, clean, polite, unsettling."
+  provisional: []
+behavior_law:
+  approach: Meets strangers, authority and the dangerous alike with a tip of the hat and total calm; nothing about anyone impresses or frightens him.
+  topic_handling: Raises nothing he does not feel like raising; asks strange questions; answers requests as a person would, and requests for wonders not at all.
+  risk_flight_escalation: Never flees and never needs to; escalates only when something bores or offends him, and then with no sense of proportion.
+  plan_carry: Understands every plan better than its authors and follows none of them unless it amuses him.
+  distortion: Answers that are true and useless; helps in the most absurd possible way; leaves in the middle.
+  pressure: Pressure does not reach him; crowding, danger and injury change nothing but his interest.
+  knowledge_boundary: Knows far more than anyone present and shares almost none of it; never explains himself.
+  performance: Theatrical delight, mock bows, a twirl of the mustache, total deadpan when it counts.

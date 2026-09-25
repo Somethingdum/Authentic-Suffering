@@ -15,7 +15,9 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
   2 The PC: physical.bodies.create (from the dossier as the scenario loader does: sex, age, height,
     mass, special, looks = appearance.looks (F1a, LOOK-01); origin 'worldgen'),
     physical.space.place_body at the start place's anchor,
-    mind.actor.create (source 'pack', content_ref = pc_ref, controller 'human'), the dossier's
+    mind.actor.create (source 'pack', content_ref = pc_ref, controller 'human') — P12 (D-102,
+    CHEAT-12): a record of generation 'cheat' (a cheat_ pack's character) gets body origin
+    'cheat', dossier source 'cheat' and item origin 'cheat' for everything below — the dossier's
     starting_inventory through physical.objects.create (origin 'worldgen'; labels / containers as the
     loader), then, when looks is set, physical.objects.dress(tx, body, looks.outfit, at, None, 0,
     'worldgen') (LOOK-02: the PC starts in their own clothes),
@@ -93,6 +95,26 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
 
 fallback_opening(pc_name, start_place_name, contacts, threat_kind, threat_ids, threat_place_name,
                  values) -> OpeningPressure   (implemented below)
+
+place_wild_card(tx, rng, pc, pc_body, settings, content_dir, at) -> str | None
+  (P12, D-79, D-102, CHEAT-15; run_worldgen calls it in WG8's transaction right after place_pc.)
+  None unless settings.wild_card is on and 'reality_exception' is not in pc.capability.tags (a life
+  as Willis has no one else to meet). The records tagged 'wild_card' among the run canon's records
+  of kind 'pc' and 'actor' from 'cheat_' packs (service.runs.create_run loaded their packs), by ref;
+  none -> None (``content_dir`` is not read). The first of them: place =
+  rng.choice(tx, 'worldgen:opening', 'wild_card', the top-level places (parent_id NULL, by
+  place_id) whose zone is not the PC's — every top-level place but the PC's when that leaves none).
+  physical.bodies.create (kind 'human', sex, age, height, mass, special and looks from the record,
+  origin 'wildcard'), placed at the place's first anchor by anchor_id (none: its centre), dressed
+  (physical.objects.dress, 'worldgen'), its starting_inventory created as place_pc does (origin
+  'worldgen'), mind.actor.create(source 'wildcard', content_ref = the ref, controller 'model',
+  event_origin 'worldgen'), actors quarantine 1 (MATERIALIZE, writer 'mind.actor': he stays out of
+  the world's maths, CHEAT-05), a known_places row for his place (PERCEIVE, 'mind.perception'),
+  physical.bodies.grant_exception(tx, him, at, 0, origin 'worldgen') when the record's
+  capability.tags hold 'reality_exception', and mind.mind.add_fickle(tx, him, at, 0, origin
+  'worldgen') when its tags hold 'fickle' (REL-06: friendly at best, never a friend). He knows nobody
+  and nobody knows him; the life is no Sandbox and no console opens. world.worldmove moves him on
+  (WORLD-07). Returns his body id.
 """
 
 from __future__ import annotations
@@ -159,4 +181,7 @@ async def place_pc(client, rng: "Rng", tx: "Tx", pc_ref: str, pc: "PCDossier", p
                    placement: "Placement", plan: "PolityPlan", region: "Region", people: "People", canon,
                    run_id: str, seed: int, qc, at: int) -> Opening:
     raise NotImplementedError("P10")
+def place_wild_card(tx: "Tx", rng: "Rng", pc: "PCDossier", pc_body: str, settings, content_dir, at: int) -> str | None:
+    raise NotImplementedError("P12")
 from ._impl_wg import place_pc  # noqa
+from ._impl_wg import place_wild_card  # noqa

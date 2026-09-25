@@ -38,6 +38,12 @@ What happens:
 From now on, any line that **starts with `/`** is a command. Everything else is still ordinary
 play.
 
+**The code box (D-79, D-102; CHEAT-12).** The menu has a plainly labelled **Enter a code** box. It
+answers only "Accepted." or "Nothing happens." and says nothing about what a code does. `2508` there
+does two things: in a loaded life it is the word typed anywhere else (above), and for as long as the
+game runs the New Life list also shows the characters of the `cheat_` packs — Willis. The list
+forgets on restart.
+
 ## 2. Before activation: absolute secrecy
 
 Until the word is typed, the game has no knowledge of cheats, codes, consoles, god modes or anyone
@@ -117,6 +123,7 @@ line (§5) and a plain detail line.
 | `/horde <n> [at <place>]` | Calls up to n of a district's own dead into a crowd heading for that place (default: yours) | `/horde 40` |
 | `/mega` | Sends the Mega Horde now | `/mega` |
 | `/census` | Counts the dead (walking, in hordes, in the districts) and the living in each settlement | `/census` |
+| `/wonder "<what he does>"` | Only when you are Willis (§6b): whatever you describe simply happens as the next moment begins — said the way people would see it. Everyone who can see him sees it and remembers it, and the story tells it. What should last is the other commands' work | `/wonder "walks straight through the wall"` |
 
 What the commands cannot do (CHEAT-07):
 
@@ -174,6 +181,7 @@ or the laptop is off, a canned line is used — never the same canned line twice
 | `/horde` | "They're coming, Boss. Lots of them." · "Crowd called. Try to be somewhere else." |
 | `/mega` | "The big one's on the road. You asked for this." · "End of days, on schedule. Yours." |
 | `/census` | "Heads counted. Living and otherwise." · "Here's the tally. Don't do the maths out loud." |
+| `/wonder` | "Reality took the note, Boss. It didn't even argue." · "Done. The universe has filed it under 'fine, apparently'." |
 
 The machine copy of this table is `cheats/commands.py::CANNED_LINES`; the two must match (a test
 compares them).
@@ -206,7 +214,46 @@ everyone else:
 
 Cheat packs (`cheat_*`) ship in the content folder with the others, but no run loads them: only
 `/spawn` reads them (validated like any pack), and worldgen and the New Life wizard never see
-them (CHEAT-10). A `generation: cheat` dossier outside a `cheat_` pack is a content error (CNT-14).
+them (CHEAT-10) — with two exceptions (D-102): a life begun as a `cheat_` pack's character after
+the code (CHEAT-12) loads that pack, and the Wild Card house rule loads the pack Willis lives in
+(CHEAT-15). Worldgen still places none of their other people. A `generation: cheat` dossier outside
+a `cheat_` pack is a content error (CNT-14).
+
+**Fredrick blends in whenever Willis is blending in (D-79).** Spawned while you are Willis, Fredrick
+is one of the people who know you: everyone who knows you knows him by name, feels about him as they
+feel about you, and he is in your groups. Beside anyone else he is a stranger who just turned up.
+
+## 6b. Willis (D-79, D-102; his card: `docs/as/sources/WILLIS.md`)
+
+`as_content/packs/cheat_admin/pcs/willis.yaml` is the owner's own cheat entity — a grinning man in an
+immaculate tuxedo and top hat with a villainous mustache and a cup of black coffee, who is not human,
+is older than the fibres of the universe, knows everything, and can do anything he likes. His
+dossier carries the owner's words on him in full (`depth_reference`). What the engine makes of him:
+
+- **Playable only after the code.** After the code box (§1), New Life lists him. His life opens with
+  the console active and the run a Sandbox from the first moment; he starts among people who accept
+  him (CHEAT-12). The engine never decides for him.
+- **The reality exception (CHEAT-13).** No wound lands on him, no need grows, no strain takes hold,
+  dirt does not stick, the cold does not reach him and a grip holds nothing. Every fight with him is
+  unwinnable: a blow that would kill anyone else may be his whim to seem to die — a corpse that looks
+  like him lies where he stood, and he is somewhere else. The console cannot kill him either.
+- **Wonders.** Played, he has `/wonder` (§3a). As a person of his own, his menu has his wonders —
+  end someone, hurt someone, give someone something impossible, be somewhere else — and nothing
+  stops them. His gifts are things like the endless plate of samiches: each samich eaten from it
+  brings another, a random one; one taken off and kept brings nothing.
+- **Friendly at best, never a friend (REL-06).** Being interesting can win his attention, even real
+  help; his fondness stops at the ant you picked up to play with, and he never owes anyone.
+- **What he shrugs off and what he does not (TEMPER-10).** Insults, punches, bullets: nothing. Worship
+  sends him straight to wrath; so does being asked for wonders by someone who has seen what he can do —
+  though the first time from each person he lets it pass with a serious, harmless correction. From
+  someone he gave a gift, the same disrespect he shrugs off from anyone else is ingratitude, and his
+  wrath on them kills.
+- **Mr. Cheater Man** stays the console voice; when you are Willis, the voice knows Willis takes him
+  for a demon in his head.
+- **The Wild Card house rule (CHEAT-15, off by default).** In a normal life, Willis walks the world as a
+  person of his own: out of the world's maths, in the reality exception, placed away from you, and
+  never where you left him — each world day you are not with him he is somewhere else (WORLD-07). The
+  life is no Sandbox and no console opens.
 
 ## 7. Sandbox and quarantine — cheating is allowed, hiding it is not
 
@@ -258,6 +305,10 @@ with a flat persona line and logged.
 | CHEAT-09 | Persona lines never repeat a canned line consecutively; fallback works with the laptop brain off |
 | CHEAT-10 | `cheat_*` packs are invisible to worldgen and the wizard; only /spawn reads them |
 | CHEAT-11 | A `standing_brief` actor holds the brief's truths every turn it is HOT/WARM, every belief arriving through perception.grant with provenance cheat; the tag outside a `cheat_` pack is a content error |
+| CHEAT-12 | The code box answers only accepted or not; after the code the New Life list shows the `cheat_` packs' characters and a life as one opens with the console active and the run a Sandbox; before it they are characters nobody has heard of |
+| CHEAT-13 | The reality exception: no wound, need, strain, dirt, cold or grip touches a listed body; a killing blow may leave a lookalike corpse while he turns up elsewhere; only such a body is offered the wonders, and nothing stops them |
+| CHEAT-14 | `/wonder` is Willis's alone; it becomes his visible act as the next turn opens, seen by whoever can see him, remembered, and told by the narrator as something that happens |
+| CHEAT-15 | The Wild Card house rule places Willis in a normal life as a person of his own (origin wildcard, quarantined, in the reality exception, fickle), away from the player; no Sandbox, no console |
 
 ## 10. What changed from the source table (and why)
 

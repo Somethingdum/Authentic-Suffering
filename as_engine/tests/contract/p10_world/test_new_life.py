@@ -100,11 +100,13 @@ def hopeless_cfg(tmp_path):
 # =========================================================================== the cards
 def test_the_cards_say_who_each_character_is(run_cfg, tmp_path):
     """on_pcs_list: one card per playable character in every pack folder (core first), in the
-    CMG §61 words — and, for a character whose story needs a certain world, the years it needs."""
+    CMG §61 words — and, for a character whose story needs a certain world, the years it needs.
+    (P12, D-102: the cheat_ folders stay out of the list until the code is entered, CHEAT-12.)"""
     svc, _pushed = service(run_cfg, tmp_path)
     [msg] = asyncio.run(send(svc, "pcs_list"))
     assert msg["action"] == "pcs"
-    folders = [REPO_PACKS / "core"] + sorted(p for p in REPO_PACKS.iterdir() if p.is_dir() and p.name != "core")
+    folders = [REPO_PACKS / "core"] + sorted(p for p in REPO_PACKS.iterdir() if p.is_dir() and p.name != "core"
+                                             and not p.name.startswith("cheat_"))
     canon, _issues = load_canon(folders)
     refs = sorted(canon.refs("pc"))
     cards = msg["data"]["cards"]

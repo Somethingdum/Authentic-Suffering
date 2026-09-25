@@ -11,7 +11,7 @@ const TIER_NAMES = ['Bitch Mode', 'Easy', 'Normal', 'Realism', 'Actually Hell', 
 const ERAS = ['early', 'established', 'mature']
 const DETAILS = ['gotta_go_to_work_soon', 'quick_look', 'standard', 'settle_in', 'not_using_my_laptop_today']
 const COMMON = ['save_mode', 'turn_depth', 'narration_length', 'intensity', 'show_mechanics']
-const MORE = ['narration_person', 'narration_tense', 'pc_voice', 'read_aloud', 'autosave_ring']
+const MORE = ['narration_person', 'narration_tense', 'pc_voice', 'read_aloud', 'wild_card', 'autosave_ring']
 
 async function open(...msgs) {
   const { store, sock } = storeWith('pcs', ...msgs)
@@ -182,7 +182,7 @@ describe('step 3: house rules', () => {
     expect(rows()).toEqual(COMMON)
     const defaults = { save_mode: 'free', turn_depth: 'balanced', narration_length: 'medium', intensity: 'full',
       show_mechanics: 'summary', narration_person: 'third_limited', narration_tense: 'past', pc_voice: 'exact',
-      read_aloud: 'false' }
+      read_aloud: 'false', wild_card: 'false' }
     for (const f of COMMON) {
       const row = byId(w, 'wizard-setting').find((r) => r.attributes('data-field') === f)
       expect(row.text()).toContain(SETTINGS_TEXT[f].label)
@@ -229,7 +229,8 @@ describe('step 4: build the world', () => {
     expect(sock.sent).toEqual([{ action: 'run_new', pc_ref: 'core:pc/addison_flores', settings: {
       difficulty: 'realism', era: 'mature', world_detail: 'quick_look', save_mode: 'ironman', turn_depth: 'deep',
       narration_length: 'medium', intensity: 'full', show_mechanics: 'summary', narration_person: 'third_limited',
-      narration_tense: 'past', pc_voice: 'exact', read_aloud: false, autosave_ring: 5, days_since_fall: 3300, seed: 42 } }])
+      narration_tense: 'past', pc_voice: 'exact', read_aloud: false, autosave_ring: 5, wild_card: false, days_since_fall: 3300,
+      seed: 42 } }])
     expect(store.screen).toBe('worldgen')
   })
 

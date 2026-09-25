@@ -151,6 +151,8 @@ class AffordanceRequires(Strict):
     reflex_only: bool = Field(default=False, description="W1: never offered on a menu (mind.affordance drops it "
                               "before the gates); only code builds it — the wet strain's compulsion (turn.cognition "
                               "step 3).")
+    capability_tags: list[str] = Field(default_factory=list, description="P12 (D-102): the actor's fused dossier "
+                                       "capability.tags must hold every one (Willis's wonders need 'reality_exception').")
     infected_within_m: float | None = Field(default=None, gt=0, description="H1: offered only while the actor sees "
                                             "one of the dead (a visual percept this turn, clear or partial, of an "
                                             "infected body) within this many metres of it.")

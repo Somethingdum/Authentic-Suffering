@@ -317,6 +317,7 @@ class TemperRules(Strict):
     provocation_heat: dict[str, int] = Field(default_factory=lambda: {   # [SAND] heat each provocation adds
         "struck": 4, "shoved": 3, "grabbed": 3, "threatened": 3, "harmed_bonded": 4, "stole_from": 3,
         "insulted": 2, "ordered_about": 1, "quarreled": 3, "reeked": 1, "bared": 2,
+        "worshipped": 20, "wished_upon": 20, "ingratitude": 20, "wish_forgiven": 0,   # D-102 (TEMPER-10)
     })
     stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1,
                                                                  "bared": 1})
@@ -506,6 +507,8 @@ class RunSettings(Strict):
     read_aloud: bool = False
     dev_mode: bool = False
     autosave_ring: int = Field(default=5, ge=1, le=50)
+    wild_card: bool = Field(default=False, description="D-79/D-102 house rule (CHEAT-15): Willis walks this world as a "
+                            "person of his own. Chosen when a life starts; it cannot change during it.")
     pack_ids: list[str] = Field(default_factory=lambda: ["core"])
 
 

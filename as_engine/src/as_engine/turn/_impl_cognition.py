@@ -347,6 +347,14 @@ async def _snap(tx, out, affs, at, turn_index, plan, st, repair):
             return Intent(actor_id=a, bound=o, speech=None, manner="", goal="", private_reason="", source="reflex", lod=lod)
 
         cap = capacity(tx, a)
+        if outlet == "wrath":                                   # TEMPER-06/10 (D-102): nothing stops it
+            from ..mind.temper import gifted_by
+            wid = "wonder_smite" if gifted_by(tx, a, T) else "wonder_hurt"
+            try:
+                out[a] = reflex(wid, target=T)
+                continue
+            except KeyError:
+                outlet = "words"
         if outlet == "fists":
             dd = point_distance(tx, a, T)
             band = tx.query_one("SELECT age_band FROM bodies WHERE body_id=?", (T,))

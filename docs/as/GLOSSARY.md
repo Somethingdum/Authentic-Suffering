@@ -127,6 +127,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | echo ledger | n-grams the model must not repeat back | — | — |
 | Sandbox | a run where a cheat changed or revealed something | "Sandbox" tag | — |
 | quarantine | cheat-origin entities excluded from balance maths (not a quarantined episode) | — | — |
+| reality exception | a body nothing in the world can touch: no wound, need, strain, dirt, cold or grip (Willis; CHEAT-13) | — | — |
+| wonder | Willis's act that nothing stops: smite, hurt, gift, vanish, or the Boss's `/wonder` (CHEAT-13, CHEAT-14) | — | miracle, spell |
+| Wild Card | the house rule that puts Willis in a normal life as a person of his own (CHEAT-15) | "Wild Card" | — |
+| fickle | a mind whose fondness stops at 1 and who owes nobody (REL-06) | — | — |
+| endless container | an item that refills itself when what came from it is eaten or drunk (the plate of samiches, Willis's cup) | — | — |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |
 | pool | a district's counted dead by type, active or dormant (`infected_pools`) | — | encounter rating, spawn table |
 | frontage | where a building site meets its street: an anchor of the hub along one side or the other ("the front of the Yazzie house"); the next building is a walk down the street (WG1, D-64) | "the front of the Yazzie house" | — |
