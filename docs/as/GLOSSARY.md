@@ -132,6 +132,11 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | Wild Card | the house rule that puts Willis in a normal life as a person of his own (CHEAT-15) | "Wild Card" | — |
 | fickle | a mind whose fondness stops at 1 and who owes nobody (REL-06) | — | — |
 | endless container | an item that refills itself when what came from it is eaten or drunk (the plate of samiches, Willis's cup) | — | — |
+| plain-words cheat | a sentence in the Cheat field that the console turns into steps (CHEAT-16, CHEAT-17) | — | natural-language command |
+| forced act | what a person or one of the dead does and nothing else until it ends, put there by the console (CHEAT-19) | — | puppet, mind control |
+| show | what the console makes happen that the world has no rules for: seen, remembered, told, and nothing more (CHEAT-18) | — | illusion |
+| blast | an explosion the console sets off: burns by distance, doors blown, a 180 dB bang (CHEAT-19) | — | — |
+| Act / Say / Cheat | the Play input's three fields, sent together as `turn_compose`; Cheat only while the console is open (D-103) | "Act", "Say", "Cheat" | Do box |
 | levels of detail (world) | the forms the dead take by distance from the player — bodies where the player is, pools per district, hordes on the roads, the exterior past the edges (fidelity §5; 06 §5.1). Nothing is made or lost passing between them | — | LOD (for this: LOD is a mind's reasoning tier) |
 | pool | a district's counted dead by type, active or dormant (`infected_pools`) | — | encounter rating, spawn table |
 | frontage | where a building site meets its street: an anchor of the hub along one side or the other ("the front of the Yazzie house"); the next building is a walk down the street (WG1, D-64) | "the front of the Yazzie house" | — |

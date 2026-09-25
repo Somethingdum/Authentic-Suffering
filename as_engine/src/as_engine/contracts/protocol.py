@@ -34,6 +34,7 @@ INBOUND_ACTIONS = (
     "quickmake_pc", "run_new", "worldgen_cancel", "runs_list", "run_load", "run_delete", "run_save", "run_close",
     "turn_submit", "turn_cancel", "view_get", "story_get", "death_reveal", "new_life_here",
     "dev_get", "worlds_list", "world_export", "world_import", "settings_get", "settings_set", "code_enter",
+    "turn_compose",
 )
 
 OUTBOUND_ACTIONS = (
@@ -135,6 +136,16 @@ class InWorldExport(Strict):
 class InWorldImport(Strict):
     filename: str = Field(description="*.asworld (a zip holding genesis.sqlite + world.json).")
     data_b64: str
+
+
+class InTurnCompose(Strict):
+    """P12 (D-103): the Play input — Act, Say and (only while the console is open) Cheat, any of them,
+    in one message; ``to`` the view refs Say is for (empty: service.game_service decides)."""
+
+    act: str = Field(default="", max_length=2000)
+    say: str = Field(default="", max_length=2000)
+    cheat: str = Field(default="", max_length=2000)
+    to: list[str] = Field(default_factory=list)
 
 
 class InCodeEnter(Strict):
@@ -369,7 +380,7 @@ IN_MODELS: dict[str, type[Strict] | None] = {
     "run_close": None, "turn_submit": InTurnSubmit, "turn_cancel": None, "view_get": None, "story_get": None,
     "death_reveal": None, "new_life_here": InNewLifeHere, "dev_get": InDevGet, "worlds_list": None,
     "world_export": InWorldExport, "world_import": InWorldImport, "settings_get": None, "settings_set": InSettingsSet,
-    "code_enter": InCodeEnter,
+    "code_enter": InCodeEnter, "turn_compose": InTurnCompose,
 }
 
 OUT_MODELS: dict[str, type[Strict] | None] = {

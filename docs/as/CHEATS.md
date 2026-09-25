@@ -35,8 +35,10 @@ What happens:
 4. The run records `CHEAT_ACTIVATED` and `meta.cheat_active = 1`. Activation alone does **not**
    mark the run Sandbox; the first command that changes or reveals anything does.
 
-From now on, any line that **starts with `/`** is a command. Everything else is still ordinary
-play.
+From now on the Play input has a third field, **Cheat**, beside Act and Say (D-103). Say anything
+there, in plain words — "Make that infected jig joyously", "put Mara on the roof", "blow the back door
+off", "make June think the gate is open" — and it happens (§3b). A line that **starts with `/`** is a
+command (§3, the shortcuts); in the Act or Say field a `/` line is still ordinary play.
 
 **The code box (D-79, D-102; CHEAT-12).** The menu has a plainly labelled **Enter a code** box. It
 answers only "Accepted." or "Nothing happens." and says nothing about what a code does. `2508` there
@@ -135,6 +137,31 @@ What the commands cannot do (CHEAT-07):
   mind, and it does so through the ordinary perception door, so the record shows exactly what was
   implanted and when.
 
+### 3b. Plain words (D-103; `cheats/interpret.py`, CHEAT-16..19)
+
+The Cheat field takes any sentence. The console reads it the way the Boss's character sees things:
+"that one", "him", "the door" mean what your character is looking at or what the last cheat named;
+people you know are known by name, strangers by how they look. It turns the sentence into steps the
+world can take, in the order you said them, and every step is checked before any of them runs — if
+one cannot be done, none are, and it says which and why. When it cannot tell which one you mean it
+asks, and nothing happens until you say.
+
+What the steps can do: move anyone anywhere (nobody sees them go); give, make or unmake things;
+spawn or unmake people and the dead; kill, revive, heal, hurt; god mode; set a stat; pass time; change
+the weather; make a noise; overwrite a will; cut out a memory; brief someone; **make someone believe
+something**; **change how someone feels about someone**; standing; infect, cure; call a horde; the Mega
+Horde; **make a person or one of the dead do something — and nothing else — for a while** ("the
+shambler jigs joyously for ten minutes"); **reshape a place** (rename it, light it, darken it); **open,
+close, lock, bar or break a door**; **blow something up** (burns by distance, doors blown open, a bang
+the whole district hears); census, reveal, mind.
+
+And anything else: what the world has no rules for (confetti from the ceiling, a choir of the dead)
+is a **show** — everyone there sees it happen as the next moment begins, remembers it, and the story
+tells it — and the answer says plainly that it was a show and nothing more. Nothing is ever faked
+into rules that do not exist, and nothing asked for is silently dropped.
+
+Everything is on the record like any command (§7), and the run is a Sandbox.
+
 ## 4. Names
 
 Names resolve against what your character knows first (people you know by name or description,
@@ -182,9 +209,11 @@ or the laptop is off, a canned line is used — never the same canned line twice
 | `/mega` | "The big one's on the road. You asked for this." · "End of days, on schedule. Yours." |
 | `/census` | "Heads counted. Living and otherwise." · "Here's the tally. Don't do the maths out loud." |
 | `/wonder` | "Reality took the note, Boss. It didn't even argue." · "Done. The universe has filed it under 'fine, apparently'." |
+| `/plain` | "Done, Boss. Reality's been told." · "Consider it handled. The world will pretend it was always like this." |
 
 The machine copy of this table is `cheats/commands.py::CANNED_LINES`; the two must match (a test
-compares them).
+compares them). `/plain` is the line set for plain words in the Cheat field (§3b); there is no `/plain`
+command.
 
 **A retired legend.** `/spawn campervan` answers with the Camper-Van of the Gods eulogy and
 spawns nothing:
@@ -309,6 +338,10 @@ with a flat persona line and logged.
 | CHEAT-13 | The reality exception: no wound, need, strain, dirt, cold or grip touches a listed body; a killing blow may leave a lookalike corpse while he turns up elsewhere; only such a body is offered the wonders, and nothing stops them |
 | CHEAT-14 | `/wonder` is Willis's alone; it becomes his visible act as the next turn opens, seen by whoever can see him, remembered, and told by the narrator as something that happens |
 | CHEAT-15 | The Wild Card house rule places Willis in a normal life as a person of his own (origin wildcard, quarantined, in the reality exception, fickle), away from the player; no Sandbox, no console |
+| CHEAT-16 | The plain-words console names what the Boss's character can see and knows, by handles; what it looks at and what was named last are marked |
+| CHEAT-17 | A plain-words cheat is steps from a closed vocabulary, all checked before any runs, all in one transaction (one impossible step undoes the rest); an ambiguous one is asked back and changes nothing |
+| CHEAT-18 | What the world has no rules for is a show: seen by everyone there as the next moment begins, remembered, told, and reported as a show |
+| CHEAT-19 | Forced acts (a person or one of the dead does that and nothing else until it ends) and blasts (burns by distance, doors blown, a 180 dB bang) |
 
 ## 10. What changed from the source table (and why)
 

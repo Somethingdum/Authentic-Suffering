@@ -191,6 +191,9 @@ class PlayView(Strict):
     lanes: LanesView
     sandbox: bool = False
     mechanics: MechanicsReceipt | None = None
+    say_to: str | None = Field(default=None, description="P12 (D-103): the people ref Say goes to when no name is "
+                               "given (the last one spoken to, while still known here); None = everyone present.")
+    console: bool = Field(default=False, description="P12 (D-103): the Cheat field is shown (meta cheat_active).")
 
 
 ContainerView.model_rebuild()

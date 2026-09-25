@@ -213,3 +213,15 @@
   noise_db: 20
   effect: continue_task
   tags: [task]
+- schema: as.affordance.v1
+  id: forced_act
+  verb: wait
+  label: "Do what you are made to do"
+  ui_label: "Do it"
+  binds: self
+  range: self
+  requires: {reflex_only: true}
+  duration: {base_s: 60}
+  noise_db: 0
+  effect: wait
+  tags: [wait, forced]

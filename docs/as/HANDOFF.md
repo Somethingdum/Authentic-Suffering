@@ -28,8 +28,10 @@ replaces "the rest will remain uncoded"). What is left:
 3. **P12** — the surfaces (§5). The cheat console of CHEATS.md is BUILT (D-100; tests 12 §3.18), and
    so are the owner's commands (D-101: will, forget, infect — mid-meeting too — cure, horde, mega,
    census), and so are Willis and the Wild Card rule (D-102: the code box, a life as Willis, the
-   reality exception, his wonders and gifts, his temper, the Wild Card); still to do: the rest
-   below, then the owner's rework of the cheats into plain words (Act / Say / Cheat). The owner's list was: overwriting an
+   reality exception, his wonders and gifts, his temper, the Wild Card), and so is the owner's
+   rework of the cheats into plain words (D-103: the Cheat field takes any sentence — "Make that
+   infected jig joyously" — through `cheats/interpret.py`; the Play input is Act / Say / Cheat,
+   `turn_compose`, with Ask as a '?' button); still to do: the rest below. The owner's list was: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

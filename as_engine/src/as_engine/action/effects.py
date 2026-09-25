@@ -504,6 +504,7 @@ SEEN: dict[str, str | None] = {
     "wonder_hurt": "glances at {target}",
     "wonder_gift": "produces something impossible for {target}",
     "wonder_vanish": "is suddenly not there",
+    "forced_act": None,   # D-103: the act itself (the bound label) is what is seen
 }
 
 NOISE_TEXT: dict[str, str] = {

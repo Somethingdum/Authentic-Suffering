@@ -407,6 +407,16 @@ def step(tx, rng, row, fired, turn_index):
     if folded:
         return folded
     R = tx.rules.infected
+    act = bodies.forced(tx, b, at)
+    if act:                                   # CHEAT-19 (D-103): it does that, and nothing else
+        ev = tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=at, turn_index=turn_index, actor_id=b,
+                                   cause_event_id=cause,
+                                   payload={"actor_id": b, "def_id": "forced_act", "verb": "wait", "target_id": None,
+                                            "destination_id": None, "item_id": None, "est_duration_s": R.step_min_s,
+                                            "visible": True, "seen": act, "continues_task": False, "label": act, "goal": "",
+                                            "attention": None}))
+        clock.schedule(tx, at + round(R.step_min_s * 1000), "INFECTED_STEP", b, {"body_id": b}, ev.event_id)
+        return [ev]
     out = []
     leg = p.get("leg")
     if leg:

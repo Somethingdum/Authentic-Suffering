@@ -465,7 +465,7 @@ def change_place(tx: "Tx", place_id: str, changes: dict, reason: str, at: int, c
                  turn_index: int) -> Event:
     import json as _json
     from ..contracts.events import EventType, WriteOp, WriteRecord
-    allowed = {"held", "light_level", "ambient_db", "props"}
+    allowed = {"held", "light_level", "ambient_db", "props", "name"}   # P12 D-103: 'name' (the console's reshape)
     if not changes or set(changes) - allowed:
         raise ValueError(f"place changes limited to {sorted(allowed)}")
     p = _row(tx, "SELECT * FROM places WHERE place_id=?", (place_id,))

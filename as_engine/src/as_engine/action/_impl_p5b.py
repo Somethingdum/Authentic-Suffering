@@ -277,7 +277,7 @@ def _start_event(tx, intent, at, turn_index):
     return tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=at, turn_index=turn_index, actor_id=intent.actor_id,
                                  payload={"actor_id": intent.actor_id, "def_id": b.def_id, "verb": b.verb.value if hasattr(b.verb, "value") else b.verb,
                                           "target_id": b.target_id, "destination_id": b.destination_id, "item_id": b.item_id,
-                                          "est_duration_s": b.est_duration_s, "visible": d.visible_act, "seen": SEEN.get(b.def_id),
+                                          "est_duration_s": b.est_duration_s, "visible": d.visible_act, "seen": b.label if b.def_id == "forced_act" else SEEN.get(b.def_id),
                                           "continues_task": b.def_id == "keep_working", "label": b.label, "goal": intent.goal,
                                           "attention": intent.attention}))
 

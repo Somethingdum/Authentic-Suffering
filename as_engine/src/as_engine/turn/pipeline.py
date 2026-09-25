@@ -62,7 +62,8 @@ simulate — stages 0-12 in ONE store transaction:
     event actor_id = that actor) updates the row. P12 (D-102, CHEAT-14): then
     cheats.commands.take_wonder(tx, the PC, T, t0) — a waiting wonder becomes the PC's own visible
     ACTION_START at t0, so wave 0's scene (S3, compile_scene step 2) shows it to whoever can see
-    him, and the narrator's packet tells it. Ledger 0 {lanes_up: sorted lane values,
+    him, and the narrator's packet tells it; then (D-103, CHEAT-18) cheats.interpret.take_shows(tx,
+    the PC, T, t0). Ledger 0 {lanes_up: sorted lane values,
     timers_fired: how many rows fired, pending_reactions: sorted FORCED ids}.
   S1 intake: (pc_intent, info) = await turn.intake.intake(tx, session, submit, T, t0).
     Ledger 1 {signature, source}.

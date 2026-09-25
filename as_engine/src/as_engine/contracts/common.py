@@ -49,6 +49,7 @@ class CallClass(StrEnum):
     DOSSIER_INTAKE = "dossier_intake"
     PC_QUICKMAKE = "pc_quickmake"
     CHEAT_PERSONA = "cheat_persona"
+    CHEAT_INTERPRET = "cheat_interpret"   # P12, D-103: plain-words cheats (cheats.interpret)
     PROBE = "probe"
 
 

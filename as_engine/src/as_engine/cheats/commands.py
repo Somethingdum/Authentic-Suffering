@@ -37,6 +37,8 @@ parse(text) -> CheatCommand | CheatParseError   (only for a line that starts wit
   CheatCommand(name, args, raw = the stripped text).
 
 resolve(tx, pc_id, kind, name) -> (id, None) | (None, persona line)   (§4 Names)
+  (D-103) A name that is itself an id of that kind (a body id for 'person', a place, group or item
+  id) is that id — how cheats.interpret passes what the Boss named.
   kind 'person': 'me' / 'myself' / 'self' -> the PC; else first the PC's acquaintance rows
   (known_name, then description), then every actors row (display_name, then its first word);
   'place': the PC's known_places, then every place; 'group': every group; 'item_def': canon items
@@ -337,6 +339,8 @@ CANNED_LINES: dict[str, tuple[str, str]] = {
                "Here's the tally. Don't do the maths out loud."),
     "wonder": ("Reality took the note, Boss. It didn't even argue.",
                "Done. The universe has filed it under 'fine, apparently'."),
+    "plain": ("Done, Boss. Reality's been told.",
+              "Consider it handled. The world will pretend it was always like this."),
     "off": (DEACTIVATION_LINE, DEACTIVATION_LINE),
 }
 

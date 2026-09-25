@@ -79,6 +79,40 @@ class ProbeContext(Strict):
     probe: Literal["hello", "json", "thinking_off", "thinking_on"]
 
 
+class SceneEntry(Strict):
+    """One thing the plain-words console may name (cheats.interpret.scene, CHEAT-16)."""
+
+    handle: str
+    label: str
+    kind: str = ""
+    where: str = ""
+    note: str = ""
+
+
+class CheatScene(Strict):
+    """What 'that', 'him', 'the door' can mean: the PC's side of the glass (cheats.interpret.scene)."""
+
+    me: SceneEntry
+    here: SceneEntry
+    people: list[SceneEntry] = Field(default_factory=list)
+    places: list[SceneEntry] = Field(default_factory=list)
+    doors: list[SceneEntry] = Field(default_factory=list)
+    items: list[SceneEntry] = Field(default_factory=list)
+    groups: list[SceneEntry] = Field(default_factory=list)
+    makeable: list[str] = Field(default_factory=list)
+    spawnable: list[str] = Field(default_factory=list)
+    strains: list[str] = Field(default_factory=list)
+    weather: list[str] = Field(default_factory=list)
+    willis: bool = False
+
+
+class CheatInterpretContext(Strict):
+    """P12, D-103: the Boss's plain words and the scene they are said in (CHEAT_INTERPRET)."""
+
+    request: str
+    scene: CheatScene
+
+
 class CheatPersonaContext(Strict):
     command: str
     outcome: str

@@ -13,7 +13,9 @@ import yaml
 
 from as_engine.contracts.calls import (
     AuditContext,
+    CheatInterpretContext,
     CheatPersonaContext,
+    CheatScene,
     DossierIntakeContext,
     GuideContext,
     IntakeContext,
@@ -23,6 +25,7 @@ from as_engine.contracts.calls import (
     RepairContext,
     RumourContext,
     SayMyWayContext,
+    SceneEntry,
     SummaryContext,
     WorldgenContext,
 )
@@ -136,5 +139,14 @@ def render_kwargs() -> dict[CallClass, dict]:
         CallClass.DOSSIER_INTAKE: {"ctx": DossierIntakeContext(target_kind="actor", source_text="Hal is a pump mechanic in his forties.", pack_id="my_content")},
         CallClass.PC_QUICKMAKE: {"ctx": WorldgenContext(stage="quickmake", brief="Name: Dana. Age 30. Before: bus driver.")},
         CallClass.CHEAT_PERSONA: {"ctx": CheatPersonaContext(command="/time +2h", outcome="The clock moved two hours.", recent_lines=["Done, Boss."])},
+        CallClass.CHEAT_INTERPRET: {"ops": __import__("as_engine.cheats.interpret", fromlist=["OP_DOCS"]).OP_DOCS,
+                                    "ctx": CheatInterpretContext(request="Make that infected jig joyously", scene=CheatScene(
+                                        me=SceneEntry(handle="P0", label="Owen Marsh", kind="human", where="L0"),
+                                        here=SceneEntry(handle="L0", label="Sales floor", kind="room"),
+                                        people=[SceneEntry(handle="P1", label="a shambler", kind="infected", where="L0",
+                                                           note="looking at")],
+                                        places=[SceneEntry(handle="L0", label="Sales floor", kind="room")],
+                                        makeable=["box of .38 rounds"], spawnable=["Shambler"], strains=["wet"],
+                                        weather=["clear", "rain"]))},
         CallClass.PROBE: {"ctx": ProbeContext(probe="hello")},
     }

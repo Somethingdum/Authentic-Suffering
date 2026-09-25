@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-683 ids; 432 with their own statement, 251 named only in context.
+687 ids; 436 with their own statement, 251 named only in context.
 
 
 ## ABUSE
@@ -155,7 +155,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CHEAT-03 | No player-facing string, help text, guide answer, narrator prompt or actor prompt contains the word, the persona name or command words before activation; Ask-mode cheat questions get the deflection | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py`, `as_engine/service/game_service.py`, `as_engine/service/guide.py` | `contract/p12_surfaces/test_cheat_protocol.py`, `contract/p12_surfaces/test_cheat_secrecy.py` |
 | CHEAT-04 | Every executed command writes cheat_log + CHEAT_OVERRIDE(origin cheat) and sets sandbox (except /help, /off) | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py` | `contract/p12_surfaces/test_cheat_console.py`, `contract/p12_surfaces/test_cheat_owner.py` |
 | CHEAT-05 | Quarantined entities are excluded from worldgen/threat/faction/economy maths and the abuse battery | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py`, `as_engine/world/worldgen/opening.py`, `as_content/packs/cheat_admin/actors/fredrick.yaml` | `contract/p12_surfaces/test_cheat_console.py`, `contract/p12_surfaces/test_cheat_owner.py`, `contract/p12_surfaces/test_cheat_twin.py` |
-| CHEAT-06 | /reveal and /mind text never reaches narration, story prose or any packet | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py` | `contract/p12_surfaces/test_cheat_console.py`, `contract/p12_surfaces/test_cheat_protocol.py` |
+| CHEAT-06 | /reveal and /mind text never reaches narration, story prose or any packet | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py`, `as_engine/cheats/interpret.py` | `contract/p12_surfaces/test_cheat_console.py`, `contract/p12_surfaces/test_cheat_protocol.py` |
 | CHEAT-07 | Commands cannot edit past events, locked run settings or the event log | CHEATS §9 | `as_engine/cheats/__init__.py`, `as_engine/cheats/commands.py` | `contract/p12_surfaces/test_cheat_console.py` |
 | CHEAT-08 | The hard line: spawned/given content passes CNT-11; violating commands are refused | CHEATS §9 | `as_engine/cheats/commands.py`, `as_engine/content/safety.py` | `contract/p12_surfaces/test_cheat_console.py` |
 | CHEAT-09 | Persona lines never repeat a canned line consecutively; fallback works with the laptop brain off | CHEATS §9 | `as_engine/cheats/commands.py` | `contract/p12_surfaces/test_cheat_console.py`, `contract/p12_surfaces/test_cheat_secrecy.py` |
@@ -165,6 +165,10 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CHEAT-13 | The reality exception: no wound, need, strain, dirt, cold or grip touches a listed body; a killing blow may leave a lookalike corpse while he turns up elsewhere; only such a body is offered the wonders, and nothing stop… | CHEATS §9 | `as_engine/action/effects.py`, `as_engine/cheats/commands.py`, `as_engine/physical/bodies.py`, `as_content/packs/cheat_admin/affordances/wonders.yaml`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p12_surfaces/test_willis.py` |
 | CHEAT-14 | `/wonder` is Willis's alone; it becomes his visible act as the next turn opens, seen by whoever can see him, remembered, and told by the narrator as something that happens | CHEATS §9 | `as_engine/cheats/commands.py`, `as_engine/narration/narrator.py`, `as_engine/turn/pipeline.py` | `contract/p12_surfaces/test_willis.py` |
 | CHEAT-15 | The Wild Card house rule places Willis in a normal life as a person of his own (origin wildcard, quarantined, in the reality exception, fickle), away from the player; no Sandbox, no console | CHEATS §9 | `as_engine/mind/mind.py`, `as_engine/service/runs.py`, `as_engine/world/worldgen/opening.py`, `as_engine/world/worldgen/pipeline.py`, `as_content/packs/cheat_admin/pack.yaml`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p12_surfaces/test_willis.py` |
+| CHEAT-16 | The plain-words console names what the Boss's character can see and knows, by handles; what it looks at and what was named last are marked | CHEATS §9 | `as_engine/cheats/interpret.py`, `as_engine/contracts/calls.py` | `contract/p12_surfaces/test_plain_cheats.py` |
+| CHEAT-17 | A plain-words cheat is steps from a closed vocabulary, all checked before any runs, all in one transaction (one impossible step undoes the rest); an ambiguous one is asked back and changes nothing | CHEATS §9 | `as_engine/cheats/interpret.py`, `as_engine/contracts/mind.py` | `contract/p12_surfaces/test_plain_cheats.py` |
+| CHEAT-18 | What the world has no rules for is a show: seen by everyone there as the next moment begins, remembered, told, and reported as a show | CHEATS §9 | `as_engine/cheats/interpret.py`, `as_engine/turn/pipeline.py` | `contract/p12_surfaces/test_plain_cheats.py` |
+| CHEAT-19 | Forced acts (a person or one of the dead does that and nothing else until it ends) and blasts (burns by distance, doors blown, a 180 dB bang) | CHEATS §9 | `as_engine/cheats/interpret.py`, `as_engine/physical/bodies.py`, `as_engine/world/infected.py` | `contract/p12_surfaces/test_plain_cheats.py` |
 
 ## CHECK
 

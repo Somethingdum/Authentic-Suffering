@@ -132,44 +132,63 @@ describe('a turn in progress', () => {
   })
 })
 
-describe('the input box', () => {
-  test('three modes with their placeholders; Enter sends, Shift+Enter does not', async () => {
+describe('the input box (Act / Say / Cheat, D-103)', () => {
+  test('Act and Say are two fields, sent together as one moment; Enter sends, Shift+Enter does not', async () => {
     const { w, sock } = await play('view_rich')
-    const text = () => field(w, 'input-text')
-    expect(text().attributes('placeholder')).toBe('What do you do?')
-    await one(w, 'mode-say').trigger('click')
-    expect(text().attributes('placeholder')).toBe('What do you say?')
-    await one(w, 'mode-ask').trigger('click')
-    expect(text().attributes('placeholder')).toBe("Ask the guide anything — it won't cost a turn")
-    await one(w, 'mode-do').trigger('click')
-    await text().setValue('I force the steel door.')
-    await text().trigger('keydown', { key: 'Enter', shiftKey: true })
+    expect(field(w, 'input-act').attributes('placeholder')).toBe(TEXT.placeholder.act)
+    expect(field(w, 'input-say').attributes('placeholder')).toBe(TEXT.placeholder.say)
+    expect(field(w, 'input-act').attributes('aria-label')).toBe(TEXT.inputLabel.act)
+    expect(field(w, 'input-say').attributes('aria-label')).toBe(TEXT.inputLabel.say)
+    expect(has(w, 'input-cheat')).toBe(false)   // no console, no field (CHEATS §2)
+    await field(w, 'input-act').setValue('I force the steel door.')
+    await field(w, 'input-act').trigger('keydown', { key: 'Enter', shiftKey: true })
     expect(sock.sent).toEqual([])
-    await text().trigger('keydown', { key: 'Enter' })
-    expect(sock.sent).toEqual([{ action: 'turn_submit', mode: 'do', text: 'I force the steel door.', suggestion_ref: null,
-      addressee_refs: [] }])
-    expect(text().element.value).toBe('')
+    await field(w, 'input-say').setValue('Stand back.')
+    await field(w, 'input-say').trigger('keydown', { key: 'Enter' })
+    expect(sock.sent).toEqual([{ action: 'turn_compose', act: 'I force the steel door.', say: 'Stand back.', cheat: '', to: [] }])
+    expect(field(w, 'input-act').element.value).toBe('')
+    expect(field(w, 'input-say').element.value).toBe('')
   })
 
-  test('Ctrl+1/2/3 switch modes; Say goes to the chosen person', async () => {
-    const { w, sock } = await play('view_rich')
-    const text = () => field(w, 'input-text')
-    await text().trigger('keydown', { key: '2', ctrlKey: true })
-    expect(text().attributes('placeholder')).toBe('What do you say?')
+  test('Say knows who it is for: a chip per person here, the last one spoken to chosen first', async () => {
+    const { store, sock } = storeWith('run_loaded', 'view_rich')
+    store.view = { ...store.view, say_to: 'p2' }
+    const w = mountWith(PlayScreen, { store })
+    await flush()
+    sock.sent.length = 0
     const chips = byId(w, 'say-to-chip')
     expect(chips.map((c) => c.text())).toEqual(['Anyone who can hear', 'Tomas', 'a figure'])
+    expect(chips.map((c) => c.attributes('aria-pressed'))).toEqual(['false', 'false', 'true'])
     await chips[1].trigger('click')
-    await text().setValue('Tomas, the filter.')
+    expect(chips[1].attributes('aria-pressed')).toBe('true')
+    await field(w, 'input-say').setValue('The filter.')
     await one(w, 'input-send').trigger('click')
-    expect(sock.sent).toEqual([{ action: 'turn_submit', mode: 'say', text: 'Tomas, the filter.', suggestion_ref: null,
-      addressee_refs: ['p1'] }])
-    await text().trigger('keydown', { key: '3', ctrlKey: true })
-    expect(text().attributes('placeholder')).toBe("Ask the guide anything — it won't cost a turn")
-    await text().trigger('keydown', { key: '1', ctrlKey: true })
-    expect(text().attributes('placeholder')).toBe('What do you do?')
+    expect(sock.sent).toEqual([{ action: 'turn_compose', act: '', say: 'The filter.', cheat: '', to: ['p1'] }])
   })
 
-  test("suggestions are the character's own options: a do chip is sent at once, a say chip waits for words", async () => {
+  test('the Cheat field appears with the console and takes plain words', async () => {
+    const { w, sock, store } = await play('view_rich')
+    store.view = { ...store.view, console: true }
+    await flush()
+    expect(field(w, 'input-cheat').attributes('placeholder')).toBe(TEXT.placeholder.cheat)
+    expect(field(w, 'input-cheat').attributes('aria-label')).toBe(TEXT.inputLabel.cheat)
+    await field(w, 'input-cheat').setValue('Make that infected jig joyously')
+    await one(w, 'input-send').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'turn_compose', act: '', say: '', cheat: 'Make that infected jig joyously', to: [] }])
+  })
+
+  test('Ask is a button, not a field: the guide answers and no turn passes', async () => {
+    const { w, sock } = await play('view_rich')
+    expect(one(w, 'input-ask').attributes('aria-label')).toBe(TEXT.askLabel)
+    await one(w, 'input-ask').trigger('click')
+    expect(field(w, 'ask-text').attributes('placeholder')).toBe(TEXT.askPlaceholder)
+    await field(w, 'ask-text').setValue('Is the pump holding?')
+    await one(w, 'ask-send').trigger('click')
+    expect(sock.sent).toEqual([{ action: 'turn_submit', mode: 'ask', text: 'Is the pump holding?', suggestion_ref: null,
+      addressee_refs: [] }])
+  })
+
+  test("suggestions are the character's own options: a do chip is sent at once, a say chip fills Say", async () => {
     const { w, sock } = await play('view_rich')
     const chips = byId(w, 'suggestion-chip')
     expect(chips.map((c) => c.text())).toEqual(fixture('view_rich').data.view.suggestions.map((s) => s.label))
@@ -178,8 +197,7 @@ describe('the input box', () => {
     sock.sent.length = 0
     await chips[1].trigger('click')
     expect(sock.sent).toEqual([])
-    expect(field(w, 'input-text').attributes('placeholder')).toBe('What do you say?')
-    await field(w, 'input-text').setValue('Is the pump holding?')
+    await field(w, 'input-say').setValue('Is the pump holding?')
     await one(w, 'input-send').trigger('click')
     expect(sock.sent).toEqual([{ action: 'turn_submit', mode: 'say', text: 'Is the pump holding?', suggestion_ref: 's2',
       addressee_refs: [] }])
@@ -189,7 +207,8 @@ describe('the input box', () => {
     const { store } = storeWith('view_dead_sandbox')
     const w = mountWith(PlayScreen, { store })
     await flush()
-    expect(field(w, 'input-text').attributes('disabled')).toBeDefined()
+    expect(field(w, 'input-act').attributes('disabled')).toBeDefined()
+    expect(field(w, 'input-say').attributes('disabled')).toBeDefined()
     expect(one(w, 'input-dead').text()).toBe(TEXT.deadInput)
     expect(byId(w, 'suggestion-chip')).toEqual([])
   })
@@ -206,7 +225,7 @@ describe('the right-hand tabs', () => {
     expect(has(w, 'body-panel')).toBe(true)
   })
 
-  test('an item action fills the Do box and sends nothing', async () => {
+  test('an item action fills the Act box and sends nothing', async () => {
     const { w, sock, store } = await play('view_rich')
     await byId(w, 'pack-hands-item')[0].trigger('click')
     const actions = byId(w, 'item-action')
@@ -215,7 +234,7 @@ describe('the right-hand tabs', () => {
     await flush()
     expect(sock.sent).toEqual([])
     expect(store.composeText).toBe('Put away the crowbar')
-    expect(field(w, 'input-text').element.value).toBe('Put away the crowbar')
-    expect(field(w, 'input-text').attributes('placeholder')).toBe('What do you do?')
+    expect(field(w, 'input-act').element.value).toBe('Put away the crowbar')
+    expect(field(w, 'input-act').attributes('placeholder')).toBe(TEXT.placeholder.act)
   })
 })

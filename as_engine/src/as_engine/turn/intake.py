@@ -74,7 +74,10 @@ Speech intent (a helper): the 'speak' option bound to the addressee, else the ta
 addressee_for(session, packet, submit) -> body id | None
   session.extras.pop('forced_addressee') when present (service.replay sets it: a re-simulated say
   goes to whom it went to); else the first submit.addressee_refs entry whose view ref
-  (session.extras['view_refs']) maps to a body that is an entity of the packet; else
+  (session.extras['view_refs']) maps to a body that is an entity of the packet; else (P12, D-103:
+  "it's gotta know who we're talking to") a name the words start with — the say text, or for 'do'
+  its first quoted span — a word followed by ',' or ':' ("Mara, keep it shut") equal (case-
+  insensitive) to the known_name, or its first word, of exactly one entity of the packet; else
   session.extras['last_addressee'] when it is an entity of the packet; else None ('everyone').
 record_input(tx, turn_index, mode, raw_text, mapped) -> Event
   PLAYER_INPUT {mode, received_hash} (writer 'turn.pipeline', at = world_clock.now_ms) inserting

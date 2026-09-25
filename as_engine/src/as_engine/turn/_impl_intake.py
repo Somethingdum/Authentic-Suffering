@@ -56,10 +56,27 @@ def addressee_for(session, packet, submit):
         b = refs.get(r)
         if b and _entity_handle(packet, b):
             return b
+    named = _named_first(packet, submit)
+    if named:
+        return named
     last = session.extras.get("last_addressee")
     if last and _entity_handle(packet, last):
         return last
     return None
+
+
+def _named_first(packet, submit):
+    import re as _re
+    text = submit.text or ""
+    if submit.mode == "do":
+        q = _re.search(r'["\u201c]([^"\u201d]*)["\u201d]', text)
+        text = q.group(1) if q else ""
+    m = _re.match(r"\s*([A-Za-z][\w'-]*)\s*[,:]", text)
+    if not m:
+        return None
+    word = m.group(1).lower()
+    hits = [e for e in packet.entities if e.known_name and word in (e.known_name.lower(), e.known_name.split()[0].lower())]
+    return packet.handles.get(hits[0].handle) if len(hits) == 1 else None
 
 
 def _speech_intent(packet, aff, words, addressee, lod):

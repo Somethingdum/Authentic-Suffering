@@ -1,0 +1,22 @@
+The scene, as the Boss's character knows it:
+- P0 (the Boss): {{ ctx.scene.me.label }}{% if ctx.scene.willis %} (he can do anything he likes){% endif %}
+- Here, L0: {{ ctx.scene.here.label }}
+People and creatures:
+{% for p in ctx.scene.people %}- {{ p.handle }}: {{ p.label }} ({{ p.kind }}{% if p.where %}, at {{ p.where }}{% endif %}{% if p.note %}; {{ p.note }}{% endif %})
+{% else %}- nobody
+{% endfor %}Places:
+{% for p in ctx.scene.places %}- {{ p.handle }}: {{ p.label }}
+{% endfor %}Doors and ways here:
+{% for d in ctx.scene.doors %}- {{ d.handle }}: {{ d.label }} ({{ d.note }})
+{% else %}- none
+{% endfor %}Things here and on the Boss:
+{% for i in ctx.scene.items %}- {{ i.handle }}: {{ i.label }}
+{% else %}- nothing
+{% endfor %}Groups:
+{% for g in ctx.scene.groups %}- {{ g.handle }}: {{ g.label }}
+{% else %}- none
+{% endfor %}Makeable: {{ ctx.scene.makeable | join(", ") }}
+Spawnable: {{ ctx.scene.spawnable | join(", ") }}
+Strains: {{ ctx.scene.strains | join(", ") }}. Weather: {{ ctx.scene.weather | join(", ") }}.
+The Boss says:
+{{ ctx.request }}

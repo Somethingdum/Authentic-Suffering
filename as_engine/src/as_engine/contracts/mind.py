@@ -436,6 +436,32 @@ class CascadeSuggestion(Strict):
     suggestions: list[str] = Field(default_factory=list, max_length=5)
 
 
+class CheatOp(Strict):
+    """One step of a plain-words cheat (cheats.interpret OPS; CHEAT-17). Handles name the scene's
+    entries: P0 is the Boss's own character."""
+
+    op: Literal["teleport", "give", "make", "destroy", "spawn", "despawn", "kill", "revive", "heal", "hurt", "god",
+                "set", "time", "weather", "noise", "will", "forget", "brief", "believe", "feel", "rep", "infect",
+                "cure", "horde", "mega", "force", "reshape", "door", "blast", "show", "census", "reveal", "mind"]
+    who: str | None = Field(default=None, max_length=8)
+    target: str | None = Field(default=None, max_length=8)
+    to: str | None = Field(default=None, max_length=8)
+    item: str | None = Field(default=None, max_length=80)
+    text: str | None = Field(default=None, max_length=300)
+    n: int | None = Field(default=None, ge=-1000, le=1000)
+    stat: str | None = Field(default=None, max_length=40)
+    state: str | None = Field(default=None, max_length=40)
+    size: Literal["small", "large", "huge"] | None = None
+
+
+class CheatPlan(Strict):
+    """CHEAT_INTERPRET output: what to do, in order — or the one question to ask back."""
+
+    ops: list[CheatOp] = Field(default_factory=list, max_length=12)
+    clarify: str | None = Field(default=None, max_length=200, description="Ask this instead of acting (which one?).")
+    summary: str = Field(default="", max_length=200)
+
+
 class SayMyWayOutput(Strict):
     line: str = Field(min_length=1, max_length=400)
     survived: Literal["intact", "softened", "garbled", "withheld"]

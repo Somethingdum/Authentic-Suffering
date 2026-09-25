@@ -42,8 +42,10 @@ describe('the fixed strings of 10_UI', () => {
   })
 
   test('input placeholders and the one-tab message', () => {
-    expect(W.TEXT.placeholder).toEqual({ do: 'What do you do?', say: 'What do you say?',
-      ask: "Ask the guide anything — it won't cost a turn" })
+    expect(W.TEXT.placeholder).toEqual({ act: 'What do you do?', say: 'What do you say?', cheat: 'Anything at all.' })
+    expect(W.TEXT.inputLabel).toEqual({ act: 'Act', say: 'Say', cheat: 'Cheat' })
+    expect(W.TEXT.askLabel).toBe('Ask the guide')
+    expect(W.TEXT.askPlaceholder).toBe("Ask the guide anything — it won't cost a turn")
     expect(W.TEXT.otherTab).toBe('The game is already open in another tab or window. Close that one, then reload this page.')
   })
 

@@ -145,6 +145,8 @@ describe('actions -> messages', () => {
     store.validatePack('my_content')
     store.submit('do', '', { suggestionRef: 's4' })
     store.submit('ask', 'How does bleeding work?')
+    store.turnCompose({ act: 'I force the steel door.', say: 'Stand back.', to: ['p1'] })
+    store.turnCompose({ cheat: 'Make that infected jig joyously' })
     expect(sock.sent).toEqual([
       { action: 'get_state' }, { action: 'models_list' }, { action: 'models_test', lane: 'B' }, { action: 'config_get' },
       { action: 'config_set', patch: { lanes: { B: { model: 'x' } } } }, { action: 'runs_list' },
@@ -157,6 +159,8 @@ describe('actions -> messages', () => {
       { action: 'content_validate', pack_id: 'my_content' },
       { action: 'turn_submit', mode: 'do', text: '', suggestion_ref: 's4', addressee_refs: [] },
       { action: 'turn_submit', mode: 'ask', text: 'How does bleeding work?', suggestion_ref: null, addressee_refs: [] },
+      { action: 'turn_compose', act: 'I force the steel door.', say: 'Stand back.', cheat: '', to: ['p1'] },
+      { action: 'turn_compose', act: '', say: '', cheat: 'Make that infected jig joyously', to: [] },
     ])
   })
 

@@ -249,6 +249,29 @@ For a body in the exception: apply_harm writes nothing and returns [] (a blow, a
   at the first anchor (none: the centre) of a top-level place drawn with rng.choice(tx, 'resolve',
   f"respawn:{body}:{cause_event_id}", every top-level place but his own, by place_id) — nobody sees
   where. apply_harm still returns []: the blow had no say over him.
+
+P12 (D-103, CHEAT-19) — what the plain-words console can make a body do, and blasts:
+force_act(tx, body_id, act, until_ms, at, turn_index, cause_event_id) -> Event
+  meta 'forced_acts' (a JSON object {body_id: {act, until}}) gains or replaces the body's entry:
+  SETTINGS_CHANGE {source: 'forced_act', body_id, act, until} (writer 'kernel.meta', origin 'cheat').
+forced(store, body_id, at) -> str | None: the body's act while at < until, else None.
+  What obeys it: turn.cognition (a person under a forced act does exactly that this wave: a reflex
+  of the core 'forced_act' def whose label is the act, seen as f"{Ref} {act}."), and
+  world.infected.step (one of the dead under a forced act takes no step toward anything and bites no
+  one: its step commits that act as its visible ACTION_START and comes back after R.step_min_s).
+blast(tx, rng, at_id, size, at, turn_index, cause_event_id) -> list[Event]
+  The point: a body id -> its position; a portal id -> its place_a side (anchor_a's point, else the
+  centre of place_a); a place id -> its first anchor (by anchor_id), else its centre. R =
+  BLAST_RADIUS_M[size] (small 3, large 8, huge 20). Every living body in that place (by body_id) at
+  distance d from the point (its anchor's point, else its x/y): d <= R / 4 'catastrophic', <= R / 2
+  'severe', <= R 'significant', else 'minor' for 'huge' only — one 'burn' wound through apply_harm
+  (anatomy by rng.weighted(tx, 'cheats', f"blast:{body}:{at}", action.effects.CENTRE_MASS); god mode
+  and the reality exception still hold). Every portal of the place whose anchor on this side lies
+  within R (none: the portal counts as within R): physical.space.portal_change_event {damage 3,
+  is_open 1, is_locked 0, barricade 0} (a wall or fence: damage 3 only). One NOISE (writer
+  'action.propagate', origin 'cheat', place_id) {source_db 180, kind 'blast', text 'an explosion',
+  place_id, x_m, y_m} at the point, then action.propagate.propagate(tx, [it], at, turn_index) (the
+  district hears it and the dead come). Returns every event committed, in order.
 """
 
 from __future__ import annotations
@@ -484,6 +507,88 @@ def _decoy(tx, body_id, wound, at, cause_event_id, turn_index, rng):
     else:
         p = tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (to,))
         space.place_body(tx, body_id, to, None, p[0] / 2, p[1] / 2, at, cause_event_id, turn_index)
+
+
+BLAST_RADIUS_M: dict[str, float] = {"small": 3.0, "large": 8.0, "huge": 20.0}
+
+
+def force_act(tx: "Tx", body_id: str, act: str, until_ms: int, at: int, turn_index: int,
+              cause_event_id: str | None) -> "Event":
+    import json as _json
+
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    r = tx.query_one("SELECT value FROM meta WHERE key='forced_acts'")
+    try:
+        cur = _json.loads(r[0]) if r is not None and r[0] else {}
+    except (TypeError, ValueError):
+        cur = {}
+    cur[body_id] = {"act": act, "until": until_ms}
+    return tx.commit_event(Event(type=EventType.SETTINGS_CHANGE, writer="kernel.meta", origin="cheat", at=at,
+                                 turn_index=turn_index, cause_event_id=cause_event_id,
+                                 payload={"source": "forced_act", "body_id": body_id, "act": act, "until": until_ms},
+                                 writes=[WriteRecord(op=WriteOp.UPSERT, table="meta", key={"key": "forced_acts"},
+                                                     values={"key": "forced_acts", "value": _json.dumps(cur, sort_keys=True)})]))
+
+
+def forced(store: "Store | Tx", body_id: str, at: int) -> "str | None":
+    import json as _json
+    r = store.query_one("SELECT value FROM meta WHERE key='forced_acts'")
+    if r is None or not r[0]:
+        return None
+    try:
+        e = _json.loads(r[0]).get(body_id)
+    except (TypeError, ValueError, AttributeError):
+        return None
+    return e["act"] if e and at < e["until"] else None
+
+
+def blast(tx: "Tx", rng: "Rng", at_id: str, size: str, at: int, turn_index: int, cause_event_id: str | None) -> list:
+    from ..action.effects import CENTRE_MASS
+    from ..action.propagate import propagate
+    from ..contracts.events import Event, EventType
+    from ..physical import space
+    R = BLAST_RADIUS_M[size]
+    if at_id.startswith("act_"):
+        p = tx.query_one("SELECT place_id, x_m, y_m FROM positions WHERE body_id=?", (at_id,))
+        place, x, y = p[0], p[1], p[2]
+    elif tx.query_one("SELECT 1 FROM portals WHERE portal_id=?", (at_id,)) is not None:
+        pr = tx.query_one("SELECT place_a, anchor_a FROM portals WHERE portal_id=?", (at_id,))
+        place = pr[0]
+        a = tx.query_one("SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (pr[1],)) if pr[1] else None
+        if a is None:
+            a = [v / 2 for v in tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (place,))]
+        x, y = a[0], a[1]
+    else:
+        place = at_id
+        a = tx.query_one("SELECT x_m, y_m FROM anchors WHERE place_id=? ORDER BY anchor_id LIMIT 1", (place,))
+        if a is None:
+            a = [v / 2 for v in tx.query_one("SELECT width_m, depth_m FROM places WHERE place_id=?", (place,))]
+        x, y = a[0], a[1]
+    out = []
+    for (b, bx, by) in [tuple(r) for r in tx.query("SELECT b.body_id, q.x_m, q.y_m FROM bodies b JOIN positions q ON q.body_id=b.body_id "
+                                                   "WHERE q.place_id=? AND b.alive=1 ORDER BY b.body_id", (place,))]:
+        d = ((bx - x) ** 2 + (by - y) ** 2) ** 0.5
+        sev = ("catastrophic" if d <= R / 4 else "severe" if d <= R / 2 else "significant" if d <= R
+               else "minor" if size == "huge" else None)
+        if sev is None:
+            continue
+        anat = rng.weighted(tx, "cheats", f"blast:{b}:{at}", list(CENTRE_MASS))
+        out += apply_harm(tx, b, WoundSpec(anat, "burn", sev, 0), at, cause_event_id, turn_index, rng)
+    for (pid, kind, pa, aa, ab) in [tuple(r) for r in tx.query("SELECT portal_id, kind, place_a, anchor_a, anchor_b FROM portals "
+                                                               "WHERE place_a=? OR place_b=? ORDER BY portal_id", (place, place))]:
+        anc = aa if pa == place else ab
+        pt = tx.query_one("SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (anc,)) if anc else None
+        if pt is not None and ((pt[0] - x) ** 2 + (pt[1] - y) ** 2) ** 0.5 > R:
+            continue
+        ch = {"damage": 3} if kind in ("wall", "fence") else {"damage": 3, "is_open": 1, "is_locked": 0, "barricade": 0}
+        out.append(space.portal_change_event(tx, pid, ch, at, None, cause_event_id, turn_index))
+    noise = tx.commit_event(Event(type=EventType.NOISE, writer="action.propagate", origin="cheat", at=at, turn_index=turn_index,
+                                  place_id=place, cause_event_id=cause_event_id,
+                                  payload={"source_db": 180, "kind": "blast", "text": "an explosion", "place_id": place,
+                                           "x_m": x, "y_m": y}))
+    out.append(noise)
+    out += propagate(tx, [noise], at, turn_index)
+    return out
 
 
 def excepted(store: "Store | Tx", body_id: str) -> bool:

@@ -194,6 +194,10 @@ def _match(name, table):
 
 def resolve(tx, pc_id, kind, name):
     """-> (id, None) or (None, the persona line saying why not)."""
+    exact = {"person": "SELECT 1 FROM bodies WHERE body_id=?", "place": "SELECT 1 FROM places WHERE place_id=?",
+             "group": "SELECT 1 FROM groups WHERE group_id=?", "item": "SELECT 1 FROM items WHERE item_id=?"}
+    if kind in exact and tx.query_one(exact[kind], (name,)) is not None:      # D-103: an id is itself
+        return name, None
     if kind == "person":
         if name.strip().lower() in ("me", "myself", "self"):
             return pc_id, None

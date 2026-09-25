@@ -132,6 +132,11 @@ attract(tx, body_id, target_id, at, cause_event_id, turn_index, *, reason) -> Ev
   body_id, 'leg': None}, the drift id).
 
 step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handler, INF-12)
+  P12 (D-103, CHEAT-19): after the fold, a body under a forced act (physical.bodies.forced) commits
+  ACTION_START {def_id 'forced_act', verb 'wait', visible True, seen = the act, label = the act}
+  (writer 'action.resolve', actor_id = it, cause = the fired timer), schedules its next
+  INFECTED_STEP at at + R.step_min_s (payload {body_id}) and returns [that event]: no step toward
+  anything, no bite.
   b = payload.body_id, at = row.due_at, cause = fired. Not active -> [] (no new row). Then
   world.hordes.fold(tx, b, at, turn_index, fired.event_id) (HRD-18): not empty -> the body went
   back into its count; those events are returned and nothing else happens (no new row).

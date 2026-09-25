@@ -239,6 +239,16 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     'bad_settings', message: its message} then the same state; any other exception ->
     logged, error {internal, INTERNAL}, the same state; cancelled -> nothing is pushed but the
     bar's progress_done {ok False} (on_worldgen_cancel answers). Finally worldgen_task = None.
+  on_turn_compose(InTurnCompose) (P12, D-103; the Play input: Act / Say / Cheat, any of them at once).
+    No session -> turn_rejected no_run; busy -> turn_rejected busy. The word in any field ->
+    exactly on_turn_submit's activation (the line is consumed; nothing else happens). cheat (stripped)
+    while meta cheat_active is '1': a '/' line -> on_turn_submit's slash path; anything else ->
+    cheats.interpret.run(session, cheat) -> [cheat_result {persona_line, ok, detail}, view, story];
+    while the console is closed the field does not exist (CHEATS §2): its text is ignored. Then act
+    and say (stripped): both -> on_turn_submit(InTurnSubmit(mode 'do', text = act + ' "' + say with
+    every '"' made '”' + '"', addressee_refs = to)) — one moment: the act, and the words said while
+    doing it; say only -> mode 'say', text say, addressee_refs to; act only -> mode 'do', text act. The
+    replies are the cheat's first, then the turn's. Nothing to do at all -> turn_rejected empty.
   on_code_enter(InCodeEnter) (P12, D-79, D-102, CHEAT-12; the menu's "Enter a code" box). A session
     loaded and busy -> BUSY (nothing changes). cheats.commands.detect_activation(code) false ->
     [code_result {accepted False}]
@@ -293,6 +303,7 @@ NO_RUN = "No game is loaded. Continue or load a run first."
 BUSY = "Your last move is still being worked out. Wait for it to finish, then try again."
 DEAD = "Your character is dead. Load a save or start a new life."
 EMPTY_QUESTION = "Type a question first, then press Send."
+EMPTY_INPUT = "Type something first."   # P12 (D-103): on_turn_compose with nothing in any field
 NOTHING_TO_CANCEL = "There is no move in progress to stop."
 NO_WORLDGEN = "No world is being built right now, so there is nothing to stop."
 TOO_LATE = "Too late to stop: the world has already moved. The result is on its way."
@@ -452,6 +463,10 @@ class GameService:
 
     async def on_code_enter(self, msg):
         """P12: the menu's "Enter a code" box (CHEAT-12)."""
+        raise NotImplementedError("P12")
+
+    async def on_turn_compose(self, msg):
+        """P12 (D-103): the Play input — Act, Say, Cheat."""
         raise NotImplementedError("P12")
 
     async def on_content_import(self, msg):

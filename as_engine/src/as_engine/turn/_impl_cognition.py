@@ -192,6 +192,7 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
         log_repair(tx, "echo_reject", 6, "ECHO-02", {"actor_id": a, "ngrams": sorted(hits)}, turn_index, at)
     _compel(tx, out, affs, at, turn_index)
     await _snap(tx, out, affs, at, turn_index, plan, st, repair)
+    _forced(tx, out, at, plan)               # CHEAT-19 (D-103): the Boss's word outranks the snap
     if audits is not None:   # PORT-06: what the retrospective audit may judge
         for a in sorted(out):
             if a in st and out[a] is not None and out[a].source == "model":
@@ -317,6 +318,23 @@ def urge_pc(tx, rng, pc_id, intent, turn_index, at):
         return intent
     _commit_act(tx, pc_id, act, item, target, at, turn_index, "compulsion", pc=True)
     return _act_intent(tx, pc_id, def_id, item, target, intent.lod)
+
+
+def _forced(tx, out, at, plan):
+    from ..action.intent import Intent
+    from ..mind.affordance import BoundAffordance
+    from ..physical.bodies import forced
+    try:
+        d = tx.canon.find("affordance", "forced_act")
+    except KeyError:
+        return
+    for a in sorted(plan.lod):
+        act = forced(tx, a, at)
+        if not act:
+            continue
+        o = BoundAffordance(def_id=d.id, verb=d.verb, label=act, ui_label=act, est_duration_s=d.duration.base_s,
+                            noise_db=d.noise_db, check=None, tags=tuple(d.tags))
+        out[a] = Intent(actor_id=a, bound=o, speech=None, manner="", goal="", private_reason="", source="reflex", lod=plan.lod[a])
 
 
 async def _snap(tx, out, affs, at, turn_index, plan, st, repair):

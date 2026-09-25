@@ -56,6 +56,7 @@ from ..contracts.common import CallClass
 from ..contracts.mind import (
     ActorReplyV2,
     CascadeSuggestion,
+    CheatPlan,
     IntakeOutput,
     PortrayalVerdict,
     ReflectionOutput,
@@ -87,6 +88,7 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.DOSSIER_INTAKE: None,
     CallClass.PC_QUICKMAKE: None,
     CallClass.CHEAT_PERSONA: None,
+    CallClass.CHEAT_INTERPRET: CheatPlan,
     CallClass.PROBE: None,
 }
 

@@ -252,6 +252,10 @@ def build_view(tx, session):
                 line += f" (needed {p['target']} or less, rolled {p['draw']})"
             lines.append(line)
         mech = MechanicsReceipt(lines=lines)
+    last = session.extras.get("last_addressee")
+    say_to = next((r for r, i in refs.items() if i == last and r in {p.ref for p in people}), None) if last else None
+    cons = tx.query_one("SELECT value FROM meta WHERE key='cheat_active'")
     return PlayView(run_id=session.run_id, turn_index=T, pc_name=a["display_name"], alive=bool(b["alive"]), clock=clock_v, location=loc,
                     inventory=inv, body=body, people=people, journal=journal, map=MapView(places=places), suggestions=sugg, lanes=lanes,
-                    sandbox=tx.query_one("SELECT value FROM meta WHERE key='sandbox'")[0] == "1", mechanics=mech)
+                    sandbox=tx.query_one("SELECT value FROM meta WHERE key='sandbox'")[0] == "1", mechanics=mech, say_to=say_to,
+                    console=cons is not None and cons[0] == "1")

@@ -669,6 +669,38 @@ class GameService:
                                                     if r else None)))
         return [out("pcs", OutPCs(cards=cards))]
 
+    async def on_turn_compose(self, msg):
+        from ..cheats import commands as cheats
+        from ..cheats import interpret
+        from ..contracts.protocol import InTurnSubmit, OutCheat, OutStory, OutTurnRejected, OutView
+        G = _G()
+        if self.session is None:
+            return [out("turn_rejected", OutTurnRejected(reason_code="no_run", message=G.NO_RUN))]
+        if self.busy:
+            return [out("turn_rejected", OutTurnRejected(reason_code="busy", message=G.BUSY))]
+        act, say, cheat = (msg.act or "").strip(), (msg.say or "").strip(), (msg.cheat or "").strip()
+        for t in (act, say, cheat):
+            if cheats.detect_activation(t):
+                return await self.on_turn_submit(InTurnSubmit(mode="do", text=t))
+        replies = []
+        if cheat and self.session.store.meta("cheat_active") == "1":
+            if cheat.startswith("/"):
+                replies += await self.on_turn_submit(InTurnSubmit(mode="do", text=cheat))
+            else:
+                r = await interpret.run(self.session, cheat)
+                replies += [out("cheat_result", OutCheat(persona_line=r.persona_line, ok=r.ok, detail=r.detail)),
+                            out("view", OutView(view=self._view())), out("story", OutStory(entries=self._story()))]
+        if act and say:
+            words = say.replace('"', "\u201d")
+            replies += await self.on_turn_submit(InTurnSubmit(mode="do", text=f'{act} "{words}"', addressee_refs=list(msg.to)))
+        elif say:
+            replies += await self.on_turn_submit(InTurnSubmit(mode="say", text=say, addressee_refs=list(msg.to)))
+        elif act:
+            replies += await self.on_turn_submit(InTurnSubmit(mode="do", text=act))
+        if not replies:
+            return [out("turn_rejected", OutTurnRejected(reason_code="empty", message=G.EMPTY_INPUT))]
+        return replies
+
     async def on_code_enter(self, msg):
         from ..cheats import commands as cheats
         from ..contracts.protocol import OutCheat, OutCodeResult, OutStory
