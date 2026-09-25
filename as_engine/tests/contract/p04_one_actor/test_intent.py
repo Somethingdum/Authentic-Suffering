@@ -102,15 +102,16 @@ def test_speak_without_words_is_empty(june):
 
 
 def test_talking_while_acting_costs_time(june):
-    """TIME-05: more than 12 words while doing something else adds words / 2.5 seconds."""
+    """TIME-05, SEG-02: words said alongside an attempt overlap it — the longer of the two (a V1
+    answer's speech is alongside)."""
     w, pkt, aff = june
     h = helpers.handle_for(pkt, "go_look", "back_door_in", w)
     base = next(o for o in aff.options if o.signature == pkt.handles[h])
     short = to_intent(pkt, aff, cog(h, speech={"text": "Coming, hang on.", "to": []}), lod=LOD.HOT, source="model")
-    assert short.bound.est_duration_s == pytest.approx(base.est_duration_s)
+    assert short.bound.est_duration_s == pytest.approx(max(base.est_duration_s, 3 / 2.5))
     words = "Okay so I am going to go and look at the back door right now all right"   # 17 words
     long = to_intent(pkt, aff, cog(h, speech={"text": words, "to": []}), lod=LOD.HOT, source="model")
-    assert long.bound.est_duration_s == pytest.approx(base.est_duration_s + 17 / 2.5)
+    assert long.bound.est_duration_s == pytest.approx(max(base.est_duration_s, 17 / 2.5))
     assert base.est_duration_s == pytest.approx(next(o for o in aff.options if o.signature == pkt.handles[h]).est_duration_s), \
         "the AffordanceSet itself is not modified"
 

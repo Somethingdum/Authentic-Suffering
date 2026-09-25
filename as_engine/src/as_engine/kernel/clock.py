@@ -91,6 +91,7 @@ QUEUE_TYPES: dict[str, str] = {
     "TRACE_DECAY": "world.traces",        # payload {trace_id}
     "LOYALTY_CHECK": "society.group",     # payload {actor_id, group_id, reason} (group benefit check at a crisis)
     "ACTION_LAND": "action.resolve",      # payload {intent: action.intent.intent_to_dict(...), start_event_id} (P5)
+    "SPEECH_SEGMENT": "action.resolve",   # payload {the SPEECH payload of one segment} (P5, SEG-03: action.resolve.say_pending)
 }
 
 # P9: the background life of a place — a settlement's shifts, draws, routines and group days, and

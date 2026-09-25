@@ -141,8 +141,9 @@ cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMReque
   call class ACTOR_REACTION when reaction else ACTOR_COGNITION; json_schema =
   lanes.schemas.cognition_schema(affordance handles, entity handles, consult_kinds =
   packet.consult_kinds, families = packet.families, subject_handles = the packet's P# handles then
-  its S# handles, each in number order (none when it offers no consultation)) — a reaction's packet
-  offers no consultation. HOT: regime =
+  its S# handles, each in number order (none when it offers no consultation), gesture_handles /
+  attention_handles = the handles of packet.gestures / packet.attention_points (B4)) — a
+  reaction's packet offers no consultation, gesture or attention point. HOT: regime =
   config.hot_cognition and the schema is attached only when config.lanes[Lane.A]
   .structured_with_thinking == 'supported' or the regime has thinking off (otherwise the JSON is
   extracted from the text and a failure is repaired, LANE-06); WARM: regime = config.regimes[call

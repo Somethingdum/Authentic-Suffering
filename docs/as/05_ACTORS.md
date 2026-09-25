@@ -279,6 +279,24 @@ makes the snap, when it comes, code's act:
   Everyone who saw it stops trusting the one who did it, the story travels (CAS-022), and whoever
   lived through it never forgets (CAS-023).
 
+### 7.2 Timing, gestures and attention (Actor v2 B4, D-87; Actor Spec §9)
+
+One primary attempt at a time is a limit on the body, not on the person: words, a small gesture and
+where they look can go with it when their voice, hands and eyes are free. The resolver owns the
+timing; the person chooses only what goes with what.
+
+| Rule | What it says |
+|---|---|
+| SEG-01 | A long speech arrives in segments of at most eight words, cut at the last pause (. , ; : ! ? … —) among the 4th to 8th words (`action.intent.segments`). |
+| SEG-02 | Words take 2.5 a second, however few: alongside an attempt they overlap it (the longer of the two), before or after it they add; nobody hides or sneaks while talking (their words come first) (`action.intent.to_intent`). |
+| SEG-03 | Each segment is a SPEECH of its own, said when the words before it have been (the rest queued as SPEECH_SEGMENT); words 'after' an attempt start when it lands (`action.resolve`). |
+| SEG-04 | A segment is said only if the speaker is alive and conscious then; a new attempt cuts what is left (one voice, one utterance); one SPEECH_CUT records where the words stopped, and listeners only ever hear what was said. |
+| GEST-01 | The packet offers the gestures the person's free hands allow — nod, shake of the head, shrug; pointing, beckoning or waving someone off toward each person here; a finger to the lips; both empty hands shown (`mind.packet`). |
+| GEST-02 | A gesture takes the hands the attempt leaves free (`INTENT-09`: 'no_free_hand'); contact is never a gesture — a touch, a grab, covering a mouth is an attempt of its own. |
+| GEST-03 | A gesture goes out with the attempt as a GESTURE event: seen at clear or partial, never heard; 'Mara points at you.' (`action.resolve`, `mind.perception`). |
+| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). |
+| FOCUS-02 | Eyes on one thing: it is seen one step better, everything else one step worse, until the next attempt (`sense.optics.visibility`). |
+
 ## 8. The player's side
 
 - **Manner, never target/verb/refusal** (SYM-02): the PC's dossier colours how an action is done.

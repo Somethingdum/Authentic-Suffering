@@ -62,7 +62,13 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
            visible false: results are perceived through the state events they caused).
   HARM also grants the harmed body itself a TACTILE exact percept (when conscious after the
            harm): render_pain; source_id = the event's actor when the holder can see it, else NULL.
-  The holder never perceives its own MOVE / ACTION_* / ITEM_TRANSFER / SPEECH / NOISE-it-caused
+  GESTURE  (B4, GEST-03; P5 adds it to SENSORY_TYPES) visual only — a gesture is never heard — for
+           holders who see the actor at clear or partial (a silhouette's hands are not read):
+           fidelity exact / partial; text f"{Ref} {seen}." with Ref as for ACTION_START and seen
+           = action.effects.GESTURES[payload.gesture].seen, {target} = word_for(holder,
+           payload.target_id) — 'you' when the holder is the target ('Mara points at you.');
+           source_id = the actor. The one it is made toward is a holder like any other.
+  The holder never perceives its own MOVE / ACTION_* / ITEM_TRANSFER / SPEECH / GESTURE / NOISE-it-caused
   events (it knows what it did through its own action record, mind.memory).
   Unconscious and dead holders perceive nothing; asleep holders only sounds, per acoustics. When a
   reception has wakes = True, perception grants the TONE_ONLY percept and then calls

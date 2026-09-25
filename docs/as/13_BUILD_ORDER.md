@@ -169,6 +169,21 @@ machine yet, so start here, not at P0 task 1:
    - P7: the narrator's pc_state_lines (`narration/_impl_narrator.py`) — `p07_slice/test_narration_care.py`.
    - P10: `physical/bodies.cold_need`, and progress's step 2 (LOOK-08 grime and weather, LOOK-09
      chill; their boundaries join the jump) — `p10_world/test_weather_and_cold.py`.
+   Actor v2 B4 — timing, gestures and attention (SEG-01..04, GEST-01..03, FOCUS-01..02; D-87; 05
+   §7.2; Actor Spec §9) the same way:
+   - P1: `lanes/schemas.cognition_schema` — the gesture / attention enums (SCHEMA-04) —
+     `p01_lanes/test_schemas.py`.
+   - P4: `action/_impl_intent.py` — SEG-02's timing and INTENT-09 (gesture, attention,
+     'no_free_hand'); `mind/_impl_affordance.py` — BoundAffordance.hands; `mind/_impl_packet.py` —
+     G# and F# handles, `gestures`, `attention_points`, `hands_free` (the prompts are written) —
+     `p04_one_actor/test_speech_timing.py`, `test_expressions.py`, `test_intent.py`, `test_intent_v2.py`.
+   - P5: `action/intent.segments` and the round trip's new fields (`action/_impl_p5b.py`
+     `intent_to_dict` / `intent_from_dict`); `action/_impl_p5b.py` resolve_wave — segments on the
+     clock, the SPEECH_CUT, a speaking intent never carries on, the GESTURE, the start's attention;
+     `action/resolve.say_pending` and its dispatch in `turn/_impl_timers.py`; `mind/perception.py` —
+     GESTURE (SENSORY_TYPES and `_perceive_event`); `sense/optics.visibility` — FOCUS-02 —
+     `p05_many_actors/test_speech_segments.py`, `test_gestures.py`.
+   - P7: `turn/_impl_cognition.py` `_schema` passes the packet's G and F handles.
 2. P8: steps 1–3 are built except the owner's sessions browser (RUN-12, RUN-13, D-76):
    `service/runs.wipe_tree`, `delete_run` and `list_runs`' `final` in `_impl_runs.py`, and
    `on_run_delete` in `_impl_game_service.py` — `test_sessions.py` and `test_runs_protocol.py::test_delete`.

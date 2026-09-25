@@ -87,8 +87,9 @@ def test_speech_is_heard_at_the_start(scenario):
     evs = wave(w, [i])
     sp = [e for e in evs if e.type == "SPEECH"][0]
     assert sp.at == t and sp.writer == "action.propagate" and sp.actor_id == w.id("mara")
+    (start,) = [e for e in evs if e.type == "ACTION_START"]
     assert sp.payload == {"words": "June, stay where you are.", "volume": "raised", "to": [w.id("june")],
-                          "source_db": 70.0, "armed": False}
+                          "source_db": 70.0, "armed": False, "utterance_id": start.event_id, "segment": 1, "segments": 1}
     assert types(evs)[:2] == ["ACTION_START", "SPEECH"]
 
 

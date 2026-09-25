@@ -18,6 +18,11 @@ visibility(observer, subject) -> 'clear' | 'partial' | 'silhouette' | 'none'
   hidden = positions.hidden = 1. moved = the subject is the body (actor_id) of a MOVE event
           with at_ms - 1000 < at <= at_ms whose payload.from_place is not null (being placed by
           the scenario loader or worldgen is not movement).
+  FOCUS-02 (B4, Actor Spec §9; built with P5's resolver) attention: A = payload.attention of the
+          observer's latest ACTION_START (by seq) with at <= at_ms (none, or None: no attention).
+          The subject is A, or A is a portal and the subject's anchor is that portal's anchor_a
+          or anchor_b -> score + 1; A is set and the subject is not -> score - 1 (eyes on one
+          thing miss others). A new attempt without attention ends it.
   clear >= 3; partial >= 1; silhouette >= -1; else none.
 What each level reveals (VIS-03): clear = identity if known to the observer, held items, wounds
 visible (severe+), action; partial = rough description (build, clothing colour), gross action;

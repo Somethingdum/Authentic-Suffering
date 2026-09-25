@@ -127,6 +127,20 @@ Possibilities you notice (choose one)
 {% for a in p.affordances %}
 - {{ a.handle }}: {{ a.label }}{{ (" (" ~ a.cost_note ~ ")") if a.cost_note else "" }}{{ (" [risk: " ~ a.risk_note ~ "]") if a.risk_note else "" }}
 {% endfor %}
+{% if p.gestures %}
+
+A gesture that may go with it (optional)
+{% for g in p.gestures %}
+- {{ g.handle }}: {{ g.label }}{{ (" (needs " ~ g.hands ~ " free hand" ~ ("s" if g.hands > 1 else "") ~ ")") if g.hands else "" }}
+{% endfor %}
+{% endif %}
+{% if p.attention_points %}
+
+Where you may keep your eyes (optional)
+{% for f in p.attention_points %}
+- {{ f.handle }}: {{ f.label }}
+{% endfor %}
+{% endif %}
 {% if p.looked_up %}
 
 What you looked up

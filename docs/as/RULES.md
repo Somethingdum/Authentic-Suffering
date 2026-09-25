@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-645 ids; 392 with their own statement, 253 named only in context.
+651 ids; 401 with their own statement, 250 named only in context.
 
 
 ## ABUSE
@@ -338,6 +338,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | FAC-05 | FAC-05 Where the decon team goes (world.worldmove OPS-02 for kind 'decon'; the killer = operations.target_id): at 'arrive' the team goes where the killer IS now (world.hordes.target(its place)); the killer outside the a… | as_engine/world/factions.py | `as_engine/world/factions.py`, `as_engine/world/worldmove.py` | `contract/p10_world/test_ghosts.py` |
 | FAC-06 | FAC-06 Nothing here makes a Ghost appear where nobody could be: teams are materialised at the enclave (from its counted people, CONSERVE-04) and walk there like any operation. | as_engine/world/factions.py | `as_engine/world/factions.py` | — |
 
+## FOCUS
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py` |
+| FOCUS-02 | Eyes on one thing: it is seen one step better, everything else one step worse, until the next attempt (`sense.optics.visibility`). | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/resolve.py`, `as_engine/sense/optics.py` | `contract/p05_many_actors/test_gestures.py` |
+
 ## GATE
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -371,6 +378,14 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | GEO-02 | *Body clearance (GEO-02, used by ``admits``):* | as_engine/physical/space.py | `as_engine/physical/space.py` | — |
 | GEO-03 | GEO-03/04 (P10): the building's rooms, portals, containers and loot, the first time (see the | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/region.py`, `as_content/packs/core/buildings/commercial.yaml` | `contract/p10_world/test_discovery.py`, `contract/p10_world/test_region.py` |
 | GEO-04 | *3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_content/packs/core/buildings/commercial.yaml`, `as_content/packs/core/loot/tables.yaml` | `contract/p10_world/test_discovery.py` |
+
+## GEST
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| GEST-01 | The packet offers the gestures the person's free hands allow — nod, shake of the head, shrug; pointing, beckoning or waving someone off toward each person here; a finger to the lips; both empty hands shown (`mind.packet… | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py` |
+| GEST-02 | A gesture takes the hands the attempt leaves free (`INTENT-09`: 'no_free_hand'); contact is never a gesture — a touch, a grab, covering a mouth is an attempt of its own. | 05_ACTORS §7.2 | — | — |
+| GEST-03 | A gesture goes out with the attempt as a GESTURE event: seen at clear or partial, never heard; 'Mara points at you.' (`action.resolve`, `mind.perception`). | 05_ACTORS §7.2 | `as_engine/action/resolve.py`, `as_engine/mind/perception.py` | `contract/p05_many_actors/test_gestures.py` |
 
 ## GRP
 
@@ -561,15 +576,15 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| INTENT-01 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py` |
-| INTENT-02 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/mind.py`, `as_engine/turn/cognition.py` | — |
-| INTENT-03 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_effects.py` |
-| INTENT-04 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
-| INTENT-05 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
-| INTENT-06 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-01 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py` |
+| INTENT-02 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/contracts/mind.py`, `as_engine/turn/cognition.py` | — |
+| INTENT-03 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/physical/objects.py` | `contract/p02_space_bodies/test_objects.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_effects.py` |
+| INTENT-04 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-05 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
+| INTENT-06 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
 | INTENT-07 | * INTENT-07 pace (a decision's or the player's; a V1 answer's is 'normal'): 'normal', or one of the chosen option's paces (BoundAffordance.paces, copied from AffordanceDef.paces) — else IntentError 'unsupported_pace' (a… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_intent_v2.py` |
 | INTENT-08 | * INTENT-08 an Actor's answer (source 'model') with more than 100 words of speech (whitespace-separated), or more than 12 in a reaction (reaction=True) -> IntentError 'speech_too_long' (Actor Spec §7: long talk goes on… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
-| INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (no packet offers any yet) — else IntentError 'hallucinated_expression'. An inscription needs a chosen option tagged 'write' (no core opt… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
+| INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (B4: mind.packet GEST-01 / FOCUS-01) — else IntentError 'hallucinated_expression'. A gesture takes the hands the attempt leaves free: its… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p04_one_actor/test_intent_v2.py` |
 
 ## LANE
 
@@ -794,11 +809,11 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RESOLVE-01 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-02 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-03 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-04 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
-| RESOLVE-05 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-01 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-02 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-03 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-04 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-05 | *Resolution (Stage 8, P5). Rules RESOLVE-01..06, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
 
 ## ROUT
 
@@ -862,9 +877,10 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SEG-01 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
-| SEG-02 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
-| SEG-03 | *Paused: Actor v2 step 4 (speech in segments, SEG-01..04) is half-written and kept out of the repo* | HANDOFF §0 | — | — |
+| SEG-01 | A long speech arrives in segments of at most eight words, cut at the last pause (. , ; : ! ? … —) among the 4th to 8th words (`action.intent.segments`). | 05_ACTORS §7.2 | `as_engine/action/intent.py` | `contract/p05_many_actors/test_speech_segments.py` |
+| SEG-02 | Words take 2.5 a second, however few: alongside an attempt they overlap it (the longer of the two), before or after it they add; nobody hides or sneaks while talking (their words come first) (`action.intent.to_intent`). | 05_ACTORS §7.2 | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py`, `contract/p04_one_actor/test_intent_v2.py`, `contract/p04_one_actor/test_speech_timing.py` |
+| SEG-03 | Each segment is a SPEECH of its own, said when the words before it have been (the rest queued as SPEECH_SEGMENT); words 'after' an attempt start when it lands (`action.resolve`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/action/resolve.py`, `as_engine/turn/timers.py` | `contract/p05_many_actors/test_speech_segments.py` |
+| SEG-04 | A segment is said only if the speaker is alive and conscious then; a new attempt cuts what is left (one voice, one utterance); one SPEECH_CUT records where the words stopped, and listeners only ever hear what was said. | 05_ACTORS §7.2 | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_speech_segments.py` |
 
 ## SEL
 
@@ -1021,7 +1037,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | TIME-02 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_engine/kernel/clock.py`, `as_engine/turn/pipeline.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | TIME-03 | *World clock (P0). docs/as/07_RULES.md §Time. Rules TIME-01..05.* | as_engine/kernel/clock.py | `as_engine/kernel/clock.py`, `as_engine/turn/pipeline.py` | — |
 | TIME-04 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_engine/kernel/clock.py`, `as_engine/turn/pipeline.py` | — |
-| TIME-05 | *est_duration_s grows by words / 2.5 seconds (speech consumes real time, TIME-05) — the* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py`, `contract/p05_many_actors/test_resolve.py` |
+| TIME-05 | * SEG-02 speech takes time (TIME-05; Actor Spec §9): an utterance of n words takes u = n / 2.5* | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py`, `contract/p05_many_actors/test_resolve.py` |
 | TIME-06 | *``type_`` not in QUEUE_TYPES raises ValidationFailure(rule='TIME-06').* | as_engine/kernel/clock.py | `as_engine/kernel/clock.py`, `as_engine/turn/timers.py` | `contract/p00_substrate/test_clock.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
 | TIME-07 | *Rules TIME-06..10, CAS-06.* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | `contract/p09_society/test_timers_society.py` |
 | TIME-08 | *Rules TIME-06..10, CAS-06.* | as_engine/turn/timers.py | `as_engine/turn/timers.py` | `contract/p09_society/test_timers_society.py` |

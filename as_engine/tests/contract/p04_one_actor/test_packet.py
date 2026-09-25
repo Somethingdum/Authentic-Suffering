@@ -336,7 +336,7 @@ def test_no_internal_id_reaches_the_prompt(scenario):
             p = packet_for(w, local, at)
             text = rendered(p)
             assert not ID_RE.search(text), (name, local, ID_RE.search(text).group(0))
-            assert p.handles and all(k[0] in "PSAEL" for k in p.handles)
+            assert p.handles and all(k[0] in "PSAELGF" for k in p.handles)
 
 
 # --------------------------------------------------------------------------- SKULL-09 budget

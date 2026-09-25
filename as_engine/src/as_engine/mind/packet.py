@@ -50,6 +50,16 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
           option's BoundAffordance.signature 'def_id:target:destination:item' ('*' for an empty
           slot).
   L1..Ln  open loops (below) in packet order.   E1..En  memories (P6).
+  G1..Gn  (B4, GEST-01) gestures, in this order: per action.effects.GESTURES entry (catalog
+          order) whose hands <= physical.bodies.capacity(actor).hands_free — an untargeted one
+          once; a targeted one once per P-handle whose whereabouts is 'here', in P order, at most
+          3 (the first three). Handle value f'{gesture_id}:{body id or "*"}'. Label = the
+          gesture's label with {target} = the P-handle's description.
+  F1..Fn  (B4, FOCUS-01) attention points: every P-handle whose whereabouts is 'here', in P
+          order (label f'Keep your eyes on {description}'), then every portal of the actor's
+          place the actor has a visual percept of this turn, by portal_id (label f'Watch the
+          {portal name}': a door you can see is the door). Handle value = the body or portal id. A reaction packet
+          offers neither G nor F handles (its answer is short; Actor Spec §7).
   ``handles`` maps every handle to its internal id (percept_id, body id, signature, loop_id,
   episode_id) and is never rendered. tests/helpers.handle_for finds an option by def and referent.
 
@@ -179,6 +189,9 @@ Fields (second person, plain English):
                     the middle of anything.'; empty stakes.would_lose -> ['Nothing you can name.'];
                     empty resources -> ['You carry nothing.'].
   affordances       AffordanceOption(A#, verb, label, cost_note, risk_note) per option.
+  gestures / attention_points   (B4) ExpressionOption(G# | F#, label, hands) per handle above
+                    (hands 0 for attention); hands_free = capacity(actor).hands_free. The prompt
+                    lists them after the options; the answer may name one of each (INTENT-09).
   uncertainty       one line per PARTIAL or TONE_ONLY percept, in S order: f'You did not catch all
                     of {S#}.'
   families          [] when reaction or consulted; else mind.consult.families(affordances, the

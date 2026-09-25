@@ -212,6 +212,16 @@ street at noon with one of the dead close, Pumpwell for the rows.
 | `p07_slice/test_narration_care.py` | the story knows when the player has nothing on or is bare to the waist, and when they are freezing |
 | `p10_world/test_weather_and_cold.py` | a day at a time to grimy and no further; a wash starts the count again; the rain soaks and rinses the gore off (the camouflage with it), never under a roof; out of it you dry; what the place, the night and a soaking ask; a night in the open by what each wears, and no claim for a body never dressed; the cold impairs; naked on a wet night in a cold country kills; warm again the chill goes |
 
+### 3.10 Timing, gestures and attention (Actor v2 B4; D-87)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_speech_timing.py` | words alongside overlap the attempt, before or after they add; even one word takes time; nobody hides or sneaks while talking; the words that are the attempt; the menu never changes |
+| `p04_one_actor/test_expressions.py` | the gestures free hands allow, toward each person here; hands full leaves only what needs none; where to keep your eyes (people here, the door you see); a reaction offers neither; the prompt lists them and the answer may name one of each; the Intent carries them through the round trip; a gesture needs the hands the attempt leaves |
+| `p05_many_actors/test_speech_segments.py` | eight words at most, cut at a pause; a long warning arrives a segment at a time; what is not yet said waits on the clock; a dead speaker finishes nothing; new words cut the old; words after the attempt come when it is done; a listener hears only what was said |
+| `p05_many_actors/test_gestures.py` | a gesture goes out with the attempt; she sees it pointed at her; nobody hears a gesture; eyes on one thing miss others, and the next attempt ends it; watching a door is watching whoever stands in it |
+| `p01_lanes/test_schemas.py`, `p04_one_actor/test_intent.py`, `test_intent_v2.py`, `test_packet.py`, `p05_many_actors/test_effects.py`, `test_resolve.py` (amended) | the offered G / F handles are the schema's only values; words' time by SEG-02; an unoffered G99 / F99 is refused; G and F handles are handles like the rest; the start carries its attention; a SPEECH says which segment of which utterance it is |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

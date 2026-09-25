@@ -10,6 +10,7 @@ dispatch(tx, rng, row, fired, turn_index, horizon_ms) -> list[Event]
     NOISE           commit NOISE (writer 'action.propagate', no writes) with payload = the row's
                     payload unchanged, place_id = payload.place_id, cause = fired.
     ACTION_LAND     action.resolve.land_pending(tx, rng, row, turn_index, horizon_ms=horizon_ms).
+    SPEECH_SEGMENT  action.resolve.say_pending(tx, row, turn_index)                       (P5, SEG-03)
     WEATHER_CHANGE  commit WEATHER_CHANGE (writer 'kernel.clock', payload = the row's payload)
                     updating world_clock.weather (and wind_level when the payload has it).
     PORTAL_CHANGE   commit physical.space.portal_change_event(tx, payload.portal_id,

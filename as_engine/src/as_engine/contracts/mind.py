@@ -151,6 +151,15 @@ class AffordanceOption(Strict):
     risk_note: str | None = None
 
 
+class ExpressionOption(Strict):
+    """B4 (Actor Spec §9): a gesture (G#) or a thing to keep your eyes on (F#) that may go with an
+    attempt. It changes nothing by itself: a gesture is seen, attention is where you look."""
+
+    handle: str = Field(pattern=r"^[GF]\d+$")
+    label: str
+    hands: int = Field(default=0, ge=0, le=2, description="Free hands a gesture needs (0 for attention).")
+
+
 class Commitments(Strict):
     current_task: str | None = None
     plan_step: str | None = None
@@ -188,6 +197,9 @@ class SkullPacket(Strict):
     stakes: Stakes = Field(default_factory=Stakes)
     resources: list[str] = Field(default_factory=list)
     affordances: list[AffordanceOption] = Field(min_length=1)
+    gestures: list[ExpressionOption] = Field(default_factory=list, description="B4 GEST-01: what may go with the attempt.")
+    attention_points: list[ExpressionOption] = Field(default_factory=list, description="B4 FOCUS-01: what you may keep your eyes on.")
+    hands_free: int = Field(default=0, ge=0, le=2, description="B4: free hands now (a gesture and the attempt share them).")
     uncertainty: list[str] = Field(default_factory=list)
     handles: dict[str, str] = Field(default_factory=dict, description="handle -> internal id. NEVER rendered.")
     omitted: list[str] = Field(default_factory=list, description="What the budget dropped, in drop order "

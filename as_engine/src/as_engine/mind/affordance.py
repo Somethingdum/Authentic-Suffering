@@ -124,10 +124,11 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
   armed_at_me (a weapon in hand while it spoke to this actor). The set's ``threats`` lists them
   (body ids, in known-body order; turn.cognition HOLD-02 reads it).
   Survivors become BoundAffordance(def_id, verb, target_id, destination_id, item_id, label,
-  ui_label, est_duration_s, noise_db, cost_note, risk_note, check, tags, paces). est_duration_s =
+  ui_label, est_duration_s, noise_db, cost_note, risk_note, check, tags, paces, hands). est_duration_s =
   duration.base_s + duration.per_meter_s x the walking distance to the referent (0 for self /
   touch); tags = the def tags + the option's moral tags; paces = the def's paces (Actor Spec §7,
-  action.intent INTENT-07). Placeholders (label AND ui_label):
+  action.intent INTENT-07); (B4) hands = the def's requires.hands_free (the hands the attempt
+  itself takes: a gesture gets what is left, INTENT-09). Placeholders (label AND ui_label):
     {target}      a body: its known name or with_article(describe(...)); an item, container or
                   portal: thing_phrase(name) ('the office door'); a wound: f'the wound on your
                   <anatomy words>' (own) or f'the wound on <ref>'s <anatomy words>'; keep_working:
@@ -269,6 +270,7 @@ class BoundAffordance:
     check: "CheckSpec | None" = None
     tags: tuple[str, ...] = ()
     paces: tuple[str, ...] = ()   # AffordanceDef.paces: 'careful' / 'rushed' besides normal
+    hands: int = 0                 # B4: AffordanceDef.requires.hands_free (INTENT-09's gesture check)
 
     @property
     def signature(self) -> str:

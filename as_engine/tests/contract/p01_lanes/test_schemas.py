@@ -55,7 +55,7 @@ def test_cognition_schema_enums():
 
 
 def test_a_schema_offers_only_what_the_engine_can_do():
-    """SCHEMA-04: gestures, attention points and writing stay null-only (no packet offers them yet);
+    """SCHEMA-04: without offered gestures or attention points they, and writing, stay null-only;
     a consultation appears only where the packet offers one, its kinds, families and subjects as
     enums — never an enum over nothing."""
     sch = cognition_schema(["A1"], ["P1"], consult_kinds=["recall", "more_actions"], families=["movement", "access"],
@@ -113,3 +113,12 @@ def test_output_model_table_is_complete():
     for cc in (CallClass.ACTOR_COGNITION, CallClass.ACTOR_REACTION, CallClass.INTENT_REPAIR):
         assert OUTPUT_MODELS[cc] is ActorReplyV2, cc
     assert OUTPUT_MODELS[CallClass.WRITEBACK] is WritebackOutput
+
+
+def test_offered_gestures_and_attention_points_are_the_only_ones():
+    """SCHEMA-04 (B4): what the packet offers as G# and F# handles, and nothing else, or null."""
+    sch = cognition_schema(["A1"], ["P1"], gesture_handles=["G1", "G2"], attention_handles=["F1"])
+    act = _branch(sch["properties"]["action"])
+    assert act["properties"]["gesture"] == {"anyOf": [{"type": "string", "enum": ["G1", "G2"]}, {"type": "null"}]}
+    assert act["properties"]["attention"] == {"anyOf": [{"type": "string", "enum": ["F1"]}, {"type": "null"}]}
+    assert act["properties"]["inscription"] == {"type": "null"}

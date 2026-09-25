@@ -109,11 +109,12 @@ def test_a_v1_answer_is_at_normal_pace(june):
 
 
 def test_pace_applies_after_the_time_speech_takes(june):
+    """Words said before the attempt add their time (SEG-02); the pace then scales the whole."""
     w, pkt, aff = june
     h = helpers.handle_for(pkt, "search_place")
     words = " ".join(["now"] * 25)
-    it = to_intent(pkt, aff, act(h, pace="rushed", speech=SpeechOut(text=words, to=["everyone"])), lod=LOD.HOT,
-                   source="model")
+    it = to_intent(pkt, aff, act(h, pace="rushed", speech=SpeechOut(text=words, to=["everyone"], timing="before")),
+                   lod=LOD.HOT, source="model")
     assert it.bound.est_duration_s == pytest.approx((bound_of(pkt, aff, h).est_duration_s + 25 / 2.5) * 0.6)
 
 
@@ -162,7 +163,7 @@ def test_a_decisions_goal_and_reason_become_the_intents(june):
 
 
 # --------------------------------------------------------------------------- INTENT-09 expression and writing
-@pytest.mark.parametrize("field, value", [("gesture", "G1"), ("attention", "F1"), ("attention", "P1"), ("gesture", "A1")])
+@pytest.mark.parametrize("field, value", [("gesture", "G99"), ("attention", "F99"), ("attention", "P1"), ("gesture", "A1")])
 def test_a_gesture_or_a_look_the_packet_did_not_offer_is_refused(june, field, value):
     w, pkt, aff = june
     h = helpers.handle_for(pkt, "go_look")

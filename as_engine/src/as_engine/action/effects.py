@@ -25,7 +25,8 @@ How an action runs (action.resolve drives it; handlers only LAND actions)
 ACTION_START payload: {actor_id, def_id, verb, target_id, destination_id, item_id,
   est_duration_s, visible (= AffordanceDef.visible_act), seen (= SEEN[def_id] or null),
   continues_task (true only for keep_working), label (= intent.bound.label, the option as the
-  actor was offered it), goal (= intent.goal)}. label and goal are the actor's own record of what
+  actor was offered it), goal (= intent.goal), attention (B4 FOCUS-02: intent.attention, None
+  without one)}. label and goal are the actor's own record of what
   it chose and why (mind.memory builds its aftermath from them); perception never renders them. Perception renders it for observers as
   f'{Ref} {seen}.' with {target} / {destination} / {item} filled for THAT observer (a body: 'you'
   when it is the observer — "{target}'s" becomes 'your' — else its Ref; a thing: thing_phrase of
@@ -368,6 +369,27 @@ WEAPON_WOUNDS: dict[str, dict[str, str]] = {
     "light": {"clean": "significant", "cost": "minor"},
     "medium": {"clean": "severe", "cost": "significant"},
     "heavy": {"clean": "catastrophic", "cost": "severe"},
+}
+
+@dataclass(frozen=True)
+class Gesture:
+    """B4 (Actor Spec §9, GEST-01): a small expression that goes with an attempt. Never contact — a
+    touch, a grab or covering a mouth is an attempt of its own."""
+    label: str        # what the menu says ('point at {target}')
+    seen: str         # what an observer sees ('points at {target}')
+    hands: int        # free hands it needs (0, 1 or 2)
+    targeted: bool    # made toward someone seen
+
+
+GESTURES: dict[str, Gesture] = {
+    "nod": Gesture("nod", "nods", 0, False),
+    "shake_head": Gesture("shake your head", "shakes their head", 0, False),
+    "shrug": Gesture("shrug", "shrugs", 0, False),
+    "point_at": Gesture("point at {target}", "points at {target}", 1, True),
+    "beckon": Gesture("beckon {target} over", "beckons {target} over", 1, True),
+    "wave_off": Gesture("wave {target} off", "waves {target} off", 1, True),
+    "hush": Gesture("put a finger to your lips", "puts a finger to their lips", 1, False),
+    "empty_hands": Gesture("show your empty hands", "holds up empty hands", 2, False),
 }
 
 # What an observer sees when the action STARTS (perception fills the placeholders per holder).

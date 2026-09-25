@@ -92,6 +92,8 @@ class EventType(StrEnum):
     PLAN_CHANGE = "PLAN_CHANGE"
     # social
     SPEECH = "SPEECH"
+    SPEECH_CUT = "SPEECH_CUT"   # SEG-04: where an utterance stopped (action.resolve)
+    GESTURE = "GESTURE"         # GEST-03: a gesture made with an attempt (action.resolve; seen, never heard)
     REQUEST = "REQUEST"
     ORDER = "ORDER"
     THREAT = "THREAT"
@@ -189,7 +191,7 @@ _groups: dict[EventClass, list[str]] = {
                       "PROMISE_KEPT", "PROMISE_BROKEN", "LOOP_OPENED", "LOOP_CLOSED", "LOOP_STRENGTH", "LIE_TOLD",
                       "LIE_DISCOVERED", "PERSONA_PIERCED", "LESSON_LEARNED", "ANCHOR_MEMORY",
                       "EPISODE_WRITTEN", "REFLECTION", "PLAN_CHANGE"],
-    EventClass.SOCIAL: ["SPEECH", "REQUEST", "ORDER", "THREAT", "OFFER", "DELIBERATE_QUOTATION",
+    EventClass.SOCIAL: ["SPEECH", "SPEECH_CUT", "GESTURE", "REQUEST", "ORDER", "THREAT", "OFFER", "DELIBERATE_QUOTATION",
                         "TENSION_CHANGE", "ESCALATION", "DEFECTION", "LEADERSHIP_CHALLENGE",
                         "RECONCILIATION", "RUMOUR_SPREAD", "LOYALTY_CHECK", "STANDING_CHANGE",
                         "RUMOUR_DISTORTED"],

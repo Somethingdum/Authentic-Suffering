@@ -12,13 +12,17 @@ LM-Studio-safe schema (SCHEMA-01): ``to_lm_schema(model)`` returns
 
 Dynamic enums (SCHEMA-02):
   cognition_schema(affordance_handles, entity_handles, *, consult_kinds=(), families=(),
-                   subject_handles=()) -> dict   (Actor Spec §7; SCHEMA-04)
+                   subject_handles=(), gesture_handles=(), attention_handles=()) -> dict
+                   (Actor Spec §7; SCHEMA-04)
       to_lm_schema(ActorReplyV2), then:
         kind          enum ["decision"], plus "consultation" when consult_kinds is not empty;
         action        (nullable object) choice = {"type": "string", "enum": affordance_handles};
                       speech.to items = {"type": "string", "enum": entity_handles + ["everyone"]};
-                      gesture, attention and inscription = {"type": "null"} (no packet offers
-                      gestures, attention points or a writing attempt yet);
+                      gesture = {"anyOf": [{"type": "string", "enum": gesture_handles},
+                      {"type": "null"}]} when gesture_handles is not empty, else {"type": "null"};
+                      attention the same with attention_handles (B4: the packet's G# and F#
+                      handles); inscription = {"type": "null"} (no packet offers a writing
+                      attempt yet);
         consultation  {"type": "null"} when consult_kinds is empty; else nullable, with kind =
                       {"type": "string", "enum": consult_kinds}; family = the enum of families
                       (nullable), or {"type": "null"} when families is empty; template =
@@ -125,7 +129,8 @@ def _branch(sch):
 
 def cognition_schema(affordance_handles: list[str], entity_handles: list[str], *,
                      consult_kinds: tuple[str, ...] | list[str] = (), families: tuple[str, ...] | list[str] = (),
-                     subject_handles: tuple[str, ...] | list[str] = ()) -> dict[str, Any]:
+                     subject_handles: tuple[str, ...] | list[str] = (), gesture_handles: tuple[str, ...] | list[str] = (),
+                     attention_handles: tuple[str, ...] | list[str] = ()) -> dict[str, Any]:
     if not affordance_handles:
         raise ValueError("SCHEMA-03: no affordance handles")
     sch = to_lm_schema(ActorReplyV2)

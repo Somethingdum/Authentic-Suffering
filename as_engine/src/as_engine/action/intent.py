@@ -1,4 +1,4 @@
-"""Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, L2, L3, L5.
+"""Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.
 
 An Intent is what a mind attempts. It is built by CODE from a decision — the ActionPayload of an
 ActorReplyV2 (Actor Spec §7) —, the player's IntakeOutput, a V1 CognitionOutput (tests and the V1
@@ -25,18 +25,28 @@ to_intent(packet, affordances, output, *, lod, source, reaction=False) -> Intent
     'speech_too_long' (Actor Spec §7: long talk goes on over further decisions). The player's own
     words are never refused for length. delivery and timing are copied into the SpeechAct (a V1
     speech: ordinary, alongside).
-  * speech with a non-SPEAK choice is allowed; if it exceeds 12 words the bound option's
-    est_duration_s grows by words / 2.5 seconds (speech consumes real time, TIME-05) — the
-    Intent carries a copy of the BoundAffordance with the new duration. A SPEAK choice's
-    duration becomes max(its est_duration_s, words / 2.5).
+  * SEG-02 speech takes time (TIME-05; Actor Spec §9): an utterance of n words takes u = n / 2.5
+    seconds, however short. A SPEAK choice: est_duration_s = max(its est_duration_s, u). Any other
+    choice: timing 'alongside' -> max(est_duration_s, u) (the words overlap the attempt); 'before'
+    or 'after' -> est_duration_s + u (serial parts add). An 'alongside' with a chosen option
+    tagged 'sneak' or 'hide' cannot overlap it (the words would give them away): the SpeechAct's
+    timing becomes 'before' and the parts add. The Intent carries a copy of the BoundAffordance
+    with the new duration (the AffordanceSet is never changed); action.resolve places the words
+    (SEG-03).
   * INTENT-07 pace (a decision's or the player's; a V1 answer's is 'normal'): 'normal', or one of
     the chosen option's paces (BoundAffordance.paces, copied from AffordanceDef.paces) — else
     IntentError 'unsupported_pace' (an IntakeOutput's unsupported pace is read as 'normal': the
     player's words are not a protocol). careful: est_duration_s x 1.5 and noise_db - 6 (not below 0);
     rushed: est_duration_s x 0.6 and noise_db + 6 (not above 180), applied after the speech rule
     above, on the Intent's copy of the BoundAffordance. (Its check modifier: action.effects.)
-  * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (no packet
-    offers any yet) — else IntentError 'hallucinated_expression'. An inscription needs a chosen
+  * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (B4:
+    mind.packet GEST-01 / FOCUS-01) — else IntentError 'hallucinated_expression'. A gesture
+    takes the hands the attempt leaves free: its ExpressionOption.hands <= packet.hands_free -
+    the chosen option's BoundAffordance.hands — else IntentError 'no_free_hand' (showing both
+    empty hands cannot go with carrying a load in both). The Intent carries gesture = the G
+    handle's value split at ':' into (gesture_id, body id or None) and attention = the F handle's
+    value (a body or portal id); both None otherwise (a V1 answer and the player's own words
+    carry neither). An inscription needs a chosen
     option tagged 'write' (no core option is one yet), at most 35 words, and a quotation_source
     that is null or an S# / E# key of packet.handles whose percept or memory text contains the
     inscription text word for word — else IntentError 'bad_inscription'.
@@ -79,9 +89,18 @@ plan_continuation(tx, actor_id, affordances, at, turn_index, *, accepted_only=Fa
     'observe_area', else 'wait_here', else the first option.
   manner '' ; goal = actors.goal_text or the option label; private_reason ''; lod COLD.
 
+segments(text) -> list[str]   (SEG-01, P5; Actor Spec §9: a long speech does not arrive at once)
+  The words of ``text`` (whitespace-separated), in order, cut into segments of at most
+  SEGMENT_WORDS (8): each segment takes the next 8 words; when more words follow those 8, it ends
+  instead after the LAST of its words 4..8 (counting from 1) that ends with one of . , ; : ! ? …
+  or — when there is one, else after the 8th. Words are joined with single spaces; an empty text
+  -> []. ('June, stay where you are. Nita is checking the cans out back.' -> ['June, stay where
+  you are.', 'Nita is checking the cans out back.'])
+
 intent_to_dict(intent) -> dict / intent_from_dict(d) -> Intent   JSON-safe round trip (queue rows,
   pending_reactions): every Intent, SpeechAct and BoundAffordance field (pace, delivery, timing and
-  the inscription included; a dict without them reads as normal, ordinary, alongside, None);
+  the inscription included, and (B4) gesture as a two-item list, attention and hands; a dict without
+  them reads as normal, ordinary, alongside, None, None, None, 0);
   CheckSpec as its model_dump.
 """
 
@@ -126,12 +145,14 @@ class Intent:
     blocked: str | None = None   # set by barrier(): 'referent_missing
     pace: str = "normal"         # normal | careful | rushed (INTENT-07)
     inscription: InscriptionAct | None = None
+    gesture: tuple[str, str | None] | None = None   # B4 INTENT-09: (GESTURES id, toward body id or None)
+    attention: str | None = None                    # B4 INTENT-09: the body or portal id kept in view
 
 
 @dataclass(frozen=True)
 class IntentError:
     kind: Literal["hallucinated_choice", "hallucinated_target", "empty", "none_choice", "speech_too_long",
-                  "unsupported_pace", "hallucinated_expression", "bad_inscription"]
+                  "unsupported_pace", "hallucinated_expression", "bad_inscription", "no_free_hand"]
     detail: str
 
 
@@ -147,6 +168,13 @@ def barrier(tx: "Tx", intents: list[Intent]) -> list[Intent]:
 
 def plan_continuation(tx: "Tx", actor_id: str, affordances: "AffordanceSet", at: int,
                       turn_index: int, *, accepted_only: bool = False) -> Intent | None:
+    raise NotImplementedError("P5")
+
+
+SEGMENT_WORDS = 8
+
+
+def segments(text: str) -> list[str]:
     raise NotImplementedError("P5")
 
 

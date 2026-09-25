@@ -16,8 +16,10 @@ and the frontend toolchain are not built — the DSH builder builds them (13_BUI
 
 **From here on nothing more is implemented by the kit-maker.** The owner's words: the rest is
 DeepSeek's to build. The kit-maker writes contracts, tests, docs and instructions only. What is left:
-1. **Actor v2 steps 4–6** — the Actor Specification's remaining parts (speech segments, gestures,
-   attention, resources — spec §9; memory, firewall and promises — AC08–AC13, fidelity C10; the
+1. **Actor v2 steps 4–6** — the Actor Specification's remaining parts. **Step 4 (B4) is SPECIFIED**
+   (D-87; 05 §7.2; 13 §4.0 step 1; tests 12 §3.10): words in segments on the clock, cut when the
+   speaker stops; gestures by free hands, seen and never heard; one attention point. Left: memory,
+   firewall and promises — AC08–AC13, fidelity C10; the
    society and wake fixes — C04, C06, C08) as contracts and tests amending the built phases. Each
    amended function is named, so the builder knows which bodies to change.
 2. **P11** — the audits (§5).

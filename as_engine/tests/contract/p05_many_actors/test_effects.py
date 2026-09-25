@@ -68,7 +68,7 @@ def test_a_walk_starts_then_lands(scenario):
     assert start.payload == {"actor_id": w.id("june"), "def_id": "go_look", "verb": "move", "target_id": None,
                              "destination_id": w.id("back_door_in"), "item_id": None, "est_duration_s": i.bound.est_duration_s,
                              "visible": True, "seen": "goes to look toward {destination}", "continues_task": False,
-                             "label": "go_look", "goal": "go_look"}
+                             "label": "go_look", "goal": "go_look", "attention": None}
     land = effects.land_ms(t, i.bound.est_duration_s)
     assert land == t + math.ceil((1 + math.hypot(2, 2.5)) * 1000)
     mv = one(evs, "MOVE")

@@ -44,6 +44,9 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | smear | covering yourself in the dead's gore to walk among them (`action.effects` smear; D-77 exposure) | camouflage up, gore up | — |
 | strip | taking a worn piece off an adult who cannot stop you — out cold or dead (`action.effects` strip; never anyone under 18, CNT-11) | loot clothes | — |
 | reeked / bared | TEMPER-09's provocations: the reek of the dead on a person close by; a naked adult in plain sight (`mind.temper.exposures`) | disgusted, offended | — |
+| utterance / segment | an utterance is what one attempt says; it goes out in segments of at most eight words, each a SPEECH when its turn comes (`action.intent.segments`, SEG-01..04) | message, chunk | — |
+| gesture | a small expression that goes with an attempt, from `action.effects.GESTURES`; seen, never heard, never contact (GEST-01..03) | emote, animation | — |
+| attention point | the one person or door a person keeps their eyes on until their next attempt (FOCUS-01..02) | focus target | — |
 | known law | a law of the place a person knows: every law there for a member of the settlement's group, and the ones anyone else was told; a cost next to an option, never a missing option (AFF-11) | — | forbidden action |
 | intent | what a mind attempts (never an outcome) | "what you do" | action (as a record), move |
 | decision | an Actor's answer that attempts something: one offered option, its pace, speech, goal, private reason (`ActorReplyV2` kind decision) | what they do | — |
