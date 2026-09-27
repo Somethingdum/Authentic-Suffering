@@ -404,6 +404,10 @@ playable character, faction, lore) and drop a `.md`, `.txt` or `.docx`.
 5. Progress shows per section. **Nothing becomes canon until you move the draft into the pack**
    (IMP-06).
 
+How to lay out a lore document so intake maps it cleanly — one heading per record, truth and
+belief, numbers not moods, and the questions the next document should answer — is
+`docs/as/LORE_STRUCTURE.md`.
+
 This is the mechanism for your Ghost faction corpus. The core pack deliberately ships **no** Ghost
 faction — the first time the Ghosts enter a world should be when you feed them in yourself.
 
