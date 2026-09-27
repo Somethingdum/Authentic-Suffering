@@ -107,7 +107,11 @@ Voice lines are the most important craft element. Rules that make them work:
 Starting state: `starting_inventory` (item grants with slots and nesting labels) and
 `starting_loops` (goals, grudges, promises they begin with). Clothing they wear is not in
 `starting_inventory` — it is the outfit in `appearance.looks` (below); gear worn on the body (a
-holstered pistol, a pack) stays in `starting_inventory` with slot `worn`.
+holstered pistol, a pack) stays in `starting_inventory` with slot `worn`. A PC may also carry
+`canon_events` (D-109): things that really happened to them before any life begins — `title`,
+`memory` (what they carry of it, in their own terms) and `days_before_start` (a range, default
+1–365). Every life as them starts remembering each one as an anchor memory, on a day drawn for
+that world (WG-33b); Addison's is "The laundromat".
 
 ### 3.1 How they look (`appearance.looks`, F1a)
 

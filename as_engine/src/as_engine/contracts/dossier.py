@@ -444,6 +444,23 @@ class BehaviorLaw(Strict):
     performance: str = Field(min_length=10, description="What mocking, joking, flirting, fake familiarity and post-adrenaline behaviour look like for them.")
 
 
+class CanonEvent(Strict):
+    """D-109: something that happened to this character before any life as them begins — an
+    owner-canon event they remember (world.worldgen.opening.canon_memories, WG-33b)."""
+    title: str = Field(min_length=3, description="What it is called: 'The laundromat'.")
+    memory: str = Field(min_length=20, description="What they carry of it, in their own terms (the anchor memory's "
+                        "summary; it never decays).")
+    days_before_start: tuple[int, int] = Field(default=(1, 365), description="How long before the run's first "
+                                               "day it happened, as a range (a life may begin any time after it).")
+
+    @field_validator("days_before_start")
+    @classmethod
+    def _range(cls, v: tuple[int, int]) -> tuple[int, int]:
+        if v[0] < 1 or v[1] < v[0]:
+            raise ValueError("days_before_start must be (lo, hi) with 1 <= lo <= hi")
+        return v
+
+
 class PCDossier(ActorDossier):
     """A playable character. Same record as any Actor (L12) plus selection/worldgen fields.
 
@@ -462,6 +479,8 @@ class PCDossier(ActorDossier):
     faction_standing: list[FactionMembership] = Field(default_factory=list, description="Relations to factions without membership, e.g. protected external asset.")
     recap: Recap = Field(default_factory=Recap)
     behavior_law: BehaviorLaw | None = Field(default=None, description="CMG §54; strongly recommended for every authored PC.")
+    canon_events: list[CanonEvent] = Field(default_factory=list, description="D-109: owner-canon events this "
+                                           "character remembers at the start of every life (WG-33b).")
 
     @model_validator(mode="after")
     def _card_name_matches(self) -> "PCDossier":

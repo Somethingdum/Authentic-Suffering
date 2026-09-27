@@ -110,8 +110,8 @@ discover_layout(tx, rng, building_place_id, at, turn_index) -> list[Event]   (P1
   the caller, world.worldmove.on_arrival (physical does not write world tables).
 
 P12, D-108 — height, and the lines only a few can take (PARKOUR-01..08). The owner: "You also have to
-account for how to simulate Addison Flores. She parkours." Her card: "Goes up and away — to a ledge,
-a fence, a roof — before she has decided anything; her feet decide first."
+account for how to simulate Addison Flores. She parkours." Her bible: "She has already started moving before
+she knows why. She has learned to trust that." (D-109)
 PARKOUR-01 Height. places.elevation_m is the floor's height above the street (the ground 0; a roof
   its building's height; a room its storey's). A place of kind 'roof' is open air on top of a
   building. PARKOUR_KINDS = ('climb', 'gap', 'edge') are three portal kinds nobody walks through
@@ -137,7 +137,7 @@ PARKOUR-05 Jumping a gap: action.effects jump_gap (against gap.class); a FAIL ba
   BREAK falls into the gap's landing place.
 PARKOUR-06 Dropping off an edge: action.effects drop_down (against drop.class) — always a fall, and
   a good roll takes metres off it (physical.bodies FALL-01).
-PARKOUR-07 Her feet decide first: action.effects flee — a body tagged 'parkour' goes up first when
+PARKOUR-07 Moving before she knows why: action.effects flee — a body tagged 'parkour' goes up first when
   its place has a way up.
 PARKOUR-08 Roofs in the world: discover_layout steps 4 and 5 (a building's roof, its ways up and
   down, the gaps between the roofs of a block).

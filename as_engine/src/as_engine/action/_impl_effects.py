@@ -474,7 +474,7 @@ def h_leave_place(tx, rng, intent, land_at, ctx, d):
 def h_flee(tx, rng, intent, land_at, ctx, d):
     from ..physical.space import distance_to_point
     threat = intent.bound.target_id
-    up = _way_up(tx, intent.actor_id)   # PARKOUR-07 (D-108): her feet decide first
+    up = _way_up(tx, intent.actor_id)   # PARKOUR-07 (D-108): moving before she knows why
     if up is not None:
         spec = _def(tx, "climb_obstacle").check
         landing, band = _climb_across(tx, rng, intent, land_at, ctx, d, up, spec=spec, res_key="climb.class", noise="flee")

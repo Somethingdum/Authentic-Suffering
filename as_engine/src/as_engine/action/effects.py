@@ -107,7 +107,7 @@ Per effect (result strings in quotes; 'done' unless noted):
                      the threat (target); none -> MOVE to the anchor of the place farthest from it.
                      (D-108, PARKOUR-07) A body whose fused capability tags hold 'parkour' goes up
                      first: when its place has a 'climb' portal to a higher place it climbs it as
-                     climb_face does (with climb_obstacle's check spec) — "her feet decide first";
+                     climb_face does (with climb_obstacle's check spec) — moving before she knows why;
                      FAIL: the flee above; BREAK: the fall.
   end_own_life       (D-107) physical.bodies.end_own_life(tx, rng, actor, the bound item, land_at, T,
                      the start event): 'done' when it killed, 'click' when the gun was empty (they are

@@ -113,6 +113,7 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | memory job | one person's writeback for one turn, kept in `memory_jobs` until done; a failed call is tried again (MEM-19) | — | — |
 | quarantined episode | a memory naming someone its holder never learned the name of: kept as raw evidence, never recalled, awaiting review (MEM-18) | — | — |
 | anchor memory | an episode that never decays | — | — |
+| canon event | something that really happened to an authored character before any life as them; remembered in every life as an anchor memory, on a day drawn for each world (`PCDossier.canon_events`, WG-33b, D-109) | "The laundromat" | backstory event |
 | persistence lock | a subject decay never removes | — | PERSISTENCE_LOCK |
 | place | a node in the place graph (room, street …) | the place's name | LSDL location (as geometry) |
 | anchor | a named point inside a place | "the counter", "by the window" | — |

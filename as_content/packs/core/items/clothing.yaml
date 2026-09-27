@@ -617,6 +617,71 @@
     style:
     - casual
 - schema: as.item.v1
+  id: parkour_pants
+  name: pair of parkour pants
+  plural: pairs of parkour pants
+  kind: clothing
+  mass_g: 300
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 4
+  description: Light, stretchy, tough-woven pants with reinforced knees and a gusset that lets a foot come up to the chest.
+  clothing:
+    slot: legs
+    layer: mid
+    covers:
+    - groin
+    - legs
+    words: light parkour pants
+    colour: dark grey
+    plural: true
+    style:
+    - casual
+    - outdoor
+- schema: as.item.v1
+  id: sports_bra
+  name: sports bra
+  plural: sports bras
+  kind: clothing
+  mass_g: 90
+  bulk: 0
+  tags:
+  - clothing
+  barter_value: 2
+  description: A close-fitting athletic bra — normal wear in the heat, not underwear.
+  clothing:
+    slot: torso
+    layer: mid
+    covers:
+    - torso
+    words: sports bra
+    colour: pink
+    style:
+    - casual
+- schema: as.item.v1
+  id: parkour_shoes
+  name: pair of parkour shoes
+  plural: pairs of parkour shoes
+  kind: clothing
+  mass_g: 450
+  bulk: 1
+  tags:
+  - clothing
+  barter_value: 6
+  description: Thin-soled, flexible, grippy shoes that take hard landings day after day.
+  clothing:
+    slot: feet
+    layer: mid
+    covers:
+    - feet
+    words: thin-soled parkour shoes
+    colour: grey
+    plural: true
+    style:
+    - casual
+    - outdoor
+- schema: as.item.v1
   id: athletic_top
   name: sports top
   plural: sports tops

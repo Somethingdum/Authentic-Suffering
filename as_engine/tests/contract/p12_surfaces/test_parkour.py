@@ -3,9 +3,8 @@ DECISIONS D-108 (physical/space.py; physical/bodies.py fall; action/effects.py c
 drop_down, flee; mind/affordance.py; narration/location.py; world/infected.py; affordances
 movement.yaml; buildings roofs; scenario rooftops).
 
-The owner: "You also have to account for how to simulate Addison Flores. She parkours." Her card:
-"Goes up and away — to a ledge, a fence, a roof — before she has decided anything; her feet decide
-first." The world she moves in (tests/fixtures/scenarios/rooftops.yaml): the market roof (4.5 m), a
+The owner: "You also have to account for how to simulate Addison Flores. She parkours." Her bible:
+"She has already started moving before she knows why. She has learned to trust that." (D-109) The world she moves in (tests/fixtures/scenarios/rooftops.yaml): the market roof (4.5 m), a
 1.6 m gap up to the warehouse roof (6 m), a 2.8 m gap on to the apartments (6.5 m), a drainpipe and
 the roof edges down to Hardy Street, one of the dead at the foot of the pipe and a runner in the
 street.
@@ -201,7 +200,7 @@ def test_how_a_fall_hurts(scenario, h, got):
     assert alive == (0 if h >= 15 else 1)
 
 
-# =========================================================================== her feet decide first
+# ================================================================ moving before she knows why
 def test_her_feet_decide_first(scenario):
     """PARKOUR-07: in the street with the dead at the pipe, fleeing means up."""
     w = scenario("rooftops")

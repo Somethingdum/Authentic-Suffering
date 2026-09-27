@@ -41,7 +41,9 @@ replaces "the rest will remain uncoded"). What is left:
    screaming is public knowledge and nothing more, the talk shatters or breaks most minds, the Voice
    sometimes dooms at the bite, and some can't take it), and so is parkour (D-108: the world has
    height — roofs, drainpipes, gaps between buildings, edges — and Addison Flores moves on it; falls
-   hurt by height; runners follow her up and often fall); still to do: a new life here and the rest below. The owner's list was: overwriting an
+   hurt by height; runners follow her up and often fall), and so is Addison from her writer's bible
+   (D-109: from Boston, ten at the Fall; the laundromat is a canon event she remembers in every
+   life, on a day drawn for each world); still to do: a new life here and the rest below. The owner's list was: overwriting an
    Actor's will, wiping a memory, giving one Top-Hat the wet strain remotely in the middle of a
    council meeting (`factions.in_session`), horde and Mega Horde cheats, census inspection — all
    inside the simulation (every cheat is an event with a cause; a cheated run is Sandbox forever).

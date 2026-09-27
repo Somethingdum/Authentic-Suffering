@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-738 ids; 486 with their own statement, 252 named only in context.
+739 ids; 487 with their own statement, 252 named only in context.
 
 
 ## ABUSE
@@ -535,7 +535,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| I-AS-10 | I-AS-10: The PC card text differs between Part II §2.3 ("Getting to places…") and Part XV | DECISIONS §5 | `as_content/packs/core/pcs/addison_flores.yaml` | — |
+| I-AS-10 | I-AS-10: The PC card text differs between Part II §2.3 ("Getting to places…") and Part XV | DECISIONS §5 | — | — |
 | I-AS-11 | I-AS-11: The document is titled "Master Guide v4.1" inside while its file and footer say v4.2. | DECISIONS §5 | — | — |
 | I-AS-12 | I-AS-12: CMG §43.B's Addison Containment Rule assumes Addison is always the PC; with selectable | DECISIONS §5 | `as_content/packs/core/factions/mafia_remnants.yaml` | — |
 | I-AS-13 | I-AS-13: CMG §42.1 names Codex as responsible for the escape; AS has no narrator-god, so the | DECISIONS §5 | — | — |
@@ -777,7 +777,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | PARKOUR-04 | PARKOUR-04 Climbing a face: action.effects climb_face (A + athletics against climb.class; one less going down); a BREAK falls half the height. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
 | PARKOUR-05 | PARKOUR-05 Jumping a gap: action.effects jump_gap (against gap.class); a FAIL balks at the edge, a BREAK falls into the gap's landing place. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
 | PARKOUR-06 | PARKOUR-06 Dropping off an edge: action.effects drop_down (against drop.class) — always a fall, and a good roll takes metres off it (physical.bodies FALL-01). | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
-| PARKOUR-07 | PARKOUR-07 Her feet decide first: action.effects flee — a body tagged 'parkour' goes up first when its place has a way up. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
+| PARKOUR-07 | PARKOUR-07 Moving before she knows why: action.effects flee — a body tagged 'parkour' goes up first when its place has a way up. | as_engine/physical/space.py | `as_engine/action/effects.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
 | PARKOUR-08 | PARKOUR-08 Roofs in the world: discover_layout steps 4 and 5 (a building's roof, its ways up and down, the gaps between the roofs of a block). | as_engine/physical/space.py | `as_engine/contracts/settings.py`, `as_engine/physical/space.py` | `contract/p12_surfaces/test_parkour.py` |
 
 ## PARSE
@@ -1262,9 +1262,10 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | WG-28 | WG-28 Writing (per person, slot order; pack actors first in placement order): the body, needs, a position at the settlement site's anchor, the dossier (source 'pack' with its content ref, or 'generated') and the actor (… | as_engine/world/worldgen/people.py | `as_engine/world/factions.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_materialise.py`, `contract/p10_world/test_worldgen_pipeline.py` |
 | WG-29 | WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acquaintance of every other named person there (known_name = display name, description = mind.perception. describe_dossier) and known_places for… | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_materialise.py`, `contract/p10_world/test_worldgen_pipeline.py` |
 | WG-30 | *the player is never decided here or anywhere in worldgen (WG-30).* | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/opening.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
-| WG-31 | *them (P10). Rules WG-18..21, WORLD-01, WG-31, WG-32. docs/as/06_WORLD.md §1.3.* | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-31 | *them (P10). Rules WG-18..21, WORLD-01, WG-31, WG-32. docs/as/06_WORLD.md §1.3.* | as_engine/world/worldgen/history.py | `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py`, `contract/p12_surfaces/test_addison.py` |
 | WG-32 | *3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/history.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
 | WG-33 | *them right now, what they have heard, and what they remember (P10). Rules WG-30, WG-33, QC-4, QC-5.* | as_engine/world/worldgen/opening.py | `as_engine/world/worldgen/opening.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |
+| WG-33b | WG-33b (D-109): then the PC's canon events, canon_memories(...) below — their history rows are counted in the same WORLDGEN_STAGE 'personal' and their episodes committed in the same ANCHOR_MEMORY. 8 world_params.commit_… | as_engine/world/worldgen/opening.py | `as_engine/contracts/dossier.py`, `as_engine/world/worldgen/opening.py` | `contract/p12_surfaces/test_addison.py` |
 | WG-34 | *A run setting, or a combination of settings, the world cannot honour (P10: WG-34).* | as_engine/kernel/errors.py | `as_engine/kernel/errors.py`, `as_engine/service/game_service.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/params.py`, `as_engine/world/worldgen/people.py`, `as_engine/world/worldgen/pipeline.py`, `as_content/templates/actor_template.yaml` | `contract/p10_world/test_params.py`, `contract/p10_world/test_worldgen_pipeline.py` |
 | WG-35 | WG-35 assert_world(store, region, plan, opening) -> list[str] (plain sentences; [] = it holds) 1 "Fewer than three places worth the risk." unless len(opening.magnets) >= 3 and the PC holds a live, believed 'lead' propos… | as_engine/world/worldgen/checks.py | `as_engine/audit/release.py`, `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/pipeline.py`, `as_engine/world/worldgen/region.py` | `contract/p10_world/test_region.py`, `contract/p10_world/test_worldgen_pipeline.py` |
 | WG-36 | WG-36 The seven world checks name nothing from the story: which people will betray, die or befriend the player is never decided here or anywhere in worldgen (WG-30). | as_engine/world/worldgen/checks.py | `as_engine/world/worldgen/checks.py`, `as_engine/world/worldgen/pipeline.py` | `contract/p10_world/test_worldgen_pipeline.py` |

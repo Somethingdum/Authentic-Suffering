@@ -1,159 +1,193 @@
-# Addison Flores — the reference playable character (CMG §61 Part XV carried; card text per Part XV,
-# see DECISIONS I-AS-10). Authorial rule (her writer's bible): she acts on impulse and habit, never
-# strategy — never describe her as robotic or calculating.
+# Addison Flores — the reference playable character. Canon: CMG §61 Part XV (the card, start facts,
+# inventory, recap), the owner's writer's character bible and the owner's canon event "the
+# laundromat" (DECISIONS D-109). The owner's rulings (2026-09-26): from Boston, ten at the Fall,
+# moved south after it; pale; a mild Boston accent; light parkour pants replace the skort; she has
+# survived at least three mega hordes. Write her from the bible: she reacts before she thinks.
 schema: as.pc.v1
 id: addison_flores
 generation: authored
 days_since_fall_range: [3287, 4018]
 identity:
   name: Addison Flores
-  aliases: [Addy]
+  aliases: [Roof Goblin]
   age: 20
   sex: female
   cohort: fall_child
-  birthplace: Hattiesburg, Mississippi
-  occupation_before: A ten-year-old parkour kid who climbed everything in her neighbourhood
-  occupation_now: Runner-scavenger and trader
-  one_line: A small, warm runner-scavenger who gets into places nobody else can reach and trades what she finds there.
+  birthplace: Boston, Massachusetts
+  occupation_before: A ten-year-old parkour kid in Boston who climbed everything she could reach
+  occupation_now: Runner-scavenger and trader — scout, mapper, courier, the one who retrieves what nobody else can reach
+  one_line: A small, warm runner-scavenger who collects the things nobody else can get to, and trades them.
 appearance:
   height_cm: 152
   mass_kg: 52
-  build: Lean and compact; does not look strong, and is
-  hair: Dark brown, thick, tied up in a high messy knot to keep it off her neck in the heat
-  eyes: Brown
-  skin: Warm tan, sun-browned, scraped at the knees and knuckles
+  build: Small and light, none of it wasted — no visible muscle to speak of; calves from years of landing, a core that holds without showing. At rest she just looks small.
+  hair: Very long, mid-back when loose, deep brown that goes nearly black in low light; worn in a tight low bun with one scrunchie, pulled so tight it looks uncomfortable. Down only when she has judged the room actually safe.
+  eyes: Large, dark brown, moving constantly — exits, the room, anything in motion
+  skin: Pale with a slight rosy undertone; marks easily, bruises go purple within hours; 8-12 light freckles across the nose and cheekbones
   distinguishing_marks:
-    - A daypack covered in years of accumulated stickers
+    - A daypack covered in years of overlapping stickers — cartoon characters, music stickers, produce fruit labels, one worn unreadable she has never peeled off
     - A cartoon sticker on the grip of her Glock
-    - Callused palms and fingertips from ten years of climbing
-  clothing_usual: A teal skort, a pink sports bra, running shoes; an oversized windbreaker when it rains
-  movement_under_stress: Goes up and away — to a ledge, a fence, a roof — before she has decided anything; her feet decide first.
-  habit_gesture: Taps out routes on her thigh with two fingers while she listens, as if tracing a map.
-  relation_to_appearance: Likes looking cute and keeps the perfume for days that matter; mostly she dresses for heat and climbing.
+    - Always some low-level damage — scrapes, shin bruises, roughed-up knuckles
+    - A slight smirk at the corner of her mouth as her resting face
+  clothing_usual: Light parkour pants, a pink sports bra and thin-soled parkour shoes; an oversized plastic windbreaker, two sizes too big, when it rains
+  movement_under_stress: Already moving before she knows why — up, out, to whatever surface holds — and she has learned to trust that; compact, focused, movement first and thought second.
+  habit_gesture: Retying her hair; shifting onto the balls of her feet; stretching a calf; perching instead of sitting deeply, always somewhere she can move out of fast.
+  relation_to_appearance: Keeps herself startlingly clean whenever she can — soap, shampoo, deodorant, perfume — as regulation and a refusal to surrender, not vanity. Dresses for heat and movement; managing anyone's reaction is not her job.
   looks:
-    hair_colour: dark brown
+    hair_colour: deep brown
     hair_length: long
-    hair_style: tied up in a high messy knot
-    eye_colour: brown
-    complexion: "warm tan, sun-browned skin"
+    hair_style: in a tight low bun
+    eye_colour: dark brown
+    complexion: "pale skin with a rosy undertone, freckled across the nose and cheekbones"
     marks:
-      - {what: "fresh scrapes", where: "across the knees and knuckles", shows: near}
-      - {what: "callused palms and fingertips", where: "on both hands", shows: close}
+      - {what: "a scatter of light freckles", where: "across the nose and cheekbones", shows: close}
+      - {what: "scrapes and fading bruises", where: "on the shins, knees and knuckles", shows: near}
     outfit:
-      - {item: "core:item/athletic_top"}
-      - {item: "core:item/skort"}
-      - {item: "core:item/running_shoes"}
+      - {item: "core:item/sports_bra"}
+      - {item: "core:item/parkour_pants"}
+      - {item: "core:item/parkour_shoes"}
 capability:
   special: {S: 5, P: 7, E: 7, C: 7, I: 5, A: 9, L: 6}
   skills:
-    - {domain: athletics, rank: 3, evidence: "Ten years of parkour, starting before the Fall at about age ten, and every day since."}
-    - {domain: scavenging, rank: 3, evidence: "A decade of getting into collapsed, locked and high places nobody else reaches."}
-    - {domain: trade, rank: 2, evidence: "Known in her region's trade economy as reliable, with surprising inventory."}
-    - {domain: navigation, rank: 2, evidence: "Route memory that is always running; she has never been lost outdoors."}
-    - {domain: stealth, rank: 1, evidence: "Moves quietly out of habit; not a hider — she prefers height to cover."}
+    - {domain: athletics, rank: 3, evidence: "Free-running for about a decade, since before the Fall at about ten, and every day since."}
+    - {domain: scavenging, rank: 3, evidence: "Ten years of getting into collapsed, locked and high places nobody else reaches; her whole thing is collecting what others cannot."}
+    - {domain: navigation, rank: 3, evidence: "Route memory so strong it feels uncanny to other people; she does not lose routes unless her brain is compromised."}
+    - {domain: trade, rank: 2, evidence: "Well known in her region's trade economy; shows up with surprising inventory and deals fair."}
+    - {domain: stealth, rank: 2, evidence: "Makes herself hard to find in a cluttered interior; went down a live stairwell on the edges of the steps without a sound."}
+    - {domain: cooking, rank: 2, evidence: "No kitchen training; makes something good out of very little — stews, soups, rough steaks."}
+    - {domain: survival, rank: 1, evidence: "Gets a fire going reliably; learned it from an older man she once shared a fire with."}
+    - {domain: medicine, rank: 1, evidence: "Dresses her own wounds properly every time; knows the signs of a concussion."}
   tags: [parkour, climber]
   trained_responses:
     - {cue: infected_close, verb: flee, note: "Up and out — the nearest climbable line."}
-    - {cue: grabbed_from_behind, verb: escape, note: "Twists and drops, then runs."}
+    - {cue: grabbed_from_behind, verb: escape, note: "Her body answers before her brain does; what comes out is not controlled."}
     - {cue: threat_seen, verb: move, note: "Puts height or a gap between her and it before anything else."}
+    - {cue: voice_unknown, verb: observe, note: "Since the laundromat: a voice from somewhere she can't see gets listened to, not answered."}
   literacy: 2
   tech_literacy: 1
   resolve_trait_mod: 0
 motive:
-  motive: Keep moving and stay known — somebody who shows up, trades fair, and is worth keeping around.
+  motive: Keep moving and stay known — somebody who shows up, trades fair, and is worth keeping around; stay only while staying is more rewarding than leaving.
   method: Gets into places others can't, finds things others can't get, and trades them to people who need them.
   moral_line:
-    will: ["Rob the dead", "Walk away from a deal that feels wrong", "Mock someone from a safe distance"]
-    wont: ["Stay somewhere she can't leave", "Hurt someone who isn't coming at her", "Cheat a regular trading partner"]
+    will: ["Rob the dead", "Leave a group without a word when the thing she came for is gone", "Mock someone from a safe height after they came at her"]
+    wont: ["Stay somewhere she can't leave", "Hurt someone who isn't coming at her", "Go for someone's real wound for a joke"]
     wont_tags: [attack_unarmed, kill_child]
-  inner_conflict: She has never fully looked at whether the man she stabbed with broken glass had to be stabbed, and she keeps moving so she never has to.
-  past_wound: About a year into the Fall a man in the group she ran with came at her; she barely survived, stabbed him with broken glass and fled, and the group fell apart soon after.
-  signature_behaviour: Drifts into friendly conversation with almost anyone, then peels off on her own when she's done — mid-sentence if she has to.
+  inner_conflict: She did what she had to do in the first year. She has never fully examined whether that is actually true, and she keeps moving so she never has to.
+  past_wound: About a year into the Fall, at eleven, a man in the group she was running with came at her; she barely survived, stabbed him with broken glass and fled. The group fell apart soon after.
+  signature_behaviour: Fills a safe room with talk, movement and noise; leaves a bad one without a speech — stages her gear and goes.
   risk_threshold: 7
-  risk_text: Physical risk feels like play to her; social risk and being cornered do not.
+  risk_text: Physical risk in space she can move through feels like play; dead ends, one-exit rooms and being rushed do not.
   resource_constraints: Forty-five rounds she treats as precious, no vehicle and no way to drive one, and whatever fits in a 20-litre daypack.
 persona:
   public:
-    shown_traits: [friendly, easygoing, reliable]
-    claimed_history: Been running since she was ten; trades with anyone fair.
+    shown_traits: [bright, warm, funny, nosy]
+    claimed_history: "Been free-running for about a decade now, fun hobby — it helps her get supplies no one else can."
     presented_affiliation: Nobody's — known to everybody
   private:
-    true_goals: ["Never be trapped", "Stay wanted by the people she trades with"]
-    concealed_history: She stabbed a man in the group she ran with and never went back to find out if he lived.
+    true_goals: ["Never be cornered", "Stay wanted by the people she trades with", "Keep the bright and bubbly — it is real, it is hers, and keeping it costs something"]
+    concealed_history: She stabbed a man in the group she ran with at eleven and never went back to find out if he lived.
     real_affiliation: Her own trade circuit
 traits:
-  - tag: warm
-    manifests: Talks to strangers like old friends, remembers names and what people needed last time.
-    triggers: Anyone who isn't pointing something at her, and most people who are.
-    causes: She makes friends and trading partners fast, and she walks up to people others would avoid.
-    costs: Her warmth reads as naive or as a come-on to the wrong people, and sometimes spooks the jumpy ones.
-    example: Approached a stranger too warmly, spooked him, dodged two swings of a pipe, escaped over a fence, and teased him from the roof.
+  - tag: architectural_confidence
+    manifests: Bolder on rooftops, ledges, rails, counters, clutter, stairwells and layered rooms; flatter in dead ends, open flat ground, cramped or one-exit rooms.
+    triggers: The shape of the space she is in — how many ways out it has.
+    causes: Where she can leave clean she approaches, pokes, stays curious and makes weird conversation with people she should probably leave alone.
+    costs: She engages people she should leave alone because she feels she can get out, and she goes short and sharp in a narrow hall.
+    example: Sat on a service platform above a man who had just hit her with a pipe and talked at him for two hours, because he could not reach her.
+  - tag: warm_not_open
+    manifests: Friendly, funny, curious and physically loose with people within minutes, while revealing nothing that could be used against her.
+    triggers: Anyone who is not actively dangerous.
+    causes: People think they are closer to her than they are; she often lets that misunderstanding stand.
+    costs: People project access onto her and build private claims she is slow to see.
+    example: Liked a trader within minutes, laughed with him for an hour, and never once mentioned she had not slept or that her landing that morning was bad.
+  - tag: the_mouth
+    manifests: No gap between thinking something and saying it — the compliment with 'than I expected' attached, the ranking that includes you, the invasive question asked because she wants to know.
+    triggers: Pressure, excitement or boredom switching her slow filter off.
+    causes: Small accidental slights, and people feeling handled or shown up.
+    costs: She catches the slip afterwards and fixes it awkwardly, sometimes worse than the original.
+    example: 'Asked a man "What happened to your face." meaning the scar, because she wanted the story.'
+  - tag: troll
+    manifests: Straight-faced bits scaled to how safe she is, how much she dislikes someone and how good their face is — the wrong name locked in, fake romantic investment, escalating concern, a terrible rap verse about them, the callback.
+    triggers: Someone who came at her, failed, and is now stuck below her or otherwise can't reach her.
+    causes: Humiliation without a punch; rhythm broken; the room sees she is not rattled.
+    costs: It can keep a hostile person invested in her long after she should have left.
+    example: Called a thief George for two hours though it was not his name, told him she loved him with a perfectly straight face, and rapped at him about beans until she ran out of words.
   - tag: restless
-    manifests: Cannot stay still or in one place for long; fidgets, climbs things, taps routes on her thigh.
-    triggers: Walls, crowded rooms, long talks about plans, anyone telling her to wait.
-    causes: She leaves early, moves on, and takes the physical job over the talking one.
-    costs: Deals and friendships get dropped half-finished, and people call her unreliable when she is anything but.
-    example: Walked out of a council meeting about a new housing site once the talk turned abstract, and climbed the water tower instead.
-  - tag: impulsive_mouth
-    manifests: Says the practical half of an idea loudly and forgets the diplomatic half.
-    triggers: Being asked to explain something, or anyone being slow about something obvious.
-    causes: Good ideas arrive rough; rooms take her seriously and get defensive at the same time.
-    costs: She offends people she needed, and has to fix it later with gifts.
-    example: Told a council their gate was "a bottleneck that's going to get somebody eaten" instead of proposing a second gate.
+    manifests: Low threat does not produce rest; it produces energy with nowhere to go — pull-ups on a pipe, freerunning a route she already knows, bothering whoever is near, freestyling at someone with no warning.
+    triggers: Downtime, waiting, a quiet room.
+    causes: The room gets texture whether it wanted it or not.
+    costs: She installs herself in people's space and ignores every signal that she is in the way.
+    example: Rapped a whole Eminem verse at full volume off a twentieth-floor platform at a man who had begged her not to.
 contradictions:
-  - belief_a: People are good to trade with, and most are decent if you're decent to them.
-    belief_b: Anyone can come at you, even the people you're running with.
-    a_wins_when: She's in open space with a way out, trading.
-    b_wins_when: She's cornered, in a closed room, or someone grabs her.
+  - belief_a: Groups are warmth — somewhere to land, people she likes, texture in the day.
+    belief_b: She does not need any group; the bedroll goes anywhere and she can leave at any time.
+    a_wins_when: The room is decent, functional and heading somewhere real.
+    b_wins_when: The structure that made the bad parts tolerable starts failing.
+  - belief_a: People are mostly decent if you are decent to them.
+    belief_b: Anyone bigger who wants unexplained closeness is a bad sign.
+    a_wins_when: Open space, a way out, trading.
+    b_wins_when: A confined space, being rushed, being grabbed.
 decision_stack:
   layers:
-    - Keep a way out — height, a gap, an exit
+    - Keep a way out — height, a gap, a line she can run
     - Keep her gear and her Glock
+    - Keep the few people she trusts safe
     - Keep her trading partners happy
     - Help whoever is in front of her
     - Other people's rules
   inversion_conditions:
-    - If a trading partner she likes is in real danger, helping them rises above keeping her gear.
-  past_example: When a trading partner's stall was being robbed, she dropped her pack to climb faster, got on the roof above the robbers and pelted them with bottles until the shield men came.
+    - If someone she is close to is being hurt, protecting them rises above keeping her gear.
+    - If someone took her things and she can get above them, getting them back rises above keeping her distance.
+  past_example: When a man stole her pack with her gun in it, she tracked him to a high-rise, climbed twenty floors of balconies, dropped onto his balcony, took it back past a lead pipe, and trolled him from a platform he could not reach.
 silence:
   goes_quiet_when:
     - Anyone mentions the group she ran with in the first year.
-    - She's in a closed room with more than a few people she doesn't know.
-  body_when_silent: Tapping routes on her thigh, eyes going to windows and doors, weight shifting like she's about to go.
+    - She is in a cramped or one-exit room with people she does not know.
+    - Someone she trusts is breaking down — she has nothing to say, and she stays.
+  body_when_silent: The fidgeting stops, which is its own tell; eyes on the exits harder than the faces; weight on the balls of her feet.
   refuses_to_discuss: ["The man with the broken glass"]
-  comfortable_vs_uncomfortable: Comfortable silence is sitting on a high ledge at sunset; uncomfortable silence is a room waiting for her to answer a question about the past.
+  comfortable_vs_uncomfortable: Comfortable silence is a high ledge alone or a movie that makes her cry; uncomfortable silence is a room waiting for her to explain herself.
 knowledge:
   knows:
-    - The routes, rooftops and entry points of her start zone.
+    - The routes, rooftops and entry points of her start zone — every surface that holds weight.
     - Who trades what, and who pays fair, in her region's markets.
     - Infected get back up hours after they go down, unless the head's done.
+    - What a lurker sounds like up close — wet palms slapping the pavement, a click at the top of every breath — and that one has worn her own voice and Dave's.
+    - The signs of a concussion — throwing up, getting confused, not staying awake.
   does_not_know:
     - Whether any of the group she ran with in the first year are still alive, or what story they tell.
+    - The real name of the man she calls George — he told her, and she forgot.
   knows_but_hides:
     - What happened with the man and the broken glass.
-  cues: [knows_headshot_rule, knows_false_death, knows_noise_draws_dead, knows_crawler_ambush, knows_runner_stamina, knows_no_sharing]
+    - How badly the laundromat shook her.
+  cues: [knows_headshot_rule, knows_false_death, knows_noise_draws_dead, knows_crawler_ambush, knows_runner_stamina, knows_no_sharing, knows_lurker_signs, knows_lurker_mimicry]
 voice:
-  capsule: Bright, quick, a little breathless, Mississippi warmth; talks like she's already halfway to the next place. Friendly by default, teasing when safe, blunt when bored. Carries plans badly — the practical bits survive, the abstract language dies.
+  capsule: Informal and live — short bursts, pivots, self-corrections, mild run-ons when safe; a mild Boston accent. Comes in sideways, puts stupid labels on real things, lands hard on the word doing the work. Sounds young in a real way. Bright to deadpan in one beat; under threat she compresses — shorter, flatter, literal.
   speech_tendencies:
-    - Calls people by the thing they traded her last ("Hey, lighter guy!").
-    - Describes places by how to get into them.
-    - Teases hardest when she's just been scared.
+    - "Fillers she reaches for: 'like', 'uh', 'okay', 'I mean', 'whatever', 'anyway', 'stuffs' (pluralized wrongly on purpose), and 'Sir' or 'Guy' — warm, sarcastic or de-escalating."
+    - "Comes in sideways before the real ask: 'I wouldn't mind if you priced that.'"
+    - "Stupid accurate labels on real things: 'Historic fish event.' 'It betrayed me spiritually first.'"
+    - "Capitals on the word carrying the feeling: 'VERY important question', 'deeply insulting'."
+    - "Steals someone's pressure phrasing and hands it back reversed, still warm."
+    - "Trails off when she runs out: 'Also, and, or uh..'"
   exemplars:
-    low_stakes: "Okay, so the pharmacy's roof hatch is rusted open, and I've got four bottles of the good ibuprofen if you've got anything with protein."
-    under_pressure: "Nope, nope, nope — up, I'm going up — don't follow me, you'll fall."
-    at_the_limit: "Let go! Let go of me or I'm taking your eye!"
+    low_stakes: "Gotta ask, do you have those stick-on mustaches? Like any? Those are awesome."
+    under_pressure: "If I could be less aimed at, I could definitely explain the climbing thing!"
+    at_the_limit: "You do not get to do that to me."
   would_never_say:
-    - "Let's circle back to that and align on a plan."
-    - "I'll just wait here."
-    - "Take the gun, I don't need it."
+    - "Your anger is clearly displaced and I refuse to internalize it."
+    - "I understand your pain, but this reaction is disproportionate."
+    - "State your trade inventory."
+    - "I weaponize surprise because men are predictably script-bound."
   profanity: frequent
-  dialect_notes: Southern Mississippi; 'y'all', 'fixing to', 'might could'.
+  dialect_notes: A mild Boston accent from the first ten years of her life.
 temper:
-  fuse: 2
-  outlet: words
+  fuse: 4
+  outlet: cold
   grudge: 1
-  pet_peeves: ["being underestimated", "people touching her pack"]
-  cools_down_by: "climbing something high"
+  pet_peeves: ["being physically handled without warning", "people touching her pack", "being cornered and yelled at", "being told she looks bad when she's sick"]
+  cools_down_by: "running a route she already knows, just to run it"
 social:
   household_role: ""
   relations: []
@@ -161,42 +195,43 @@ social:
   guardians: []
   memberships: []
 life:
-  aspiration: A safe high place to sleep and people who are glad to see her come back.
+  aspiration: Somewhere with people who stay decent, heading somewhere real — and a high place to sleep.
   current_project: Her current trade run — decided at worldgen.
   routine:
     - {start_hh: 5, end_hh: 11, activity: running and scavenging before the heat, place_hint: outside}
     - {start_hh: 11, end_hh: 16, activity: resting somewhere high and shaded, place_hint: rooftop}
     - {start_hh: 16, end_hh: 21, activity: trading, place_hint: market}
-    - {start_hh: 21, end_hh: 24, activity: sleep routine somewhere high, place_hint: rooftop}
+    - {start_hh: 21, end_hh: 24, activity: "learning the room, the sounds and the exits, staging her gear", place_hint: rooftop}
     - {start_hh: 0, end_hh: 5, activity: sleep, place_hint: rooftop}
   obligations: ["Her regular trading partners"]
-  hopes: ["A rooftop garden of her own", "Never being cornered again"]
-  fears: ["Being trapped", "Being alone with nobody to trade with"]
+  hopes: ["A working movie setup and a night to watch something that makes her cry", "A group worth staying in: decent, functional, going somewhere"]
+  fears: ["Being cornered or rushed in a tight space", "Her route memory failing", "Her own voice coming from somewhere she isn't"]
   secrets:
-    - content: A year into the Fall she stabbed a man from her own group with broken glass and fled; she never learned whether he lived.
+    - content: A year into the Fall, at eleven, she stabbed a man from her own group with broken glass and fled; she never learned whether he lived.
       who_knows: []
       exposure_consequence: If survivors of that group tell their version, her reputation as safe to trade with could collapse.
 disposition:
   archetype_prior: survivor
   toward_strangers: warm
-  encounter_default: Waves from somewhere high and out of reach, and asks what they're trading.
+  encounter_default: Comes in from higher ground or with options behind her, says the obvious thing — "Hi, don't shoot!" — and asks what they're trading.
 starting_loops:
   - {kind: question, text: "Is anyone from the first-year group still out there", strength: 1}
+  - {kind: fear, text: "The lurker that knows her voice and Dave's is still out there", strength: 2}
 starting_inventory:
   - {item: "core:item/glock_19", slot: worn, label: glock, props: {chambered: false, note: "Cartoon sticker on the grip."}}
   - {item: "core:item/magazine_9mm_15", container: glock, props: {rounds: 15}}
-  - {item: "core:item/daypack", slot: worn, label: pack, props: {note: "Covered in stickers."}}
+  - {item: "core:item/daypack", slot: worn, label: pack, props: {note: "Worn straps, a repaired seam, covered in overlapping stickers."}}
   - {item: "core:item/magazine_9mm_15", qty: 2, slot: pack, container: pack, props: {rounds: 15}}
-  - {item: "core:item/pocket_knife", slot: pocket, props: {note: "Staged for reaching in the dark."}}
+  - {item: "core:item/pocket_knife", slot: pocket, props: {note: "In her thigh pocket, where her hand expects it in the dark."}}
   - {item: "core:item/bedroll", slot: pack, container: pack}
-  - {item: "core:item/medkit", slot: pack, container: pack, props: {note: "Scavenged."}}
+  - {item: "core:item/medkit", slot: pack, container: pack, props: {note: "Scavenged: bandages, gauze, tape, antiseptic wipes, butterfly closures, antibiotic ointment."}}
   - {item: "core:item/perfume", slot: pack, container: pack, props: {note: "Real, intact, kept carefully."}}
   - {item: "core:item/toiletries", slot: pack, container: pack, props: {note: "Travel-size deodorant, soap and shampoo."}}
-  - {item: "core:item/windbreaker", slot: pack, container: pack, props: {note: "Oversized."}}
+  - {item: "core:item/windbreaker", slot: pack, container: pack, props: {note: "Plastic, folds small, two sizes too big; hits mid-thigh."}}
   - {item: "core:item/spare_clothes", slot: pack, container: pack, props: {note: "A short skirt, a spare sports bra, spare underwear."}}
   - {item: "core:item/lighter", slot: pocket, props: {note: "Needs replacing often."}}
-writers_notes: She acts on impulse and habit, never on strategy — never write her as robotic or calculating. The Glock came off a body near a gun store on the first day; she has read the manual and nothing else, is not a marksman, and would rather not use it.
-tags: [pc, canon_cmg_61]
+writers_notes: Write her from the owner's writer's bible (DECISIONS D-109). She reacts before she thinks; her confidence is architectural; warmth is cheap and trust is expensive; she is not rude by default (warm, shorter, flatter, clipped, gone); she does not perform sexuality as baseline; cornered or rushed she panics messily, never coolly; she is hard to crash out; the bright and bubbly is real and earned and keeping it costs something. She was ten at the Fall and has been in hell since; she has survived at least three mega hordes. She is not a marksman and would rather not fire.
+tags: [pc, canon_cmg_61, owner_bible]
 card:
   display_name: Addison Flores
   one_line_identity: Small, warm, physically competent runner-scavenger
@@ -216,12 +251,14 @@ plausibility_gate:
 start_constraints: {start_trust_range: [4, 7], start_relationship_default: neutral, faction_present_preferred: either}
 locked_start_facts:
   - "Age 20, 5'0\" (152 cm), about 110-120 lb, lean; does not look strong."
+  - "From Boston; ten at the Fall; moved south after it."
   - "About ten years of parkour, started before the Fall at about age ten."
   - "Cannot drive (hard lock)."
   - "Route memory is always running; it fails only under neurological compromise."
   - "Glock 19, one magazine of 15 plus two spare magazines (30) — 45 rounds total, treated as precious; cartoon sticker on the grip."
   - "Known in the start region's trade economy; not embedded in any faction's command structure; not an enemy of any established group; has prior contact with at least one local group; has informal route knowledge of the start zone."
   - "Climate resolution: subtropical ruin — hot, humid, overgrown."
+  - "Has survived at least three mega hordes."
 faction_standing:
   - {faction: "core:faction/mafia_remnants", role: "Protected External Retrieval Asset (not a member)", standing: 1, since: "established trade"}
 recap:
@@ -233,12 +270,25 @@ recap:
   unresolved_complication: "Some of that group may still be out there. She doesn't know who survived or what story they have. She never went back."
   open_ambiguity: "She did what she had to do. She has never fully examined whether that is actually true."
   provisional: [formative_incident_1, formative_incident_2, unresolved_complication, open_ambiguity]
+canon_events:
+  - title: The laundromat
+    days_before_start: [1, 365]
+    memory: >-
+      The laundromat. Crying behind the dead machines, then "Help me" — the same crack in the same
+      place, every time. A lurker waited in the gap she ran for. It used Dave's voice — "Hey, Roof
+      Goblin" — and hers, words she had said days before at a trade table. It chased her up a fire
+      escape, raced her to the roof by the stairs, and she got out through a painted-shut window with
+      nothing but a pocket knife, because her gun was in the pack she had thrown down. It had been
+      following her for days: the stairwell on Eighth that went quiet, the pigeons. A man took the
+      pack after. She climbed twenty floors of balconies, took it back, caught a pipe across the
+      shoulder, and talked at him from a platform he couldn't reach until her voice was hers again.
+      She has not taken her old routes since.
 behavior_law:
-  approach: Walks up to strangers friendly and too fast, like they already know each other; to authority she is polite and slippery; to anyone big and angry she keeps a climbable escape in view and talks from it.
-  topic_handling: Raises needs sideways, as a trade ("I've got X if you've got Y"); warnings come out blunt and loud; shameful topics get a joke and a subject change.
-  risk_flight_escalation: Bails early the moment she feels cornered — often too early — and commits hard to any physical escape; she almost never escalates to violence unless grabbed.
-  plan_carry: Carries practical plans well — routes, timing, who has what — and abstract ones badly; civic or political language dies in her mouth and only the practical logic survives.
-  distortion: Says the rude practical half and forgets the diplomatic half; overtalks when nervous, then leaves mid-conversation.
-  pressure: Crowding and confinement make her jittery and short; embarrassment makes her tease; injury makes her quiet and stubborn; sleep debt makes her careless on climbs.
-  knowledge_boundary: Knows places, routes and prices cold; misreads people's motives, especially attraction and malice, and never infers politics cleanly.
-  performance: Mocks from safety after a scare — rooftop taunts, cheerful insults; fake familiarity comes naturally; after adrenaline she gets giddy and chatty, then crashes and wants to sleep somewhere high.
+  approach: Friendly and fast with strangers when she can leave clean; arrives from higher ground or with options behind her; unexplained requests for closeness from larger people read as a bad sign at once; a group held together by fear or one person's control she does not approach at all.
+  topic_handling: Needs come in sideways ("I wouldn't mind if you priced that"); warnings come out blunt; guilt comes out earnest and practical — a messy apology, then something concrete she can hand over (perfume for a smell); shameful things get a stupid label and a pivot.
+  risk_flight_escalation: Bold where she can move, flat where she can't. Rushed or cornered she panics immediately and messily — noise, recoil, scramble, exit math. Grabbed or handled without warning, her body answers before her brain. Otherwise she is hard to crash out — warm, shorter, flatter, clipped, gone. In a gunfight she moves first, fires two or three rounds and relocates.
+  plan_carry: Practical, immediate plans carry well — routes, timing, what she can carry, climb, reach or fix. Abstract, civic and systems plans die in her mouth; she does not model shared resources (hot water, drying space, rations) unless she has learned that system.
+  distortion: Says the thought as it arrives — the compliment with 'than I expected' in it, the ranking that includes you, the invasive question; answers the logistics of a question and misses the weight behind it; catches the slip afterwards and fixes it awkwardly.
+  pressure: Closed, low-mobility rooms make her shorter, flatter, more literal and accidentally sharp. Tired, she goes quieter and slower — the delay before the words is the tell. Sick at mid-severity she misjudges how sick she is. A shower lowers her guard faster than she has judged the person who gave it to her.
+  knowledge_boundary: Reads bodies fast — breath before commitment, stillness that isn't calm, the weight shift before someone moves; slower on subtext and motive. With trusted or near-romantic people she reads danger as a crush or awkwardness first, and reclassifies only when it turns physically wrong.
+  performance: Troll tiers by how safe she is, how much she dislikes the person and how good their face is — the wrong name locked in, fake romantic investment, escalating concern, a terrible rap verse, the callback. Fake flirtation is one straight-faced deployment and gone; real attraction makes her stilted. She never goes for the real wound.

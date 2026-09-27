@@ -85,6 +85,9 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     n} for all of them) and an anchor
     episode for the PC {holder, at = day x DAY + 12 h, turn_index 0, summary = text, salience 95,
     anchor 1, subject_ids [the PC]} (ANCHOR_MEMORY, writer 'mind.memory').
+    WG-33b (D-109): then the PC's canon events, canon_memories(...) below — their history rows are
+    counted in the same WORLDGEN_STAGE 'personal' and their episodes committed in the same
+    ANCHOR_MEMORY.
   8 world_params.commit_json = WorldgenCommit(run_id, seed, pc_ref, params, placement,
     start_zone_type = the start zone's kind, start_district_type = the start place's archetype name
     or kind, opening, qc_result, qc_patches, skeleton — P11, D-95: the region, the plan and this
@@ -183,5 +186,15 @@ async def place_pc(client, rng: "Rng", tx: "Tx", pc_ref: str, pc: "PCDossier", p
     raise NotImplementedError("P10")
 def place_wild_card(tx: "Tx", rng: "Rng", pc: "PCDossier", pc_body: str, settings, content_dir, at: int) -> str | None:
     raise NotImplementedError("P12")
+def canon_memories(tx: "Tx", rng: "Rng", pc: "PCDossier", pc_body: str, dsf: int) -> tuple[list, list]:
+    """WG-33b (D-109): the owner's canon events for this PC as (history writes, episode writes),
+    nothing committed. For each of pc.canon_events, index i in order: back = rng.range_int(tx,
+    'worldgen:opening', f"canon:{i}", *days_before_start); day = max(1, dsf - back); a
+    history_events row {kind 'personal', day, subject_ids [pc_body], truth_text = title,
+    belief_text = memory} and an anchor episode {holder pc_body, at = day x DAY + 12 h, turn_index 0,
+    summary = memory, salience 100, anchor 1, subject_ids [pc_body]}. No canon events -> ([], [])
+    and no draw."""
+    raise NotImplementedError("P12")
 from ._impl_wg import place_pc  # noqa
 from ._impl_wg import place_wild_card  # noqa
+from ._impl_wg import canon_memories  # noqa

@@ -331,7 +331,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p12_surfaces/test_parkour.py` (world `rooftops`) | PARKOUR-01..08, FALL-01, INF-20: the roofs have height (elevations, drops, rises) and nobody walks a climb, a gap or an edge; Addison sees the lines on her menu (the pipe, the gap, the edge) and nothing to open or walk through; the Where panel says how high, how far and which way; how hard each line is (climb, gap and drop classes, up and down); she makes the jump (CLEAN), balks at the edge (FAIL), falls short into the alley (BREAK: a leg and an arm, down, the noise of it); a roll takes the drop out, a bad one takes all of it, the worst lands head first; down the drainpipe is easier; how a fall hurts by height, and twenty metres kills; her feet decide first (fleeing means up); the dead below cannot follow — a shambler never, a runner by the drainpipe, anyone by the fire escape; the runner climbs and sometimes falls; roofs come with their buildings (hatch, drainpipe, edge) and the block's roofs get a gap |
+| `p12_surfaces/test_parkour.py` (world `rooftops`) | PARKOUR-01..08, FALL-01, INF-20: the roofs have height (elevations, drops, rises) and nobody walks a climb, a gap or an edge; Addison sees the lines on her menu (the pipe, the gap, the edge) and nothing to open or walk through; the Where panel says how high, how far and which way; how hard each line is (climb, gap and drop classes, up and down); she makes the jump (CLEAN), balks at the edge (FAIL), falls short into the alley (BREAK: a leg and an arm, down, the noise of it); a roll takes the drop out, a bad one takes all of it, the worst lands head first; down the drainpipe is easier; how a fall hurts by height, and twenty metres kills; she moves before she knows why (fleeing means up); the dead below cannot follow — a shambler never, a runner by the drainpipe, anyone by the fire escape; the runner climbs and sometimes falls; roofs come with their buildings (hatch, drainpipe, edge) and the block's roofs get a gap |
+
+### 3.24 Addison and canon events (P12; D-109)
+
+| File | What it proves |
+|---|---|
+| `p12_surfaces/test_addison.py` (world `rooftops`) | D-109, WG-33b: she is from Boston and sounds it (no Mississippi, no Hattiesburg, no y'all); pale skin and the tight low bun; light parkour pants, not the skort; the bible's sample lines; hard to crash out (fuse 4, cold); she knows the mimicry (the cue); dressed from her card, the pants, bra and shoes cover her; the laundromat is canon, 1–365 days before the run; a canon event's range must be real (1 <= lo <= hi); `canon_memories` writes one personal history row and one anchor memory (salience 100) on a day 1–365 before; a card without canon events writes and draws nothing; the day is drawn on the opening stream, purpose canon:0 |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

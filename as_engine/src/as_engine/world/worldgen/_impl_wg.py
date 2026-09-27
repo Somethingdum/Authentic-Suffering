@@ -1666,6 +1666,9 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
         ews.append(W("episodes", {"episode_id": tx.mint("epi"), "holder_id": body, "at": d * DAY + 12 * H, "turn_index": 0,
                                   "place_id": None, "summary": t, "salience": 95, "percept_ids": [], "subject_ids": [body],
                                   "anchor": 1, "decayed": 0}))
+    chws, cews = canon_memories(tx, rng, pc, body, dsf)   # WG-33b (D-109)
+    hws += chws
+    ews += cews
     commit(tx, EventType.WORLDGEN_STAGE, "world.worldgen", at, hws, {"stage": "WG8", "personal": len(hws)})
     commit(tx, EventType.ANCHOR_MEMORY, "mind.memory", at, ews, {"holder_id": body, "anchors": len(ews), "seed": True}, actor_id=body)
     # 8 commit json
@@ -1686,6 +1689,20 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
         {"stage": "WG8", "commit": True})
     return Opening(pc_body=body, start_place_id=start, contacts=contacts, threat_kind=tkind, threat_place_id=tplace,
                    threat_ids=threat_ids, magnets=magnets, telegraph_trace_id=trace_id, opening=opening)
+
+
+def canon_memories(tx, rng, pc, pc_body, dsf):
+    """The canon-event memories (world.worldgen.opening, D-109)."""
+    hws, ews = [], []
+    for i, ev in enumerate(getattr(pc, "canon_events", None) or []):
+        back = rng.range_int(tx, SO, f"canon:{i}", ev.days_before_start[0], ev.days_before_start[1])
+        day = max(1, dsf - back)
+        hws.append(W("history_events", {"hist_id": tx.mint("his"), "day": day, "kind": "personal", "subject_ids": [pc_body],
+                                        "cause_hist_id": None, "truth_text": ev.title, "belief_text": ev.memory}))
+        ews.append(W("episodes", {"episode_id": tx.mint("epi"), "holder_id": pc_body, "at": day * DAY + 12 * H,
+                                  "turn_index": 0, "place_id": None, "summary": ev.memory, "salience": 100,
+                                  "percept_ids": [], "subject_ids": [pc_body], "anchor": 1, "decayed": 0}))
+    return hws, ews
 
 
 # ------------------------------------------------------------------------------------------ WG9 checks

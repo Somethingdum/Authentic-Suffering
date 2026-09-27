@@ -57,6 +57,7 @@ cues:
   - {id: knows_lock_picking, description: "Knows how to pick a simple pin lock."}
   - {id: knows_crawler_ambush, description: "Believes crawlers hide under cars, steps and rubble."}
   - {id: knows_lurker_signs, description: "Believes scratches, arranged bones and crude marks mean a lurker's territory."}
+  - {id: knows_lurker_mimicry, description: "Knows a voice from somewhere unseen — a stranger crying, a friend, even your own — can be a lurker, and that a cry repeated exactly the same is not a person (D-109)."}
   - {id: knows_runner_stamina, description: "Believes runners burn out if you keep them chasing."}
   - {id: knows_cold_start, description: "Believes the unbitten dead can rise after about three days."}
   - {id: knows_no_sharing, description: "Holds to the rule of never sharing bottles, utensils or cigarettes."}
