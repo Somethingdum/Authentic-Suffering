@@ -58,7 +58,7 @@ class InModelsTest(Strict):
 
 class InConfigSet(Strict):
     patch: dict = Field(description="Partial EngineConfig: only 'lanes' (per lane: name, base_url, model, "
-                                    "max_concurrency, request_timeout_s) and 'background_cognition' (PROTO-10).")
+                                    "max_concurrency, stall_window_s) and 'background_cognition' (PROTO-10).")
 
 
 class InContentValidate(Strict):

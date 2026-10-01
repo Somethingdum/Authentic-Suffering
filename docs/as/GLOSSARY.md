@@ -194,6 +194,9 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | abuse battery | the eight code checks against the author: stat bands, mortality, check caps, gear limits, a way in, no farming, clock sync, cheat leakage (ABUSE-01..08) | — | — |
 | release audit | the developer's check of a generated run before a release: the world as it began, days off-screen with the dead counted, the battery, unbuilt rules, CNT-11 (REL-01..06) | — | — |
 | ablation | switching one call class off (LANE-09) to measure what it is for | — | — |
+| stall | a model call that made no progress (no token, no reasoning, no prompt-processing advance) for the lane's stall window, 5 minutes by default; the only thing that ends a call for being slow: nothing ends a call for taking long, and the status `timeout` now means a stall (LANE-10, D-110) | "no progress for N s" | — |
+| stall window | `LaneConfig.stall_window_s`: how long a call may go without progress before it is stalled | — | — |
+| expected time | `deadline_s` on a request or regime: how long a call is expected to take; past it the call is shown as slow and nothing else happens (D-110) | "taking longer than usual" | — |
 | world skeleton | what WG9 checked a world against, kept in the worldgen commit (`WorldgenCommit.skeleton`) | — | — |
 
 ## Player-facing words (the only words play screens use for these things)

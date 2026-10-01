@@ -78,7 +78,9 @@ lanes:
     base_url: http://localhost:1234/v1
     model: nemotron-cascade-2-30b-a3b
     max_concurrency: 1
-    request_timeout_s: 240
+    stall_window_s: 300            # LANE-10: stop a call only if it makes NO progress for this long (never for taking long)
+    silent_prefill_window_s: 0     # 0 = no limit while the server reads a long prompt in silence (the Stop button is the way out)
+    prefill_progress: unknown      # set by the probe: supported | unsupported | unknown
     thinking_mode: native          # set by the probe: native | system_no_think | chat_template_kwargs | prefill_empty_think | none
     structured_mode: json_schema   # json_schema | prompt_only
     structured_with_thinking: unknown   # set by the probe
@@ -88,7 +90,7 @@ lanes:
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     max_concurrency: 1
 background_cognition: true         # quiet-hours reflection between turns (05 §9.2)
-# regimes:                         # per call class: lane, temperature, max_tokens, thinking, deadline_s
+# regimes:                         # per call class: lane, temperature, max_tokens, thinking, deadline_s (the EXPECTED seconds: a call past it is "slow", never cancelled)
 #   narration: {lane: A, temperature: 0.8, max_tokens: 1400, deadline_s: 90}
 # hot_cognition: {lane: A, temperature: 0.7, max_tokens: 3000, thinking: true, deadline_s: 75}
 # rules:                           # RulesConfig overrides — new runs only (SET-03)
@@ -106,7 +108,8 @@ background_cognition: true         # quiet-hours reflection between turns (05 §
 | `lanes.A/B.base_url`, `.model` | where each brain lives | Connect screen |
 | `lanes.*.thinking_mode`, `structured_with_thinking` | how to switch thinking off, and whether JSON schemas work with thinking on | `tools/as/probe.py --write` (the Connect screen's Test button only checks that the model answers, how fast, and whether structured answers work) |
 | `lanes.*.max_concurrency` | parallel requests per machine | you, after `bench` shows the machine copes |
-| `regimes.<call_class>` | lane, sampling, token cap, deadline per call class (08 §4) | you (advanced; edit the file — the Play UI never changes regimes, because a regime change alters every later request and so breaks re-simulation, DET-02) |
+| `lanes.*.stall_window_s`, `silent_prefill_window_s`, `prefill_progress` | how long a model may go without any progress before a call is stopped (default 5 minutes; there is no limit on total time), the same for the silent wait before the first token when the server reports no prompt progress (default: none), and whether the server reports it | `stall_window_s` you (Settings → Models); `prefill_progress` `tools/as/probe.py --write` |
+| `regimes.<call_class>` | lane, sampling, token cap, expected seconds per call class (08 §4) | you (advanced; edit the file — the Play UI never changes regimes, because a regime change alters every later request and so breaks re-simulation, DET-02) |
 | `hot_cognition` | the regime for deep-thinking people | you (advanced) |
 | `rules` | every tunable number (`RulesConfig`; P9 adds `society`: daily needs by age band, ration multipliers, shortage and recovery days, draw and group hours, role skills, sleep windows, tension and drift numbers, rumour pace — `contracts/settings.py::SocietyRules`; P10 adds the table below). A group you name keeps its defaults for the numbers you leave out, but a table keyed by difficulty or era (for example `hordes.mega_daily_chance`) replaces the default table whole: give every key | you (advanced; new runs only) |
 | `background_cognition` | allow reflection jobs while you read | Settings → Advanced (`config_set`) |

@@ -620,6 +620,10 @@
    "doc": "SEAL-01 (D-104): a model on this machine or its home network, or the config does not load.",
    "sig": "(cls, v: str) -> str"
   },
+  "LaneConfig._retired_timeout": {
+   "doc": "D-110: ``request_timeout_s`` (never read by anything) is gone; a config that still has it loads.",
+   "sig": "(cls, data)"
+  },
   "MemoryRules": {
    "doc": "B5 memory jobs (mind.memory MEM-19; turn.pipeline S14).",
    "sig": "(Strict)"
@@ -921,11 +925,19 @@
  },
  "as_engine.lanes.client": {
   "<module>": {
-   "doc": "LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.\n\n    client = LaneClient(config: EngineConfig, transport: Transport)\n    resp = await client.call(request, output_model=None)\n\nBehaviour:\n  1. If the lane is marked down (``mark_down``) -> return parse_status 'lane_error' immediately.\n  2. ``await asyncio.wait_for(transport.send(lane_cfg, request), request.deadline_s)``;\n     LaneTimeout / asyncio.TimeoutError -> 'timeout'; LaneUnavailable -> 'lane_error' and the lane\n     is marked down until ``health`` succeeds again.\n  3. ``strip_think`` the text; reasoning from the transport (if any) is kept in ``reasoning``.\n  4. If ``output_model`` is given: extract_json -> None => 'grammar_fail';\n     validate fails => 'schema_fail' (error set); success => parsed = instance.model_dump(mode='json').\n     Empty visible text => 'empty'.\n  5. ``raw`` is kept only when parse_status != 'ok'.\n  6. Every call (any status) is appended to the call log via ``on_call`` callback if set:\n     ``on_call(request, response)`` — the turn pipeline wires this to lanes.calllog.\n\nModel-swap guard (LANE-05): ``check_models()`` lists models on each lane and raises ModelSwapped\nif the configured model id is not present. The turn pipeline calls it before T0.\n\nAblation (LANE-09, P11; 08 §4 ablation duty): ``client.ablated`` is a set of CallClass (empty by\ndefault). A call of an ablated class never reaches the transport: it returns parse_status\n'cancelled' with error 'ablated' at once, logged through ``on_call`` like any other call, so every\ncaller takes the fallback path it already has for a call that did not come back\n(tools/as/eval.py --ablate).",
+   "doc": "LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.\n\n    client = LaneClient(config: EngineConfig, transport: Transport)\n    resp = await client.call(request, output_model=None)\n\nBehaviour:\n  1. If the lane is marked down (``mark_down``) -> return parse_status 'lane_error' immediately.\n  2. ``await transport.send(lane_cfg, request)`` with NO deadline (LANE-10, D-110): a call that is slow\n     but moving is never cut off. LaneStalled (no progress for the lane's ``stall_window_s``) and any other\n     LaneTimeout -> 'timeout' (the error says 'no progress for N s'; the lane is not marked down);\n     LaneUnavailable -> 'lane_error' and the lane is marked down until ``health`` succeeds again.\n     ``request.deadline_s`` is only the call's EXPECTED time: it sets the ``slow`` flag in the progress\n     snapshot and nothing else. A cancelled call (the Stop button) closes its connection, which stops the model.\n  3. ``strip_think`` the text; reasoning from the transport (if any) is kept in ``reasoning``.\n  4. If ``output_model`` is given: extract_json -> None => 'grammar_fail';\n     validate fails => 'schema_fail' (error set); success => parsed = instance.model_dump(mode='json').\n     Empty visible text => 'empty'.\n  5. ``raw`` is kept only when parse_status != 'ok'.\n  6. Every call (any status) is appended to the call log via ``on_call`` callback if set:\n     ``on_call(request, response)`` — the turn pipeline wires this to lanes.calllog.\n\nProgress (LANE-11): ``client.live`` maps each call in flight (by ``id(request)``) to its latest snapshot\n(lanes/progress.py: phase 'waiting'/'prefill'/'thinking'/'writing', elapsed_s, quiet_s, slow, the prompt\ncounters and the chars of reasoning and text so far), and ``client.on_progress(request, snapshot)``, when\nset, is called as the transport reports it (about once a second). Both are for display only.\n\nModel-swap guard (LANE-05): ``check_models()`` lists models on each lane and raises ModelSwapped\nif the configured model id is not present. The turn pipeline calls it before T0.\n\nAblation (LANE-09, P11; 08 §4 ablation duty): ``client.ablated`` is a set of CallClass (empty by\ndefault). A call of an ablated class never reaches the transport: it returns parse_status\n'cancelled' with error 'ablated' at once, logged through ``on_call`` like any other call, so every\ncaller takes the fallback path it already has for a call that did not come back\n(tools/as/eval.py --ablate).",
    "sig": ""
   }
  },
  "as_engine.lanes.errors": {
+  "LaneStalled": {
+   "doc": "LANE-10 (D-110): the model made no progress (no token, no reasoning, no prefill advance) for\nthe lane's whole stall window. A slow call that keeps moving is never this.",
+   "sig": "(LaneTimeout)"
+  },
+  "LaneTimeout": {
+   "doc": "A call that could not finish. Since D-110 nothing here is a wall-clock limit: the one\nsubclass raised is LaneStalled (LANE-10).",
+   "sig": "(ASError)"
+  },
   "ModelSwapped": {
    "doc": "The model loaded on a lane changed mid-session (LANE-05): hard stop before T0.",
    "sig": "(ASError)"
@@ -939,6 +951,20 @@
   "split_sentences": {
    "doc": "Handles terminator + closing quote at the boundary.",
    "sig": "(text: str) -> list[str]"
+  }
+ },
+ "as_engine.lanes.progress": {
+  "<module>": {
+   "doc": "Call progress (LANE-10, LANE-11; D-110). Nothing here ends a call: it only records whether the\nmodel is moving, so the transport can tell a slow call from a stalled one and the UI can show the wait.\n\n    p = CallProgress(request.call_class, request.lane, expected_s=request.deadline_s)\n    p.note_prefill(processed, total, cache)   # the server's prompt-processing progress (when it sends it)\n    p.note_text(chars)                        # visible text arrived        (phase 'writing')\n    p.note_reasoning(chars)                   # reasoning arrived           (phase 'thinking')\n    p.quiet_s()                               # seconds since the last of those\n    p.snapshot()                              # a plain dict for the UI and the log\n\nPhases, in order: 'waiting' (nothing yet), 'prefill' (the server reported prompt progress),\n'thinking', 'writing'. ``progressed`` is true once anything at all has arrived. ``slow`` is true when\nthe call has run longer than the regime's ``deadline_s`` (an expectation, never a limit).",
+   "sig": ""
+  },
+  "CallProgress.note_alive": {
+   "doc": "The first chunk of any kind: the server has read the prompt and begun to answer. Counts once.",
+   "sig": "(self) -> None"
+  },
+  "CallProgress.note_prefill": {
+   "doc": "True when the server's prompt processing moved forward (that is progress).",
+   "sig": "(self, processed: int, total: int, cache: int=0) -> bool"
   }
  },
  "as_engine.lanes.repair": {
@@ -989,12 +1015,32 @@
  },
  "as_engine.lanes.transport": {
   "<module>": {
-   "doc": "Transports (P1). docs/as/08_LLM_CALLS.md §HTTP.\n\nTransport protocol::\n\n    class Transport(Protocol):\n        async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse: ...\n        async def list_models(self, lane_id: Lane, lane: LaneConfig) -> list[str]: ...\n        async def health(self, lane_id: Lane, lane: LaneConfig) -> bool: ...\n\n``send`` returns an LMResponse with ``text``/``reasoning``/token counts filled and\nparse_status 'ok' (parsing happens in the client), or raises LaneUnavailable / LaneTimeout.\n\nHttpTransport request (OpenAI-compatible, LM Studio):\n  POST {lane.base_url}/chat/completions   (base_url already ends in /v1)\n  headers: Authorization: Bearer {lane.api_key}\n  body:\n    model, messages (after thinking-mode transform), temperature, top_p, max_tokens, stream=false\n    + response_format = {\"type\": \"json_schema\", \"json_schema\": {\"name\": schema_name,\n        \"strict\": true, \"schema\": json_schema}}  when request.json_schema is set AND\n        lane.structured_mode == 'json_schema' AND (not request.thinking OR\n        lane.structured_with_thinking == 'supported')\n  Thinking-mode transform (thinking.apply):\n    native               -> unchanged\n    system_no_think      -> when thinking is False, append \"\n/no_think\" to the system message\n    chat_template_kwargs -> body[\"chat_template_kwargs\"] = {\"enable_thinking\": thinking}\n    prefill_empty_think  -> when thinking is False, append {\"role\":\"assistant\",\"content\":\"<think></think>\"}\n    none                 -> unchanged\n  Response: text = choices[0].message.content or \"\"; reasoning = message.reasoning_content or\n  message.reasoning or None; usage.prompt_tokens / completion_tokens (0 when absent).\n  HTTP errors / connection refused -> LaneUnavailable; timeout (request.deadline_s) -> LaneTimeout.\nGET {base_url}/models -> [m[\"id\"] for m in data]. health = list_models succeeds within 5 s.\nThe client never reads proxies or certificates from the environment (httpx trust_env False; SEAL-04,\nD-104): a proxy would carry the game's words off the machine.",
+   "doc": "Transports (P1). docs/as/08_LLM_CALLS.md §HTTP.\n\nTransport protocol::\n\n    class Transport(Protocol):\n        async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse: ...\n        async def list_models(self, lane_id: Lane, lane: LaneConfig) -> list[str]: ...\n        async def health(self, lane_id: Lane, lane: LaneConfig) -> bool: ...\n\n``send`` returns an LMResponse with ``text``/``reasoning``/token counts filled and\nparse_status 'ok' (parsing happens in the client), or raises LaneUnavailable / LaneTimeout.\n\nHttpTransport request (OpenAI-compatible, LM Studio):\n  POST {lane.base_url}/chat/completions   (base_url already ends in /v1)\n  headers: Authorization: Bearer {lane.api_key}\n  body:\n    model, messages (after thinking-mode transform), temperature, top_p, max_tokens,\n    stream=true, stream_options={\"include_usage\": true}\n    + return_progress=true when lane.prefill_progress == 'supported' (llama.cpp: the server then streams\n        prompt_progress {total, cache, processed} while it reads the prompt)\n    + response_format = {\"type\": \"json_schema\", \"json_schema\": {\"name\": schema_name,\n        \"strict\": true, \"schema\": json_schema}}  when request.json_schema is set AND\n        lane.structured_mode == 'json_schema' AND (not request.thinking OR\n        lane.structured_with_thinking == 'supported')\n  Thinking-mode transform (thinking.apply):\n    native               -> unchanged\n    system_no_think      -> when thinking is False, append \"\n/no_think\" to the system message\n    chat_template_kwargs -> body[\"chat_template_kwargs\"] = {\"enable_thinking\": thinking}\n    prefill_empty_think  -> when thinking is False, append {\"role\":\"assistant\",\"content\":\"<think></think>\"}\n    none                 -> unchanged\n  Response: server-sent events. text = the joined delta.content; reasoning = the joined\n  delta.reasoning_content (or delta.reasoning) or None; usage.prompt_tokens / completion_tokens (0, and the\n  number of streamed chunks, when absent). A server that ignores ``stream`` and answers with one JSON body is\n  read the old way: text = choices[0].message.content or \"\", the same reasoning fields.\n  HTTP errors / connection refused / a dropped stream -> LaneUnavailable.\n\nNo deadline (LANE-10, D-110). Nothing ends a call because it has taken long. A call ends only when\n\n  * it finishes;\n  * the server fails (above);\n  * it STALLS: no progress for ``lane.stall_window_s`` (default 300 s) -> LaneStalled (a LaneTimeout).\n    Progress is a streamed token, a streamed reasoning token, or the server's prompt-processing counter\n    moving forward. SSE comments, empty deltas and repeated identical counters are not progress.\n    Before the first sign of life the window is ``lane.stall_window_s`` when the server reports prefill\n    progress (lane.prefill_progress == 'supported'), else ``lane.silent_prefill_window_s`` (0 = no limit:\n    a cold 100K-token prompt can take many minutes and the transport cannot see inside the server);\n  * the caller cancels it (the Stop button): the connection is closed, which stops the model.\nThe 5 s ``list_models`` / ``health`` probes below are liveness checks, not call limits.\n\nProgress (LANE-11): ``transport.sink``, when set, is called as ``sink(request, CallProgress)`` about once a\nsecond, on a phase change, and once at the end, so the client and the UI can show whether the model is\nwaiting, reading the prompt, thinking or writing, and how long it has been quiet.\nGET {base_url}/models -> [m[\"id\"] for m in data]. health = list_models succeeds within 5 s.\nThe client never reads proxies or certificates from the environment (httpx trust_env False; SEAL-04,\nD-104): a proxy would carry the game's words off the machine.",
    "sig": ""
   },
   "HttpTransport": {
    "doc": "``HttpTransport(transport=None)``: ``transport`` is passed to ``httpx.AsyncClient(transport=...)``\nso tests can inject ``httpx.MockTransport`` (real runs pass nothing).",
    "sig": "()"
+  },
+  "HttpTransport._open": {
+   "doc": "POST and wait for the response head. No httpx read timeout (the watchdog is ours): only the connect\n(10 s: nobody is listening) and the write (60 s) are bounded.",
+   "sig": "(self, lane, body, request, prog, state)"
+  },
+  "HttpTransport._read_body": {
+   "doc": "A server that answered with one JSON body (it ignored ``stream``): nothing to watch but the wait.",
+   "sig": "(self, r, lane, request, prog, state)"
+  },
+  "HttpTransport._read_events": {
+   "doc": "LANE-10/11: read server-sent events, noting every sign of progress.",
+   "sig": "(self, r, lane, request, prog, state)"
+  },
+  "HttpTransport._until": {
+   "doc": "Await ``fut`` (a task), checking for a stall and reporting progress between ticks. Never cancels ``fut``.",
+   "sig": "(self, fut, lane: LaneConfig, request: LMRequest, prog, state: dict)"
+  },
+  "HttpTransport.window": {
+   "doc": "LANE-10: how long this call may stay quiet right now (None = no limit).",
+   "sig": "(lane: LaneConfig, prog) -> float | None"
   }
  },
  "as_engine.mind": {

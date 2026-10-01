@@ -215,11 +215,11 @@ were (PROTO-06). From stage 12 on the answer is `too_late` and the result still 
 | Lane B down at turn start | stage 0 probe | Single-lane mode: the scheduler places HOT and WARM calls on lane A within the budget (the rest run COLD); every other call moves to lane A; the turn's notice: "Your second model is offline; turns will be thinner until it is back." |
 | Lane A down | stage 0 probe | No HOT; WARM, narration and the rest move to lane B (thinking off); notice: "Your main model is offline; the story runs on the second model until it is back." |
 | Both down | stage 0 | Refuse the turn: `turn_rejected {code: 'no_models'}`; nothing changes |
-| Lane dies mid-wave | timeout / reset | No repair; HOLD-01 for that actor (a consequential moment: the turn is not played; otherwise what they took on goes on, or no attempt); `DEGRADED_FALLBACK` event |
+| Lane dies mid-wave | stall (LANE-10) / reset | No repair; HOLD-01 for that actor (a consequential moment: the turn is not played; otherwise what they took on goes on, or no attempt); `DEGRADED_FALLBACK` event |
 | Grammar/schema failure | parse_status | One repair call (INTENT_REPAIR, a decision only); then HOLD-01 + `DEGRADED_FALLBACK` + `error_repair_log` |
 | Choice not in the offered set | intent validator | Same as above; never reaches `resolve` |
 | An Actor line repeats the player's words | echo ledger | One repair with the phrases named; when it fails or still echoes, the original line stands; logged as `echo_reject` |
-| Call over deadline | scheduler | Cancel; HOLD-01; record |
+| Call takes long but keeps moving | `LaneClient` (LANE-10, D-110) | Nothing: there is no deadline; the progress bar shows the wait (LANE-11). A call is stopped only when it makes no progress for the lane's stall window (default 5 minutes): status `timeout` (error "no progress for N s"), HOLD-01, record. The Stop button cancels any call and closes its connection |
 | Model swapped mid-session | `check_models` | Hard stop before T0 with a plain message (LANE-05) |
 | Commit fails | exception | Full rollback; input not consumed |
 | Save write fails | checksum | Keep previous save; keep new as `.partial`; refuse to advance |

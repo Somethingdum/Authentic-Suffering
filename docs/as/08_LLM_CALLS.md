@@ -41,10 +41,36 @@ Nothing above this boundary knows which model answered; swapping a model is a co
 (IFACE-01: the P7 slice is byte-identical under a stub transport returning the same outputs).
 
 HTTP (`lanes/transport.py`): `POST {base_url}/chat/completions` with `model`, `messages`,
-`temperature`, `top_p`, `max_tokens`, `stream: false`, and — for structured calls —
-`response_format: {"type": "json_schema", "json_schema": {"name", "strict": true, "schema"}}`.
-Response text from `choices[0].message.content`; reasoning from `reasoning_content` or `reasoning`
-when LM Studio separates it; `<think>…</think>` blocks are stripped from content either way.
+`temperature`, `top_p`, `max_tokens`, `stream: true` (+ `stream_options: {include_usage: true}`), and — for
+structured calls — `response_format: {"type": "json_schema", "json_schema": {"name", "strict": true, "schema"}}`.
+The reply is read as server-sent events: text from `delta.content`; reasoning from `delta.reasoning_content`
+or `delta.reasoning` when LM Studio separates it; `<think>…</think>` blocks are stripped from content either
+way. A server that ignores `stream` and sends one JSON body (`choices[0].message`) is read the old way.
+
+### 3.0 No deadlines: stalls, not timeouts (LANE-10, LANE-11; D-110)
+The owner's rule: *a model that thinks for four minutes is working, not hung; a timeout can cut off good work
+and throw it away.* So **nothing ends a call for taking long.** A call ends when it finishes, when the server
+fails (`lane_error`), when the player presses Stop (the connection closes, which stops the model), or when it
+**stalls**: no progress for `lane.stall_window_s` (default **300 s**). Progress is a streamed token, a streamed
+reasoning token, or the server's prompt-processing counter moving forward; SSE comments, empty deltas and a
+counter that stays put are not. A stalled call comes back as `parse_status` `timeout` with the error "no
+progress for N s (phase); the model may have hung" (`LaneStalled`, a `LaneTimeout`), and the lane is **not**
+marked down. `max_tokens` is still the bound on how much a call may say, so a model stuck in a loop ends there.
+
+**The silent wait.** Before the first token the server may say nothing while it reads the prompt, and the first
+prompt of a long context can take ten minutes. `lane.prefill_progress` says whether the server reports it
+(llama.cpp's `return_progress`, which the transport asks for only when the lane is `supported`; the probe
+finds out and writes it). Supported: the stall window applies from the first second, to the counter. Not
+supported: the engine cannot see inside the server, so the silent wait is limited only by
+`lane.silent_prefill_window_s` (default 0 = no limit; the Stop button is the way out). Once anything arrives the
+window applies as normal.
+
+`request.deadline_s` / `regimes.*.deadline_s` / `hot_cognition.deadline_s` are only the call's **expected**
+seconds: past it the call's progress snapshot says `slow: true` (for the UI) and nothing else happens.
+
+**Progress.** `client.live` holds a snapshot per call in flight (`lanes/progress.py`: `phase` waiting / prefill /
+thinking / writing, `elapsed_s`, `quiet_s`, `slow`, the prompt counters, characters of reasoning and text so far)
+and `client.on_progress(request, snapshot)` is called about once a second. Display only.
 
 ### 3.1 Thinking control (per lane, `LaneConfig.thinking_mode`)
 Nemotron Cascade 2 has thinking and instruct modes (instruct is activated by an empty

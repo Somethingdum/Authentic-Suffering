@@ -9,7 +9,7 @@
         "model": "nemotron-cascade-2-30b-a3b",
         "api_key": "lm-studio",
         "max_concurrency": 1,
-        "request_timeout_s": 240.0,
+        "stall_window_s": 300.0,
         "thinking_mode": "native",
         "structured_mode": "json_schema",
         "structured_with_thinking": "unknown"
@@ -20,7 +20,7 @@
         "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
         "api_key": "lm-studio",
         "max_concurrency": 1,
-        "request_timeout_s": 240.0,
+        "stall_window_s": 300.0,
         "thinking_mode": "native",
         "structured_mode": "json_schema",
         "structured_with_thinking": "unknown"

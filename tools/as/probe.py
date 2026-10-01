@@ -6,8 +6,13 @@
 
 Per lane: reachable? the configured model loaded? For thinking OFF, which thinking_mode actually
 suppresses reasoning (fastest of those that do)? Does JSON-schema output validate? Does JSON schema
-still allow reasoning when thinking is ON (structured_with_thinking)? Needs the engine's P1
+still allow reasoning when thinking is ON (structured_with_thinking)? Does the server stream
+prompt-processing progress while it reads a long prompt (prefill_progress, D-110 LANE-10), and how long
+until the first token / how many tokens a second on a ~4,000-token prompt? Needs the engine's P1
 (transport, client, config loader).
+
+The probe's own calls are bounded (a stall window of 2 minutes, 10 minutes of silence for a model that is
+still loading) so a diagnostic never hangs; the game's calls are not (see lane.stall_window_s).
 """
 
 from __future__ import annotations
@@ -24,11 +29,45 @@ SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}, "word": {"
           "required": ["ok", "word"], "additionalProperties": False}
 
 
+async def probe_prefill(lane_id, lane, transport) -> dict:
+    """D-110: does the server report prompt-processing progress, and what do a long prompt and a short answer cost?
+    Asks for ``return_progress`` once; a server that rejects the field or never sends ``prompt_progress`` is 'unsupported'."""
+    from as_engine.contracts.common import CallClass
+    from as_engine.contracts.lanes import ChatMessage, LMRequest
+    from as_engine.lanes.errors import LaneUnavailable
+
+    filler = " ".join(["The quick brown fox jumps over the lazy dog."] * 400)          # about 4,000 tokens
+    msgs = [ChatMessage(role="system", content="You answer in one word."),
+            ChatMessage(role="user", content=filler + "\nSay: ready")]
+    req = LMRequest(call_class=CallClass.PROBE, lane=lane_id, messages=msgs, thinking=False, max_tokens=32, deadline_s=120)
+    lc = lane.model_copy(update={"prefill_progress": "supported", "stall_window_s": 120, "silent_prefill_window_s": 600})
+    seen: list[dict] = []
+    old, transport.sink = transport.sink, (lambda request, prog: seen.append(prog.snapshot()))
+    t = time.perf_counter()
+    try:
+        resp = await transport.send(lc, req)
+    except LaneUnavailable as e:
+        return {"prefill_progress": "unsupported", "prefill_note": f"the server refused return_progress: {str(e)[:80]}"}
+    except Exception as e:  # noqa: BLE001
+        return {"prefill_progress": "unknown", "prefill_note": f"could not tell: {str(e)[:80]}"}
+    finally:
+        transport.sink = old
+    total_s = time.perf_counter() - t
+    first = next((s for s in seen if s["progressed"] and s["phase"] != "prefill"), None)
+    ttft = first["elapsed_s"] if first else None
+    reported = any(s["prompt_total"] > 0 for s in seen)
+    out = {"prefill_progress": "supported" if reported else "unsupported",
+           "prompt_tokens": resp.prompt_tokens, "time_to_first_token_s": ttft, "total_s": round(total_s, 1)}
+    if ttft is not None and resp.prompt_tokens and ttft > 0:
+        out["prompt_tokens_per_s"] = round(resp.prompt_tokens / ttft, 1)
+    return out
+
+
 async def probe_lane(lane_id, cfg, transport) -> dict:
     from as_engine.contracts.common import CallClass
     from as_engine.contracts.lanes import ChatMessage, LMRequest
 
-    lane = cfg.lanes[lane_id]
+    lane = cfg.lanes[lane_id].model_copy(update={"stall_window_s": 120, "silent_prefill_window_s": 600})   # a probe never hangs
     out = {"lane": lane_id.value, "base_url": lane.base_url, "model": lane.model}
     try:
         out["reachable"] = await transport.health(lane_id, lane)
@@ -52,6 +91,7 @@ async def probe_lane(lane_id, cfg, transport) -> dict:
             results.append({"mode": mode, "ms": round(ms), "reasoning": reasoned, "text": (resp.text or "")[:40]})
         except Exception as e:  # noqa: BLE001
             results.append({"mode": mode, "error": str(e)[:120]})
+    out.update(await probe_prefill(lane_id, lane, transport))
     out["thinking_off_trials"] = results
     good = [r for r in results if "error" not in r and not r["reasoning"]]
     out["thinking_mode"] = min(good, key=lambda r: (r["ms"], MODES.index(r["mode"])))["mode"] if good else None
@@ -97,7 +137,9 @@ async def main(write: bool) -> int:
     (REPORTS / "probe.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
     for r in report:
         print(f"lane {r['lane']}: reachable={r.get('reachable')} model_loaded={r.get('model_loaded')} "
-              f"thinking_mode={r.get('thinking_mode')} json={r.get('json_schema')} structured_with_thinking={r.get('structured_with_thinking')}")
+              f"thinking_mode={r.get('thinking_mode')} json={r.get('json_schema')} structured_with_thinking={r.get('structured_with_thinking')} "
+              f"prefill_progress={r.get('prefill_progress')} first_token={r.get('time_to_first_token_s')}s "
+              f"prompt_tok/s={r.get('prompt_tokens_per_s')}")
     if write:
         lanes = dict(cfg.lanes)
         for r in report:
@@ -107,6 +149,8 @@ async def main(write: bool) -> int:
                 upd["thinking_mode"] = r["thinking_mode"]
             if r.get("structured_with_thinking") in ("supported", "unsupported"):
                 upd["structured_with_thinking"] = r["structured_with_thinking"]
+            if r.get("prefill_progress") in ("supported", "unsupported"):
+                upd["prefill_progress"] = r["prefill_progress"]
             lanes[lid] = lanes[lid].model_copy(update=upd)
         save_config(cfg.model_copy(update={"lanes": lanes}))
         print("as_config.yaml updated")

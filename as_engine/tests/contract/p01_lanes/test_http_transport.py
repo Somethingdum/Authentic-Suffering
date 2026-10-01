@@ -44,7 +44,7 @@ async def test_request_body_and_response_mapping():
     body = json.loads(cap[0].content)
     assert cap[0].url == httpx.URL("http://x/v1/chat/completions")
     assert cap[0].headers["authorization"] == "Bearer lm-studio"
-    assert body["model"] == "m1" and body["stream"] is False
+    assert body["model"] == "m1" and body["stream"] is True
     assert body["response_format"]["type"] == "json_schema"
     assert body["response_format"]["json_schema"]["strict"] is True
     assert r.text == '{"a":1}' and r.reasoning == "thought" and (r.prompt_tokens, r.completion_tokens) == (7, 3)

@@ -339,6 +339,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p12_surfaces/test_addison.py` (world `rooftops`) | D-109, WG-33b: she is from Boston and sounds it (no Mississippi, no Hattiesburg, no y'all); pale skin and the tight low bun; light parkour pants, not the skort; the bible's sample lines; hard to crash out (fuse 4, cold); she knows the mimicry (the cue); dressed from her card, the pants, bra and shoes cover her; the laundromat is canon, 1–365 days before the run; a canon event's range must be real (1 <= lo <= hi); `canon_memories` writes one personal history row and one anchor memory (salience 100) on a day 1–365 before; a card without canon events writes and draws nothing; the day is drawn on the opening stream, purpose canon:0 |
 
+### 3.25 No deadlines: the stall watchdog (P1; D-110)
+
+| File | What it proves |
+|---|---|
+| `p01_lanes/test_stall.py` | LANE-10: a call that keeps moving outlasts both the stall window and its expected time; reasoning alone is progress; keep-alives, empty deltas and a prefill counter that stops advancing are not; no progress for the window is `LaneStalled` (a `LaneTimeout`); the silent wait before the first token (a silent head or a silent body) has no limit unless `silent_prefill_window_s` is set; with `prefill_progress: supported` the window applies from the first second and `return_progress` is sent (and only then); cancelling a call closes the stream; an error event or a dropped connection is a lane error, not a stall; a server that ignores `stream` is read as one body. LANE-11: progress snapshots show the phases and the quiet time; the client reports what is live, never cuts a slow call off, and maps a stall to `timeout` without marking the lane down. Settings: stall window 300 s, silent prefill 0, a config that still has `request_timeout_s` loads. `p01_lanes/test_http_transport.py` (amended): the request asks for a stream |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

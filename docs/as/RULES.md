@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-739 ids; 487 with their own statement, 252 named only in context.
+741 ids; 488 with their own statement, 253 named only in context.
 
 
 ## ABUSE
@@ -649,6 +649,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | LANE-06 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py`, `as_engine/lanes/repair.py`, `as_engine/lanes/requests.py`, `as_engine/turn/cognition.py` | `contract/p01_lanes/test_repair.py`, `contract/p07_slice/test_decision_v2.py` |
 | LANE-07 | *LaneClient (P1): one call = transport + parse + validate + call log. Rules LANE-01..08.* | as_engine/lanes/client.py | `as_engine/lanes/client.py` | — |
 | LANE-09 | *Ablation (LANE-09, P11; 08 §4 ablation duty): ``client.ablated`` is a set of CallClass (empty by* | as_engine/lanes/client.py | `as_engine/lanes/client.py` | `contract/p11_audits/test_eval_ablation.py` |
+| LANE-10 | LANE-10 (D-110): the model made no progress (no token, no reasoning, no prefill advance) for | as_engine/lanes/errors.py | `as_engine/lanes/client.py`, `as_engine/lanes/errors.py`, `as_engine/lanes/progress.py`, `as_engine/lanes/transport.py` | `contract/p01_lanes/test_stall.py` |
+| LANE-11 | *Progress (LANE-11): ``client.live`` maps each call in flight (by ``id(request)``) to its latest snapshot* | as_engine/lanes/client.py | `as_engine/lanes/client.py`, `as_engine/lanes/progress.py`, `as_engine/lanes/transport.py` | `contract/p01_lanes/test_stall.py` |
 
 ## LESSON
 

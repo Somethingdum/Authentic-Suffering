@@ -19,7 +19,10 @@ lanes:
     model: nemotron-cascade-2-30b-a3b         # the exact model id LM Studio lists (tools/as/doctor.py --lanes shows them)
     api_key: lm-studio
     max_concurrency: 1
-    request_timeout_s: 240
+    stall_window_s: 300                       # LANE-10: a call is stopped only if it makes NO progress (no token, no reasoning)
+                                              # for this long. There is no limit on total time: a model may think for ten minutes.
+    silent_prefill_window_s: 0                # 0 = wait without limit while the server reads a long prompt and says nothing
+    prefill_progress: unknown                 # tools/as/probe.py --write: does the server report prompt-processing progress?
     thinking_mode: native                     # tools/as/probe.py picks: native | system_no_think | chat_template_kwargs | prefill_empty_think | none
     structured_mode: json_schema              # json_schema | prompt_only
     structured_with_thinking: unknown         # probe writes supported | unsupported
@@ -29,7 +32,10 @@ lanes:
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     api_key: lm-studio
     max_concurrency: 1
-    request_timeout_s: 240
+    stall_window_s: 300                       # LANE-10: a call is stopped only if it makes NO progress (no token, no reasoning)
+                                              # for this long. There is no limit on total time: a model may think for ten minutes.
+    silent_prefill_window_s: 0                # 0 = wait without limit while the server reads a long prompt and says nothing
+    prefill_progress: unknown                 # tools/as/probe.py --write: does the server report prompt-processing progress?
     thinking_mode: native
     structured_mode: json_schema
     structured_with_thinking: unknown
@@ -40,7 +46,7 @@ hot_cognition:        # the HOT actor call (lane A, thinking on)
   top_p: 0.95
   max_tokens: 3000
   thinking: true
-  deadline_s: 75
+  deadline_s: 75              # the EXPECTED seconds (reported "slow" past it); it never cuts a call off (LANE-10)
 
 background_cognition: true   # reflection / scene summaries while you read
 

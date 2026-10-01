@@ -5,9 +5,12 @@
 
 Behaviour:
   1. If the lane is marked down (``mark_down``) -> return parse_status 'lane_error' immediately.
-  2. ``await asyncio.wait_for(transport.send(lane_cfg, request), request.deadline_s)``;
-     LaneTimeout / asyncio.TimeoutError -> 'timeout'; LaneUnavailable -> 'lane_error' and the lane
-     is marked down until ``health`` succeeds again.
+  2. ``await transport.send(lane_cfg, request)`` with NO deadline (LANE-10, D-110): a call that is slow
+     but moving is never cut off. LaneStalled (no progress for the lane's ``stall_window_s``) and any other
+     LaneTimeout -> 'timeout' (the error says 'no progress for N s'; the lane is not marked down);
+     LaneUnavailable -> 'lane_error' and the lane is marked down until ``health`` succeeds again.
+     ``request.deadline_s`` is only the call's EXPECTED time: it sets the ``slow`` flag in the progress
+     snapshot and nothing else. A cancelled call (the Stop button) closes its connection, which stops the model.
   3. ``strip_think`` the text; reasoning from the transport (if any) is kept in ``reasoning``.
   4. If ``output_model`` is given: extract_json -> None => 'grammar_fail';
      validate fails => 'schema_fail' (error set); success => parsed = instance.model_dump(mode='json').
@@ -15,6 +18,11 @@ Behaviour:
   5. ``raw`` is kept only when parse_status != 'ok'.
   6. Every call (any status) is appended to the call log via ``on_call`` callback if set:
      ``on_call(request, response)`` — the turn pipeline wires this to lanes.calllog.
+
+Progress (LANE-11): ``client.live`` maps each call in flight (by ``id(request)``) to its latest snapshot
+(lanes/progress.py: phase 'waiting'/'prefill'/'thinking'/'writing', elapsed_s, quiet_s, slow, the prompt
+counters and the chars of reasoning and text so far), and ``client.on_progress(request, snapshot)``, when
+set, is called as the transport reports it (about once a second). Both are for display only.
 
 Model-swap guard (LANE-05): ``check_models()`` lists models on each lane and raises ModelSwapped
 if the configured model id is not present. The turn pipeline calls it before T0.
@@ -46,6 +54,10 @@ class LaneClient:
         self.on_call = on_call
         self._down: set = set()
         self.ablated: set = set()
+        self.on_progress: Callable[[LMRequest, dict], None] | None = None
+        self.live: dict[int, dict] = {}
+        if hasattr(transport, "sink"):
+            transport.sink = self._on_sink
 
     async def call(self, request: LMRequest, output_model: type[BaseModel] | None = None) -> LMResponse:
         import asyncio, time
@@ -61,7 +73,7 @@ class LaneClient:
         lane_cfg = self.config.lanes[request.lane]
         t0 = time.monotonic()
         try:
-            got = await asyncio.wait_for(self.transport.send(lane_cfg, request), request.deadline_s)
+            got = await self.transport.send(lane_cfg, request)
         except (LaneTimeout, asyncio.TimeoutError) as e:
             resp = LMResponse(**base, parse_status="timeout", error=str(e) or "timeout")
             self._log(request, resp); return resp
@@ -69,6 +81,8 @@ class LaneClient:
             self.mark_down(request.lane)
             resp = LMResponse(**base, parse_status="lane_error", error=str(e))
             self._log(request, resp); return resp
+        finally:
+            self.live.pop(id(request), None)
         visible, reasoning = strip_think(got.text)
         reasoning = got.reasoning or reasoning
         upd = dict(text=visible, reasoning=reasoning, latency_ms=got.latency_ms or int((time.monotonic()-t0)*1000))
@@ -87,6 +101,12 @@ class LaneClient:
         resp = got.model_copy(update=upd)
         self._log(request, resp)
         return resp
+
+    def _on_sink(self, request: LMRequest, prog) -> None:
+        snap = prog.snapshot()
+        self.live[id(request)] = snap
+        if self.on_progress:
+            self.on_progress(request, snap)
 
     def _log(self, q, r):
         if self.on_call:

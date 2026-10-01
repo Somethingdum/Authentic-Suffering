@@ -293,7 +293,7 @@ from ..contracts.common import Strict
 
 PushFn = Callable[[dict[str, Any]], Awaitable[None]]
 
-CONFIG_LANE_FIELDS: tuple[str, ...] = ("name", "base_url", "model", "max_concurrency", "request_timeout_s")
+CONFIG_LANE_FIELDS: tuple[str, ...] = ("name", "base_url", "model", "max_concurrency", "stall_window_s")
 PROBE_SCHEMA: dict = {"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"],
                       "additionalProperties": False}
 

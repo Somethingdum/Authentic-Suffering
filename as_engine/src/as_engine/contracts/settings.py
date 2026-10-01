@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from .common import CallClass, Difficulty, Era, Lane, Strict, WorldDetail
 
@@ -28,10 +28,27 @@ class LaneConfig(Strict):
     model: str = ""
     api_key: str = "lm-studio"
     max_concurrency: int = Field(default=1, ge=1, le=8)
-    request_timeout_s: float = Field(default=240.0, gt=0)
+    stall_window_s: float = Field(default=300.0, gt=0, description="LANE-10 (D-110): a call is stalled when it makes no progress "
+                                  "(a streamed token, reasoning, or a prefill advance) for this long. There is no limit on "
+                                  "total time: a call that keeps moving is never cut off.")
+    silent_prefill_window_s: float = Field(default=0.0, ge=0, description="LANE-10: how long the model may stay silent before "
+                                           "its first token when the server does not report prompt-processing progress "
+                                           "(prefill_progress != 'supported'). 0 = no limit (the Stop button is the way out); "
+                                           "the very first prompt on a cold context can take many minutes.")
+    prefill_progress: Literal["supported", "unsupported", "unknown"] = Field(
+        default="unknown", description="Whether the server streams prompt-processing progress (llama.cpp's return_progress). "
+        "tools/as/probe.py writes it; the engine asks for it only when 'supported'.")
     thinking_mode: Literal["native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "none"] = "native"
     structured_mode: Literal["json_schema", "prompt_only"] = "json_schema"
     structured_with_thinking: Literal["supported", "unsupported", "unknown"] = "unknown"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _retired_timeout(cls, data):
+        """D-110: ``request_timeout_s`` (never read by anything) is gone; a config that still has it loads."""
+        if isinstance(data, dict) and "request_timeout_s" in data:
+            data = {k: v for k, v in data.items() if k != "request_timeout_s"}
+        return data
 
     @field_validator("base_url")
     @classmethod
@@ -57,7 +74,9 @@ class CallRegime(Strict):
     top_p: float = Field(default=0.95, gt=0, le=1)
     max_tokens: int = Field(ge=16)
     thinking: bool = False
-    deadline_s: float = Field(gt=0)
+    deadline_s: float = Field(gt=0, description="D-110: the EXPECTED wall time of this call. It cancels nothing: a call that "
+                              "runs past it is reported as 'slow' (lanes/progress.py) and goes on while it keeps making "
+                              "progress. Only LaneConfig.stall_window_s ends a call.")
 
 
 def default_regimes() -> dict[CallClass, CallRegime]:
