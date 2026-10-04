@@ -52,6 +52,17 @@ replaces "the rest will remain uncoded"). What is left:
    that name no session; tests in p08 `test_sessions.py`, p10 `test_world_names_no_run.py`, vitest
    `sessions.spec.js`.
 5. **The final pass** — docs coherence, RULES regenerated, the manifest, the handoff.
+6. **Since the owner's new pair of models (2026-10)** — BUILT, each with its tests: no deadlines,
+   a stall watchdog instead (D-110: a call that keeps moving is never cut off); the Writer and the
+   Clerk (D-111, D-113: lane A is Boulesis v2.1 26B-A4B, about 5 tokens a second, and does everything
+   narrative plus the HOT minds; lane B is Nemotron 3.5 Lightning MTP, about 19 a second, for the WARM
+   minds, the judges and quick background work; the player's words are never reworded unless they opt
+   in); the automated limits bench (D-112, `tools/as/bench.py`: the owner runs it overnight, and until
+   then every call time in the scheduler is a placeholder); the models at work under the loading bar
+   (D-114); the Cheat field's command words and dictionary (D-115: "Spawn Fredrick" without a slash,
+   an autocomplete and a dictionary from the server); character examples as history (D-116:
+   `voice.examples`, shown as things a person already said). What the owner still has to do or
+   decide is in PROGRESS "Waiting on the owner".
 Owner requirements queued (2026-09-24, in the owner's words where it matters; specify in this order):
 - **Appearance, smell, condition, clothing** (new senses work, amends P2 bodies/items, P3 perception, P4 packet
   and cues, P10 infected): everyone and everything has a visual identity in high detail (hair, faces, marks,
@@ -200,7 +211,7 @@ the 58-bit gate. Keep doing this for every phase: build a world, play it, read w
 - Hostile-human openings do nothing with the fake model (it keeps everyone waiting); with real
   models the raiders decide. The live suite should play one.
 
-## 5. P11 built; P12 not started at contract level
+## 5. P11 built; P12 partly built
 
 **P11 Audits** — BUILT with their contracts (D-92): `audit/commit_gate.py` (AUDIT-03 BIT_STAGE),
 `audit/abuse.py` (ABUSE-01..08), `audit/release.py` (REL-01..06: WG-35 again on the run's turn-0
@@ -210,8 +221,8 @@ unbuilt rules, CNT-11 over packs and the world's dossiers, soak statistics), `au
 `tools/as/eval.py --ablate [--fake]`. Tests: `p11_audits/` (12 §3.17). The DSH builder has nothing
 to build here; the P11 gate records the evidence.
 
-**P12 Surfaces**: `cheats/commands.py` + GameService routing + the `cheat_admin` pack (CHEATS.md —
-the owner's "bonus dev-cheats" document, extended with the owner's session-8 asks in §0);
+**P12 Surfaces** — built: the cheats, the seal, the death screen, the Doom, parkour, canon events,
+the Cheat field's dictionary and character examples (§0 item 3 and item 6). Still to do:
 `content/importers.py` (files, character cards, docx, dossier intake); `service/death.py` (death
 screen, new life here); worlds (list / export / import, `create_run(world_id=…)` from
 `_worlds/<id>/genesis.sqlite`); the sessions browser and hard delete; the migration framework
@@ -237,9 +248,9 @@ without asking anyone. For every phase that means nine things exist and agree wi
 
 ### P11 — Audits: built (13_BUILD_ORDER §4 P11; DECISIONS D-95..D-99; tests 12 §3.17)
 
-### P12 — Surfaces (stubs exist; contracts not finished)
-R1 contracts to write or finish:
-- `cheats/commands.py` (a draft exists): every command's exact effects, events, refusals and persona
+### P12 — Surfaces (part built; the rest has draft contracts)
+R1 contracts to write or finish (the cheat items are BUILT, D-100..D-103, D-115; kept for the record):
+- `cheats/commands.py` (BUILT): every command's exact effects, events, refusals and persona
   lines; GameService routing (turn_submit with the 2508 token, /commands); the `cheat_admin` pack
   (dossiers such as 'fredrick'); sandbox save rules (CHEAT-02); CHEAT-03 (no cheat words in any
   narrator/actor prompt). The owner's additions (§0 item 3): a will overwrite (what the Actor then
@@ -247,10 +258,10 @@ R1 contracts to write or finish:
   what a reflection makes of the gap), a remote infection of a named person wherever they are (a
   council in session included), horde / Mega Horde commands, census inspection. `docs/as/CHEATS.md`
   is the owner's bonus document — keep it and the contract identical.
-- `content/importers.py` (draft exists): import_file per format, character-card mapping, docx
+- `content/importers.py` (draft exists; D-116 maps a card's example dialogue to voice examples): import_file per format, character-card mapping, docx
   extraction, intake_document chunk/merge/validate, ImportResult / IntakeJob, progress pushes.
-- `service/death.py` (sketch): DeathView model, cause-chain rendering, last turns, contributing
-  choices, truth_reveal after explicit click (DEATH-10), new-life-here flow.
+- `service/death.py` (BUILT, D-105..D-107, except the new-life-here flow, RUN-07): DeathView model,
+  cause-chain rendering, last turns, contributing choices, truth_reveal after explicit click (DEATH-10).
 - Worlds: `service/runs.py` list_worlds / export / import / `create_run(world_id=…)` from
   `_worlds/<id>/genesis.sqlite` (RUN-09); the world.json format is fixed by P10.
 - Sessions: a list of every session ever played and an unrecoverable delete (RUN-06 amended: the

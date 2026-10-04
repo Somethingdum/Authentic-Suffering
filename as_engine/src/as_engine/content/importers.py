@@ -10,6 +10,14 @@ import_file(path, pack_id, content_dir) -> ImportResult
        name -> identity.name; description/personality -> depth_reference + seeds for
        appearance/traits; scenario -> knowledge.knows; first_mes + mes_example -> voice exemplar
        candidates (up to 3 lines of the character's own speech, cleaned of {{char}}/{{user}});
+       (D-116) mes_example -> voice.examples, one per line of the character's in it, in order (at
+       most 60): split on '<START>'; a line opening '{{char}}:' or '<the card's name>:' is the
+       character's, any other 'X:' line someone else's. Each character line is an example
+       {situation 'In conversation.', by '' after a '{{user}}:' line (the player's side is never
+       named) else that X, said_to_them the other line just before it in the same block or '',
+       they_say the line without its prefix, '{{char}}' and '{{user}}' made the card's name and
+       'you', cut to 800 characters (said_to_them to 400), pressure 'easy'} — a card's example
+       dialogue is exactly the history D-116 shows a model;
        character_book entries -> LoreEntry drafts (truth = entry content; belief = same text with
        confidence 2; flagged for review). Everything the card lacks goes to .gaps.md.
   .txt/.docx/.md without front matter -> not auto-imported; use dossier intake (below).
@@ -18,7 +26,7 @@ import_file(path, pack_id, content_dir) -> ImportResult
 Dossier intake (IMP-05, the 'dump a big document in' path — e.g. the Ghost faction corpus):
   intake_document(text, target_kind, pack_id) -> IntakeJob
   1. chunk the text into <= 12,000-token sections on heading boundaries;
-  2. lane A (Cascade, 1M context) DOSSIER_INTAKE call per section with the target schema field list
+  2. lane A (the Writer: the long context) DOSSIER_INTAKE call per section with the target schema field list
      -> partial JSON; 3. merge partials field by field (later sections append to lists, never
      overwrite a non-empty string); 4. validate; 5. write draft + gaps; 6. report progress
      (intake_progress) after each section. The user reviews and moves the draft into the pack.

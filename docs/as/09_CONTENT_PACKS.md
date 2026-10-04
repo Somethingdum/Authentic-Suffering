@@ -410,7 +410,7 @@ the step's own label, which is on screen beside it. Keep each line under 80 char
 |---|---|
 | `.yaml` / `.yml` / `.json` with a `schema:` line | validated and copied into `my_content` |
 | `.md` with front matter | same; the Markdown body becomes `depth_reference` |
-| SillyTavern / Chub character card: `.png` with a `chara` or `ccv3` text chunk, or `.json` with `spec: chara_card_v2/v3` | converted to a **draft** actor dossier (IMP-03): name → identity; description/personality → depth reference and trait/appearance seeds; scenario → knowledge; first message + example messages → up to three voice-line candidates (with `{{char}}`/`{{user}}` removed); lorebook entries → lore drafts |
+| SillyTavern / Chub character card: `.png` with a `chara` or `ccv3` text chunk, or `.json` with `spec: chara_card_v2/v3` | converted to a **draft** actor dossier (IMP-03): name → identity; description/personality → depth reference and trait/appearance seeds; scenario → knowledge; first message + example messages → up to three voice-line candidates (with `{{char}}`/`{{user}}` removed), and every line of theirs in the example messages → a voice example with the line said to them before it (D-116, §3.0); lorebook entries → lore drafts |
 | `.txt` / `.docx` / `.md` without front matter | not imported directly — use dossier intake (below) |
 
 Every import that is not already complete lands in `my_content/_drafts/` with a sibling
