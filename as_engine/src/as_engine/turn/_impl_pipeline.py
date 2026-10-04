@@ -182,7 +182,8 @@ async def simulate(ctx):
             evs = _events_after(tx, first)
             # 9 propagate
             evs += propagate(tx, evs, wave_at, T)
-            # 10 cascade
+            # 10 cascade — over what was seen: the witness rules read who saw what (D-120)
+            _see(ctx, tx, evs, _everyone(ctx, tx, perceivers))
             evs += cascade.sweep(tx, evs, rules, wave_at, T)
             # 11 reactions: everyone perceives what happened, then who reacts
             await _progress(ctx, 11)
@@ -202,14 +203,14 @@ async def simulate(ctx):
             rows = clock.due_between(tx, -1, final)
             if not rows:
                 break
-            timers.fire_one(tx, rng, rows[0], T, final)
+            _fire_seen(ctx, tx, rows[0], final, rules, [])
         ctx.final = final
         for a in [r[0] for r in tx.query("SELECT DISTINCT actor_id FROM tasks WHERE status='active' ORDER BY actor_id")]:
             tasks.advance(tx, a, final, T)
         before = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
         for b in [r[0] for r in tx.query("SELECT body_id FROM bodies WHERE alive=1 ORDER BY body_id")]:
             bodies.progress(tx, b, final, T, rng)
-        _hear_the_doomed(ctx, tx, _events_after(tx, before))
+        _window_end(ctx, tx, _events_after(tx, before), final, rules)
         clock.advance_event(tx, final, "turn")
         perception.compile_scene(tx, s.pc_id, final, T)
         scenes(tx, s.pc_id, T, t0, final)
@@ -224,38 +225,71 @@ async def simulate(ctx):
         _ledger(tx, T, 12, "ok", {"horizon": ctx.horizon, "final": final, "gate": "all 58"}, 2 if ctx.strict else 1)
 
 
-def _hear_the_doomed(ctx, tx, evs):
-    """DOOM-04 in S12: a doom that began in the window's last progress — its scream — is heard like a
-    wave's events (EVERYONE and whoever it reaches)."""
-    from ..contracts.events import EventType
+def _everyone(ctx, tx, perceivers=()):
+    """EVERYONE of S11: the selection candidates, the PC and this wave's perceivers."""
+    from . import select
+    s = ctx.session
+    return sorted(set(select.candidates(tx, s.pc_id, ctx.T, ctx.horizon)) | {s.pc_id} | set(perceivers))
+
+
+def _see(ctx, tx, events, everyone):
+    """D-120: the percepts of ``events`` for EVERYONE and whoever their sounds reach (SEL-07). Run
+    before a cascade sweep, so the rules that read who saw what find them, and again after it for
+    what the sweep made; a percept already granted is never granted twice."""
     from ..mind import perception
     from . import select
-    cries = [e for e in evs if e.type == EventType.NOISE and e.payload.get("kind") == "screaming"]
-    if not cries:
+    if not events:
         return
-    s = ctx.session
-    last = max(e.at for e in cries)
-    for h in sorted(set(select.candidates(tx, s.pc_id, ctx.T, ctx.horizon)) | {s.pc_id} | set(select.reached(tx, cries, ctx.T))):
-        perception.compile_aftermath(tx, h, cries, last, ctx.T)
+    last = max([e.at for e in events] + [ctx.t0])
+    for h in sorted(set(everyone) | set(select.reached(tx, events, ctx.T))):   # SEL-07 (B6, C08)
+        perception.compile_aftermath(tx, h, events, last, ctx.T)
+
+
+def _fire_seen(ctx, tx, row, horizon_ms, rules, perceivers):
+    """One queue row the way a wave's events go (D-120): fire, dispatch, propagate, seen, swept, and
+    what the sweep made seen. Returns every event committed after the fired one."""
+    from ..action import cascade
+    from ..action._impl_p5b import _events_since
+    from ..action.propagate import propagate
+    from ..kernel import clock
+    from . import timers
+    fired = clock.fire(tx, row, ctx.T)
+    first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    timers.dispatch(tx, ctx.session.rng, row, fired, ctx.T, horizon_ms)
+    tev = _events_since(tx, first)
+    tev += propagate(tx, tev, row["due_at"], ctx.T)
+    everyone = _everyone(ctx, tx, perceivers)
+    _see(ctx, tx, tev, everyone)
+    made = cascade.sweep(tx, tev, rules, row["due_at"], ctx.T)
+    _see(ctx, tx, made, everyone)
+    return tev + made
+
+
+def _window_end(ctx, tx, evs, final, rules):
+    """S12 (D-120): what the window's last progress did — a death from bleeding, a need's new stage,
+    the screams of a doom that began there (DOOM-04) — is seen, propagated and swept like a wave's."""
+    from ..action import cascade
+    from ..action.propagate import propagate
+    if not evs:
+        return
+    everyone = _everyone(ctx, tx)
+    _see(ctx, tx, evs, everyone)
+    evs = evs + propagate(tx, evs, final, ctx.T)
+    made = cascade.sweep(tx, evs, rules, final, ctx.T)
+    _see(ctx, tx, made, everyone)
 
 
 async def _after_wave(ctx, tx, evs, wave_idx, max_waves, perceivers):
     """Perceive the wave's events, fire timers, decide the next wave. Returns (time | None, holders)."""
-    from ..action import cascade, reactions
-    from ..action.propagate import propagate
-    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    from ..action import reactions
     from ..kernel import clock
-    from ..mind import perception
-    from . import select, timers
+    from . import select
     s = ctx.session
     T = ctx.T
     rules = tx.canon.all("cascade")
-    everyone = sorted(set(select.candidates(tx, s.pc_id, T, ctx.horizon)) | {s.pc_id} | set(perceivers))
 
     def perceive(events):
-        last = max([e.at for e in events] + [ctx.t0])
-        for h in sorted(set(everyone) | set(select.reached(tx, events, T))):   # SEL-07 (B6, C08)
-            perception.compile_aftermath(tx, h, events, last, T)
+        _see(ctx, tx, events, _everyone(ctx, tx, perceivers))
         for h, trig in reactions.material_holders(tx, events, T):
             if h == s.pc_id:
                 ctx.horizon = select.pull(ctx.horizon, trig, _last_at(tx, T))
@@ -270,14 +304,7 @@ async def _after_wave(ctx, tx, evs, wave_idx, max_waves, perceivers):
         if not rows:
             break
         row = rows[0]
-        fired = clock.fire(tx, row, T)
-        first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
-        timers.dispatch(tx, s.rng, row, fired, T, ctx.horizon)
-        from ..action._impl_p5b import _events_since
-        tev = _events_since(tx, first)
-        tev += propagate(tx, tev, row["due_at"], T)
-        tev += cascade.sweep(tx, tev, rules, row["due_at"], T)
-        everyone = sorted(set(select.candidates(tx, s.pc_id, T, ctx.horizon)) | {s.pc_id} | set(perceivers))
+        tev = _fire_seen(ctx, tx, row, ctx.horizon, rules, perceivers)
         perceive(tev)
         t2, h2 = _next(tx, s, tev, T, wave_idx + 1, ctx.horizon, exclude, max_waves)
         if t2 is not None and (nxt is None or t2 <= nxt):

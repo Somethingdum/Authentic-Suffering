@@ -154,7 +154,7 @@
     - kind: emit_event
       event_type: RELATION_CHANGE
       target: onlookers_of(trigger.event_id)
-      payload: {toward: "$trigger.killer", axis: trust, delta: -3, cause: killed_someone}
+      payload: {toward: "$trigger.killer", axis: trust, delta: -2, cause: killed_someone}
     - kind: emit_event
       event_type: RELATION_CHANGE
       target: onlookers_of(trigger.event_id)

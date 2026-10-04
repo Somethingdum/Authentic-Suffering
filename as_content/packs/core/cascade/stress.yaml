@@ -48,7 +48,7 @@
     - kind: emit_event
       event_type: RELATION_CHANGE
       target: witnesses_of(trigger.event_id)
-      payload: {toward: "$trigger.actor_id", axis: trust, delta: -3, cause: fed_someone_to_the_dead}
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: fed_someone_to_the_dead}
     - kind: create_rumour
       target: witnesses_of(trigger.event_id)
       payload: {about: "$trigger.actor_id", claim: fed_someone_to_the_dead}

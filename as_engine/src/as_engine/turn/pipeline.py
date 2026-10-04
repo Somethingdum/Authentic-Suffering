@@ -103,16 +103,20 @@ simulate — stages 0-12 in ONE store transaction:
        before resolving); answered += their (actor, event) pairs; the wave's events = everything
        committed since that seq.
     S9 propagate: += action.propagate.propagate(tx, events, wave_at, T).
-    S10 cascade: += action.cascade.sweep(tx, events, canon cascade rules, wave_at, T).
+    S10 cascade: (D-120) SEE(events), then += action.cascade.sweep(tx, events, canon cascade rules,
+       wave_at, T) — the rules that read who saw what (witnesses_of, theft_witnesses_of,
+       onlookers_of) find them. SEE(E) = perception.compile_aftermath(tx, h, E, max(e.at for e in
+       E, t0), T) for each of EVERYONE (as S11 defines it) and (B6, SEL-07) each of
+       select.reached(tx, E, T) — whoever E's sounds reach, anywhere (a percept already granted is
+       never granted twice).
     S11 reactions: EVERYONE = select.candidates(...) + the PC + this wave's perceivers. perceive(E):
-       perception.compile_aftermath(tx, h, E, max(e.at for e in E, t0), T) for each of EVERYONE
-       and (B6, SEL-07) each of select.reached(tx, E, T) — whoever E's sounds reach, anywhere,
-       then the PC-material pull as in S3. perceive(the wave's events); (next_at, holders) =
-       NEXT(the wave's events). Then the timers inside the window, one at a time: while
-       clock.due_between(tx, -1, next_at or horizon) is not empty: fire its first row, dispatch it
-       (horizon_ms = horizon), += propagate / sweep of what it committed (at = its due_at),
-       EVERYONE recomputed, perceive(those events), (t2, h2) = NEXT(those events); when t2 is not
-       None and (next_at is None or t2 <= next_at): next_at = t2 and holders = h2 (their union when
+       SEE(E), then the PC-material pull as in S3. perceive(the wave's events, the sweep's among
+       them); (next_at, holders) = NEXT(the wave's events). Then the timers inside the window, one
+       at a time: while clock.due_between(tx, -1, next_at or horizon) is not empty: FIRE(its first
+       row, horizon) — fire it, dispatch it (horizon_ms as given), += propagate of what it
+       committed (at = its due_at), EVERYONE recomputed, SEE(those events), += sweep (at = its
+       due_at), SEE(what the sweep made) — perceive(those events), (t2, h2) = NEXT(those events);
+       when t2 is not None and (next_at is None or t2 <= next_at): next_at = t2 and holders = h2 (their union when
        t2 == next_at). A next_at beyond the (possibly pulled) horizon means no next wave. The next
        wave runs at next_at with the conscious holders; none -> the waves are over.
        NEXT(E) = action.reactions.next_wave(tx, rng, E, T, wave + 1, horizon, exclude={pc}) (the PC
@@ -127,13 +131,14 @@ simulate — stages 0-12 in ONE store transaction:
     Ledger rows 3..11 are written once, after the last wave (stage 4 detail {'waves': …}, stage 8
     detail {'responses': [[actor, speech event, response], …]}, the others {}).
   S12 commit: repeat — final = max(horizon, the latest events.at of this turn) (a COST landing can
-    complete after the horizon; G04); turn.timers.fire_one(tx, rng, the first row of
-    due_between(tx, -1, final), T, final) (P9: fire, dispatch, propagate, sweep) — until none is
-    left (S08). Then action.tasks.advance(tx, a, final, T) for
+    complete after the horizon; G04); FIRE(the first row of due_between(tx, -1, final), final)
+    (D-120: what lands after the horizon is seen before it is swept, as inside the window) — until
+    none is left (S08). Then action.tasks.advance(tx, a, final, T) for
     each actor with an active task (sorted); physical.bodies.progress(tx, b, final, T, rng) for each
-    living body (sorted) — the screams of a doom that began there (its NOISE events of kind
-    'screaming', DOOM-04) are heard as a wave's are: perception.compile_aftermath(tx, h, those
-    events, their latest at, T) for EVERYONE and each of select.reached(tx, those events, T);
+    living body (sorted) — (D-120) what that progress did is answered like a wave: SEE(its events)
+    (a death from bleeding, the screams of a doom that began there — NOISE of kind 'screaming',
+    DOOM-04 — and the rest), += action.propagate.propagate(tx, those, final, T), += sweep(those,
+    final), SEE(what the sweep made); EVERYONE here is select.candidates + the PC;
     clock.advance_event(tx, final, 'turn'); perception.compile_scene(tx, pc,
     final, T) (the PC's view as the window closes: the play view and the narrator read it);
     scenes(tx, pc, T, t0, final); every buffered call -> lanes.calllog.record; g =

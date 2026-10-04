@@ -396,7 +396,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p09_society/test_a_killing_seen.py` | With the lights on, Owen kills Alice in front of Mara, all three of Delgado's crew: `trigger.killer` is Owen; the onlookers are Mara alone (never the killer, the dead or June in the back) and the crew is the group that saw; CAS-025 — Mara trusts him 3 less, fears him 2 more, holds a fear of him and carries the story; CAS-026 — he carries it (stress +2); CAS-027 — the crew's standing for him drops by 2. CAS-028: told by Mara, Eli (who trusts her) believes it and trusts Owen 2 less; Nita (who does not) changes nothing. In the dark Mara sees a figure go down: nobody is an onlooker, no group saw, nothing changes but his own stress. Self-defence and stopping her going for Mara: `killer_provoked`, nothing follows. Mara kills Alice in front of Owen: nothing is written into the player's character (C06). No killer — a death with no cause, or the cold after he hit her — is not a killing; the rumour's words |
+| `p09_society/test_a_killing_seen.py` | With the lights on, Owen kills Alice in front of Mara, all three of Delgado's crew: `trigger.killer` is Owen; the onlookers are Mara alone (never the killer, the dead or June in the back) and the crew is the group that saw; CAS-025 — Mara trusts him 2 less, fears him 2 more, holds a fear of him and carries the story; CAS-026 — he carries it (stress +2); CAS-027 — the crew's standing for him drops by 2. CAS-028: told by Mara, Eli (who trusts her) believes it and trusts Owen 2 less; Nita (who does not) changes nothing. In the dark Mara sees a figure go down: nobody is an onlooker, no group saw, nothing changes but his own stress. Self-defence and stopping her going for Mara: `killer_provoked`, nothing follows. Mara kills Alice in front of Owen: nothing is written into the player's character (C06). No killer — a death with no cause, or the cold after he hit her — is not a killing; the rumour's words |
+
+### 3.34 Seen before swept (P7; D-120)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_seen_before_swept.py` | Through whole turns, not hand-granted percepts: Owen takes Dale's jerky from the stall and June, who saw it and knows whose it is, carries it out of the turn (CAS-012 found her in S10) — Nita, who saw it too, does not; Alice, cut by Owen before the moment, bleeds out as it ends (S12) in the light, Mara sees her go down, is strained by it (CAS-019), trusts Owen 2 less and carries the story (CAS-025). Off-screen (`run_offscreen`) her death is swept too: Owen carries it (CAS-026), and nobody is strained by seeing it, because nobody perceives off-screen |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

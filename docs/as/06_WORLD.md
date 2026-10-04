@@ -226,7 +226,7 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Standing** — the group's memory of a person (−5..+5) — lives in `group_standing`; laws and,
   from P10, deeds move it; it feeds trade and pressure.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
-  killer the trust of everyone who saw who fell and who did it (−3), makes them afraid of the
+  killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later
   believes the teller trusts the killer 2 less. Each of the dead's groups with an onlooker among
   its members gives the killer 2 less standing, even one of their own. The killer carries it
@@ -263,7 +263,7 @@ handler committed. These are **background** queue types (`kernel.clock.BACKGROUN
 they fire inside the PC's windows but never cut a condition-ended window short (HOR-01), so
 "I wait and watch the yard" still lasts its 8 hours. `turn.timers.run_offscreen` is the off-screen
 step — 6-hour windows (`WorldRules.offscreen_tick_h`) of seed → fire due timers → progress every
-living body's needs → advance the clock — used by tests and, from P10, by travel and long waits.
+living body's needs, and sweep what that did (D-120: a death leaves its vacancy, hunger wears people down) → advance the clock — used by tests and, from P10, by travel and long waits.
 A world with no settlements (every P7 scenario) runs exactly as it did before P9.
 People away on an outing skip their timetable (ROUT-06 'away', P10) — otherwise the routine
 would walk them home in the middle of it.

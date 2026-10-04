@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2025 passed (2032 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2035 passed (2042 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -149,7 +149,11 @@ do nothing.
    can say who; self-defence and stopping someone hurting another cost nothing more; your own character
    is never told how to feel about one. **Your call**: should settlements have a law against killing (a
    cost on the option for whoever knows the law, and the settlement's answer)? That changes what worldgen
-   writes, so it waits for your word.
+   writes, so it waits for your word. Checking it through whole turns found an older fault: in a real
+   turn the world never answered what people had just seen — a theft, a death, someone shoved to the
+   dead — because it answered before they had seen it, and a death at the end of a moment or off-screen
+   was never answered at all. Fixed (D-120); one moment now moves anyone's trust by 2 at most (the
+   game's own check refused more, which would have undone the whole move).
 
 ## Notes (builder)
 

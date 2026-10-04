@@ -46,8 +46,8 @@ fire_one(tx, rng, row, turn_index, horizon_ms) -> list[Event]   (TIME-07)
   fired = kernel.clock.fire(tx, row, turn_index); made = dispatch(tx, rng, row, fired, turn_index,
   horizon_ms); made += action.propagate.propagate(tx, made, row['due_at'], turn_index); made +=
   action.cascade.sweep(tx, made, the canon cascade rules, row['due_at'], turn_index). Returns
-  [fired] + made — every event committed, in seq order. (Stage 11's timer loop is exactly this,
-  plus perception.)
+  [fired] + made — every event committed, in seq order. (Stage 11's and Stage 12's timer loops are
+  this with perception before the sweep and after it — D-120; nobody perceives off-screen.)
 fire_due(tx, rng, until_ms, turn_index, horizon_ms) -> list[Event]   (TIME-08)
   While kernel.clock.due_between(tx, -1, until_ms) is not empty: fire_one(its first row). A row a
   handler schedules inside the window fires in the same call. Returns every event committed.
@@ -67,7 +67,11 @@ run_offscreen(tx, rng, until_ms, turn_index) -> list[Event]   (TIME-10, the off-
   seed_society(tx, now, turn_index); seed_world(tx, now, turn_index) (P10); fire_due(tx, rng, end,
   turn_index, end);
   physical.bodies.progress(tx, b, end, turn_index, rng) for every living body with a positions row
-  (by body_id; P10: a body folded back into a count, world.hordes HRD-18, has none);
+  (by body_id; P10: a body folded back into a count, world.hordes HRD-18, has none); (D-120) what
+  that progress committed, when anything: += action.propagate.propagate(tx, those, end,
+  turn_index), then action.cascade.sweep(tx, those, the canon cascade rules, end, turn_index) — a
+  death from bleeding leaves its household a vacancy, hunger wears a person down, off-screen as on;
+  nobody perceives off-screen, so the rules that ask who saw it find nobody;
   kernel.clock.advance_event(tx, end, 'offscreen'). Returns every event committed. The turn
   pipeline plays the same rules inside its own windows (04 §Stage 0, §Stage 12); P9 tests use this
   to let a settlement run for days, and P10 uses it for the world beyond the PC.

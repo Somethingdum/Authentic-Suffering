@@ -136,6 +136,8 @@ def seed_world(tx, at, turn_index):
 
 
 def run_offscreen(tx, rng, until_ms, turn_index):
+    from ..action import cascade
+    from ..action.propagate import propagate
     from ..kernel import clock
     from ..kernel.errors import ClockError
     from ..physical import bodies
@@ -149,9 +151,14 @@ def run_offscreen(tx, rng, until_ms, turn_index):
         seed_society(tx, now, turn_index)
         seed_world(tx, now, turn_index)
         fire_due(tx, rng, end, turn_index, end)
+        before = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
         for b in [r[0] for r in tx.query("SELECT b.body_id FROM bodies b JOIN positions p ON p.body_id=b.body_id "
                                          "WHERE b.alive=1 ORDER BY b.body_id")]:
             bodies.progress(tx, b, end, turn_index, rng)
+        made = _ev_model(tx, before)                    # D-120: what the progress did is answered too
+        if made:
+            made += propagate(tx, made, end, turn_index)
+            cascade.sweep(tx, made, tx.canon.all("cascade"), end, turn_index)
         clock.advance_event(tx, end, "offscreen")
         now = end
     return _ev_model(tx, first)

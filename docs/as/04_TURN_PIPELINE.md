@@ -19,9 +19,9 @@ player are in `STAGE_LABELS` (never engine words).
 | 7 | barrier | CODE | validated `Intent` list; nothing mutated yet | **G7** every referent resolves at T0 or is marked for ACTION_BLOCKED |
 | 8 | resolve | CODE | outcome events (checks, conflicts, effects); how each mind answered what it was asked (refusals recorded, `turn/cognition.record_responses`) | **G8** each intent resolved exactly once; every draw in `prng_ledger` |
 | 9 | propagate | CODE | sound, sight, evidence, harm follow-ons | **G9** conservation holds (items, bodies, cohorts) |
-| 10 | cascade | CODE (+LM(B) advisory, never committed) | secondary consequences from the cascade table | **G10** every cascade event cites its rule id |
+| 10 | cascade | CODE (+LM(B) advisory, never committed) | the wave's events perceived first (D-120: the rules that ask who saw it find them), then secondary consequences from the cascade table | **G10** every cascade event cites its rule id |
 | 11 | reactions | CODE | next wave or stop (§3.2) | **G11** wave legality (time-bounded), cap 3, overflow → `pending_reactions` |
-| 12 | commit | CODE | remaining due timers fired (`turn.timers.fire_one`, each swept); clock advanced to the end of the window; bodies/tasks progressed; the PC's closing view; scenes; 58-bit gate; COMMIT | **G12** all 58 bits = 1 |
+| 12 | commit | CODE | remaining due timers fired, each seen then swept as inside the window; clock advanced to the end of the window; bodies/tasks progressed, and what that did (a death from bleeding, a need's next stage) seen, propagated and swept (D-120); the PC's closing view; scenes; 58-bit gate; COMMIT | **G12** all 58 bits = 1 |
 | 13 | aftermath | CODE | `AftermathPacket` per mind that perceived anything | **G13** packet ⊆ that holder's percepts |
 | 14 | writeback | LM(B) | memories, beliefs, feelings, loops, lessons (per holder or identical group) | **G14** no item cites an unperceived fact (dropped + logged) |
 | 15 | audits | LM(B)+CODE | retrospective portrayal audit, leak scan | **G15** producer ≠ judge; leak scan is a query |
@@ -123,13 +123,14 @@ wave 0 at t0: candidates = living actors in the active area except the PC + acto
 for each wave w (0..cap; cap 3, 1 in the strict retry):
     S3 perceive  -> S4 select -> S5 afford -> S6 cognition (the PC's intent joins at wave 0)
     -> S7 barrier -> S8 resolve (+ how each mind answered what it was asked)
-    -> S9 propagate -> S10 cascade
+    -> S9 propagate -> S10 cascade (the wave's events perceived first, as S11 perceives them, so
+       the rules that ask who saw it find them — D-120)
     S11: everyone in the area — and, B6 (SEL-07, fidelity C08), whoever the wave's sounds reach,
          wherever they are — perceives the wave's events (compile_aftermath); the PC's material
          percepts pull the horizon; holders with MATERIAL new percepts (reactions.material_holders,
          the PC excluded — the player answers next turn) react at trigger + 150–250 ms (+400 ms
          drowsy or focused); timers due before that (or before the horizon) fire first, one at a
-         time, and their consequences may bring the next wave forward. Holders past the cap or
+         time — what each one did perceived before it is swept — and their consequences may bring the next wave forward. Holders past the cap or
          past the window go to pending_reactions (TIME-04): they are mandatory at the start of the
          next transaction. Stop when no wave remains.
 ```

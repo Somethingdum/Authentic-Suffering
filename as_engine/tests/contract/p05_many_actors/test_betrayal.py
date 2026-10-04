@@ -279,7 +279,7 @@ def test_everyone_who_saw_it_stops_trusting_him(street):
     assert all(e.payload["to_id"] == w.id("ray") and e.payload["axis"] == "trust" and e.rule_cited == "CAS-022"
                for e in changes)
     trust = dict(w.store.query("SELECT from_id, trust FROM relationships WHERE to_id = ?", (w.id("ray"),)))
-    assert trust[w.id("june")] <= -3
+    assert trust[w.id("june")] <= -2, "as far as one moment moves anyone (commit gate E10: |delta| <= 2)"
 
 
 def test_he_never_forgets_it(street):

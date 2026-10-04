@@ -99,7 +99,7 @@ def test_a_squad_mate_killed_in_front_of_everybody(scenario):
         assert cascade.select(tx, "groups_that_saw(trigger.event_id)", death) == [crew]
     out = sweep(w, death, t + 2000)
     assert {e.rule_cited for e in out} >= {"CAS-025", "CAS-026", "CAS-027"}
-    assert rel(w, "mara", "pc", "trust") == max(-3, trust_before - 3) and rel(w, "mara", "pc", "fear") == min(3, fear_before + 2)
+    assert rel(w, "mara", "pc", "trust") == max(-3, trust_before - 2) and rel(w, "mara", "pc", "fear") == min(3, fear_before + 2)
     (loop,) = [r for r in w.store.query("SELECT kind, text, subject_ids FROM open_loops WHERE holder_id = ? AND kind = 'fear'",
                                         (w.id("mara"),)) if w.id("pc") in r[2]]
     assert "killed someone in front of you" in loop[1]
