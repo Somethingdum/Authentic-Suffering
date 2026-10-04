@@ -36,6 +36,32 @@ parse(text) -> CheatCommand | CheatParseError   (only for a line that starts wit
     wonder <what he does> (one quoted token or the rest of the line): {what}
   CheatCommand(name, args, raw = the stripped text).
 
+plain_command(text) -> CheatCommand | None   (CHEAT-20, D-115: "I should just be able to say 'Spawn Fredrick'")
+  A Cheat-field line WITHOUT the leading '/': when its first word, lowercased, is in COMMAND_NAMES and
+  parse('/' + the stripped line) gives a CheatCommand -> that command, its raw the line as typed
+  (stripped). A command that takes nothing (ARGLESS) only when the line is that word alone ("off with his
+  head" is not /off). Else None. GameService runs it through execute(); when it did not happen
+  (CheatResult.untouched: a name nobody knows, a command that cannot be done — a plain command that did
+  not happen writes nothing at all, not even its story line) the line goes on to plain words
+  (cheats.interpret, CHEAT-16..19) as if it had never been tried. So "Spawn Fredrick" does what
+  /spawn fredrick does, without the plain-words reading first, and "kill the lights" still darkens the
+  room. The hard line (CHEAT-08) is refused and logged as typed, and goes no further.
+
+dictionary(tx, pc_id, content_dir=None) -> list[dict]   (CHEAT-21, D-115: "an auto complete that shows all of the options, and
+  a dictionary on that same menu so I don't get confused")
+  Every command, in COMMAND_NAMES order — 'wonder' only while the PC is in the reality exception
+  (physical.bodies.excepted: Willis, CHEAT-14) — as {name, usage: USAGE[name], meaning: MEANINGS[name],
+  example: EXAMPLES[name], slots: {slot: [options]}} for the slots SLOTS[name] names, in that order. The
+  options, each list without repeats and sorted case-insensitively:
+    person: 'me', then the known_name of every acquaintance row of the PC that has one;
+    place: the names of the PC's known places; item: every canon item's name; group: every group's name;
+    what (/spawn): the infected type words /spawn reads, then the bare id of every actor and pc record of
+      the run's packs and of the cheat_ packs under ``content_dir`` (the pools /spawn looks in; None: the run's only);
+    stat: the SPECIAL letters, 'resolve', then SKILL_DOMAINS; kind (/weather): WEATHER_KINDS;
+    strain (/infect): every canon pathway's id.
+  Read only. GameService answers cheat_dictionary_get with it only while meta cheat_active is '1'; before,
+  the list is empty — nothing about the console exists before the word (CHEAT-03).
+
 resolve(tx, pc_id, kind, name) -> (id, None) | (None, persona line)   (§4 Names)
   (D-103) A name that is itself an id of that kind (a body id for 'person', a place, group or item
   id) is that id — how cheats.interpret passes what the Boss named.
@@ -52,7 +78,9 @@ resolve(tx, pc_id, kind, name) -> (id, None) | (None, persona line)   (§4 Names
 async execute(session, command) -> CheatResult   (CHEAT-04..08)
   help -> the persona line (below) and detail HELP_TEXT; a story 'cheat' entry; nothing else.
   Every other command runs its effect; an effect that cannot happen returns (False, a persona line
-  — resolve's, or the command's own below) and changes nothing: no log, no sandbox. A command that
+  — resolve's, or the command's own below) and changes nothing: no log, no sandbox. (D-115) A plain
+  command (raw without the '/', CHEAT-20) that cannot happen does not even add its story line: the
+  transaction is rolled back and the result is untouched. A command that
   happened: persona line; unless in SANDBOX_EXEMPT, a CHEAT_OVERRIDE (writer 'cheats', payload
   {command, raw, outcome} + reconciliation: true for /despawn) inserting cheat_log {entry_id
   (kind 'cht'), turn_index T, command = raw, outcome, persona_line, event_id = the first effect
@@ -280,6 +308,52 @@ COMMAND_NAMES: tuple[str, ...] = ("help", "off", "give", "heal", "god", "tp", "s
                                   "brief", "noise", "will", "forget", "infect", "cure", "horde", "mega",
                                   "census", "wonder")
 
+# D-115 (CHEAT-20, CHEAT-21): what the Cheat field's dictionary says of each command
+ARGLESS: frozenset[str] = frozenset({"help", "off", "reveal", "mega", "census"})
+SLOTS: dict[str, tuple[str, ...]] = {
+    "give": ("item", "person"), "heal": ("person",), "god": ("person",), "tp": ("place",), "set": ("stat", "person"),
+    "weather": ("kind",), "rep": ("group",), "spawn": ("what",), "despawn": ("person",), "kill": ("person",),
+    "revive": ("person",), "mind": ("person",), "brief": ("person",), "will": ("person",),
+    "forget": ("person", "place"), "infect": ("person", "strain"), "cure": ("person",), "horde": ("place",),
+}
+MEANINGS: dict[str, str] = {
+    "help": "Lists the commands.",
+    "off": "Closes the console. The run stays a Sandbox.",
+    "give": "Makes an item in someone's pack (yours unless you say to whom).",
+    "heal": "Clears wounds, blood loss, pain and needs (yours unless you name someone).",
+    "god": "Harm no longer lands on that body (yours unless you name someone).",
+    "tp": "Moves you to a place, unseen.",
+    "set": "Sets a SPECIAL score (1-10), resolve, or a skill (0-3).",
+    "time": "Lets the world live on for that many hours (1-720).",
+    "weather": "Changes the weather.",
+    "rep": "Sets how a group regards you (-5 to 5).",
+    "spawn": "Brings a person from any pack, or the dead by type, to your place (1-20; ally: they take your orders).",
+    "despawn": "Removes someone or something the console made.",
+    "kill": "Kills a person.",
+    "revive": "Brings a person back, wounds cleared; any infection stays.",
+    "reveal": "Shows the truth about your place and the places next to it.",
+    "mind": "Shows what a person wants, plans and believes.",
+    "brief": "Puts the truth about your place and the people here into a person's head.",
+    "noise": "Makes a sound of that loudness (40-180 dB) here or at a spot.",
+    "will": "Overwrites what a person wants. Never your own character.",
+    "forget": "Cuts someone or somewhere out of a person's memory.",
+    "infect": "Gives a person a strain (wet unless you say).",
+    "cure": "Cures anyone not fully turned. The world itself still has no cure.",
+    "horde": "Calls a district's dead into a crowd heading for a place (yours unless you say).",
+    "mega": "Sends the Mega Horde now.",
+    "census": "Counts the dead and the living.",
+    "wonder": "Willis only: what you describe simply happens, as people would see it.",
+}
+EXAMPLES: dict[str, str] = {
+    "help": "/help", "off": "/off", "give": '/give bandage 3 to Mara', "heal": "/heal June", "god": "/god on",
+    "tp": '/tp "Delgado\'s Market"', "set": "/set A 9", "time": "/time +12h", "weather": "/weather storm",
+    "rep": '/rep "Mafia Remnants" 4', "spawn": "/spawn fredrick ally", "despawn": "/despawn Fredrick",
+    "kill": '/kill "the man in the red jacket"', "revive": "/revive Nita", "reveal": "/reveal", "mind": "/mind Mara",
+    "brief": "/brief Fredrick", "noise": '/noise 90 at "back door"', "will": '/will Mara "get out of the city tonight"',
+    "forget": "/forget June about Mara", "infect": '/infect "the Top-Hat" with wet', "cure": "/cure Nita",
+    "horde": "/horde 40", "mega": "/mega", "census": "/census", "wonder": '/wonder "walks straight through the wall"',
+}
+
 ACTIVATION_LINE = ("Alright, alright, settle down. 'Mr. Cheater Man' reporting for duty, Boss. Systems "
                    "unlocked, safeties vaporized. You now wield the digital thunder. What reality shall "
                    "we rewrite today?")
@@ -370,6 +444,7 @@ class CheatResult:
     persona_line: str
     detail: str = ""
     event_ids: list[str] = field(default_factory=list)
+    untouched: bool = False          # D-115: nothing at all was written (rolled back)
 
 
 def detect_activation(text: str) -> bool:
@@ -383,6 +458,14 @@ def activate(session) -> CheatResult:
 
 def parse(text: str) -> CheatCommand | CheatParseError:
     raise NotImplementedError("P12")
+
+
+def plain_command(text: str) -> "CheatCommand | None":
+    raise NotImplementedError("D-115")
+
+
+def dictionary(tx, pc_id: str, content_dir=None) -> list[dict]:
+    raise NotImplementedError("D-115")
 
 
 def resolve(tx, pc_id: str, kind: str, name: str) -> tuple[str | None, str | None]:
@@ -427,3 +510,4 @@ def is_cheat_question(text: str) -> bool:
     return any(k in t for k in keys) or ("code" in t and "unlock" in t)
 from ._impl_cheats import activate, parse, resolve, execute, brief_beliefs, persona, god_bodies, standing_brief  # noqa
 from ._impl_cheats import start_life, take_wonder  # noqa
+from ._impl_cheats import dictionary, plain_command  # noqa

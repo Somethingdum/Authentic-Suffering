@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 1989 passed (1996 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2008 passed (2015 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -89,8 +89,8 @@ do nothing.
 4. ~~The UI shows no live model progress~~ — done while you were away (D-114): the loading bar now says what
    the models are doing ("Thinking · 2 min") and speaks up when one goes quiet. Nothing for you to do; look at
    it on your first long move and say if the words are wrong.
-5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 / D-114 — 65 pass (4 new), 101
-   fail, exactly as before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
+5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 / D-114 / D-115 — 76 pass (15 new),
+   101 fail, exactly as before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
    home, store, socket). The repo itself has no vitest toolchain yet (13_BUILD_ORDER P8).
 
 6. **How picky the narration lint should be** (your call): every narration draft goes through a code lint;
@@ -103,6 +103,20 @@ do nothing.
    (`bench.md`, "Narration and the code lint"). If the style rules throw away prose you like: set
    `rules.style.max_narration_attempts: 1` (new runs), loosen the numbers under `rules.style`, or tell me to
    make the style rules advisory and keep only the fidelity checks forcing a redraft.
+
+7. ~~Cheat autocomplete and "Spawn Fredrick"~~ — done while you were away (D-115): a line in the Cheat field
+   that starts with a command word is that command, at once, with no plain-words reading ("Spawn Fredrick",
+   "give bandage 3 to Mara", "census"); a sentence that only starts like one ("kill the lights") still goes
+   to plain words. The server now serves a dictionary of every command, what it does, an example, and what
+   each blank can take (the people your character knows, places, items, groups, the packs' people, the dead
+   by type, stats, weather, strains); the UI's autocomplete logic is built and tested. The list and the
+   dictionary panel themselves sit in the Play screen's input box, which is still the builder's (P8). Try it
+   once the Play screen exists and say if anything reads wrong.
+8. **A private repository for the lore** (needed from you): this repository is public (a fork), so none of
+   the ASCL lore may go in it. These wait for a private repository you create and add to the session: the
+   Lurker venom and feeding ("it should be in there, if not there's issues"), the Lurker stalk and the
+   settlement hunt, Codex as the inner monologue, and your Willis card updates (2026-09-26). Left alone:
+   the game keeps the lore it has now (CHEATS §6b, the core pack), and none of these are built.
 
 ## Notes (builder)
 

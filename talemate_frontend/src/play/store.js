@@ -24,6 +24,7 @@ export function createPlayStore(socket, { download } = {}) {
     story: [], progress: null, rejection: null, settings: null, changeable: [], ironman: false, sandbox: false,
     notices: [], death: null, doom: null, worldgen: null, worlds: [], devData: {}, cheatShimmer: false, error: null, saved: null,
     composeText: '', mode: 'do', settingsOpen: false, bar: null, wizard: freshDraft(), codeResult: null,
+    cheatCommands: [],
   })
   const send = (action, fields = {}) => socket.send({ action, ...fields })
   const on = (action, fn) => socket.on(action, (data) => fn(data || {}))
@@ -38,6 +39,7 @@ export function createPlayStore(socket, { download } = {}) {
   s.revealDeath = () => send('death_reveal')   // P12 (DEATH-10): the truth, only when asked
   s.dismissDoom = () => { s.doom = null }   // P12, D-106: the frozen moment is over
   s.enterCode = (code) => { s.codeResult = null; send('code_enter', { code }) }   // P12, CHEAT-12: the menu's code box
+  s.getCheatDictionary = () => send('cheat_dictionary_get')   // P12, D-115 (CHEAT-21): the Cheat field's words
   s.newLife = (pcRef, settings, worldId = null) => {
     send('run_new', worldId ? { pc_ref: pcRef, settings, world_id: worldId } : { pc_ref: pcRef, settings })
     s.screen = 'worldgen'
@@ -63,9 +65,14 @@ export function createPlayStore(socket, { download } = {}) {
   on('run_loaded', (d) => {
     s.runId = d.run_id; s.ironman = d.ironman; s.sandbox = d.sandbox; s.settings = d.settings; s.notices = d.notices
     s.screen = 'play'; s.story = []; s.rejection = null; s.death = null; s.doom = null; s.progress = null; s.wizard = freshDraft()
+    s.cheatCommands = []
     send('settings_get')
   })
-  on('view', (d) => { s.view = d.view; s.lanes = d.view?.lanes ?? s.lanes })
+  on('view', (d) => {
+    s.view = d.view; s.lanes = d.view?.lanes ?? s.lanes
+    if (!d.view?.console) s.cheatCommands = []   // D-115: a closed console leaves nothing of itself behind (CHEAT-03)
+  })
+  on('cheat_dictionary', (d) => { s.cheatCommands = d.commands || [] })   // D-115 (CHEAT-21)
   on('story', (d) => { s.story = d.entries })
   on('pcs', (d) => { s.pcs = d.cards })
   on('death', (d) => { s.death = d.death; s.screen = 'dead' })   // P12, D-105/D-106: sent twice — at once, then with the Voice's last word

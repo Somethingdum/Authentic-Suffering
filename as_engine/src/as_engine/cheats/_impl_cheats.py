@@ -767,7 +767,7 @@ async def execute(session, command):
     try:
         return await _execute(session, command)
     except _Refuse as r:                     # found impossible after a write: rolled back, nothing happened
-        return CheatResult(ok=False, persona_line=str(r), detail="")
+        return CheatResult(ok=False, persona_line=str(r), detail="", untouched=True)
 
 
 async def _execute(session, command):
@@ -785,6 +785,8 @@ async def _execute(session, command):
         ok, outcome, detail, evs = res[0], res[1], res[2], res[3]
         reconciliation = len(res) > 4 and res[4] is True
         if ok is False:
+            if not command.raw.startswith("/"):    # D-115 (CHEAT-20): a plain line that did not happen leaves no trace
+                raise _Refuse(outcome)
             append_story(tx, T, "cheat", f"{command.raw}\n{outcome}")
             return CheatResult(ok=False, persona_line=outcome, detail="")
         if ok is None:                       # a retired legend: a line, nothing else
@@ -1122,3 +1124,86 @@ def start_life(tx, pc_id, record):
                                                    "event_id": evs[0].event_id}, "insert")],
                    {"command": "start", "raw": "start", "outcome": f"began a life as {record.identity.name}"}, at, T))
     return [e for e in evs if e is not None]
+
+
+# ---------------------------------------------------------------------------- D-115 (CHEAT-20, CHEAT-21)
+def plain_command(text):
+    from .commands import ARGLESS, COMMAND_NAMES, CheatCommand
+    line = (text or "").strip()
+    if not line or line.startswith("/"):
+        return None
+    word = line.split()[0].lower()
+    if word not in COMMAND_NAMES:
+        return None
+    if word in ARGLESS and line.lower() != word:
+        return None
+    cmd = parse("/" + line)
+    if not isinstance(cmd, CheatCommand):
+        return None
+    cmd.raw = line
+    return cmd
+
+
+def _infected_words(tx):
+    words = []
+    for r in tx.canon.refs("infected"):
+        t = tx.canon.get(r)
+        words += [t.name.lower()] + [w.lower() for w in re.findall(r"[A-Z]+", t.id)
+                                     if len(w) > 3 and w not in ("ZOMBIE", "ARCHETYPE", "VARIANT")]
+    return words
+
+
+def dictionary(tx, pc_id, content_dir=None):
+    from ..physical import bodies
+    from .commands import COMMAND_NAMES, EXAMPLES, MEANINGS, SKILL_DOMAINS, SLOTS, USAGE, WEATHER_KINDS
+
+    def clean(xs):
+        seen, out = set(), []
+        for x in xs:
+            if x and x.lower() not in seen:
+                seen.add(x.lower())
+                out.append(x)
+        return out
+
+    def srt(xs):
+        return sorted(clean(xs), key=str.lower)
+    pools = {}
+
+    def options(slot):
+        if slot in pools:
+            return pools[slot]
+        if slot == "person":
+            got = ["me"] + srt(r[0] for r in tx.query(
+                "SELECT known_name FROM acquaintance WHERE holder_id=? AND known_name IS NOT NULL", (pc_id,)))
+        elif slot == "place":
+            got = srt(r[0] for r in tx.query("SELECT pl.name FROM known_places k JOIN places pl ON pl.place_id=k.place_id "
+                                             "WHERE k.holder_id=?", (pc_id,)))
+        elif slot == "item":
+            got = srt(tx.canon.get(r).name for r in tx.canon.refs("item"))
+        elif slot == "group":
+            got = srt(r[0] for r in tx.query("SELECT name FROM groups"))
+        elif slot == "what":
+            from ..content.pack import cheat_records
+            refs = [r for k in ("actor", "pc") for r in tx.canon.refs(k)]
+            if content_dir is not None:
+                refs += list(cheat_records(content_dir))
+            got = clean(_infected_words(tx)) + srt(r.rsplit("/", 1)[1] for r in refs)
+            got = clean(got)
+        elif slot == "stat":
+            got = list("SPECIAL") + ["resolve"] + list(SKILL_DOMAINS)
+        elif slot == "kind":
+            got = list(WEATHER_KINDS)
+        elif slot == "strain":
+            got = srt(tx.canon.get(r).id for r in tx.canon.refs("pathway"))
+        else:
+            raise ValueError(slot)
+        pools[slot] = got
+        return got
+    willis = bodies.excepted(tx, pc_id)
+    out = []
+    for name in COMMAND_NAMES:
+        if name == "wonder" and not willis:
+            continue
+        out.append({"name": name, "usage": USAGE[name], "meaning": MEANINGS[name], "example": EXAMPLES[name],
+                    "slots": {slot: options(slot) for slot in SLOTS.get(name, ())}})
+    return out

@@ -1,0 +1,395 @@
+{
+  "type": "as_game",
+  "action": "cheat_dictionary",
+  "data": {
+    "commands": [
+      {
+        "name": "help",
+        "usage": "/help",
+        "meaning": "Lists the commands.",
+        "example": "/help",
+        "slots": {}
+      },
+      {
+        "name": "off",
+        "usage": "/off",
+        "meaning": "Closes the console. The run stays a Sandbox.",
+        "example": "/off",
+        "slots": {}
+      },
+      {
+        "name": "give",
+        "usage": "/give <item> [<qty>] [to <person>]",
+        "meaning": "Makes an item in someone's pack (yours unless you say to whom).",
+        "example": "/give bandage 3 to Mara",
+        "slots": {
+          "item": [
+            ".22 rifle",
+            ".22 round",
+            "bandage roll",
+            "bandana",
+            "bottle of water",
+            "crowbar",
+            "fire axe",
+            "Glock 19"
+          ],
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "heal",
+        "usage": "/heal [<person>]",
+        "meaning": "Clears wounds, blood loss, pain and needs (yours unless you name someone).",
+        "example": "/heal June",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "god",
+        "usage": "/god on|off [<person>]",
+        "meaning": "Harm no longer lands on that body (yours unless you name someone).",
+        "example": "/god on",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "tp",
+        "usage": "/tp <place>",
+        "meaning": "Moves you to a place, unseen.",
+        "example": "/tp \"Delgado's Market\"",
+        "slots": {
+          "place": [
+            "Maple Street",
+            "Office",
+            "Sales floor",
+            "Stockroom"
+          ]
+        }
+      },
+      {
+        "name": "set",
+        "usage": "/set <stat> <value> [<person>]",
+        "meaning": "Sets a SPECIAL score (1-10), resolve, or a skill (0-3).",
+        "example": "/set A 9",
+        "slots": {
+          "stat": [
+            "S",
+            "P",
+            "E",
+            "C",
+            "I",
+            "A",
+            "L",
+            "resolve",
+            "firearms",
+            "melee",
+            "brawling",
+            "athletics",
+            "stealth",
+            "medicine",
+            "mechanics",
+            "electronics",
+            "scavenging",
+            "survival",
+            "tracking",
+            "navigation",
+            "persuasion",
+            "deception",
+            "intimidation",
+            "leadership",
+            "trade",
+            "cooking",
+            "farming",
+            "building",
+            "driving",
+            "infected_lore",
+            "childcare",
+            "animal_handling"
+          ],
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "time",
+        "usage": "/time +<n>h",
+        "meaning": "Lets the world live on for that many hours (1-720).",
+        "example": "/time +12h",
+        "slots": {}
+      },
+      {
+        "name": "weather",
+        "usage": "/weather clear|overcast|rain|storm|fog|wind|heat|snow",
+        "meaning": "Changes the weather.",
+        "example": "/weather storm",
+        "slots": {
+          "kind": [
+            "clear",
+            "overcast",
+            "rain",
+            "storm",
+            "fog",
+            "wind",
+            "heat",
+            "snow"
+          ]
+        }
+      },
+      {
+        "name": "rep",
+        "usage": "/rep <group> <-5..5>",
+        "meaning": "Sets how a group regards you (-5 to 5).",
+        "example": "/rep \"Mafia Remnants\" 4",
+        "slots": {
+          "group": [
+            "Delgado's crew"
+          ]
+        }
+      },
+      {
+        "name": "spawn",
+        "usage": "/spawn <what> [x<n>] [ally]",
+        "meaning": "Brings a person from any pack, or the dead by type, to your place (1-20; ally: they take your orders).",
+        "example": "/spawn fredrick ally",
+        "slots": {
+          "what": [
+            "crawler",
+            "shambler",
+            "lurker",
+            "runner",
+            "fredrick",
+            "mara_voss",
+            "willis"
+          ]
+        }
+      },
+      {
+        "name": "despawn",
+        "usage": "/despawn <person or item>",
+        "meaning": "Removes someone or something the console made.",
+        "example": "/despawn Fredrick",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "kill",
+        "usage": "/kill <person>",
+        "meaning": "Kills a person.",
+        "example": "/kill \"the man in the red jacket\"",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "revive",
+        "usage": "/revive <person>",
+        "meaning": "Brings a person back, wounds cleared; any infection stays.",
+        "example": "/revive Nita",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "reveal",
+        "usage": "/reveal",
+        "meaning": "Shows the truth about your place and the places next to it.",
+        "example": "/reveal",
+        "slots": {}
+      },
+      {
+        "name": "mind",
+        "usage": "/mind <person>",
+        "meaning": "Shows what a person wants, plans and believes.",
+        "example": "/mind Mara",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "brief",
+        "usage": "/brief <person>",
+        "meaning": "Puts the truth about your place and the people here into a person's head.",
+        "example": "/brief Fredrick",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "noise",
+        "usage": "/noise <db> [here|at <anchor>]",
+        "meaning": "Makes a sound of that loudness (40-180 dB) here or at a spot.",
+        "example": "/noise 90 at \"back door\"",
+        "slots": {}
+      },
+      {
+        "name": "will",
+        "usage": "/will <person> \"<what they now want>\"",
+        "meaning": "Overwrites what a person wants. Never your own character.",
+        "example": "/will Mara \"get out of the city tonight\"",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "forget",
+        "usage": "/forget <person> about <person or place>",
+        "meaning": "Cuts someone or somewhere out of a person's memory.",
+        "example": "/forget June about Mara",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ],
+          "place": [
+            "Maple Street",
+            "Office",
+            "Sales floor",
+            "Stockroom"
+          ]
+        }
+      },
+      {
+        "name": "infect",
+        "usage": "/infect <person> [with <strain>]",
+        "meaning": "Gives a person a strain (wet unless you say).",
+        "example": "/infect \"the Top-Hat\" with wet",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ],
+          "strain": [
+            "air",
+            "cold_start",
+            "lurker_deep",
+            "wet"
+          ]
+        }
+      },
+      {
+        "name": "cure",
+        "usage": "/cure <person>",
+        "meaning": "Cures anyone not fully turned. The world itself still has no cure.",
+        "example": "/cure Nita",
+        "slots": {
+          "person": [
+            "me",
+            "Alice",
+            "Eli",
+            "June",
+            "Mara",
+            "Nita"
+          ]
+        }
+      },
+      {
+        "name": "horde",
+        "usage": "/horde <n> [at <place>]",
+        "meaning": "Calls a district's dead into a crowd heading for a place (yours unless you say).",
+        "example": "/horde 40",
+        "slots": {
+          "place": [
+            "Maple Street",
+            "Office",
+            "Sales floor",
+            "Stockroom"
+          ]
+        }
+      },
+      {
+        "name": "mega",
+        "usage": "/mega",
+        "meaning": "Sends the Mega Horde now.",
+        "example": "/mega",
+        "slots": {}
+      },
+      {
+        "name": "census",
+        "usage": "/census",
+        "meaning": "Counts the dead and the living.",
+        "example": "/census",
+        "slots": {}
+      }
+    ]
+  }
+}

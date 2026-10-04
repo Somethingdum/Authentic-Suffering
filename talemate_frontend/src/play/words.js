@@ -110,4 +110,13 @@ export const TEXT = {
   doom: {
     next: 'Go on',
   },
+  // P12 (D-115, CHEAT-21): the Cheat field's autocomplete and dictionary
+  cheat: {
+    dictionary: 'Commands',
+    filter: 'Find a command',
+    none: 'No command by that name. Plain words work too.',
+    example: 'For example',
+    slot: { item: 'item', person: 'person', place: 'place', group: 'group', what: 'who or what', stat: 'stat',
+      kind: 'weather', strain: 'strain' },
+  },
 }

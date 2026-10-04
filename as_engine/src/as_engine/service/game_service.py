@@ -251,13 +251,19 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
   on_turn_compose(InTurnCompose) (P12, D-103; the Play input: Act / Say / Cheat, any of them at once).
     No session -> turn_rejected no_run; busy -> turn_rejected busy. The word in any field ->
     exactly on_turn_submit's activation (the line is consumed; nothing else happens). cheat (stripped)
-    while meta cheat_active is '1': a '/' line -> on_turn_submit's slash path; anything else ->
-    cheats.interpret.run(session, cheat) -> [cheat_result {persona_line, ok, detail}, view, story];
+    while meta cheat_active is '1': a '/' line -> on_turn_submit's slash path; (D-115, CHEAT-20) a line
+    cheats.commands.plain_command makes a command ("Spawn Fredrick") -> cheats.commands.execute; when
+    that happened -> [cheat_result, view, story] as a '/' line's, else (it changed nothing) on to plain
+    words; anything else -> cheats.interpret.run(session, cheat) -> [cheat_result {persona_line, ok,
+    detail}, view, story];
     while the console is closed the field does not exist (CHEATS §2): its text is ignored. Then act
     and say (stripped): both -> on_turn_submit(InTurnSubmit(mode 'do', text = act + ' "' + say with
     every '"' made '”' + '"', addressee_refs = to)) — one moment: the act, and the words said while
     doing it; say only -> mode 'say', text say, addressee_refs to; act only -> mode 'do', text act. The
     replies are the cheat's first, then the turn's. Nothing to do at all -> turn_rejected empty.
+  on_cheat_dictionary_get (D-115, CHEAT-21): no session, or meta cheat_active not '1' -> [cheat_dictionary
+    {commands: []}] (nothing about the console before the word, CHEAT-03); else [cheat_dictionary {commands:
+    cheats.commands.dictionary(tx, the PC, config.content_dir)}] (a read transaction).
   on_code_enter(InCodeEnter) (P12, D-79, D-102, CHEAT-12; the menu's "Enter a code" box). A session
     loaded and busy -> BUSY (nothing changes). cheats.commands.detect_activation(code) false ->
     [code_result {accepted False}]

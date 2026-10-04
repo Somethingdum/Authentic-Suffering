@@ -706,7 +706,10 @@ class GameService:
             if cheat.startswith("/"):
                 replies += await self.on_turn_submit(InTurnSubmit(mode="do", text=cheat))
             else:
-                r = await interpret.run(self.session, cheat)
+                cmd = cheats.plain_command(cheat)               # D-115 (CHEAT-20): "Spawn Fredrick"
+                r = await cheats.execute(self.session, cmd) if cmd is not None else None
+                if r is None or r.untouched:
+                    r = await interpret.run(self.session, cheat)
                 replies += [out("cheat_result", OutCheat(persona_line=r.persona_line, ok=r.ok, detail=r.detail)),
                             out("view", OutView(view=self._view())), out("story", OutStory(entries=self._story()))]
         if act and say:
@@ -719,6 +722,15 @@ class GameService:
         if not replies:
             return [out("turn_rejected", OutTurnRejected(reason_code="empty", message=G.EMPTY_INPUT))]
         return replies
+
+    async def on_cheat_dictionary_get(self, msg):
+        from ..cheats import commands as cheats
+        from ..contracts.protocol import OutCheatDictionary
+        if self.session is None or self.session.store.meta("cheat_active") != "1":
+            return [out("cheat_dictionary", OutCheatDictionary(commands=[]))]
+        with self.session.store.transaction() as tx:
+            rows = cheats.dictionary(tx, self.session.pc_id, self.config.content_dir)
+        return [out("cheat_dictionary", OutCheatDictionary(commands=rows))]
 
     async def on_code_enter(self, msg):
         from ..cheats import commands as cheats

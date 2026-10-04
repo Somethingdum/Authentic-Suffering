@@ -36,7 +36,7 @@ INBOUND_ACTIONS = (
     "quickmake_pc", "run_new", "worldgen_cancel", "runs_list", "run_load", "run_delete", "run_save", "run_close",
     "turn_submit", "turn_cancel", "view_get", "story_get", "death_reveal", "new_life_here",
     "dev_get", "worlds_list", "world_export", "world_import", "settings_get", "settings_set", "code_enter",
-    "turn_compose",
+    "turn_compose", "cheat_dictionary_get",
 )
 
 OUTBOUND_ACTIONS = (
@@ -45,7 +45,7 @@ OUTBOUND_ACTIONS = (
     "runs", "run_deleted", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
     "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done", "code_result", "doom",
-    "activity",
+    "activity", "cheat_dictionary",
 )
 
 Screen = Literal["connect", "home", "wizard", "worldgen", "play", "dead"]
@@ -149,6 +149,21 @@ class InTurnCompose(Strict):
     say: str = Field(default="", max_length=2000)
     cheat: str = Field(default="", max_length=2000)
     to: list[str] = Field(default_factory=list)
+
+
+class CheatCommandHelp(Strict):
+    """D-115 (cheats.commands.dictionary, CHEAT-21): one command as the Cheat field's dictionary shows it."""
+    name: str
+    usage: str
+    meaning: str
+    example: str
+    slots: dict[str, list[str]] = Field(default_factory=dict, description="What each of its blanks can take.")
+
+
+class OutCheatDictionary(Strict):
+    """D-115: every command, for the Cheat field's autocomplete and dictionary — empty before the console opens
+    (CHEAT-03)."""
+    commands: list[CheatCommandHelp] = Field(default_factory=list)
 
 
 class InCodeEnter(Strict):
@@ -412,7 +427,7 @@ IN_MODELS: dict[str, type[Strict] | None] = {
     "run_close": None, "turn_submit": InTurnSubmit, "turn_cancel": None, "view_get": None, "story_get": None,
     "death_reveal": None, "new_life_here": InNewLifeHere, "dev_get": InDevGet, "worlds_list": None,
     "world_export": InWorldExport, "world_import": InWorldImport, "settings_get": None, "settings_set": InSettingsSet,
-    "code_enter": InCodeEnter, "turn_compose": InTurnCompose,
+    "code_enter": InCodeEnter, "turn_compose": InTurnCompose, "cheat_dictionary_get": None,
 }
 
 OUT_MODELS: dict[str, type[Strict] | None] = {
@@ -424,5 +439,6 @@ OUT_MODELS: dict[str, type[Strict] | None] = {
     "death": OutDeath, "doom": OutDoom, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
     "dev_data": OutDevData, "error": OutError, "worlds": OutWorlds, "world_file": OutWorldFile, "settings": OutSettings,
     "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone, "activity": OutActivity,
+    "cheat_dictionary": OutCheatDictionary,
     "code_result": OutCodeResult,
 }

@@ -162,6 +162,31 @@ into rules that do not exist, and nothing asked for is silently dropped.
 
 Everything is on the record like any command (§7), and the run is a Sandbox.
 
+### 3c. The command words without the slash, and the dictionary (D-115; CHEAT-20, CHEAT-21)
+
+The owner: "There needs to be an auto complete that shows all of the options, and a dictionary on that
+same menu so I don't get confused. I should also just be able to say 'Spawn Fredrick' in the cheats
+thing."
+
+- **A command word first is that command** (`cheats.commands.plain_command`). "Spawn Fredrick", "give
+  bandage 3 to Mara", "census" in the Cheat field are `/spawn Fredrick`, `/give bandage 3 to Mara`,
+  `/census` — at once, with no plain-words reading first. A command that takes nothing counts only as
+  the word alone ("off with his head" is not `/off`). When the command cannot happen ("kill the
+  lights": nobody is called "the lights") it leaves no trace at all and the line goes on to plain
+  words (§3b) as if it had never been tried — so the room still goes dark. The hard line (§8) is
+  refused and logged as typed, and goes no further.
+- **The autocomplete** (the Play screen's Cheat field, 10_UI §2.6): while the first word is typed, every
+  command that starts with it (an empty field: all of them), each with what it does; after a command,
+  everything its blanks can take that starts with what is being typed — the people your character knows
+  by name (and "me"), the places they know, every item, every group, every person in the packs and the
+  dead by type for `/spawn`, the stats, the weather, the strains — all of them, in a list that scrolls.
+  Picking one puts it in the line, in quotes when it has a space.
+- **The dictionary**, on the same menu: every command with its usage, what it does and an example, with
+  a filter; the one being typed is marked. `/wonder` appears only while the PC is Willis (§6b).
+- Both come from the server (`cheat_dictionary_get` → `cheat_dictionary`, read only), and only while the
+  console is open: before the word the list is empty and the client holds nothing (§2, CHEAT-03); a
+  closed console (`/off`) or another run clears it.
+
 ## 4. Names
 
 Names resolve against what your character knows first (people you know by name or description,
@@ -363,6 +388,8 @@ with a flat persona line and logged.
 | CHEAT-17 | A plain-words cheat is steps from a closed vocabulary, all checked before any runs, all in one transaction (one impossible step undoes the rest); an ambiguous one is asked back and changes nothing |
 | CHEAT-18 | What the world has no rules for is a show: seen by everyone there as the next moment begins, remembered, told, and reported as a show |
 | CHEAT-19 | Forced acts (a person or one of the dead does that and nothing else until it ends) and blasts (burns by distance, doors blown, a 180 dB bang) |
+| CHEAT-20 | A Cheat-field line whose first word is a command is that command (an argument-free command only as the word alone); one that cannot happen writes nothing at all and goes on to plain words; the hard line goes no further |
+| CHEAT-21 | The dictionary: every command (wonder only for the reality exception) with usage, meaning, example and the options of each blank, from what the PC knows and the packs hold; empty before the word; the autocomplete narrows it as the Boss types and quotes what has a space |
 
 ## 10. What changed from the source table (and why)
 
