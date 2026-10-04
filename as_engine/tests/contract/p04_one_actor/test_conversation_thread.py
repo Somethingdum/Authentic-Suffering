@@ -1,5 +1,6 @@
 """What was said here (D-117). Rules THREAD-01, THREAD-02 (mind/packet.py thread_lines, the budget;
-prompts/actor_cognition.user.j2), DOS-05 (action.resolve: a SPEECH writes its speaker's voice line).
+prompts/actor_cognition.user.j2), DOS-05 (action.resolve: a SPEECH writes its speaker's voice line), SEL-03
+owed_answer (turn/select.py).
 
 The owner: "I definitely need group dynamics, NPC interaction, conversations and what not buffed." Actor
 Spec §11: "Keep a short holder-specific conversation thread: delivered words, recognized speakers,
@@ -23,6 +24,7 @@ from as_engine.mind.affordance import enumerate_affordances
 from as_engine.mind.packet import build_packet, estimate_tokens
 from as_engine.physical import space
 from as_engine.prompts.render import render
+from as_engine.turn import select
 from as_engine.testing.scenario import load_scenario
 
 pytestmark = pytest.mark.phase(4)
@@ -187,3 +189,27 @@ def test_what_was_said_gives_way_after_memories_oldest_first(room):
     p = packet(w2, "june", t2 + MIN)
     assert [x.words for x in p.thread] == ["Second thing.", "Third thing."]
     assert p.omitted == ["thread: First thing."]
+
+
+# ------------------------------------------------------------------------- SEL-03 owed_answer
+
+
+def test_a_question_left_hanging_keeps_her_in_the_moment(room):
+    """Actor Spec §11: being addressed creates a decision opportunity — and it stays one until she answers."""
+    w = room()
+    t = now(w)
+    say(w, "mara", "June, where did you put the keys?", ["june"], t + 1000)
+
+    def owed(who, at):
+        with w.store.transaction() as tx:
+            perception.compile_scene(tx, w.id(who), at, 1)
+            cands = [w.id("june"), w.id("mara")]
+            return select.salience_flags(tx, w.id(who), cands, w.id("pc"), 1, at)["owed_answer"]
+    assert owed("june", t + MIN) is True
+    assert owed("mara", t + MIN) is False, "the one who asked owes nothing"
+    with w.store.transaction() as tx:
+        weights = tx.rules.scheduler.salience_weights
+    assert weights["owed_answer"] > 0 and select.salience({"owed_answer": True, "new_flag": True}, False, weights) == \
+        weights["owed_answer"], "a flag the weights do not name counts nothing"
+    own_line(w, "june", "Hook by the door.", t + 2000)
+    assert owed("june", t + MIN) is False

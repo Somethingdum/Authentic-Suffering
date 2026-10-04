@@ -213,6 +213,11 @@ the 58-bit gate. Keep doing this for every phase: build a world, play it, read w
   touch or smell sense at arm's length — a content/rules question, not a bug.
 - Hostile-human openings do nothing with the fake model (it keeps everyone waiting); with real
   models the raiders decide. The live suite should play one.
+- Three tables are declared and owned but nothing writes them (a sweep after D-117 found that
+  `voice_lines` was one more, now fixed): `conditions` (the generic condition model, superseded by the
+  condition columns of bodies and items), `lots` (production lots: the economy counts stores instead)
+  and `blobs` (the annex for event payloads over 64K characters, commit gate E14/E15/G13: nothing that
+  large is written yet). Leave them unless a feature needs them; do not build against them.
 
 ## 5. P11 built; P12 partly built
 

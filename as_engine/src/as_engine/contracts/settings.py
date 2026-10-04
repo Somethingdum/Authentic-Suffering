@@ -239,7 +239,7 @@ class SchedulerRules(Strict):
     salience_weights: dict[str, float] = Field(default_factory=lambda: {
         "mandatory": 100.0, "unique_info": 3.0, "loudest_percept": 2.0, "addressed": 4.0, "in_conflict": 3.0,
         "interrupt_trigger": 5.0, "open_loop_with_pc": 1.0, "dependent_present": 1.0, "visible_to_pc": 1.0,
-        "grievance_near": 3.0,
+        "grievance_near": 3.0, "owed_answer": 3.0,
     })
 
 

@@ -80,8 +80,13 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     grievance_near    (H1) another living body in its place toward which mind.temper.heat(tx, actor,
                       it, at) >= max(1, mind.temper.threshold(tx, actor) // 2), or about which it has
                       an open 'grudge' loop (subject_ids) — someone it can hardly stand is right there.
+    owed_answer       (D-117, Actor Spec §11: being addressed creates a decision opportunity — and it
+                      stays one until answered) mind.packet.thread_lines(tx, actor_id, turn_index, at,
+                      names = the body id itself, the run's PacketRules) holds a line marked unanswered:
+                      a question put to it here, earlier, that it has not answered.
 SEL-04 salience(flags, is_mandatory, weights) -> float
-  sum(weights[flag] for true flags) + weights['mandatory'] when mandatory (SchedulerRules
+  sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written
+  before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules
   .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by actor id).
 
 HOR-01 horizon(tx, pc_intent, t0) -> int   (the end of the simulation window, ms)

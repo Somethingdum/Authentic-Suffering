@@ -193,7 +193,10 @@ window; the PC's intent targets it.
 Salience = Σ `SchedulerRules.salience_weights` over the true flags: `unique_info` (holds a
 PARTIAL+ percept no other candidate holds), `loudest_percept`, `addressed`, `in_conflict`,
 `interrupt_trigger` (a standing order's trigger crossed), `open_loop_with_pc`,
-`dependent_present`, `visible_to_pc`. Ties break by actor id.
+`dependent_present`, `visible_to_pc`, `grievance_near` (H1: someone they can hardly stand is right
+there), `owed_answer` (D-117: a question put to them here earlier that they have not answered — being
+asked stays a reason to decide until they answer, Actor Spec §11). A flag the weights do not name counts
+nothing. Ties break by actor id.
 
 ## 4. Failure, rollback and degradation
 

@@ -147,13 +147,15 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
             if _tm.heat(tx, actor_id, r[0], at) >= need or any(r[0] in g for g in grudges):
                 griev = True
                 break
+    from ..mind.packet import thread_lines
+    owed = any(x.unanswered for x in thread_lines(tx, actor_id, turn_index, at, lambda b: b, tx.rules.packet))
     return {"unique_info": unique, "loudest_percept": loudest, "addressed": addressed, "in_conflict": in_conflict,
             "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis,
-            "grievance_near": griev}
+            "grievance_near": griev, "owed_answer": owed}
 
 
 def salience(flags, is_mandatory, weights):
-    s = sum(weights[k] for k, v in flags.items() if v)
+    s = sum(weights.get(k, 0.0) for k, v in flags.items() if v)
     if is_mandatory:
         s += weights["mandatory"]
     return float(s)
