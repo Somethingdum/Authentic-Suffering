@@ -76,6 +76,9 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   RumourDistortion), ctx=ctx); resp = await client.call(request, RumourDistortion) (no repair).
   A final parse_status other than 'ok' -> JobResult(failed=True) (committed as nothing).
 BG-04 commit(tx, job, result, at, turn_index) -> list[Event]   (its own transaction, between turns)
+  (D-125) Last, action.cascade.sweep(tx, every event committed above, the canon cascade rules, at,
+  turn_index) — a promise kept or broken in the quiet hours is answered (replay re-commits through
+  here, so it is answered the same way again).
   First every pair of result.calls is recorded with lanes.calllog.record(tx, request, response)
   (turn_index T: every model call is logged, a failed one too). result.failed -> nothing else is
   written, []. Returns every event committed, in seq order.

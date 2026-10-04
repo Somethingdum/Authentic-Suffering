@@ -529,6 +529,7 @@ async def after_commit(ctx, notices):
             at = clock.now(tx)
             cue_ids = [c.id for c in _cues(store)]
             from ..mind.memory import finish_writeback
+            wb_first = _max_seq(tx)
             wb_failed = []
             for g in groups:
                 r = wres[g[0]]
@@ -544,6 +545,8 @@ async def after_commit(ctx, notices):
                 out = WritebackOutput.model_validate(r.parsed)
                 apply_writeback(tx, pk.holder_id, out, pk, at, T, cue_ids=cue_ids)
                 finish_writeback(tx, key, True, at, T)
+            from ..action import cascade as _cascade                  # D-125: a promise kept or broken is answered
+            _cascade.sweep(tx, _events_after(tx, wb_first), tx.canon.all("cascade"), at, T)
             _ledger(tx, T, 14, "degraded" if wb_failed else "ok", {"groups": groups, "failed": wb_failed})
         # 15 audits: the leak scan (a query)
         await _progress(ctx, 15)

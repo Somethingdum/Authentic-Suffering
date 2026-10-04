@@ -245,7 +245,9 @@ def commit(tx, job, result, at, turn_index):
                                                           "standing_orders": orders, "updated_at": at}),
                                       WriteRecord(op=WriteOp.UPDATE, table="actors", key={"actor_id": actor},
                                                   values={"goal_text": out.plan_goal})]))
+    from ..action import cascade
     from ..action._impl_p5b import _events_since
+    cascade.sweep(tx, _events_since(tx, first), tx.canon.all("cascade"), at, turn_index)   # D-125
     return _events_since(tx, first)
 
 

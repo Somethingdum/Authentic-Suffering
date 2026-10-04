@@ -202,8 +202,11 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
     'degraded', 14, 'MEM-02', {holders: [the packet's holder], status}) and that group writes
     nothing but (B5, MEM-19) mind.memory.finish_writeback(tx, its job key, False, now, T);
     otherwise mind.memory.apply_writeback(tx, holder, WritebackOutput, its packet, now, T,
-    cue_ids=…) then finish_writeback(tx, its job key, True, now, T). Ledger 14 'degraded' when a
-    group failed, else 'ok'; detail {groups, failed: the first entries of the failed groups}.
+    cue_ids=…) then finish_writeback(tx, its job key, True, now, T). (D-125) Then
+    action.cascade.sweep(tx, every event the groups committed, the canon cascade rules, now, T) —
+    a promise kept or broken (PROMISE_KEPT / PROMISE_BROKEN, closed by a writeback) is answered like
+    anything else. Ledger 14 'degraded' when a group failed, else 'ok'; detail {groups, failed: the
+    first entries of the failed groups}.
   S15 audits: the leak scan (a query): claim_holdings rows with acquired_at >= t0 and provenance
     != 'inferred' whose holder has no percept_log row for acquired_via ->
     audit.log.record(tx, 'G15-leak', 'mind.perception', 'fail' | 'pass', [{holder_id, claim_id}],

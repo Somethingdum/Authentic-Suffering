@@ -428,6 +428,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_bite_seen.py` | Hal is bitten in the yard in the light with Mae beside him: the settlement that saw is Pumpwell (Hal's own bite is no sighting; Owen belongs nowhere) and its quarantine law comes into force for Hal (CAS-015). With Mae in the shed nobody of the settlement saw it: nothing. A settlement without the law: nothing, and no warning — not having the law is not a fault |
 
+### 3.39 Promises answered (P7; D-125)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_promises_answered.py` | Through a turn: June's writeback says Mara broke her promise — June trusts Mara 2 less and holds a grudge (CAS-011) in that same turn; says she kept it — Mara gets a little Resolve back (CAS-029). In the quiet hours: Mara's reflection decides Eli broke his — answered there too (BG-04) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
