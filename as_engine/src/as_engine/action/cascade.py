@@ -37,6 +37,18 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
     body(<path>)                              (D-123) the body itself (none when there is no such body)
+    hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
+                                              (trigger.attacker present): the one hurt — never the
+                                              player's character (what they feel is theirs, C06)
+    assault_onlookers_of(<path>)              (D-126) for such a HARM: the holders of a visual EXACT or
+                                              PARTIAL percept of it who also saw who did it (as
+                                              onlookers_of), never the attacker, the one hurt or the PC
+    threatened_by(<path>)                     (D-126) for a SPEECH: the holders of a speech percept of
+                                              it addressed to them with the weapon on them (detail
+                                              addressed_to_me and armed_at_me) whose words, as heard, are
+                                              a threat in themselves (mind.firewall.classify_form without
+                                              the weapon: "or I'll", "I'll kill you" — an armed "Quiet."
+                                              is not one); never the speaker or the PC
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)
@@ -231,6 +243,9 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     'everyone'; false otherwise; missing when there is no killer; (D-123) trigger.killer_first —
     true when no DEATH committed before this one has the same trigger.killer, false otherwise,
     missing when there is no killer; body(<path>).<column> — a bodies column (age_years, kind, ...),
+    (D-126) trigger.attacker — for a HARM: its actor (payload actor_id, else the event's), when that and
+    the one hurt both have actors rows and differ; otherwise missing — and trigger.attacker_provoked —
+    true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

@@ -440,6 +440,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_nobody_is_a_template.py` | GEN-01: twenty adults of one settlement and one trade have twenty different voices and inner lives, and each part of them varies on its own; a child's lines are a child's, with no swearing, dialect or secret; nobody born after the Fall lost family in its first week; a thousand people of every age are valid (CNT-10) and child-safe (CNT-11); the same seed is the same person |
 
+### 3.41 Being hurt leaves a mark (P9; D-126)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_being_hurt.py` | Owen hits Alice for nothing with Mara watching: Alice trusts him 2 less, fears him 1 more and holds it against him (CAS-036); Mara trusts him 1 less and tells it (CAS-037). A fight Alice started: nothing. Mara hits Owen: nothing is written into Owen (C06), and Alice, watching, judges Mara. Owen with his Glock: "Quiet." is no threat to remember; "Hand it over or I'll shoot you." leaves Alice afraid of him (CAS-038) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

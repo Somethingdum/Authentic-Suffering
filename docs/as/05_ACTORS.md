@@ -294,6 +294,7 @@ makes the snap, when it comes, code's act:
 - **Stress** (`actors.stress` 0–10) is what wears a person down: seeing someone die (more the closer
   they were, CAS-019), hunger, thirst and exhaustion past the first pangs (CAS-020), being struck or
   threatened, seeing their people hurt. A night's unbroken sleep takes the edge off, on waking (CAS-021).
+- **What lasts** (D-126): anger fades, but being hurt by someone you were not fighting costs them your trust, leaves you afraid of them and holding a grudge (CAS-036); seeing it costs the attacker your trust and you tell it (CAS-037); a threat made at weapon point leaves you afraid (CAS-038). Never written into the player's character.
 - **Temper** (dossier `temper`: `fuse` 1–5, `outlet` fists / words / cold / flight / tears,
   `grudge` 0–3, `pet_peeves`, `cools_down_by`) is how this person breaks. It is on their card
   ("What sets you off").

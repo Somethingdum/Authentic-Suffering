@@ -256,3 +256,57 @@
       payload: {cause: killed_child}
   delay_s: 0
   cites: [D-123, docs/as/05_ACTORS.md#5]
+# D-126 — being hurt leaves a mark (the owner: "If I treat them like shit, or do something just absolutely evil.
+# I do expect reactions, and proper ones."). Anger at a blow fades by the hour (TEMPER-02); what it does to trust
+# and fear does not. Only for someone who was not fighting a person (trigger.attacker_provoked == false); the
+# player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-036
+  description: Being hurt by someone you were not fighting costs them your trust, makes you afraid of them, and you hold it against them.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.attacker_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: hurt_by_someone(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -2, cause: hurt_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: hurt_by_someone(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: fear, delta: 1, cause: hurt_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: hurt_by_someone(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.attacker", text: "{subject} hurt you, and you were not fighting them.", strength: 2}
+  delay_s: 0
+  cites: [D-126, TEMPER-02, docs/as/05_ACTORS.md#7.1]
+- schema: as.cascade.v1
+  id: CAS-037
+  description: Seeing someone hurt a person who was not fighting them costs the attacker the onlookers' trust, and the story travels.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.attacker_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: saw_them_hurt_someone}
+    - kind: create_rumour
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.attacker", claim: hurt_someone}
+  delay_s: 0
+  cites: [D-126, docs/as/06_WORLD.md#6]
+- schema: as.cascade.v1
+  id: CAS-038
+  description: A threat made with a weapon in hand leaves whoever it was made to afraid of the one who made it.
+  trigger_event: SPEECH
+  where: {armed: true}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: threatened_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: threatened}
+  delay_s: 0
+  cites: [D-126, TEMPER-03]

@@ -629,6 +629,11 @@ def _path(tx, path, trig):
         if k is None:
             return _MISSING
         return k[0] if path == "trigger.killer" else k[1]
+    if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
+        a = _assault(tx, trig)
+        if a is None:
+            return _MISSING
+        return a[0] if path == "trigger.attacker" else a[1]
     if path == "trigger.killer_first":                             # D-123
         k = _killing(tx, trig)
         if k is None:
@@ -689,15 +694,33 @@ def _killing(tx, trig):
     killer = blow["actor_id"]
     if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (killer,)) is None:
         return None
-    lo = blow["at"] - 10 * 60_000
-    person = "(SELECT actor_id FROM actors WHERE actor_id != :dead)"
-    provoked = tx.query_one(
-        "SELECT 1 FROM events WHERE actor_id=:dead AND at>=:lo AND at<=:at AND ("
+    return killer, _was_fighting(tx, dead, blow["at"]), blow["event_id"]
+
+
+def _was_fighting(tx, who, until):
+    """D-119 / D-126: in the 10 minutes up to ``until`` ``who`` harmed a person, started an attack at one, or
+    spoke armed to one or to everyone."""
+    person = "(SELECT actor_id FROM actors WHERE actor_id != :who)"
+    return tx.query_one(
+        "SELECT 1 FROM events WHERE actor_id=:who AND at>=:lo AND at<=:at AND ("
         f"(type='HARM' AND json_extract(payload, '$.body_id') IN {person}) OR "
         f"(type='ACTION_START' AND json_extract(payload, '$.verb')='attack' AND json_extract(payload, '$.target_id') IN {person}) OR "
         "(type='SPEECH' AND json_extract(payload, '$.armed')=1 AND EXISTS (SELECT 1 FROM json_each(json_extract(payload, '$.to')) "
-        f"WHERE value='everyone' OR value IN {person}))) LIMIT 1", {"dead": dead, "lo": lo, "at": blow["at"]}) is not None
-    return killer, provoked, blow["event_id"]
+        f"WHERE value='everyone' OR value IN {person}))) LIMIT 1", {"who": who, "lo": until - 10 * 60_000, "at": until}) is not None
+
+
+def _assault(tx, trig):
+    """D-126: (attacker, provoked) for a HARM one person did to another, else None."""
+    if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "HARM":
+        return None
+    pl = trig.payload or {}
+    victim, attacker = pl.get("body_id"), pl.get("actor_id") or trig.actor_id
+    if not attacker or attacker == victim:
+        return None
+    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (attacker,)) is None or \
+            tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (victim,)) is None:
+        return None
+    return attacker, _was_fighting(tx, victim, trig.at)
 
 
 _WOUND_DEATHS = ("blood_loss", "head_wound", "neck_wound", "harm")
@@ -789,6 +812,41 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "hurt_by_someone":                                      # D-126: the one hurt, never the PC
+        a = _assault(tx, trigger)
+        victim = (trigger.payload or {}).get("body_id")
+        from ..society._impl_society import _controller
+        return [victim] if a is not None and _controller(tx, victim) != "human" else []
+    if fn == "assault_onlookers_of":                                 # D-126
+        from ..sense.optics import visibility
+        from ..society._impl_society import _controller
+        a = _assault(tx, trigger)
+        if a is None:
+            return []
+        attacker, victim = a[0], (trigger.payload or {}).get("body_id")
+        out = []
+        for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                             "fidelity IN ('exact','partial') ORDER BY holder_id", (v,)):
+            if h in (attacker, victim) or _controller(tx, h) == "human":
+                continue
+            named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity "
+                                 "IN ('exact','partial') AND at>=? AND at<=?", (h, attacker, trigger.at - 10_000, trigger.at))
+            if named is not None or visibility(tx, h, attacker, trigger.at) in ("clear", "partial"):
+                out.append(h)
+        return out
+    if fn == "threatened_by":                                        # D-126: a threat at weapon point
+        from ..mind.firewall import classify_form
+        from ..society._impl_society import _controller
+        out = []
+        for h, det in tx.query("SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' ORDER BY "
+                               "holder_id", (v,)):
+            d = json.loads(det) if isinstance(det, str) else (det or {})
+            if not (d.get("addressed_to_me") and d.get("armed_at_me")) or h == trigger.actor_id or _controller(tx, h) == "human":
+                continue
+            form = classify_form(d.get("words") or "")
+            if (form.value if hasattr(form, "value") else form) == "threat":
+                out.append(h)
+        return sorted(set(out))
     if fn == "settlements_seeing":                                   # D-124
         from ..society._impl_society import settlement_of as _stl_of
         dead = (trigger.payload or {}).get("body_id")
