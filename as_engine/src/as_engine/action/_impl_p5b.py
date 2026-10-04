@@ -842,6 +842,15 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn in ("onlookers_of_act", "onlookers_bonded_to_target"):   # D-133
+        from ..society._impl_society import _controller
+        out = [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                      "fidelity IN ('exact','partial') ORDER BY holder_id", (v,))
+               if h != trigger.actor_id and _controller(tx, h) != "human"]
+        if fn == "onlookers_bonded_to_target":
+            tgt = (trigger.payload or {}).get("target_id")
+            out = [h for h in out if tgt and h != tgt and _bonded_to(tx, h, tgt)]
+        return out
     if fn == "robbed_by":                                            # D-129: they saw what is theirs taken
         from ..society._impl_society import _controller
         return [h for h in _theft_victims(tx, v) if _controller(tx, h) != "human"]

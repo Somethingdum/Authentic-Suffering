@@ -405,3 +405,70 @@
       payload: {cause: made_to_watch}
   delay_s: 0
   cites: [D-129, docs/as/05_ACTORS.md#5]
+# D-133 — eating the dead (the owner: "If I ... do something just absolutely evil. I do expect reactions, and proper
+# ones."). Whoever sees someone cut meat from a person's body trusts them less, is afraid of them, is shaken, and tells
+# it; whoever loved the dead never forgives it; the one who does it carries it, whoever they are.
+- schema: as.cascade.v1
+  id: CAS-045
+  description: Seeing someone cut meat from a person's body costs them your trust, leaves you afraid of them and shaken, and the story travels.
+  trigger_event: ACTION_START
+  where: {def_id: butcher_human}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: ate_the_dead}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: ate_the_dead}
+    - kind: adjust_stress
+      target: onlookers_of_act(trigger.event_id)
+      amount: 2
+    - kind: create_rumour
+      target: onlookers_of_act(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: ate_the_dead}
+  delay_s: 0
+  cites: [D-133]
+- schema: as.cascade.v1
+  id: CAS-046
+  description: Seeing someone cut meat from the body of someone you loved is never forgiven.
+  trigger_event: ACTION_START
+  where: {def_id: butcher_human}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} cut meat from the body of someone you loved.", strength: 3}
+  delay_s: 0
+  cites: [D-133]
+- schema: as.cascade.v1
+  id: CAS-047
+  description: Whoever cuts meat from a person's body carries it afterwards, whatever drove them to it.
+  trigger_event: ACTION_START
+  where: {def_id: butcher_human}
+  preconditions: []
+  effects:
+    - kind: adjust_stress
+      target: actor(trigger.actor_id)
+      amount: 2
+    - kind: drain_resolve
+      target: actor(trigger.actor_id)
+      payload: {cause: self_disgust}
+  delay_s: 0
+  cites: [D-133, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-048
+  description: Hearing, from someone they believe, that a person cut meat from the dead costs that person the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: ate_the_dead, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: actor(trigger.payload.listener_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
+  delay_s: 0
+  cites: [D-133, INFO-02]

@@ -37,6 +37,12 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
     body(<path>)                              (D-123) the body itself (none when there is no such body)
+    onlookers_of_act(<path>)                  (D-133) the holders of a visual EXACT or PARTIAL percept of
+                                              the event, never its actor or the PC (what the player's
+                                              character feels is theirs, C06)
+    onlookers_bonded_to_target(<path>)        (D-133) of onlookers_of_act, those bonded to the event's
+                                              payload target_id (affection >= 1 toward it, or one
+                                              household)
     robbed_by(<path>)                         (D-129) for an ITEM_TRANSFER: of theft_witnesses_of, those
                                               whose believed owner of the item is themselves or one of
                                               their households (and not the taker's own, as there) —

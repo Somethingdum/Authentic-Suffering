@@ -284,7 +284,7 @@ def _turn(tx):
 
 
 # ------------------------------------------------------------------ legality
-_DEAD_OK = {"smear_gore", "strip_clothing", "finish_downed", "watch_target", "infected_bite", "butcher_carcass"}
+_DEAD_OK = {"smear_gore", "strip_clothing", "finish_downed", "watch_target", "infected_bite", "butcher_carcass", "butcher_human"}
 
 
 def _legal(tx, intent, land_at):
@@ -1189,13 +1189,13 @@ def h_butcher(tx, rng, intent, land_at, ctx, d):
     b = _body(tx, t)
     special = _j.loads(b["special"]) if isinstance(b["special"], str) else (b["special"] or {})
     blade = any("blade" in _idef(tx, it).tags for it in _held(tx, intent.actor_id))
-    if b is None or b["kind"] != "animal" or b["alive"] or special.get("butchered") or not blade:
+    if b is None or b["kind"] not in ("animal", "human") or b["alive"] or special.get("butchered") or not blade:
         return _done("nothing_to_butcher")
-    an = tx.canon.get(b["content_ref"])
+    portions = tx.canon.get(b["content_ref"]).meat_portions if b["kind"] == "animal" else max(1, b["mass_kg"] // 10)   # D-133
     pos = _pos(tx, t)
     meat = None
-    if an.meat_portions > 0:
-        ev = create(tx, "core:item/raw_meat", an.meat_portions, Holder(kind="place", id=pos["place_id"], anchor_id=pos["anchor_id"]),
+    if portions > 0:
+        ev = create(tx, "core:item/raw_meat", portions, Holder(kind="place", id=pos["place_id"], anchor_id=pos["anchor_id"]),
                     "craft", {}, land_at, ctx.start_event_id, ctx.turn_index)
         meat = ev.payload["item_id"]
     tx.commit_event(Event(type=EventType.BODY_CONDITION, writer="physical.bodies", at=land_at, turn_index=ctx.turn_index,

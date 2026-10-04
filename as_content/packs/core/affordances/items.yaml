@@ -178,6 +178,21 @@
   noise_db: 30
   effect: butcher
   tags: [food, work]
+# D-133: meat from a person's body. Nothing in the world allowed it, though eat_human was always a line a person
+# could refuse to cross (the moral gate takes it off the menu of anyone who would never); the hungry can.
+- schema: as.affordance.v1
+  id: butcher_human
+  verb: manipulate
+  label: "Cut meat from {target}'s body (about {duration})"
+  ui_label: "Cut meat from {target}'s body"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, held_item_tags: [blade], target_kinds: [human], target_alive: false}
+  moral_tags_if_target: {human: [eat_human]}
+  duration: {base_s: 900}
+  noise_db: 30
+  effect: butcher
+  tags: [food, work]
 # W1 (D-77): the wet strain's compulsion — never on a menu (reflex_only); turn.cognition builds them.
 - schema: as.affordance.v1
   id: spit_into

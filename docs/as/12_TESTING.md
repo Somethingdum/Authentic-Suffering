@@ -476,6 +476,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_putting_down_the_dead.py` | June is dead; a minute later Alice destroys her head, as everyone must: no attacker, no onlookers of an assault, no grudge for Mara who loved her, no rumour, no lost trust; no anger at Alice and no 'bonded_hurt' for Mara. The blow that kills still lands on someone alive |
 
+### 3.47 Eating the dead (P9; D-133)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_eating_the_dead.py` | Alice, a knife in hand by June's body, is offered to cut meat from it, and the body gives raw meat by its mass; Owen and Mara watch: Mara (never Owen) trusts Alice 2 less, fears her, is shaken and tells it, and — she loved June — holds a grudge of strength 3; Alice carries it (stress, Resolve). Shoving someone to the dead (CAS-022) is never written into Owen |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

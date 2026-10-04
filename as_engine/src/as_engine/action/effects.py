@@ -42,7 +42,7 @@ Legality at landing (EFF-02) — the state as it stands NOW (earlier landings al
                  destination not in the actor's place
   'target_dead'  a body target that is dead (alive 0), for every def except finish_downed,
                  watch_target and (I1) infected_bite (the dead feed on the dead: world.infected,
-                 rule INF-16) and butcher_carcass, and (F1c) smear_gore and strip_clothing
+                 rule INF-16) and butcher_carcass (and D-133 butcher_human), and (F1c) smear_gore and strip_clothing
   'item_gone'    the bound item is no longer where it was bound (held/carried by the actor for
                  item_held / item_carried; lying at the bound place/anchor for item_reachable;
                  inside the container for take_from)
@@ -273,10 +273,12 @@ Per effect (result strings in quotes; 'done' unless noted):
                      passing mark by someone else -> 'mouth_contact_item' as above (food a host
                      ate from carries it as a bottle does); and an eater at a saliva-infectious
                      stage marks the food it ate from (objects.contaminate, passing).
-  butcher            (I1) the target is a dead animal body (bodies.kind 'animal', alive 0) that has
+  butcher            (I1) the target is a dead animal body (bodies.kind 'animal', alive 0) — or (D-133,
+                     butcher_human) a dead human body — that has
                      not been butchered (bodies.special has no 'butchered') and the actor holds an
                      item tagged 'blade' in a hand — else 'nothing_to_butcher'. meat = the AnimalDef's
-                     meat_portions (canon, by bodies.content_ref); objects.create(core:item/raw_meat,
+                     meat_portions (canon, by bodies.content_ref); a person's: max(1, mass_kg // 10)
+                     — the meat is raw_meat like any other: nobody can tell it apart; objects.create(core:item/raw_meat,
                      qty = meat, on the floor at the carcass's point (its anchor, else its place),
                      origin 'craft', props {} ...); then BODY_CONDITION {body_id, butchered: true}
                      (writer 'physical.bodies', cause = the start event) updating bodies.special
@@ -466,6 +468,7 @@ SEEN: dict[str, str | None] = {
     "infected_grab": "lunges and grabs at {target}",
     "infected_bite": "sinks its teeth into {target}",
     "butcher_carcass": "cuts into {target} with a knife",
+    "butcher_human": "cuts meat from {target}'s body",          # D-133
     "spit_into": "leans low over {item}",
     "spit_in_mouth": "bends over {target}'s sleeping face",
     "wash_self": "washes with {item}",
