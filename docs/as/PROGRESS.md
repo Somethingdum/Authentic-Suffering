@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 1979 passed (1986 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 1989 passed (1996 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -86,10 +86,11 @@ do nothing.
    lane B, and their spoken lines come from B too. For every spoken line from A, set
    `regimes.actor_cognition.lane: A` and `regimes.actor_reaction.lane: A` — minutes per person at 5 tokens a
    second. Left alone: B voices the lesser people.
-4. **The UI shows no live model progress yet** (thinking / writing / how long): with a 5-tokens-a-second
-   Writer a turn is minutes of a still screen. The engine reports it (LANE-11); the Play UI does not show it.
-5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 — 61 pass, 101 fail, exactly as
-   before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
+4. ~~The UI shows no live model progress~~ — done while you were away (D-114): the loading bar now says what
+   the models are doing ("Thinking · 2 min") and speaks up when one goes quiet. Nothing for you to do; look at
+   it on your first long move and say if the words are wrong.
+5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 / D-114 — 65 pass (4 new), 101
+   fail, exactly as before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
    home, store, socket). The repo itself has no vitest toolchain yet (13_BUILD_ORDER P8).
 
 ## Notes (builder)

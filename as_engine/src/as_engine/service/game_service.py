@@ -189,6 +189,10 @@ Handlers (P8):
           pushes its plan (quips_for(store.canon, 'quiet_hours')) before catch_up, step('quiet',
           'jobs', done=done, total=total) on each catch_up progress call, and done(True) after it
           (done(False) when it raised or was cancelled).
+        Activity (D-114, PROG-08): while catch_up runs, session.client.on_progress is the quiet hours'
+          ActivityFeed(f"quiet_hours-{T}", 'quiet_hours', push2, config.lanes) — only when the quiet
+          hours have a bar — and while run_turn runs, an ActivityFeed(f"turn-{T}", 'turn', push2,
+          config.lanes); each is flushed before its bar's done, and on_progress is restored after.
         Progress v2: tr = Tracker('turn', f"turn-{T}"); await tr.plan(quips_for(store.canon,
           'turn')) just before run_turn; from then on the progress callback above also awaits
           tr.step(*service.progress.TURN_STAGES[stage]) for every stage in TURN_STAGES (the quiet

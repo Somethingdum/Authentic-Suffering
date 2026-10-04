@@ -16,6 +16,8 @@ P12 intake / import / quick-make). docs/as/10_UI.md §4 is the client side.
 P10 adds the loading bar (service.progress, PROG-01..07): progress_plan, then progress while the
 job runs, then progress_done — pushed for worldgen, a turn and the quiet hours (P12: a time skip)
 alongside the older turn_progress / worldgen_progress, which stay as they are.
+D-114 adds activity (PROG-08) while a turn or the quiet hours wait on a model: what the models are doing —
+waiting, reading, thinking, writing — how long, and how long they have been quiet; never who or how many.
 """
 
 from __future__ import annotations
@@ -43,6 +45,7 @@ OUTBOUND_ACTIONS = (
     "runs", "run_deleted", "run_loaded", "saved", "turn_progress", "turn_result", "turn_rejected", "guide_answer",
     "view", "story", "death", "cheat_activated", "cheat_result", "lanes_status", "dev_data", "error",
     "worlds", "world_file", "settings", "progress_plan", "progress", "progress_done", "code_result", "doom",
+    "activity",
 )
 
 Screen = Literal["connect", "home", "wizard", "worldgen", "play", "dead"]
@@ -236,6 +239,21 @@ class OutProgress(Strict):
     detail: str | None = Field(default=None, description="Developer mode only (PROG-05).")
 
 
+class OutActivity(Strict):
+    """D-114 (service.progress PROG-08): what the models are doing right now, under the bar — never who, which
+    lane or how many (PROG-05)."""
+    job_id: str
+    kind: Literal["worldgen", "turn", "quiet_hours", "time_skip"]
+    phase: Literal["idle", "waiting", "reading", "thinking", "writing"]
+    call_s: float = Field(ge=0, description="How long the longest call in flight has run.")
+    quiet_s: float = Field(ge=0, description="Seconds since the newest sign of life from any call in flight.")
+    slow: bool = Field(default=False, description="A call is past its expected time (never a limit).")
+    reading_pct: float | None = Field(default=None, ge=0, le=100, description="How far the prompt read is, when "
+                                      "the server reports it.")
+    stall_in_s: float | None = Field(default=None, ge=0, description="Seconds of further silence before the stall "
+                                     "watchdog ends a call (LANE-10); None when no window applies.")
+
+
 class OutProgressDone(Strict):
     job_id: str
     kind: Literal["worldgen", "turn", "quiet_hours", "time_skip"]
@@ -405,6 +423,6 @@ OUT_MODELS: dict[str, type[Strict] | None] = {
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,
     "death": OutDeath, "doom": OutDoom, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,
     "dev_data": OutDevData, "error": OutError, "worlds": OutWorlds, "world_file": OutWorldFile, "settings": OutSettings,
-    "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone,
+    "progress_plan": OutProgressPlan, "progress": OutProgress, "progress_done": OutProgressDone, "activity": OutActivity,
     "code_result": OutCodeResult,
 }

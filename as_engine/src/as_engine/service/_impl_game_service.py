@@ -494,26 +494,40 @@ class GameService:
             await progress(0, _bgmod().QUIET_HOURS, 0.0)
             if live["quiet"] is not None:
                 await live["quiet"].step("quiet", "jobs", done=done, total=total)
+        prev_on_progress = s.client.on_progress
         try:
             if self.config.background_cognition:
+                qfeed = None
                 if _bgmod().pending(s.store, T - 1):
                     live["quiet"] = pv2.Tracker("quiet_hours", f"quiet_hours-{T}", push_v2, dev=dev)
                     await live["quiet"].plan(pv2.quips_for(s.store.canon, "quiet_hours"))
+                    qfeed = pv2.ActivityFeed(f"quiet_hours-{T}", "quiet_hours", push_v2, s.config.lanes)
+                    s.client.on_progress = qfeed.seen
                 try:
                     await self.background.catch_up(s, quiet_progress)
                 except BaseException:
                     if live["quiet"] is not None:
+                        await qfeed.flush()
                         await live["quiet"].done(False)
                     raise
+                finally:
+                    s.client.on_progress = prev_on_progress
                 if live["quiet"] is not None:
+                    await qfeed.flush()
                     await live["quiet"].done(True)
             await tr.plan(pv2.quips_for(s.store.canon, "turn"))
             live["turn"] = True
+            feed = pv2.ActivityFeed(f"turn-{T}", "turn", push_v2, s.config.lanes)
+            s.client.on_progress = feed.seen
             try:
                 o = await pipeline.run_turn(s, msg, progress)
             except BaseException:
+                await feed.flush()
                 await tr.done(False)
                 raise
+            finally:
+                s.client.on_progress = prev_on_progress
+            await feed.flush()
             await tr.done(o.ok)
             if o.ok:
                 if o.doom:

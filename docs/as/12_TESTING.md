@@ -353,6 +353,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p05_many_actors/test_reactions_cascade_plan.py` (amended) | HOT goes to `hot_cognition.lane` (A by default; B when the owner sets it) and WARM to the actor-cognition lane; with the Clerk down WARM moves to the Writer (DEGRADE-01); WARM never spills onto the Writer to balance load |
 | `p07_slice/test_hot_lane_schema.py` | a HOT call's JSON schema is sent with thinking on only when its OWN lane supports it |
 
+### 3.28 The models at work under the bar (P10; D-114)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_activity.py` | PROG-08: `activity()` takes the furthest phase, the longest call, the newest sign of life, the reading percentage and the time left before the stall watchdog, and says nothing of lanes, calls or counts; the window read from a snapshot is the transport's own (LANE-10); the feed pushes on a change and otherwise every two seconds, ending idle. LANE-11: two clients over one transport each see only their own calls, and the end of a call is reported as None. Through the service: a turn's activity is valid, its own, ends idle before its bar closes; the quiet hours' job clients pass theirs on (BG-03) |
+| UI `loading_bar.spec.js` (amended) | the activity line and the quiet line (10_UI §2.10) |
+
 ### 3.27 The limits bench (tools; D-112)
 
 | File | What it proves |

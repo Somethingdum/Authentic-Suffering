@@ -15,13 +15,15 @@
     <span data-testid="bar-elapsed">{{ TEXT.barElapsed(bar.elapsed) }}</span>
     <span v-if="bar.eta != null" data-testid="bar-eta">{{ TEXT.barEta(bar.eta) }}</span>
     <p v-if="quip" data-testid="bar-quip" class="bar-quip">{{ quip }}</p>
+    <p v-if="doing" data-testid="bar-doing" class="bar-doing">{{ doing }}</p>
+    <p v-if="quiet" data-testid="bar-quiet" class="bar-quiet" role="status">{{ quiet }}</p>
     <p v-if="bar.detail" data-testid="bar-detail">{{ bar.detail }}</p>
   </section>
 </template>
 
 <script setup>
 import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
-import { QUIP_MS, nextQuip, quipLines } from '../quips.js'
+import { QUIET_WARN_S, QUIP_MS, nextQuip, quipLines } from '../quips.js'
 import { TEXT } from '../words.js'
 
 const props = defineProps({
@@ -39,6 +41,14 @@ const stepLabel = computed(() => {
   const b = store.bar
   if (!b || b.phaseIndex < 0) return ''
   return b.subLabel || b.phases[b.phaseIndex]?.label || ''
+})
+
+// D-114 (PROG-08): the models at work, and a word when one has gone quiet while it should be talking
+const doing = computed(() => (store.bar && store.bar.activity ? TEXT.barDoing(store.bar.activity) : ''))
+const quiet = computed(() => {
+  const a = store.bar && store.bar.activity
+  if (!a || !['thinking', 'writing'].includes(a.phase) || a.quietS < QUIET_WARN_S) return ''
+  return TEXT.barQuiet(a.quietS, a.stallInS)
 })
 
 function stateOf(i) {

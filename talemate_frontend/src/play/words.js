@@ -81,6 +81,12 @@ export const TEXT = {
   barCount: (done, total) => `${done} of ${total}`,
   barElapsed: (s) => time(s, ' so far'),
   barEta: (s) => `About ${time(s, ' left')}`,
+  // D-114 (PROG-08): what the models are doing — never who, which or how many
+  barPhase: { waiting: 'Waiting for the model', reading: 'Reading', thinking: 'Thinking', writing: 'Writing' },
+  barDoing: (a) => [TEXT.barPhase[a.phase], a.readingPct != null ? `${Math.round(a.readingPct)}%` : null,
+    time(a.callS, '')].filter(Boolean).join(' · '),
+  barQuiet: (quietS, stallInS) => `No word from the model for ${time(quietS, '')}.` +
+    (stallInS != null ? ` If it has hung, the game stops waiting in ${time(stallInS, '')}.` : ''),
   // P12 (D-105): the death screen, and Willis at every death
   death: {
     title: (name) => `${name} is dead.`,

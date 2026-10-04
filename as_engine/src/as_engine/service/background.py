@@ -55,7 +55,9 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   (JobResult.answer: reflection {'output': ReflectionOutput, 'handles': packet.handles};
   retelling the RumourDistortion). T = world_clock.turn_index. Every call goes through its own
   LaneClient(session.config, session.client.transport, on_call = a collector), so the job's calls,
-  and only its calls, end up in JobResult.calls as (request, response) pairs in call order.
+  and only its calls, end up in JobResult.calls as (request, response) pairs in call order; its
+  on_progress is session.client.on_progress, so the quiet hours' bar shows the model at work (D-114,
+  PROG-08).
   reflection: in one read transaction, at = kernel.clock.now, affordances =
   mind.affordance.enumerate_affordances(tx, actor, canon affordances, at, T), packet =
   mind.packet.build_packet(tx, actor, LOD.WARM, affordances, T, at), and the new episodes (BG-02;

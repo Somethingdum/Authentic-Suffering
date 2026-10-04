@@ -100,7 +100,10 @@ seconds: past it the call's progress snapshot says `slow: true` (for the UI) and
 
 **Progress.** `client.live` holds a snapshot per call in flight (`lanes/progress.py`: `phase` waiting / prefill /
 thinking / writing, `elapsed_s`, `quiet_s`, `slow`, the prompt counters, characters of reasoning and text so far)
-and `client.on_progress(request, snapshot)` is called about once a second. Display only.
+and `client.on_progress(request, snapshot)` is called about once a second, and with None when the call ends.
+Display only. The transport's sink routes each report to the client that made the call (several clients share
+one transport). The Play UI shows it under the loading bar — what the models are doing, how long, how long
+quiet — never who or how many (`service/progress.py` PROG-08, D-114).
 
 ### 3.1 Thinking control (per lane, `LaneConfig.thinking_mode`)
 Nemotron 3.5 Lightning is a hybrid reasoning model (thinking on unless told otherwise). Gemma 4 (the Writer's

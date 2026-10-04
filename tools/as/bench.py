@@ -362,9 +362,9 @@ class Bench:
 
     # -- one call ---------------------------------------------------------------------------------------
 
-    def _progress(self, request, snap: dict) -> None:
+    def _progress(self, request, snap: dict | None) -> None:
         w = self.watch.get(id(request))
-        if w is None:
+        if w is None or snap is None:            # None: the call has ended (LANE-11)
             return
         t = self.clock()
         if snap.get("prompt_total"):

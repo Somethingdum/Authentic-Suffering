@@ -82,7 +82,13 @@ export function createPlayStore(socket, { download } = {}) {
   on('error', (d) => { s.error = { code: d.code, message: d.message } })
   on('progress_plan', (d) => {
     s.bar = { jobId: d.job_id, kind: d.kind, title: d.title, phases: d.phases, quips: d.quips || {}, phase: null,
-      phaseIndex: -1, sub: null, subLabel: null, done: null, total: null, pct: 0, elapsed: 0, eta: null, detail: null }
+      phaseIndex: -1, sub: null, subLabel: null, done: null, total: null, pct: 0, elapsed: 0, eta: null, detail: null,
+      activity: null }
+  })
+  on('activity', (d) => {   // D-114 (PROG-08): what the models are doing, for the bar that is showing
+    if (!s.bar || s.bar.jobId !== d.job_id) return
+    s.bar.activity = d.phase === 'idle' ? null : { phase: d.phase, callS: d.call_s, quietS: d.quiet_s, slow: d.slow,
+      readingPct: d.reading_pct, stallInS: d.stall_in_s }
   })
   on('progress', (d) => {
     if (!s.bar || s.bar.jobId !== d.job_id) return

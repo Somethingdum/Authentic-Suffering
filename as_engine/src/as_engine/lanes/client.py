@@ -22,7 +22,11 @@ Behaviour:
 Progress (LANE-11): ``client.live`` maps each call in flight (by ``id(request)``) to its latest snapshot
 (lanes/progress.py: phase 'waiting'/'prefill'/'thinking'/'writing', elapsed_s, quiet_s, slow, the prompt
 counters and the chars of reasoning and text so far), and ``client.on_progress(request, snapshot)``, when
-set, is called as the transport reports it (about once a second). Both are for display only.
+set, is called as the transport reports it (about once a second), and once more as
+``on_progress(request, None)`` when the call ends, whatever the outcome (D-114). Both are for display only.
+The transport's one ``sink`` is a dispatcher every client shares (``LaneClient.dispatch``): each report goes
+to the client that made that call, so several clients over one transport — the turn's, the quiet hours'
+jobs', the bench's — each see only their own calls (D-114: a second client used to take the sink over).
 
 Model-swap guard (LANE-05): ``check_models()`` lists models on each lane and raises ModelSwapped
 if the configured model id is not present. The turn pipeline calls it before T0.
@@ -54,10 +58,19 @@ class LaneClient:
         self.on_call = on_call
         self._down: set = set()
         self.ablated: set = set()
-        self.on_progress: Callable[[LMRequest, dict], None] | None = None
+        self.on_progress: Callable[[LMRequest, dict | None], None] | None = None
         self.live: dict[int, dict] = {}
         if hasattr(transport, "sink"):
-            transport.sink = self._on_sink
+            transport.sink = LaneClient.dispatch
+
+    _owners: dict[int, "LaneClient"] = {}       # calls in flight, any client: id(request) -> the client that sent it
+
+    @staticmethod
+    def dispatch(request: LMRequest, prog) -> None:
+        """The transport's sink (LANE-11): hand a progress report to the client that made the call."""
+        owner = LaneClient._owners.get(id(request))
+        if owner is not None:
+            owner._on_sink(request, prog)
 
     async def call(self, request: LMRequest, output_model: type[BaseModel] | None = None) -> LMResponse:
         import asyncio, time
@@ -72,6 +85,7 @@ class LaneClient:
             self._log(request, resp); return resp
         lane_cfg = self.config.lanes[request.lane]
         t0 = time.monotonic()
+        LaneClient._owners[id(request)] = self
         try:
             got = await self.transport.send(lane_cfg, request)
         except (LaneTimeout, asyncio.TimeoutError) as e:
@@ -83,6 +97,10 @@ class LaneClient:
             self._log(request, resp); return resp
         finally:
             self.live.pop(id(request), None)
+            if LaneClient._owners.get(id(request)) is self:
+                del LaneClient._owners[id(request)]
+            if self.on_progress:
+                self.on_progress(request, None)
         visible, reasoning = strip_think(got.text)
         reasoning = got.reasoning or reasoning
         upd = dict(text=visible, reasoning=reasoning, latency_ms=got.latency_ms or int((time.monotonic()-t0)*1000))

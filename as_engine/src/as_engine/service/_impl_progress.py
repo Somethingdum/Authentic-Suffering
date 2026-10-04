@@ -88,3 +88,71 @@ def quips_for(canon, kind):
                 if line not in cur:
                     cur.append(line)
     return out
+
+
+# ---------------------------------------------------------------------------- PROG-08 (D-114)
+def activity(entries):
+    from ..lanes.progress import stall_window
+    from .progress import ACTIVITY_ORDER
+    if not entries:
+        return None
+    rank = {p: i for i, p in enumerate(ACTIVITY_ORDER)}
+    phases = [("reading" if s.get("phase") == "prefill" else s.get("phase") or "waiting") for s, _l in entries]
+    phase = max(phases, key=lambda p: rank.get(p, 0))
+    reading = None
+    if phase == "reading":
+        pcts = [100.0 * s["prompt_processed"] / s["prompt_total"] for (s, _l), p in zip(entries, phases)
+                if p == "reading" and s.get("prompt_total")]
+        reading = round(min(100.0, max(pcts)), 1) if pcts else None
+    left = [max(0.0, w - float(s.get("quiet_s", 0.0))) for s, lane in entries
+            for w in [stall_window(lane, s)] if w is not None]
+    return {"phase": phase,
+            "call_s": round(max(float(s.get("elapsed_s", 0.0)) for s, _l in entries), 1),
+            "quiet_s": round(min(float(s.get("quiet_s", 0.0)) for s, _l in entries), 1),
+            "slow": any(bool(s.get("slow")) for s, _l in entries),
+            "reading_pct": reading,
+            "stall_in_s": round(min(left), 1) if left else None}
+
+
+class ActivityFeed:
+    def __init__(self, job_id, kind, push, lanes, *, clock=None, every_s=None):
+        from .progress import ACTIVITY_EVERY_S
+        self.job_id, self.kind, self._push, self.lanes, self.clock = job_id, kind, push, lanes, clock
+        self.every_s = ACTIVITY_EVERY_S if every_s is None else every_s
+        self.live = {}
+        self.last_at = None
+        self.last_phase = None
+        self.tasks = set()
+
+    def _now(self):
+        return self.clock() if self.clock is not None else asyncio.get_running_loop().time()
+
+    def seen(self, request, snapshot):
+        from ..contracts.common import Lane
+        key = id(request)
+        if snapshot is None:
+            if self.live.pop(key, None) is None:
+                return
+        else:
+            lane = self.lanes.get(Lane(snapshot.get("lane"))) if snapshot.get("lane") else None
+            if lane is None:
+                return
+            self.live[key] = (snapshot, lane)
+        a = activity(list(self.live.values()))
+        phase = a["phase"] if a else "idle"
+        now = self._now()
+        if phase == self.last_phase and self.last_at is not None and now - self.last_at < self.every_s:
+            return
+        self.last_phase, self.last_at = phase, now
+        data = {"job_id": self.job_id, "kind": self.kind, **(a or {"phase": "idle", "call_s": 0.0, "quiet_s": 0.0,
+                                                                     "slow": False, "reading_pct": None,
+                                                                     "stall_in_s": None})}
+        r = self._push("activity", data)
+        if inspect.isawaitable(r):
+            t = asyncio.ensure_future(r)
+            self.tasks.add(t)
+            t.add_done_callback(self.tasks.discard)
+
+    async def flush(self):
+        while self.tasks:
+            await asyncio.gather(*list(self.tasks), return_exceptions=True)

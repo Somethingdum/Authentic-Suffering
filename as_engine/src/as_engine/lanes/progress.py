@@ -11,6 +11,13 @@ model is moving, so the transport can tell a slow call from a stalled one and th
 Phases, in order: 'waiting' (nothing yet), 'prefill' (the server reported prompt progress),
 'thinking', 'writing'. ``progressed`` is true once anything at all has arrived. ``slow`` is true when
 the call has run longer than the regime's ``deadline_s`` (an expectation, never a limit).
+
+stall_window(lane, snapshot) -> float | None   (LANE-10 read from a snapshot, D-114)
+  How long the call may stay quiet now: ``lane.stall_window_s`` once it has progressed, once the server has
+  reported prompt progress for it (prompt_total > 0), or when the lane says the server reports it
+  (prefill_progress 'supported'); else ``lane.silent_prefill_window_s``, 0 meaning no limit (None). The same
+  rule the transport applies (lanes/transport.py HttpTransport.window), so the UI can say how long a quiet call
+  has before the watchdog ends it.
 """
 
 from __future__ import annotations
@@ -91,3 +98,9 @@ class CallProgress:
                 "prompt_processed": self.prompt_processed, "prompt_total": self.prompt_total,
                 "prompt_cache": self.prompt_cache, "reasoning_chars": self.reasoning_chars,
                 "text_chars": self.text_chars}
+
+
+def stall_window(lane, snap: dict) -> float | None:
+    if snap.get("progressed") or snap.get("prompt_total") or lane.prefill_progress == "supported":
+        return lane.stall_window_s
+    return lane.silent_prefill_window_s or None

@@ -1,5 +1,7 @@
 // The loading bar's line picking (10_UI §2.10; service/progress.py PROG-07). Pure functions.
 export const QUIP_MS = 2500
+// D-114 (PROG-08): a model that has said nothing for this long while thinking or writing gets a line of its own
+export const QUIET_WARN_S = 60
 
 export function quipLines(quips, kind, phase, sub) {
   const q = quips || {}

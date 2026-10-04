@@ -1,0 +1,14 @@
+{
+  "type": "as_game",
+  "action": "activity",
+  "data": {
+    "job_id": "turn-42",
+    "kind": "turn",
+    "phase": "writing",
+    "call_s": 250.0,
+    "quiet_s": 75.0,
+    "slow": false,
+    "reading_pct": null,
+    "stall_in_s": 225.0
+  }
+}

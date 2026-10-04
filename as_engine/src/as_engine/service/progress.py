@@ -45,6 +45,25 @@ PROG-07 (the UI's side, 10_UI.md) The bar shows every phase of the plan in order
   phase, sub), then (kind, phase), then (kind); a new line every 2.5 s, drawn at random but never
   one of the last three shown; the quip is never the only thing on screen (the label is always
   there).
+PROG-08 (D-114) What the models are doing, live — never who or how many. A Writer that writes five tokens a
+  second makes a move minutes long; the bar must show the wait is work, not a hang.
+  activity(entries) -> dict | None: entries = [(snapshot, LaneConfig)] of the model calls in flight
+  (lanes.progress snapshots, LANE-11). None when empty. Else {phase: the furthest along of any call —
+  'waiting' < 'reading' (a snapshot's 'prefill') < 'thinking' < 'writing'; call_s: the longest elapsed_s;
+  quiet_s: the smallest quiet_s (the newest sign of life anywhere); slow: whether any call is past its
+  expected time; reading_pct: when phase is 'reading', the largest round(100 x prompt_processed /
+  prompt_total, 1) among reading calls that report a total, else None; stall_in_s: the smallest
+  max(0, lanes.progress.stall_window(lane, snapshot) - quiet_s) over the calls that have a window
+  (LANE-10), else None}; seconds rounded to 0.1. It never says which call, whose, which lane, or how many
+  (PROG-05).
+  ActivityFeed(job_id, kind, push, lanes, *, clock=None, every_s=ACTIVITY_EVERY_S): ``seen(request,
+  snapshot)`` is wired as LaneClient.on_progress (and the quiet hours' job clients pass theirs on, BG-03);
+  it keeps the latest snapshot per call in flight (by id(request)) with that call's lane config (from
+  ``lanes`` by snapshot['lane']) and forgets a call when told None (its end). It pushes activity
+  {job_id, kind, phase, call_s, quiet_s, slow, reading_pct, stall_in_s} — phase 'idle' with zeros and
+  None when nothing is in flight — when the phase changes (idle included) and otherwise at most once every
+  ``every_s`` seconds (clock: as PROG-03). ``push`` is scheduled on the running loop (seen is called inside
+  the transport's report and never waits); ``flush()`` awaits what was scheduled.
 """
 
 from __future__ import annotations
@@ -130,4 +149,26 @@ class Tracker:
 
 def quips_for(canon, kind: str) -> dict[str, list[str]]:
     raise NotImplementedError("P10")
-from ._impl_progress import Tracker, quips_for  # noqa
+
+
+ACTIVITY_EVERY_S = 2.0
+ACTIVITY_ORDER = ("waiting", "reading", "thinking", "writing")
+
+
+def activity(entries: list) -> dict | None:
+    raise NotImplementedError("D-114")
+
+
+class ActivityFeed:
+    """PROG-08. The live line under the bar."""
+
+    def __init__(self, job_id: str, kind: str, push: Callable[[str, dict], Any], lanes: dict, *,
+                 clock: Callable[[], float] | None = None, every_s: float = ACTIVITY_EVERY_S):
+        raise NotImplementedError("D-114")
+
+    def seen(self, request: Any, snapshot: dict | None) -> None:
+        raise NotImplementedError("D-114")
+
+    async def flush(self) -> None:
+        raise NotImplementedError("D-114")
+from ._impl_progress import ActivityFeed, Tracker, activity, quips_for  # noqa

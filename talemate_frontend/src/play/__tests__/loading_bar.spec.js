@@ -203,3 +203,62 @@ describe('the Play screen during a move', () => {
     expect(has(w, 'loading-bar')).toBe(false)
   })
 })
+
+describe('what the models are doing (PROG-08, D-114)', () => {
+  test('the store keeps it for the bar that is showing, and idle clears it', () => {
+    const { store, sock } = storeWith('progress_plan_turn')
+    expect(store.bar.activity).toBe(null)
+    sock.emit(fixture('activity_turn_thinking'))
+    expect(store.bar.activity).toEqual({ phase: 'thinking', callS: 95, quietS: 0.4, slow: false, readingPct: null,
+      stallInS: 299.6 })
+    const other = fixture('activity_turn_reading')
+    other.data.job_id = 'turn-41'
+    sock.emit(other)
+    expect(store.bar.activity.phase).toBe('thinking')
+    sock.emit(fixture('activity_turn_idle'))
+    expect(store.bar.activity).toBe(null)
+    sock.emit(fixture('progress_plan_turn'))
+    expect(store.bar.activity).toBe(null)
+  })
+
+  test('a line under the bar: what, how far, how long — and nothing when idle', async () => {
+    const { store, sock } = storeWith('progress_plan_turn')
+    const w = mountBar(store)
+    sock.emit(fixture('progress_turn_decide'))
+    await flush()
+    expect(has(w, 'bar-doing')).toBe(false)
+    sock.emit(fixture('activity_turn_thinking'))
+    await flush()
+    expect(one(w, 'bar-doing').text()).toBe('Thinking · 2 min')
+    sock.emit(fixture('activity_turn_reading'))
+    await flush()
+    expect(one(w, 'bar-doing').text()).toBe('Reading · 45% · 20 s')
+    expect(has(w, 'bar-quiet')).toBe(false)
+    sock.emit(fixture('activity_turn_idle'))
+    await flush()
+    expect(has(w, 'bar-doing')).toBe(false)
+  })
+
+  test('a model quiet for a minute while it should be talking gets a word, with when the game stops waiting', async () => {
+    const { store, sock } = storeWith('progress_plan_turn')
+    const w = mountBar(store)
+    sock.emit(fixture('activity_turn_quiet'))
+    await flush()
+    expect(one(w, 'bar-doing').text()).toBe('Writing · 4 min')
+    expect(one(w, 'bar-quiet').text()).toBe('No word from the model for 1 min. If it has hung, the game stops waiting in 4 min.')
+    expect(one(w, 'bar-quiet').attributes('role')).toBe('status')
+    const reading = fixture('activity_turn_reading')
+    reading.data.quiet_s = 600
+    sock.emit(reading)
+    await flush()
+    expect(has(w, 'bar-quiet')).toBe(false)
+  })
+
+  test('the words never name a person, a model or a count', () => {
+    for (const phase of ['waiting', 'reading', 'thinking', 'writing']) {
+      const line = TEXT.barDoing({ phase, callS: 30, readingPct: null })
+      expect(line).toMatch(/^(Waiting for the model|Reading|Thinking|Writing) · 30 s$/)
+    }
+    expect(TEXT.barQuiet(61, null)).toBe('No word from the model for 1 min.')
+  })
+})

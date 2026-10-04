@@ -150,6 +150,7 @@ async def run_job(session, job):
     T = _turn(store)
     calls = []
     client = LaneClient(session.config, session.client.transport, on_call=lambda q, r: calls.append((q, r)))
+    client.on_progress = session.client.on_progress          # D-114: the quiet hours' bar sees the work
     if job.kind == "reflection":
         with store.transaction() as tx:
             at = now(tx)
