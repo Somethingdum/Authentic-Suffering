@@ -120,6 +120,17 @@ describe('messages -> state', () => {
   })
 })
 
+describe('the Cheat field after the word (D-115)', () => {
+  test('cheat_activated opens the field at once and asks for its words', () => {
+    const { store, sock } = storeWith('run_loaded', 'view_rich')
+    sock.sent.length = 0
+    expect(store.view.console).toBeFalsy()
+    sock.emit({ type: 'as_game', action: 'cheat_activated', data: { persona_line: 'Well, well. Hello, Boss.', ok: true, detail: '' } })
+    expect(store.view.console).toBe(true)   // not after the next turn
+    expect(sock.sent).toEqual([{ action: 'cheat_dictionary_get' }])
+  })
+})
+
 describe('actions -> messages', () => {
   test('each action sends exactly its protocol message', () => {
     const { store, sock } = storeWith('run_loaded', 'view_rich')

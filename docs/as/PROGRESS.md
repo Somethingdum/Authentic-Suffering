@@ -90,10 +90,11 @@ do nothing.
 4. ~~The UI shows no live model progress~~ — done while you were away (D-114): the loading bar now says what
    the models are doing ("Thinking · 2 min") and speaks up when one goes quiet. Nothing for you to do; look at
    it on your first long move and say if the words are wrong.
-5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 / D-114 / D-115 — 76 pass (15 new),
-   102 fail: the 101 from before those changes plus one new spec for the Cheat field's suggestion list and
-   dictionary panel (P8's input box) (the 101 are the P8 screens the builder has not built yet: words, play, connect /
-   home, store, socket). The repo itself has no vitest toolchain yet (13_BUILD_ORDER P8).
+5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 / D-114 / D-115 — 76 pass (15 new)
+   and 103 fail. Every failure is a P8 part the builder has not built yet (words, play, connect / home,
+   store, socket); two of them are new: the Cheat field's suggestion list and dictionary panel, and the store
+   opening the field the moment the word is typed. The repo itself
+   has no vitest toolchain yet (13_BUILD_ORDER P8).
 
 6. **How picky the narration lint should be** (your call): every narration draft goes through a code lint;
    one error throws the draft away and asks the Writer again, up to `rules.style.max_narration_attempts` (3),
