@@ -9,8 +9,15 @@ disable-model-invocation: false
 
 - Read `docs/as/10_UI.md` (screens, components, test ids, copy, store, socket) — every `data-testid` in
   the tests is listed there. Do not invent ids. §2 says which screens are P8 (Connect, Home, Play,
-  Content validator, Settings, Developer panel); the wizard, worldgen, death and worlds screens are
-  P10 / P12 — until then PlayApp shows `LaterScreen.vue`.
+  Content validator, Settings, Developer panel); the wizard, worldgen and death screens and the Doom
+  overlay are built (P10, P12), and the worlds screen is P12 — until then PlayApp shows `LaterScreen.vue`
+  for it.
+- Some of `src/play/` is built already and has green specs: `quips.js`, `doom.js`, `cheatAssist.js`
+  (the Cheat field's autocomplete and dictionary, D-115), `LoadingBar.vue` (with the models' activity,
+  D-114), `PCCard.vue`, `DoomOverlay.vue`, the built screens, and the P10 / P12 parts of `store.js` and
+  `words.js` (the bar and its activity, `cheatCommands` / `getCheatDictionary`, `TEXT.cheat`, the death
+  and Doom words). Extend `store.js`, `words.js` and `socket.js`; never replace them, and keep those
+  specs green. The input box's Cheat field uses `cheatAssist.js` (10 §2.5 "The Cheat field's help").
 - Backend first: `service/guide.py`, then `service/game_service.py` (`out`, `handle`, `push`, `idle`,
   `get_service`, then the `on_<action>` handlers). A turn runs as a background task
   (`asyncio.create_task`): `turn_submit` answers `state {busy: true}` at once and everything else is
