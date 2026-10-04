@@ -155,7 +155,7 @@ class FakeTransport:
         self._scripts: dict[tuple[CallClass, str | None], deque] = defaultdict(deque)
         self._down: set[Lane] = set()
         self._models = models or {
-            Lane.A: ["nemotron-cascade-2-30b-a3b"],
+            Lane.A: ["boulesis-v2.1-26b-a4b-i1"],
             Lane.B: ["nvidia-nemotron-3.5-lightning-30b-a3b"],
         }
 

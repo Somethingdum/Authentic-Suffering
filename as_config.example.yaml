@@ -13,25 +13,27 @@ compiled_dir: as_content/_compiled # compiled canon cache
 # The game only talks to models on this machine or your home network (the seal, 02 §9): an address
 # anywhere else is refused and the config does not load.
 lanes:
-  A:   # the main model: the thinking decisions of the people who matter most, and the narration
-    name: Main model — Nemotron Cascade 2 30B-A3B
+  A:   # the main model, the Writer: the thinking decisions of the people who matter most, the narration and every
+       # other piece of prose (D-111, 08 §2)
+    name: Main model — the Writer (Boulesis v2.1 26B-A4B, a Gemma 4)
     base_url: http://localhost:1234/v1        # the LM Studio server on this machine
-    model: nemotron-cascade-2-30b-a3b         # the exact model id LM Studio lists (tools/as/doctor.py --lanes shows them)
+    model: boulesis-v2.1-26b-a4b-i1           # the exact model id LM Studio lists (tools/as/doctor.py --lanes shows them)
     api_key: lm-studio
     max_concurrency: 1
     stall_window_s: 300                       # LANE-10: a call is stopped only if it makes NO progress (no token, no reasoning)
                                               # for this long. There is no limit on total time: a model may think for ten minutes.
     silent_prefill_window_s: 0                # 0 = wait without limit while the server reads a long prompt and says nothing
     prefill_progress: unknown                 # tools/as/probe.py --write: does the server report prompt-processing progress?
-    thinking_mode: native                     # tools/as/probe.py picks: native | system_no_think | chat_template_kwargs | prefill_empty_think | none
+    thinking_mode: native                     # tools/as/probe.py picks: native | system_no_think | chat_template_kwargs | prefill_empty_think
+                                              # | system_think_token (Gemma 4: thinks only when <|think|> opens the system prompt) | none
     structured_mode: json_schema              # json_schema | prompt_only
     structured_with_thinking: unknown         # probe writes supported | unsupported
-  B:   # the second model: everything else, in parallel with the main one (both are equals)
-    name: Second model — Nemotron 3.5 Lightning 30B-A3B
+  B:   # the second model, the Clerk: intake, the other minds, memory, the checks and audits — closed answers code can check
+    name: Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)
     base_url: http://localhost:1234/v1        # the same list, via LM Link (without LM Link: that machine's own address)
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     api_key: lm-studio
-    max_concurrency: 1
+    max_concurrency: 1                        # more parallel slots here = more people per turn get a model call
     stall_window_s: 300                       # LANE-10: a call is stopped only if it makes NO progress (no token, no reasoning)
                                               # for this long. There is no limit on total time: a model may think for ten minutes.
     silent_prefill_window_s: 0                # 0 = wait without limit while the server reads a long prompt and says nothing
@@ -40,11 +42,11 @@ lanes:
     structured_mode: json_schema
     structured_with_thinking: unknown
 
-hot_cognition:        # the HOT actor call (lane A, thinking on)
+hot_cognition:        # the HOT actor call: the Writer, thinking on (D-111). lane: B puts it on the Clerk
   lane: A
   temperature: 0.7
   top_p: 0.95
-  max_tokens: 3000
+  max_tokens: 4096            # thinking counts against it
   thinking: true
   deadline_s: 75              # the EXPECTED seconds (reported "slow" past it); it never cuts a call off (LANE-10)
 

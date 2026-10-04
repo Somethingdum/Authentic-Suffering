@@ -24,12 +24,12 @@ def _schema(packet, consult=True):
 
 
 def cognition_request(config, packet, lod, lane, *, reaction, turn_index):
-    from ..contracts.common import LOD, CallClass, Lane
+    from ..contracts.common import LOD, CallClass
     from ..lanes.requests import build_request
     cc = CallClass.ACTOR_REACTION if reaction else CallClass.ACTOR_COGNITION
     if lod == LOD.HOT:
         reg = config.hot_cognition
-        structured = config.lanes[Lane.A].structured_with_thinking == "supported" or not reg.thinking
+        structured = config.lanes[lane or reg.lane].structured_with_thinking == "supported" or not reg.thinking
         return build_request(config, cc, turn_index=turn_index, actor_id=packet.actor_id, context=packet,
                              json_schema=_schema(packet) if structured else None, regime=reg, lane=lane, p=packet)
     return build_request(config, cc, turn_index=turn_index, actor_id=packet.actor_id, context=packet,

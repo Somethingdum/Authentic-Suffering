@@ -273,7 +273,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| DEGRADE-01 | *with thinking=False (DEGRADE-01). If both lanes are down, every job returns 'lane_error'.* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py` | `contract/p01_lanes/test_scheduler_run_jobs.py` |
+| DEGRADE-01 | *with thinking=False (DEGRADE-01). If both lanes are down, every job returns 'lane_error'.* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py` | `contract/p01_lanes/test_scheduler_run_jobs.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 
 ## DEMO
 

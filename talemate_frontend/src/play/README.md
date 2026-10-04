@@ -14,8 +14,8 @@ The rule ids in brackets are what a failed line breaks; `docs/as/RULES.md` expla
 
 ## 0. Before you start
 
-- [ ] LM Studio is running on the desktop with Nemotron Cascade 2 30B-A3B loaded, and on the
-      laptop with Nemotron 3.5 Lightning 30B-A3B loaded (LM Link on). `python tools/as/doctor.py --lanes`
+- [ ] LM Studio is running on the desktop with Boulesis v2.1 26B-A4B (the Writer) loaded, and on the
+      laptop with Nemotron 3.5 Lightning 30B-A3B (the Clerk) loaded (LM Link on). `python tools/as/doctor.py --lanes`
       shows both lanes OK.
 - [ ] Make a run to play (in P8 the New Life wizard does not exist yet): from the fork root, with
       Talemate's venv active, `as-engine new-scenario as_engine/tests/fixtures/scenarios/metal_fence.yaml`.

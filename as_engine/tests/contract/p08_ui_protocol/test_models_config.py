@@ -15,13 +15,13 @@ pytestmark = pytest.mark.phase(8)
 
 
 async def test_models_list_reports_both_brains(svc, gated):
-    gated.set_models(Lane.A, ["nemotron-cascade-2-30b-a3b", "other-model"])
+    gated.set_models(Lane.A, ["boulesis-v2.1-26b-a4b-i1", "other-model"])
     gated.down(Lane.B)
     r = await send(svc, "models_list")
     assert [m["action"] for m in r] == ["models", "models"]
     a, b = r[0]["data"], r[1]["data"]
-    assert a == {"lane": "A", "models": ["nemotron-cascade-2-30b-a3b", "other-model"],
-                 "selected": "nemotron-cascade-2-30b-a3b", "reachable": True}
+    assert a == {"lane": "A", "models": ["boulesis-v2.1-26b-a4b-i1", "other-model"],
+                 "selected": "boulesis-v2.1-26b-a4b-i1", "reachable": True}
     assert b == {"lane": "B", "models": [], "selected": "nvidia-nemotron-3.5-lightning-30b-a3b", "reachable": False}
 
 
@@ -42,7 +42,7 @@ async def test_models_test_not_answering_and_model_missing(svc, gated):
     assert t["detail"] == game_service.NOT_ANSWERING.format(url=svc.config.lanes[Lane.B].base_url)
     gated.set_models(Lane.A, ["something-else"])
     t = only(await send(svc, "models_test", lane="A"), "model_test_result")
-    assert t["ok"] is False and t["detail"] == game_service.MODEL_MISSING.format(model="nemotron-cascade-2-30b-a3b")
+    assert t["ok"] is False and t["detail"] == game_service.MODEL_MISSING.format(model="boulesis-v2.1-26b-a4b-i1")
     assert gated.calls(CallClass.PROBE) == [], "no probe call when the model is not there"
 
 
@@ -60,7 +60,7 @@ async def test_models_test_with_broken_structured_answers(svc, gated):
 async def test_config_get_and_set_lanes(svc, config_path):
     """The Connect screen edits the lanes and they are written to as_config.yaml (CFG)."""
     c = only(await send(svc, "config_get"), "config")
-    assert c["lanes"]["A"]["model"] == "nemotron-cascade-2-30b-a3b" and c["background_cognition"] is True
+    assert c["lanes"]["A"]["model"] == "boulesis-v2.1-26b-a4b-i1" and c["background_cognition"] is True
     r = await send(svc, "config_set", patch={"lanes": {"B": {"base_url": "http://192.168.1.20:1234/v1",
                                                              "model": "lightning-q4"}},
                                              "background_cognition": False})

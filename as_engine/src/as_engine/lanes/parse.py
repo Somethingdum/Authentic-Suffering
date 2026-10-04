@@ -4,6 +4,8 @@ strip_think(text) -> (visible, reasoning|None)
   * Removes every ``<think>...</think>`` block (non-greedy, DOTALL, case-insensitive) and joins
     their inner text with "\n" as reasoning. An unclosed leading ``<think>`` (no closing tag)
     means the whole text is reasoning: return ("", inner). Visible text is .strip()-ed.
+  * Gemma 4's thought channel, ``<|channel>thought ... <channel|>`` (D-111), is read exactly like a
+    ``<think>`` block, when a server passes it through instead of separating the reasoning.
 
 extract_json(text) -> dict | None   (PARSE-02)
   Try in order, return the first that json.loads to a dict:
@@ -36,9 +38,12 @@ import json
 import re
 
 THINK = re.compile(r"<think>(.*?)</think>", re.S | re.I)
+GEMMA_THOUGHT = re.compile(r"<\|channel>thought\s*(.*?)<channel\|>", re.S)
+GEMMA_OPEN = re.compile(r"^(\s*)<\|channel>thought\s*", re.S)
 
 
 def strip_think(text: str) -> tuple[str, str | None]:
+    text = GEMMA_OPEN.sub(r"\1<think>", GEMMA_THOUGHT.sub(lambda m: "<think>" + m.group(1) + "</think>", text))
     inner = THINK.findall(text)
     vis = THINK.sub("", text)
     m = re.match(r"\s*<think>(.*)$", vis, re.S | re.I)

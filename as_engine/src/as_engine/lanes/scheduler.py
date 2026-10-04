@@ -14,11 +14,15 @@ plan_cognition(candidates, config, turn_depth, lanes_up) -> CognitionPlan   (P5)
   candidates: list of (actor_id, salience, mandatory: bool); config: EngineConfig (rules.scheduler
   S, lanes[*].max_concurrency); lanes_up: the lanes whose probe passed this turn.
   1. Order: mandatory candidates first, then the rest; each part by (salience desc, actor_id).
-  2. HOT: when lane A is up, the first min(S.max_hot[turn_depth], len) candidates of that order,
-     each on lane A with est S.estimated_call_s['actor_cognition_hot'].
-  3. WARM: the following candidates in order, each placed on the up lane with the smaller queued
-     estimate so far (ties -> B), est S.estimated_call_s['actor_cognition_warm'], while the wave
-     wall-clock estimate max(sum_A / conc_A, sum_B / conc_B) stays <= S.turn_budget_s[turn_depth]
+  Lanes are roles, not a pool (D-111): lane A is the Writer, lane B the Clerk, and a mind's call
+  goes to the lane its regime names — it never spills onto the other lane to balance the load.
+  2. HOT: when the hot lane (config.hot_cognition.lane; A by default) is up, the first
+     min(S.max_hot[turn_depth], len) candidates of that order, each on that lane with est
+     S.estimated_call_s['actor_cognition_hot']. Hot lane down -> no HOT.
+  3. WARM: the following candidates in order, each on the warm lane (config.regimes
+     [ACTOR_COGNITION].lane; when that lane is down, the up lane, B first — DEGRADE-01), est
+     S.estimated_call_s['actor_cognition_warm'], while the wave wall-clock estimate
+     max(sum_A / conc_A, sum_B / conc_B) stays <= S.turn_budget_s[turn_depth]
      - S.reserve_narration_s. A mandatory candidate is placed even past the budget (overrun =
      True, note 'BUDGET_OVERRUN <actor_id>'); a non-mandatory candidate that would exceed it
      becomes COLD and so does every one after it.

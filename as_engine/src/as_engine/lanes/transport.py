@@ -27,6 +27,9 @@ HttpTransport request (OpenAI-compatible, LM Studio):
     system_no_think      -> when thinking is False, append "\n/no_think" to the system message
     chat_template_kwargs -> body["chat_template_kwargs"] = {"enable_thinking": thinking}
     prefill_empty_think  -> when thinking is False, append {"role":"assistant","content":"<think></think>"}
+    system_think_token   -> when thinking is True, put "<|think|>" and a newline at the start of the system
+                            message (a system message "<|think|>" first when there is none). Gemma 4 thinks
+                            only when that token opens the system prompt (D-111); thinking False sends as-is.
     none                 -> unchanged
   Response: server-sent events. text = the joined delta.content; reasoning = the joined
   delta.reasoning_content (or delta.reasoning) or None; usage.prompt_tokens / completion_tokens (0, and the
@@ -136,6 +139,12 @@ class HttpTransport:
             body["chat_template_kwargs"] = {"enable_thinking": request.thinking}
         elif mode == "prefill_empty_think" and not request.thinking:
             msgs.append({"role": "assistant", "content": "<think></think>"})
+        elif mode == "system_think_token" and request.thinking:
+            sys_msg = next((m for m in msgs if m["role"] == "system"), None)
+            if sys_msg is None:
+                msgs.insert(0, {"role": "system", "content": "<|think|>"})
+            else:
+                sys_msg["content"] = "<|think|>\n" + sys_msg["content"]
         body["messages"] = msgs
         if lane.prefill_progress == "supported":
             body["return_progress"] = True

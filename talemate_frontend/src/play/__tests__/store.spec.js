@@ -42,7 +42,7 @@ describe('connecting', () => {
 describe('messages -> state', () => {
   test('models, tests, config, runs', () => {
     const { store } = storeWith('models_a', 'models_b', 'test_a_ok', 'test_b_down', 'config', 'runs')
-    expect(store.models.A.models).toEqual(['nemotron-cascade-2-30b-a3b', 'qwen3-32b'])
+    expect(store.models.A.models).toEqual(['boulesis-v2.1-26b-a4b-i1', 'qwen3-32b'])
     expect(store.models.B.reachable).toBe(false)
     expect(store.laneTests.A.ok).toBe(true)
     expect(store.laneTests.B.detail).toMatch(/^Not answering/)

@@ -153,8 +153,8 @@ cognition_request(config, packet, lod, lane, *, reaction, turn_index) -> LMReque
   its S# handles, each in number order (none when it offers no consultation), gesture_handles /
   attention_handles = the handles of packet.gestures / packet.attention_points (B4)) — a
   reaction's packet offers no consultation, gesture or attention point. HOT: regime =
-  config.hot_cognition and the schema is attached only when config.lanes[Lane.A]
-  .structured_with_thinking == 'supported' or the regime has thinking off (otherwise the JSON is
+  config.hot_cognition and the schema is attached only when config.lanes[the call's lane — ``lane``,
+  else the regime's] .structured_with_thinking == 'supported' or the regime has thinking off (otherwise the JSON is
   extracted from the text and a failure is repaired, LANE-06); WARM: regime = config.regimes[call
   class] (build_request's default), schema attached. The call is
   lanes.requests.build_request(config, call class, turn_index=turn_index, actor_id=packet.actor_id,

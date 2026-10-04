@@ -23,8 +23,8 @@ class Strict(BaseModel):
 
 
 class Lane(StrEnum):
-    A = "A"  # desktop, Nemotron Cascade 2 30B-A3B: deep cognition + narration
-    B = "B"  # laptop, Nemotron 3.5 Lightning 30B-A3B: fast structured calls, audits
+    A = "A"  # desktop, the Writer (Boulesis v2.1 26B-A4B, a Gemma 4): the HOT minds, narration, the other prose (D-111)
+    B = "B"  # laptop, the Clerk (Nemotron 3.5 Lightning 30B-A3B): WARM minds, intake, memory, the checks, the audits (D-111)
 
 
 class CallClass(StrEnum):

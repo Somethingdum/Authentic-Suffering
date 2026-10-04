@@ -345,6 +345,14 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p01_lanes/test_stall.py` | LANE-10: a call that keeps moving outlasts both the stall window and its expected time; reasoning alone is progress; keep-alives, empty deltas and a prefill counter that stops advancing are not; no progress for the window is `LaneStalled` (a `LaneTimeout`); the silent wait before the first token (a silent head or a silent body) has no limit unless `silent_prefill_window_s` is set; with `prefill_progress: supported` the window applies from the first second and `return_progress` is sent (and only then); cancelling a call closes the stream; an error event or a dropped connection is a lane error, not a stall; a server that ignores `stream` is read as one body. LANE-11: progress snapshots show the phases and the quiet time; the client reports what is live, never cuts a slow call off, and maps a stall to `timeout` without marking the lane down. Settings: stall window 300 s, silent prefill 0, a config that still has `request_timeout_s` loads. `p01_lanes/test_http_transport.py` (amended): the request asks for a stream |
 
+### 3.26 The Writer and the Clerk (P1, P5, P7; D-111)
+
+| File | What it proves |
+|---|---|
+| `p01_lanes/test_writer_clerk.py` | `system_think_token` puts `<|think|>` at the start of the system message only when thinking is on (and makes a system message when there is none); no other mode sends it; Gemma's thought channel (closed, cut off, empty) is reasoning, never story; the Writer's call classes are exactly the story and long-context ones, and its narration, Voice, Willis and recap think; the HOT minds think on the Writer, the WARM minds and the judges on the Clerk, the judges thinking; every call that thinks has at least 2,000 tokens of room |
+| `p05_many_actors/test_reactions_cascade_plan.py` (amended) | HOT goes to `hot_cognition.lane` (A by default; B when the owner sets it) and WARM to the actor-cognition lane; with the Clerk down WARM moves to the Writer (DEGRADE-01); WARM never spills onto the Writer to balance load |
+| `p07_slice/test_hot_lane_schema.py` | a HOT call's JSON schema is sent with thinking on only when its OWN lane supports it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

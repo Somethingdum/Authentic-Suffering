@@ -4,8 +4,9 @@
   python tools/as/probe.py            probe both lanes, print a report, write as_runs/reports/probe.json
   python tools/as/probe.py --write    also write thinking_mode / structured_with_thinking into as_config.yaml
 
-Per lane: reachable? the configured model loaded? For thinking OFF, which thinking_mode actually
-suppresses reasoning (fastest of those that do)? Does JSON-schema output validate? Does JSON schema
+Per lane: reachable? the configured model loaded? Which thinking_mode actually switches reasoning
+OFF and ON (D-111: each mode is tried both ways; the fastest that does both wins, else the fastest that
+at least turns it off)? Does JSON-schema output validate? Does JSON schema
 still allow reasoning when thinking is ON (structured_with_thinking)? Does the server stream
 prompt-processing progress while it reads a long prompt (prefill_progress, D-110 LANE-10), and how long
 until the first token / how many tokens a second on a ~4,000-token prompt? Needs the engine's P1
@@ -24,7 +25,7 @@ import time
 
 from _live import REPORTS, load_config, need, save_config
 
-MODES = ("native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "none")
+MODES = ("native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "system_think_token", "none")
 SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}, "word": {"type": "string"}},
           "required": ["ok", "word"], "additionalProperties": False}
 
@@ -66,6 +67,7 @@ async def probe_prefill(lane_id, lane, transport) -> dict:
 async def probe_lane(lane_id, cfg, transport) -> dict:
     from as_engine.contracts.common import CallClass
     from as_engine.contracts.lanes import ChatMessage, LMRequest
+    from as_engine.lanes.parse import strip_think
 
     lane = cfg.lanes[lane_id].model_copy(update={"stall_window_s": 120, "silent_prefill_window_s": 600})   # a probe never hangs
     out = {"lane": lane_id.value, "base_url": lane.base_url, "model": lane.model}
@@ -82,19 +84,27 @@ async def probe_lane(lane_id, cfg, transport) -> dict:
     results = []
     for mode in MODES:
         lc = lane.model_copy(update={"thinking_mode": mode})
-        req = LMRequest(call_class=CallClass.PROBE, lane=lane_id, messages=msgs, thinking=False, max_tokens=64, deadline_s=60)
-        t = time.perf_counter()
-        try:
-            resp = await transport.send(lc, req)
-            ms = (time.perf_counter() - t) * 1000
-            reasoned = bool(resp.reasoning) or "<think>" in (resp.text or "")
-            results.append({"mode": mode, "ms": round(ms), "reasoning": reasoned, "text": (resp.text or "")[:40]})
-        except Exception as e:  # noqa: BLE001
-            results.append({"mode": mode, "error": str(e)[:120]})
+        row = {"mode": mode}
+        for thinking in (False, True):
+            req = LMRequest(call_class=CallClass.PROBE, lane=lane_id, messages=msgs, thinking=thinking,
+                            max_tokens=1024 if thinking else 64, deadline_s=60)
+            key = "on" if thinking else "off"
+            t = time.perf_counter()
+            try:
+                resp = await transport.send(lc, req)
+                row[f"ms_{key}"] = round((time.perf_counter() - t) * 1000)
+                row[f"reasoning_{key}"] = bool(resp.reasoning) or bool(strip_think(resp.text or "")[1])
+                row[f"text_{key}"] = (resp.text or "")[:40]
+            except Exception as e:  # noqa: BLE001
+                row[f"error_{key}"] = str(e)[:120]
+        results.append(row)
     out.update(await probe_prefill(lane_id, lane, transport))
-    out["thinking_off_trials"] = results
-    good = [r for r in results if "error" not in r and not r["reasoning"]]
-    out["thinking_mode"] = min(good, key=lambda r: (r["ms"], MODES.index(r["mode"])))["mode"] if good else None
+    out["thinking_trials"] = results
+    off = [r for r in results if "error_off" not in r and not r["reasoning_off"]]
+    both = [r for r in off if "error_on" not in r and r["reasoning_on"]]
+    pick = both or off
+    out["thinking_mode"] = min(pick, key=lambda r: (r["ms_off"], MODES.index(r["mode"])))["mode"] if pick else None
+    out["thinking_on_works"] = bool(both)
     chosen = lane.model_copy(update={"thinking_mode": out["thinking_mode"] or lane.thinking_mode})
     jreq = LMRequest(call_class=CallClass.PROBE, lane=lane_id, messages=msgs, thinking=False, max_tokens=64,
                      schema_name="probe", json_schema=SCHEMA, deadline_s=60)
@@ -105,8 +115,8 @@ async def probe_lane(lane_id, cfg, transport) -> dict:
     except Exception as e:  # noqa: BLE001
         out["json_schema"] = f"failed: {str(e)[:80]}"
     treq = jreq.model_copy(update={"thinking": True, "max_tokens": 1024})
-    try:
-        r = await transport.send(chosen, treq)
+    try:   # ask for the schema WITH thinking on (the transport sends it only when the lane says 'supported')
+        r = await transport.send(chosen.model_copy(update={"structured_with_thinking": "supported"}), treq)
         parsed_ok = True
         try:
             json.loads(r.text)
@@ -137,9 +147,12 @@ async def main(write: bool) -> int:
     (REPORTS / "probe.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
     for r in report:
         print(f"lane {r['lane']}: reachable={r.get('reachable')} model_loaded={r.get('model_loaded')} "
-              f"thinking_mode={r.get('thinking_mode')} json={r.get('json_schema')} structured_with_thinking={r.get('structured_with_thinking')} "
+              f"thinking_mode={r.get('thinking_mode')} thinking_on_works={r.get('thinking_on_works')} json={r.get('json_schema')} "
+              f"structured_with_thinking={r.get('structured_with_thinking')} "
               f"prefill_progress={r.get('prefill_progress')} first_token={r.get('time_to_first_token_s')}s "
               f"prompt_tok/s={r.get('prompt_tokens_per_s')}")
+        if r.get("thinking_mode") and not r.get("thinking_on_works"):
+            print(f"  lane {r['lane']}: no mode turned thinking ON; calls that should think will not (08 §3.1)")
     if write:
         lanes = dict(cfg.lanes)
         for r in report:

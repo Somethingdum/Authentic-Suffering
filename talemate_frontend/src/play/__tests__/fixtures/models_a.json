@@ -4,10 +4,10 @@
   "data": {
     "lane": "A",
     "models": [
-      "nemotron-cascade-2-30b-a3b",
+      "boulesis-v2.1-26b-a4b-i1",
       "qwen3-32b"
     ],
-    "selected": "nemotron-cascade-2-30b-a3b",
+    "selected": "boulesis-v2.1-26b-a4b-i1",
     "reachable": true
   }
 }

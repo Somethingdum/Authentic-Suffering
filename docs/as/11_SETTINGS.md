@@ -73,26 +73,26 @@ runs_dir: as_runs
 content_dir: as_content/packs
 compiled_dir: as_content/_compiled
 lanes:
-  A:
-    name: Main model — Nemotron Cascade 2 30B-A3B
+  A:                               # the Writer (D-111, 08 §2)
+    name: Main model — the Writer (Boulesis v2.1 26B-A4B, a Gemma 4)
     base_url: http://localhost:1234/v1
-    model: nemotron-cascade-2-30b-a3b
+    model: boulesis-v2.1-26b-a4b-i1
     max_concurrency: 1
     stall_window_s: 300            # LANE-10: stop a call only if it makes NO progress for this long (never for taking long)
     silent_prefill_window_s: 0     # 0 = no limit while the server reads a long prompt in silence (the Stop button is the way out)
     prefill_progress: unknown      # set by the probe: supported | unsupported | unknown
-    thinking_mode: native          # set by the probe: native | system_no_think | chat_template_kwargs | prefill_empty_think | none
+    thinking_mode: native          # set by the probe: native | system_no_think | chat_template_kwargs | prefill_empty_think | system_think_token | none
     structured_mode: json_schema   # json_schema | prompt_only
     structured_with_thinking: unknown   # set by the probe
-  B:
-    name: Second model — Nemotron 3.5 Lightning 30B-A3B
+  B:                               # the Clerk
+    name: Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)
     base_url: http://localhost:1234/v1   # via LM Link; or the laptop's own address
     model: nvidia-nemotron-3.5-lightning-30b-a3b
     max_concurrency: 1
 background_cognition: true         # quiet-hours reflection between turns (05 §9.2)
 # regimes:                         # per call class: lane, temperature, max_tokens, thinking, deadline_s (the EXPECTED seconds: a call past it is "slow", never cancelled)
-#   narration: {lane: A, temperature: 0.8, max_tokens: 1400, deadline_s: 90}
-# hot_cognition: {lane: A, temperature: 0.7, max_tokens: 3000, thinking: true, deadline_s: 75}
+#   narration: {lane: A, temperature: 1.0, max_tokens: 8192, thinking: true, deadline_s: 240}   # thinking counts against max_tokens
+# hot_cognition: {lane: A, temperature: 0.7, max_tokens: 4096, thinking: true, deadline_s: 75}  # lane B puts the HOT minds on the Clerk
 # rules:                           # RulesConfig overrides — new runs only (SET-03)
 #   scheduler: {turn_budget_s: {quick: 40, balanced: 75, deep: 150}}
 #   society: {draw_hour: 7, group_hour: 20, shortage_days: 3, drift_friction: 0.3}   # P9 (06 §2)
@@ -106,11 +106,11 @@ background_cognition: true         # quiet-hours reflection between turns (05 §
 | Key | Meaning | Who changes it |
 |---|---|---|
 | `lanes.A/B.base_url`, `.model` | where each brain lives | Connect screen |
-| `lanes.*.thinking_mode`, `structured_with_thinking` | how to switch thinking off, and whether JSON schemas work with thinking on | `tools/as/probe.py --write` (the Connect screen's Test button only checks that the model answers, how fast, and whether structured answers work) |
+| `lanes.*.thinking_mode`, `structured_with_thinking` | how to switch thinking off and on (each mode is tried both ways, D-111; Gemma 4 needs `system_think_token`), and whether JSON schemas work with thinking on | `tools/as/probe.py --write` (the Connect screen's Test button only checks that the model answers, how fast, and whether structured answers work) |
 | `lanes.*.max_concurrency` | parallel requests per machine | you, after `bench` shows the machine copes |
 | `lanes.*.stall_window_s`, `silent_prefill_window_s`, `prefill_progress` | how long a model may go without any progress before a call is stopped (default 5 minutes; there is no limit on total time), the same for the silent wait before the first token when the server reports no prompt progress (default: none), and whether the server reports it | `stall_window_s` you (Settings → Models); `prefill_progress` `tools/as/probe.py --write` |
 | `regimes.<call_class>` | lane, sampling, token cap, expected seconds per call class (08 §4) | you (advanced; edit the file — the Play UI never changes regimes, because a regime change alters every later request and so breaks re-simulation, DET-02) |
-| `hot_cognition` | the regime for deep-thinking people | you (advanced) |
+| `hot_cognition` | the regime for deep-thinking people; its `lane` is where the HOT minds think (A, the Writer, by default; B puts them on the Clerk — D-111) | you (advanced) |
 | `rules` | every tunable number (`RulesConfig`; P9 adds `society`: daily needs by age band, ration multipliers, shortage and recovery days, draw and group hours, role skills, sleep windows, tension and drift numbers, rumour pace — `contracts/settings.py::SocietyRules`; P10 adds the table below). A group you name keeps its defaults for the numbers you leave out, but a table keyed by difficulty or era (for example `hordes.mega_daily_chance`) replaces the default table whole: give every key | you (advanced; new runs only) |
 | `background_cognition` | allow reflection jobs while you read | Settings → Advanced (`config_set`) |
 

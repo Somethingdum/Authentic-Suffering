@@ -7,7 +7,7 @@ import json
 import math
 import re
 
-from ..contracts.common import LOD, Lane, Verb, attr_mod
+from ..contracts.common import LOD, CallClass, Lane, Verb, attr_mod
 from ..contracts.events import Event, EventType
 
 
@@ -937,20 +937,22 @@ def plan_cognition(candidates, config, turn_depth, lanes_up):
     tot = {Lane.A: 0.0, Lane.B: 0.0}
     wall = lambda: max(tot[Lane.A] / conc[Lane.A], tot[Lane.B] / conc[Lane.B])  # noqa: E731
     budget = S.turn_budget_s[turn_depth] - S.reserve_narration_s
+    hot_lane = config.hot_cognition.lane
+    warm = config.regimes[CallClass.ACTOR_COGNITION].lane
+    warm_lane = warm if warm in lanes_up else next(l for l in (Lane.B, Lane.A) if l in lanes_up)
     i = 0
-    if Lane.A in lanes_up:
+    if hot_lane in lanes_up:
         for a, _s, _m in order[: S.max_hot[turn_depth]]:
             plan.lod[a] = LOD.HOT
-            plan.lane[a] = Lane.A
-            tot[Lane.A] += S.estimated_call_s["actor_cognition_hot"]
+            plan.lane[a] = hot_lane
+            tot[hot_lane] += S.estimated_call_s["actor_cognition_hot"]
             i += 1
     cold = False
     for a, _s, mand in order[i:]:
         if cold and not mand:
             plan.lod[a] = LOD.COLD
             continue
-        ups = [l for l in (Lane.B, Lane.A) if l in lanes_up]
-        lane = min(ups, key=lambda l: (tot[l] / conc[l], 0 if l == Lane.B else 1))
+        lane = warm_lane
         est = S.estimated_call_s["actor_cognition_warm"]
         tot[lane] += est
         if wall() > budget:

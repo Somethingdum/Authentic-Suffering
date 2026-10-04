@@ -2,8 +2,8 @@
 
 **What this folder is.** The complete game design and build specification for *Authentic Suffering*
 (AS): a local-model, AI-narrated survival RPG built as a fork of Talemate 0.39.0, driven by two
-LM Studio models — **Nemotron Cascade 2 30B-A3B** (desktop, "Lane A") and **Nemotron 3.5 Lightning
-30B-A3B** (laptop, "Lane B"). It is written for a coding agent working in **DeepSeek Harness (DSH)** on local LM Studio models,
+LM Studio models — **Boulesis v2.1 26B-A4B**, a Gemma 4 (desktop, "Lane A", the Writer) and **Nemotron 3.5 Lightning
+30B-A3B** (laptop, "Lane B", the Clerk). It is written for a coding agent working in **DeepSeek Harness (DSH)** on local LM Studio models,
 which must be able to build the game from these files alone.
 
 **Status:** Specified. Not built. The only legal status words until a phase gate passes are

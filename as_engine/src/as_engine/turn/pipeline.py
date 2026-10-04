@@ -254,7 +254,7 @@ MODEL_SWAPPED = ("The model loaded in LM Studio changed since this run started. 
                  "the new one in Settings), then try again.")
 REJECT_FAILED = "Something went wrong working out that moment. Nothing changed; try again."
 LANE_B_DOWN = "Your second model is offline; turns will be thinner until it is back."
-LANE_A_DOWN = "Your main model is offline; the story runs on the second model until it is back."
+LANE_A_DOWN = "Your main model is offline; the story is told plainly until it is back."
 
 
 class GateFailed(Exception):

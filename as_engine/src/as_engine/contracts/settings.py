@@ -38,7 +38,8 @@ class LaneConfig(Strict):
     prefill_progress: Literal["supported", "unsupported", "unknown"] = Field(
         default="unknown", description="Whether the server streams prompt-processing progress (llama.cpp's return_progress). "
         "tools/as/probe.py writes it; the engine asks for it only when 'supported'.")
-    thinking_mode: Literal["native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "none"] = "native"
+    thinking_mode: Literal["native", "system_no_think", "chat_template_kwargs", "prefill_empty_think", "system_think_token",
+                           "none"] = "native"
     structured_mode: Literal["json_schema", "prompt_only"] = "json_schema"
     structured_with_thinking: Literal["supported", "unsupported", "unknown"] = "unknown"
 
@@ -61,9 +62,11 @@ class LaneConfig(Strict):
 
 def default_lanes() -> dict[Lane, LaneConfig]:
     return {
-        Lane.A: LaneConfig(name="Main model — Nemotron Cascade 2 30B-A3B",
-                           model="nemotron-cascade-2-30b-a3b"),
-        Lane.B: LaneConfig(name="Second model — Nemotron 3.5 Lightning 30B-A3B",
+        # D-111: lane A is the Writer, lane B the Clerk — the owner's models; the Connect screen changes them
+        # (LM Studio's list) and the swap guard (LANE-05) checks them.
+        Lane.A: LaneConfig(name="Main model — the Writer (Boulesis v2.1 26B-A4B, a Gemma 4)",
+                           model="boulesis-v2.1-26b-a4b-i1"),
+        Lane.B: LaneConfig(name="Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)",
                            model="nvidia-nemotron-3.5-lightning-30b-a3b"),
     }
 
@@ -80,7 +83,9 @@ class CallRegime(Strict):
 
 
 def default_regimes() -> dict[CallClass, CallRegime]:
-    """Default lane + sampling per call class (08_LLM_CALLS.md §Call table)."""
+    """Default lane + sampling per call class (08_LLM_CALLS.md §Call table). D-111: lane A is the Writer (prose the
+    player reads, and the long-context creative work), lane B the Clerk (closed, checkable answers); a call that is
+    allowed to think has room for it in ``max_tokens`` (thinking counts against it)."""
     A, B = Lane.A, Lane.B
     return {
         CallClass.INTAKE: CallRegime(lane=B, temperature=0.2, max_tokens=400, deadline_s=30),
@@ -88,25 +93,25 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.ACTOR_REACTION: CallRegime(lane=B, temperature=0.6, max_tokens=300, deadline_s=25),
         CallClass.INTENT_REPAIR: CallRegime(lane=B, temperature=0.1, max_tokens=300, deadline_s=20),
         CallClass.WRITEBACK: CallRegime(lane=B, temperature=0.5, max_tokens=700, deadline_s=45),
-        CallClass.PORTRAYAL_AUDIT: CallRegime(lane=B, temperature=0.1, max_tokens=250, deadline_s=25),
-        CallClass.NARRATION: CallRegime(lane=A, temperature=0.8, max_tokens=1400, deadline_s=90),
-        CallClass.RENDER_LINT: CallRegime(lane=B, temperature=0.0, max_tokens=400, deadline_s=25),
+        CallClass.PORTRAYAL_AUDIT: CallRegime(lane=B, temperature=0.6, max_tokens=2000, deadline_s=45, thinking=True),
+        CallClass.NARRATION: CallRegime(lane=A, temperature=1.0, max_tokens=8192, deadline_s=240, thinking=True),
+        CallClass.RENDER_LINT: CallRegime(lane=B, temperature=0.6, max_tokens=2000, deadline_s=45, thinking=True),
         CallClass.RUMOUR_DISTORT: CallRegime(lane=B, temperature=0.7, max_tokens=200, deadline_s=20),
         CallClass.CASCADE_ADVISORY: CallRegime(lane=B, temperature=0.4, max_tokens=400, deadline_s=30),
         CallClass.GUIDE: CallRegime(lane=B, temperature=0.3, max_tokens=500, deadline_s=30),
         CallClass.REFLECTION: CallRegime(lane=B, temperature=0.6, max_tokens=700, deadline_s=60),
         CallClass.SCENE_SUMMARY: CallRegime(lane=B, temperature=0.3, max_tokens=500, deadline_s=40),
-        CallClass.RECAP: CallRegime(lane=B, temperature=0.4, max_tokens=500, deadline_s=40),
+        CallClass.RECAP: CallRegime(lane=A, temperature=1.0, max_tokens=4096, deadline_s=240, thinking=True),
         CallClass.SAY_MY_WAY: CallRegime(lane=B, temperature=0.8, max_tokens=200, deadline_s=20),
-        CallClass.WORLDGEN_HISTORY: CallRegime(lane=A, temperature=0.8, max_tokens=2500, deadline_s=240, thinking=True),
+        CallClass.WORLDGEN_HISTORY: CallRegime(lane=A, temperature=0.8, max_tokens=8192, deadline_s=240, thinking=True),
         CallClass.WORLDGEN_ACTOR: CallRegime(lane=A, temperature=0.9, max_tokens=3500, deadline_s=240),
-        CallClass.WORLDGEN_OPENING: CallRegime(lane=A, temperature=0.7, max_tokens=800, deadline_s=120, thinking=True),
+        CallClass.WORLDGEN_OPENING: CallRegime(lane=A, temperature=0.7, max_tokens=4096, deadline_s=120, thinking=True),
         CallClass.DOSSIER_INTAKE: CallRegime(lane=A, temperature=0.2, max_tokens=6000, deadline_s=600),
         CallClass.PC_QUICKMAKE: CallRegime(lane=A, temperature=0.8, max_tokens=4000, deadline_s=300),
         CallClass.CHEAT_PERSONA: CallRegime(lane=B, temperature=0.9, max_tokens=150, deadline_s=15),
-        CallClass.CHEAT_INTERPRET: CallRegime(lane=A, temperature=0.2, max_tokens=900, deadline_s=60),
-        CallClass.WILLIS_ROAST: CallRegime(lane=A, temperature=0.95, max_tokens=700, deadline_s=45),
-        CallClass.THE_VOICE: CallRegime(lane=A, temperature=0.95, max_tokens=1400, deadline_s=90),
+        CallClass.CHEAT_INTERPRET: CallRegime(lane=B, temperature=0.6, max_tokens=2500, deadline_s=60, thinking=True),
+        CallClass.WILLIS_ROAST: CallRegime(lane=A, temperature=1.0, max_tokens=4096, deadline_s=180, thinking=True),
+        CallClass.THE_VOICE: CallRegime(lane=A, temperature=1.0, max_tokens=6144, deadline_s=240, thinking=True),
         CallClass.DOOM_GUARD: CallRegime(lane=B, temperature=0.0, max_tokens=40, deadline_s=15),
         CallClass.PROBE: CallRegime(lane=B, temperature=0.0, max_tokens=64, deadline_s=30),
     }
@@ -540,7 +545,7 @@ class EngineConfig(Strict):
     regimes: dict[CallClass, CallRegime] = Field(default_factory=default_regimes)
     rules: RulesConfig = Field(default_factory=RulesConfig)
     hot_cognition: CallRegime = Field(default_factory=lambda: CallRegime(
-        lane=Lane.A, temperature=0.7, max_tokens=3000, thinking=True, deadline_s=75))
+        lane=Lane.A, temperature=0.7, max_tokens=4096, thinking=True, deadline_s=75))
     background_cognition: bool = True
     model_config = Strict.model_config | {"populate_by_name": True}
 

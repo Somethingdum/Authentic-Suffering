@@ -308,7 +308,7 @@
         "A": {
           "label": "Main model",
           "ok": true,
-          "model": "nemotron-cascade-2-30b-a3b",
+          "model": "boulesis-v2.1-26b-a4b-i1",
           "detail": ""
         },
         "B": {

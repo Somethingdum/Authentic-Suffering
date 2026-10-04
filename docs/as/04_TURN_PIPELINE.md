@@ -212,8 +212,8 @@ were (PROTO-06). From stage 12 on the answer is `too_late` and the result still 
 
 | Failure | Detection | Behaviour (never "guess and continue") |
 |---|---|---|
-| Lane B down at turn start | stage 0 probe | Single-lane mode: the scheduler places HOT and WARM calls on lane A within the budget (the rest run COLD); every other call moves to lane A; the turn's notice: "Your second model is offline; turns will be thinner until it is back." |
-| Lane A down | stage 0 probe | No HOT; WARM, narration and the rest move to lane B (thinking off); notice: "Your main model is offline; the story runs on the second model until it is back." |
+| Lane B down at turn start | stage 0 probe | Single-lane mode: the scheduler places HOT (on the hot lane, `hot_cognition.lane`, A by default) and WARM calls on lane A within the budget (the rest run COLD); the scheduled Clerk jobs move to lane A with thinking off (DEGRADE-01); the turn's notice: "Your second model is offline; turns will be thinner until it is back." |
+| Lane A down | stage 0 probe | No HOT while the hot lane is down; WARM stays on lane B (D-111). The Clerk never writes the story: narration falls back to the plain code telling (NARR-FALLBACK), the Voice and Willis to their fallbacks; notice: "Your main model is offline; the story is told plainly until it is back." |
 | Both down | stage 0 | Refuse the turn: `turn_rejected {code: 'no_models'}`; nothing changes |
 | Lane dies mid-wave | stall (LANE-10) / reset | No repair; HOLD-01 for that actor (a consequential moment: the turn is not played; otherwise what they took on goes on, or no attempt); `DEGRADED_FALLBACK` event |
 | Grammar/schema failure | parse_status | One repair call (INTENT_REPAIR, a decision only); then HOLD-01 + `DEGRADED_FALLBACK` + `error_repair_log` |

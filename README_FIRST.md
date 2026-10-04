@@ -125,8 +125,9 @@ The builder never runs the maintainer commands; the guard blocks them.
 
 ## 7. The game (what the spec builds)
 
-- **AI as Dungeon Master, engine as rulebook**: two local models (Nemotron Cascade 2 on the desktop,
-  Nemotron 3.5 Lightning on the laptop) play everyone else and narrate; the engine owns rules,
+- **AI as Dungeon Master, engine as rulebook**: two local models (Boulesis 26B-A4B, a Gemma 4, on the desktop
+  writes the story and thinks for the people who matter most; Nemotron 3.5 Lightning on the laptop thinks for
+  everyone else and checks the work); the engine owns rules,
   dice, bodies, clocks, inventory, location and memory. One machine off → slower, thinner, still
   playable, and it tells you.
 - **Actors, not NPCs**: each person thinks in their own model call with only what reached them

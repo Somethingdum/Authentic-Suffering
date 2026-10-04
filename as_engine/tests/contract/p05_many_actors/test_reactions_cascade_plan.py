@@ -218,6 +218,25 @@ def test_plan_cognition_without_lane_a_has_no_hot():
     assert LOD.HOT not in p.lod.values() and p.lod["a1"] == LOD.WARM and p.lane["a1"] == Lane.B
 
 
+def test_plan_cognition_follows_the_hot_lane_and_degrades_when_it_is_down():
+    """D-111: HOT goes to hot_cognition.lane; with the warm lane down, WARM moves to the lane that is up."""
+    cfg = EngineConfig()
+    cfg.hot_cognition.lane = Lane.B                                    # the owner can put the HOT minds on the Clerk
+    p = plan_cognition([("a1", 5.0, True), ("a2", 1.0, False)], cfg, "deep", {Lane.A, Lane.B})
+    assert p.lod == {"a1": LOD.HOT, "a2": LOD.HOT} and p.lane == {"a1": Lane.B, "a2": Lane.B}
+    five = [(f"a{i}", 5.0 - i, False) for i in range(5)]
+    q = plan_cognition(five, EngineConfig(), "deep", {Lane.A})
+    assert [q.lod[a] for a, _s, _m in five] == [LOD.HOT] * 3 + [LOD.WARM] * 2
+    assert set(q.lane.values()) == {Lane.A}, "the Clerk is down: WARM moves to the Writer (DEGRADE-01)"
+
+
+def test_plan_cognition_never_spills_warm_onto_the_writer_to_balance_load():
+    many = [(f"w{i:02d}", 1.0, False) for i in range(30)]
+    p = plan_cognition(many, EngineConfig(), "deep", {Lane.A, Lane.B})
+    warm = [a for a, l in p.lod.items() if l == LOD.WARM]
+    assert len(warm) > 18 and {p.lane[a] for a in warm} == {Lane.B}, "lanes are roles, not a pool (D-111)"
+
+
 def test_plan_cognition_budget_and_mandatory_overrun():
     cfg = EngineConfig()
     many = [(f"m{i:02d}", 1.0, True) for i in range(30)]

@@ -22,9 +22,9 @@ describe('Connect', () => {
     }
     expect(one(w, 'lane-A-card').text()).toContain('Main model')
     expect(one(w, 'lane-B-card').text()).toContain('Second model')
-    expect(one(w, 'lane-A-model').text()).toContain('nemotron-cascade-2-30b-a3b')
+    expect(one(w, 'lane-A-model').text()).toContain('boulesis-v2.1-26b-a4b-i1')
     expect(one(w, 'lane-A-model').find('input').exists()).toBe(false)
-    expect(byId(w, 'lane-A-model-option').map((o) => o.text())).toEqual(['nemotron-cascade-2-30b-a3b', 'qwen3-32b'])
+    expect(byId(w, 'lane-A-model-option').map((o) => o.text())).toEqual(['boulesis-v2.1-26b-a4b-i1', 'qwen3-32b'])
     expect(byId(w, 'lane-B-model-option')).toEqual([])
     expect(has(w, 'lane-A-url')).toBe(false)
     await one(w, 'lane-A-advanced').trigger('click')
@@ -34,7 +34,7 @@ describe('Connect', () => {
   test('a model that is no longer loaded is replaced from the list, never typed', async () => {
     const { store, sock } = storeWith('welcome_connect', 'config')
     const w = mountWith(ConnectScreen, { store })
-    const listed = ['nemotron-cascade-2-30b-a3b', 'nvidia-nemotron-3.5-lightning-30b-a3b']
+    const listed = ['boulesis-v2.1-26b-a4b-i1', 'nvidia-nemotron-3.5-lightning-30b-a3b']
     sock.emit({ type: 'as_game', action: 'models', data: { lane: 'B', models: listed, selected: listed[1], reachable: true } })
     sock.emit({ type: 'as_game', action: 'models', data: { lane: 'A', models: listed, selected: 'an-old-model', reachable: true } })
     await flush()

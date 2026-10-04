@@ -22,18 +22,20 @@ fork's diff against upstream small (list in §4) so future Talemate releases can
 
 | Lane | Machine | Model | Role |
 |---|---|---|---|
-| **A** | `msi` desktop | **Nemotron Cascade 2 30B-A3B** (1M ctx, thinking + instruct modes, strong instruction following) | Narration, HOT actor cognition (thinking on), worldgen history/people/opening, dossier intake, quick-make |
-| **B** | laptop (RTX 5070 8 GB + 32 GB RAM) | **NVIDIA Nemotron 3.5 Lightning 30B-A3B** (built for fast tool calls and structured output) | Player intake, WARM actor cognition, memory writeback, portrayal audit, render lint judge, rumours, guide, summaries, reflection |
+| **A** — the Writer | `msi` desktop (12 GB card) | **Boulesis v2.1 26B-A4B** (`boulesis-v2.1-26b-a4b-i1`, a Gemma 4 26B-A4B fine-tune, GGUF Q4_K_M ≈ 16 GB; 143,360 tokens of context; a thinking model; nearly as fast as the Cascade it replaced, and much smarter; consistent over a long context, keeps extra directions, tells in-story from meta) | HOT actor cognition (thinking on), narration, the Voice, Willis, the recap, worldgen history/people/opening, dossier intake, quick-make |
+| **B** — the Clerk | laptop (RTX 5070 8 GB + 32 GB RAM) | **NVIDIA Nemotron 3.5 Lightning 30B-A3B** for now (fast; built for tool calls and structured output; the owner may pick a better one — the role stays) | Player intake, WARM actor cognition, reactions, repair, memory writeback, portrayal audit and render lint judge (thinking on), rumours, guide, summaries, reflection, the cheat interpreter |
 
 - Both run **simultaneously**; each machine holds **one** model. A lane never swaps models
   mid-session (LANE-05 hard stop).
 - **LM Link**: when both machines are linked, both models are reachable through the desktop's
   `http://localhost:1234/v1` by model key. The game runs on the desktop. Lanes can also point at two
   different base URLs.
+- The split (D-111, 08 §2): the Writer writes what the player reads; the Clerk answers what code can check.
+  Lanes are roles: a call never moves to the other lane to balance load, only when its lane is down.
 - The audit calls on Lane B judge work produced on Lane A by a *different model* — the strongest
-  form of "producer ≠ judge" (L13).
-- Suggested LM Studio load settings: Lane A context 32k, Lane B context 16k; flash attention on;
-  "max concurrent predictions" 1 until `tools/as/bench.py` shows the laptop handles 2.
+  form of "producer ≠ judge" (L13). (WARM decisions are judged on their own lane, in an independent call.)
+- Suggested LM Studio load settings: Lane A the context LM Studio offers for it (143,360), Lane B context 16k;
+  flash attention on; "max concurrent predictions" 1 until `tools/as/bench.py` shows the laptop handles 2.
 
 ## 3. Process model
 
@@ -49,8 +51,8 @@ fork's diff against upstream small (list in §4) so future Talemate releases can
                                    │        │ HttpTransport (httpx)                              │
                                    └────────┼────────────────────────────────────────────────────┘
                                             ▼
-                         LM Studio :1234 ──(LM Link)──► laptop: Lightning (Lane B)
-                          desktop: Cascade (Lane A)
+                         LM Studio :1234 ──(LM Link)──► laptop: Lightning (Lane B, the Clerk)
+                          desktop: Boulesis 26B-A4B (Lane A, the Writer)
 ```
 
 - One backend process. `GameService` is a process-wide singleton so a browser reload reconnects to
