@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-769 ids; 514 with their own statement, 255 named only in context.
+772 ids; 516 with their own statement, 256 named only in context.
 
 
 ## ABUSE
@@ -44,6 +44,14 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *Belief cues (AFF-10): a cue is HELD by an actor when a lessons row for that holder carries the cue* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
 | AFF-11 | AFF-11 (Actor v2, Actor Spec AC06: a menu built from what the person knows) Two worlds that differ | as_engine/mind/affordance.py | `as_engine/action/cascade.py`, `as_engine/mind/affordance.py`, `as_content/packs/core/affordances/items.yaml` | `contract/p04_one_actor/test_knowledge_menus.py`, `contract/p09_society/test_theft_seen.py` |
+
+## AMB
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| AMB-01 | AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacket / None (D-128) What a COLD person — someone past this moment's model budget — has to go on to say one short thing, or nothing (turn.cogni… | as_engine/mind/packet.py | `as_engine/contracts/mind.py`, `as_engine/mind/packet.py` | `contract/p07_slice/test_the_room_talks.py` |
+| AMB-02 | AMB-02 gives the room's lines to the COLD people in it). LOD never changes competence, knowledge or morality (LOD-01); it only changes who calls a model. | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/mind/packet.py`, `as_engine/turn/cognition.py` | `contract/p07_slice/test_the_room_talks.py` |
+| AMB-03 | AMB-03 an answer with parse_status 'ok' that validates as AmbientLine, whose line — stripped, without surrounding quotes and without anything between asterisks — is not empty and does not echo (narration.lint.check_line… | as_engine/turn/cognition.py | `as_engine/turn/cognition.py` | — |
 
 ## AUD
 
@@ -360,7 +368,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | ECHO-01 | ECHO-01 each sorted n-gram of content_ngrams(unquoted text, numbers.echo_n, numbers.echo_min_content_tokens) that is in packet.player_input_echo_block (quoted speech is licensed: the PC's own words may be quoted) passed… | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
-| ECHO-02 | ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3. | as_engine/turn/cognition.py | `as_engine/narration/lint.py`, `as_engine/turn/cognition.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
+| ECHO-02 | *Render lint (Stage 18) and the echo ledger (P7). Rules STYLE-01..06, DISC-01..04, ECHO-01..03,* | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/turn/cognition.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
 
 ## ECON
 
@@ -697,7 +705,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| LOD-01 | *est_wall_s = the final estimate. LOD never changes competence, knowledge or morality (LOD-01);* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/turn/cognition.py` | `contract/p05_many_actors/test_cues_and_continuation.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py` |
+| LOD-01 | *AMB-02 gives the room's lines to the COLD people in it). LOD never changes competence, knowledge or morality (LOD-01);* | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/turn/cognition.py` | `contract/p05_many_actors/test_cues_and_continuation.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | LOD-02 | *(COLD, LOD-02) The same decision the actor made last time, still running. First match wins; the* | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | — |
 
 ## LOOK
@@ -935,7 +943,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| RESOLVE-01 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
+| RESOLVE-01 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py`, `as_engine/turn/cognition.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
 | RESOLVE-02 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
 | RESOLVE-03 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
 | RESOLVE-04 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |

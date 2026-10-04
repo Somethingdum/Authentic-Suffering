@@ -541,3 +541,59 @@ def _f1c_lines(tx, actor_id):
         elif "torso" not in cov:
             out.append(BARE_LINES[1])
     return out
+
+
+_SWEARS = {"none": "You do not swear.", "rare": "You rarely swear.", "frequent": "You swear often.",
+           "constant": "You swear all the time."}
+
+
+def ambient_packet(tx, actor_id, turn_index, at, *, doing=""):
+    # AMB-01 (D-128): what a COLD person has to go on to say one thing — their own records only
+    from ..contracts.mind import AmbientPacket, AmbientPerson
+    from .actor import fused
+    from .perception import place_phrase, word_for
+    last = tx.query_one("SELECT MAX(at) FROM events WHERE type='SPEECH' AND actor_id=? AND at<=?", (actor_id, at))[0]
+    rows = [dict(r) for r in tx.query(
+        "SELECT * FROM percept_log WHERE holder_id=? AND turn_index BETWEEN ? AND ? AND at<=? AND at>? AND "
+        "event_id NOT LIKE 'scene:%' AND (source_id IS NULL OR source_id != ?) ORDER BY at DESC, percept_id DESC LIMIT 4",
+        (actor_id, turn_index - 1, turn_index, at, -1 if last is None else last, actor_id))]
+    if not rows:
+        return None
+    PR = tx.rules.packet
+    reached = []
+    for p in reversed(rows):
+        if p["channel"] == "speech":
+            det = json.loads(p["detail"]) if isinstance(p["detail"], str) else (p["detail"] or {})
+            who = word_for(tx, actor_id, p["source_id"]) if p["source_id"] else "Someone"
+            reached.append(f"{_cap(who)} said{' to you' if det.get('addressed_to_me') else ''}: "
+                           f"\"{cut_heard(det.get('words', ''), PR.max_heard_chars)}\"")
+        else:
+            reached.append(p["text"])
+    v = fused(tx, actor_id).voice
+    voice = [v.capsule, "How you talk: " + " ".join(t if t.rstrip().endswith((".", "!", "?", '"')) else t.rstrip() + "."
+                                                   for t in v.speech_tendencies),
+             f"Easy: \"{v.exemplars.low_stakes}\"", f"Under pressure: \"{v.exemplars.under_pressure}\"",
+             f"At the limit: \"{v.exemplars.at_the_limit}\"",
+             "You would never say: " + "; ".join(f"\"{x}\"" for x in v.would_never_say), _SWEARS[v.profanity]]
+    if v.dialect_notes:
+        voice.append(v.dialect_notes)
+    pl = _row(tx, "SELECT p.name FROM positions s JOIN places p ON p.place_id = s.place_id WHERE s.body_id=?", (actor_id,))
+    said = [r[0] for r in tx.query("SELECT text FROM voice_lines WHERE actor_id=? AND at<=? ORDER BY at DESC, line_id DESC "
+                                   "LIMIT 3", (actor_id, at))][::-1]
+    people, handles = [], {}
+    for (b,) in tx.query("SELECT p.source_id FROM percept_log p JOIN bodies b ON b.body_id = p.source_id WHERE "
+                         "p.holder_id=? AND p.turn_index=? AND p.at<=? AND p.source_id != ? AND b.alive=1 AND "
+                         "b.kind='human' GROUP BY p.source_id ORDER BY MIN(p.at), MIN(p.percept_id) LIMIT 6",
+                         (actor_id, turn_index, at, actor_id)):
+        h = f"P{len(people) + 1}"
+        handles[h] = b
+        rel = _row(tx, "SELECT * FROM relationships WHERE from_id=? AND to_id=?", (actor_id, b))
+        parts = [_temper_feeling(tx, actor_id, b, at)]
+        if rel is not None and _rel_text(rel) != "No strong feelings.":
+            t = _rel_text(rel).rstrip(".")
+            parts.append(t[:1].lower() + t[1:])
+        people.append(AmbientPerson(handle=h, word=word_for(tx, actor_id, b), feeling="; ".join(x for x in parts if x)))
+    name = _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (actor_id,))["display_name"]
+    return AmbientPacket(actor_id=actor_id, name=name, voice=voice, where=place_phrase(pl["name"]) if pl else "",
+                         doing=doing, state=[x for x in _body_lines(tx, actor_id) if x != "Unhurt."][:3],
+                         reached=reached, said=said, people=people, handles=handles)

@@ -491,6 +491,38 @@ class DoomGuardOutput(Strict):
     tells: bool
 
 
+class AmbientPerson(Strict):
+    """D-128: someone the speaker can see, as they know them."""
+
+    handle: str                      # P1.. (resolved by code, never shown as an id)
+    word: str                        # the name they know, else how they look ('a tall man')
+    feeling: str = ""                # how they feel about them now (mind.packet's TEMPER-08 words), or ''
+
+
+class AmbientPacket(Strict):
+    """AMBIENT_LINE context (D-128, AMB-01): what a COLD person — someone past this moment's model
+    budget — has to go on to say one thing, or nothing. Built only from their own records (Skull Law)."""
+
+    actor_id: str
+    name: str
+    voice: list[str]                 # how they talk: the capsule, tendencies, the three exemplars, never-says
+    where: str
+    doing: str = ""                  # what code has them doing (their continuation's label), or ''
+    state: list[str] = Field(default_factory=list)   # how their body and mind are (max 3), or none
+    reached: list[str]               # what has reached them since they last spoke, oldest first (max 4)
+    said: list[str] = Field(default_factory=list)    # their own last lines (max 3): never say them again
+    people: list[AmbientPerson] = Field(default_factory=list)
+    handles: dict[str, str] = Field(default_factory=dict)
+
+
+class AmbientLine(Strict):
+    """AMBIENT_LINE output (D-128): one short line in their own voice, or nothing (line null)."""
+
+    line: str | None = Field(default=None, max_length=200)
+    to: str | None = None            # a P-handle of the packet, or null: to whoever is there
+    volume: Literal["low", "normal", "raised"] = "normal"
+
+
 class WillisRoast(Strict):
     """WILLIS_ROAST output (D-105): what Willis says to the dead, line by line."""
 

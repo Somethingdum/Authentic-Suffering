@@ -1,5 +1,5 @@
 """Stage 6 (cognition) and the stage-8 reading of answers (P7). Rules LOD-01/02, LANE-06, INTENT-02,
-ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
+AMB-02..03, ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
 
 decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), audits=None) -> dict[actor_id, Intent]
   ``answered`` = the pipeline's set of (actor, speech event) pairs already answered this turn (HOLD-02
@@ -135,6 +135,28 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
                the straight-line distance from the actor to the anchor); else, or not mobile, no
                intent this wave (it stays, seething).
        tears   'rest' (est_duration_s = duration.base_s): it sits down and breaks down.
+  AMB-02 (D-128) the room talks. The people code moves (COLD) never chose words with a model, so a
+     crowd stood mute while two or three people talked. When lane B is up (session.client.is_down(
+     Lane.B) is false — a line never falls over to lane A: the Writer is not spent on background
+     talk), the COLD actors of plan.order (most salient first) that qualify get one AMBIENT_LINE call
+     each, at most SchedulerRules.max_ambient[session.settings.turn_depth]: not the PC; controller
+     'model'; in the PC's place (positions); no SPEECH of theirs this turn (one line a turn); no
+     pending ACTION_LAND (kernel.clock.pending_for: words start an action anew, RESOLVE-01, so a line
+     never cuts off what someone is in the middle of); their continuation (plan_continuation(tx,
+     actor, affs[actor], at, turn_index), as for every COLD actor) is not None; and pk =
+     mind.packet.ambient_packet(tx, actor, turn_index, at, doing = that continuation's bound.label)
+     is not None (something reached them). The request: lanes.requests.build_request(config,
+     CallClass.AMBIENT_LINE, turn_index=turn_index, actor_id=actor, context=pk, json_schema=
+     lanes.schemas.to_lm_schema(AmbientLine), ctx=pk); its Job (job_id 'ambient:' + actor,
+     output_model AmbientLine, lane_pref Lane.B, est_s = estimated_call_s['ambient_line']) joins step
+     1's run_jobs batch after the decision jobs.
+  AMB-03 an answer with parse_status 'ok' that validates as AmbientLine, whose line — stripped, without
+     surrounding quotes and without anything between asterisks — is not empty and does not echo
+     (narration.lint.check_line finds nothing) -> the continuation with speech = SpeechAct(that
+     line, to = (handles[to],) when ``to`` is a handle of the packet, else ('everyone',), volume)
+     and source 'ambient'. Anything else — a null line, a failure, a timeout, an echo — is silence:
+     the continuation as it was, with no repair, no hold and no audit row (it was never a decision:
+     what they do is code's either way; only their words were asked for).
   Every call is logged by the pipeline through LaneClient.on_call; nothing here writes lm_calls.
 
 urge_pc(tx, rng, pc_id, intent, turn_index, at) -> Intent   (W1, D-80: actions pass through)

@@ -53,6 +53,7 @@ class CallClass(StrEnum):
     WILLIS_ROAST = "willis_roast"         # P12, D-105: Willis at every death (service.death.roast)
     THE_VOICE = "the_voice"               # P12, D-106: the Voice before and after a death (service.voice)
     DOOM_GUARD = "doom_guard"             # P12, D-106: the doomed cannot tell (turn.intake DOOM-07)
+    AMBIENT_LINE = "ambient_line"         # D-128: a COLD person in the PC's place says something (turn.cognition AMB-02)
     PROBE = "probe"
 
 

@@ -446,6 +446,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_being_hurt.py` | Owen hits Alice for nothing with Mara watching: Alice trusts him 2 less, fears him 1 more and holds it against him (CAS-036); Mara trusts him 1 less and tells it (CAS-037). A fight Alice started: nothing. Mara hits Owen: nothing is written into Owen (C06), and Alice, watching, judges Mara. Owen with his Glock: "Quiet." is no threat to remember; "Hand it over or I'll shoot you." leaves Alice afraid of him (CAS-038) |
 
+### 3.42 The room talks (P7; D-128)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_room_talks.py` | AMB-01..03: Owen asks the floor for his lighter; Mara, past the budget, gets one line on lane B from a packet of her own voice and what reached her, and it is her COLD act's speech, to Owen; Alice, unscripted, keeps quiet. The line is said and goes into her voice lines. Quotes and asterisks are not words. A failed line is silence — no fallback event, no repair row. At quick depth one line, the most salient first. Nothing reached them, lane B down, or already spoken this turn: no call |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

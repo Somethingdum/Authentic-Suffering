@@ -55,6 +55,7 @@ from pydantic import BaseModel
 from ..contracts.common import CallClass
 from ..contracts.mind import (
     ActorReplyV2,
+    AmbientLine,
     CascadeSuggestion,
     CheatPlan,
     DoomGuardOutput,
@@ -95,6 +96,7 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.WILLIS_ROAST: WillisRoast,
     CallClass.THE_VOICE: VoiceMessage,
     CallClass.DOOM_GUARD: DoomGuardOutput,
+    CallClass.AMBIENT_LINE: AmbientLine,
     CallClass.PROBE: None,
 }
 

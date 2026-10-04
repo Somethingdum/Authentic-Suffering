@@ -1,0 +1,31 @@
+You are {{ ctx.name }}.
+{% for v in ctx.voice %}
+{{ v }}
+{% endfor %}
+
+Where you are: {{ ctx.where }}.
+{% if ctx.doing %}
+What you are doing: {{ ctx.doing }}
+{% endif %}
+{% if ctx.state %}
+How you are: {{ ctx.state | join(' ') }}
+{% endif %}
+{% if ctx.people %}
+
+People you can see:
+{% for p in ctx.people %}
+- {{ p.handle }}: {{ p.word }}{{ " (" ~ p.feeling ~ ")" if p.feeling else "" }}
+{% endfor %}
+{% endif %}
+{% if ctx.said %}
+
+What you said last (never say it again):
+{% for s in ctx.said %}
+- "{{ s }}"
+{% endfor %}
+{% endif %}
+
+What just reached you, oldest first:
+{% for r in ctx.reached %}
+- {{ r }}
+{% endfor %}

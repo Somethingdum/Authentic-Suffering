@@ -27,7 +27,8 @@ plan_cognition(candidates, config, turn_depth, lanes_up) -> CognitionPlan   (P5)
      True, note 'BUDGET_OVERRUN <actor_id>'); a non-mandatory candidate that would exceed it
      becomes COLD and so does every one after it.
   4. Everyone else COLD (no lane). No lane up -> everyone COLD, note 'NO_LANES'.
-  est_wall_s = the final estimate. LOD never changes competence, knowledge or morality (LOD-01);
+  est_wall_s = the final estimate; order = the actor ids in step 1's order (D-128: turn.cognition
+  AMB-02 gives the room's lines to the COLD people in it). LOD never changes competence, knowledge or morality (LOD-01);
   it only changes who calls a model.
 """
 
@@ -58,6 +59,7 @@ class Job:
 class CognitionPlan:
     lod: dict[str, LOD] = field(default_factory=dict)
     lane: dict[str, Lane] = field(default_factory=dict)
+    order: list[str] = field(default_factory=list)   # D-128: step 1's order (mandatory first, salience desc)
     overrun: bool = False
     est_wall_s: float = 0.0
     notes: list[str] = field(default_factory=list)

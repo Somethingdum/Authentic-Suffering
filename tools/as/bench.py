@@ -69,7 +69,7 @@ COLORS = ("red", "blue", "green", "yellow", "white")
 CODE_WORDS = ("MARIGOLD", "HARBOR", "CINDER", "LANTERN", "THISTLE", "BRAMBLE", "COPPER", "RAVEN")
 RECALL_FLOOR = 0.8           # four facts in five
 SCHED_KEYS = ("intake", "actor_cognition_hot", "actor_cognition_warm", "actor_reaction", "writeback",
-              "portrayal_audit", "narration", "render_lint")       # SchedulerRules.estimated_call_s
+              "portrayal_audit", "narration", "render_lint", "ambient_line")   # SchedulerRules.estimated_call_s
 CAPACITY_CANDIDATES = 80
 # The thinking calls on every move's own path (the HOT decision, the narration and its judge): the bench also times
 # each without thinking, so the owner can weigh minutes against quality with real numbers. --accept never turns

@@ -1150,6 +1150,7 @@ def plan_cognition(candidates, config, turn_depth, lanes_up):
     S = config.rules.scheduler
     plan = CognitionPlan()
     order = sorted([c for c in candidates if c[2]], key=lambda c: (-c[1], c[0])) + sorted([c for c in candidates if not c[2]], key=lambda c: (-c[1], c[0]))
+    plan.order = [a for a, _s, _m in order]                  # D-128: who comes first, for the room's lines
     if not lanes_up:
         for a, _s, _m in order:
             plan.lod[a] = LOD.COLD

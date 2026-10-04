@@ -114,6 +114,7 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.WILLIS_ROAST: CallRegime(lane=A, temperature=1.0, max_tokens=4096, deadline_s=180, thinking=True),
         CallClass.THE_VOICE: CallRegime(lane=A, temperature=1.0, max_tokens=6144, deadline_s=240, thinking=True),
         CallClass.DOOM_GUARD: CallRegime(lane=B, temperature=0.0, max_tokens=40, deadline_s=15),
+        CallClass.AMBIENT_LINE: CallRegime(lane=B, temperature=0.9, max_tokens=120, deadline_s=15),
         CallClass.PROBE: CallRegime(lane=B, temperature=0.0, max_tokens=64, deadline_s=30),
     }
 
@@ -232,10 +233,11 @@ class SchedulerRules(Strict):
     turn_budget_s: dict[str, float] = Field(default_factory=lambda: {"quick": 40.0, "balanced": 75.0, "deep": 150.0})
     reserve_narration_s: float = 25.0
     max_hot: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})
+    max_ambient: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})  # D-128 AMB-02
     max_reaction_waves: int = 3
     estimated_call_s: dict[str, float] = Field(default_factory=lambda: {
         "intake": 2.3, "actor_cognition_hot": 21.2, "actor_cognition_warm": 3.6, "actor_reaction": 2.5,
-        "writeback": 3.7, "portrayal_audit": 2.6, "narration": 18.6, "render_lint": 2.1,
+        "writeback": 3.7, "portrayal_audit": 2.6, "narration": 18.6, "render_lint": 2.1, "ambient_line": 1.5,
     })  # [SAND] BENCH-01 replaces these with measured means per lane
     salience_weights: dict[str, float] = Field(default_factory=lambda: {
         "mandatory": 100.0, "unique_info": 3.0, "loudest_percept": 2.0, "addressed": 4.0, "in_conflict": 3.0,

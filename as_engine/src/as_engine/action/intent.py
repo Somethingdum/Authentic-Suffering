@@ -140,7 +140,8 @@ class Intent:
     manner: str
     goal: str
     private_reason: str
-    source: Literal["model", "plan", "reflex", "human", "fallback", "pending"]
+    source: Literal["model", "plan", "reflex", "human", "fallback", "pending", "ambient"]   # D-128: 'ambient' — a COLD
+    #   person's words (AMB-03) on what code had them doing
     lod: LOD
     blocked: str | None = None   # set by barrier(): 'referent_missing
     pace: str = "normal"         # normal | careful | rushed (INTENT-07)

@@ -159,6 +159,15 @@ moving to within 20 m is news to whoever sees it, and it ends the player's watch
 - WARM: `regimes[actor_cognition]` (lane B, thinking off, json_schema).
 - COLD: `action.intent.plan_continuation` — the same decision still running. **LOD is a reasoning
   tier only**: it never changes competence, morality or knowledge (LOD-01).
+- **The room talks (D-128, AMB-01..03).** COLD people never chose words with a model, so a crowd
+  stood mute while two or three people talked. Now, with lane B up, the most salient COLD people in
+  the PC's place that something reached since they last spoke — not mid-action, not having spoken
+  this turn — get one `ambient_line` call each on lane B (at most `max_ambient`: 1 / 2 / 3 by
+  depth), in the same batch as the WARM calls: a short packet of their own voice (capsule,
+  tendencies, the three exemplars, never-says), where they are, what code has them doing, how they
+  are, who they can see and how they feel about them, their last lines, and the newest four things
+  that reached them (`mind.packet.ambient_packet`). A line rides on their continuation as its
+  speech; a null line, a failure or an echo is silence — never a repair, never a hold, never lane A.
 - The scheduler fills both lanes breadth-first: a WARM call beside a HOT call costs no wall-clock
   (plan §4.4). Mandatory actors always get a call, even past budget (`BUDGET_OVERRUN` logged).
 - Every generated speech line is checked against the echo ledger; an echo triggers one repair with

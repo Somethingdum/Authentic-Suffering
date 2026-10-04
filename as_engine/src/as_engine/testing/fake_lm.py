@@ -277,6 +277,8 @@ class FakeTransport:
             return {"goals_add": [], "loops_close": [], "lesson": None, "plan_goal": None, "plan_steps": []}
         if cc == CallClass.CHEAT_PERSONA:
             return "Done, Boss. Reality bent exactly as ordered."
+        if cc == CallClass.AMBIENT_LINE:     # D-128: unscripted, the room stays quiet
+            return {"line": None, "to": None, "volume": "normal"}
         if cc == CallClass.PROBE:
             return {"ok": True}
         if cc in (CallClass.WORLDGEN_HISTORY, CallClass.WORLDGEN_ACTOR, CallClass.WORLDGEN_OPENING):

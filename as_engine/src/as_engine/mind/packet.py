@@ -271,6 +271,30 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   line, 'uncertainty: ' + the line — e.g. 'refusal: You refused: hand me the revolver.' When
   nothing droppable is left the packet is returned over budget (the scheduler logs it).
 No instruction to forget anything is ever added (L1): what must not be used is absent.
+
+AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacket | None   (D-128)
+  What a COLD person — someone past this moment's model budget — has to go on to say one short thing,
+  or nothing (turn.cognition AMB-02). Their own records only (Skull Law), at <= ``at`` (SKULL-10).
+  reached: their percept_log rows of this turn or the one before (turn_index - 1 .. turn_index) that
+    are not scene percepts (event_id 'scene:...'), whose source is not themselves, at <= ``at`` and
+    later than their own latest SPEECH event (what they spoke after has had its answer); the newest
+    4, oldest first. A speech percept reads f'{word} said' + (' to you' when addressed_to_me) +
+    f': "{words}"' (word = perception.word_for, 'Someone' without a source; the words as heard, cut
+    to PacketRules.max_heard_chars by cut_heard); any other its text. Nothing reached -> None:
+    nobody talks to the air on code's time.
+  voice: the fused dossier's — the capsule; 'How you talk: ' + the tendencies, each a sentence (a '.' added to one
+    that does not end in '.', '!', '?' or '"'), joined ' '; f'Easy:
+    "{low_stakes}"', f'Under pressure: "{under_pressure}"', f'At the limit: "{at_the_limit}"';
+    'You would never say: ' + each never-say in quotes joined '; '; the profanity line (none 'You do
+    not swear.', rare 'You rarely swear.', frequent 'You swear often.', constant 'You swear all the
+    time.'); the dialect notes when not empty.
+  where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given.
+  state: their body lines (as the SkullPacket's body) but 'Unhurt.', the first 3.
+  said: their own last 3 voice_lines by (at, line_id), oldest first — never to be said again.
+  people: the living human bodies, not themselves, that are the source of a percept of theirs this
+    turn at <= ``at``, in order of first percept, at most 6: handle P1.., word = word_for, feeling =
+    the TEMPER-08 words and then their relationship line (as the SkullPacket's), lower-cased and
+    joined '; ' ('' with neither). handles: P# -> body id.
 """
 
 from __future__ import annotations
@@ -281,6 +305,7 @@ from ..contracts.common import LOD
 from ..contracts.mind import SkullPacket
 
 if TYPE_CHECKING:
+    from ..contracts.mind import AmbientPacket
     from ..kernel.store import Tx
     from .affordance import AffordanceSet
     from .consult import Consulted
@@ -309,6 +334,10 @@ def thread_lines(tx: "Tx", holder_id: str, turn_index: int, at: int, names, rule
     raise NotImplementedError("D-117")
 
 
+def ambient_packet(tx: "Tx", actor_id: str, turn_index: int, at: int, *, doing: str = "") -> "AmbientPacket | None":
+    raise NotImplementedError("D-128")
+
+
 def choose_examples(examples, *, reaction: bool, rules) -> list:
     raise NotImplementedError("D-116")
 
@@ -316,4 +345,4 @@ def choose_examples(examples, *, reaction: bool, rules) -> list:
 def estimate_tokens(text: str) -> int:
     """len(text) // 4 (implemented; the same estimate is used everywhere)."""
     return len(text) // 4
-from ._impl_packet import build_packet, choose_examples, thread_lines  # noqa
+from ._impl_packet import ambient_packet, build_packet, choose_examples, thread_lines  # noqa

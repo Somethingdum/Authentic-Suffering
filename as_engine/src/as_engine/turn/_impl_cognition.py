@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import dataclasses
+import re
 
 FALLBACK_KIND = {"grammar_fail": "grammar_fail", "schema_fail": "schema_fail", "empty": "grammar_fail",
                  "timeout": "timeout", "lane_error": "lane_down", "cancelled": "timeout",
@@ -96,6 +97,9 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
         req, j = job(a, pkt)
         st[a] = {"pkt": pkt, "req": req, "repair": False}
         jobs.append(j)
+    cold = {a: plan_continuation(tx, a, affs[a], at, turn_index) for a in sorted(plan.lod) if plan.lod[a] == LOD.COLD}
+    room = _ambient_jobs(tx, session, plan, cold, turn_index, at)        # AMB-02 (D-128)
+    jobs += [j for _pk, j in room.values()]
     results = await run_jobs(session.client, jobs) if jobs else {}
 
     async def repair(a, error_text, raw):
@@ -134,7 +138,7 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
     consulting = []
     for a in sorted(plan.lod):
         if plan.lod[a] == LOD.COLD:
-            out[a] = plan_continuation(tx, a, affs[a], at, turn_index)
+            out[a] = _ambient_said(tx, cold[a], *room[a], results) if a in room else cold[a]
             continue
         kind, val = _read(st[a]["pkt"], affs[a], results[a], plan.lod[a], reaction, second=False)
         got = await settle(a, kind, val, results[a])
@@ -198,6 +202,65 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
             if a in st and out[a] is not None and out[a].source == "model":
                 audits.append(portrayal.Judged(a, plan.lod[a], st[a]["pkt"], st[a]["req"], out[a], a in prechecked))
     return out
+
+
+def _ambient_jobs(tx, session, plan, cold, turn_index, at):
+    # AMB-02 (D-128): {actor: (packet, Job)} — the COLD people in the PC's place who get a line
+    from ..contracts.common import LOD, CallClass, Lane
+    from ..contracts.mind import AmbientLine
+    from ..kernel.clock import pending_for
+    from ..lanes.requests import build_request
+    from ..lanes.scheduler import Job
+    from ..lanes.schemas import to_lm_schema
+    from ..mind.packet import ambient_packet
+    cfg = session.config
+    cap = cfg.rules.scheduler.max_ambient.get(session.settings.turn_depth, 0)
+    here = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (session.pc_id,))
+    if cap <= 0 or here is None or session.client.is_down(Lane.B):
+        return {}
+    out = {}
+    for a in plan.order:
+        if len(out) >= cap:
+            break
+        if plan.lod.get(a) != LOD.COLD or a == session.pc_id or cold.get(a) is None:
+            continue
+        if tx.query_one("SELECT 1 FROM actors a JOIN positions p ON p.body_id = a.actor_id WHERE a.actor_id=? AND "
+                        "a.controller='model' AND p.place_id=?", (a, here[0])) is None:
+            continue
+        if tx.query_one("SELECT 1 FROM events WHERE type='SPEECH' AND actor_id=? AND turn_index=?", (a, turn_index)) is not None \
+                or pending_for(tx, "ACTION_LAND", a):
+            continue
+        pk = ambient_packet(tx, a, turn_index, at, doing=cold[a].bound.label)
+        if pk is None:
+            continue
+        req = build_request(cfg, CallClass.AMBIENT_LINE, turn_index=turn_index, actor_id=a, context=pk,
+                            json_schema=to_lm_schema(AmbientLine), ctx=pk)
+        out[a] = (pk, Job(job_id="ambient:" + a, call_class=CallClass.AMBIENT_LINE, request=req, output_model=AmbientLine,
+                          lane_pref=Lane.B, est_s=cfg.rules.scheduler.estimated_call_s["ambient_line"]))
+    return out
+
+
+_ASIDE = re.compile(r"\*[^*]*\*")
+
+
+def _ambient_said(tx, intent, pk, j, results):
+    # AMB-03: a line in their own voice on what code has them doing, or silence
+    from ..action.intent import SpeechAct
+    from ..contracts.common import Volume
+    from ..contracts.mind import AmbientLine
+    from ..narration.lint import check_line
+    resp = results.get(j.job_id)
+    if resp is None or resp.parse_status != "ok":
+        return intent
+    try:
+        got = AmbientLine.model_validate(resp.parsed)
+    except Exception:  # noqa: BLE001 — an answer that does not validate is silence
+        return intent
+    line = " ".join(_ASIDE.sub(" ", got.line or "").split()).strip(' "“”')
+    if not line or check_line(tx, line, tx.rules.style):
+        return intent
+    to = (pk.handles[got.to],) if got.to in pk.handles else ("everyone",)
+    return dataclasses.replace(intent, speech=SpeechAct(text=line, to=to, volume=Volume(got.volume)), source="ambient")
 
 
 def _urge_act(tx, a, at):
