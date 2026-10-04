@@ -593,6 +593,12 @@ def record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq):
                                         resp == ResponseClass.ENTRENCHED_REFUSAL, wave_at, turn_index, p["event_id"])
             elif resp in (ResponseClass.READY_COMPLIANCE, ResponseClass.RELUCTANT_COMPLIANCE, ResponseClass.COERCED_COMPLIANCE):
                 firewall.revise_refusal(tx, a, p["speaker"], sig, wave_at, turn_index, p["event_id"])
+                if getattr(eff, "value", eff) == "threat" and (tx.query_one(
+                        "SELECT controller FROM actors WHERE actor_id=?", (a,)) or ["human"])[0] != "human":
+                    from ..mind.mind import relate                      # D-129: made to do it costs them
+                    from ..mind.resolve import drain
+                    drain(tx, a, "coerced", p["event_id"], wave_at, turn_index)
+                    relate(tx, a, p["speaker"], "resentment", 1, p["event_id"], wave_at, turn_index)
             elif resp == ResponseClass.PREPARING:
                 sp = tx.query_one("SELECT event_id FROM events WHERE type='SPEECH' AND actor_id=? AND seq > ? ORDER BY seq LIMIT 1", (a, first_seq))
                 if sp:

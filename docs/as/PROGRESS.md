@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2075 passed (2082 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2081 passed (2088 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, D-129 what is done to you and yours lasts, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -171,7 +171,11 @@ do nothing.
    was not fighting you and they stop trusting you, are afraid of you and hold it against you; whoever saw
    it trusts you less and tells it; threaten someone with a gun in your hand and they stay afraid of you
    (D-126). With D-119 (a killing seen) and D-123 (a first kill, a child) the worst things now cost what
-   they should. Anger still flares and fades by the hour on top of that, and people can still snap.
+   they should. Anger still flares and fades by the hour on top of that, and people can still snap. Now
+   also (D-129): take what is someone's in front of them and they hold it against you; hurt someone they
+   love and it is not forgiven, kill them and it never is; shame them in front of others and it wears them
+   down; hold them and make them watch and it breaks something; make them do it at gunpoint and they
+   resent you for it.
 16. **The room talks** (your "We have a very very fast model ... insignificant NPC dialogue"). Past the model
    budget people were moved by code and never said a word, so in a full room two or three people talked and
    the rest were furniture. Now the most salient of them in your place, when something reached them, get one

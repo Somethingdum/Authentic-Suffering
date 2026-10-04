@@ -233,7 +233,11 @@ record_responses(tx, intents, affs, asks, turn_index, wave_at, first_seq) -> lis
       no relationship row toward the speaker or trust <= -1 (a stranger); else 'cost'.
     (AC09 — the words are recorded first; no yes is a lie by itself)
     READY / RELUCTANT / COERCED_COMPLIANCE -> firewall.revise_refusal(tx, actor, speaker, signature,
-      wave_at, turn_index, event_id) (a person can change their mind: WILL-12).
+      wave_at, turn_index, event_id) (a person can change their mind: WILL-12). (D-129) Any of the three
+      when the effective form is THREAT — doing it at the point of a threat — for anyone but the PC
+      (what the player's character feels is theirs, C06), also costs them: mind.resolve.drain(tx, actor,
+      'coerced', event_id, wave_at, turn_index) and mind.mind.relate(tx, actor, speaker, 'resentment',
+      +1, event_id, wave_at, turn_index) — made to do it, they hold it against the one who made them.
     DEFERRED_ASSENT -> mind.mind.open_loop(tx, actor, 'promise_made', f'I said I would:
       {perception.norm_text(words)} — "{the speech text}"', [speaker], strength 1, cause = the
       actor's first SPEECH event with seq > first_seq (else the ask's event), wave_at,

@@ -793,6 +793,33 @@ def _theft_witnesses(tx, event_id):
     return out
 
 
+def _theft_victims(tx, event_id):
+    """D-129: of a taking's witnesses, those who believe the thing is their own or their household's."""
+    ev = _row(tx, "SELECT actor_id, payload FROM events WHERE event_id=?", (event_id,))
+    if ev is None:
+        return []
+    taker, item = ev["actor_id"], json.loads(ev["payload"]).get("item_id")
+    theirs = {taker}
+    theirs |= {r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (taker,))}
+    theirs |= {r[0] for r in tx.query("SELECT group_id FROM group_members WHERE actor_id=?", (taker,))}
+    out = []
+    for h in _theft_witnesses(tx, event_id):
+        mine = {h} | {r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (h,))}
+        owners = [r[0] for r in tx.query(
+            "SELECT p.object_value FROM claim_holdings c JOIN propositions p ON p.prop_id=c.claim_id WHERE c.holder_id=? "
+            "AND c.superseded_by IS NULL AND c.believed=1 AND p.subject_type='object' AND p.subject_id=? AND p.predicate='owner'",
+            (h, item))]
+        if any(o in mine and o not in theirs for o in owners):
+            out.append(h)
+    return out
+
+
+def _drained_lately(tx, actor, reason, at):
+    """D-129: a Resolve drain of this reason in the hour up to ``at`` (once an hour, however often it happens)."""
+    return tx.query_one("SELECT 1 FROM events WHERE type='RESOLVE_CHANGE' AND actor_id=? AND json_extract(payload,'$.reason')=? "
+                        "AND at>? AND at<=?", (actor, reason, at - 3_600_000, at)) is not None
+
+
 def select(tx, selector, trigger):
     m = re.match(r"^(\w+)\((.*)\)$", selector.strip())
     if not m:
@@ -812,6 +839,43 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "robbed_by":                                            # D-129: they saw what is theirs taken
+        from ..society._impl_society import _controller
+        return [h for h in _theft_victims(tx, v) if _controller(tx, h) != "human"]
+    if fn == "bonded_onlookers_of":                                  # D-129: someone they love, hurt or killed
+        body = (trigger.payload or {}).get("body_id")
+        seen = select(tx, "assault_onlookers_of(trigger.event_id)", trigger) if _assault(tx, trigger) is not None \
+            else _onlookers(tx, trigger, v)
+        return [h for h in seen if _bonded_to(tx, h, body)]
+    if fn == "humiliated_by":                                        # D-129: insulted in front of others
+        from ..mind.temper import INSULT_WORDS, _words_have
+        from ..society._impl_society import _controller
+        heard = [(h, json.loads(d) if isinstance(d, str) else (d or {})) for h, d in tx.query(
+            "SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' AND fidelity IN ('exact','partial') "
+            "ORDER BY holder_id", (v,))]
+        out = []
+        for h, d in heard:
+            if h == trigger.actor_id or _controller(tx, h) == "human" or not d.get("addressed_to_me"):
+                continue
+            if not any(_words_have(d.get("words") or "", x) for x in INSULT_WORDS):
+                continue
+            if not any(o not in (h, trigger.actor_id) for o, _d in heard) or _drained_lately(tx, h, "humiliated_publicly", trigger.at):
+                continue
+            out.append(h)
+        return sorted(set(out))
+    if fn == "made_to_watch":                                        # D-129: held, and made to see it
+        body = (trigger.payload or {}).get("body_id")
+        doer = (_assault(tx, trigger) or _killing(tx, trigger) or (trigger.actor_id,))[0]
+        out = []
+        for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND fidelity IN "
+                             "('exact','partial') ORDER BY holder_id", (v,)):
+            if h in (body, doer) or not _bonded_to(tx, h, body):
+                continue
+            held = tx.query_one("SELECT restrained FROM bodies WHERE body_id=?", (h,))
+            if held is None or not held[0] or _drained_lately(tx, h, "made_to_watch", trigger.at):
+                continue
+            out.append(h)
+        return out
     if fn == "hurt_by_someone":                                      # D-126: the one hurt, never the PC
         a = _assault(tx, trigger)
         victim = (trigger.payload or {}).get("body_id")

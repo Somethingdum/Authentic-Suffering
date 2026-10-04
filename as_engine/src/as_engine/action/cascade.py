@@ -37,6 +37,26 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
     body(<path>)                              (D-123) the body itself (none when there is no such body)
+    robbed_by(<path>)                         (D-129) for an ITEM_TRANSFER: of theft_witnesses_of, those
+                                              whose believed owner of the item is themselves or one of
+                                              their households (and not the taker's own, as there) —
+                                              never the PC
+    bonded_onlookers_of(<path>)               (D-129) for a HARM with trigger.attacker: of
+                                              assault_onlookers_of, for a DEATH with trigger.killer: of
+                                              onlookers_of — those bonded to the one hurt or killed
+                                              (affection >= 1 toward them, or one household)
+    humiliated_by(<path>)                     (D-129) for a SPEECH: the holders of an EXACT or PARTIAL
+                                              speech percept of it addressed to them whose words hold an
+                                              entry of mind.temper.INSULT_WORDS (whole words), when
+                                              someone else besides the speaker heard it too (an
+                                              audience), and no RESOLVE_CHANGE of theirs with reason
+                                              'humiliated_publicly' in the hour up to it; never the
+                                              speaker or the PC
+    made_to_watch(<path>)                     (D-129) for a HARM or DEATH: the holders of a visual EXACT
+                                              or PARTIAL percept of it who are held (bodies.restrained)
+                                              and bonded to the one hurt (as above), never that body or
+                                              the one who did it, with no RESOLVE_CHANGE of theirs with
+                                              reason 'made_to_watch' in the hour up to it
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
                                               (trigger.attacker present): the one hurt — never the
                                               player's character (what they feel is theirs, C06)

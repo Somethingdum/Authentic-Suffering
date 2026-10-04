@@ -452,6 +452,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_room_talks.py` | AMB-01..03: Owen asks the floor for his lighter; Mara, past the budget, gets one line on lane B from a packet of her own voice and what reached her, and it is her COLD act's speech, to Owen; Alice, unscripted, keeps quiet. The line is said and goes into her voice lines. Quotes and asterisks are not words. A failed line is silence — no fallback event, no repair row. At quick depth one line, the most salient first. Nothing reached them, lane B down, or already spoken this turn: no call |
 
+### 3.43 What is done to you and yours lasts (P9; D-129)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_what_is_done_lasts.py` | Owen takes Alice's ledger from her hand: she trusts him 2 less, resents him and holds it (CAS-039); Mara, who knows whose it is, is a witness, not the one robbed; Alice taking Owen's Glock writes nothing into Owen. Owen hits June for nothing: Mara, who loves her, trusts him 2 less in all and holds it (CAS-040), Alice 1 less; Owen kills June: Mara's grudge is strength 3 (CAS-041). Called useless alone: an insult only; in front of Mara: Alice loses a point of Resolve and resents him (CAS-042), once an hour; Owen insulted: nothing. Held, Mara watches June beaten: Resolve -2, once an hour; Alice, held, does not love June: nothing (CAS-043). Alice hands over the ledger at gunpoint: Resolve -1 and resentment (record_responses) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

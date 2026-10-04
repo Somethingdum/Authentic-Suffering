@@ -310,3 +310,98 @@
       payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: threatened}
   delay_s: 0
   cites: [D-126, TEMPER-03]
+# D-129 — what is done to you and yours lasts (the owner: "If I treat them like shit, or do something just
+# absolutely evil. I do expect reactions, and proper ones."). Anger at a theft, an insult or a loved one hurt
+# fades by the hour (TEMPER-03); now the theft, the harm to their own, the shaming and the watching do not.
+# The player's character is never one of those changed (C06), except for what being made to watch costs.
+- schema: as.cascade.v1
+  id: CAS-039
+  description: Seeing someone take what is yours costs them your trust, and you hold it against them.
+  trigger_event: ITEM_TRANSFER
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: robbed_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: robbed_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: robbed_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: robbed_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: robbed_by(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} took what was yours.", strength: 2}
+  delay_s: 0
+  cites: [D-129, TEMPER-03]
+- schema: as.cascade.v1
+  id: CAS-040
+  description: Seeing someone hurt a person you love, who was not fighting them, is not forgiven.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.attacker_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: bonded_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: hurt_my_own}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: bonded_onlookers_of(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.attacker", text: "{subject} hurt someone you love.", strength: 2}
+  delay_s: 0
+  cites: [D-129, TEMPER-03]
+- schema: as.cascade.v1
+  id: CAS-041
+  description: Seeing someone kill a person you loved, who was not fighting them, leaves a grudge that does not let go.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.killer_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: bonded_onlookers_of(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.killer", text: "{subject} killed someone you loved.", strength: 3}
+  delay_s: 0
+  cites: [D-129, D-119]
+- schema: as.cascade.v1
+  id: CAS-042
+  description: Being insulted in front of others wears a person down, and they resent the one who did it.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: humiliated_by(trigger.event_id)
+      payload: {cause: humiliated_publicly}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: humiliated_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: humiliated}
+  delay_s: 0
+  cites: [D-129, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-043
+  description: Being held and made to watch someone you love hurt breaks something in a person.
+  trigger_event: HARM
+  where: {}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: made_to_watch(trigger.event_id)
+      payload: {cause: made_to_watch}
+  delay_s: 0
+  cites: [D-129, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-044
+  description: Being held and made to watch someone you love die breaks something in a person.
+  trigger_event: DEATH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: made_to_watch(trigger.event_id)
+      payload: {cause: made_to_watch}
+  delay_s: 0
+  cites: [D-129, docs/as/05_ACTORS.md#5]

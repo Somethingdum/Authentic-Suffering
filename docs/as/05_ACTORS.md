@@ -196,8 +196,10 @@ severe pain 1, betrayal 2, first kill 1, killing a child 3, a starving day 1, a 
 losing a dependent 3, being made to watch 2, being coerced 1 (D-123: as cascade rules — CAS-008 a bonded
 death seen, a guardian's dependent the worst; CAS-030 word of a dependent's death; CAS-031 a first kill;
 CAS-032 a child killed; CAS-033 a severe wound; CAS-034 each new stage of hunger; CAS-035 a day and
-more awake; a loss is grieved once. A sustained fear scene, public humiliation and being made to watch
-have nothing to hang on yet). Recovery: +1 per night asleep in a
+more awake; a loss is grieved once. D-129: CAS-042 public humiliation — insulted in front of others, once
+an hour; CAS-043/044 being made to watch — held while someone they love is hurt or killed, once an hour;
+being coerced — doing what they were told at the point of a threat (turn.cognition record_responses).
+A sustained fear scene has nothing to hang on yet). Recovery: +1 per night asleep in a
 place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dependent. (D-122: a night
 is six hours or more of unbroken sleep, given back on waking — CAS-021; sleeping through it is what
 "believes is safe" is read as. A promise kept: CAS-029. Protecting a dependent is not built: without a
@@ -295,6 +297,7 @@ makes the snap, when it comes, code's act:
   they were, CAS-019), hunger, thirst and exhaustion past the first pangs (CAS-020), being struck or
   threatened, seeing their people hurt. A night's unbroken sleep takes the edge off, on waking (CAS-021).
 - **What lasts** (D-126): anger fades, but being hurt by someone you were not fighting costs them your trust, leaves you afraid of them and holding a grudge (CAS-036); seeing it costs the attacker your trust and you tell it (CAS-037); a threat made at weapon point leaves you afraid (CAS-038). Never written into the player's character.
+- **What is done to you and yours** (D-129): seeing what is yours taken costs the taker your trust, and you resent them and hold it (CAS-039); seeing someone you love hurt for nothing costs the attacker more of your trust and is held against them (CAS-040), and killed, held for good (CAS-041); being insulted in front of others wears you down and you resent who did it (CAS-042); held and made to watch someone you love hurt or killed breaks something (CAS-043/044); doing what you were told at the point of a threat costs you and you resent who made you (record_responses). Only what being made to watch costs is ever written into the player's character.
 - **Temper** (dossier `temper`: `fuse` 1–5, `outlet` fists / words / cold / flight / tears,
   `grudge` 0–3, `pet_peeves`, `cools_down_by`) is how this person breaks. It is on their card
   ("What sets you off").
