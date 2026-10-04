@@ -416,6 +416,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_sleep_rests_you.py` | SLEEP-01: 16 hours awake then 8 asleep — fatigue held while she sleeps, rested when she wakes, the waking saying how long she slept; a 2-hour nap pays 4 of the 16 hours owed. SLEEP-02 through a turn: Owen has slept seven hours and "I wait" wakes him first, rested, and the night takes the edge off and gives back a little Resolve (CAS-021 — swept although a sound at the scene compile was what woke him). Five hours is not a night. SLEEP-02 in the resolver: Owen asleep wakes before anything but sleep, sleeping on is not falling asleep again (all of it counts), and June asleep does not wake by deciding to. CAS-029: Mara kept her promise to June and is steadier for it |
 
+### 3.37 What wears the will down (P9; D-123)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_what_wears_the_will_down.py` | In a kitchen: Dale cuts eight-year-old Teo's throat in front of his mother — Rosa, his guardian, loses 3 (CAS-008, lost_dependent); the onlookers who saw who it was never include the dead; Dale's first kill and a child: 1 and 3 (CAS-031, CAS-032). Owen kills Rosa: Dale, who loves her, and Teo, her son, lose 2 each, Owen nothing; the same death is grieved once. Rosa in the yard sees nothing; Nita tells her, she believes it and loses 3 (CAS-030) — told twice, grieved once. A second kill is not a first. A scratch is not severe pain, a stab is (CAS-033); fed, nothing — hungry, 1 (CAS-034); sixteen hours awake, nothing — a day, 1 (CAS-035) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

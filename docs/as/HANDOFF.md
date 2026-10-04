@@ -120,6 +120,10 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   surrendering, a child), tension and loyalty checks after a killing, a settlement's law response (a law
   against killing changes what worldgen writes — the owner's call), the PC's nerve, intrusive memories
   and sleep.
+- **Resolve, still open after D-122 / D-123**: three drains of 05 §5 have nothing to hang on (a sustained
+  fear scene, public humiliation, being made to watch); protecting a dependent (+1) needs a once-a-day
+  limit before it can be built; hunger drains per stage (every 84 h without food), not per day — a daily
+  tick would make it exact.
 - **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
   group talk, distinct voices.
 - **Willis / the cheat cure** (D-78, D-79) — with P12's cheat system.

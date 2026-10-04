@@ -36,6 +36,10 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               (the same group; two names for readability)
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
+    body(<path>)                              (D-123) the body itself (none when there is no such body)
+    seen_clearly_by(<path>)                   (D-123) the holders of a visual EXACT or PARTIAL percept
+                                              of that event (they saw who it was) — never the event's
+                                              own body (payload body_id)
     onlookers_of(<path>)                      (D-119) for a killing (trigger.killer present): the holders
                                               of a visual EXACT or PARTIAL percept of that event or of
                                               the killing blow (they saw who fell) who also saw who did
@@ -138,8 +142,19 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   create_rumour                              world.rumours.seed(tx, target, p.about, p.claim, at,
                                              turn_index, E, confidence = p.confidence or 3)            (P9)
   drain_resolve                              mind.resolve.drain(target, reason = payload.cause or
-                                             'coerced', ...) — payload.scale_by 'bond_to_subject' drains
-                                             once per affection step >= 1 toward the dead (max 3)
+                                             'coerced', ...) for a target that is a living actor (anyone
+                                             else: no-op). (D-123) payload.scale_by — the subject is
+                                             trigger.payload.body_id, else about_id, else subject_id:
+                                             'bond_to_subject': a guardian of the subject (its
+                                             household_members.guardian_of) is drained 'lost_dependent'
+                                             instead; otherwise only a target bonded to the subject
+                                             (affection >= 1 toward them, or one household) is drained,
+                                             with the given cause; 'dependent_of_subject': only a guardian,
+                                             'lost_dependent'. Either way a loss is grieved once: no drain
+                                             when the target already has a RESOLVE_CHANGE of reason
+                                             witness_bonded_death or lost_dependent whose cause event's
+                                             payload body_id or about_id is the subject, nor for the
+                                             subject itself
   recover_resolve                            (D-122) mind.resolve.recover(tx, target, payload.cause,
                                              E, at, turn_index) for a target that is a living actor
                                              (anyone else: no-op)
@@ -208,7 +223,9 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     when, in the 10 minutes up to the blow, the dead was fighting a person (any actor but the dead,
     so defending someone else counts): a HARM by the dead to them, an ACTION_START by the dead with
     verb 'attack' at them, or an armed SPEECH by the dead (payload armed true) to them or to
-    'everyone'; false otherwise; missing when there is no killer,
+    'everyone'; false otherwise; missing when there is no killer; (D-123) trigger.killer_first —
+    true when no DEATH committed before this one has the same trigger.killer, false otherwise,
+    missing when there is no killer; body(<path>).<column> — a bodies column (age_years, kind, ...),
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

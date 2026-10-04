@@ -193,7 +193,11 @@ Selection rules (grouping, caps, the always-present wait/observe) are in `mind/a
 `Resolve.max = 3 + floor((E + C) / 4) + resolve_trait_mod` (RulesConfig.resolve). Drains (each
 cites its event): witnessing a bonded person's death 2, sustained fear scene 1, public humiliation 1,
 severe pain 1, betrayal 2, first kill 1, killing a child 3, a starving day 1, a sleepless night 1,
-losing a dependent 3, being made to watch 2, being coerced 1. Recovery: +1 per night asleep in a
+losing a dependent 3, being made to watch 2, being coerced 1 (D-123: as cascade rules — CAS-008 a bonded
+death seen, a guardian's dependent the worst; CAS-030 word of a dependent's death; CAS-031 a first kill;
+CAS-032 a child killed; CAS-033 a severe wound; CAS-034 each new stage of hunger; CAS-035 a day and
+more awake; a loss is grieved once. A sustained fear scene, public humiliation and being made to watch
+have nothing to hang on yet). Recovery: +1 per night asleep in a
 place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dependent. (D-122: a night
 is six hours or more of unbroken sleep, given back on waking — CAS-021; sleeping through it is what
 "believes is safe" is read as. A promise kept: CAS-029. Protecting a dependent is not built: without a

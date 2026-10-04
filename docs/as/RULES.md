@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-759 ids; 505 with their own statement, 254 named only in context.
+765 ids; 511 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -109,7 +109,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-005 | A water shortage cuts the settlement's ration level by one step. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-006 | A ration cut to level 2 or lower raises every dependent-holding household's tension toward the leadership, and forces the worst-hit household's head into a loyalty check. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/group.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-007 | A death leaves the dead person's household grieving and opens a vacancy in every role they held. | as_content/packs/core/cascade/people.yaml | `as_engine/society/household.py`, `as_engine/society/work.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_household.py` |
-| CAS-008 | Everyone bonded to the dead person who knows of the death loses Resolve; the closer the bond, the larger the loss. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
+| CAS-008 | Everyone bonded to the dead who sees it happen loses Resolve, and a guardian who sees their dependent die loses the most. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-009 | A very loud sound outdoors pulls nearby infected toward it over the following minutes. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-01 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-010 | Catching someone in a lie costs them trust with whoever caught them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
@@ -134,6 +134,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-028 | Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py` |
 | CAS-029 | Keeping a promise steadies the one who kept it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_sleep_rests_you.py` |
 | CAS-03 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
+| CAS-030 | Word that someone in their care is dead breaks a guardian's Resolve, if they believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-031 | The first time someone kills a person, it weighs on them — whatever the reason. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-032 | Killing a child breaks something in the killer. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-033 | A severe wound's pain shakes a person's will. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-034 | Every new stage of hunger wears a person's will down. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-035 | A day and more without sleep wears a person's will down, and more every eight hours after. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-05 | CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>, trigger.actor_id, trigger.event_id, and — D-119 — trigger.killer, trigger.killer_provoked). Each selector returns… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_theft_seen.py`, `contract/p09_society/test_timers_society.py` |
 | CAS-06 | CAS-06 schedule_event, and any rule with delay_s > 0, enqueues a CASCADE_EFFECT queue row (kernel.clock.QUEUE_TYPES) instead of emitting now: kernel.clock.schedule(tx, due, 'CASCADE_EFFECT', target, {rule_id, effect_ind… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/turn/timers.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_timers_society.py` |

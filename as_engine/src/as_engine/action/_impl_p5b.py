@@ -629,6 +629,16 @@ def _path(tx, path, trig):
         if k is None:
             return _MISSING
         return k[0] if path == "trigger.killer" else k[1]
+    if path == "trigger.killer_first":                             # D-123
+        k = _killing(tx, trig)
+        if k is None:
+            return _MISSING
+        for r in tx.query("SELECT * FROM events WHERE type='DEATH' AND seq < (SELECT seq FROM events WHERE event_id=?) "
+                          "ORDER BY seq", (trig.event_id,)):
+            ok = _killing(tx, _ev_model(tx, r))
+            if ok is not None and ok[0] == k[0]:
+                return False
+        return True
     m = re.match(r"^(\w+)\((.+)\)\.(\w+)$", path)
     if m:
         fn, inner, col = m.groups()
@@ -637,6 +647,9 @@ def _path(tx, path, trig):
             return _MISSING
         if fn == "actor":
             r = _row(tx, "SELECT * FROM actors WHERE actor_id=?", (ids[0],))
+            return r.get(col, _MISSING) if r else _MISSING
+        if fn == "body":                                            # D-123
+            r = _row(tx, "SELECT * FROM bodies WHERE body_id=?", (ids[0],))
             return r.get(col, _MISSING) if r else _MISSING
         if fn == "settlement_of":
             from ..society._impl_society import days_of, has_shortage
@@ -767,6 +780,8 @@ def select(tx, selector, trigger):
         return []
     if fn == "actor":
         return [v]
+    if fn == "body":                                                 # D-123
+        return [v] if tx.query_one("SELECT 1 FROM bodies WHERE body_id=?", (v,)) else []
     if fn == "place_of":
         r = _row(tx, "SELECT place_id FROM positions WHERE body_id=?", (v,))
         return [r["place_id"]] if r else []
@@ -774,6 +789,10 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "seen_clearly_by":                                      # D-123
+        dead = (trigger.payload or {}).get("body_id")
+        return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                              "fidelity IN ('exact','partial')", (v,))} - {dead})
     if fn == "onlookers_of":                                         # D-119
         return _onlookers(tx, trigger, v)
     if fn == "groups_that_saw":                                      # D-119
@@ -870,6 +889,29 @@ def sweep(tx, deltas, rules, at, turn_index):
     return _events_since(tx, first)
 
 
+def _guardian_of(tx, actor, subject):
+    return tx.query_one("SELECT 1 FROM household_members WHERE actor_id=? AND EXISTS (SELECT 1 FROM json_each(guardian_of) "
+                        "WHERE value=?)", (actor, subject)) is not None
+
+
+def _bonded_to(tx, actor, subject):
+    """D-123: affection >= 1 toward them, or one household."""
+    r = tx.query_one("SELECT affection FROM relationships WHERE from_id=? AND to_id=?", (actor, subject))
+    if r is not None and r[0] >= 1:
+        return True
+    return tx.query_one("SELECT 1 FROM household_members a JOIN household_members b ON a.household_id=b.household_id "
+                        "WHERE a.actor_id=? AND b.actor_id=?", (actor, subject)) is not None
+
+
+def _grieved(tx, actor, subject):
+    """D-123: a loss is grieved once — an earlier grief drain of this actor whose cause names the subject."""
+    return tx.query_one(
+        "SELECT 1 FROM events r JOIN events c ON c.event_id = r.cause_event_id WHERE r.type='RESOLVE_CHANGE' AND "
+        "json_extract(r.payload,'$.actor_id')=? AND json_extract(r.payload,'$.reason') IN ('witness_bonded_death','lost_dependent') "
+        "AND (json_extract(c.payload,'$.body_id')=? OR json_extract(c.payload,'$.about_id')=?)",
+        (actor, subject, subject)) is not None
+
+
 def _unbuilt(tx, rule, what, at, turn_index):
     from ..audit.log import record
     record(tx, "G10-cascade", "action.cascade", "warn", [{"kind": "cascade_unbuilt", "rule_id": rule.id, "what": what}], turn_index)
@@ -886,6 +928,19 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
         R = tx.rules.resolve
         if reason not in R.drains:
             reason = "coerced"
+        alive = tx.query_one("SELECT b.alive FROM actors a JOIN bodies b ON b.body_id = a.actor_id WHERE a.actor_id=?", (target,))
+        if alive is None or not alive[0]:
+            return []
+        scale = (eff.payload or {}).get("scale_by")
+        if scale in ("bond_to_subject", "dependent_of_subject"):        # D-123
+            pl = trig.payload or {}
+            subj = pl.get("body_id") or pl.get("about_id") or pl.get("subject_id")
+            if not subj or subj == target or _grieved(tx, target, subj):
+                return []
+            if _guardian_of(tx, target, subj):
+                reason = "lost_dependent"
+            elif scale == "dependent_of_subject" or not _bonded_to(tx, target, subj):
+                return []
         ev = drain(tx, target, reason, trig.event_id, at, turn_index)
         return [] if ev is None else [ev]
     if eff.kind == "emit_event" and eff.event_type in ("RELATION_CHANGE", "LOOP_OPENED"):

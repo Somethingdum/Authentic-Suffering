@@ -87,4 +87,40 @@
       amount: 1
   delay_s: 0
   cites: [INF-15, docs/as/06_WORLD.md#5]
-
+# D-123 — what wears the will down (05 §5): severe pain, going hungry, going without sleep.
+- schema: as.cascade.v1
+  id: CAS-033
+  description: A severe wound's pain shakes a person's will.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.payload.severity != 'minor' and trigger.payload.severity != 'significant'"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.payload.body_id)
+      payload: {cause: severe_pain}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-034
+  description: Every new stage of hunger wears a person's will down.
+  trigger_event: NEED_STAGE
+  where: {need: hunger}
+  preconditions: ["trigger.payload.stage >= 1"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.payload.body_id)
+      payload: {cause: starving_day}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-035
+  description: A day and more without sleep wears a person's will down, and more every eight hours after.
+  trigger_event: NEED_STAGE
+  where: {need: fatigue}
+  preconditions: ["trigger.payload.stage >= 3"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.payload.body_id)
+      payload: {cause: sleepless_night}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]

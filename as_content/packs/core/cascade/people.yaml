@@ -19,17 +19,16 @@
   cites: [docs/as/06_WORLD.md#2.6]
 - schema: as.cascade.v1
   id: CAS-008
-  description: Everyone bonded to the dead person who knows of the death loses Resolve; the closer the bond, the larger the loss.
-  trigger_event: BELIEF_FORM
-  where: {predicate: dead, subject_type: body}
-  preconditions: ["trigger.payload.confidence >= 2"]
+  description: Everyone bonded to the dead who sees it happen loses Resolve, and a guardian who sees their dependent die loses the most.
+  trigger_event: DEATH
+  where: {}
+  preconditions: []
   effects:
     - kind: drain_resolve
-      target: actor(trigger.payload.holder_id)
-      amount: 1
-      payload: {scale_by: bond_to_subject, cause: bereavement}
+      target: seen_clearly_by(trigger.event_id)
+      payload: {scale_by: bond_to_subject, cause: witness_bonded_death}
   delay_s: 0
-  cites: [SKULL-01, docs/as/06_WORLD.md#2.6]
+  cites: [SKULL-01, D-123, docs/as/05_ACTORS.md#5]
 - schema: as.cascade.v1
   id: CAS-009
   description: A very loud sound outdoors pulls nearby infected toward it over the following minutes.
@@ -219,3 +218,41 @@
       payload: {cause: fulfilled_obligation}
   delay_s: 0
   cites: [D-122, docs/as/05_ACTORS.md#5]
+# D-123 — what wears the will down (05 §5), beyond grief seen (CAS-008): word of a dependent's death, a
+# first kill, a child killed. (Pain, hunger and sleeplessness: stress.yaml.)
+- schema: as.cascade.v1
+  id: CAS-030
+  description: Word that someone in their care is dead breaks a guardian's Resolve, if they believe it.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: dead, believed: true}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.payload.listener_id)
+      payload: {scale_by: dependent_of_subject, cause: lost_dependent}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-031
+  description: The first time someone kills a person, it weighs on them — whatever the reason.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.killer_first == true"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.killer)
+      payload: {cause: first_kill}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]
+- schema: as.cascade.v1
+  id: CAS-032
+  description: Killing a child breaks something in the killer.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["body(trigger.payload.body_id).age_years <= 14"]
+  effects:
+    - kind: drain_resolve
+      target: actor(trigger.killer)
+      payload: {cause: killed_child}
+  delay_s: 0
+  cites: [D-123, docs/as/05_ACTORS.md#5]
