@@ -43,3 +43,9 @@ legacy-state-reinforcements.yaml
 CLAUDE.md
 docs/update-progress
 talemate_frontend/eslint.config.cjs
+
+# Authentic Suffering
+as_runs/
+as_content/_compiled/
+as_config.yaml
+.dsh/hooks.json

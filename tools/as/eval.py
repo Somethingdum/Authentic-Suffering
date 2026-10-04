@@ -6,6 +6,10 @@
   python tools/as/eval.py --scenario metal_fence --turns 6
   python tools/as/eval.py --fake ...           the same on the fake model (no LM Studio): a smoke run
 
+A real run plays on your as_config.yaml (lanes, regimes, thinking, the scheduler's measured call times),
+each scenario's world rules kept. On your pair a turn takes minutes (PROGRESS, owner item 10): the full
+run is hours — try --scenario metal_fence --turns 2 first.
+
 Reports per scenario (MEASURES): turns played, turns that played, mean turn wall-clock, calls, the
 calls an ablation cancelled, intent repairs, echo rejections, lint failures, leak findings,
 portrayal misfits, memory jobs that failed, held or continued decisions, refusals, narration word
@@ -45,12 +49,13 @@ async def play(name: str, turns: int, ablate: str | None, *, fake: bool = False)
     from as_engine.testing.scenario import load_scenario
     from as_engine.turn.pipeline import run_turn
 
+    owner = None
     if fake:
         from as_engine.testing.fake_lm import FakeTransport
         transport = FakeTransport()
     else:
         from as_engine.lanes.transport import HttpTransport
-        load_config()
+        owner = load_config()
         transport = HttpTransport()
     world = load_scenario(ROOT / "as_engine" / "tests" / "fixtures" / "scenarios" / f"{name}.yaml",
                           packs_root=ROOT / "as_engine" / "tests" / "fixtures" / "packs",
@@ -59,6 +64,13 @@ async def play(name: str, turns: int, ablate: str | None, *, fake: bool = False)
         session = world.session()
     except NotImplementedError:
         need("P7", "testing.scenario.ScenarioWorld.session")
+    if owner is not None:
+        # Your lanes, regimes, thinking and measured call times (as_config.yaml, bench --accept); the scenario's
+        # own world rules stay. Without this a real run played on the defaults, not on your settings.
+        from as_engine.lanes.client import LaneClient
+        session.config = owner.model_copy(update={"rules": session.config.rules.model_copy(
+            update={"scheduler": owner.rules.scheduler})})
+        session.client = LaneClient(session.config, transport)
     if ablate:
         session.client.ablated = {CallClass(ablate)}
     walls, words, ok = [], [], 0
@@ -101,6 +113,9 @@ def compare(plain: dict, ablated: dict) -> dict:
 
 
 async def main(args: list[str]) -> int:
+    if "--help" in args or "-h" in args:
+        print(__doc__)
+        return 0
     ablate = args[args.index("--ablate") + 1] if "--ablate" in args else None
     only = args[args.index("--scenario") + 1] if "--scenario" in args else None
     turns = int(args[args.index("--turns") + 1]) if "--turns" in args else 99
