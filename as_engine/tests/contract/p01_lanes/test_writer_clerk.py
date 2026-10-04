@@ -20,8 +20,9 @@ from as_engine.lanes.transport import HttpTransport
 
 pytestmark = pytest.mark.phase(1)
 
-WRITER = {CallClass.NARRATION, CallClass.THE_VOICE, CallClass.WILLIS_ROAST, CallClass.RECAP, CallClass.WORLDGEN_HISTORY,
-          CallClass.WORLDGEN_ACTOR, CallClass.WORLDGEN_OPENING, CallClass.DOSSIER_INTAKE, CallClass.PC_QUICKMAKE}
+WRITER = {CallClass.NARRATION, CallClass.THE_VOICE, CallClass.WILLIS_ROAST, CallClass.RECAP, CallClass.SCENE_SUMMARY,
+          CallClass.SAY_MY_WAY, CallClass.WORLDGEN_HISTORY, CallClass.WORLDGEN_ACTOR, CallClass.WORLDGEN_OPENING,
+          CallClass.DOSSIER_INTAKE, CallClass.PC_QUICKMAKE}
 
 
 def req(messages, thinking):
@@ -86,7 +87,8 @@ def test_a_gemma_thought_channel_is_reasoning_not_story():
 def test_the_writer_writes_the_story_and_the_clerk_does_the_rest():
     regs = default_regimes()
     assert {cc for cc, r in regs.items() if r.lane == Lane.A} == WRITER
-    for cc in (CallClass.NARRATION, CallClass.THE_VOICE, CallClass.WILLIS_ROAST, CallClass.RECAP):
+    for cc in (CallClass.NARRATION, CallClass.THE_VOICE, CallClass.WILLIS_ROAST, CallClass.RECAP, CallClass.SCENE_SUMMARY,
+               CallClass.SAY_MY_WAY):
         assert regs[cc].thinking, f"{cc.value}: the Writer thinks before it writes"
 
 

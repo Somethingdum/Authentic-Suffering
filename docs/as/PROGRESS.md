@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 1966 passed (1973 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 1979 passed (1986 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -33,10 +33,10 @@ Status words: **not started** · **in progress** · **observed implementation, n
 
 | Number | Where | Replaced by |
 |---|---|---|
-| per-call latency estimates | `SchedulerRules.estimated_call_s` | `tools/as/bench.py` on your machines (BENCH-01) |
+| per-call latency estimates, the narration reserve and the turn budgets (placeholders sized for 20-second calls; the owner's pair writes about 5 and 19 tokens a second) | `SchedulerRules.estimated_call_s`, `reserve_narration_s`, `turn_budget_s` | `tools/as/bench.py --accept` on your machines (BENCH-01, D-112) |
 | acoustic fidelity margins 12/5/0 dB | `AcousticRules` | `tools/as/eval.py` belief-accuracy runs (BENCH-07) |
 | Resolve drains/recoveries | `ResolveRules` | eval refusal/compliance rates (BENCH-03) |
-| packet token budgets 6000/4000/3000 (Actor Spec §5; were 3500/2200/1400) | `PacketRules.token_budget` | bench prefill times (BENCH-04) with the identity card in every call |
+| packet token budgets 6000/4000/3000 (Actor Spec §5; were 3500/2200/1400) | `PacketRules.token_budget` | the bench's ladder (D-112): reading speed and recall by prompt length, and each cognition call's real time (BENCH-04) |
 | heard words cut at 800 characters (Actor Spec §5) | `PacketRules.max_heard_chars` | a play session's longest speeches: nobody's own context crowded out, no ordinary speech cut |
 | outings: daily chance per kind | `WorldRules.op_chance` | 100-day fake-model soak per difficulty (BENCH-06): how many go out, how many come back |
 | how long marks last under a roof | `WorldRules.sheltered_trace_mult` | play-tuning |
@@ -66,11 +66,31 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | Item | Phase | Done |
 |---|---|---|
 | LM Studio set up on both machines, LM Link on (08 §2) | before P7 live play | |
-| `tools/as/probe.py` run; thinking mode + structured-with-thinking written to `as_config.yaml` | P1 | |
-| `tools/as/bench.py --n 5` run and accepted | P1+ | |
+| `tools/as/bench.py --accept` run overnight (D-112; it runs the probe too) and `reports/bench.md` read | P1+, and after any model change | |
 | Play UI smoke checklist, P8 part (`talemate_frontend/src/play/README.md` §0–§6) | P8 | |
 | Play UI smoke checklist, later parts (§7 New life and worlds: P10; §8 death, imports, cheats: P12) | P10 / P12 | |
 | Review `SPEC_ISSUES.md` | every phase | |
+
+## Waiting on the owner
+
+Things only you can do or decide, collected while you were away (newest last). Each says what happens if you
+do nothing.
+
+1. **Run the limits bench overnight**: `python tools\as\bench.py --accept` (about three hours on your pair;
+   `--resume` if it stops; add `--ctx-B 59136` if LM Studio does not report the laptop's context through LM
+   Link). Then read `as_runs\reports\bench.md`. Until then the planner's call times are placeholders many
+   times too optimistic for these machines, so turns admit more minds than the time they take. (D-112)
+2. **Boulesis's top_k**: set it to 64 in LM Studio (Google's recommendation for Gemma 4). The game sends
+   temperature and top_p with every call; top_k only LM Studio sets. Nothing breaks without it.
+3. **Who speaks through which model**: the people who matter most (HOT) think on lane A; the rest (WARM) on
+   lane B, and their spoken lines come from B too. For every spoken line from A, set
+   `regimes.actor_cognition.lane: A` and `regimes.actor_reaction.lane: A` — minutes per person at 5 tokens a
+   second. Left alone: B voices the lesser people.
+4. **The UI shows no live model progress yet** (thinking / writing / how long): with a 5-tokens-a-second
+   Writer a turn is minutes of a still screen. The engine reports it (LANE-11); the Play UI does not show it.
+5. **The Play UI specs**: run on a scratch vitest setup after D-111 / D-112 — 61 pass, 101 fail, exactly as
+   before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
+   home, store, socket). The repo itself has no vitest toolchain yet (13_BUILD_ORDER P8).
 
 ## Notes (builder)
 

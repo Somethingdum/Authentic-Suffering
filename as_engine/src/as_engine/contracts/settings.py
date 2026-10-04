@@ -67,7 +67,7 @@ def default_lanes() -> dict[Lane, LaneConfig]:
         Lane.A: LaneConfig(name="Main model — the Writer (Boulesis v2.1 26B-A4B, a Gemma 4)",
                            model="boulesis-v2.1-26b-a4b-i1"),
         Lane.B: LaneConfig(name="Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)",
-                           model="nvidia-nemotron-3.5-lightning-30b-a3b"),
+                           model="nvidia-nemotron-3.5-lightning-30b-a3b-mtp"),
     }
 
 
@@ -83,9 +83,10 @@ class CallRegime(Strict):
 
 
 def default_regimes() -> dict[CallClass, CallRegime]:
-    """Default lane + sampling per call class (08_LLM_CALLS.md §Call table). D-111: lane A is the Writer (prose the
-    player reads, and the long-context creative work), lane B the Clerk (closed, checkable answers); a call that is
-    allowed to think has room for it in ``max_tokens`` (thinking counts against it)."""
+    """Default lane + sampling per call class (08_LLM_CALLS.md §Call table). D-111: lane A is the Writer (every
+    word the player reads as story, the HOT minds, and the long-context creative work), lane B the Clerk (scoped
+    background work with answers code can check); a call that is allowed to think has room for it in
+    ``max_tokens`` (thinking counts against it)."""
     A, B = Lane.A, Lane.B
     return {
         CallClass.INTAKE: CallRegime(lane=B, temperature=0.2, max_tokens=400, deadline_s=30),
@@ -100,9 +101,9 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.CASCADE_ADVISORY: CallRegime(lane=B, temperature=0.4, max_tokens=400, deadline_s=30),
         CallClass.GUIDE: CallRegime(lane=B, temperature=0.3, max_tokens=500, deadline_s=30),
         CallClass.REFLECTION: CallRegime(lane=B, temperature=0.6, max_tokens=700, deadline_s=60),
-        CallClass.SCENE_SUMMARY: CallRegime(lane=B, temperature=0.3, max_tokens=500, deadline_s=40),
+        CallClass.SCENE_SUMMARY: CallRegime(lane=A, temperature=1.0, max_tokens=4096, deadline_s=240, thinking=True),
         CallClass.RECAP: CallRegime(lane=A, temperature=1.0, max_tokens=4096, deadline_s=240, thinking=True),
-        CallClass.SAY_MY_WAY: CallRegime(lane=B, temperature=0.8, max_tokens=200, deadline_s=20),
+        CallClass.SAY_MY_WAY: CallRegime(lane=A, temperature=1.0, max_tokens=2048, deadline_s=120, thinking=True),
         CallClass.WORLDGEN_HISTORY: CallRegime(lane=A, temperature=0.8, max_tokens=8192, deadline_s=240, thinking=True),
         CallClass.WORLDGEN_ACTOR: CallRegime(lane=A, temperature=0.9, max_tokens=3500, deadline_s=240),
         CallClass.WORLDGEN_OPENING: CallRegime(lane=A, temperature=0.7, max_tokens=4096, deadline_s=120, thinking=True),

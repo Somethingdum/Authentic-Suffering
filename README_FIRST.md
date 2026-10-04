@@ -117,7 +117,7 @@ should stop after the P10 gate.
 |---|---|
 | Any time | Read `docs/as/SPEC_ISSUES.md`. The builder files there instead of changing a test or doc |
 | Approving a change | Edit the protected file(s), add a row to `docs/as/CHANGELOG_AS.md`, then in **your own** terminal set `AS_MAINTAINER=1` (cmd: `set AS_MAINTAINER=1`; PowerShell: `$env:AS_MAINTAINER=1`) and run `python tools\as\protect.py --write-manifest` — after a docstring change run `python tools\as\gate.py --write-reference` first |
-| P1 | On your machines: `python tools\as\probe.py --write` (finds each model's thinking switch and structured-output support), then `python tools\as\bench.py --n 5 --accept` |
+| P1 | On your machines, overnight: `python tools\as\bench.py --accept` — the limits bench (about three hours on the owner's pair; `--resume` after a Stop): each model's thinking switch, context, reading and writing speed, parallel slots, long-prompt recall and every call's real time, written into `as_config.yaml`. `reports\bench.md` says what it found |
 | P8 | The smoke checklist in `talemate_frontend/src/play/README.md` |
 | P10 | Its §7: a new life through the wizard, a world built under the loading bar, the bar during a move, and an Ironman run |
 

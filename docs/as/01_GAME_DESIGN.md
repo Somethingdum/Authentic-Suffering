@@ -51,7 +51,7 @@ Every run starts by choosing a character:
   JSON, v2/v3), or a long document. The importer turns it into a draft and lists, in plain
   language, what is missing ("needs three voice lines: easy, under pressure, at the limit").
 - **Quick make.** Name, age, look, what they did before, three skills, a flaw, a fear, a few items.
-  Cascade writes the rest; you review it before playing.
+  The main model writes the rest; you review it before playing.
 
 Your character is processed exactly like every other person in the world (L12). Their dossier
 shapes how your actions are carried out (manner), what options your body even has (skills and
@@ -188,7 +188,7 @@ Everything that makes a world — people, playable characters, factions, lore wi
 a belief layer, items, laws, buildings, infected variants, cascade rules — lives in **content
 packs**: plain YAML/Markdown folders you can write by hand. A validator tells you exactly what is
 missing in plain language. Big documents (like a faction bible) go through **dossier intake**:
-Cascade reads it section by section and drafts the record; you review it before it becomes canon.
+the main model reads it section by section and drafts the record; you review it before it becomes canon.
 
 ## 14. Honest limits
 

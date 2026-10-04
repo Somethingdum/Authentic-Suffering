@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-741 ids; 488 with their own statement, 253 named only in context.
+742 ids; 488 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -75,6 +75,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
+| BENCH-01 | (named only by tests) |  | — | `contract/p01_lanes/test_bench_limits.py` |
 | BENCH-03 | */ O5 / Resolve formula / Decided / `3 + floor((E+C)/4) + trait_mod`, drains/recoveries as in 05 §5, all in `RulesConfig.resolve`, tagged `[SAND]` and calibrated by `tools/as/eval.py` (BENCH-03). /* | DECISIONS §1 | — | — |
 
 ## BG

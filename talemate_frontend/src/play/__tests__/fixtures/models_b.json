@@ -4,7 +4,7 @@
   "data": {
     "lane": "B",
     "models": [],
-    "selected": "nvidia-nemotron-3.5-lightning-30b-a3b",
+    "selected": "nvidia-nemotron-3.5-lightning-30b-a3b-mtp",
     "reachable": false
   }
 }

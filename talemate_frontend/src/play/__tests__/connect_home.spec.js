@@ -34,7 +34,7 @@ describe('Connect', () => {
   test('a model that is no longer loaded is replaced from the list, never typed', async () => {
     const { store, sock } = storeWith('welcome_connect', 'config')
     const w = mountWith(ConnectScreen, { store })
-    const listed = ['boulesis-v2.1-26b-a4b-i1', 'nvidia-nemotron-3.5-lightning-30b-a3b']
+    const listed = ['boulesis-v2.1-26b-a4b-i1', 'nvidia-nemotron-3.5-lightning-30b-a3b-mtp']
     sock.emit({ type: 'as_game', action: 'models', data: { lane: 'B', models: listed, selected: listed[1], reachable: true } })
     sock.emit({ type: 'as_game', action: 'models', data: { lane: 'A', models: listed, selected: 'an-old-model', reachable: true } })
     await flush()

@@ -400,7 +400,7 @@ low stakes, under pressure, at the limit"). Drafts never load (IMP-02). Move a f
 playable character, faction, lore) and drop a `.md`, `.txt` or `.docx`.
 
 1. The text is split into sections of at most ~12,000 tokens on heading boundaries.
-2. Cascade (Lane A, long context) reads each section with the record's field list and fills what
+2. The Writer (lane A, the main model: long context) reads each section with the record's field list and fills what
    that section supports. It never invents: fields a section does not support stay empty.
 3. Partial results merge field by field (later sections append to lists; they never overwrite a
    filled text field).

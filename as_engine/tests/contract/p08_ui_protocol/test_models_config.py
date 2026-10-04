@@ -22,7 +22,7 @@ async def test_models_list_reports_both_brains(svc, gated):
     a, b = r[0]["data"], r[1]["data"]
     assert a == {"lane": "A", "models": ["boulesis-v2.1-26b-a4b-i1", "other-model"],
                  "selected": "boulesis-v2.1-26b-a4b-i1", "reachable": True}
-    assert b == {"lane": "B", "models": [], "selected": "nvidia-nemotron-3.5-lightning-30b-a3b", "reachable": False}
+    assert b == {"lane": "B", "models": [], "selected": "nvidia-nemotron-3.5-lightning-30b-a3b-mtp", "reachable": False}
 
 
 async def test_models_test_working(svc, gated):

@@ -74,8 +74,8 @@ them (CNT-08 warns on them in content; "sotry" is an error).
 | push | a protocol message the service sends without being asked (turn progress, the turn's result, the story) to every connected page | — | broadcast, event (for messages) |
 | busy | a turn is running; the service refuses anything that would read or change the run, except the view and the story from before the turn | "Your last move is still being worked out." | locked |
 | lane | one model the game uses (A = the main model, B = the second; both picked from one LM Studio list) | "Main model", "Second model" | box, slot, Storyteller brain, Fast brain |
-| Writer | lane A's role (D-111): the stronger model — it writes everything the player reads as story (narration, the Voice, Willis, the recap), thinks for the people who matter most (HOT), and does the long-context creative work (worldgen, dossier intake, quick-make) | "Main model" | — |
-| Clerk | lane B's role (D-111): the model that answers what code can check — intake, the WARM minds, writeback, the audits and the lint judge | "Second model" | — |
+| Writer | lane A's role (D-111, D-113): the smarter model, and the better writer — everything narrative (narration, the Voice, Willis, the recap, scene summaries, say-my-way when opted in), the people who matter most (HOT), and the long-context creative work (worldgen, dossier intake, quick-make) | "Main model" | — |
+| Clerk | lane B's role (D-111): a capable model, not as smart, and faster — rapid, clearly scoped background work whose answers code can check: intake, the WARM minds, writeback, the audits and the lint judge | "Second model" | — |
 | call class | the kind of model call (intake, narration …) | — | stage call |
 | LOD | reasoning tier of a mind: HOT (deep, thinking), WARM (fast), COLD (code continues the plan). The world's levels of detail are something else: see "levels of detail (world)" | — | level of detail (as a competence level — never) |
 | turn | one transaction from player input to committed world + prose | "a turn" | tick |

@@ -31,7 +31,7 @@ lanes:
   B:   # the second model, the Clerk: intake, the other minds, memory, the checks and audits — closed answers code can check
     name: Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)
     base_url: http://localhost:1234/v1        # the same list, via LM Link (without LM Link: that machine's own address)
-    model: nvidia-nemotron-3.5-lightning-30b-a3b
+    model: nvidia-nemotron-3.5-lightning-30b-a3b-mtp
     api_key: lm-studio
     max_concurrency: 1                        # more parallel slots here = more people per turn get a model call
     stall_window_s: 300                       # LANE-10: a call is stopped only if it makes NO progress (no token, no reasoning)

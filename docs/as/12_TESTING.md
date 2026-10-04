@@ -349,9 +349,15 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p01_lanes/test_writer_clerk.py` | `system_think_token` puts `<|think|>` at the start of the system message only when thinking is on (and makes a system message when there is none); no other mode sends it; Gemma's thought channel (closed, cut off, empty) is reasoning, never story; the Writer's call classes are exactly the story and long-context ones, and its narration, Voice, Willis and recap think; the HOT minds think on the Writer, the WARM minds and the judges on the Clerk, the judges thinking; every call that thinks has at least 2,000 tokens of room |
+| `p01_lanes/test_writer_clerk.py` | `system_think_token` puts `<|think|>` at the start of the system message only when thinking is on (and makes a system message when there is none); no other mode sends it; Gemma's thought channel (closed, cut off, empty) is reasoning, never story; the Writer's call classes are exactly the narrative and long-context ones (D-113: scene summaries and say-my-way included), and its narration, Voice, Willis, recap, scene summaries and say-my-way think; the HOT minds think on the Writer, the WARM minds and the judges on the Clerk, the judges thinking; every call that thinks has at least 2,000 tokens of room |
 | `p05_many_actors/test_reactions_cascade_plan.py` (amended) | HOT goes to `hot_cognition.lane` (A by default; B when the owner sets it) and WARM to the actor-cognition lane; with the Clerk down WARM moves to the Writer (DEGRADE-01); WARM never spills onto the Writer to balance load |
 | `p07_slice/test_hot_lane_schema.py` | a HOT call's JSON schema is sent with thinking on only when its OWN lane supports it |
+
+### 3.27 The limits bench (tools; D-112)
+
+| File | What it proves |
+|---|---|
+| `p01_lanes/test_bench_limits.py` | `tools/as/bench.py --fake` on two simulated lanes with known limits (`tools/as/benchsim.py` SMALL: the owner's speeds in small contexts) finds them: a reported context, and an unreported one pinned by halving; reading and writing speed within 15–20%; the thinking switch and prompt progress; one cached prompt; the parallel slots; how far in five facts are still found, every rung answered in the JSON asked for; every call class on its own lane and regime, and the HOT call timed on the other lane too. The settings keep the design: concurrency from the slots, never a lower stall window, `max_tokens` raised only where a call was cut short (capped by the context left), expected seconds from p90, budgets that still admit each depth's designed minds, no call moved to another lane, `--keep-budgets` honoured; it never writes as_config.yaml for simulated lanes. The pieces: parallel slots must pay (20% throughput, at most double the latency), recall is reliable only up to the first fading length, cut short means the cap was reached or thinking never ended, the filler is the size asked with facts where asked and no shared prefix, a resumed run keeps what it measured, an unknown stage is refused |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
@@ -545,7 +551,7 @@ Runs anywhere, no models needed, and prints one plain line per check:
   switched off (and how).
 - `tests/live/test_json_compliance_live.py`: 20 cognition calls per lane against real packets from
   the metal-fence scenario; ≥ 95 % parse and validate without repair.
-- `tools/as/bench.py --n 5`: per call class latency on each lane → `reports/bench.json`.
+- `tools/as/bench.py`: the limits bench (08 §7, D-112) → `reports/bench.json` and `bench.md`; `--accept` writes the settings.
 - `tools/as/eval.py --scenario metal_fence --turns 10 [--ablate <call_class>] [--fake]`: plays with
   real models (or the fake one) and reports the measures in its docstring. With --ablate it plays
   plain and with that call class switched off (LANE-09) and names what changed; a class whose

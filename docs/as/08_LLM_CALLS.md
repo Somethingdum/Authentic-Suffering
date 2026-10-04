@@ -20,39 +20,45 @@ conservation, cascade application, scoring, selection, commit, save and replay a
    for it (143,360), flash attention on. Set its sampling in LM Studio to Google's recommendation for Gemma 4
    (temperature 1.0, top_p 0.95, **top_k 64**: the game sends temperature and top_p per call; top_k is LM
    Studio's). Start the server (Developer tab or `lms server start`) on port 1234.
-2. Laptop: load **NVIDIA Nemotron 3.5 Lightning 30B-A3B** — the Clerk, lane B, for now — (Unsloth GGUF
-   UD-Q4_K_XL ≈ 20 GB RAM; partial GPU offload on the 8 GB card), context 16384. More parallel slots there
-   (`max_concurrency`) mean more people per turn get a model call. A better laptop model takes the same role.
+2. Laptop: load **NVIDIA Nemotron 3.5 Lightning 30B-A3B** with multi-token prediction
+   (`nvidia-nemotron-3.5-lightning-30b-a3b-mtp`) — the Clerk, lane B, for now — partial GPU offload on the
+   8 GB card, with the context LM Studio offers for it (59,136). More parallel slots there (`max_concurrency`)
+   mean more people per turn get a model call. A better laptop model takes the same role.
 3. Link the machines with **LM Link** (`lms link enable` on both). Both models now appear in the
    desktop's `http://localhost:1234/v1/models`.
 4. In the game's Connect screen (and Settings → Models) pick the **Main model** and the **Second
    model** from the one list LM Studio shows — no typing, no addresses — and press **Test** on each.
    The test runs PROBE calls (below) and records whether structured output and thinking control
    work for that model.
-5. Once per model change, run `python tools/as/probe.py --write`: it finds each lane's thinking switch
-   (a Gemma 4 may need `system_think_token`; without a working switch the Writer never thinks), whether JSON schemas survive
-   thinking, and whether the server reports prompt progress, and writes them to `as_config.yaml`.
+5. Once per model change, run the limits bench overnight: `python tools/as/bench.py --accept` (§7). It finds
+   each lane's thinking switch (a Gemma 4 may need `system_think_token`; without a working switch the Writer
+   never thinks), the context, reading and writing speeds, parallel slots, how far into a long prompt each
+   model still finds facts, how long each of the game's calls takes, and writes the settings that follow into
+   `as_config.yaml`. (`python tools/as/probe.py --write` alone does the thinking switch in minutes.)
 
-**The Writer and the Clerk (D-111).** The two models are not equals. **Lane A, the Writer** (Boulesis v2.1
-26B-A4B, a Gemma 4) is the stronger one and the only one good at prose: it keeps a long context consistent,
-holds extra directions, and tells in-story from meta; it is a mixture of experts (about 4B active), nearly as
-fast as the Cascade it replaced and much smarter. **Lane B, the Clerk** (Nemotron 3.5 Lightning for now) is
-fast and good at well-scoped work. The rule for which lane a call belongs on:
+**The Writer and the Clerk (D-111, D-113).** The two models are not equals. **Lane A, the Writer**
+(Boulesis v2.1 26B-A4B, a Gemma 4) is many times smarter and by far the better writer: it keeps a long context
+consistent, holds extra directions, and tells in-story from meta. It is also slow on a consumer card — about
+5 tokens a second — and the owner takes that trade for the quality. **Lane B, the Clerk** (Nemotron 3.5
+Lightning for now) is a capable model, not as smart, and faster: about 19 tokens a second written and some
+200 read (a 25K-token prompt in about two minutes), and it thinks a lot. The rule for which lane a call
+belongs on:
 
-* **Writer** — everything the player reads as story, the thinking decisions of the people who matter most
-  (HOT), and long-context creative work: narration, the Voice, Willis, the recap, HOT actor cognition,
-  worldgen history / people / opening, dossier intake, quick-make.
-* **Clerk** — a call whose answer is *closed* (a schema or a short verdict), *checked by code*, *stateless*,
-  fits in about 8K tokens of context, and whose failure is *cheap* (a fallback exists): intake, the WARM
-  minds, reactions, repair, writeback, the audits and the lint judge, rumours, the guide, summaries,
-  reflection, say-my-way, the cheat interpreter and persona, the doom guard.
+* **Writer** — everything narrative: every word the player reads as story (narration, the Voice, Willis, the
+  recap, the Journal's scene summaries, and the player's own line when they opt in to say-my-way), the
+  thinking decisions of the people who matter most (HOT actor cognition), and the long-context creative work
+  (worldgen history / people / opening, dossier intake, quick-make).
+* **Clerk** — rapid, clearly scoped background work: a call whose answer is *closed* (a schema or a short
+  verdict), *checked by code*, *stateless*, fits in about 8K tokens of context, and whose failure is *cheap*
+  (a fallback exists): intake, the WARM minds, reactions, repair, writeback, the audits and the lint judge,
+  rumours, the guide, reflection, the cheat interpreter and persona, the doom guard.
 
 Lanes are roles, not a pool: a call goes to the lane its regime names and is never moved to balance load
 (the planner, `lanes/scheduler.py`); only a lane that is **down** sends a Clerk call to the Writer
 (DEGRADE-01, thinking off). Narration is never written by the Clerk: with lane A down the moment is told
-plainly by code (NARR-FALLBACK). The HOT decisions follow `hot_cognition.lane` (A by default, thinking on):
-should the Writer ever be slow enough that its HOT calls hold up the narration, `hot_cognition.lane: B` moves
-them to the Clerk.
+plainly by code (NARR-FALLBACK). The HOT decisions follow `hot_cognition.lane` (A by default, thinking on).
+What that costs is measured, not guessed: the bench times a HOT decision on both lanes and shows a turn either
+way (§7); `hot_cognition.lane: B` moves them to the Clerk.
 The scheduler plans by `SchedulerRules.estimated_call_s`, placeholders until `tools/as/bench.py` measures your
 machines. (Without LM Link, open Advanced on the Second model's
 card and give that machine's own address, e.g. `http://192.168.1.50:1234/v1`, with LM Studio's
@@ -133,8 +139,8 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | cascade_advisory | B | no | CascadeSuggestion | when lanes idle | the cascade table would never learn (output is design debt, never committed) |
 | guide | B | no | text | Ask mode | — (player help; no turn) |
 | reflection | B | no | ReflectionOutput | idle time between turns | Actors would not grow new goals/grudges off-screen |
-| scene_summary / recap | B / A | no / yes | text | scene end / load | the Journal and "previously" would be empty |
-| say_my_way | B | no | SayMyWayOutput | Say mode "my way" | — (optional mode) |
+| scene_summary / recap | A | yes | text | scene end / load | the Journal and "previously" would be empty |
+| say_my_way | A | yes | SayMyWayOutput | Say mode "my way" — only when the player opts in (`pc_voice: my_way`; the default `exact` sends their words as typed, D-113) | — (optional mode) |
 | worldgen_history / actor / opening | A | history & opening yes | JSON (stage schemas) | worldgen only | — (off the turn path) |
 | dossier_intake / pc_quickmake | A | no | JSON | content tools | — |
 | cheat_persona | B | no | text | cheat commands | falls back to canned persona lines |
@@ -173,10 +179,24 @@ one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 
   *Who you are* and the identity card (05 §2.1; p04 `test_identity.py`).
 
 ## 7. Live tools (run on your machines; `AS_LIVE=1`)
-- `tools/as/probe.py` — reachability, model ids, JSON-schema compliance, thinking control; writes
-  results into `as_config.yaml`.
-- `tools/as/bench.py --n 5` — per-call-class latency on each lane with realistic packet sizes;
-  writes `reports/bench.json`; replaces `SchedulerRules.estimated_call_s` when you accept it.
+- `tools/as/probe.py` — reachability, model ids, JSON-schema compliance, thinking control (each mode tried both
+  off and on); writes results into `as_config.yaml` with `--write`.
+- `tools/as/bench.py` — **the limits bench** (D-112). Unattended: one command, every stage, both lanes,
+  `--resume` after a Stop or a crash. It grades nothing; it finds where each model's limits are:
+  the context it was loaded with (LM Studio's native API, or found by halving the gap between a prompt read and
+  one refused or silently cut), reading speed from 1K tokens to that limit, recall (five facts at five depths of
+  every long prompt — the same prompts, so long contexts are read once), what the prompt cache saves, writing
+  speed with thinking off and on and how much of it is thinking, whether parallel requests add throughput, and
+  every call class the game makes at its own regime (time, prompt size, thinking, whether `max_tokens` cut it
+  short, whether it parsed) — with the HOT decision timed on both lanes. It writes `reports/bench.json` and a
+  readable `reports/bench.md` (each lane's limits, the call table, a medium scene's turn time per depth with
+  the HOT minds on either lane, and what `--accept` would change). `--accept` writes the thinking switch,
+  JSON-with-thinking, prompt progress, `max_concurrency`, the stall window (only raised), the `max_tokens` of
+  any call it saw cut short (raised), each regime's expected seconds, `estimated_call_s`, and turn budgets that
+  still admit the minds each depth was designed for (`--keep-budgets` to leave them). It never moves a call to
+  another lane. On the owner's pair (5 and 19 tokens a second) a full run takes about three hours — run it
+  overnight; `--quick` about one. `--fake` runs it on two simulated lanes with known limits
+  (`tools/as/benchsim.py`); the contract test checks that it finds them (p01 `test_bench_limits.py`).
 - `tools/as/eval.py` — plays the canonical scenarios with real models and reports: refusal rate on
   WILL scenarios, echo rejections, lint failures per 10 turns, leak findings, average prose
   metrics, intent repair rate, turn wall-clock. This is how you find quality problems the fake

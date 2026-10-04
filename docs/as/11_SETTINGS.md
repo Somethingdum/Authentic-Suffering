@@ -44,7 +44,7 @@ Difficulty descriptions (CMG §61 Part II, shown verbatim in the wizard):
 | **Scene length** | `narration_length` | Short (80–180 words) · **Medium** (160–350) · Long (300–600) | Target prose length (lint band). |
 | **Point of view** | `narration_person` | **Third person** ("Addison") · Second person ("you") | Narrator grammar only. |
 | **Tense** | `narration_tense` | **Past** · Present | Narrator grammar only. |
-| **Say it my way** | `pc_voice` | **Off** (your words are spoken exactly) · On (you give the idea; your character says it their way) | CMG §53 Dialogue Seed Protocol. The result is recorded as intact, softened, garbled or withheld. Never changes who you address or what you do. |
+| **Say it my way** | `pc_voice` | **Off** (your words are spoken exactly) · On (you give the idea; your character says it their way) | CMG §53 Dialogue Seed Protocol. The result is recorded as intact, softened, garbled or withheld. Never changes who you address or what you do. Off, nothing rewrites, paraphrases or invents your character's words anywhere: a Say goes out as typed, quotes in a Do are spoken as written, a Do that asks to speak without words is sent back for them, and the narrator may quote only words actually spoken (D-113). On, the Writer (lane A) does it. |
 | **Intensity** | `intensity` | **Full** · Softer | Presentation only: Softer asks the narrator to describe gore and atrocity with less graphic detail. **Every fact still happens and is still remembered**; the simulation is identical (INT-01). The content charter's one hard line (no sexual content involving minors) is not a setting and applies at every intensity. |
 | **Show dice** | `show_mechanics` | Off · **Summary** · Full | A small receipt under the scene ("Climb the fence: skilled +2, wet −1 → success with a cost"). Never inside the prose. Full adds every draw and modifier. |
 | **Read aloud** | `read_aloud` | **Off** · On | Uses Talemate's text-to-speech agent for narration (P12). |
@@ -87,7 +87,7 @@ lanes:
   B:                               # the Clerk
     name: Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)
     base_url: http://localhost:1234/v1   # via LM Link; or the laptop's own address
-    model: nvidia-nemotron-3.5-lightning-30b-a3b
+    model: nvidia-nemotron-3.5-lightning-30b-a3b-mtp
     max_concurrency: 1
 background_cognition: true         # quiet-hours reflection between turns (05 §9.2)
 # regimes:                         # per call class: lane, temperature, max_tokens, thinking, deadline_s (the EXPECTED seconds: a call past it is "slow", never cancelled)
@@ -106,7 +106,7 @@ background_cognition: true         # quiet-hours reflection between turns (05 §
 | Key | Meaning | Who changes it |
 |---|---|---|
 | `lanes.A/B.base_url`, `.model` | where each brain lives | Connect screen |
-| `lanes.*.thinking_mode`, `structured_with_thinking` | how to switch thinking off and on (each mode is tried both ways, D-111; Gemma 4 needs `system_think_token`), and whether JSON schemas work with thinking on | `tools/as/probe.py --write` (the Connect screen's Test button only checks that the model answers, how fast, and whether structured answers work) |
+| `lanes.*.thinking_mode`, `structured_with_thinking` | how to switch thinking off and on (each mode is tried both ways, D-111; a Gemma 4 may need `system_think_token`), and whether JSON schemas work with thinking on | `tools/as/probe.py --write` (the Connect screen's Test button only checks that the model answers, how fast, and whether structured answers work) |
 | `lanes.*.max_concurrency` | parallel requests per machine | you, after `bench` shows the machine copes |
 | `lanes.*.stall_window_s`, `silent_prefill_window_s`, `prefill_progress` | how long a model may go without any progress before a call is stopped (default 5 minutes; there is no limit on total time), the same for the silent wait before the first token when the server reports no prompt progress (default: none), and whether the server reports it | `stall_window_s` you (Settings → Models); `prefill_progress` `tools/as/probe.py --write` |
 | `regimes.<call_class>` | lane, sampling, token cap, expected seconds per call class (08 §4) | you (advanced; edit the file — the Play UI never changes regimes, because a regime change alters every later request and so breaks re-simulation, DET-02) |

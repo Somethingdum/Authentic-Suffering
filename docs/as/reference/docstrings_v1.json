@@ -645,7 +645,7 @@
    "sig": "(Strict)"
   },
   "default_regimes": {
-   "doc": "Default lane + sampling per call class (08_LLM_CALLS.md §Call table). D-111: lane A is the Writer (prose the\nplayer reads, and the long-context creative work), lane B the Clerk (closed, checkable answers); a call that is\nallowed to think has room for it in ``max_tokens`` (thinking counts against it).",
+   "doc": "Default lane + sampling per call class (08_LLM_CALLS.md §Call table). D-111: lane A is the Writer (every\nword the player reads as story, the HOT minds, and the long-context creative work), lane B the Clerk (scoped\nbackground work with answers code can check); a call that is allowed to think has room for it in\n``max_tokens`` (thinking counts against it).",
    "sig": "() -> dict[CallClass, CallRegime]"
   }
  },

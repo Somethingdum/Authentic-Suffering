@@ -17,7 +17,7 @@
       "B": {
         "name": "Fast brain (laptop) — Nemotron 3.5 Lightning 30B-A3B",
         "base_url": "http://localhost:1234/v1",
-        "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+        "model": "nvidia-nemotron-3.5-lightning-30b-a3b-mtp",
         "api_key": "lm-studio",
         "max_concurrency": 1,
         "stall_window_s": 300.0,

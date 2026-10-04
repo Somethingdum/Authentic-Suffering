@@ -70,7 +70,7 @@ nothing on the turn's bar. Under each bar, one rotating line about the step (con
 | Suggestion chip | the suggestion ref maps to a PC `BoundAffordance` built last turn; re-validated against the fresh AffordanceSet | No |
 | **Do** text | quoted spans → speech (verbatim, PARSE-05); the rest → INTAKE (lane B, `intake_schema` with the PC's affordance handles) | Yes |
 | **Say** text, mode "exact" | `speak` affordance to the chosen addressee (default: the person the PC last spoke with or is facing; the UI's "To:" chip overrides); words verbatim | No |
-| **Say** text, mode "my way" | SAY_MY_WAY (lane B) turns the idea into the PC's line; `survived` recorded | Yes |
+| **Say** text, mode "my way" (opt-in only: `pc_voice` is `exact` unless the player turns it on, D-113) | SAY_MY_WAY (lane A, the Writer) turns the idea into the PC's line; `survived` recorded | Yes |
 | **Ask** | GUIDE (lane B), answered by `service/guide.py` in P8 from the play view the player already sees plus plain rules text — **not a turn**: no event, no time passes; only the call log and two story entries are written (PROTO-07, GUIDE-01..03) | Yes |
 | Contains `2508` / starts with `/` after activation | cheats (P12, routed by the service; see CHEATS.md) | Maybe |
 
@@ -145,7 +145,7 @@ moving to within 20 m is news to whoever sees it, and it ends the player's watch
 
 ### 3.3 Cognition (stage 6)
 
-- HOT: `EngineConfig.hot_cognition` (lane A, thinking on, 3000 max tokens including reasoning).
+- HOT: `EngineConfig.hot_cognition` (lane A, the Writer, thinking on, 4096 max tokens including reasoning; D-111).
   Structured output with thinking depends on the probe result for the lane
   (`structured_with_thinking`): `supported` → json_schema on the call; otherwise the call is made
   without a schema, the JSON is extracted from the text, and a failure goes to one INTENT_REPAIR on
@@ -265,7 +265,7 @@ PC's stay in one place — the first turn opens one; leaving the place ends it (
 scene; the problem resolving or its `chunk_max` ends one (PASSIVE scenes — unconscious,
 restrained, carried — MUST end at max: the coma failsafe); **opportunity weaving may only surface
 a pressure already in committed state**, never mint one (SCENE-02); scene end triggers the PC's
-scene summary (lane B) for the Journal.
+scene summary (lane A, the Writer: the Journal is read as story, D-113).
 
 ## 7. Worked trace — "Night at Delgado's" (P7 integration scenario)
 

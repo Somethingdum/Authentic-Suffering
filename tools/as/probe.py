@@ -87,7 +87,7 @@ async def probe_lane(lane_id, cfg, transport) -> dict:
         row = {"mode": mode}
         for thinking in (False, True):
             req = LMRequest(call_class=CallClass.PROBE, lane=lane_id, messages=msgs, thinking=thinking,
-                            max_tokens=1024 if thinking else 64, deadline_s=60)
+                            max_tokens=256 if thinking else 64, deadline_s=60)   # 256: enough to see it think
             key = "on" if thinking else "off"
             t = time.perf_counter()
             try:
@@ -114,17 +114,26 @@ async def probe_lane(lane_id, cfg, transport) -> dict:
         out["json_schema"] = "ok"
     except Exception as e:  # noqa: BLE001
         out["json_schema"] = f"failed: {str(e)[:80]}"
-    treq = jreq.model_copy(update={"thinking": True, "max_tokens": 1024})
-    try:   # ask for the schema WITH thinking on (the transport sends it only when the lane says 'supported')
-        r = await transport.send(chosen.model_copy(update={"structured_with_thinking": "supported"}), treq)
+    # ask for the schema WITH thinking on (the transport sends it only when the lane says 'supported'). A model that
+    # thinks past the cap has not answered either way: try once with more room, then say 'unknown' rather than guess.
+    for cap in (1024, 4096):
+        treq = jreq.model_copy(update={"thinking": True, "max_tokens": cap})
+        try:
+            r = await transport.send(chosen.model_copy(update={"structured_with_thinking": "supported"}), treq)
+        except Exception as e:  # noqa: BLE001
+            out["structured_with_thinking"] = f"unknown ({str(e)[:60]})"
+            break
         parsed_ok = True
         try:
             json.loads(r.text)
         except ValueError:
             parsed_ok = False
-        out["structured_with_thinking"] = "supported" if (r.reasoning and parsed_ok) else "unsupported"
-    except Exception as e:  # noqa: BLE001
-        out["structured_with_thinking"] = f"unknown ({str(e)[:60]})"
+        cut = r.completion_tokens >= cap - 4 or (not (r.text or "").strip() and bool(r.reasoning))
+        if parsed_ok or not cut:
+            out["structured_with_thinking"] = "supported" if (r.reasoning and parsed_ok) else "unsupported"
+            break
+    else:
+        out["structured_with_thinking"] = "unknown (it thought past 4096 tokens without answering)"
     return out
 
 

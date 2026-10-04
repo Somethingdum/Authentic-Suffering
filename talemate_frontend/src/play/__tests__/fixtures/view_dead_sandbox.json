@@ -293,7 +293,7 @@
         "B": {
           "label": "Second model",
           "ok": false,
-          "model": "nvidia-nemotron-3.5-lightning-30b-a3b",
+          "model": "nvidia-nemotron-3.5-lightning-30b-a3b-mtp",
           "detail": ""
         }
       },
