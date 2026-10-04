@@ -37,6 +37,9 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
     body(<path>)                              (D-123) the body itself (none when there is no such body)
+    settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
+                                              of the holders of a visual EXACT or PARTIAL percept of that
+                                              event, never counting the event's own body (payload body_id)
     seen_clearly_by(<path>)                   (D-123) the holders of a visual EXACT or PARTIAL percept
                                               of that event (they saw who it was) — never the event's
                                               own body (payload body_id)
@@ -124,6 +127,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   emit_event SHORTAGE                        society.settlement.declare_shortage(tx, target, p.resource, ...)
   emit_event RATION_CHANGE                   society.settlement.change_ration(tx, target, p.delta, p.cause, ...)
   emit_event LAW_APPLIED                     society.settlement.apply_law(tx, target, p.law, p.subject, ...)
+                                             — (D-124) with p.where_in_force true, a settlement that does
+                                             not have that law in force is skipped (no event, no warning)
   emit_event TENSION_CHANGE                  society.group.adjust_tension(tx, target, p.toward, p.delta,
                                              p.cause, at, turn_index, E)
   emit_event LOYALTY_CHECK                   society.group.loyalty_check(tx, target, p.group, p.reason, ...)

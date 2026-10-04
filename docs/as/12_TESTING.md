@@ -422,6 +422,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_what_wears_the_will_down.py` | In a kitchen: Dale cuts eight-year-old Teo's throat in front of his mother — Rosa, his guardian, loses 3 (CAS-008, lost_dependent); the onlookers who saw who it was never include the dead; Dale's first kill and a child: 1 and 3 (CAS-031, CAS-032). Owen kills Rosa: Dale, who loves her, and Teo, her son, lose 2 each, Owen nothing; the same death is grieved once. Rosa in the yard sees nothing; Nita tells her, she believes it and loses 3 (CAS-030) — told twice, grieved once. A second kill is not a first. A scratch is not severe pain, a stab is (CAS-033); fed, nothing — hungry, 1 (CAS-034); sixteen hours awake, nothing — a day, 1 (CAS-035) |
 
+### 3.38 A bite seen (P9; D-124)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_bite_seen.py` | Hal is bitten in the yard in the light with Mae beside him: the settlement that saw is Pumpwell (Hal's own bite is no sighting; Owen belongs nowhere) and its quarantine law comes into force for Hal (CAS-015). With Mae in the shed nobody of the settlement saw it: nothing. A settlement without the law: nothing, and no warning — not having the law is not a fault |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

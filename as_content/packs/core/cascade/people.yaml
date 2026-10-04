@@ -114,17 +114,17 @@
   cites: [docs/as/04_TURN_PIPELINE.md#7]
 - schema: as.cascade.v1
   id: CAS-015
-  description: A bite wound seen by a settlement member brings the contamination law into force for the bitten person.
-  trigger_event: BELIEF_FORM
-  where: {predicate: bitten}
-  preconditions: ["trigger.payload.confidence >= 2"]
+  description: A bite on a person, seen by members of a settlement, brings that settlement's contamination law into force for the bitten person.
+  trigger_event: HARM
+  where: {type: bite}
+  preconditions: ["body(trigger.payload.body_id).kind == 'human'"]
   effects:
     - kind: emit_event
       event_type: LAW_APPLIED
-      target: settlement_of(trigger.payload.holder_id)
-      payload: {law: contamination_quarantine, subject: "$trigger.payload.subject_id"}
+      target: settlements_seeing(trigger.event_id)
+      payload: {law: contamination_quarantine, subject: "$trigger.payload.body_id", where_in_force: true}
   delay_s: 0
-  cites: [docs/as/06_WORLD.md#2.5]
+  cites: [D-124, docs/as/06_WORLD.md#2.5]
 - schema: as.cascade.v1
   id: CAS-018
   description: Hearing, from someone they believe, that a person steals costs that person some of the listener's trust.

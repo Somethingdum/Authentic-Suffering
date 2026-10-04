@@ -789,6 +789,12 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "settlements_seeing":                                   # D-124
+        from ..society._impl_society import settlement_of as _stl_of
+        dead = (trigger.payload or {}).get("body_id")
+        holders = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                          "fidelity IN ('exact','partial')", (v,))} - {dead}
+        return sorted({s for s in (_stl_of(tx, h) for h in holders) if s})
     if fn == "seen_clearly_by":                                      # D-123
         dead = (trigger.payload or {}).get("body_id")
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
@@ -1001,7 +1007,8 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
     elif eff.kind == "emit_event" and et == "RATION_CHANGE":
         soc.change_ration(tx, target, int(pl["delta"]), pl.get("cause") or "cascade", at, turn_index, E)
     elif eff.kind == "emit_event" and et == "LAW_APPLIED":
-        soc.apply_law(tx, target, pl["law"], pl["subject"], at, turn_index, E)
+        if not (pl.get("where_in_force") and soc.law_def(tx, target, pl["law"]) is None):   # D-124
+            soc.apply_law(tx, target, pl["law"], pl["subject"], at, turn_index, E)
     elif eff.kind == "emit_event" and et == "TENSION_CHANGE":
         soc.adjust_tension(tx, target, pl["toward"], int(pl["delta"]), pl.get("cause") or "", at, turn_index, E)
     elif eff.kind == "emit_event" and et == "LOYALTY_CHECK":
