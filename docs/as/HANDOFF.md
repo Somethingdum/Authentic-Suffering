@@ -218,6 +218,11 @@ the 58-bit gate. Keep doing this for every phase: build a world, play it, read w
   condition columns of bodies and items), `lots` (production lots: the economy counts stores instead)
   and `blobs` (the annex for event payloads over 64K characters, commit gate E14/E15/G13: nothing that
   large is written yet). Leave them unless a feature needs them; do not build against them.
+- `society.settlement.trade_terms` (STL-11, SOC-03) is built and tested, but nothing in play uses it:
+  there is no trade action. Barter is talk plus `give_item`, and a trader's own beliefs and feelings
+  (the theft rumour, a grudge) already shape what they say and do. When an exchange action exists
+  (an offer both sides accept, with prices), it should read `trade_terms`; until then SOC-03 holds
+  only through the trader's mind. (Found by the D-118 sweep for contract functions nothing calls.)
 
 ## 5. P11 built; P12 partly built
 
