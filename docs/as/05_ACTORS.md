@@ -194,7 +194,15 @@ Selection rules (grouping, caps, the always-present wait/observe) are in `mind/a
 cites its event): witnessing a bonded person's death 2, sustained fear scene 1, public humiliation 1,
 severe pain 1, betrayal 2, first kill 1, killing a child 3, a starving day 1, a sleepless night 1,
 losing a dependent 3, being made to watch 2, being coerced 1. Recovery: +1 per night asleep in a
-place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dependent.
+place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dependent. (D-122: a night
+is six hours or more of unbroken sleep, given back on waking — CAS-021; sleeping through it is what
+"believes is safe" is read as. A promise kept: CAS-029. Protecting a dependent is not built: without a
+once-a-day limit, shielding someone would pump Resolve.)
+
+**Sleep** (D-122, SLEEP-01/02, `physical/bodies.py`, `action/resolve.py`): while asleep a person's
+fatigue holds where it was; waking pays it off, two hours awake for every hour slept
+(`NeedsRules.sleep_pays`) — a night pays off a day. The player decides when the PC wakes: anything he
+does but sleep wakes him first. Anyone else wakes to a sound (perception) or their routine.
 
 **Resolve gates options; it never modifies a roll.**
 
@@ -281,7 +289,7 @@ makes the snap, when it comes, code's act:
 
 - **Stress** (`actors.stress` 0–10) is what wears a person down: seeing someone die (more the closer
   they were, CAS-019), hunger, thirst and exhaustion past the first pangs (CAS-020), being struck or
-  threatened, seeing their people hurt. A night's sleep takes the edge off (CAS-021).
+  threatened, seeing their people hurt. A night's unbroken sleep takes the edge off, on waking (CAS-021).
 - **Temper** (dossier `temper`: `fuse` 1–5, `outlet` fists / words / cold / flight / tears,
   `grudge` 0–3, `pet_peeves`, `cools_down_by`) is how this person breaks. It is on their card
   ("What sets you off").

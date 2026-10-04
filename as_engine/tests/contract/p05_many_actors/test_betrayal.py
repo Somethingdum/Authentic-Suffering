@@ -331,16 +331,16 @@ def test_hunger_past_the_first_pangs_wears_you_down(street, stage, delta):
 
 
 def test_a_night_s_sleep_takes_the_edge_off(street):
+    """D-122: on waking after a night's unbroken sleep (six hours or more), not on lying down."""
     w = street()
     t = now(w)
     with w.store.transaction() as tx:
         from as_engine.mind import actor
         c = tx.commit_event(Event(type=EventType.OVERRIDE, writer="audit", at=t, turn_index=0, payload={"what": "test"}))
         actor.adjust_stress(tx, w.id("june"), 5, c.event_id, t, 0)
-        ev = tx.commit_event(Event(type=EventType.ACTION_COMPLETE, writer="action.resolve", actor_id=w.id("june"), at=t,
-                                   turn_index=0, payload={"actor_id": w.id("june"), "def_id": "sleep", "result": "done",
-                                                          "band": None}))
+        bodies.posture_event(tx, w.id("june"), "lying", t, None, 0, awareness="asleep")
+        ev = bodies.wake(tx, w.id("june"), t + 7 * 3_600_000, None, 0)
     before = strain(w, "june")
     with w.store.transaction() as tx:
-        cascade.sweep(tx, [ev], strain_rules(w, "CAS-021"), t, 0)
+        cascade.sweep(tx, [ev], strain_rules(w, "CAS-021"), t + 7 * 3_600_000, 0)
     assert strain(w, "june") == before - 2

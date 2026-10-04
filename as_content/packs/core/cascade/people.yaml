@@ -206,3 +206,16 @@
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
   delay_s: 0
   cites: [D-119, INFO-02]
+# D-122 — what gives Resolve back (05 §5): a night's unbroken sleep (CAS-021), a promise kept.
+- schema: as.cascade.v1
+  id: CAS-029
+  description: Keeping a promise steadies the one who kept it.
+  trigger_event: PROMISE_KEPT
+  where: {}
+  preconditions: []
+  effects:
+    - kind: recover_resolve
+      target: actor(trigger.payload.promiser_id)
+      payload: {cause: fulfilled_obligation}
+  delay_s: 0
+  cites: [D-122, docs/as/05_ACTORS.md#5]

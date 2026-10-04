@@ -27,16 +27,19 @@
   cites: [TEMPER-02]
 - schema: as.cascade.v1
   id: CAS-021
-  description: A night's sleep takes the edge off.
-  trigger_event: ACTION_COMPLETE
-  where: {def_id: sleep}
-  preconditions: []
+  description: A night's unbroken sleep takes the edge off and gives back a little Resolve.
+  trigger_event: AWARENESS_CHANGE
+  where: {awareness: awake, from: asleep}
+  preconditions: ["trigger.payload.slept_ms >= 21600000"]
   effects:
     - kind: adjust_stress
-      target: actor(trigger.actor_id)
+      target: actor(trigger.payload.body_id)
       amount: -2
+    - kind: recover_resolve
+      target: actor(trigger.payload.body_id)
+      payload: {cause: safe_night}
   delay_s: 0
-  cites: [TEMPER-02]
+  cites: [TEMPER-02, SLEEP-01, docs/as/05_ACTORS.md#5]
 # --- H1 consequences: not always violence, and they last.
 - schema: as.cascade.v1
   id: CAS-022

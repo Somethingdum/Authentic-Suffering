@@ -410,6 +410,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_second_look.py` | INTAKE-07 at the Night at Delgado's: "I lie down and sleep" — the first menu has no room for sleep and the intake says NONE; the second look has the same first handles, then the rest of what Owen could do, sleep among them, and he lies down. Still nothing on the second look is the rejection (two calls); words that are not an action get no second look (one call) |
 
+### 3.36 Sleep rests you (P7; D-122)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_sleep_rests_you.py` | SLEEP-01: 16 hours awake then 8 asleep — fatigue held while she sleeps, rested when she wakes, the waking saying how long she slept; a 2-hour nap pays 4 of the 16 hours owed. SLEEP-02 through a turn: Owen has slept seven hours and "I wait" wakes him first, rested, and the night takes the edge off and gives back a little Resolve (CAS-021 — swept although a sound at the scene compile was what woke him). Five hours is not a night. SLEEP-02 in the resolver: Owen asleep wakes before anything but sleep, sleeping on is not falling asleep again (all of it counts), and June asleep does not wake by deciding to. CAS-029: Mara kept her promise to June and is steadier for it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

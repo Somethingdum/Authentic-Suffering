@@ -108,7 +108,10 @@ simulate — stages 0-12 in ONE store transaction:
        onlookers_of) find them. SEE(E) = perception.compile_aftermath(tx, h, E, max(e.at for e in
        E, t0), T) for each of EVERYONE (as S11 defines it) and (B6, SEL-07) each of
        select.reached(tx, E, T) — whoever E's sounds reach, anywhere (a percept already granted is
-       never granted twice).
+       never granted twice). WOKEN (D-122): the AWARENESS_CHANGE events to 'awake' whose cause is a
+       sensory event (perception waking a sleeper — at S3's scene compile, a SEE, anywhere) committed
+       since the last WOKEN (the first: since the turn began) — every sweep of the turn sweeps them
+       with its own events, so each is swept once.
     S11 reactions: EVERYONE = select.candidates(...) + the PC + this wave's perceivers. perceive(E):
        SEE(E), then the PC-material pull as in S3. perceive(the wave's events, the sweep's among
        them); (next_at, holders) = NEXT(the wave's events). Then the timers inside the window, one

@@ -316,6 +316,10 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
         if carry:
             continue
         _cut_speech(tx, i.actor_id, wave_at, turn_index, "new_action")
+        if _def(tx, i.bound.def_id).effect != "sleep" and (tx.query_one(
+                "SELECT controller FROM actors WHERE actor_id=?", (i.actor_id,)) or [None])[0] == "human":
+            from ..physical.bodies import wake                 # SLEEP-02 (D-122): the player wakes the PC
+            wake(tx, i.actor_id, wave_at, None, turn_index)
         st = _start_event(tx, i, wave_at, turn_index)
         if i.gesture is not None:
             tx.commit_event(Event(type=EventType.GESTURE, writer="action.propagate", at=wave_at, turn_index=turn_index,
@@ -894,6 +898,13 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
         open_loop(tx, target, pl["kind"], pl.get("text") or "", [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
                   trig.event_id, at, turn_index)
         return _events_since(tx, before)
+    if eff.kind == "recover_resolve":                                # D-122
+        from ..mind.resolve import recover
+        alive = tx.query_one("SELECT b.alive FROM actors a JOIN bodies b ON b.body_id = a.actor_id WHERE a.actor_id=?", (target,))
+        if alive is None or not alive[0]:
+            return []
+        ev = recover(tx, target, eff.payload.get("cause"), trig.event_id, at, turn_index)
+        return [] if ev is None else [ev]
     if eff.kind == "adjust_stress":
         from ..mind.actor import adjust_stress
         alive = tx.query_one("SELECT b.alive FROM actors a JOIN bodies b ON b.body_id = a.actor_id WHERE a.actor_id=?", (target,))

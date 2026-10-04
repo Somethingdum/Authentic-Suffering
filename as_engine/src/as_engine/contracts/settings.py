@@ -207,6 +207,7 @@ class NeedsRules(Strict):
     thirst_stage_every_h: float = 12.0  # [SAND] heat multiplies by (1 + (climate_heat-5)*0.08)
     hunger_stage_every_h: float = 84.0
     fatigue_stage_every_h: float = 8.0
+    sleep_pays: float = 2.0         # [SAND] D-122 SLEEP-01: an hour asleep pays off this many hours awake
     death_stage: int = 6
     impairment_at_stage: dict[int, int] = Field(default_factory=lambda: {3: 1, 4: 2, 5: 3})
 

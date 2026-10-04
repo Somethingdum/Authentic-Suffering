@@ -14,6 +14,11 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms) -> list[Event
        starts anew). When the intent does not carry on, the actor's pending SPEECH_SEGMENT rows
        are cancelled too (reason 'new_action'; one voice, one utterance at a time), with one
        SPEECH_CUT per utterance cut (SEG-04, cause 'new_action').
+     * SLEEP-02 (D-122) the player decides when the PC wakes: for the human-controlled actor, when
+       the def's effect is not 'sleep', physical.bodies.wake(tx, actor, wave_at, None, turn_index)
+       first (a no-op unless asleep or drowsy; waking pays the sleep off, SLEEP-01). Anyone else
+       asleep stays as they are and their act is blocked 'incapable' at landing — people wake to a
+       sound or their routine, never to their own decision.
      * ACTION_START (effects module docstring payload; cause = none) — (B4, FOCUS-02) its payload
        also carries attention: intent.attention (None without one).
      * GEST-03 (B4, Actor Spec §9) a gesture (intent.gesture = (g, toward)): right after the

@@ -53,6 +53,8 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
      there are no world_params), N.hunger_stage_every_h, N.fatigue_stage_every_h; a changed stage
      -> NEED_STAGE {body_id, need, stage}; fatigue reaching 6 while conscious -> AWARENESS_CHANGE
      {body_id, awareness: 'asleep', from} with posture 'lying' (collapse; fatigue never kills);
+     (D-122, SLEEP-01) a body asleep at the step's start holds its fatigue where it was — waking
+     (wake) pays the sleep off;
      then (F1c) the condition over time (LOOK-08) and the cold (LOOK-09);
   3. infection: each infections row's stage = the last pathway stage whose starts_at_h <= hours
      since exposed_at; a change -> INFECTION_STAGE {body_id, pathway, stage};
@@ -1107,6 +1109,8 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
         n = tx.query_one("SELECT * FROM needs WHERE body_id=?", (body_id,))
         if n is not None:
             for need in ("thirst", "hunger", "fatigue"):
+                if need == "fatigue" and b["awareness"] == "asleep":
+                    continue
                 per = periods[need] * 3_600_000
                 k = _math.floor((t - n[lastcol[need]]) / per) + 1
                 cands.append(int(n[lastcol[need]] + k * per))
@@ -1191,6 +1195,8 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
         n = tx.query_one("SELECT * FROM needs WHERE body_id=?", (body_id,)) if b["kind"] in ("human", "lurker", "animal") else None
         if n is not None:
             for need in ("thirst", "hunger", "fatigue"):
+                if need == "fatigue" and b["awareness"] == "asleep":
+                    continue                                   # SLEEP-01 (D-122): waking pays it off
                 hours = (end - n[lastcol[need]]) / 3_600_000
                 st = min(6, max(0, int(_math.floor(hours / periods[need]))))
                 if st != n[f"{need}_stage"]:
@@ -1298,15 +1304,39 @@ def capacity(store: "Store | Tx", body_id: str) -> Capacity:
 def wake(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> Event | None:
     """P3 (perception calls it): an ASLEEP or DROWSY living body becomes 'awake' — commit
     AWARENESS_CHANGE {body_id, awareness: 'awake', from} (posture unchanged: waking is not
-    standing up). Any other awareness -> None, nothing committed."""
+    standing up). Any other awareness -> None, nothing committed.
+    SLEEP-01 (D-122) Waking from 'asleep' pays the sleep: slept_ms = at - fell, fell = the earliest at
+    of an AWARENESS_CHANGE or POSTURE_CHANGE of this body whose payload awareness is 'asleep' committed
+    after its latest waking (an AWARENESS_CHANGE with awareness 'awake') — sleeping on is not falling
+    asleep again (none: at, so 0 slept); the payload gains slept_ms. With a needs row the same event writes: debt (the
+    hours awake owed when they fell asleep) = max(0, fell - needs.last_sleep_ms), less slept_ms x
+    NeedsRules.sleep_pays, never below 0; needs.last_sleep_ms = at - debt and fatigue_stage =
+    min(6, floor(debt hours / fatigue_stage_every_h)). (While asleep, progress holds fatigue where it
+    was — module docstring step 2.)"""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     bb = _b(tx, body_id)
     if not bb["alive"] or bb["awareness"] not in ("asleep", "drowsy"):
         return None
+    writes = [WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "awake"})]
+    payload = {"body_id": body_id, "awareness": "awake", "from": bb["awareness"]}
+    if bb["awareness"] == "asleep":
+        woke = tx.query_one("SELECT MAX(seq) FROM events WHERE type='AWARENESS_CHANGE' AND json_extract(payload,'$.body_id')=? "
+                            "AND json_extract(payload,'$.awareness')='awake'", (body_id,))[0] or 0
+        r = tx.query_one("SELECT MIN(at) FROM events WHERE type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND seq>? AND "
+                         "json_extract(payload,'$.body_id')=? AND json_extract(payload,'$.awareness')='asleep' AND at<=?",
+                         (woke, body_id, at))
+        fell = r[0] if r and r[0] is not None else at
+        slept = max(0, at - fell)
+        payload["slept_ms"] = slept
+        n = tx.query_one("SELECT last_sleep_ms FROM needs WHERE body_id=?", (body_id,))
+        if n is not None:
+            N = _rules(tx).needs
+            debt = max(0.0, max(0, fell - n[0]) - slept * N.sleep_pays)
+            stage = min(6, int(_math.floor(debt / 3_600_000 / N.fatigue_stage_every_h)))
+            writes.append(WriteRecord(op=WriteOp.UPDATE, table="needs", key={"body_id": body_id},
+                                      values={"last_sleep_ms": int(at - debt), "fatigue_stage": stage}))
     return tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
-        target_ids=[body_id], cause_event_id=cause_event_id,
-        writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "awake"})],
-        payload={"body_id": body_id, "awareness": "awake", "from": bb["awareness"]}))
+        target_ids=[body_id], cause_event_id=cause_event_id, writes=writes, payload=payload))
 
 
 def effective_bleed(store: "Store | Tx", wound_id: str) -> float:

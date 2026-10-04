@@ -352,7 +352,7 @@ class InfectionPathwayDef(Strict):
 
 class CascadeEffect(Strict):
     kind: Literal["emit_event", "schedule_event", "adjust", "create_trace", "create_rumour", "drain_resolve",
-                  "adjust_stress"]
+                  "adjust_stress", "recover_resolve"]
     event_type: str | None = None
     target: str | None = Field(default=None, description="Selector (action/cascade.py CAS-05), e.g. 'actor(trigger.actor_id)', 'settlement_of(trigger.payload.workplace_id)'")
     field: str | None = None

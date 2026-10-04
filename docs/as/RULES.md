@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-756 ids; 502 with their own statement, 254 named only in context.
+759 ids; 505 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -124,7 +124,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-019 | Seeing someone die strains everyone who saw it, and more the closer they were to the dead. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/people.yaml`, `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py`, `contract/p07_slice/test_seen_before_swept.py`, `contract/p09_society/test_a_killing_seen.py` |
 | CAS-02 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-020 | Hunger and thirst past the first pangs wear a person down. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
-| CAS-021 | A night's sleep takes the edge off. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
+| CAS-021 | A night's unbroken sleep takes the edge off and gives back a little Resolve. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/people.yaml`, `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py`, `contract/p07_slice/test_sleep_rests_you.py` |
 | CAS-022 | Shoving someone to the dead costs the one who did it the trust of everyone who saw it, and the story travels. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
 | CAS-023 | Whoever was shoved to the dead, if they live, never forgets it. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
 | CAS-024 | Every bite someone sees the dead take out of a person or an animal wears them down; watching a whole feeding breaks people. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p10_world/test_feeding.py` |
@@ -132,6 +132,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-026 | Whoever kills someone who was not fighting carries it afterwards, whether anyone saw or not. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_seen_before_swept.py`, `contract/p09_society/test_a_killing_seen.py` |
 | CAS-027 | Killing one of a group's own, in front of any of them, when they were not fighting costs the killer that group's standing — even when the killer is one of them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py` |
 | CAS-028 | Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py` |
+| CAS-029 | Keeping a promise steadies the one who kept it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_sleep_rests_you.py` |
 | CAS-03 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-05 | CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>, trigger.actor_id, trigger.event_id, and — D-119 — trigger.killer, trigger.killer_provoked). Each selector returns… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_theft_seen.py`, `contract/p09_society/test_timers_society.py` |
@@ -1045,6 +1046,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
 | SKULL-09 | *it (SKULL-09): a smaller prompt never costs a person their identity.* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p06_memory/test_retrieval.py` |
 | SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/mind/temper.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_conversation_thread.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
+
+## SLEEP
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| SLEEP-01 | SLEEP-01 (D-122) Waking from 'asleep' pays the sleep: slept_ms = at - fell, fell = the earliest at | as_engine/physical/bodies.py | `as_engine/action/resolve.py`, `as_engine/physical/bodies.py`, `as_content/packs/core/cascade/stress.yaml` | `contract/p07_slice/test_sleep_rests_you.py` |
+| SLEEP-02 | * SLEEP-02 (D-122) the player decides when the PC wakes: for the human-controlled actor, when the def's effect is not 'sleep', physical.bodies.wake(tx, actor, wave_at, None, turn_index) first (a no-op unless asleep or d… | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p07_slice/test_sleep_rests_you.py` |
 
 ## SMELL
 

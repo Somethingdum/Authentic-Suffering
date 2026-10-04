@@ -85,6 +85,7 @@ async def simulate(ctx):
         t0 = clock.now(tx)
         turn_first_seq = _max_seq(tx)
         ctx.T, ctx.t0 = T, t0
+        ctx.woke_seq = turn_first_seq       # D-122: perception's wakings are swept once, at the next sweep
         clock.begin_turn(tx, T)
         timers.seed_society(tx, t0, T)
         timers.seed_world(tx, t0, T)
@@ -184,7 +185,7 @@ async def simulate(ctx):
             evs += propagate(tx, evs, wave_at, T)
             # 10 cascade — over what was seen: the witness rules read who saw what (D-120)
             _see(ctx, tx, evs, _everyone(ctx, tx, perceivers))
-            evs += cascade.sweep(tx, evs, rules, wave_at, T)
+            evs += cascade.sweep(tx, evs + _woken(ctx, tx), rules, wave_at, T)
             # 11 reactions: everyone perceives what happened, then who reacts
             await _progress(ctx, 11)
             nxt, holders = await _after_wave(ctx, tx, evs, wave_idx, max_waves, perceivers)
@@ -245,6 +246,21 @@ def _see(ctx, tx, events, everyone):
         perception.compile_aftermath(tx, h, events, last, ctx.T)
 
 
+def _woken(ctx, tx):
+    """D-122: the wakings perception caused since the last sweep (a sound reaching a sleeper — at
+    the scene compile, a wave's perceiving, anywhere): swept with the next sweep's events, once."""
+    from ..action._impl_p5b import _events_since
+    from ..mind.perception import SENSORY_TYPES
+    ph = ",".join("?" * len(SENSORY_TYPES))
+    ids = {r[0] for r in tx.query(
+        f"SELECT w.event_id FROM events w JOIN events c ON c.event_id = w.cause_event_id WHERE w.seq > ? AND "
+        f"w.type = 'AWARENESS_CHANGE' AND json_extract(w.payload, '$.awareness') = 'awake' AND c.type IN ({ph})",
+        (ctx.woke_seq, *SENSORY_TYPES))}
+    out = [e for e in _events_since(tx, ctx.woke_seq) if e.event_id in ids] if ids else []
+    ctx.woke_seq = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    return out
+
+
 def _fire_seen(ctx, tx, row, horizon_ms, rules, perceivers):
     """One queue row the way a wave's events go (D-120): fire, dispatch, propagate, seen, swept, and
     what the sweep made seen. Returns every event committed after the fired one."""
@@ -260,7 +276,7 @@ def _fire_seen(ctx, tx, row, horizon_ms, rules, perceivers):
     tev += propagate(tx, tev, row["due_at"], ctx.T)
     everyone = _everyone(ctx, tx, perceivers)
     _see(ctx, tx, tev, everyone)
-    made = cascade.sweep(tx, tev, rules, row["due_at"], ctx.T)
+    made = cascade.sweep(tx, tev + _woken(ctx, tx), rules, row["due_at"], ctx.T)
     _see(ctx, tx, made, everyone)
     return tev + made
 
@@ -270,12 +286,11 @@ def _window_end(ctx, tx, evs, final, rules):
     the screams of a doom that began there (DOOM-04) — is seen, propagated and swept like a wave's."""
     from ..action import cascade
     from ..action.propagate import propagate
-    if not evs:
-        return
     everyone = _everyone(ctx, tx)
-    _see(ctx, tx, evs, everyone)
-    evs = evs + propagate(tx, evs, final, ctx.T)
-    made = cascade.sweep(tx, evs, rules, final, ctx.T)
+    if evs:
+        _see(ctx, tx, evs, everyone)
+        evs = evs + propagate(tx, evs, final, ctx.T)
+    made = cascade.sweep(tx, evs + _woken(ctx, tx), rules, final, ctx.T)
     _see(ctx, tx, made, everyone)
 
 

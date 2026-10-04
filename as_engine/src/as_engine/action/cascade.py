@@ -7,7 +7,8 @@ and NEVER committed (CAS-03).
 sweep(tx, deltas, rules, at, turn_index) -> list[Event]
   For each committed event in order, for each rule whose trigger_event == event.type and whose
   `where` equality filters match the payload and whose preconditions evaluate true, apply the
-  effects (emit/schedule/adjust/create_trace/create_rumour/drain_resolve). Cascades may trigger
+  effects (emit/schedule/adjust/create_trace/create_rumour/drain_resolve/adjust_stress/
+  recover_resolve). Cascades may trigger
   further cascades up to depth 3 (CAS-02); depth is carried in payload '_cascade_depth'.
 
 CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>,
@@ -139,6 +140,9 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   drain_resolve                              mind.resolve.drain(target, reason = payload.cause or
                                              'coerced', ...) — payload.scale_by 'bond_to_subject' drains
                                              once per affection step >= 1 toward the dead (max 3)
+  recover_resolve                            (D-122) mind.resolve.recover(tx, target, payload.cause,
+                                             E, at, turn_index) for a target that is a living actor
+                                             (anyone else: no-op)
   adjust_stress                              (H1) mind.actor.adjust_stress(tx, target, int(effect.amount)
                                              + bond, E, at, turn_index) — bond = 0, or with payload.scale_by
                                              'bond_to_subject' the target's affection toward
