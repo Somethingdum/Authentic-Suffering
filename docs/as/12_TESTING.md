@@ -434,6 +434,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_promises_answered.py` | Through a turn: June's writeback says Mara broke her promise — June trusts Mara 2 less and holds a grudge (CAS-011) in that same turn; says she kept it — Mara gets a little Resolve back (CAS-029). In the quiet hours: Mara's reflection decides Eli broke his — answered there too (BG-04) |
 
+### 3.40 Nobody is a template (P10; D-127)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_nobody_is_a_template.py` | GEN-01: twenty adults of one settlement and one trade have twenty different voices and inner lives, and each part of them varies on its own; a child's lines are a child's, with no swearing, dialect or secret; nobody born after the Fall lost family in its first week; a thousand people of every age are valid (CNT-10) and child-safe (CNT-11); the same seed is the same person |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

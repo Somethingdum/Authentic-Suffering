@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-765 ids; 511 with their own statement, 254 named only in context.
+766 ids; 511 with their own statement, 255 named only in context.
 
 
 ## ABUSE
@@ -220,8 +220,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CNT-07 | lore without truth and belief; a faction without truth_text and belief_text | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/templates/faction_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-08 | "sotry" anywhere (error); retired names from the GLOSSARY tombstones (warning) | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-09 | a plausibility expression that does not parse | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/world/worldgen/conditions.py` | `contract/p02_space_bodies/test_conditions_parse.py`, `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_params.py` |
-| CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/people.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
-| CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/action/effects.py`, `as_engine/audit/release.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py`, `as_engine/mind/affordance.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p04_one_actor/test_care_menu.py`, `contract/p05_many_actors/test_care.py`, `contract/p11_audits/test_release.py`, `contract/p12_surfaces/test_freedom.py` |
+| CNT-10 | a record that does not match its contract — for people this includes the specificity minimums in §3 | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_engine/contracts/dossier.py`, `as_engine/testing/scenario.py`, `as_engine/world/worldgen/people.py`, `as_content/templates/actor_template.yaml` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p10_world/test_nobody_is_a_template.py` |
+| CNT-11 | **the one hard line**: any person record whose age is under 18 and that contains a word from the minor-safety list is an error. It cannot be disabled by any setting, pack or cheat. The word list is `as_engine/content/sa… | 09_CONTENT_PACKS §9 | `as_engine/action/effects.py`, `as_engine/audit/release.py`, `as_engine/content/pack.py`, `as_engine/content/safety.py`, `as_engine/mind/affordance.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p04_one_actor/test_care_menu.py`, `contract/p05_many_actors/test_care.py`, `contract/p10_world/test_nobody_is_a_template.py`, `contract/p11_audits/test_release.py`, `contract/p12_surfaces/test_freedom.py` |
 | CNT-12 | an item missing the property block its kind requires, or carrying one that belongs to another kind | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py`, `contract/p02_space_bodies/test_looks.py` |
 | CNT-13 | an infected type listing a quirk that is not written for it, or an override that changes which creature a type or quirk id means | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | CNT-14 | a `generation: cheat` dossier outside a pack whose id starts with `cheat_` | 09_CONTENT_PACKS §9 | `as_engine/content/pack.py`, `as_content/packs/cheat_admin/actors/fredrick.yaml` | `contract/p02_space_bodies/test_content_pack.py` |
@@ -441,6 +441,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | GATE-16 | *The turn transaction (P7). Rules GATE-00..19 (G0..G19), L2, L4, L5, L9, L12, TIME-01..04,* | as_engine/turn/pipeline.py | `as_engine/turn/pipeline.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | GATE-17 | *The turn transaction (P7). Rules GATE-00..19 (G0..G19), L2, L4, L5, L9, L12, TIME-01..04,* | as_engine/turn/pipeline.py | `as_engine/turn/pipeline.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | GATE-18 | *The turn transaction (P7). Rules GATE-00..19 (G0..G19), L2, L4, L5, L9, L12, TIME-01..04,* | as_engine/turn/pipeline.py | `as_engine/turn/pipeline.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+
+## GEN
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| GEN-01 | *Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the* | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py` | `contract/p10_world/test_nobody_is_a_template.py` |
 
 ## GEO
 

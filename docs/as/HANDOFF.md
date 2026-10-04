@@ -120,6 +120,11 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   surrendering, a child), tension and loyalty checks after a killing, a settlement's law response (a law
   against killing changes what worldgen writes — the owner's call), the PC's nerve, intrusive memories
   and sleep.
+- **People the PC gets to know** (after D-127): a generated person's skeleton now has its own voice and
+  inner life, but only a model can give them their own words and history. Proposed: when the PC has met a
+  skeleton person (an acquaintance row) and they have been HOT, a quiet-hours job (service.background)
+  rewrites their unlocked voice fields (capsule, tendencies, exemplars, examples) on the Writer — a few
+  hundred tokens, a minute at 5 tokens a second — so the people who matter grow into themselves.
 - **Resolve, still open after D-122 / D-123**: three drains of 05 §5 have nothing to hang on (a sustained
   fear scene, public humiliation, being made to watch); protecting a dependent (+1) needs a once-a-day
   limit before it can be built; hunger drains per stage (every 84 h without food), not per day — a daily

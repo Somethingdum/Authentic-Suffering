@@ -291,19 +291,267 @@ _TRAITS = (
      "went out alone for a part nobody else would fetch"),
     ("dutiful", "turns up for every shift early", "a job needing doing", "takes on extra work", "is always tired",
      "covered two shifts in the storm week"),
+    ("proud", "will not ask for help", "being pitied", "does it alone", "hurts in silence",
+     "carried a broken ankle home for a mile rather than be carried"),
+    ("anxious", "plans for every way it can go wrong", "plans changing", "freezes for a heartbeat", "sleeps badly",
+     "kept a packed bag by the door every night for a year"),
+    ("cheerful", "jokes to keep spirits up", "a long face", "keeps people going", "is not taken seriously",
+     "kept a whole bunkhouse laughing through a night under siege"),
+    ("stubborn", "will not be moved once decided", "being overruled", "holds the line", "loses arguments badly",
+     "refused to abandon the greenhouse when the fence fell"),
+    ("tender", "notices who is hurting", "someone crying", "stays with them", "falls behind on work",
+     "sat up three nights with a dying stranger"),
+    ("cold", "keeps feelings out of it", "a sob story", "decides fast", "is not liked",
+     "voted to turn away a family at the gate, and slept fine"),
+    ("greedy", "always knows what things are worth", "a fair split", "trades hard", "is not trusted with stores",
+     "came back from a run with more than they reported"),
+    ("brave", "goes first", "someone in danger", "takes the risk", "has scars to show for it",
+     "pulled a man off the wall with three of them on the ladder"),
+    ("bitter", "remembers every slight", "being blamed", "keeps score", "drives people off",
+     "still will not speak to the woman who took their bunk"),
+    ("devout", "prays before eating and before a run", "blasphemy", "trusts it will be all right", "frustrates the practical",
+     "kept a service going every Sunday through the hungry months"),
 )
+_KID_TRAITS = (
+    ("curious", "pokes into everything", "something new", "wanders off", "gets into trouble",
+     "found the way into the old shop through the vent"),
+    ("shy", "hides behind grown-ups", "strangers", "goes silent", "gets overlooked",
+     "did not say a word for a week after they came"),
+    ("bold", "dares the other children", "being called scared", "goes too far", "gets hurt",
+     "climbed the water tower on a dare"),
+    ("clingy", "never lets go of a hand", "being left", "follows everywhere", "gets underfoot",
+     "slept at the foot of the watch tower so as not to be left"),
+    ("helpful", "fetches and carries without being asked", "a grown-up struggling", "tries to help", "gets in the way",
+     "carried water all morning until their hands blistered"),
+    ("watchful", "notices everything", "grown-ups whispering", "listens in", "knows too much",
+     "was the first to see the dead at the fence and said nothing until asked"),
+)
+
 _VOICES = (
     ("short sentences", "talks about the work"),
     ("asks questions instead of answering", "uses people's names"),
     ("dry jokes", "understates everything"),
     ("long explanations", "repeats the important part"),
+    ("swears when nervous", "laughs at the wrong moments"),
+    ("quotes scripture, half-remembered", "calls everyone 'friend'"),
+    ("talks to fill a silence", "tells stories about before"),
+    ("barely talks", "answers with a nod or a shrug"),
+    ("counts things out loud", "speaks in lists"),
+    ("polite to a fault", "says sorry too much"),
+    ("talks fast and drops the ends of words", "old city slang"),
+    ("speaks slowly", "weighs every word"),
+    ("bitter jokes about the dead", "never says 'infected', only 'them'"),
+    ("gives orders like favours", "says 'we' when they mean 'you'"),
+    ("hums while working", "trails off mid-thought"),
+    ("corrects people", "uses old words nobody uses now"),
+    ("blunt as a hammer", "ends arguments with 'that's that'"),
+    ("warm and teasing", "calls people 'love' or 'pet'"),
+    ("whispers out of habit", "goes quiet when anyone shouts"),
+    ("talks to the dead out loud", "mixes up names when tired"),
 )
+_KID_VOICES = (
+    ("asks 'why' about everything", "repeats what grown-ups said"),
+    ("talks to a toy", "uses grown-up words wrong"),
+    ("whispers", "hides behind someone to talk"),
+    ("brags", "tells made-up stories"),
+    ("very serious for their age", "says grown-up words carefully"),
+    ("chatters", "forgets to be quiet"),
+)
+_TEEN_VOICES = (
+    ("sarcastic", "rolls their eyes into every word"),
+    ("tries to sound older", "swears to sound hard"),
+    ("mumbles", "says 'whatever'"),
+    ("argues every rule", "knows everyone's business"),
+    ("talks big about runs", "goes quiet around the dead"),
+    ("polite to adults, savage to other kids", "keeps secrets badly"),
+)
+
 _EXEMPLARS = (
     ("Pump's running. Could be worse.", "Get inside. Now.", "I can't. I just can't do it again."),
     ("You eaten today? Sit down a minute.", "Everybody quiet. Listen.", "Don't make me choose. Please."),
     ("Nice day for the end of the world.", "Move. Talk later.", "That's it. I'm done carrying this."),
     ("Here's how it works, and here's why.", "Stop. Think. Which way did it come?", "I told you. I told all of you."),
+    ("Morning. Don't touch my coffee.", "Hands where I can see them.", "Go on then. Do it. I'm tired."),
+    ("If the Lord wanted us dead, friend, He's taking His time.", "Pray later. Run now.", "There's nobody listening. There never was."),
+    ("Mm-hm. Fine.", "Back. Back, I said.", "...Leave me be."),
+    ("Three jugs, two cans, one knife. That's the lot.", "One: shut the door. Two: shut up.", "I counted them. I counted every one of them."),
+    ("Sorry, sorry, is anyone sitting here?", "Please, please just stay behind me.", "I'm sorry. I'm so sorry. I couldn't hold on."),
+    ("Y'alright? C'mon then.", "Leg it! Now, now, now!", "No. No, no, no. Not him."),
+    ("Take your time. Nothing but time now.", "Easy. Slow. Nobody shoots.", "I have nothing left to weigh it against."),
+    ("Fine weather for burying, my mother used to say.", "Them. Behind the cars. Don't look.", "I keep seeing her face. Every time I close my eyes."),
+    ("We'll want that wall patched by dark, won't we.", "We are leaving. Now.", "We? There's no we. There's just me."),
+    ("Hm-hm-hm... sorry, what was that?", "Quiet, love, quiet.", "I don't... I don't remember what I came in for."),
+    ("That's that, then.", "No. That's final.", "You want to fight me? Fine. Outside."),
+    ("Hello, pet. You look half starved.", "Pet, behind me. Don't argue.", "Not the little one. Take me instead."),
 )
+_KID_EXEMPLARS = (
+    ("Why is the sky that colour?", "Mum said we have to be quiet.", "I want to go home. I want to go home."),
+    ("I found a button. It's mine now.", "Is it them? Is it them?", "Don't leave me here. Please don't."),
+    ("Mr Bear says he's hungry.", "Shh. Shh. They'll hear.", "Wake up. Wake up. Why won't you wake up?"),
+    ("I can count to a hundred. Want to hear?", "I'm hiding. I'm good at hiding.", "I didn't mean to. I didn't!"),
+    ("When I'm big I'm going on the wall.", "I'll be brave. I'll be really brave.", "Where did everybody go?"),
+    ("Can I have the last bit? Please?", "Hold my hand. Hold it tight.", "I don't like it here anymore."),
+)
+_TEEN_EXEMPLARS = (
+    ("Whatever. It's fine.", "Run! Don't wait for me!", "Don't touch me. Don't you dare."),
+    ("I could do that run. I'm faster than you.", "Shut up and move.", "You don't get to tell me it's okay."),
+    ("Is that a real gun? Can I hold it?", "Get down, get down!", "I hate this. I hate all of you."),
+    ("Nobody asked you.", "Go. I've got it. Go!", "I'm not a kid. Stop treating me like one."),
+    ("Heard the watch talking about you.", "Not a word. Not one word.", "I just want one normal day. One."),
+    ("My mum had a phone. Imagine that.", "Stay low. Follow me.", "Leave me alone. Please, just leave me alone."),
+)
+_ELDER_EXEMPLARS = (
+    ("In my day we had a word for this. Several.", "Get the young ones in first.", "I've buried enough. I'll not bury you."),
+    ("Sit, sit. Let an old woman fuss.", "Don't run. It only makes them faster.", "Let me go. I'm slowing you down."),
+    ("Kettle's on. Would be, if there were a kettle.", "Hush. Listen to the dogs.", "This was a school once. Children laughing."),
+    ("Before all this I sold shoes. Imagine.", "Steady. Steady hands.", "Leave me the pistol and go."),
+    ("You're too thin. Eat.", "Bar the door, quick now.", "It should have been me first. Not him."),
+    ("Weather's turning. Knees never lie.", "Not that way, that's the river.", "I'm tired, love. So very tired."),
+)
+
+_NEVER_SAY = (
+    "Let them starve.", "Not my problem.", "Whatever you say, boss.", "Leave the kid behind.", "I'm done with all of you.",
+    "I don't care who you lost.", "Take my share, I don't need it.", "God is good.", "We should go back for them.",
+    "I was wrong. I'm sorry.", "Let's put it to a vote.", "Rules are rules.", "I'd rather die than run.", "Trust me.",
+    "It'll all go back to normal.", "Shoot him.", "Nobody's coming to save us.", "Lock them out.", "Feed him to them.",
+    "I miss the old world.", "I love you.", "Keep it. It's yours.", "We don't need the council.",
+    "Give them the medicine instead.", "Wait for me.", "That's not my job.", "I'm scared.", "You're right.",
+    "Let's just talk about it.", "Thank you.",
+)
+_KID_NEVER_SAY = (
+    "I'm not hungry.", "I'll go outside on my own.", "Grown-ups are always right.", "I don't need a hug.",
+    "I'm too big to be scared.", "I like the dark.", "I'll stay here by myself.", "That doesn't hurt.",
+)
+
+_MOTIVES = (
+    ("keep {group} fed and safe", "does the work assigned, and some more"),
+    ("get their sister back from wherever the convoy took her", "asks every trader who passes"),
+    ("earn a seat at the council table", "volunteers for whatever gets noticed"),
+    ("never be hungry again", "puts a little of every ration aside"),
+    ("find out what happened to their old street", "plans a run nobody has approved"),
+    ("keep their hands clean", "takes the jobs nobody has to die for"),
+    ("be useful enough that nobody ever turns them out", "learns every trade they can"),
+    ("make up for something they did in the first winter", "takes the worst shifts without a word"),
+    ("get the children through to spring", "trades their own share for milk and medicine"),
+    ("leave {settlement} for somewhere quieter", "trades for goods in secret, against the day"),
+    ("keep the {occupation} work going", "fixes what breaks before anyone asks"),
+    ("see every one of the dead put down properly", "goes out with a spade when the watch allows"),
+    ("pay back the people who took them in", "gives more than they are asked for"),
+    ("keep the peace between the families", "listens to everyone and repeats nothing"),
+    ("be left alone to do their work", "keeps their head down and their hands busy"),
+    ("get back at the crew that burned their old camp", "asks after them on every run"),
+    ("hold on to the last of their faith", "keeps the old prayers every night"),
+    ("be the one people come to", "always has a little of what is needed"),
+)
+_CONTRADICTIONS = (
+    ("{group} comes first", "family comes first", "the stores are full", "the stores are low"),
+    ("everyone deserves a chance", "strangers get people killed", "a child is at the gate", "a grown man is"),
+    ("the rules keep us alive", "the rules are for people who never went out there", "the leader is watching",
+     "nobody is"),
+    ("the dead were people once", "the dead are just meat now", "they knew the dead one", "they did not"),
+    ("hope is how we last", "hope is how we die", "the morning is quiet", "the dead are at the fence"),
+)
+_WONT = (("steal from the common store", "steal"), ("leave a wounded friend behind", "leave_wounded"),
+         ("hurt a child", "harm_dependent"), ("break their word", "break_promise"), ("turn on their own group", "betray_group"))
+_KID_MOTIVES = (
+    ("be allowed up on the wall one day", "follows the watch around"),
+    ("keep the dog they found", "shares their food with it in secret"),
+    ("find their mum", "asks every newcomer if they have seen her"),
+    ("be as brave as the grown-ups", "pretends not to cry"),
+    ("get the last of the sweets", "trades whatever they find"),
+    ("not be a bother", "does as they are told, quickly"),
+)
+_CONFLICTS = (
+    "wants to leave and cannot abandon the others", "trusts the leader and hates what the leader asks",
+    "wants to be kind and has learned that kindness gets people killed", "misses the old world and is ashamed of how little",
+    "wants a family and is terrified of losing one again", "believes in the rules and breaks them for the people they love",
+    "wants revenge on the ones who left them and needs their help now", "is proud of surviving and sick of what it cost",
+    "prays every night and no longer believes anyone hears", "wants to be needed and wants to be left alone",
+    "loves someone in the settlement who should not know it", "would trade anything for a quiet life and is good at fighting",
+)
+_KID_CONFLICTS = (
+    "wants to be brave and is scared all the time", "wants to play and knows they must be quiet",
+    "misses someone and is told not to talk about them", "wants to grow up fast and wants someone to look after them",
+)
+_WOUNDS = {
+    "pre_fall_adult": (
+        "lost family in the first week of the Fall", "left a friend behind at the stadium evacuation",
+        "shot their own brother when he turned", "was a nurse when the hospitals fell, and still smells it",
+        "hid in a freezer for two days while the street was eaten", "sold out a neighbour for a bag of rice in the first winter",
+        "walked out of the city alone, past people begging for help", "was in the first quarantine camp when the fence came down",
+        "watched their child turn and could not do it themselves",
+    ),
+    "fall_child": (
+        "was eight when the Fall came and remembers only the screaming", "grew up in the camps, moved from fence to fence",
+        "lost their parents on the road and was raised by strangers", "was carried out of the city in a laundry basket",
+        "was left at a gate with a note pinned to their coat",
+    ),
+    "post_fall_born": (
+        "has never seen a city lit at night", "lost their mother to a fever last winter", "was born in a cellar during a raid",
+        "watched a neighbour turn when they were very small", "has never known a full stomach for a whole week",
+    ),
+}
+_ASPIRATIONS = ("a quiet year", "a roof that does not leak", "to see the sea again", "to grow something that lives",
+                "to be trusted with the stores", "a bed of their own", "to hear music again", "to be left alone",
+                "a wedding, a real one", "to find out if anyone is left at home", "to teach someone what they know",
+                "to sleep through one whole night")
+_KID_ASPIRATIONS = ("a dog of their own", "to see a real shop", "to learn to shoot", "to sleep in a proper bed",
+                    "to be on the wall", "to have a birthday cake")
+_FEARS = ("the pump failing", "a fever in the camp", "the night watch sleeping", "being turned out", "fire",
+          "the dead getting in", "losing their hands", "the dark", "deep water", "being alone when it happens",
+          "turning and not knowing it", "the council's vote")
+_KID_FEARS = ("the dark", "the dead at the fence", "being left behind", "loud noises", "the cellar", "being told off")
+_SIGNATURES = ("counts the water jugs every evening", "sleeps in boots", "keeps a list of the dead in a notebook",
+               "carves little animals from scrap wood", "talks to the chickens", "never sits with their back to a door",
+               "keeps a photo nobody else is allowed to see", "sharpens every blade they pass",
+               "writes the date on the wall each morning", "sings the same song at every burial",
+               "hoards string and wire", "walks the fence before bed")
+_KID_SIGNATURES = ("carries a toy everywhere", "collects buttons", "draws on every wall", "follows the dogs",
+                   "hums to themselves", "asks for a story every night")
+_GESTURES = ("rubs the back of the neck", "taps two fingers on anything near", "cracks the knuckles",
+             "pulls at an earlobe", "crosses the arms tight", "rubs a thumb over an old scar", "chews a thumbnail",
+             "pats every pocket", "sets the jaw", "looks at the floor")
+_MOVES = ("moves quickly and keeps to the walls", "goes very still and listens", "talks faster and louder",
+          "goes pale and slow", "reaches for the nearest weapon", "looks for the children first",
+          "backs toward a door", "hums under the breath")
+_SILENCES = (
+    (["the dead are mentioned", "leaders argue"], "arms folded, looking at the floor", "comfortable at work, uncomfortable in meetings"),
+    (["someone cries", "the old world comes up"], "busy hands, eyes down", "comfortable with children, uncomfortable with officials"),
+    (["they are praised", "anyone asks about family"], "a fixed smile", "comfortable outdoors, uncomfortable in crowds"),
+    (["a decision has to be made", "a gun is drawn"], "very still, watching", "comfortable on watch, uncomfortable at meals"),
+    (["they are wrong", "a child is hurt"], "turns away", "comfortable alone, uncomfortable in a room full of people"),
+    (["money or trade comes up", "someone shouts"], "picks at their sleeve", "comfortable working, uncomfortable resting"),
+)
+_STACKS = (
+    ["family", "own safety", "{group}", "strangers"], ["own safety", "family", "{group}", "strangers"],
+    ["{group}", "family", "own safety", "strangers"], ["family", "{group}", "strangers", "own safety"],
+    ["the children", "family", "{group}", "own safety"], ["their faith", "family", "{group}", "own safety"],
+)
+_TOWARD_STRANGERS = ("wary", "neutral", "warm", "hostile", "wary", "neutral")
+_ENCOUNTER = ("calls for the watch and keeps distance", "asks their name and business", "offers water and watches them drink it",
+              "puts themselves between the stranger and the children", "says nothing and fetches the leader",
+              "keeps one hand on a weapon and talks")
+_SECRETS = ("none worth telling", "none worth telling", "none worth telling",
+            "took food from the common store in the hungry month", "rode with a raider crew for a winter",
+            "left someone behind who might have lived", "was bitten once, and it never took", "lied about their trade to get in")
+_DIALECTS = ("", "", "", "a northern accent that thickens when angry", "drops the 'g' on every -ing",
+             "old army habits of speech", "a city voice gone rough", "slow country vowels")
+
+
+def _draw(seed: "PersonSeed", what: str, pool, n: int = 1):
+    """D-127: an independent, deterministic draw per field (sha256 of the person's name, variant and the
+    field), so no two fields move together and no two people share a whole inner life."""
+    import hashlib
+    h = int.from_bytes(hashlib.sha256(f"{seed.name}|{seed.variant}|{what}".encode()).digest()[:8], "big")
+    if n == 1:
+        return pool[h % len(pool)]
+    out, i = [], 0
+    while len(out) < n:
+        x = pool[(h + i * 7919) % len(pool)]
+        if x not in out:
+            out.append(x)
+        i += 1
+    return out
 
 
 # H1 (D-84): generated people break in different ways — a settlement is not a room of saints.
@@ -322,17 +570,27 @@ _SETTLERS: tuple[str, ...] = (
 
 def skeleton_dossier(seed: PersonSeed) -> dict:
     """A VALID generated ActorDossier dict from a PersonSeed (implemented; deterministic).
-    Plain but specific enough to pass CNT-10; ``variant`` picks among the small tables above, so two
-    people with different variants sound and behave differently. WORLDGEN_ACTOR may replace every
-    unlocked field of it."""
+    Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the
+    person's name, variant and the field — from pools for their age (a child under 12, a teen 12-17, an
+    adult, an elder 60 and over), cohort (what they can remember losing: pre_fall_adult, fall_child,
+    post_fall_born) and work, so no two people in a settlement share a whole inner life and a child never
+    talks like a pump mechanic. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace
+    every unlocked field of it."""
     v = seed.variant
     first = seed.name.split()[0]
     adult = seed.age >= 16
-    t1, t2 = _TRAITS[v % len(_TRAITS)], _TRAITS[(v // len(_TRAITS) + 1 + v) % len(_TRAITS)]
-    if t2 == t1:
-        t2 = _TRAITS[(v + 1) % len(_TRAITS)]
-    tend = _VOICES[v % len(_VOICES)]
-    ex = _EXEMPLARS[(v // 7) % len(_EXEMPLARS)]
+    kid, teen, elder = seed.age < 12, 12 <= seed.age < 18, seed.age >= 60
+    traits = _draw(seed, "traits", _KID_TRAITS if kid else _TRAITS, 2)
+    t1, t2 = traits
+    tend = _draw(seed, "voice", _KID_VOICES if kid else _TEEN_VOICES if teen else _VOICES)
+    ex = _draw(seed, "exemplars", _KID_EXEMPLARS if kid else _TEEN_EXEMPLARS if teen else
+               _ELDER_EXEMPLARS if elder else _EXEMPLARS)
+    fmt = {"group": seed.group_name, "settlement": seed.settlement_name, "occupation": seed.occupation}
+    motive, method = _draw(seed, "motive", _KID_MOTIVES if kid else _MOTIVES)
+    wounds = _WOUNDS.get(seed.cohort) or _WOUNDS["pre_fall_adult"]
+    silence = _draw(seed, "silence", _SILENCES)
+    wont = _draw(seed, "wont", _WONT)
+    stack = [x.format(**fmt) for x in _draw(seed, "stack", _STACKS)]
     skills = [{"domain": d, "rank": r, "evidence": f"{first} learned it the hard way at {seed.settlement_name}."}
               for d, r in sorted(seed.skills.items())]
     looks = generated_looks(seed)
@@ -350,49 +608,55 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                        "skin": looks["complexion"],
                        "distinguishing_marks": [f"{m['what']} {m['where']}" for m in looks["marks"]] or ["nothing anyone remembers"],
                        "clothing_usual": "patched work clothes" if adult else "hand-me-downs two sizes big",
-                       "movement_under_stress": "moves quickly and keeps to the walls",
-                       "habit_gesture": ("rubs the back of the neck", "taps two fingers on anything near",
-                                         "cracks the knuckles")[v % 3],
-                       "relation_to_appearance": "does not think about it", "looks": looks},
+                       "movement_under_stress": _draw(seed, "moves", _MOVES),
+                       "habit_gesture": _draw(seed, "gesture", _GESTURES),
+                       "relation_to_appearance": _draw(seed, "vanity", ("does not think about it", "keeps clean whatever it costs",
+                                                                          "hides a scar", "wears something from before every day")),
+                       "looks": looks},
         "capability": {"special": dict(seed.special), "skills": skills, "literacy": 2 if adult else 1,
                        "tech_literacy": 1},
-        "motive": {"motive": f"keep {seed.group_name} fed and safe", "method": "does the work assigned, and some more",
-                   "moral_line": {"will": ["work a double shift"], "wont": ["steal from the common store"],
-                                  "wont_tags": ["steal"]},
-                   "inner_conflict": "wants to leave and cannot abandon the others",
-                   "past_wound": "lost family in the first week of the Fall",
-                   "signature_behaviour": ("counts the water jugs every evening", "sleeps in boots",
-                                           "keeps a list of the dead in a notebook")[v % 3],
-                   "risk_threshold": 3 + v % 4, "risk_text": "takes risks only for people they know",
+        "motive": {"motive": motive.format(**fmt), "method": method,
+                   "moral_line": {"will": [_draw(seed, "will", ("work a double shift", "share their last meal",
+                                                                 "stand a watch for someone sick", "lie to protect a friend"))],
+                                  "wont": [wont[0]], "wont_tags": [wont[1]]},
+                   "inner_conflict": _draw(seed, "conflict", _KID_CONFLICTS if kid else _CONFLICTS),
+                   "past_wound": _draw(seed, "wound", wounds),
+                   "signature_behaviour": _draw(seed, "signature", _KID_SIGNATURES if kid else _SIGNATURES),
+                   "risk_threshold": 3 + v % 4,
+                   "risk_text": _draw(seed, "risk", ("takes risks only for people they know", "takes risks for anyone",
+                                                     "takes no risks they do not have to", "takes risks to be noticed")),
                    "resource_constraints": "owns what fits in one bag"},
         "persona": {"public": {"shown_traits": [t1[0]], "claimed_history": f"came to {seed.settlement_name} early",
                                "presented_affiliation": seed.group_name},
-                    "private": {"true_goals": ["keep the people they love alive"], "concealed_history": "none worth telling",
+                    "private": {"true_goals": [motive.format(**fmt)],
+                                "concealed_history": "none worth telling" if kid or teen else _draw(seed, "secret", _SECRETS),
                                 "real_affiliation": "their own people"}},
         "traits": [dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t1)),
                    dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t2))],
-        "contradictions": [{"belief_a": f"{seed.group_name} comes first", "belief_b": "family comes first",
-                            "a_wins_when": "the stores are full", "b_wins_when": "the stores are low"}],
-        "decision_stack": {"layers": ["family", "own safety", seed.group_name, "strangers"],
-                           "inversion_conditions": ["a raid on the settlement"],
+        "contradictions": [dict(zip(("belief_a", "belief_b", "a_wins_when", "b_wins_when"),
+                                    (x.format(**fmt) for x in _draw(seed, "contradiction", _CONTRADICTIONS))))],
+        "decision_stack": {"layers": stack, "inversion_conditions": ["a raid on the settlement"],
                            "past_example": "stayed on the wall during a raid instead of running home"},
-        "silence": {"goes_quiet_when": ["the dead are mentioned", "leaders argue"],
-                    "body_when_silent": "arms folded, looking at the floor",
-                    "comfortable_vs_uncomfortable": "comfortable at work, uncomfortable in meetings"},
+        "silence": {"goes_quiet_when": list(silence[0]), "body_when_silent": silence[1],
+                    "comfortable_vs_uncomfortable": silence[2]},
         "knowledge": {"knows": [f"the ways in and out of {seed.settlement_name}"]},
-        "voice": {"capsule": f"{first} speaks plainly; {tend[0]}, and {tend[1]}.",
+        "voice": {"capsule": f"{first} {tend[0]}; {tend[1]}.",
                   "speech_tendencies": list(tend),
                   "exemplars": {"low_stakes": ex[0], "under_pressure": ex[1], "at_the_limit": ex[2]},
-                  "would_never_say": ["Let them starve.", "Not my problem.", "Whatever you say, boss."],
-                  "profanity": ("rare", "none", "rare", "frequent")[v % 4]},
+                  "would_never_say": _draw(seed, "never", _KID_NEVER_SAY if kid else _NEVER_SAY, 3),
+                  "profanity": "none" if kid else _draw(seed, "profanity", ("none", "rare", "rare", "frequent", "constant")),
+                  "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
-        "life": {"aspiration": "a quiet year", "current_project": f"keeping up with the work at {seed.settlement_name}",
-                 "fears": [("the pump failing", "a fever in the camp", "the night watch sleeping")[v % 3]]},
-        "disposition": {"archetype_prior": "civilized", "toward_strangers": ("wary", "neutral", "warm")[v % 3],
-                        "encounter_default": "calls for the watch and keeps distance"},
+        "life": {"aspiration": _draw(seed, "aspiration", _KID_ASPIRATIONS if kid else _ASPIRATIONS),
+                 "current_project": f"keeping up with the work at {seed.settlement_name}",
+                 "fears": [_draw(seed, "fear", _KID_FEARS if kid else _FEARS)]},
+        "disposition": {"archetype_prior": "civilized", "toward_strangers": _draw(seed, "strangers", _TOWARD_STRANGERS),
+                        "encounter_default": _draw(seed, "encounter", _ENCOUNTER)},
         "temper": {"fuse": _FUSES[(v // 5) % len(_FUSES)], "outlet": _OUTLETS[(v // 11) % len(_OUTLETS)],
                    "grudge": (v // 7) % 4, "pet_peeves": [_PEEVES[(v // 3) % len(_PEEVES)]],
                    "cools_down_by": _SETTLERS[(v // 13) % len(_SETTLERS)]},
         "tags": ["generated"],
     }
+
+
 from ._impl_wg import write_people  # noqa
