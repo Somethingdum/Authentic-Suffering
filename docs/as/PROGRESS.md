@@ -93,6 +93,17 @@ do nothing.
    fail, exactly as before those changes (the 101 are the P8 screens the builder has not built yet: words, play, connect /
    home, store, socket). The repo itself has no vitest toolchain yet (13_BUILD_ORDER P8).
 
+6. **How picky the narration lint should be** (your call): every narration draft goes through a code lint;
+   one error throws the draft away and asks the Writer again, up to `rules.style.max_narration_attempts` (3),
+   keeping the best. The fidelity checks (a name the character cannot know, invented dialogue, knowledge the
+   viewpoint cannot have, your own words echoed back) protect the game. The style checks (passive voice, -ly
+   adverbs over 8%, more than one comparison per 200 words, abstract words, repeated sentence openers,
+   length over 125%) are taste, written when the main model was weaker — and at 5 tokens a second each
+   redraft costs minutes. The bench now lints the Writer's real drafts and lists which rules fail them
+   (`bench.md`, "Narration and the code lint"). If the style rules throw away prose you like: set
+   `rules.style.max_narration_attempts: 1` (new runs), loosen the numbers under `rules.style`, or tell me to
+   make the style rules advisory and keep only the fidelity checks forcing a redraft.
+
 ## Notes (builder)
 
 (append dated notes here: what was tricky, what you tried, anything the next session must know)

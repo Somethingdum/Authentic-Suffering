@@ -191,7 +191,8 @@ one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 
   every long prompt — the same prompts, so long contexts are read once), what the prompt cache saves, writing
   speed with thinking off and on and how much of it is thinking, whether parallel requests add throughput, and
   every call class the game makes at its own regime (time, prompt size, thinking, whether `max_tokens` cut it
-  short, whether it parsed) — with the HOT decision timed on both lanes. It writes `reports/bench.json` and a
+  short, whether it parsed) — with the HOT decision timed on both lanes, and each narration draft put through
+  the game's own code lint (how many would pass, which rules fail the rest: each failure costs a redraft). It writes `reports/bench.json` and a
   readable `reports/bench.md` (each lane's limits, the call table, a medium scene's turn time per depth with
   the HOT minds on either lane, and what `--accept` would change). `--accept` writes the thinking switch,
   JSON-with-thinking, prompt progress, `max_concurrency`, the stall window (only raised), the `max_tokens` of

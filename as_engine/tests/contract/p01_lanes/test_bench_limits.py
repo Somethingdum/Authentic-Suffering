@@ -53,7 +53,7 @@ def fake_report(bench, sim, tmp_path_factory):
     out = tmp_path_factory.mktemp("bench")
     cfg_file = ROOT / "as_config.yaml"
     before = cfg_file.read_bytes() if cfg_file.exists() else None
-    asyncio.run(bench.main(["--fake", "--accept", "--out", str(out)], sim_models=sim.SMALL, sim_scale=0.001))
+    asyncio.run(bench.main(["--fake", "--accept", "--out", str(out)], sim_models=sim.SMALL, sim_scale=0.003))
     after = cfg_file.read_bytes() if cfg_file.exists() else None
     assert before == after, "simulated lanes never change as_config.yaml"
     assert (out / "bench.fake.md").exists()
@@ -116,6 +116,10 @@ def test_every_call_class_runs_on_its_own_lane_at_its_own_regime(fake_report):
     assert rows[f"actor_cognition_hot@{other}"]["lane"] == other, "the HOT decision is timed on the other lane too"
     for k in ("intake", "actor_cognition_hot", "actor_cognition_warm", "writeback", "narration", "render_lint"):
         assert rows[k]["parsed"] == rows[k]["n"] and not rows[k]["truncated"], k
+    lint = rows["narration"]["lint"]
+    assert lint["drafts"] == rows["narration"]["n"] and 0 <= lint["passed"] <= lint["drafts"], \
+        "every narration draft is put through the game's own code lint"
+    assert lint["max_attempts"] == cfg.rules.style.max_narration_attempts
 
 
 # ------------------------------------------------------------------------- the settings that follow

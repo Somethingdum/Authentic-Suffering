@@ -596,6 +596,7 @@ class Bench:
         return {"runs": rows, "recommended": recommend_concurrency(rows)}
 
     async def stage_classes(self, lane) -> dict:
+        from as_engine.contracts.common import CallClass
         from as_engine.lanes.schemas import OUTPUT_MODELS
         out = {}
         plan = [(key, cc, req) for key, cc, req in class_requests(self.cfg) if req.lane == lane]
@@ -617,6 +618,8 @@ class Bench:
                    "truncated": sum(truncated(s.completion_tokens, req.max_tokens, s.status, s.reasoning_chars)
                                     for s in shots)}
             row["ok"] = row["parsed"] > 0
+            if cc == CallClass.NARRATION:
+                row["lint"] = narration_lint(self.cfg, [s.text for s in shots if s.ok], req.context)
             self.log(f"[{lane.value} {key}] {_dur(row['mean_s'])} (p90 {_dur(row['p90_s'])}), {row['prompt_tokens']} in, "
                      f"{row['completion_max']} out of {row['max_tokens']}, parsed {row['parsed']}/{row['n']}"
                      + (f", CUT SHORT {row['truncated']}x" if row["truncated"] else ""))
@@ -690,6 +693,30 @@ async def native_info(transport, lane) -> dict:
         return data if isinstance(data, dict) else {}
     except Exception:  # noqa: BLE001 — not LM Studio, or an older one
         return {}
+
+
+_CANON = []
+
+
+def narration_lint(cfg, drafts: list[str], packet) -> dict:
+    """The game's own code lint (narration.lint.lint_prose, the core pack's style rules, ``cfg.rules.style``) on
+    each narration draft: how many would pass, and which rules failed the rest. A failed draft costs the game a
+    whole redraft, up to ``rules.style.max_narration_attempts``."""
+    from collections import Counter
+    from as_engine.content.pack import load_canon
+    from as_engine.narration.lint import lint_prose
+    if not _CANON:
+        _CANON.append(load_canon([ROOT / "as_content" / "packs" / "core"])[0])
+    style = _CANON[0].find("style", "narration")
+    names = set(packet.allowed_names) | {"Nita", "Eli", "Carl", "Reggie"}       # people this PC has not met
+    errors, passed = Counter(), 0
+    for text in drafts:
+        rep = lint_prose(text, packet, style, cfg.rules.style, names)
+        bad = [f.rule for f in rep.findings if f.severity == "error"]
+        passed += not bad
+        errors.update(bad)
+    return {"drafts": len(drafts), "passed": passed, "errors": dict(sorted(errors.items())),
+            "max_attempts": cfg.rules.style.max_narration_attempts}
 
 
 def class_requests(cfg) -> list:
@@ -792,6 +819,13 @@ def markdown(report: dict) -> str:
                          f"{_dur(r['p90_s'])} | {r['prompt_tokens']:,} | {r['reasoning_chars']:,} | "
                          f"{r['completion_max']:,} / {r['max_tokens']:,} | {r['parsed']}/{r['n']} | {r['truncated'] or ''} |")
         lines.append("")
+        lint = (rows.get("narration") or {}).get("lint")
+        if lint and lint["drafts"]:
+            failed = ", ".join(f"{k} x{v}" for k, v in lint["errors"].items()) or "none"
+            lines += [f"**Narration and the code lint**: {lint['passed']} of {lint['drafts']} drafts would pass; the rules "
+                      f"that failed a draft: {failed}. Every failed draft costs the game a whole redraft (up to "
+                      f"`rules.style.max_narration_attempts` = {lint['max_attempts']}, the best kept), at the narration "
+                      f"time above each.", ""]
     pj = report.get("projection") or {}
     if pj:
         hot = pj.get("hot_lane", "A")
