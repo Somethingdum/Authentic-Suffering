@@ -1,1 +1,8 @@
 {{ ctx.brief }}
+{% if ctx.fields.get("events") %}
+
+The events, oldest first (answer for every one, and keep each id exactly as given):
+{% for e in ctx.fields.get("events") %}
+- {{ e.id }}: day {{ e.day }} since the Fall, {{ e.kind | replace("_", " ") }}{{ "; who: " ~ (e.subjects | join(", ")) if e.subjects else "" }}{{ "; it followed " ~ e.cause if e.cause else "" }}. In short: {{ e.skeleton }}
+{% endfor %}
+{% endif %}

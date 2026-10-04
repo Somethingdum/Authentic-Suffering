@@ -84,7 +84,11 @@ WG-20 async write_history(client, tx, events, plan, region, params, at, progress
   WorldgenContext(stage='WG2', brief = a code-built English summary of the region and the batch,
   fields={'events': [{'id', 'day', 'kind', 'subjects': [names], 'cause': hist id or None,
   'skeleton': text}], 'region': {'zones': [names], 'climate': climate_descriptor, 'days_since_fall':
-  dsf}}); answer model HistoryAnswer {events: [{id, truth, belief}]}. An event of the batch missing
+  dsf}}) — (D-131) the user prompt shows the batch after the brief: 'The events, oldest first (answer
+  for every one, and keep each id exactly as given):' and per event '- <id>: day <day> since the
+  Fall, <kind with spaces>; who: <subjects>; it followed <cause>. In short: <skeleton>' (the who and
+  followed parts only when there are any) — it asked for ids it never showed, so every event kept
+  its skeleton; answer model HistoryAnswer {events: [{id, truth, belief}]}. An event of the batch missing
   from the answer, or with truth outside 20..600 characters or belief outside 10..400, keeps its
   skeleton: truth = text, belief = f"People say {text with 'Day N: ' removed}". A failed call (any
   parse_status but 'ok', or a lane error) does the same for its whole batch. history_events rows {hist_id, day, kind,

@@ -154,7 +154,8 @@ Fields (second person, plain English):
                     PacketRules.max_beliefs by (confidence desc, acquired_at desc, claim_id asc).
                     provenance_text: witnessed 'you saw it'; overheard 'you overheard it';
                     told_by:<id> f'{name or with_article(describe)} told you'; read:<id> 'you
-                    read it'; common 'everyone says so'; childhood 'since you were small';
+                    read it'; common 'everyone says so'; childhood 'since you were small'; (D-130) group 'your
+                    people say so';
                     rumour / rumour:<id> 'a rumour'; inferred 'your own guess'; anything else
                     'you are not sure where from'. age_text from (at - acquired_at): < 60 s 'just
                     now'; < 1 h 'N minutes ago' ('1 minute ago'); < 1 day 'N hours ago'; else
@@ -168,6 +169,10 @@ Fields (second person, plain English):
                     memories   MemoryLine(E#, text = summary, age_text as for beliefs, from the
                                episode's at) per episode, E1..En in that order; handles E# -> episode_id;
                     lessons    f'Experience taught you: {text}' per lesson;
+                    lore       (D-130, LORE-03) f'{text} ({provenance_text as for beliefs})' per
+                               Retrieved.lore entry: what people say about what is in front of them —
+                               at most PacketRules.max_lore lines, pinned: they bear on this
+                               moment, so SKULL-09 counts them and never drops them;
                     open_loops LoopLine per loop;
                     refusals   f'You refused: {summary}.' per refusal — only refusals whose
                                requester is here or named (MEM-17).
@@ -260,7 +265,7 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   whose requester is not a source of this turn's percepts (oldest first), (B5) the unprocessed
   lines of every unsettled turn but the latest (the oldest line first), uncertainty lines (last
   first). Never dropped (Actor Spec AC16: what bears on this decision is pinned, never cut for
-  age or length): identity (the card), recent_lines, body, position, perceived_now, utterances,
+  age or length): identity (the card), recent_lines, body, position, perceived_now, utterances, (D-130) lore,
   entities, affordances, commitments, stakes, resources, open loops, what a consultation brought
   back (looked_up), the latest unsettled turn's unprocessed lines, and every refusal whose
   requester is a source of this turn's percepts (someone here or speaking now). Every item
@@ -291,6 +296,8 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacke
   where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given.
   state: their body lines (as the SkullPacket's body) but 'Unhurt.', the first 3.
   said: their own last 3 voice_lines by (at, line_id), oldest first — never to be said again.
+  knows: (D-130) the texts of mind.retrieval.lore_lines(tx, actor_id, turn_index, at, min(2,
+    PacketRules.max_lore)) — what people say about what is in front of them.
   people: the living human bodies, not themselves, that are the source of a percept of theirs this
     turn at <= ``at``, in order of first percept, at most 6: handle P1.., word = word_for, feeling =
     the TEMPER-08 words and then their relationship line (as the SkullPacket's), lower-cased and

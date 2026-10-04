@@ -249,6 +249,8 @@ def cues_of(tx, holder_id, turn_index, at):
                 out.add("gunshot_close" if d <= 30 else "gunshot_distant")
             if k in ("glass_break", "metal_crash"):
                 out.add(k)
+            if k == "screaming":                     # D-130: the scream people make before they die (DOOM-04)
+                out.add("scream")
             if k in _MOVE_EFFECTS and d <= 5 and ev["actor_id"] not in visible_srcs:
                 out.add("footsteps_close")
             if k == "force_portal":

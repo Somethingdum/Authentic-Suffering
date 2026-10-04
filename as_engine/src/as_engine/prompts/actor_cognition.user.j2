@@ -25,7 +25,7 @@ Still raw from before (what you did and saw, not yet settled in your mind):
 - {{ l }}
 {% endfor %}
 {% endif %}
-{% if p.beliefs or p.memories or p.lessons %}
+{% if p.beliefs or p.memories or p.lessons or p.lore %}
 
 What you remember
 {% if p.beliefs %}
@@ -43,6 +43,12 @@ What you remember:
 {% if p.lessons %}
 What experience has taught you:
 {% for l in p.lessons %}
+- {{ l }}
+{% endfor %}
+{% endif %}
+{% if p.lore %}
+What people say about this (what you grew up hearing, not what you saw):
+{% for l in p.lore %}
 - {{ l }}
 {% endfor %}
 {% endif %}

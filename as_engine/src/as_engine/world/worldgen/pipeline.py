@@ -27,7 +27,8 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
     WG2  plan = history.plan_polity(...); events = history.skeleton(...); await
          history.write_history(...); history.mark_held(...).
     WG3  polity.write_groups.   WG4 polity.write_settlements.   WG5 polity.write_cohorts.
-    WG6  people = await people.write_people(...).   WG7 polity.write_laws.
+    WG6  people = await people.write_people(...).   WG7 polity.write_laws, then (D-130) mind.actor.seed_lore
+    for every actor by actor id (origin 'worldgen': what their own people say, now that groups exist).
     P10 (progress v2, service.progress): WG2's history.write_history and WG6's people.write_people
          are passed progress=sub, an async callable(done, total) that they await after each
          history batch and after each WORLDGEN_ACTOR answer (completion order; done counts

@@ -10,6 +10,8 @@ beliefs:
   - {held_by: "cohort:pre_fall_adult", text: "Shoot them enough and they stay down.", confidence: 1}
 tags: [lore_v1_2_3, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_SHAMBLER01", "core:infected/ZOMBIE_VARIANT_ID_RUNNER01"]
+about: ["headshot", "the head", "get back up", "got back up", "play dead", "playing dead", "stay down"]
+when: [corpse_seen]
 ---
 "They play dead and wait" is a belief, not truth — false death is shutdown, not strategy. It gives
 the same practical advice for the wrong reason.

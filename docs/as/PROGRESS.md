@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2081 passed (2088 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, D-129 what is done to you and yours lasts, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2091 passed (2098 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, D-129 what is done to you and yours lasts, D-130 everyone knows, D-131 the Writer sees what it is asked to write, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -182,6 +182,23 @@ do nothing.
    short line each on the fast lane in their own voice — or say nothing, as most people would (D-128). A
    line costs a second or two on lane B, at most 1 / 2 / 3 a wave by depth; a failed one is silence. The
    limits bench measures it (`ambient_line`).
+17. **Everyone knows what their world says** (your "The lore needs merged into ever crevice of this"). The
+   core pack's lore — what everyone says ("If it's not the head, it's not dead."), what each generation
+   says (a child born after the Fall: "Walkers are sleepwalking people."), what the Remnants say among
+   themselves — was written but nobody ever held any of it, and people made by worldgen never even got
+   what their own card says they know. Now everyone holds what their world, their generation and their
+   people say, and it comes to mind when it bears on the moment: said aloud (someone asks about a cure),
+   seen (a Ghost in the yard) or felt (a scream) — a few lines at most, never a list (D-130). Your lore's
+   records can say what brings each one to mind (`about`: words; `when`: moments — LORE_STRUCTURE §2.5).
+   **Your call** (SPEC_ISSUES SI-006): the lore says everyone knows to aim for the head; the combat
+   menus were built on the untrained not knowing it. Should everyone know?
+18. **The Writer was writing your world blind** (found while doing 17). Every worldgen call kept what the
+   Writer needed beside its prompt instead of in it: the region's history was asked for by ids it never
+   saw (so every event stayed a one-line stub), the opening was asked to cite people and places it was
+   never shown (so every opening was written by code), and the people were written from a name, an age
+   and a job. The test model read the hidden parts directly, so nothing ever failed. Now each prompt
+   carries what it needs — for a person: how long since the Fall, what their generation remembers, the
+   sketch that makes them different, what happened here, and what everyone around them says (D-131).
 
 ## Notes (builder)
 

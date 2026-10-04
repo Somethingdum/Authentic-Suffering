@@ -258,6 +258,9 @@ def load_scenario(path_or_dict: str | Path | dict, *, packs_root: str | Path, co
             if b.plan:
                 ws.append(W("plans", {"actor_id": ids[b.id], "goal_text": b.plan.goal, "steps": b.plan.steps,
                                       "standing_orders": [so.model_dump() for so in b.plan.standing_orders], "updated_at": start}))
+            from ..mind._impl_lore import lore_rows        # D-130 (LORE-02): what they grew up hearing, in the same event
+            ws += lore_rows(tx, ids[b.id], rec.identity.cohort,
+                            {g.content_ref for g in spec.groups if g.content_ref and any(m.actor == b.id for m in g.members)}, start)
             ev = E(EventType.MATERIALIZE, "mind.actor", ws, {"actor_id": ids[b.id], "source": source}, target_ids=[ids[b.id]])
             actor_ev[b.id] = ev.event_id
         # items

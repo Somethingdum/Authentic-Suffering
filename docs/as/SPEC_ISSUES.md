@@ -85,6 +85,29 @@ Copy the template, give it the next number, fill every line.
   `actor` at them, and amend WG-28 so a placed pack actor takes its seat's role.
 - Meanwhile: generated per world.
 
+### SI-006 — Does everyone know to aim for the head? (the lore's cues are not given out)
+- Status: open (human)
+- Phase / test: P4 / D-130 · tests/contract/p04_one_actor/test_affordances.py (WILL-03 two_skills);
+  content `core:lore/false_death`, `cold_start`, `shamblers`, `crawlers`, `runners`, `lurkers`,
+  `no_cure`, `contamination_culture`, `the_screaming`, `wet_strain`
+- Rule id(s): AFF-10, AFF-05, LORE-02
+- The spec says: AFF-10 — belief cues come from dossier knowledge.cues "and held lore beliefs' cues
+  (worldgen WG6 / scenario load, confidence 3)"; the lore says "If it's not the head, it's not
+  dead." is held by everyone (common, confidence 3, cues knows_headshot_rule and knows_false_death).
+- The test/contract does: WILL-03 / test_gates_run_in_order expects an untrained person (twin_b)
+  NOT to hold knows_headshot_rule: shoot_head fails at the skill gate. Nothing ever gave lore cues
+  out, so the two never met.
+- The problem: given out as the lore and AFF-10 say, every person holds knows_headshot_rule,
+  knows_false_death, knows_noise_draws_dead, knows_crawler_ambush, knows_runner_stamina,
+  knows_lurker_signs, knows_bite_is_fatal, knows_no_sharing, knows_cold_start and
+  knows_the_screaming — so anyone may TRY for the head (at +2 resistance untrained, AFF-05) and
+  finish the downed, and the WILL-03 twin difference narrows to skill and nerve.
+- Proposed resolution: the owner decides. (a) Everyone knows (canon: the most basic survival
+  knowledge, years after the Fall): seed the cues with the beliefs (LORE-02) and amend WILL-03's
+  twin_b to hold a misbelief instead; or (b) the cues stay earned (a dossier's knowledge or a
+  lesson) and AFF-10's sentence about lore cues is struck.
+- Meanwhile (D-130): lore beliefs are held and come to mind as words; their cues are not given out.
+
 ## Resolved
 
 (none yet)

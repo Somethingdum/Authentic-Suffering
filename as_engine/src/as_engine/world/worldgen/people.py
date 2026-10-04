@@ -49,7 +49,18 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   The FIRST T['llm_dossiers'] generated people (slot order) get a WORLDGEN_ACTOR call each, all
   started together (asyncio.gather) and applied in slot order (P10: await progress(done, total) as each
   answer arrives, whatever its outcome): context WorldgenContext(stage='WG6',
-  brief = plain English about the person, their settlement, group and history, fields={'skeleton':
+  brief = plain English about the person, their settlement, group and history — (D-131) one line
+  each: name, age, sex, settlement, group and work; 'It is day N since the Fall, Y years on.'; what
+  their cohort remembers (post_fall_born 'Born after the Fall: they have never known any other
+  world.', fall_child 'A child when the Fall came: they remember a little of the world before.',
+  pre_fall_adult 'Grown when the Fall came: they remember the world before, and losing it.'); 'A
+  sketch of them to build on: keep its spirit, make it specific and their own.' then the skeleton's
+  voice capsule, motive, past wound, inner conflict, aspiration, fears and signature behaviour as
+  '- <what>: <text>' lines; 'What happened here, as people tell it:' then the history belief texts
+  (at most 8); 'What people around them say, and they believe too (...)' then every core-lore
+  belief held by 'common', their cohort or their group's faction (content_ref) — the Writer wrote
+  people from a name, an age and a job, blind to the world they live in — and last 'Write their
+  dossier: how they look, move, speak and decide.'; fields={'skeleton':
   the skeleton dict, 'settlement': name, 'group': name, 'role': occupation, 'history': [the belief
   texts of the history events whose subjects include their group]}), json_schema = the
   ActorDossier schema, client.call with no output model; the answer (lanes.parse.extract_json of

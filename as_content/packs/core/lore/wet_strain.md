@@ -10,6 +10,8 @@ beliefs:
   - {held_by: "cohort:post_fall_born", text: "You can burn it out if you cut the bite off fast enough.", confidence: 2}
 tags: [canon_cmg_42, infection, pathway_wet]
 entities: ["core:pathway/wet"]
+about: ["bite", "bitten", "bites", "wet strain", "turned", "turning"]
+when: [bite_wound_seen, spreader_signs]
 ---
 The false belief among the post-Fall-born (cutting it out works) is a deliberate misconception:
 people who hold it make choices that the world will punish.

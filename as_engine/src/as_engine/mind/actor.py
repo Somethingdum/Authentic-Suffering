@@ -28,6 +28,12 @@ create(tx, body_id, dossier, source, at, turn_index, *, content_ref=None, mind_k
   display_name = identity.name, resolve_max = resolve_max(E, C, capability.resolve_trait_mod,
   tx.rules.resolve), resolve_cur = resolve_max, stress 0, goal_text = goal, lod_hint 'cold',
   accepted_authority '[]', quarantine 0}. A body that already has an actors row -> ValueError.
+  (D-130) Then what they know: one LESSON_LEARNED {holder_id, cues, seed: true} (writer 'mind.mind',
+  actor_id = body_id, the same origin) inserting a lessons row per registry cue of the dossier's
+  knowledge.cues {cue_tags [cue], text f'Knows: {the cue's description}', confidence 3,
+  source_event = the MATERIALIZE, at} — as the scenario loader seeds them (AFF-10) — when there are
+  any. (D-130, LORE-02) The MATERIALIZE also inserts the lore they hold (seed_lore's rows for their
+  dossier's cohort and the groups they are already in). Returns the MATERIALIZE.
 """
 
 from __future__ import annotations
@@ -84,3 +90,24 @@ def controller(store: "Store | Tx", actor_id: str) -> str:
 from ._impl_p4a import resolve_max, fused, display_name, recent_lines  # noqa
 from ..action._impl_p5a import adjust_stress  # noqa
 from ..world._impl_p10 import actor_create as create  # noqa
+
+
+def seed_lore(tx: "Tx", holder_id: str, at: int, turn_index: int, *, origin: str = "sim") -> "Event | None":
+    """LORE-02 (D-130): what everyone around them says, as they grew up hearing it. A person (an actors
+    row on a human body) holds, of every canon lore entry (by ref) and each of its beliefs in order:
+    those held_by 'common'; 'cohort:<c>' when their fused dossier identity.cohort is c; a faction
+    ContentRef when they are a member (group_members status member or probation) of a group whose
+    content_ref is it ('region:<tag>' is held by nobody yet). Held as lore_held rows {holder_id,
+    lore_ref, belief (the index), confidence = the belief's, provenance 'childhood' for a
+    cohort:post_fall_born belief (the only world they have known), 'group' for a faction's, else
+    'common'; acquired_at} — never claim_holdings: what someone grew up hearing is not something they
+    perceived, and it never competes with what they know (MEM-13). create writes them inside its
+    MATERIALIZE (and the scenario loader inside each actor's), so a new person costs no extra event;
+    this function adds what is missing for someone who already exists (worldgen WG7, once their
+    groups exist): one MATERIALIZE {actor_id, source: 'lore', beliefs: n} (writer 'mind.actor',
+    actor_id = holder, ``origin``) inserting the rows not yet held; nothing missing, or not a person
+    -> None. The beliefs' cues are not given out (AFF-10's lore cues: SPEC_ISSUES SI-006). What it
+    gives is brought to mind by mind.retrieval.lore_lines (LORE-03), never listed whole."""
+    raise NotImplementedError("D-130")
+from ._impl_lore import seed_lore  # noqa: E402,F811
+

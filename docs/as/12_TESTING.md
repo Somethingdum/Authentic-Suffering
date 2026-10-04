@@ -458,6 +458,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_what_is_done_lasts.py` | Owen takes Alice's ledger from her hand: she trusts him 2 less, resents him and holds it (CAS-039); Mara, who knows whose it is, is a witness, not the one robbed; Alice taking Owen's Glock writes nothing into Owen. Owen hits June for nothing: Mara, who loves her, trusts him 2 less in all and holds it (CAS-040), Alice 1 less; Owen kills June: Mara's grudge is strength 3 (CAS-041). Called useless alone: an insult only; in front of Mara: Alice loses a point of Resolve and resents him (CAS-042), once an hour; Owen insulted: nothing. Held, Mara watches June beaten: Resolve -2, once an hour; Alice, held, does not love June: nothing (CAS-043). Alice hands over the ledger at gunpoint: Resolve -1 and resentment (record_responses) |
 
+### 3.44 Everyone knows (P6; D-130)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_everyone_knows.py` | LORE-02: in a market yard Owen, Vito of the Remnants, a masked Ghost and a child of seven each hold exactly what everyone says, what their generation says and what their faction says — never as a belief, and with no event more than the load had. LORE-03: with nothing in the moment none of it comes to mind, and when it does it is what people say, never something they know; "Is there a cure for a bite?" brings "There's no cure…" and what the Remnants say about it to Vito's mind; seeing the Ghost brings the three things he has heard about them; the child's lines say where they come from and reach her ambient packet; a scream heard (the cue, no word said) brings what everyone says about the screaming, each thing once before any twice. A person made mid-game (mind.actor.create) holds the same, and their card's knowledge cues as lessons |
+
+### 3.45 The Writer sees what it is asked to write (P10; D-131)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_the_writer_sees_the_world.py` | Read from the prompts the Writer was sent, not the fields beside them: the history call lists every event it must answer for, by id; a person is written knowing the day since the Fall, what their generation remembers, the sketch that makes them who they are, what happened here and what everyone (and their generation) says — a child born after the Fall hears "Walkers are sleepwalking people", not what the old say; the opening call lists every entity it may cite by id and every condition by name |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

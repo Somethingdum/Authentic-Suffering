@@ -601,6 +601,10 @@ class LoreEntry(Strict):
     beliefs: list[LoreBelief] = Field(min_length=1)
     tags: list[str] = Field(default_factory=list)
     entities: list[ContentRef] = Field(default_factory=list)
+    about: list[str] = Field(default_factory=list, description="D-130 (LORE-03): words or short phrases that bring this to "
+                             "mind when someone hears them said (whole words, any case): 'cure', 'clinic', 'the Fall'.")
+    when: list[str] = Field(default_factory=list, description="D-130 (LORE-03): moment cues (cues.yaml) that bring this to "
+                            "mind: 'corpse_seen', 'scream', 'bite_wound_seen'.")
     body: str | None = Field(default=None, description="Set by the loader: the markdown below the front matter (depth text, pulled on demand; never put in a packet whole).")
     model_config = Strict.model_config | {"populate_by_name": True}
 

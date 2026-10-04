@@ -27,6 +27,18 @@ MEM-13 beliefs: the holder's live believed holdings (believed 1, superseded_by N
   recency_bonus(hours since acquired_at) + (15 when subject is in K); ordered (score desc,
   claim_id asc); the first max_beliefs. Entries {claim_id, text, confidence, provenance,
   acquired_at, score}; text as mind.packet words a belief.
+LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict]
+  What people say about what is in front of the holder: its lore_held rows (mind.actor.seed_lore,
+  LORE-02 — never beliefs: thirty things everyone says would crowd out what this person knows)
+  whose lore entry (the canon record named by lore_ref) is brought to mind now — any of: a perceived speech row of MEM-11's selection whose words hold one
+  of the entry's ``about`` phrases as whole words, any case; a body that is the source of a VISUAL
+  percept of that selection at EXACT or PARTIAL whose bodies.content_ref is one of the entry's
+  ``entities``, or who is a member (status member or probation) of a group whose content_ref is
+  one, or an item that is such a source whose def_ref is one; mind.cues.cues_of(tx, holder,
+  turn_index, at) meets the entry's ``when``. Each thing once before any twice: the entries ordered
+  by their best line (confidence desc, then lore_ref), each entry's lines (confidence desc, belief);
+  round by round, the next line of every entry that has one, in that order; the first n. Entries {lore_id, belief, text (the entry's belief text), confidence, provenance}. retrieve fills
+  Retrieved.lore with lore_lines(..., n = RulesConfig.packet.max_lore).
 MEM-14 episodes: the holder's episodes with decayed 0 and (B5, MEM-18) quarantined 0.
   Anchors (anchor 1) come first and always: ordered (salience desc, at desc, episode_id), at most 2.
   Then the rest by score = salience + (20 when any subject_id is in K) + (15 when the episode
@@ -79,6 +91,7 @@ class Retrieved:
     lessons: list[dict] = field(default_factory=list)
     loops: list[dict] = field(default_factory=list)
     refusals: list[dict] = field(default_factory=list)
+    lore: list[dict] = field(default_factory=list)      # D-130 (LORE-03)
     keys: set[str] = field(default_factory=set)
     moment_keys: set[str] = field(default_factory=set)
 
@@ -88,6 +101,11 @@ def retrieve(tx: "Tx", holder_id: str, turn_index: int, at: int, *, max_beliefs:
     raise NotImplementedError("P6")
 
 
+def lore_lines(tx: "Tx", holder_id: str, turn_index: int, at: int, n: int) -> list[dict]:
+    raise NotImplementedError("D-130")
+
+
 def recency_bonus(hours_since: float) -> float:
     raise NotImplementedError("P6")
 from ._impl_p6 import retrieve, recency_bonus  # noqa
+from ._impl_lore import lore_lines  # noqa: E402,F811

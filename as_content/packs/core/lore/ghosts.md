@@ -13,6 +13,7 @@ beliefs:
   - {held_by: "core:faction/ghosts", text: "Knowing where the depot is tells you nothing. The mountain is visible; you still cannot enter the mountain.", confidence: 3}
 tags: [ghosts_6, faction]
 entities: ["core:faction/ghosts"]
+about: ["ghost", "ghosts", "the masks", "keep moving"]
 ---
 The smile is a signature, not a threat display: it is used when the Council wants a body to say
 who answered, and left off when disappearance says more.

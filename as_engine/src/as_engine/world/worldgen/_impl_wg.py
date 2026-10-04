@@ -993,18 +993,61 @@ POSTS = (("pump_operator", "water_pump", 6, 18), ("pump_operator", "water_pump",
 LOCKED = ("id", "generation", "identity", "days_since_fall_range", "tags")
 
 
-def _brief_person(seed, role):
-    return (f"{seed.name}, {seed.age}, {seed.sex}, lives at {seed.settlement_name} with {seed.group_name}; "
-            f"works as {role}. Write their dossier: how they look, move, speak and decide.")
+COHORT_WORDS = {   # D-131: what a generation remembers
+    "post_fall_born": "Born after the Fall: they have never known any other world.",
+    "fall_child": "A child when the Fall came: they remember a little of the world before.",
+    "pre_fall_adult": "Grown when the Fall came: they remember the world before, and losing it.",
+}
 
 
-async def _actor_answer(client, seed, skel, role, history):
+def _lore_for(canon, cohort, group_ref):
+    """D-131: what everyone around them says, what their generation says, what their own people say."""
+    cohort = getattr(cohort, "value", cohort)
+    out = []
+    for ref in canon.refs("lore"):
+        for b in canon.get(ref).beliefs:
+            if b.held_by == "common" or b.held_by == f"cohort:{cohort}" or (group_ref and b.held_by == group_ref):
+                out.append(b.text)
+    return out
+
+
+def _brief_person(seed, role, skel=None, history=(), dsf=None, lore=()):
+    """WG6 (D-131): who they are, the world they live in, a sketch to build on, what happened here, and what
+    they grew up hearing — the Writer wrote people from a name, an age and a job."""
+    lines = [f"{seed.name}, {seed.age}, {seed.sex}, lives at {seed.settlement_name} with {seed.group_name}; works as {role}."]
+    if dsf is not None:
+        years = dsf // 365
+        lines.append(f"It is day {dsf} since the Fall" + (f", {years} year{'s' if years != 1 else ''} on." if years else "."))
+    c = getattr(seed.cohort, "value", seed.cohort)
+    if c in COHORT_WORDS:
+        lines.append(COHORT_WORDS[c])
+    if skel:
+        m, v, lf = skel.get("motive") or {}, skel.get("voice") or {}, skel.get("life") or {}
+        fears = lf.get("fears")
+        fears = ", ".join(fears) if isinstance(fears, list) else fears
+        sketch = [("How they talk", v.get("capsule")), ("What drives them", m.get("motive")), ("What hurt them", m.get("past_wound")),
+                  ("What pulls them two ways", m.get("inner_conflict")), ("What they hope for", lf.get("aspiration")),
+                  ("What they fear", fears), ("What they always do", m.get("signature_behaviour"))]
+        lines.append("A sketch of them to build on: keep its spirit, make it specific and their own.")
+        lines += [f"- {k}: {x}" for k, x in sketch if x]
+    if history:
+        lines.append("What happened here, as people tell it:")
+        lines += [f"- {h}" for h in list(history)[:8]]
+    if lore:
+        lines.append("What people around them say, and they believe too (nothing in the dossier contradicts it; "
+                     "let it show only where it would):")
+        lines += [f"- {x}" for x in lore]
+    lines.append("Write their dossier: how they look, move, speak and decide.")
+    return "\n".join(lines)
+
+
+async def _actor_answer(client, seed, skel, role, history, dsf=None, lore=()):
     from ...contracts.calls import WorldgenContext
     from ...contracts.common import CallClass
     from ...contracts.dossier import ActorDossier
     from ...lanes import schemas
     from ...lanes.requests import build_request
-    ctx = WorldgenContext(stage="WG6", brief=_brief_person(seed, role), fields={
+    ctx = WorldgenContext(stage="WG6", brief=_brief_person(seed, role, skel, history, dsf, lore), fields={
         "skeleton": skel, "settlement": seed.settlement_name, "group": seed.group_name, "role": role, "history": history})
     try:
         req = build_request(client.config, CallClass.WORLDGEN_ACTOR, turn_index=0, context=ctx,
@@ -1174,7 +1217,9 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
     finished = {"n": 0}
 
     async def one(i):
-        a = await _actor_answer(client, seeds[i][1], skels[i], seeds[i][1].occupation, hist_for(seeds[i][0][1].group_id))
+        g = groups.get(seeds[i][0][1].group_id)
+        a = await _actor_answer(client, seeds[i][1], skels[i], seeds[i][1].occupation, hist_for(seeds[i][0][1].group_id), dsf,
+                                _lore_for(canon, seeds[i][1].cohort, getattr(g, "content_ref", None)))
         finished["n"] += 1
         if progress is not None:
             r = progress(finished["n"], k)
@@ -1807,6 +1852,14 @@ def place_wild_card(tx, rng, pc, pc_body, settings, content_dir, at):
     return body
 
 
+def _group_lore(tx, at):
+    """D-130 (LORE-02): what each person's own people say, once everyone has their groups (what everyone says
+    and what their generation says came with them, mind.actor.create)."""
+    from ...mind.actor import seed_lore
+    for (aid,) in tx.query("SELECT actor_id FROM actors ORDER BY actor_id"):
+        seed_lore(tx, aid, at, 0, origin="worldgen")
+
+
 # ------------------------------------------------------------------------------------------ pipeline
 STAGE_STREAMS = {"WG0": ("worldgen:params", "worldgen:placement"), "WG1": ("worldgen:region",),
                  "WG2": ("worldgen:history", "worldgen:placement"), "WG4": ("worldgen:polity",),
@@ -1940,7 +1993,7 @@ async def run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id
         await run_stage("WG6", wg6)
         people = ctx["people"]
         report.skipped_actors = list(people.skipped)
-        await run_stage("WG7", lambda tx: polity_mod.write_laws(tx, plan, params, canon, at))
+        await run_stage("WG7", lambda tx: (polity_mod.write_laws(tx, plan, params, canon, at), _group_lore(tx, at)))
         # genesis
         wd = Path(world_dir)
         wd.mkdir(parents=True, exist_ok=True)

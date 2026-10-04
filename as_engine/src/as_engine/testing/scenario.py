@@ -31,7 +31,9 @@ load_scenario(path_or_dict, *, packs_root, core_pack_dir, rules=None, transport=
                                        the referenced dossier record's JSON, source 'pack',
                                        content_hash = sha256(baseline_json); resolve_max from
                                        mind.actor.resolve_max; resolve_cur = spec.resolve if set
-                                       else resolve_max; display_name = identity.name)
+                                       else resolve_max; display_name = identity.name; D-130: the
+                                       same event inserts the lore_held rows mind.actor.seed_lore
+                                       describes — their cohort's and their fixture groups')
        items                          (physical.objects, ITEM_CREATED per item, origin 'scenario')
        tasks                          (action.tasks, TASK_STEP per task with steps_done preset)
        relationships                  (mind.mind, RELATION_CHANGE per pair)

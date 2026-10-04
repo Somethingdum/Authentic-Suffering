@@ -514,6 +514,18 @@ CREATE TABLE dossier_deltas (
   at         INTEGER NOT NULL
 );
 
+-- OWNER mind.actor   (D-130, LORE-02: what a person grew up hearing — the lore's belief layer they hold;
+-- the words are the canon lore entry's, by ref and belief index. Never a percept, never in claim_holdings.)
+CREATE TABLE lore_held (
+  holder_id    TEXT NOT NULL,
+  lore_ref     TEXT NOT NULL,
+  belief       INTEGER NOT NULL,
+  confidence   INTEGER NOT NULL CHECK (confidence BETWEEN 0 AND 3),
+  provenance   TEXT NOT NULL CHECK (provenance IN ('common','childhood','group')),
+  acquired_at  INTEGER NOT NULL,
+  PRIMARY KEY (holder_id, lore_ref, belief)
+);
+
 -- OWNER action.propagate
 CREATE TABLE voice_lines (
   line_id  TEXT PRIMARY KEY,

@@ -13,6 +13,8 @@ beliefs:
   - {held_by: common, text: "It's God, or the Devil, or nothing at all.", confidence: 1}
 tags: [culture, the_screaming, d_107]
 entities: []
+about: ["scream", "screams", "screaming", "screamed"]
+when: [scream]
 ---
 Most people who have lived a few years since the Fall have heard it more than once: a person who is
 going to die starts screaming — not from pain, or not only from pain — and does not stop until the

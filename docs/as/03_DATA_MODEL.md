@@ -77,7 +77,8 @@ with provenance `told_by:X`), never Y.
 `washed_at`; what is worn is items with slot `worn`) ·
 `positions` · `wounds` · `needs` · `infections` · `actors` (the mind wrapper: dossier, controller,
 Resolve, stress, goal, duty post, accepted authority, quarantine) · `dossiers` (full baseline JSON)
-· `dossier_deltas` · `voice_lines` · `plans` · `tasks` · `relationships` (6 axes, per-axis cause) ·
+· `dossier_deltas` · `lore_held` (D-130: the lore's beliefs a person grew up hearing — by lore ref and belief, with
+confidence and provenance; never a belief or a percept) · `voice_lines` · `plans` · `tasks` · `relationships` (6 axes, per-axis cause) ·
 `refusals` · `open_loops` (promises, debts, grudges, goals, desires, fears, questions, plans, kept
 secrets) · `lessons` · `episodes` (+ FTS; `self_event_ids`, `quarantined`) · `memory_jobs` (a
 writeback per holder and turn, never lost to a failed call) · `promises` (each person's own

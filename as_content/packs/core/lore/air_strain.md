@@ -10,6 +10,7 @@ beliefs:
   - {held_by: "cohort:post_fall_born", text: "People have always huddled; it's just smart.", confidence: 2}
 tags: [canon_cmg_42, infection, pathway_air]
 entities: ["core:pathway/air"]
+about: ["cold-sickness", "cold sickness", "air strain", "sleeping alone", "huddle", "huddled", "huddling"]
 ---
 Use it for clustering, warmth-seeking and odd fixations in behaviour, never as a personal horror
 beat. It is ambient and universal (Batch-2 ruling: only three infection vectors).

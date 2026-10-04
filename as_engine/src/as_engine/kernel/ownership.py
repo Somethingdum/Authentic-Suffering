@@ -42,6 +42,7 @@ TABLE_OWNERS: dict[str, str] = {
     "lots": "physical.objects",
     "actors": "mind.actor",
     "dossiers": "mind.actor",
+    "lore_held": "mind.actor",          # D-130
     "dossier_deltas": "mind.actor",
     "voice_lines": "action.propagate",   # D-117: a SPEECH writes its speaker's voice line (DOS-05)
     "plans": "mind.actor",

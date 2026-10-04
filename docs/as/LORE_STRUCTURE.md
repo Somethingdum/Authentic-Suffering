@@ -113,6 +113,10 @@ Anything a body can be put into: venom paralysis, shock, a fever, a broken mind.
 ### 2.5 Lore topic (`## <title> (lore: history | place | faction | infected | culture | rumour | tech | person)`)
 - *Truth* (one paragraph); *beliefs* (who, what, how sure); *who can know*; the entities it
   concerns.
+- (D-130) *What brings it to mind*: the words or short phrases people would use when talking about it
+  ("cure", "the Steward", "crying for help"), and the moments that bring it up unasked (a scream heard,
+  a bite seen, a body on the ground). A person who holds one of its beliefs remembers it when they hear
+  one of those words, see one of its entities, or live one of those moments — never otherwise.
 
 ### 2.6 Faction or group (`## <name> (faction)`)
 - *What they want* beneath *what they say they want*; *methods*; *what they will not do*.

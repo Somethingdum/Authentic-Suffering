@@ -10,6 +10,8 @@ beliefs:
   - {held_by: common, text: "Don't breathe near the dead, it's in the air around them.", confidence: 1}
 tags: [canon_cmg_42_16, infection, pathway_cold_start]
 entities: ["core:pathway/cold_start"]
+about: ["unbitten", "come back", "comes back", "came back", "put it down", "put them down", "burn the body"]
+when: [corpse_seen]
 ---
 The "in the air around them" belief is FALSE (Batch-2 ruling #5: no gaseous corpse transmission).
 It exists so that people can be wrong about it.

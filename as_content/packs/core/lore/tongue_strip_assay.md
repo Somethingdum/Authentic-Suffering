@@ -10,5 +10,6 @@ beliefs:
   - {held_by: common, text: "You can fool the strip if you rinse with whiskey first.", confidence: 1}
 tags: [canon_cmg_43_c, tech]
 entities: ["core:item/tongue_strip_assay"]
+about: ["strip", "strips", "tongue strip", "assay"]
 ---
 The whiskey belief is false.

@@ -22,7 +22,8 @@ def _sp(s):
 
 
 _PROV = {"witnessed": "you saw it", "overheard": "you overheard it", "common": "everyone says so",
-         "childhood": "since you were small", "rumour": "a rumour", "inferred": "your own guess"}
+         "childhood": "since you were small", "rumour": "a rumour", "inferred": "your own guess",
+         "group": "your people say so"}                                     # D-130
 
 
 def _age(ms):
@@ -313,6 +314,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         handles[f"E{i}"] = e["episode_id"]
         memories.append(MemoryLine(handle=f"E{i}", text=e["summary"], age_text=_age(at - e["at"])))
     lessons = [f"Experience taught you: {l['text']}" for l in R.lessons]
+    lore = [f"{r['text']} ({_PROV.get(r['provenance'], 'everyone says so')})" for r in R.lore]     # D-130 (LORE-03)
     refusal_rows = [{"request_summary": r["summary"], "created_at": r["created_at"], "requester_id": r["requester_id"]}
                     for r in R.refusals]
     task = None
@@ -405,7 +407,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         body_lines=_body_lines(tx, actor_id),
         resolve_cur=act["resolve_cur"], resolve_max=act["resolve_max"], position_text=position,
         perceived_now=perceived, utterances=utts, entities=entities, beliefs=beliefs, relationships=rel_lines,
-        memories=memories, lessons=lessons, open_loops=loops, refusals=[f"You refused: {r['request_summary']}." for r in refusal_rows],
+        memories=memories, lessons=lessons, lore=lore, open_loops=loops, refusals=[f"You refused: {r['request_summary']}." for r in refusal_rows],
         commitments=com, stakes=stakes, resources=resources,
         affordances=opts, uncertainty=unc, handles=handles, gestures=gests, attention_points=pts, hands_free=hf,
         unprocessed=[t for _tix, lines in unprocessed_raw for t in lines],
@@ -594,6 +596,8 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing=""):
             parts.append(t[:1].lower() + t[1:])
         people.append(AmbientPerson(handle=h, word=word_for(tx, actor_id, b), feeling="; ".join(x for x in parts if x)))
     name = _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (actor_id,))["display_name"]
+    from .retrieval import lore_lines
+    knows = [r["text"] for r in lore_lines(tx, actor_id, turn_index, at, min(2, tx.rules.packet.max_lore))]   # D-130
     return AmbientPacket(actor_id=actor_id, name=name, voice=voice, where=place_phrase(pl["name"]) if pl else "",
                          doing=doing, state=[x for x in _body_lines(tx, actor_id) if x != "Unhurt."][:3],
-                         reached=reached, said=said, people=people, handles=handles)
+                         reached=reached, said=said, knows=knows, people=people, handles=handles)

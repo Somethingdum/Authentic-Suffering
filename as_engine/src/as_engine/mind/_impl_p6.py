@@ -521,6 +521,8 @@ def retrieve(tx, holder_id, turn_index, at, *, max_beliefs, max_memories, max_lo
                    "acquired_at": r["acquired_at"], "score": score})
     bl.sort(key=lambda b: (-b["score"], b["claim_id"]))
     out.beliefs = bl[:max_beliefs]
+    from .retrieval import lore_lines
+    out.lore = lore_lines(tx, holder_id, turn_index, at, tx.rules.packet.max_lore)      # D-130
     # episodes
     eps = [dict(r, rowid=r["rowid"]) for r in tx.query("SELECT rowid, * FROM episodes WHERE holder_id=? AND decayed=0 AND quarantined=0", (holder_id,))]
     anchors = sorted([e for e in eps if e["anchor"]], key=lambda e: (-e["salience"], -e["at"], e["episode_id"]))[:2]

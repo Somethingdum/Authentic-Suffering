@@ -10,6 +10,8 @@ beliefs:
   - {held_by: "cohort:post_fall_born", text: "The Clean Clinics have a cure, but it's only for the Steward's people.", confidence: 1}
 tags: [canon_cmg_42_2, infection]
 entities: ["core:faction/mafia_remnants"]
+about: ["cure", "cured", "cures", "antidote", "medicine for it"]
+when: [bite_wound_seen]
 ---
 CMG §42.2 Absolute No-Cure Rule. This is canon, not "none known" — nothing in the engine may ever
 restore an infected person, including cheats' /revive of a truly infected body (it revives them

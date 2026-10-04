@@ -70,7 +70,7 @@ Validation (CNT-*), each error names file + field in plain language:
          depends_on). The message suggests the closest existing ref ("Did you mean ...?", difflib
          cutoff 0.8) when there is one.
   CNT-05 every cue referenced exists in some pack's cues.yaml: capability.trained_responses[].cue,
-         knowledge.cues, lore beliefs[].cues, affordance requires.belief_cues and
+         knowledge.cues, lore beliefs[].cues and (D-130) lore when[], affordance requires.belief_cues and
          requires.skill_or_belief_cue, quirk trigger_cue, pathway stages[].signs (P10).
   CNT-06 affordance.effect is in action.effects.EFFECT_IDS, and its label / ui_label use only the
          placeholders {target} {destination} {item} {distance} {duration}.
@@ -641,6 +641,9 @@ def load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:
                 for j, c in enumerate(b.cues):
                     if c not in cues:
                         err(p, rel, "CNT-05", f"beliefs[{i}].cues[{j}]", f"cue '{c}' is not in any cues.yaml.")
+            for j, c in enumerate(rec.when):                                   # D-130 (LORE-03)
+                if c not in cues:
+                    err(p, rel, "CNT-05", f"when[{j}]", f"cue '{c}' is not in any cues.yaml.")
         if kind == "affordance":
             if rec.effect not in EFFECT_IDS:
                 err(p, rel, "CNT-06", "effect", f"'{rec.id}' uses effect '{rec.effect}', which the engine does not have.")

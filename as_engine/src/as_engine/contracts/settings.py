@@ -256,6 +256,7 @@ class PacketRules(Strict):
     # [SAND] Actor Spec §5: 6000 deliberating, 4000 routine, 3000 a reaction, fixed text included
     token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 6000, "warm": 4000, "reaction": 3000})
     max_beliefs: int = 12
+    max_lore: int = 3               # D-130 (LORE-03): what people say about what is in front of you, at most
     max_memories: int = 6
     max_open_loops: int = 8
     max_recent_lines: int = 5

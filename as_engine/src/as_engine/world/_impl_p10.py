@@ -55,8 +55,27 @@ def actor_create(tx, body_id, dossier, source, at, turn_index, *, content_ref=No
           W("actors", {"actor_id": body_id, "dossier_id": did, "controller": mind_kind, "display_name": rec.identity.name,
                        "resolve_cur": rmax, "resolve_max": rmax, "stress": 0, "goal_text": goal, "lod_hint": "cold",
                        "accepted_authority": [], "quarantine": 0})]
-    return E(tx, EventType.MATERIALIZE, "mind.actor", at, turn_index, ws, {"actor_id": body_id, "source": source},
-             cause=cause_event_id, actor_id=body_id, target_ids=[body_id], origin=event_origin)
+    kind = tx.query_one("SELECT kind FROM bodies WHERE body_id=?", (body_id,))
+    if kind is not None and kind[0] == "human":                    # D-130 (LORE-02): what they grew up hearing
+        from ..mind._impl_lore import group_refs_of, lore_rows
+        ws += lore_rows(tx, body_id, rec.identity.cohort, group_refs_of(tx, body_id), at)
+    ev = E(tx, EventType.MATERIALIZE, "mind.actor", at, turn_index, ws, {"actor_id": body_id, "source": source},
+           cause=cause_event_id, actor_id=body_id, target_ids=[body_id], origin=event_origin)
+    # D-130: what their own card says they know (AFF-10, as the scenario loader seeds it)
+    cues = [c for c in (getattr(getattr(rec, "knowledge", None), "cues", None) or []) if _cue(tx, c) is not None]
+    if cues:
+        E(tx, EventType.LESSON_LEARNED, "mind.mind", at, turn_index, [
+            W("lessons", {"lesson_id": tx.mint("lsn"), "holder_id": body_id, "cue_tags": [c], "text": f"Knows: {_cue(tx, c).description}",
+                          "confidence": 3, "source_event": ev.event_id, "at": at}) for c in cues],
+          {"holder_id": body_id, "cues": cues, "seed": True}, actor_id=body_id, origin=event_origin)
+    return ev
+
+
+def _cue(tx, cue_id):
+    try:
+        return tx.canon.find("cue", cue_id)
+    except Exception:  # noqa: BLE001 — not a registry cue
+        return None
 
 
 # ------------------------------------------------------------------------------------------ population

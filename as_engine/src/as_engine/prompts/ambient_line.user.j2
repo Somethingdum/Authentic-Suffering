@@ -17,6 +17,13 @@ People you can see:
 - {{ p.handle }}: {{ p.word }}{{ " (" ~ p.feeling ~ ")" if p.feeling else "" }}
 {% endfor %}
 {% endif %}
+{% if ctx.knows %}
+
+What people say about this:
+{% for k in ctx.knows %}
+- {{ k }}
+{% endfor %}
+{% endif %}
 {% if ctx.said %}
 
 What you said last (never say it again):

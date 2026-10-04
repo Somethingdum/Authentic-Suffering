@@ -17,6 +17,8 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
                     (space.distance_to_point)
   gunshot_distant   the same, farther than 30 m
   glass_break / metal_crash   an auditory P of a NOISE whose payload.kind is that cue id
+  scream            (D-130) an auditory P of a NOISE whose payload.kind is 'screaming' (physical.bodies
+                    DOOM-04: the scream people make before they die)
   footsteps_close   an auditory P of a NOISE whose kind is a movement effect (move_to_anchor,
                     move_through_portal, follow_body, leave_place, flee) with its source within
                     5 m, from a body the holder has no visible P of this turn
@@ -54,8 +56,8 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
   bite_wound_seen   a sighting of a B with an unhealed wound of type 'bite';
   (stage signs)     every cue id in the ``signs`` of each stage physical.bodies.stages(B) returns
                     (content: fever_seen, spreader_signs, ...), for a sighting of that B.
-  Not detected before their phase (never present until then): scream, fire_seen, smoke_smell (no
-  fire or scream model yet); whisper_seen, sudden_silence (P7 observed_social); shift_change,
+  Not detected before their phase (never present until then): fire_seen, smoke_smell (no fire
+  model yet); whisper_seen, sudden_silence (P7 observed_social); shift_change,
   ration_cut (P9). Belief cues ('knows_*') are HELD, not present: mind.affordance reads them from
   lessons (AFF-10).
   F1a: plus appearance_cues(tx, holder_id, B, level, physical.space.point_distance(holder, B))

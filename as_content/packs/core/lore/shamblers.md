@@ -12,6 +12,8 @@ beliefs:
   - {held_by: "cohort:post_fall_born", text: "Walkers are sleepwalking people. Wake them up and they get angry.", confidence: 1}
 tags: [lore_v1_4, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_SHAMBLER01"]
+about: ["walker", "walkers", "shambler", "shamblers", "noise", "the wind"]
+when: [loud_noise]
 ---
 The smell belief is false (they are sound-led); it makes survivors waste effort on scent and not on
 noise discipline.

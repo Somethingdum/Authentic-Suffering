@@ -205,6 +205,8 @@ class SkullPacket(Strict):
     relationships: list[RelationshipLine] = Field(default_factory=list)
     memories: list[MemoryLine] = Field(default_factory=list)
     lessons: list[str] = Field(default_factory=list, description="'Experience taught you: …' lines (P6, MEM-15).")
+    lore: list[str] = Field(default_factory=list, description="D-130 (LORE-03): what people say about what is in front of "
+                            "them, as they hold it: '<text> (everyone says so)'.")
     open_loops: list[LoopLine] = Field(default_factory=list)
     refusals: list[str] = Field(default_factory=list)
     commitments: Commitments = Field(default_factory=Commitments)
@@ -511,6 +513,7 @@ class AmbientPacket(Strict):
     state: list[str] = Field(default_factory=list)   # how their body and mind are (max 3), or none
     reached: list[str]               # what has reached them since they last spoke, oldest first (max 4)
     said: list[str] = Field(default_factory=list)    # their own last lines (max 3): never say them again
+    knows: list[str] = Field(default_factory=list)   # D-130: what people say about what is in front of them (max 2)
     people: list[AmbientPerson] = Field(default_factory=list)
     handles: dict[str, str] = Field(default_factory=dict)
 

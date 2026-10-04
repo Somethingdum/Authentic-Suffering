@@ -11,6 +11,7 @@ beliefs:
   - {held_by: "core:faction/mafia_remnants", text: "Somebody with a lab and a budget made it. The family never cared who; it cared who'd be left paying.", confidence: 2}
 tags: [canon_cmg_42, history]
 entities: []
+about: ["the fall", "before the fall", "before-times", "the government", "how it started", "where it came from"]
 ---
 CMG §42.1 names Codex as responsible for the escape. AS has no narrator-god, so the escape's author
 is deliberately unassigned (DECISIONS I-AS-13). Keep it unknowable in play.

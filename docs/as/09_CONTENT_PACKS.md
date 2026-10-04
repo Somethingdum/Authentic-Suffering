@@ -322,6 +322,8 @@ beliefs:
   - {held_by: common, text: "A bite is a death sentence, full stop.", confidence: 3}
   - {held_by: "cohort:post_fall_born", text: "You can burn it out if you cut fast enough.", confidence: 2}
 tags: [infection, canon_cmg_42]
+about: ["bite", "bitten", "wet strain"]        # D-130: heard said, it comes to mind
+when: [bite_wound_seen, spreader_signs]         # D-130: these moments bring it to mind
 ---
 Long-form notes for humans and for on-demand depth (never loaded into a prompt by default).
 ```
@@ -330,7 +332,13 @@ Long-form notes for humans and for on-demand depth (never loaded into a prompt b
 (`held_by`: `common`, a faction ref, `cohort:<cohort>` or `region:<tag>`), seeded into their
 minds at world start with the stated confidence. A lore entry with no belief layer is an error
 (LORE-01). Lore is **queried**, never dumped into prompts: a mind receives a lore belief only if it
-holds it.
+holds it. (D-130) Everyone holds the `common` beliefs, their cohort's and their groups' factions'
+(LORE-02: table lore_held, written when the person is made; never a belief or a percept); a held
+belief comes to mind (LORE-03, at
+most three, under "What people say about this") when one of the entry's `about` words or phrases is
+heard said, one of its `entities` is seen (an infected of that kind, a member of that faction, that
+item), or one of its `when` cues is present. `region:<tag>` beliefs are held by nobody yet. A
+belief's `cues` are not given out by holding it (SPEC_ISSUES SI-006).
 
 ## 7. Items, affordances, laws, buildings, cascades
 

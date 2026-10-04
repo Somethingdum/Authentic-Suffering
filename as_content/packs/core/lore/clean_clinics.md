@@ -9,4 +9,5 @@ beliefs:
   - {held_by: common, text: "There's a nurse who'll see you at the back door at night if you're desperate. Don't say her name.", confidence: 1}
 tags: [canon_cmg_43_b, culture]
 entities: ["core:faction/mafia_remnants"]
+about: ["clinic", "clinics", "nurse", "a doctor"]
 ---

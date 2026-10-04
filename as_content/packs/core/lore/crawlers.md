@@ -9,4 +9,5 @@ beliefs:
   - {held_by: common, text: "A crawler's the one that gets you when you're watching the walkers.", confidence: 2}
 tags: [lore_v1_4, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_CRAWLER01"]
+about: ["crawler", "crawlers", "under the car"]
 ---

@@ -1,1 +1,19 @@
 {{ ctx.brief }}
+{% if ctx.fields.get("entities") %}
+
+The real people, places and threats (cite them by id):
+{% for e in ctx.fields.get("entities") %}
+- {{ e.id }}: {{ e.what }}
+{% endfor %}
+{% endif %}
+{% if ctx.fields.get("params") %}
+
+The world's conditions (cite them by name; each is a level):
+{% for k, v in ctx.fields.get("params") | dictsort %}
+- {{ k }}: {{ v }}
+{% endfor %}
+{% endif %}
+{% if ctx.fields.get("error") %}
+
+Your last answer was refused: {{ ctx.fields.get("error") }}
+{% endif %}

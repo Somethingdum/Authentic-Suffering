@@ -11,5 +11,7 @@ beliefs:
   - {held_by: "core:faction/mafia_remnants", text: "They hit the leaders first. Change your routes and your guards every week.", confidence: 3}
 tags: [lore_v1_4, canon_cmg_42_19, infected]
 entities: ["core:infected/ZOMBIE_VARIANT_ID_LURKER01", "core:pathway/lurker_deep"]
+about: ["lurker", "lurkers", "crying for help", "scratches", "piled bones"]
+when: [territory_marking]
 ---
 "Bitten twice" is false; nobody in-world knows how a person becomes a Lurker.

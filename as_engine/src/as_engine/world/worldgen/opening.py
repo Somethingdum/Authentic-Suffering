@@ -72,7 +72,11 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     'place': start place name, 'zone': zone name, 'entities': [{'id', 'what'}] for the contacts, the
     threat bodies (or the trace for lurker signs), the magnets and the home settlement, 'params':
     {name: value} for the A and B blocks, 'placement': placement.model_dump(), 'budgets':
-    tables.OPENING_BUDGETS}); the answer validates as OpeningPressure after QC-5 trims each text to
+    tables.OPENING_BUDGETS}) — (D-131) the user prompt shows them: after the brief, 'The real people,
+    places and threats (cite them by id):' and '- <id>: <what>' per entity; 'The world's conditions
+    (cite them by name; each is a level):' and '- <name>: <value>' per param in name order; on the
+    retry 'Your last answer was refused: <error>' (it asked for citations of a list it never showed,
+    so every opening was code's); the answer validates as OpeningPressure after QC-5 trims each text to
     its budget at a word boundary. QC-4: cites_entity_ids non-empty and all among the listed ids,
     cites_params non-empty and all A/B names. Failing -> one more call with fields['error'] = the
     problem; failing again -> fallback_opening(...) (code; qc patch "QC-4: opening written by code").

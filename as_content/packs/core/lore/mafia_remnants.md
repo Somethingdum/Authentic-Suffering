@@ -11,4 +11,5 @@ beliefs:
   - {held_by: "core:faction/mafia_remnants", text: "Without us, this region starves in a winter. Everybody knows it, even the ones who spit.", confidence: 3}
 tags: [canon_cmg_43_b, faction]
 entities: ["core:faction/mafia_remnants"]
+about: ["remnants", "the steward", "the family", "the market", "the trucks", "borrow", "borrowed"]
 ---
