@@ -179,6 +179,8 @@ Fields (second person, plain English):
                     f'You refused: {request_summary}.'
   commitments       current_task: the actor's task named by actors.current_task, else its first
                     'active' task by started_at -> f'{label} ({steps_done} of {steps_total} done)';
+                    (D-118) none -> the paused task keep_working would name -> f'{label} ({steps_done}
+                    of {steps_total} done, put down for now)' — interrupted work is not forgotten;
                     plan_step = plans.steps[0] when the plans row has steps; standing_orders =
                     f'On {trigger with _ as spaces}: {response}.' per plans.standing_orders entry
                     ('On loud noise: find the source and cover it.'); deadline = None (P6+).

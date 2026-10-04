@@ -26,6 +26,9 @@ resume(tx, task_id, at, cause_event_id, turn_index) -> Event
   actor: resuming pauses any other active one first.
 interrupt(tx, task_id, cause_event_id, at, turn_index) = pause (the cascade name for it).
 active_task(store, actor_id) -> dict | None   the active row (first by started_at, task_id).
+put_down(store, actor_id) -> dict | None   (D-118) the work they put down last: the 'paused' row with the
+  latest started_at, then the highest task_id; None when nothing is paused. mind.affordance offers
+  keep_working for it and action.effects continue_task resumes it when nothing is active.
 """
 
 from __future__ import annotations
@@ -61,4 +64,8 @@ def interrupt(tx: "Tx", task_id: str, cause_event_id: str | None, at: int, turn_
 
 def active_task(store: "Store | Tx", actor_id: str) -> dict | None:
     raise NotImplementedError("P5")
-from ._impl_p5a import start, advance, pause, resume, interrupt, active_task  # noqa
+
+
+def put_down(store: "Store | Tx", actor_id: str) -> dict | None:
+    raise NotImplementedError("D-118")
+from ._impl_p5a import start, advance, pause, resume, interrupt, active_task, put_down  # noqa

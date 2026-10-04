@@ -386,6 +386,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p04_one_actor/test_conversation_thread.py` | THREAD-01: a question put to her hangs until she answers, a demand does not; her own lines in order among what she heard; a speaker never hears herself; this turn's words are utterances, not the thread, and nothing later than the moment reaches it; the window (30 minutes, a rule) and the room (she left and came back: what was said before is gone; a step within the room is not an arrival); only the last few lines, the speaker as a handle, never an id. THREAD-02: the heading and lines in the prompt between where she is and what reaches her; over budget the oldest line goes first, after memories and lessons. SEL-03 `owed_answer`: a question left hanging keeps her in the moment until she answers; the one who asked owes nothing; a flag the weights do not name counts nothing |
 | `p07_slice/test_what_was_said.py` | DOS-05 through whole turns: Mara's "Quiet." and June's "What was that?" become their voice lines, each naming its utterance, and Mara knows what she said; the silent have none. THREAD-01 the next turn: Alice has both lines in the order said, Mara her own first, June hers |
 
+### 3.32 Work put down can be taken up again (P5; D-118)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_picking_up_work.py` | After CAS-014 pauses June's count, `put_down` names it, the menu offers "Keep going" for it by its label and her commitments say it is put down; keeping working resumes it from where it stood (never from zero) and counts on; finished work is never offered again |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

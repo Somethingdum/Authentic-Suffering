@@ -1300,7 +1300,11 @@ def h_hold(tx, rng, intent, land_at, ctx, d):
 
 
 def h_continue(tx, rng, intent, land_at, ctx, d):
-    from .tasks import active_task, advance
+    from .tasks import active_task, advance, put_down, resume
+    if active_task(tx, intent.actor_id) is None:          # D-118: take up the work put down last
+        put = put_down(tx, intent.actor_id)
+        if put is not None:
+            resume(tx, put["task_id"], land_at, None, ctx.turn_index)
     advance(tx, intent.actor_id, ctx.horizon_ms, ctx.turn_index)
     t = _row(tx, "SELECT status FROM tasks WHERE actor_id=? ORDER BY started_at DESC, task_id DESC LIMIT 1", (intent.actor_id,))
     _noise(tx, intent, "continue_task", d.noise_db, land_at, ctx)

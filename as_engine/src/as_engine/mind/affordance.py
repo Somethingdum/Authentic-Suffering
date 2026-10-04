@@ -208,7 +208,10 @@ enumerate it too, one option per combination (then capped by the selection rules
                        age_years >= 18 (CNT-11: never anyone younger, nor a body of unknown age)
   bandage/tourniquet/suture/clean/pressure  wound (own, or of a body within touch) x the carried
                        medical item whose tags match (pressure needs no item)
-  keep_working         only when the actor has an active task; {target} = the task label
+  keep_working         only when the actor has an active task — or (D-118) none active but a paused one:
+                       the paused task with the latest started_at (then the highest task_id), the work
+                       they put down last (CAS-014 pauses a task when they start anything else; without
+                       this it could never be taken up again); {target} = that task's label
   surrender            only when a threat was perceived this turn (nobody gives up to an empty room)
   flee_threat          body = each threat this turn (A THREAT above)
   shield_dependent     only when a threat was perceived this turn; body = each known body that is

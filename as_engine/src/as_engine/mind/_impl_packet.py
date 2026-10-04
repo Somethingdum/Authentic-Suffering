@@ -320,10 +320,16 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         task = _row(tx, "SELECT * FROM tasks WHERE task_id=?", (act["current_task"],))
     if task is None:
         task = _row(tx, "SELECT * FROM tasks WHERE actor_id=? AND status='active' ORDER BY started_at, task_id", (actor_id,))
+    put_down = False
+    if task is None:                                   # D-118: the work put down last is still theirs to pick up
+        from ..action.tasks import put_down
+        task = put_down(tx, actor_id)
+        put_down = task is not None
     plan = _row(tx, "SELECT * FROM plans WHERE actor_id=?", (actor_id,))
     steps = json.loads(plan["steps"]) if plan else []
     orders = json.loads(plan["standing_orders"]) if plan else []
-    com = Commitments(current_task=f"{task['label']} ({task['steps_done']} of {task['steps_total']} done)" if task else None,
+    com = Commitments(current_task=(f"{task['label']} ({task['steps_done']} of {task['steps_total']} done"
+                                    + (", put down for now)" if put_down else ")")) if task else None,
                       plan_step=steps[0] if steps else None,
                       standing_orders=[f"On {_sp(o['trigger'])}: {o['response']}." for o in orders])
     deps = []

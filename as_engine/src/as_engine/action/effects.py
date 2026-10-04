@@ -235,7 +235,10 @@ Per effect (result strings in quotes; 'done' unless noted):
   observe / wait / guard / sleep / rest   condition-ended: land at T with result 'holding';
                      sleep -> bodies.posture_event('lying', awareness='asleep'); rest ->
                      posture_event('sitting').
-  continue_task      action.tasks.advance(actor, horizon) inside the landing; result 'working'.
+  continue_task      (D-118) no active task but a paused one (the same task the menu named) ->
+                     action.tasks.resume(tx, it, land_at, None, turn_index) first — it goes on from
+                     where it stood (TASK-02, CAS-014); then action.tasks.advance(actor, horizon)
+                     inside the landing; result 'working'.
   speak              the SPEECH was committed by the resolver at T; result 'said'.
   calm_person        C + persuasion check vs target.attr_mod.I; success -> mind.actor.adjust_stress
                      (target, -2 CLEAN / -1 COST); BREAK -> +1.

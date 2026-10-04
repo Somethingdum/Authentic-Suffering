@@ -376,3 +376,9 @@ def _own_names(tx, holder_id):
         return set()
     names = {d.identity.name.split()[0].lower()} | {a.split()[0].lower() for a in d.identity.aliases}
     return names
+
+
+def put_down(store, actor_id):
+    r = store.query_one("SELECT * FROM tasks WHERE actor_id=? AND status='paused' ORDER BY started_at DESC, task_id DESC "
+                        "LIMIT 1", (actor_id,))
+    return dict(r) if r is not None else None

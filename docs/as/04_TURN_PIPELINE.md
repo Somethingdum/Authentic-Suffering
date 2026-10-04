@@ -293,7 +293,7 @@ Asserted by `test_p07_slice_metal_fence.py` unless noted.
 | 6 | scripted: Mara "Quiet." + take cover at the rear shelving; June "What was that?" (raised) + go and look toward the back door; Alice watches the storeroom door; Nita hides at the dumpster; the stranger runs to the tall weeds (Eli waits: the fake's default) |
 | 8 | the stranger's run lands at +0.9 s; Mara's, June's and Nita's moves land after the window (queued `ACTION_LAND`) |
 | 9 | Mara's "Quiet." reaches June as a voice only (TONE_ONLY); June's call reaches Nita PARTIAL ("What … that?"), Mara PARTIAL, the stranger TONE_ONLY |
-| 10 | June's and Alice's tasks pause (`CAS-014` cited) |
+| 10 | June's and Alice's tasks pause (`CAS-014` cited) — put down where they stood; "Keep going" picks them up again later (D-118) |
 | 11 | Nita alone sees an unknown man run to the weeds within 20 m — material → wave 1 at the run + 150–250 ms: she keeps hiding (same choice, the hide carries on); no wave 2 |
 | 12 | clock → t0 + 3 s; 58 bits all 1; commit |
 | 13–14 | Nita alone writes "someone was watching the back and ran when June shouted", and infers "The thin man ran because June shouted." from a half-heard call — confidence 2, fidelity partial; nobody else can know it |

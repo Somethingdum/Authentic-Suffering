@@ -116,7 +116,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-011 | A broken promise costs trust with the person it was made to and leaves them a grievance they carry. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/mind.py`, `as_engine/mind/promise.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p06_memory/test_mind.py` |
 | CAS-012 | Whoever saw someone take what they know belongs to another now carries it as a rumour, and talk spreads it from them. | as_content/packs/core/cascade/people.yaml | `as_engine/world/rumours.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_theft_seen.py` |
 | CAS-013 | A death off-screen leaves a corpse where it happened and a rumour among the people who would hear of it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/propagate.py`, `as_engine/world/rumours.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p10_world/test_world_day.py` |
-| CAS-014 | Starting a different action while in the middle of a counted task pauses the task where it stands instead of resetting it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/tasks.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p05_many_actors/test_tasks.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| CAS-014 | Starting a different action while in the middle of a counted task pauses the task where it stands instead of resetting it. | as_content/packs/core/cascade/people.yaml | `as_engine/action/effects.py`, `as_engine/action/tasks.py`, `as_engine/mind/affordance.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p05_many_actors/test_picking_up_work.py`, `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p05_many_actors/test_tasks.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | CAS-015 | A bite wound seen by a settlement member brings the contamination law into force for the bitten person. | as_content/packs/core/cascade/people.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-016 | A kitchen cycle that leaves the settlement with under three days of food declares a food shortage. | as_content/packs/core/cascade/economy.yaml | `as_content/packs/core/cascade/economy.yaml` | — |
 | CAS-017 | A food shortage cuts the settlement's ration level by one step. | as_content/packs/core/cascade/economy.yaml | `as_content/packs/core/cascade/economy.yaml` | — |
@@ -1126,7 +1126,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | TASK-01 | *Rules TASK-01..03, CROWD-04.* | as_engine/action/tasks.py | `as_engine/action/tasks.py` | `contract/p05_many_actors/test_tasks.py` |
-| TASK-02 | *Rules TASK-01..03, CROWD-04.* | as_engine/action/tasks.py | `as_engine/action/tasks.py` | `contract/p05_many_actors/test_tasks.py` |
+| TASK-02 | *where it stood (TASK-02, CAS-014); then action.tasks.advance(actor, horizon)* | as_engine/action/effects.py | `as_engine/action/effects.py`, `as_engine/action/tasks.py` | `contract/p05_many_actors/test_picking_up_work.py`, `contract/p05_many_actors/test_tasks.py` |
 
 ## TELEPATHY
 

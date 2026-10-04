@@ -101,6 +101,8 @@ def _ctx(tx, actor_id, at, turn_index):
         if k == "infected" or attacked:
             c.threats.append(b)
     c.task = _row(tx, "SELECT * FROM tasks WHERE actor_id=? AND status='active' ORDER BY task_id LIMIT 1", (actor_id,))
+    from ..action.tasks import put_down
+    c.put_down = None if c.task else put_down(tx, actor_id)     # D-118: work put down can be taken up again
     hh = [r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (actor_id,))]
     c.household = {r[0] for r in tx.query(f"SELECT actor_id FROM household_members WHERE household_id IN ({','.join('?'*len(hh))})", hh)} - {actor_id} if hh else set()
     c.guardian_of = set()
@@ -160,7 +162,7 @@ def _bindings(c, d):
     eff = d.effect
     out = []
     if b in ("none", "self"):
-        if d.id == "keep_working" and not c.task:
+        if d.id == "keep_working" and not (c.task or c.put_down):
             return []
         if d.id == "surrender" and not c.threats:
             return []
@@ -535,8 +537,8 @@ def _label(c, d, o, tmpl, ui):
     P = c.P
     t = o.get("target_id")
     parts = {}
-    if d.id == "keep_working" and c.task:
-        parts["target"] = c.task["label"]
+    if d.id == "keep_working" and (c.task or c.put_down):
+        parts["target"] = (c.task or c.put_down)["label"]
     elif t is None and getattr(d.binds, "value", d.binds) == "speech":
         parts["target"] = "anyone who can hear"
     elif t and t.startswith("act_"):
