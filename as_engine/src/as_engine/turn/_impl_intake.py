@@ -215,13 +215,23 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         it = _speech_intent(pkt, aff, " ".join(q.strip() for q in quotes), addressee, lod)
         info["addressee"] = addressee
     else:
-        ctx = IntakeContext(packet=pkt, player_text=text, quoted_speech=quotes)
-        req = build_request(session.config, CallClass.INTAKE, turn_index=turn_index, actor_id=pc, context=ctx,
-                            json_schema=intake_schema([a.handle for a in pkt.affordances]), ctx=ctx)
-        resp = await session.client.call(req, IntakeOutput)
-        if resp.parse_status != "ok":
-            raise Rejected("intake_failed", "That didn't come through clearly. Try saying it another way.")
-        out = IntakeOutput.model_validate(resp.parsed)
+        async def ask(packet):
+            ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes)
+            req = build_request(session.config, CallClass.INTAKE, turn_index=turn_index, actor_id=pc, context=ctx,
+                                json_schema=intake_schema([a.handle for a in packet.affordances]), ctx=ctx)
+            resp = await session.client.call(req, IntakeOutput)
+            if resp.parse_status != "ok":
+                raise Rejected("intake_failed", "That didn't come through clearly. Try saying it another way.")
+            return IntakeOutput.model_validate(resp.parsed)
+        out = await ask(pkt)
+        if out.choice == "NONE" and (out.none_reason or "unclear") != "not_an_action":
+            # INTAKE-07 (D-121): the menu is a short first list; the player may mean anything the PC could do
+            shown = {o.signature for o in aff.options}
+            rest = [o for o in (aff.pool or []) if o.signature not in shown]
+            if rest:
+                from ..mind.consult import Consulted
+                pkt = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0, consulted=Consulted("more_actions", [], rest))
+                out = await ask(pkt)
         if out.choice == "NONE":
             code = out.none_reason or "unclear"
             raise Rejected(code, NONE_MESSAGES[code], out.clarify)

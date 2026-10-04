@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-755 ids; 501 with their own statement, 254 named only in context.
+756 ids; 502 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -39,7 +39,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_temper_in_packet.py` |
+| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/turn/intake.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p05_many_actors/test_temper_in_packet.py`, `contract/p07_slice/test_the_second_look.py` |
 | AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *Belief cues (AFF-10): a cue is HELD by an actor when a lessons row for that holder carries the cue* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
@@ -638,6 +638,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTAKE-04 | INTAKE-04 (4) mode 'say': words = the text; with settings.pc_voice == 'my_way' one SAY_MY_WAY call (lanes.requests.build_request(config, SAY_MY_WAY, turn_index = T, actor_id = the PC, context and ctx = SayMyWayContext(p… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-05 | INTAKE-05 (5) mode 'do': quotes = lanes.parse.extract_quotes(text); rest = the text with every quoted span ("…" or “…”) replaced by ' ', stripped; addressee = addressee_for(...) — ALWAYS called here, before anything els… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-06 | INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time passes and the input is not consumed (the player can rephrase). | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
+| INTAKE-07 | INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the call answers 'NONE' with a none_… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_second_look.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
 
 ## INTENT
 

@@ -1,4 +1,4 @@
-"""Stage 1: the player's input becomes the PC's intent (P7). Rules INTAKE-01..06, PARSE-05, SYM-02,
+"""Stage 1: the player's input becomes the PC's intent (P7). Rules INTAKE-01..07, PARSE-05, SYM-02,
 L12, S03, ECHO-01. docs/as/04_TURN_PIPELINE.md §2.
 
 The PC's intent is built exactly like an Actor's: from the PC's own packet and AffordanceSet
@@ -53,10 +53,11 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      quoted span ("…" or “…”) replaced by ' ', stripped; addressee = addressee_for(...) — ALWAYS
      called here, before anything else, so a replay's forced_addressee is consumed on every 'do'
      turn. Quotes and no ASCII letter ([A-Za-z]) left in rest -> a speech intent with the quotes
-     joined by ' ' (each stripped) to that addressee, info['addressee'] = addressee. Otherwise ONE
+     joined by ' ' (each stripped) to that addressee, info['addressee'] = addressee. Otherwise the
      INTAKE call (build_request(config, INTAKE, turn_index = T, actor_id = the PC, context and ctx =
      IntakeContext(packet, player_text = text, quoted_speech = quotes), json_schema =
-     lanes.schemas.intake_schema(the packet's affordance handles)), output IntakeOutput):
+     lanes.schemas.intake_schema(the packet's affordance handles)), output IntakeOutput) — at most
+     two (INTAKE-07):
        parse_status != 'ok' -> Rejected('intake_failed', "That didn't come through clearly. Try
          saying it another way.");
        choice 'NONE' -> Rejected(none_reason or 'unclear', NONE_MESSAGES[that code],
@@ -73,6 +74,15 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      "Continue: …"). record_pc_input(text); record_input(mode, text, {signature, addressee:
      info['addressee']}) (None for a do without speech).
   "mode" in record_input is 'do' when the text came from a remainder chip, else submit.mode.
+  INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding
+     (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the
+     call answers 'NONE' with a none_reason other than 'not_an_action' and aff.pool holds options
+     that aff.options does not (by signature), the packet is rebuilt with them appended in pool
+     order — build_packet(tx, pc, LOD.WARM, aff, turn_index, t0, consulted =
+     mind.consult.Consulted('more_actions', [], those options)): the first handles keep their
+     meaning, the rest are A{n+1}.. — and ONE more INTAKE call is made with it; its answer is the
+     answer (a 'NONE' there is the rejection, with its reason and clarify). Nothing more to show,
+     or 'not_an_action': no second call.
   INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time
   passes and the input is not consumed (the player can rephrase).
 

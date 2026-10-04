@@ -74,7 +74,7 @@ async def test_a_rejected_move_changes_nothing(svc, make_run, gated):
     await loaded(svc, make_run)
     before = world(svc)
     gated.script(CallClass.INTAKE, {"choice": "NONE", "none_reason": "impossible", "manner": "", "remainder": None,
-                                    "clarify": "Do you want to climb the fence instead?"})
+                                    "clarify": "Do you want to climb the fence instead?"}, times=2)   # INTAKE-07: both looks
     start = len(svc.pushed)
     await send(svc, "turn_submit", mode="do", text="I fly over the fence.")
     await svc.idle()

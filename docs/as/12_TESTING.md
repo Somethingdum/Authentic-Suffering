@@ -404,6 +404,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_seen_before_swept.py` | Through whole turns, not hand-granted percepts: Owen takes Dale's jerky from the stall and June, who saw it and knows whose it is, carries it out of the turn (CAS-012 found her in S10) — Nita, who saw it too, does not; Alice, cut by Owen before the moment, bleeds out as it ends (S12) in the light, Mara sees her go down, is strained by it (CAS-019), trusts Owen 2 less and carries the story (CAS-025). Off-screen (`run_offscreen`) her death is swept too: Owen carries it (CAS-026), and nobody is strained by seeing it, because nobody perceives off-screen |
 
+### 3.35 The second look (P7; D-121)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_second_look.py` | INTAKE-07 at the Night at Delgado's: "I lie down and sleep" — the first menu has no room for sleep and the intake says NONE; the second look has the same first handles, then the rest of what Owen could do, sleep among them, and he lies down. Still nothing on the second look is the rejection (two calls); words that are not an action get no second look (one call) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

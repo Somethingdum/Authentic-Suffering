@@ -74,7 +74,12 @@ nothing on the turn's bar. Under each bar, one rotating line about the step (con
 | **Ask** | GUIDE (lane B), answered by `service/guide.py` in P8 from the play view the player already sees plus plain rules text — **not a turn**: no event, no time passes; only the call log and two story entries are written (PROTO-07, GUIDE-01..03) | Yes |
 | Contains `2508` / starts with `/` after activation | cheats (P12, routed by the service; see CHEATS.md) | Maybe |
 
-INTAKE `choice = NONE` ends the request with `turn_rejected` (reason code + a plain message built
+The PC's menu is a short first list ranked for a mind deciding in the moment (24 options, AFF-07);
+the player may mean anything the PC could do. So a first `NONE` (unless the words are not an action)
+gets **one second look** (INTAKE-07, D-121): the same call again with everything else the PC could
+do appended to the menu, the first handles unchanged. A miss costs one more Clerk call; a hit costs
+nothing extra.
+INTAKE `choice = NONE` (on the second look, when there was one) ends the request with `turn_rejected` (reason code + a plain message built
 by code, e.g. `not_holding` → "You're not holding that.", plus the model's clarifying question when
 it asked one) — **the input is not consumed and no time passes**. `remainder` becomes the first
 suggestion next turn ("Continue: grab the can"). The exact messages and the recorded
