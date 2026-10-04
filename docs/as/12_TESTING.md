@@ -470,6 +470,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_the_writer_sees_the_world.py` | Read from the prompts the Writer was sent, not the fields beside them: the history call lists every event it must answer for, by id; a person is written knowing the day since the Fall, what their generation remembers, the sketch that makes them who they are, what happened here and what everyone (and their generation) says — a child born after the Fall hears "Walkers are sleepwalking people", not what the old say; the opening call lists every entity it may cite by id and every condition by name |
 
+### 3.46 Putting down the dead is not hurting anyone (P9; D-132)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_putting_down_the_dead.py` | June is dead; a minute later Alice destroys her head, as everyone must: no attacker, no onlookers of an assault, no grudge for Mara who loved her, no rumour, no lost trust; no anger at Alice and no 'bonded_hurt' for Mara. The blow that kills still lands on someone alive |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

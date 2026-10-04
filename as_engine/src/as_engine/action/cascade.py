@@ -264,7 +264,9 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     true when no DEATH committed before this one has the same trigger.killer, false otherwise,
     missing when there is no killer; body(<path>).<column> — a bodies column (age_years, kind, ...),
     (D-126) trigger.attacker — for a HARM: its actor (payload actor_id, else the event's), when that and
-    the one hurt both have actors rows and differ; otherwise missing — and trigger.attacker_provoked —
+    the one hurt both have actors rows and differ, and (D-132) the one hurt was not already dead when it
+    landed (bodies.dead_at earlier than the HARM: the dead put down — head, or fire, as everyone must,
+    lore cold_start — is no one hurt); otherwise missing — and trigger.attacker_provoked —
     true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the

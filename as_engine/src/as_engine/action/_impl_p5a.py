@@ -191,6 +191,12 @@ def adjust_stress(tx, actor_id, delta, cause_event_id, at, turn_index):
 _MOVE_EFFECTS = {"move_to_anchor", "move_through_portal", "follow_body", "leave_place", "flee"}
 
 
+def _alive_at(tx, body_id, at):
+    """D-132: the body was alive when it happened (the dead put down are no one hurt and in no danger)."""
+    r = tx.query_one("SELECT dead_at FROM bodies WHERE body_id=?", (body_id,))
+    return r is None or r[0] is None or r[0] >= at
+
+
 def _ev(tx, eid):
     if not eid or str(eid).startswith("scene:"):
         return None
@@ -281,11 +287,12 @@ def cues_of(tx, holder_id, turn_index, at):
                 w = _row(tx, "SELECT severity FROM wounds WHERE wound_id=?", (pl.get("wound_id"),))
                 if w and w["severity"] in ("severe", "catastrophic"):
                     out.add("blood_seen")
-                if pl.get("body_id") in bonded:
+                if pl.get("body_id") in bonded and _alive_at(tx, pl["body_id"], ev["at"]):
                     out.add("bonded_hurt")
-                if pl.get("body_id") in guard_of:
+                if pl.get("body_id") in guard_of and _alive_at(tx, pl["body_id"], ev["at"]):
                     out.add("dependent_in_danger")
-            if ev["type"] == "ACTION_START" and pl.get("verb") == "attack" and pl.get("target_id") in guard_of:
+            if ev["type"] == "ACTION_START" and pl.get("verb") == "attack" and pl.get("target_id") in guard_of \
+                    and _alive_at(tx, pl["target_id"], ev["at"]):
                 out.add("dependent_in_danger")
             if ev["type"] == "PORTAL_CHANGE" and "damage" in pl.get("changes", {}):
                 out.add("door_forced")

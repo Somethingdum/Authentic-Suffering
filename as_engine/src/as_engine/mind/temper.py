@@ -42,7 +42,9 @@ TEMPER-03 provocations(tx, holder_id, turn_index, at) -> list[Provocation]: read
                    INSULT_WORDS as whole words (case-insensitive) — a hint, never proof of motive
                    (Actor Spec §10); how the person reads it later (writeback) is what lasts
     harmed_bonded  a visual percept of a HARM (its source is the one hurt) whose payload body_id is
-                   a body the holder has affection >= 2 toward (relationships from the holder) and
+                   a body the holder has affection >= 2 toward (relationships from the holder), alive
+                   when it landed (D-132: bodies.dead_at NULL or not before the HARM — the dead put
+                   down, as everyone must, are no one hurt), and
                    whose payload actor_id is set, is not the holder, and is the source of a visual
                    percept of the holder in the same window (it saw who did it): toward_id = that
                    actor_id
@@ -301,7 +303,10 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
             who = pl.get("actor_id")
             if (pl.get("body_id") and rels.get(pl["body_id"], 0) >= 2 and who and who != holder_id
                     and who in seen_sources):
-                add(who, "harmed_bonded", eid)
+                at_ = tx.query_one("SELECT at FROM events WHERE event_id=?", (eid,))[0]
+                dead = tx.query_one("SELECT dead_at FROM bodies WHERE body_id=?", (pl["body_id"],))
+                if dead is None or dead[0] is None or dead[0] >= at_:      # D-132: the dead put down are no one hurt
+                    add(who, "harmed_bonded", eid)
         if ch == "visual" and typ == "ITEM_TRANSFER" and human_src:
             item = pl.get("item_id")
             owners = [r[0] for r in tx.query(

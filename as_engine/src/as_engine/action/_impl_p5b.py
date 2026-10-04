@@ -720,6 +720,9 @@ def _assault(tx, trig):
     if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (attacker,)) is None or \
             tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (victim,)) is None:
         return None
+    dead = tx.query_one("SELECT dead_at FROM bodies WHERE body_id=?", (victim,))
+    if dead is not None and dead[0] is not None and dead[0] < trig.at:
+        return None                     # D-132: the dead put down — as everyone must — is no one hurt
     return attacker, _was_fighting(tx, victim, trig.at)
 
 

@@ -42,9 +42,11 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
   door_forced       an auditory P of a NOISE with kind 'force_portal', or a visual P of a
                     PORTAL_CHANGE whose changes include damage
   bonded_hurt       a visible P of a HARM on a body the holder has affection >= 2 toward or shares
-                    a household with
+                    a household with — (D-132) alive when it landed (bodies.dead_at NULL or not
+                    before the event): the dead put down are no one hurt and in no danger
   dependent_in_danger  bonded_hurt or threat_seen where the body concerned (harmed / targeted /
-                    within 5 m of the threat) is one the holder is guardian_of
+                    within 5 m of the threat) is one the holder is guardian_of (harmed / targeted:
+                    alive when it happened, as above)
   stranger_approaching  a visible P of a MOVE, inside the holder's place, by a body with no
                     acquaintance known_name for the holder, whose to-point is closer to the holder
                     than its from_anchor's point (no from_anchor -> not detected)
