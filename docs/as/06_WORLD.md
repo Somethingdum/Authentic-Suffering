@@ -225,6 +225,14 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   group day re-checks anyone within one of their threshold, at most every 3 days.
 - **Standing** — the group's memory of a person (−5..+5) — lives in `group_standing`; laws and,
   from P10, deeds move it; it feeds trade and pressure.
+- **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
+  killer the trust of everyone who saw who fell and who did it (−3), makes them afraid of the
+  killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later
+  believes the teller trusts the killer 2 less. Each of the dead's groups with an onlooker among
+  its members gives the killer 2 less standing, even one of their own. The killer carries it
+  (stress +2) whether anyone saw or not. A figure going down in the dark names nobody; self-defence
+  and defending someone else cost nothing beyond the death; the player's character is never made to
+  feel anything about it (C06).
 - Leadership challenges, splintering, coalitions, reconciliation and **faction doctrine** (rules
   of engagement for organised force) would ride on the same tension and pressure numbers; they are
   backlog, not v1 (DECISIONS D-49). P10 brings leaving a group (§3: people who meant to leave go).

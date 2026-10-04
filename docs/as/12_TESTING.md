@@ -392,6 +392,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_picking_up_work.py` | After CAS-014 pauses June's count, `put_down` names it, the menu offers "Keep going" for it by its label and her commitments say it is put down; keeping working resumes it from where it stood (never from zero) and counts on; finished work is never offered again |
 
+### 3.33 A killing seen (P9; D-119)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_killing_seen.py` | With the lights on, Owen kills Alice in front of Mara, all three of Delgado's crew: `trigger.killer` is Owen; the onlookers are Mara alone (never the killer, the dead or June in the back) and the crew is the group that saw; CAS-025 — Mara trusts him 3 less, fears him 2 more, holds a fear of him and carries the story; CAS-026 — he carries it (stress +2); CAS-027 — the crew's standing for him drops by 2. CAS-028: told by Mara, Eli (who trusts her) believes it and trusts Owen 2 less; Nita (who does not) changes nothing. In the dark Mara sees a figure go down: nobody is an onlooker, no group saw, nothing changes but his own stress. Self-defence and stopping her going for Mara: `killer_provoked`, nothing follows. Mara kills Alice in front of Owen: nothing is written into the player's character (C06). No killer — a death with no cause, or the cold after he hit her — is not a killing; the rumour's words |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

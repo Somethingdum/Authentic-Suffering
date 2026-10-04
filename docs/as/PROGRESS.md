@@ -142,6 +142,14 @@ do nothing.
    they arrived, as they heard them, their own among them — and knows when a question put to them is still
    hanging (and is given a moment to answer it). Building it found a bug: nothing ever saved what people said, so nobody saw their own last
    words; fixed. Still to come: people starting topics themselves, interrupting, changing the subject.
+12. **A killing seen** — built while you were away (D-119, your "kill one of my squad mates for the hell of
+   it, in front of everybody"): whoever saw it — saw who fell and who did it — stops trusting the killer,
+   is afraid of them and tells it; whoever believes the telling trusts them less; the crew that saw thinks
+   less of them, even one of its own; the killer carries it whether anyone saw or not. In the dark nobody
+   can say who; self-defence and stopping someone hurting another cost nothing more; your own character
+   is never told how to feel about one. **Your call**: should settlements have a law against killing (a
+   cost on the option for whoever knows the law, and the settlement's answer)? That changes what worldgen
+   writes, so it waits for your word.
 
 ## Notes (builder)
 

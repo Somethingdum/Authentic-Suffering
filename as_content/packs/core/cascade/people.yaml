@@ -139,3 +139,70 @@
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
   delay_s: 0
   cites: [SOC-03, INFO-02]
+# D-119 — a killing seen (the owner: "What happens if I say, kill one of my squad mates for the hell of it, in
+# front of everybody? ... there better be some Authentic Suffering in there when I do."). Only a killing of
+# someone who was not fighting the killer (trigger.killer_provoked == false; no killer — the dead, a fall, the
+# cold — never matches). Seeing a death already strains everyone (CAS-019), and whoever loved the dead holds a
+# grudge (H1, TEMPER); these are what the killing itself costs.
+- schema: as.cascade.v1
+  id: CAS-025
+  description: Killing someone who was not fighting costs the killer the trust of everyone who saw who did it, leaves them afraid of the killer, and the story travels.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.killer_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.killer", axis: trust, delta: -3, cause: killed_someone}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.killer", axis: fear, delta: 2, cause: killed_someone}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: onlookers_of(trigger.event_id)
+      payload: {kind: fear, subject: "$trigger.killer", text: "{subject} killed someone in front of you, and they were not fighting back.", strength: 3}
+    - kind: create_rumour
+      target: onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.killer", claim: killed_someone}
+  delay_s: 0
+  cites: [D-119, docs/as/06_WORLD.md#2.5, docs/as/06_WORLD.md#6]
+- schema: as.cascade.v1
+  id: CAS-026
+  description: Whoever kills someone who was not fighting carries it afterwards, whether anyone saw or not.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.killer_provoked == false"]
+  effects:
+    - kind: adjust_stress
+      target: actor(trigger.killer)
+      amount: 2
+  delay_s: 0
+  cites: [D-119, TEMPER-02, docs/as/05_ACTORS.md#7.1]
+- schema: as.cascade.v1
+  id: CAS-027
+  description: Killing one of a group's own, in front of any of them, when they were not fighting costs the killer that group's standing — even when the killer is one of them.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.killer_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: STANDING_CHANGE
+      target: groups_that_saw(trigger.event_id)
+      payload: {toward: "$trigger.killer", delta: -2}
+  delay_s: 0
+  cites: [D-119, STAND-02]
+- schema: as.cascade.v1
+  id: CAS-028
+  description: Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: killed_someone, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: actor(trigger.payload.listener_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
+  delay_s: 0
+  cites: [D-119, INFO-02]

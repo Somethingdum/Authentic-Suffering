@@ -11,8 +11,8 @@ sweep(tx, deltas, rules, at, turn_index) -> list[Event]
   further cascades up to depth 3 (CAS-02); depth is carried in payload '_cascade_depth'.
 
 CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition path (trigger.payload.<key>,
-  trigger.actor_id, trigger.event_id). Each selector returns 0..n entity ids, deterministically
-  ordered by id; the effect is applied once per id:
+  trigger.actor_id, trigger.event_id, and — D-119 — trigger.killer, trigger.killer_provoked). Each
+  selector returns 0..n entity ids, deterministically ordered by id; the effect is applied once per id:
     actor(<path>)                             the actor itself
     household_of(<path>)                      society.household.household_of(actor)
     settlement_of(<path>)                     society.settlement.settlement_of(id): an actor, place,
@@ -35,6 +35,20 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               (the same group; two names for readability)
     infected_within_hearing_of(<p>)           infected bodies whose place receives the trigger NOISE above their hearing threshold
     witnesses_of(<path>)                      bodies with a PERCEIVE row for that event
+    onlookers_of(<path>)                      (D-119) for a killing (trigger.killer present): the holders
+                                              of a visual EXACT or PARTIAL percept of that event or of
+                                              the killing blow (they saw who fell) who also saw who did
+                                              it — a visual EXACT or PARTIAL percept whose source is the
+                                              killer, from 10 s before the blow to the trigger, or
+                                              sense.optics.visibility of the killer at the blow's time
+                                              'clear' or 'partial'. Never the killer, the dead or the
+                                              player's character (what they feel about it is the
+                                              player's, C06). A figure going down in the dark names
+                                              nobody. No killer: []
+    groups_that_saw(<path>)                   (D-119) for a killing: the groups the dead was a 'member'
+                                              or 'probation' member of that have one of
+                                              onlookers_of(<path>) as a 'member' or 'probation' member —
+                                              what none of them saw costs no standing
     theft_witnesses_of(<path>)                (B6, AFF-11: whether a taking is theft is for those who
                                               see it and what they know) for an ITEM_TRANSFER into its
                                               actor's own hands or carry (payload.to is a body holder
@@ -108,6 +122,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   emit_event TENSION_CHANGE                  society.group.adjust_tension(tx, target, p.toward, p.delta,
                                              p.cause, at, turn_index, E)
   emit_event LOYALTY_CHECK                   society.group.loyalty_check(tx, target, p.group, p.reason, ...)
+  emit_event STANDING_CHANGE                 (D-119) mind.mind.adjust_group_standing(tx, target (a group id),
+                                             p.toward, int(p.delta), E, at, turn_index)
   emit_event INFECTED_DRIFT                  world.infected.attract(tx, target, p.toward (a place or body
                                              id, '$'-resolved), at, E, turn_index, reason = p.reason or
                                              'noise')                                                   (P10)
@@ -180,6 +196,15 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     """Tiny expression language (docs/as/07_RULES.md §Cascade expressions):
     '<path> <op> <literal>' with op in == != >= <= > <, joined by ' and '. Paths:
     trigger.payload.<key>, trigger.actor_id, trigger.type, actor(<path>).<column>,
+    (D-119, a killing) trigger.killer — for a DEATH from wounds (payload cause blood_loss, head_wound,
+    neck_wound or harm): the actor of the killing blow — its cause event when that is a HARM to the
+    dead body, else the latest HARM (at <= the death) whose wound_id is a wound still open on the dead
+    body; the blow's actor must have an actors row and not be the dead; otherwise missing (hunger, the
+    cold, infection, an infected's bite never have a killer) — and trigger.killer_provoked — true
+    when, in the 10 minutes up to the blow, the dead was fighting a person (any actor but the dead,
+    so defending someone else counts): a HARM by the dead to them, an ACTION_START by the dead with
+    verb 'attack' at them, or an armed SPEECH by the dead (payload armed true) to them or to
+    'everyone'; false otherwise; missing when there is no killer,
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

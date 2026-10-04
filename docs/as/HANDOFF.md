@@ -113,7 +113,13 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   captive, surrendering, a child, their own member) becomes rumour, group standing, tension, loyalty checks,
   a settlement's law response, reputation that travels; the player's character pays for crossing their own
   values (nerve, intrusive memories, sleep). The owner intends to push atrocity edge cases: the world must
-  answer with Authentic Suffering, never a lecture.
+  answer with Authentic Suffering, never a lecture. **Part built (D-119, a killing seen; CAS-025..028):**
+  killing someone who was not fighting costs the killer the onlookers' trust and makes them afraid,
+  starts a story that costs trust with whoever believes it, costs standing with the dead's groups that
+  saw it, and the killer carries it (stress). Still open: scaling by what was seen (captive,
+  surrendering, a child), tension and loyalty checks after a killing, a settlement's law response (a law
+  against killing changes what worldgen writes — the owner's call), the PC's nerve, intrusive memories
+  and sleep.
 - **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
   group talk, distinct voices.
 - **Willis / the cheat cure** (D-78, D-79) — with P12's cheat system.

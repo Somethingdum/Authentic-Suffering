@@ -620,6 +620,11 @@ def _path(tx, path, trig):
         return trig.type.value if hasattr(trig.type, "value") else trig.type
     if path == "trigger.event_id":
         return trig.event_id
+    if path in ("trigger.killer", "trigger.killer_provoked"):      # D-119: a killing
+        k = _killing(tx, trig)
+        if k is None:
+            return _MISSING
+        return k[0] if path == "trigger.killer" else k[1]
     m = re.match(r"^(\w+)\((.+)\)\.(\w+)$", path)
     if m:
         fn, inner, col = m.groups()
@@ -642,6 +647,67 @@ def _path(tx, path, trig):
             return r.get(col, _MISSING) if r else _MISSING
         raise NotImplementedError(f"selector {fn} (P9)")
     raise ValueError(f"bad path {path}")
+
+
+def _killing(tx, trig):
+    """D-119: (killer, provoked, the killing blow's event id) for a DEATH someone caused, else None."""
+    if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "DEATH":
+        return None
+    pl = trig.payload or {}
+    dead = pl.get("body_id")
+    if pl.get("cause") not in _WOUND_DEATHS:
+        return None
+    blow = None
+    if trig.cause_event_id:
+        r = _row(tx, "SELECT event_id, type, actor_id, at, json_extract(payload, '$.body_id') AS body_id FROM events "
+                     "WHERE event_id=?", (trig.cause_event_id,))
+        if r and r["type"] == "HARM" and r["body_id"] == dead:
+            blow = r
+    if blow is None:
+        blow = _row(tx, "SELECT event_id, actor_id, at FROM events WHERE type='HARM' AND json_extract(payload, '$.body_id')=? "
+                        "AND at<=? AND json_extract(payload, '$.wound_id') IN (SELECT wound_id FROM wounds WHERE body_id=? AND "
+                        "healed_at IS NULL) ORDER BY at DESC, seq DESC LIMIT 1", (dead, trig.at, dead))
+    if blow is None or not blow["actor_id"] or blow["actor_id"] == dead:
+        return None
+    killer = blow["actor_id"]
+    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (killer,)) is None:
+        return None
+    lo = blow["at"] - 10 * 60_000
+    person = "(SELECT actor_id FROM actors WHERE actor_id != :dead)"
+    provoked = tx.query_one(
+        "SELECT 1 FROM events WHERE actor_id=:dead AND at>=:lo AND at<=:at AND ("
+        f"(type='HARM' AND json_extract(payload, '$.body_id') IN {person}) OR "
+        f"(type='ACTION_START' AND json_extract(payload, '$.verb')='attack' AND json_extract(payload, '$.target_id') IN {person}) OR "
+        "(type='SPEECH' AND json_extract(payload, '$.armed')=1 AND EXISTS (SELECT 1 FROM json_each(json_extract(payload, '$.to')) "
+        f"WHERE value='everyone' OR value IN {person}))) LIMIT 1", {"dead": dead, "lo": lo, "at": blow["at"]}) is not None
+    return killer, provoked, blow["event_id"]
+
+
+_WOUND_DEATHS = ("blood_loss", "head_wound", "neck_wound", "harm")
+
+
+def _onlookers(tx, trigger, event_id):
+    """D-119: who saw the death or the blow land, and saw who did it."""
+    from ..sense.optics import visibility
+    k = _killing(tx, trigger)
+    if k is None:
+        return []
+    killer, _provoked, blow_id = k
+    blow_at = tx.query_one("SELECT at FROM events WHERE event_id=?", (blow_id,))[0]
+    saw = set()
+    for e in (event_id, blow_id):
+        saw |= {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                       "fidelity IN ('exact','partial')", (e,))}
+    from ..society._impl_society import _controller
+    out = []
+    for h in sorted(saw - {killer, (trigger.payload or {}).get("body_id")}):
+        if _controller(tx, h) == "human":
+            continue
+        named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity IN "
+                             "('exact','partial') AND at>=? AND at<=?", (h, killer, blow_at - 10_000, trigger.at)) is not None
+        if named or visibility(tx, h, killer, blow_at) in ("clear", "partial"):
+            out.append(h)
+    return out
 
 
 def evaluate_precondition(tx, expr, trigger):
@@ -704,6 +770,15 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "onlookers_of":                                         # D-119
+        return _onlookers(tx, trigger, v)
+    if fn == "groups_that_saw":                                      # D-119
+        seen = _onlookers(tx, trigger, v)
+        dead = (trigger.payload or {}).get("body_id")
+        return sorted({r[0] for r in tx.query("SELECT group_id FROM group_members WHERE actor_id=? AND status IN "
+                                              "('member','probation')", (dead,))
+                       if any(tx.query_one("SELECT 1 FROM group_members WHERE group_id=? AND actor_id=? AND status IN "
+                                           "('member','probation')", (r[0], h)) for h in seen)})
     if fn == "active_task_of":
         from ._impl_p5a import active_task
         t = active_task(tx, v)
@@ -865,6 +940,10 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
         soc.adjust_tension(tx, target, pl["toward"], int(pl["delta"]), pl.get("cause") or "", at, turn_index, E)
     elif eff.kind == "emit_event" and et == "LOYALTY_CHECK":
         soc.loyalty_check(tx, target, pl["group"], pl.get("reason") or "cascade", at, turn_index, E)
+    elif eff.kind == "emit_event" and et == "STANDING_CHANGE":           # D-119
+        from ..mind.mind import adjust_group_standing
+        if pl.get("toward"):
+            adjust_group_standing(tx, target, pl["toward"], int(pl["delta"]), E, at, turn_index)
     elif eff.kind == "adjust":
         kind = str(target).split("_")[0]
         if kind == "wkp":
