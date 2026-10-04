@@ -108,6 +108,14 @@ Where you are: {{ p.position_text }}
 
 {{ p.portrayal_note }}
 {% endif %}
+{% if p.thread %}
+
+What was said here before this moment (oldest first)
+{% for t in p.thread %}
+- {{ t.ago_text }}, {% if t.speaker == "you" %}you{% else %}{{ t.speaker }}{% if t.to_me %} to you{% endif %}{% endif %}: {% if t.words %}"{{ t.words }}"{% else %}(you could not make out the words){% endif %}{% if t.unanswered %} (you have not answered){% endif %}
+
+{% endfor %}
+{% endif %}
 
 What reaches you
 {% for s in p.perceived_now %}

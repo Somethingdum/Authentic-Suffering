@@ -514,7 +514,7 @@ CREATE TABLE dossier_deltas (
   at         INTEGER NOT NULL
 );
 
--- OWNER mind.actor
+-- OWNER action.propagate
 CREATE TABLE voice_lines (
   line_id  TEXT PRIMARY KEY,
   actor_id TEXT NOT NULL,

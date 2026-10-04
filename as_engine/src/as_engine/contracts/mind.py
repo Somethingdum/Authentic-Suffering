@@ -103,6 +103,18 @@ class PerceivedItem(Strict):
     seconds_ago: float = Field(ge=0)
 
 
+class ThreadLine(Strict):
+    """D-117 (THREAD-01, Actor Spec §11): one line of what was said where this mind is, before this moment,
+    as this mind heard it or said it."""
+
+    speaker: str = Field(description="'you', a P-handle of this packet, or what this mind calls the speaker "
+                         "('Someone' when it could not tell).")
+    to_me: bool = False
+    words: str = Field(description="As heard: exact, gap-marked, or '' when only the tone came through.")
+    ago_text: str
+    unanswered: bool = Field(default=False, description="A question put to this mind that it has not answered.")
+
+
 class UtteranceView(Strict):
     """A perceived utterance addressed to (or overheard by) this mind.
 
@@ -220,6 +232,8 @@ class SkullPacket(Strict):
                                        "you would say about something you did lately that was not like you; None otherwise.")
     voice_examples: list[VoiceExample] = Field(default_factory=list, description="D-116 (EXAMPLE-02): moments "
                                                "in this person's own words, shown as things they already said.")
+    thread: list[ThreadLine] = Field(default_factory=list, description="D-117 (THREAD-01): what was said "
+                                     "here before this moment, oldest first.")
 
 
 # ---------------------------------------------------------------------------

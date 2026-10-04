@@ -213,6 +213,30 @@ Fields (second person, plain English):
                     rules=PacketRules) — EXAMPLE-02. The prompt shows them right after the card (stable
                     per person, so a cached prompt stays cached, PROMPT-01).
 
+  thread            (D-117) thread_lines(tx, actor_id, turn_index, at, names, PacketRules) — THREAD-01, with
+                    names(body) = the body's P-handle when this packet gave it one, else what the holder calls
+                    them (acquaintance known_name, else with_article(describe)).
+
+THREAD-01 thread_lines(tx, holder_id, turn_index, at, names, rules) -> list[ThreadLine]   (D-117; Actor
+  Spec §11: "a short holder-specific conversation thread ... Never inject the UI's complete chat
+  transcript. Remembered statements outside the room enter only through legitimate memory or later
+  report.") What was said where the holder is now, before this moment, as the holder heard and said it.
+  since = max(at - rules.thread_window_min minutes, the at of the holder's latest MOVE event (actor_id =
+  holder) whose payload to_place differs from its from_place — when they arrived where they are).
+  Heard: the holder's percept_log rows of channel 'speech' with turn_index < turn_index (this turn's are
+  the utterances), since <= at' <= at (SKULL-10) and source_id distinct from the holder: speaker =
+  names(source_id) ('Someone' when source_id is NULL), words = cut_heard(detail.words, max_heard_chars) —
+  '' when the fidelity is tone_only — to_me = detail.addressed_to_me. Said: the holder's voice_lines
+  with since <= at' < at: speaker 'you', to_me False. Merged by (at, then the event order: the heard
+  SPEECH's seq, or the seq of the speaker's own SPEECH that wrote the line, then id),
+  the last rules.max_thread_lines kept, oldest first; ago_text = the beliefs' age words for at - at'.
+  unanswered: a heard line to_me whose mind.firewall.classify_form(words) is QUESTION and after which
+  (at' greater) the holder said nothing in the merged list before the cut.
+THREAD-02 The prompt shows the thread under 'What was said here before this moment (oldest first)' —
+  per line f'- {ago_text}, ' + ('you' | the speaker + (' to you' when to_me)) + ': ' + the words in
+  quotes, or '(you could not make out the words)' — + ' (you have not answered)' when unanswered —
+  between where the person is and what reaches them now. No lines: no heading.
+
 EXAMPLE-02 choose_examples(examples, *, reaction, rules) -> list[VoiceExample]   (pure)
   A deliberation: the examples in the dossier's order (the author's: most telling first) while the
   running sum of estimate_tokens(situation + by + said_to_them + they_say) + 8 per example stays within
@@ -229,7 +253,7 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   prompts.render(CallClass.ACTOR_COGNITION, p=packet) (ACTOR_REACTION when reaction=True). While
   over PacketRules.token_budget[key], drop ONE item and re-render, in this order: (D-116) voice
   examples (last first: how someone sounds gives way before what they remember), memories (last
-  first), lessons (last first), beliefs (last first), relationship lines whose entity is not a
+  first), lessons (last first), (D-117) thread lines (oldest first), beliefs (last first), relationship lines whose entity is not a
   source of this turn's percepts (last first), refusals created more than 7 days before ``at``
   whose requester is not a source of this turn's percepts (oldest first), (B5) the unprocessed
   lines of every unsettled turn but the latest (the oldest line first), uncertainty lines (last
@@ -239,7 +263,8 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   back (looked_up), the latest unsettled turn's unprocessed lines, and every refusal whose
   requester is a source of this turn's percepts (someone here or speaking now). Every item
   dropped is recorded, in drop order, in ``omitted`` (never rendered: an audit of what was cut):
-  'example: ' + the example's they_say, 'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
+  'example: ' + the example's they_say, 'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry,
+  'thread: ' + the line's words, 'belief: ' + the BeliefLine
   text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'unprocessed: ' + the
   line, 'uncertainty: ' + the line — e.g. 'refusal: You refused: hand me the revolver.' When
   nothing droppable is left the packet is returned over budget (the scheduler logs it).
@@ -278,6 +303,10 @@ def build_packet(tx: "Tx", actor_id: str, lod: LOD, affordances: "AffordanceSet"
     raise NotImplementedError("P4")
 
 
+def thread_lines(tx: "Tx", holder_id: str, turn_index: int, at: int, names, rules) -> list:
+    raise NotImplementedError("D-117")
+
+
 def choose_examples(examples, *, reaction: bool, rules) -> list:
     raise NotImplementedError("D-116")
 
@@ -285,4 +314,4 @@ def choose_examples(examples, *, reaction: bool, rules) -> list:
 def estimate_tokens(text: str) -> int:
     """len(text) // 4 (implemented; the same estimate is used everywhere)."""
     return len(text) // 4
-from ._impl_packet import build_packet, choose_examples  # noqa
+from ._impl_packet import build_packet, choose_examples, thread_lines  # noqa

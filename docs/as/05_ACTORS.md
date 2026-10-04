@@ -39,8 +39,9 @@ that describes a category instead of a person fails validation (CNT-10), because
 the identified root cause of drift.
 
 **Voice comes from the database, not model recall (DOS-05).** Every committed SPEECH by an Actor is
-stored in `voice_lines`; the card carries the three exemplars and the packet adds up to five recent
-real lines (pinned lines first). Pinning is a UI action (People panel → "Pin this line").
+stored in `voice_lines` — written by the SPEECH itself, segment by segment as it is said (D-117:
+before that nothing wrote them, and nobody ever saw their own last words); the card carries the three
+exemplars and the packet adds up to five recent real lines (pinned lines first). Pinning is a UI action (People panel → "Pin this line").
 
 ### 2.1 The identity card (Actor Spec §4, AC02 / AC04; `mind/identity.py`, IDN-01..05)
 A call shows a person the whole of who they are, compiled from the fused dossier by code
@@ -95,7 +96,12 @@ card, §2.1, and the lines they said lately); **What you remember** (beliefs wit
 age, retrieved memories, lessons); **What matters to you now** (commitments, dependents and
 obligations, what it would cost, open loops, standing refusals); the time (the hour only for
 someone with a timepiece on them — anyone else knows the day and the part of it); **Your body**
-(with Resolve and what they carry); where they are; **What reaches you** (percepts with fidelity
+(with Resolve and what they carry); where they are; **What was said here before this moment**
+(D-117, THREAD-01..02, Actor Spec §11: the last eight lines said where they are now — since they
+arrived, within thirty minutes — as they heard them, their own lines among them, each with who said it
+as they know them and whether it was to them; a question put to them that they have not answered says
+so; never the whole transcript, and nothing said before they arrived: that reaches them only through
+memory); **What reaches you** (percepts with fidelity
 words: *clearly / only partly, some words lost / only the tone, no words*); **What you heard**
 (utterances with form and the receiver's standing; a flood of words past 800 characters is cut
 where a word ends, with " …" — heard, not obeyed, and never crowding the person out of their own

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-749 ids; 495 with their own statement, 254 named only in context.
+751 ids; 497 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -339,7 +339,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | DOS-02 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-03 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
 | DOS-04 | *Actors and dossier fusion (P4). Owner 'mind.actor'. Rules DOS-01..05.* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | `contract/p04_one_actor/test_actor.py` |
-| DOS-05 | *voice_lines for the actor (pinned lines first) — voice consistency comes from the database (DOS-05).* | as_engine/mind/actor.py | `as_engine/mind/actor.py` | — |
+| DOS-05 | *D-117 (DOS-05, SEG-03): the words a person says become their voice line, written by the SPEECH itself.* | as_engine/action/_impl_p5b.py | `as_engine/action/_impl_p5b.py`, `as_engine/action/resolve.py`, `as_engine/mind/actor.py` | `contract/p04_one_actor/test_conversation_thread.py`, `contract/p07_slice/test_what_was_said.py` |
 
 ## ECHO
 
@@ -996,7 +996,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | SEG-01 | A long speech arrives in segments of at most eight words, cut at the last pause (. , ; : ! ? … —) among the 4th to 8th words (`action.intent.segments`). | 05_ACTORS §7.2 | `as_engine/action/intent.py` | `contract/p05_many_actors/test_speech_segments.py` |
 | SEG-02 | Words take 2.5 a second, however few: alongside an attempt they overlap it (the longer of the two), before or after it they add; nobody hides or sneaks while talking (their words come first) (`action.intent.to_intent`). | 05_ACTORS §7.2 | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent.py`, `contract/p04_one_actor/test_intent_v2.py`, `contract/p04_one_actor/test_speech_timing.py` |
-| SEG-03 | Each segment is a SPEECH of its own, said when the words before it have been (the rest queued as SPEECH_SEGMENT); words 'after' an attempt start when it lands (`action.resolve`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/action/resolve.py`, `as_engine/turn/timers.py` | `contract/p05_many_actors/test_speech_segments.py` |
+| SEG-03 | Each segment is a SPEECH of its own, said when the words before it have been (the rest queued as SPEECH_SEGMENT); words 'after' an attempt start when it lands (`action.resolve`). | 05_ACTORS §7.2 | `as_engine/action/_impl_p5b.py`, `as_engine/action/intent.py`, `as_engine/action/resolve.py`, `as_engine/mind/actor.py`, `as_engine/turn/timers.py` | `contract/p05_many_actors/test_speech_segments.py` |
 | SEG-04 | A segment is said only if the speaker is alive and conscious then; a new attempt cuts what is left (one voice, one utterance); one SPEECH_CUT records where the words stopped, and listeners only ever hear what was said. | 05_ACTORS §7.2 | `as_engine/action/_impl_p5b.py`, `as_engine/action/resolve.py` | `contract/p05_many_actors/test_speech_segments.py` |
 
 ## SEL
@@ -1039,7 +1039,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SKULL-07 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
 | SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
 | SKULL-09 | *it (SKULL-09): a smaller prompt never costs a person their identity.* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p06_memory/test_retrieval.py` |
-| SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/mind/temper.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
+| SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/mind/temper.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_conversation_thread.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
 
 ## SMELL
 
@@ -1148,6 +1148,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | TEMPER-08 | TEMPER-08 (H1) A person knows their own state: body_lines gains the strain line, each entity its PacketEntity.feeling, and a snap of outlet 'words' this wave sets SkullPacket.outburst — all as mind.temper TEMPER-08 word… | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/temper.py` | `contract/p05_many_actors/test_temper_in_packet.py` |
 | TEMPER-09 | TEMPER-09 (F1c, D-86) What people cannot stand to be near — the owner: smeared in the dead "I'm going to smell like hell, look like hell. And people aren't gonna want to be around me for very long till I shower"; and wa… | as_engine/mind/temper.py | `as_engine/mind/temper.py` | `contract/p05_many_actors/test_care.py`, `contract/p07_slice/test_narration_care.py` |
 | TEMPER-10 | TEMPER-10 (P12, D-79, D-102 — the owner, on Willis: "he's completely unphased by most blatant disrespect ... unless he has on his own whim provided you with something valuable"; "he hates being asked for magical gifts,… | as_engine/mind/temper.py | `as_engine/action/effects.py`, `as_engine/mind/temper.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p12_surfaces/test_willis.py` |
+
+## THREAD
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| THREAD-01 | THREAD-01 thread_lines(tx, holder_id, turn_index, at, names, rules) -> list[ThreadLine] (D-117; Actor Spec §11: "a short holder-specific conversation thread ... Never inject the UI's complete chat transcript. Remembered… | as_engine/mind/packet.py | `as_engine/contracts/mind.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_conversation_thread.py`, `contract/p07_slice/test_what_was_said.py` |
+| THREAD-02 | THREAD-02 The prompt shows the thread under 'What was said here before this moment (oldest first)' — per line f'- {ago_text}, ' + ('you' / the speaker + (' to you' when to_me)) + ': ' + the words in quotes, or '(you cou… | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_conversation_thread.py` |
 
 ## TIME
 

@@ -14,6 +14,8 @@ lines, at most n in total, the unpinned ones also oldest first.
 Resolve.max = base + floor((E + C) / divisor) + capability.resolve_trait_mod  (RulesConfig.resolve)
 Voice: packet exemplars = the dossier's 3 exemplars; recent_lines = last max_recent_lines rows of
 voice_lines for the actor (pinned lines first) — voice consistency comes from the database (DOS-05).
+(D-117) The lines are written by the speech itself: each SPEECH action.resolve commits for a speaker
+with an actors row inserts that speaker's voice line (action.resolve SEG-03).
 
 create(tx, body_id, dossier, source, at, turn_index, *, content_ref=None, mind_kind='model',
        cause_event_id=None, goal='', event_origin='sim') -> Event   (P10: worldgen, materialisation)

@@ -25,7 +25,10 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms) -> list[Event
        {words: the segment, volume, to: [ids] | ['everyone'], source_db =
        AcousticRules.speech_db[volume], armed: the actor holds an item with a firearm or melee
        block in a hand, utterance_id: this ACTION_START's event id, segment: k, segments: n}
-       (writer 'action.propagate', actor_id = the speaker, cause = the start), due at say_at +
+       (writer 'action.propagate', actor_id = the speaker, cause = the start; D-117, DOS-05: when the
+       speaker has an actors row and the segment's words, stripped, are not empty, the SPEECH also
+       inserts voice_lines {line_id (tx.mint('vln')), actor_id = the speaker, text = those words, at =
+       the SPEECH's at, event_id = utterance_id, pinned 0} — what a person said, as said), due at say_at +
        ceil(1000 x (words in segments 1..k-1) / 2.5) ms. say_at = wave_at for a SPEAK choice and for
        timing 'before' or 'alongside'; for 'after', the action lands first — at
        effects.land_ms(wave_at, est_duration_s - words / 2.5) instead of step 2's land_at — and

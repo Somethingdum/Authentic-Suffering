@@ -263,6 +263,9 @@ class PacketRules(Strict):
     # About four seconds of reading on the Writer; the bench's reading speed says what it really costs.
     voice_example_tokens: int = 600
     voice_examples_reaction: int = 2
+    # [SAND] D-117 (THREAD-01, Actor Spec §11): how far back the conversation where a person is reaches
+    thread_window_min: int = 30
+    max_thread_lines: int = 8
 
 
 class StyleRulesNumbers(Strict):

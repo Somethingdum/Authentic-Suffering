@@ -379,6 +379,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_voice_examples.py` | EXAMPLE-01: an example is a situation, who spoke first and what they said, the person's words and a pressure; a voice without examples is still a voice. EXAMPLE-02: a deliberation takes them in order until the room (600 tokens) is gone, the first that does not fit ending the list; a reaction only the pressure and limit ones, at most two; over the packet budget the last example goes first and nothing else. EXAMPLE-03: the prompt shows them right after the card, before what matters now, as things already said, and a person with none shows no heading; say-my-way shows the PC's before the idea. EXAMPLE-04: Willis's own examples (the `wild_card` records of the cheat packs) open his roast; none, a missing folder or no folder: none |
 
+### 3.31 What was said here (P4, P7; D-117)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_conversation_thread.py` | THREAD-01: a question put to her hangs until she answers, a demand does not; her own lines in order among what she heard; a speaker never hears herself; this turn's words are utterances, not the thread, and nothing later than the moment reaches it; the window (30 minutes, a rule) and the room (she left and came back: what was said before is gone; a step within the room is not an arrival); only the last few lines, the speaker as a handle, never an id. THREAD-02: the heading and lines in the prompt between where she is and what reaches her; over budget the oldest line goes first, after memories and lessons |
+| `p07_slice/test_what_was_said.py` | DOS-05 through whole turns: Mara's "Quiet." and June's "What was that?" become their voice lines, each naming its utterance, and Mara knows what she said; the silent have none. THREAD-01 the next turn: Alice has both lines in the order said, Mara her own first, June hers |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

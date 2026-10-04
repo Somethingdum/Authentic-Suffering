@@ -345,7 +345,8 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
                 before += len(seg.split())
                 if k == 1 and due == wave_at:
                     tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=wave_at, turn_index=turn_index,
-                                          actor_id=i.actor_id, cause_event_id=st.event_id, payload=pl))
+                                          actor_id=i.actor_id, cause_event_id=st.event_id, payload=pl,
+                                          writes=_voice_line(tx, i.actor_id, pl, wave_at)))
                 else:
                     segq.append((due, i.actor_id, k, pl, st.event_id))
         started.append((la, i, st))
@@ -397,13 +398,24 @@ def broken_words(tx, rng, speaker, text, at):
     return "\u2014 ".join(pieces) + "\u2014"
 
 
+def _voice_line(tx, speaker, pl, at):
+    """D-117 (DOS-05, SEG-03): the words a person says become their voice line, written by the SPEECH itself."""
+    from ..contracts.events import WriteOp, WriteRecord
+    words = (pl.get("words") or "").strip()
+    if not words or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (speaker,)) is None:
+        return []
+    return [WriteRecord(op=WriteOp.INSERT, table="voice_lines", values={
+        "line_id": tx.mint("vln"), "actor_id": speaker, "text": words, "at": at, "event_id": pl["utterance_id"],
+        "pinned": 0})]
+
+
 def _say(tx, speaker, pl, sid, due, turn_index):
     """SEG-04: say one segment if the speaker can; else the SPEECH_CUT. True when said."""
     from ..physical.bodies import capacity
     b = _row(tx, "SELECT alive FROM bodies WHERE body_id=?", (speaker,))
     if b["alive"] and capacity(tx, speaker).conscious:
         tx.commit_event(Event(type=EventType.SPEECH, writer="action.propagate", at=due, turn_index=turn_index, actor_id=speaker,
-                              cause_event_id=sid, payload=pl))
+                              cause_event_id=sid, payload=pl, writes=_voice_line(tx, speaker, pl, due)))
         return True
     tx.commit_event(Event(type=EventType.SPEECH_CUT, writer="action.propagate", at=due, turn_index=turn_index, actor_id=speaker,
                           cause_event_id=sid, payload={"actor_id": speaker, "utterance_id": pl["utterance_id"],

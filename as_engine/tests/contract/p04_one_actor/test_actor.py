@@ -37,7 +37,7 @@ def delta(w, local, path, op, value, at=None):
 def line(w, local, text, at, pinned=False):
     with w.store.transaction() as tx:
         lid = tx.mint("vln")
-        tx.commit_event(Event(type=EventType.REFLECTION, writer="mind.actor", at=at, turn_index=0, actor_id=w.id(local),
+        tx.commit_event(Event(type=EventType.OVERRIDE, writer="action.propagate", at=at, turn_index=0, actor_id=w.id(local),
                               writes=[WriteRecord(op=WriteOp.INSERT, table="voice_lines", values={
                                   "line_id": lid, "actor_id": w.id(local), "text": text, "at": at,
                                   "event_id": "scenario", "pinned": int(pinned)})],

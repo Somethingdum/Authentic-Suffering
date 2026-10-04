@@ -405,7 +405,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         unprocessed=[t for _tix, lines in unprocessed_raw for t in lines],
         families=fams, consult_kinds=kinds, looked_up=list(consulted.lines) if consulted is not None else [],
         outburst=_outburst_line(tx, actor_id, ph, at), portrayal_note=_portrayal_note(tx, actor_id, turn_index),
-        voice_examples=choose_examples(d.voice.examples, reaction=reaction, rules=PR))
+        voice_examples=choose_examples(d.voice.examples, reaction=reaction, rules=PR),
+        thread=thread_lines(tx, actor_id, turn_index, at, lambda b: ph.get(b) or _name_or_desc(tx, actor_id, b), PR))
     return fields, present, refusal_rows, unprocessed_raw
 
 
@@ -442,6 +443,9 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
         elif f["lessons"]:
             om.append(f"lesson: {f['lessons'][-1]}")
             f["lessons"] = f["lessons"][:-1]
+        elif f["thread"]:                             # D-117: the oldest of what was said here goes next
+            om.append(f"thread: {f['thread'][0].words}")
+            f["thread"] = f["thread"][1:]
         elif f["beliefs"]:
             om.append(f"belief: {f['beliefs'][-1].text}")
             f["beliefs"] = f["beliefs"][:-1]
@@ -466,6 +470,39 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
             break
         pkt = SkullPacket(**f)
     return pkt
+
+
+def thread_lines(tx, holder_id, turn_index, at, names, rules):
+    from ..contracts.common import UtteranceForm
+    from ..contracts.mind import ThreadLine
+    from .firewall import classify_form
+    since = at - rules.thread_window_min * 60_000
+    moved = tx.query_one("SELECT MAX(at) FROM events WHERE type='MOVE' AND actor_id=? AND "
+                         "json_extract(payload, '$.to_place') IS NOT json_extract(payload, '$.from_place')", (holder_id,))
+    if moved and moved[0] is not None:
+        since = max(since, moved[0])
+    rows = []
+    for r in tx.query("SELECT p.percept_id, p.at, p.fidelity, p.source_id, p.detail, "
+                      "(SELECT seq FROM events e WHERE e.event_id = p.event_id) AS seq FROM percept_log p "
+                      "WHERE p.holder_id=? AND p.channel='speech' AND p.turn_index<? AND p.at>=? AND p.at<=? "
+                      "AND (p.source_id IS NULL OR p.source_id<>?)", (holder_id, turn_index, since, at, holder_id)):
+        det = json.loads(r["detail"]) if isinstance(r["detail"], str) else (r["detail"] or {})
+        words = "" if r["fidelity"] == "tone_only" else cut_heard(det.get("words", ""), rules.max_heard_chars)
+        rows.append((r["at"], r["seq"] or 0, r["percept_id"], {
+            "speaker": names(r["source_id"]) if r["source_id"] else "Someone", "to_me": bool(det.get("addressed_to_me")),
+            "words": words}))
+    for r in tx.query("SELECT v.line_id, v.at, v.text, (SELECT MIN(e.seq) FROM events e WHERE e.type='SPEECH' AND "
+                      "e.cause_event_id = v.event_id AND e.actor_id = v.actor_id AND e.at = v.at) AS seq FROM voice_lines v "
+                      "WHERE v.actor_id=? AND v.at>=? AND v.at<?", (holder_id, since, at)):
+        rows.append((r["at"], r["seq"] or 0, r["line_id"], {"speaker": "you", "to_me": False, "words": r["text"]}))
+    rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    out = []
+    for i, (t, _k, _id, f) in enumerate(rows):
+        ans = (f["to_me"] and f["words"] and classify_form(f["words"]) == UtteranceForm.QUESTION
+               and not any(x[3]["speaker"] == "you" and x[0] > t for x in rows[i + 1:]))
+        out.append(ThreadLine(speaker=f["speaker"], to_me=f["to_me"], words=f["words"], ago_text=_age(at - t),
+                              unanswered=bool(ans)))
+    return out[-rules.max_thread_lines:] if rules.max_thread_lines > 0 else []
 
 
 def choose_examples(examples, *, reaction, rules):

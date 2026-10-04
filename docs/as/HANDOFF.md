@@ -22,7 +22,9 @@ replaces "the rest will remain uncoded"). What is left:
 1. **Actor v2** — B6 is BUILT (D-93; tests 12 §3.15: work output gated by machinery and inputs,
    a boiling-over feud becomes a grudge the person decides about, far sounds are heard, the
    witnessed-theft rumour fires). Left: Actor Spec §12's plans with stable keys and delegation (a
-   leader's orders the recipient decides on) and §11's conversations.
+   leader's orders the recipient decides on) and the rest of §11's conversations — the thread is BUILT
+   (D-117: what was said here, and voice lines written at last); topics, initiative and interruptions
+   are not.
 2. **P11** — BUILT (D-95..D-99; tests 12 §3.17): the 58-bit fault proof and BIT_STAGE, the narrator's
    continuity, the abuse battery, the release audit, the portrayal audit, ablation (§5).
 3. **P12** — the surfaces (§5). The cheat console of CHEATS.md is BUILT (D-100; tests 12 §3.18), and
@@ -61,7 +63,8 @@ replaces "the rest will remain uncoded"). What is left:
    then every call time in the scheduler is a placeholder); the models at work under the loading bar
    (D-114); the Cheat field's command words and dictionary (D-115: "Spawn Fredrick" without a slash,
    an autocomplete and a dictionary from the server); character examples as history (D-116:
-   `voice.examples`, shown as things a person already said). What the owner still has to do or
+   `voice.examples`, shown as things a person already said); what was said here (D-117: a short
+   conversation thread in every packet, and a fix — nothing had ever written a person's voice lines). What the owner still has to do or
    decide is in PROGRESS "Waiting on the owner".
 Owner requirements queued (2026-09-24, in the owner's words where it matters; specify in this order):
 - **Appearance, smell, condition, clothing** (new senses work, amends P2 bodies/items, P3 perception, P4 packet
