@@ -1,5 +1,16 @@
 Who you are
 {{ p.identity.as_text() }}
+{% if p.voice_examples %}
+
+Moments from before, in your own words (how you sound; never lines to repeat):
+{% for e in p.voice_examples %}
+- {{ e.situation }}
+{% if e.said_to_them %}
+  {{ e.by or "Someone" }}: "{{ e.said_to_them }}"
+{% endif %}
+  You: "{{ e.they_say }}"
+{% endfor %}
+{% endif %}
 {% if p.recent_lines %}
 
 Things you said lately:

@@ -27,7 +27,7 @@ Contract: `contracts/dossier.py` (`ActorDossier`, `PCDossier`). Authoring guide:
 | decision stack | ≥4 ordered layers, inversion conditions, a past example | CMG §15.5 |
 | silence | when they go quiet (≥2), body when silent, topics refused, comfortable vs uncomfortable | CMG §15.6 |
 | knowledge | knows / does not know / knows but hides → seed beliefs at worldgen; *does not know* is an authoring check only and never reaches a prompt (naming a hidden fact supplies it, IDN-02) | CMG §15.4 |
-| voice | capsule, speech tendencies, **three exemplars (low stakes, under pressure, at the limit)**, **would never say (≥3)**, profanity level, dialect | CMG §14, §22.1 |
+| voice | capsule, speech tendencies, **three exemplars (low stakes, under pressure, at the limit)**, **would never say (≥3)**, profanity level, dialect; optional **examples** — moments in their own words, as many as the author has (D-116, §2.2) | CMG §14, §22.1 |
 | social | household role, relations (with history), dependents, guardians, faction memberships | Plan §8.2 |
 | life | aspiration, current project, routine, obligations, hopes, **fears (≥1)**, secrets (with who knows and exposure consequence) | Plan §6.3 |
 | disposition | archetype prior, stance toward strangers, default action on detecting a stranger | S/U First Contact, Stage-2 filter |
@@ -65,6 +65,26 @@ Authoring (09): the fields the card is made from describe tendencies, never sens
 the present. "Knows where everyone is without looking" would grant a sense; Mara's vigilance reads
 "keeps checking where each person in the room is, with quick looks nobody notices", and where people
 actually are comes from what she perceives.
+
+### 2.2 Character examples as history (D-116; EXAMPLE-01..04)
+
+The owner: "We should have a subsystem that gives character examples as history." A dossier's
+`voice.examples` holds moments in the person's own words — what was going on, who spoke to them first
+and what they said, and what the person said back, with how hard it pressed them (easy, pressure, the
+limit). They come from the author (or from the owner's own writing through dossier intake, 09 §8.1) and
+can be many; the card keeps its three exemplars either way.
+
+| Id | Rule |
+|---|---|
+| EXAMPLE-01 | A voice example is the person's own moment (situation, who spoke first and what they said, what the person said, the pressure); a voice without examples is still a voice |
+| EXAMPLE-02 | A deliberation shows the examples in the author's order while they fit `PacketRules.voice_example_tokens` (600), the first that does not fit ending the list — the same person shows the same examples every call, so a cached prompt stays cached; a reaction shows only the pressure and limit ones, at most `voice_examples_reaction` (2). Over the packet budget they are the first thing to go (last first), before memories |
+| EXAMPLE-03 | The prompt shows them right after the card as things already said ("Moments from before, in your own words (how you sound; never lines to repeat)"); say-my-way (only when the player opts in, D-113) shows the PC's the same way |
+| EXAMPLE-04 | Willis's own examples (the records tagged `wild_card` in the cheat packs) go into his frozen-moment roast; none, and the roast goes on without them |
+
+Why not the card: the card is never trimmed (SKULL-09) and a whole life of examples would make every
+call slow on the owner's machines; examples are taste, so they give way first. Why "never lines to
+repeat": a model shown a line tends to say it again; the examples show the rhythm, the words they reach
+for and how they dodge, and the person speaks fresh in the moment.
 
 ## 3. The Skull Packet
 

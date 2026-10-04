@@ -404,7 +404,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         affordances=opts, uncertainty=unc, handles=handles, gestures=gests, attention_points=pts, hands_free=hf,
         unprocessed=[t for _tix, lines in unprocessed_raw for t in lines],
         families=fams, consult_kinds=kinds, looked_up=list(consulted.lines) if consulted is not None else [],
-        outburst=_outburst_line(tx, actor_id, ph, at), portrayal_note=_portrayal_note(tx, actor_id, turn_index))
+        outburst=_outburst_line(tx, actor_id, ph, at), portrayal_note=_portrayal_note(tx, actor_id, turn_index),
+        voice_examples=choose_examples(d.voice.examples, reaction=reaction, rules=PR))
     return fields, present, refusal_rows, unprocessed_raw
 
 
@@ -432,7 +433,10 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
     alive = list(range(len(refusal_rows)))
     while _tokens(pkt, reaction) > budget:
         om = f["omitted"]
-        if f["memories"]:
+        if f["voice_examples"]:                       # D-116: how someone sounds gives way first
+            om.append(f"example: {f['voice_examples'][-1].they_say}")
+            f["voice_examples"] = f["voice_examples"][:-1]
+        elif f["memories"]:
             om.append(f"memory: {f['memories'][-1].text}")
             f["memories"] = f["memories"][:-1]
         elif f["lessons"]:
@@ -462,6 +466,21 @@ def build_packet(tx, actor_id, lod, affordances, turn_index, at, *, reaction=Fal
             break
         pkt = SkullPacket(**f)
     return pkt
+
+
+def choose_examples(examples, *, reaction, rules):
+    from .packet import estimate_tokens
+    pool = [e for e in (examples or []) if not reaction or e.pressure in ("pressure", "limit")]
+    if reaction:
+        pool = pool[:rules.voice_examples_reaction]
+    out, used = [], 0
+    for e in pool:
+        cost = estimate_tokens(e.situation + e.by + e.said_to_them + e.they_say) + 8
+        if used + cost > rules.voice_example_tokens:
+            break
+        out.append(e)
+        used += cost
+    return out
 
 
 def _f1c_lines(tx, actor_id):

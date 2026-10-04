@@ -1,6 +1,10 @@
 {{ ctx.packet.identity.name }}, {{ ctx.packet.identity.age }}. {{ ctx.packet.identity.one_line }}
 {% for l in ctx.packet.identity.section('voice').lines %}{{ l.text }}
-{% endfor %}{% if ctx.behavior_notes %}How they carry an idea:
+{% endfor %}{% if ctx.packet.voice_examples %}Moments from before, in their own words (how they sound; never lines to repeat):
+{% for e in ctx.packet.voice_examples %}- {{ e.situation }}
+{% if e.said_to_them %}  {{ e.by or "Someone" }}: "{{ e.said_to_them }}"
+{% endif %}  They said: "{{ e.they_say }}"
+{% endfor %}{% endif %}{% if ctx.behavior_notes %}How they carry an idea:
 {% for n in ctx.behavior_notes %}- {{ n }}
 {% endfor %}{% endif %}Right now: {% for s in ctx.packet.perceived_now %}{{ s.text }} {% endfor %}
 

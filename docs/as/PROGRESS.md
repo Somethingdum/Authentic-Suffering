@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2008 passed (2015 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2015 passed (2022 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -37,6 +37,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 | acoustic fidelity margins 12/5/0 dB | `AcousticRules` | `tools/as/eval.py` belief-accuracy runs (BENCH-07) |
 | Resolve drains/recoveries | `ResolveRules` | eval refusal/compliance rates (BENCH-03) |
 | packet token budgets 6000/4000/3000 (Actor Spec §5; were 3500/2200/1400) | `PacketRules.token_budget` | the bench's ladder (D-112): reading speed and recall by prompt length, and each cognition call's real time (BENCH-04) |
+| room for a person's voice examples (600 tokens) and how many a split second gets (2) | `PacketRules.voice_example_tokens`, `voice_examples_reaction` | the bench's reading speed (D-112): what 600 tokens cost the Writer per call, and a play session's sense of whether people sound like themselves (D-116) |
 | heard words cut at 800 characters (Actor Spec §5) | `PacketRules.max_heard_chars` | a play session's longest speeches: nobody's own context crowded out, no ordinary speech cut |
 | outings: daily chance per kind | `WorldRules.op_chance` | 100-day fake-model soak per difficulty (BENCH-06): how many go out, how many come back |
 | how long marks last under a roof | `WorldRules.sheltered_trace_mult` | play-tuning |
@@ -117,6 +118,14 @@ do nothing.
    Lurker venom and feeding ("it should be in there, if not there's issues"), the Lurker stalk and the
    settlement hunt, Codex as the inner monologue, and your Willis card updates (2026-09-26). Left alone:
    the game keeps the lore it has now (CHEATS §6b, the core pack), and none of these are built.
+9. **Your character examples** (D-116, done while you were away; the examples themselves are yours): every
+   character can now carry `voice.examples` — moments in their own words (what was going on, who spoke to
+   them and what they said, what the character said back, how hard it pressed them). The game shows a
+   person's examples to the model as things they already said, never as lines to repeat: in their
+   decisions, in say-my-way when you opt in, and Willis's in his frozen-moment roast. Send me the Willis
+   and Addison examples you have (as text, or a story or chat log: each moment where they speak becomes
+   one), and say whether they may go in this public repository or belong in a private pack. Left alone:
+   nobody has examples; everything works as before (the three exemplar lines on each card).
 
 ## Notes (builder)
 

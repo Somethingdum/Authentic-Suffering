@@ -259,6 +259,10 @@ class PacketRules(Strict):
     max_affordances: int = 24       # [SAND] Actor Spec §8: a short, diverse first menu of 24; more on request
     min_affordances: int = 3
     max_heard_chars: int = 800     # [SAND] Actor Spec §5: heard words past this are cut, ' …' (packet, aftermath)
+    # [SAND] D-116 (EXAMPLE-02): room for a person's voice examples, and how many a split second gets.
+    # About four seconds of reading on the Writer; the bench's reading speed says what it really costs.
+    voice_example_tokens: int = 600
+    voice_examples_reaction: int = 2
 
 
 class StyleRulesNumbers(Strict):

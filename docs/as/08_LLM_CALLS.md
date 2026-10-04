@@ -180,6 +180,11 @@ one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 
   text verbatim, `_actor_answer.j2` the answer's shape; a reaction adds only its last paragraph. No
   story, narrator, player, author or audience appears in them, and the user message opens with
   *Who you are* and the identity card (05 §2.1; p04 `test_identity.py`).
+- **A person's own moments** (D-116, 05 §2.2): right after the card, the voice examples that fit
+  `PacketRules.voice_example_tokens` (600 — about four seconds of reading on the Writer at the speeds
+  assumed until the bench measures them); they are stable per person, so they sit in the cached part of
+  the prompt, and they are the first thing the packet budget drops. Say-my-way and Willis's roast show
+  examples the same way.
 
 ## 7. Live tools (run on your machines; `AS_LIVE=1`)
 - `tools/as/probe.py` — reachability, model ids, JSON-schema compliance, thinking control (each mode tried both

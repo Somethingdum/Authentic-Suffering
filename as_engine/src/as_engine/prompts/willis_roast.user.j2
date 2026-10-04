@@ -1,4 +1,9 @@
-{% set f = ctx.facts %}The one frozen in front of you: {{ f.pc_name }}. They have lasted {{ f.lived }} ({{ f.turns }} moment{% if f.turns != 1 %}s{% endif %} of their own).
+{% set f = ctx.facts %}{% if ctx.examples %}How you have sounded before (never lines to repeat):
+{% for e in ctx.examples %}- {{ e.situation }}
+{% if e.said_to_them %}  {{ e.by or "Someone" }}: "{{ e.said_to_them }}"
+{% endif %}  You: "{{ e.they_say }}"
+{% endfor %}
+{% endif %}The one frozen in front of you: {{ f.pc_name }}. They have lasted {{ f.lived }} ({{ f.turns }} moment{% if f.turns != 1 %}s{% endif %} of their own).
 {% if f.in_debt %}They are in your debt. What they did with your power this life, oldest first:
 {% for b in f.borrowed %}- {{ b }}
 {% endfor %}{% endif %}{% if f.choices %}Their last choices, newest first:

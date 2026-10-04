@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-745 ids; 491 with their own statement, 254 named only in context.
+749 ids; 495 with their own statement, 254 named only in context.
 
 
 ## ABUSE
@@ -366,6 +366,15 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | EFF-06 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 | EFF-07 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 
+## EXAMPLE
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| EXAMPLE-01 | A voice example is the person's own moment (situation, who spoke first and what they said, what the person said, the pressure); a voice without examples is still a voice | 05_ACTORS §2.2 | `as_engine/contracts/dossier.py` | `contract/p04_one_actor/test_voice_examples.py` |
+| EXAMPLE-02 | A deliberation shows the examples in the author's order while they fit `PacketRules.voice_example_tokens` (600), the first that does not fit ending the list — the same person shows the same examples every call, so a cac… | 05_ACTORS §2.2 | `as_engine/contracts/dossier.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_voice_examples.py` |
+| EXAMPLE-03 | The prompt shows them right after the card as things already said ("Moments from before, in your own words (how you sound; never lines to repeat)"); say-my-way (only when the player opts in, D-113) shows the PC's the sa… | 05_ACTORS §2.2 | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_voice_examples.py` |
+| EXAMPLE-04 | Willis's own examples (the records tagged `wild_card` in the cheat packs) go into his frozen-moment roast; none, and the roast goes on without them | 05_ACTORS §2.2 | `as_engine/service/death.py` | `contract/p04_one_actor/test_voice_examples.py` |
+
 ## FAC
 
 | Id | Statement | Stated in | Enforced in | Tested by |
@@ -549,7 +558,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| IDN-01 | IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard (``dossier``: ActorDossier or PCDossier — pass mind.actor.fused, so accepted developments, the dossier deltas, are in it) name / age / one_line from ide… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py`, `contract/p04_one_actor/test_packet.py` |
+| IDN-01 | IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard (``dossier``: ActorDossier or PCDossier — pass mind.actor.fused, so accepted developments, the dossier deltas, are in it) name / age / one_line from ide… | as_engine/mind/identity.py | `as_engine/contracts/dossier.py`, `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py`, `contract/p04_one_actor/test_packet.py` |
 | IDN-02 | IDN-02 Kept outside the card, never in any prompt a person's call renders (Actor Spec §4, §5): writers_notes (editorial guidance for authors — AC02), knowledge.does_not_know (naming a hidden fact supplies it — AC04; the… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
 | IDN-03 | IDN-03 Every line's sources are paths that exist in the dossier (list items by index); a line is made only from its sources and the fixed words above. The card is a pure function: the same dossier gives the same card, a… | as_engine/mind/identity.py | `as_engine/contracts/mind.py`, `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
 | IDN-04 | IDN-04 dossier_hash = sha256 hex of kernel.jsoncanon.canonical_json(dossier.model_dump(mode='json', by_alias=True)) — the decision audit's pin of which identity a call saw. | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_identity.py` |
@@ -836,7 +845,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| PROMPT-01 | PROMPT-01 KV-cache order**: stable → volatile. The system template never contains volatile | 08_LLM_CALLS §6 | `as_engine/lanes/requests.py`, `as_engine/prompts/render.py` | `contract/p01_lanes/test_prompts.py` |
+| PROMPT-01 | PROMPT-01 KV-cache order**: stable → volatile. The system template never contains volatile | 08_LLM_CALLS §6 | `as_engine/lanes/requests.py`, `as_engine/mind/packet.py`, `as_engine/prompts/render.py` | `contract/p01_lanes/test_prompts.py`, `contract/p04_one_actor/test_voice_examples.py` |
 | PROMPT-02 | PROMPT-02 No pseudo-code in what the model reads**: plain organised English. Bracket-colon | 08_LLM_CALLS §6 | `as_engine/prompts/render.py` | `contract/p01_lanes/test_prompts.py` |
 
 ## PROP

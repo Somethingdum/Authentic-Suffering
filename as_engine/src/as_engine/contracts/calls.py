@@ -11,6 +11,7 @@ from typing import Literal
 
 from pydantic import Field
 
+from .dossier import VoiceExample
 from .common import Strict
 from .mind import ActionPayload, AftermathPacket, SkullPacket
 from .narration import NarratorPacket
@@ -145,6 +146,8 @@ class WillisRoastContext(Strict):
     """WILLIS_ROAST input (D-105)."""
 
     facts: RoastFacts
+    examples: list[VoiceExample] = Field(default_factory=list, description="D-116 (EXAMPLE-04): his own voice "
+                                         "examples, shown as how he has sounded before.")
 
 
 class ChainBeat(Strict):

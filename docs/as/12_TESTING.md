@@ -373,6 +373,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p12_surfaces/test_cheat_dictionary.py` | CHEAT-20: a command word first is that command, its raw the line as typed ("Spawn Fredrick" is /spawn); a command that takes nothing only as the word alone; anything else is plain words; every command has a meaning, a usage and an example that parses; a plain command that cannot happen writes nothing at all (no story line, no log, no Sandbox) while a '/' line keeps its record; through the service "Spawn Fredrick" spawns him with no plain-words reading, and "kill the lights" goes on to plain words untouched. CHEAT-21: the dictionary lists every command in order (wonder only in the reality exception) with its usage, meaning, example and the options of each blank — 'me' and the people the PC knows by name, the places it knows, the items, the groups, the packs' people and the dead by type, the stats, the weather, the strains — sorted, without repeats; CHEAT-03: empty with no run and before the word |
 | UI `cheat_assist.spec.js` | the autocomplete (`cheatAssist.js`): every command on an empty field, narrowed as the word is typed, a space after one that takes something; the blanks' options from what is typed (the longest run of words, an open quote), quoted when they have a space, the blank after to / about / with / at first; nothing for plain words; the dictionary rows, filter and the one being typed; plain words only; the store keeps the words while the console is open and drops them with the console or the run |
 
+### 3.30 Character examples as history (P4; D-116)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_voice_examples.py` | EXAMPLE-01: an example is a situation, who spoke first and what they said, the person's words and a pressure; a voice without examples is still a voice. EXAMPLE-02: a deliberation takes them in order until the room (600 tokens) is gone, the first that does not fit ending the list; a reaction only the pressure and limit ones, at most two; over the packet budget the last example goes first and nothing else. EXAMPLE-03: the prompt shows them right after the card, before what matters now, as things already said, and a person with none shows no heading; say-my-way shows the PC's before the idea. EXAMPLE-04: Willis's own examples (the `wild_card` records of the cheat packs) open his roast; none, a missing folder or no folder: none |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

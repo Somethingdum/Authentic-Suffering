@@ -16,6 +16,7 @@ from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
+from .dossier import VoiceExample
 from .common import (
     LOD,
     Channel,
@@ -217,6 +218,8 @@ class SkullPacket(Strict):
                                  "moment and are going to have it out with them; None otherwise.")
     portrayal_note: str | None = Field(default=None, description="P11 PORT-07 (D-07): what someone who knows "
                                        "you would say about something you did lately that was not like you; None otherwise.")
+    voice_examples: list[VoiceExample] = Field(default_factory=list, description="D-116 (EXAMPLE-02): moments "
+                                               "in this person's own words, shown as things they already said.")
 
 
 # ---------------------------------------------------------------------------

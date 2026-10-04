@@ -197,6 +197,22 @@ def roast_stored(store, pc_id):
     return rows or None
 
 
+def willis_examples(content_dir, rules):
+    from ..content.pack import cheat_records
+    from ..mind.packet import choose_examples
+    if content_dir is None:
+        return []
+    try:
+        recs = cheat_records(content_dir)
+    except Exception:  # noqa: BLE001 — DEATH-13: he always comes, examples or not
+        return []
+    for ref in sorted(recs):
+        rec = recs[ref]
+        if "wild_card" in (getattr(rec, "tags", None) or []):
+            return choose_examples(rec.voice.examples, reaction=False, rules=rules)
+    return []
+
+
 def fallback_roast(facts):
     if facts.in_debt:
         n = len(facts.borrowed)
@@ -225,7 +241,7 @@ async def roast(session):
     if got is not None:
         return got
     facts = roast_facts(store, pc)
-    ctx = WillisRoastContext(facts=facts)
+    ctx = WillisRoastContext(facts=facts, examples=willis_examples(session.config.content_dir, store.rules.packet))
     lines = []
     try:
         req = build_request(session.config, CallClass.WILLIS_ROAST, turn_index=clock.turn_index(store), context=ctx, ctx=ctx,

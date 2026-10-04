@@ -213,6 +213,24 @@ class VoiceExemplars(Strict):
     at_the_limit: str = Field(min_length=5)
 
 
+class VoiceExample(Strict):
+    """D-116, the owner: "We should have a subsystem that gives character examples as history."
+
+    EXAMPLE-01 A voice example is a moment in this person's own words, authored or imported from the
+      owner's writing: what was going on, what someone said to them first (and who — empty: 'Someone'),
+      and what they said. A model sees the chosen ones (mind.packet EXAMPLE-02) as something this person
+      already said — how they sound, never lines to repeat. They are not the three exemplars (which stay
+      on the identity card, IDN-01): there can be many, and only as many as fit are shown.
+    """
+
+    situation: str = Field(min_length=5, max_length=400, description="What was going on, plainly.")
+    by: str = Field(default="", max_length=60, description="Who spoke to them first ('a trader with a rifle'); empty: 'Someone'.")
+    said_to_them: str = Field(default="", max_length=400, description="What was said to them first, if anything.")
+    they_say: str = Field(min_length=1, max_length=800, description="What this person said, in their own words.")
+    pressure: Literal["easy", "pressure", "limit"] = Field(default="easy", description="How hard the moment pressed "
+                                                            "them (the exemplars' three pressures).")
+
+
 class Voice(Strict):
     capsule: str = Field(min_length=20, max_length=500)
     speech_tendencies: list[str] = Field(min_length=2)
@@ -220,6 +238,8 @@ class Voice(Strict):
     would_never_say: list[str] = Field(min_length=3)
     profanity: Literal["none", "rare", "frequent", "constant"]
     dialect_notes: str = ""
+    examples: list[VoiceExample] = Field(default_factory=list, max_length=60,
+                                         description="D-116 (EXAMPLE-01): moments in their own words, most telling first.")
 
 
 class RelationSeed(Strict):

@@ -209,10 +209,26 @@ Fields (second person, plain English):
   consult_kinds     [] when reaction or consulted; else ['recall'] + ['more_actions'] when
                     families is not empty — CONSULT-01.
   looked_up         consulted.lines, or [].
+  voice_examples    (D-116) choose_examples(the fused dossier's voice.examples, reaction=reaction,
+                    rules=PacketRules) — EXAMPLE-02. The prompt shows them right after the card (stable
+                    per person, so a cached prompt stays cached, PROMPT-01).
+
+EXAMPLE-02 choose_examples(examples, *, reaction, rules) -> list[VoiceExample]   (pure)
+  A deliberation: the examples in the dossier's order (the author's: most telling first) while the
+  running sum of estimate_tokens(situation + by + said_to_them + they_say) + 8 per example stays within
+  rules.voice_example_tokens; the first that would pass it ends the list (no reshuffling to squeeze in
+  a smaller one: the same person shows the same examples every call). A reaction (a split second):
+  only those whose pressure is 'pressure' or 'limit', in order, at most rules.voice_examples_reaction,
+  within the same token cap. None or an empty list -> [].
+EXAMPLE-03 The prompt (prompts/actor_cognition.user.j2, shared by the reaction) shows them under
+  'Moments from before, in your own words (how you sound; never lines to repeat):' as, per example,
+  '- ' + situation, then (when said_to_them) f'  {by or "Someone"}: "{said_to_them}"', then
+  f'  You: "{they_say}"'. A person with none shows nothing (no heading).
 
 Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   prompts.render(CallClass.ACTOR_COGNITION, p=packet) (ACTOR_REACTION when reaction=True). While
-  over PacketRules.token_budget[key], drop ONE item and re-render, in this order: memories (last
+  over PacketRules.token_budget[key], drop ONE item and re-render, in this order: (D-116) voice
+  examples (last first: how someone sounds gives way before what they remember), memories (last
   first), lessons (last first), beliefs (last first), relationship lines whose entity is not a
   source of this turn's percepts (last first), refusals created more than 7 days before ``at``
   whose requester is not a source of this turn's percepts (oldest first), (B5) the unprocessed
@@ -223,7 +239,7 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   back (looked_up), the latest unsettled turn's unprocessed lines, and every refusal whose
   requester is a source of this turn's percepts (someone here or speaking now). Every item
   dropped is recorded, in drop order, in ``omitted`` (never rendered: an audit of what was cut):
-  'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
+  'example: ' + the example's they_say, 'memory: ' + the MemoryLine text, 'lesson: ' + the lessons entry, 'belief: ' + the BeliefLine
   text, f'relationship: {handle}: {text}', 'refusal: ' + the refusals entry, 'unprocessed: ' + the
   line, 'uncertainty: ' + the line — e.g. 'refusal: You refused: hand me the revolver.' When
   nothing droppable is left the packet is returned over budget (the scheduler logs it).
@@ -262,7 +278,11 @@ def build_packet(tx: "Tx", actor_id: str, lod: LOD, affordances: "AffordanceSet"
     raise NotImplementedError("P4")
 
 
+def choose_examples(examples, *, reaction: bool, rules) -> list:
+    raise NotImplementedError("D-116")
+
+
 def estimate_tokens(text: str) -> int:
     """len(text) // 4 (implemented; the same estimate is used everywhere)."""
     return len(text) // 4
-from ._impl_packet import build_packet  # noqa
+from ._impl_packet import build_packet, choose_examples  # noqa

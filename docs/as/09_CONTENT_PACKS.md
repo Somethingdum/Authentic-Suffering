@@ -79,7 +79,7 @@ specificity that stops drift (CNT-10); these are the rules in words:
 | `decision_stack` | at least four layers, highest first, inversion conditions, a past example | what they do when priorities collide |
 | `silence` | at least two situations when they go quiet, body when silent | silence is characterisation |
 | `knowledge` | knows / does not know / knows but hides | seeds their beliefs at world start; *does not know* is for authoring checks and never reaches a prompt |
-| `voice` | capsule (20–500 chars), ≥ 2 speech tendencies, **three example lines** — low stakes, under pressure, at the limit — **≥ 3 things they would never say**, profanity level | the single strongest defence against every character sounding the same |
+| `voice` | capsule (20–500 chars), ≥ 2 speech tendencies, **three example lines** — low stakes, under pressure, at the limit — **≥ 3 things they would never say**, profanity level; optional `examples` (below) | the single strongest defence against every character sounding the same |
 | `social` | relations with history, dependents, guardians, memberships | dependents appear in their decisions as stakes |
 | `life` | aspiration, current project, ≥ 1 fear, secrets with who knows and what exposure costs | goals and grudges grow from these |
 | `disposition` | archetype prior, stance to strangers, default first-contact behaviour | first contact without a model call when they are far away |
@@ -112,6 +112,30 @@ holstered pistol, a pack) stays in `starting_inventory` with slot `worn`. A PC m
 `memory` (what they carry of it, in their own terms) and `days_before_start` (a range, default
 1–365). Every life as them starts remembering each one as an anchor memory, on a day drawn for
 that world (WG-33b); Addison's is "The laundromat".
+
+### 3.0 Their own moments (`voice.examples`, D-116)
+
+Give a person as many moments in their own words as you have — the more telling first, since only as
+many as fit are shown (about 600 tokens' worth in a decision, the hard ones only in a split second;
+05 §2.2). Each is what was going on, who spoke to them first and what they said (both optional), the
+person's exact words, and how hard it pressed them:
+
+```yaml
+voice:
+  # ... capsule, speech_tendencies, exemplars, would_never_say, profanity ...
+  examples:
+    - situation: A trader weighs her antibiotics and names a price.
+      by: the trader
+      said_to_them: Two cans of beans. Take it or leave it.
+      they_say: Leave it, then. Somebody's kid needs these more than you need my beans.
+    - situation: Someone grabs her arm in the dark.
+      they_say: Let go. Now.
+      pressure: pressure          # easy (the default) | pressure | limit
+```
+
+Write the words exactly as the person says them; a model sees them as something the person already
+said and is told never to repeat them. A long document of a character's scenes can go through dossier
+intake (§8.1), which makes each moment where they speak an example.
 
 ### 3.1 How they look (`appearance.looks`, F1a)
 
@@ -401,7 +425,9 @@ playable character, faction, lore) and drop a `.md`, `.txt` or `.docx`.
 
 1. The text is split into sections of at most ~12,000 tokens on heading boundaries.
 2. The Writer (lane A, the main model: long context) reads each section with the record's field list and fills what
-   that section supports. It never invents: fields a section does not support stay empty.
+   that section supports. It never invents: fields a section does not support stay empty. Every moment where the
+   character speaks becomes one of `voice.examples`, their words exactly as written (D-116) — so a
+   story, a script or a chat log of a character is a way to give them many examples at once.
 3. Partial results merge field by field (later sections append to lists; they never overwrite a
    filled text field).
 4. The merged draft is validated; problems go to the `.gaps.md` file.

@@ -61,12 +61,20 @@ async roast(session) -> list[str]
   regardless of the Wild Card, the console, the difficulty or Ironman. Stored lines are returned
   as they are (no call). Otherwise ONE WILLIS_ROAST call (lane A; lanes.requests.build_request(config,
   WILLIS_ROAST, turn_index = the current turn, context = ctx = WillisRoastContext(facts =
-  roast_facts(store, session.pc_id)), json_schema = lanes.schemas.to_lm_schema(WillisRoast))); lines
+  roast_facts(store, session.pc_id), examples = willis_examples(session.config.content_dir,
+  store.rules.packet)), json_schema = lanes.schemas.to_lm_schema(WillisRoast))); lines
   = the output's lines, each stripped and cut to 300 characters, empty ones dropped, at most 3 —
   6 when in_debt ("twice as hard"). ANY failure of the call (the lane down, a timeout, an unparseable
   or empty answer, an exception from the transport) -> fallback_roast(facts): he always comes.
   Nothing is stored or recorded here: the pipeline stores the whole scene, in order, and records
   every call of its turn.
+
+willis_examples(content_dir, rules) -> list[VoiceExample]   (D-116)
+  EXAMPLE-04 Willis sounds like himself in the frozen moment: the first record, by ref, tagged
+  'wild_card' among content.pack.cheat_records(content_dir) (the records that are Willis) ->
+  mind.packet.choose_examples(its voice.examples, reaction=False, rules=rules). No such record, None, or
+  a content folder that cannot be read -> [] (he always comes, DEATH-13; the prompt then has no
+  examples).
 
 fallback_roast(facts) -> list[str]
   DEATH-14 Willis without a model, from the facts only. He never finishes: the last line ends in
@@ -135,6 +143,10 @@ async def roast(session) -> list[str]:
     raise NotImplementedError("P12")
 
 
+def willis_examples(content_dir, rules) -> list:
+    raise NotImplementedError("D-116")
+
+
 def fallback_roast(facts: "RoastFacts") -> list[str]:
     raise NotImplementedError("P12")
 
@@ -151,4 +163,5 @@ from ._impl_death import (  # noqa
     roast_facts,
     roast_stored,
     truth_reveal,
+    willis_examples,
 )
