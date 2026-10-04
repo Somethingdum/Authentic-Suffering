@@ -71,6 +71,10 @@ RECALL_FLOOR = 0.8           # four facts in five
 SCHED_KEYS = ("intake", "actor_cognition_hot", "actor_cognition_warm", "actor_reaction", "writeback",
               "portrayal_audit", "narration", "render_lint")       # SchedulerRules.estimated_call_s
 CAPACITY_CANDIDATES = 80
+# The thinking calls on every move's own path (the HOT decision, the narration and its judge): the bench also times
+# each without thinking, so the owner can weigh minutes against quality with real numbers. --accept never turns
+# thinking off: that is the owner's call.
+NO_THINK = ("actor_cognition_hot", "narration", "render_lint")
 
 _NAMES = ("Mara", "June", "Eli", "Nita", "Owen", "Carl", "Reggie", "Alice")
 _ACTS = ("counted", "carried", "hid", "mended", "traded", "found", "cleaned", "checked")
@@ -237,6 +241,34 @@ def flipped_hot(cfg, report: dict):
         "hot_cognition": cfg.hot_cognition.model_copy(update={"lane": other})})
     reserve, budgets = design_budgets(alt)
     return with_scheduler(alt, reserve_narration_s=reserve, turn_budget_s=budgets)
+
+
+def without_thinking(cfg, report: dict):
+    """``cfg`` with the NO_THINK calls answering without thinking, timed by their ``@nothink`` rows; None when none
+    was measured. Budgets are re-derived the same way, so the columns compare fairly."""
+    from as_engine.contracts.common import CallClass
+    rows = report.get("classes") or {}
+    got = {k: rows[f"{k}@nothink"] for k in NO_THINK if (rows.get(f"{k}@nothink") or {}).get("ok")}
+    if not got:
+        return None
+    alt = cfg.model_copy(deep=True)
+    est = dict(cfg.rules.scheduler.estimated_call_s)
+    for k, row in got.items():
+        est[k] = round(row["mean_s"], 1)
+        if k == "actor_cognition_hot":
+            alt.hot_cognition = alt.hot_cognition.model_copy(update={"thinking": False})
+        else:
+            alt.regimes[CallClass(k)] = alt.regimes[CallClass(k)].model_copy(update={"thinking": False})
+    alt = with_scheduler(alt, estimated_call_s=est)
+    reserve, budgets = design_budgets(alt)
+    return with_scheduler(alt, reserve_narration_s=reserve, turn_budget_s=budgets)
+
+
+def thinking_settings(report: dict) -> list[str]:
+    """The as_config.yaml lines that turn the measured NO_THINK calls' thinking off."""
+    rows = report.get("classes") or {}
+    return [("hot_cognition.thinking: false" if k == "actor_cognition_hot" else f"regimes.{k}.thinking: false")
+            for k in NO_THINK if (rows.get(f"{k}@nothink") or {}).get("ok")]
 
 
 def recommend(report: dict, cfg, *, keep_budgets: bool = False):
@@ -657,9 +689,12 @@ class Bench:
         new, changes = recommend(self.report, self.base, keep_budgets=keep_budgets)
         measured_only = with_scheduler(self.base, estimated_call_s=new.rules.scheduler.estimated_call_s)
         flip = flipped_hot(new, self.report)
+        quiet = without_thinking(new, self.report)
         self.report["projection"] = {"now": project_turns(measured_only), "after": project_turns(new),
                                      "hot_lane": new.hot_cognition.lane.value,
-                                     "other_hot_lane": project_turns(flip) if flip is not None else None}
+                                     "other_hot_lane": project_turns(flip) if flip is not None else None,
+                                     "no_thinking": project_turns(quiet) if quiet is not None else None,
+                                     "no_thinking_settings": thinking_settings(self.report)}
         self.report["changes"] = changes
         self.report["complete"] = True
         return self.report
@@ -721,7 +756,8 @@ def narration_lint(cfg, drafts: list[str], packet) -> dict:
 
 def class_requests(cfg) -> list:
     """(bench key, call class, the game's own request) for every call class, from the protected prompt samples; and
-    the HOT decision on the other lane as ``actor_cognition_hot@<lane>`` (a comparison: it changes no setting)."""
+    the HOT decision on the other lane as ``actor_cognition_hot@<lane>``, and each NO_THINK call that thinks without
+    thinking as ``<key>@nothink`` (comparisons: they change no setting)."""
     sys.path.insert(0, str(ROOT / "as_engine" / "tests" / "fixtures" / "prompt_samples"))
     import samples
     from as_engine.contracts.calls import WritebackContext
@@ -749,6 +785,9 @@ def class_requests(cfg) -> list:
         req = build_request(cfg, cc, turn_index=1, context=context,
                             json_schema=to_lm_schema(model) if model else None, **kws)
         out.append((cc.value, cc, req))
+    for key, cc, req in list(out):
+        if key in NO_THINK and req.thinking:
+            out.append((f"{key}@nothink", cc, req.model_copy(update={"thinking": False})))
     return out
 
 
@@ -830,17 +869,23 @@ def markdown(report: dict) -> str:
     if pj:
         hot = pj.get("hot_lane", "A")
         other = "B" if hot == "A" else "A"
-        flip = pj.get("other_hot_lane")
-        head = (f"| Depth | Today's lane settings | After --accept (HOT on {hot}) | After --accept, HOT on {other} instead |"
-                if flip else "| Depth | Today's lane settings | After --accept |")
+        cols = [("Today's lane settings", pj["now"]), (f"After --accept (HOT on {hot})", pj["after"])]
+        if pj.get("other_hot_lane"):
+            cols.append((f"After --accept, HOT on {other} instead", pj["other_hot_lane"]))
+        if pj.get("no_thinking"):
+            cols.append(("After --accept, without thinking*", pj["no_thinking"]))
         lines += ["## A medium scene, per turn depth (an estimate from the measured call times)", "",
                   "Five people, sorted by the planner into HOT, WARM and no call by the depth's budget; one reaction wave "
                   "of two; five memory jobs; the narration and its lint beside the writeback.", "",
-                  head, "|---|---|---|" + ("---|" if flip else "")]
+                  "| Depth | " + " | ".join(c for c, _p in cols) + " |", "|---|" + "---|" * len(cols)]
         for dpt in ("quick", "balanced", "deep"):
-            cells = [_scene(pj["now"][dpt]), _scene(pj["after"][dpt])] + ([_scene(flip[dpt])] if flip else [])
-            lines.append(f"| {dpt} | " + " | ".join(cells) + " |")
+            lines.append(f"| {dpt} | " + " | ".join(_scene(p[dpt]) for _c, p in cols) + " |")
         lines.append("")
+        if pj.get("no_thinking"):
+            lines += ["*The HOT minds, the narration and its judge answering without thinking first (the game's calls "
+                      "above, `@nothink`). Thinking costs minutes on these machines and may buy better choices and "
+                      "prose: it is your call, and --accept never changes it. To turn it off, in as_config.yaml: "
+                      + ", ".join(f"`{x}`" for x in pj.get("no_thinking_settings") or []) + ".", ""]
     lines += ["## What --accept changes", ""]
     lines += [f"- `{c}`" for c in report.get("changes") or []] or ["- nothing"]
     return "\n".join(lines) + "\n"

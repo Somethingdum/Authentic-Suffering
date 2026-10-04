@@ -126,6 +126,14 @@ do nothing.
    and Addison examples you have (as text, or a story or chat log: each moment where they speak becomes
    one), and say whether they may go in this public repository or belong in a private pack. Left alone:
    nobody has examples; everything works as before (the three exemplar lines on each card).
+10. **How long a move takes, and thinking** (your call, after the bench): every move's own path has three
+   calls that think first — each HOT person's decision and the narration on the Writer, and the narration's
+   judge on the Clerk. Guessing from your speeds (the Writer thinking about 800 tokens at 5 a second is nearly
+   three minutes a call), a move with one HOT person takes roughly 9 minutes and a deep one with three about
+   15; with those three calls not thinking, roughly 3 to 4. The bench now times each of them both ways and
+   shows the whole move both ways ("without thinking" in `bench.md`), with the exact as_config.yaml lines
+   (`hot_cognition.thinking: false`, `regimes.narration.thinking: false`, `regimes.render_lint.thinking:
+   false`); `--accept` never changes thinking. Left alone: everything thinks, as you asked for quality.
 
 ## Notes (builder)
 

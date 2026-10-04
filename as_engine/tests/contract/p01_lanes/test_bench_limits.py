@@ -101,7 +101,7 @@ def test_it_sees_the_cache_the_slots_and_the_recall(fake_report, sim):
         assert L["ladder"]["format_ok"] == L["ladder"]["rung_count"], "every rung answered in the JSON asked for"
 
 
-def test_every_call_class_runs_on_its_own_lane_at_its_own_regime(fake_report):
+def test_every_call_class_runs_on_its_own_lane_at_its_own_regime(fake_report, bench):
     cfg = EngineConfig()
     rows = fake_report["classes"]
     assert rows["actor_cognition_hot"]["lane"] == cfg.hot_cognition.lane.value and rows["actor_cognition_hot"]["thinking"]
@@ -114,6 +114,11 @@ def test_every_call_class_runs_on_its_own_lane_at_its_own_regime(fake_report):
     assert rows["actor_cognition_warm"]["lane"] == cfg.regimes[CallClass.ACTOR_COGNITION].lane.value
     other = "B" if cfg.hot_cognition.lane == Lane.A else "A"
     assert rows[f"actor_cognition_hot@{other}"]["lane"] == other, "the HOT decision is timed on the other lane too"
+    for k in bench.NO_THINK:
+        quiet = rows[f"{k}@nothink"]
+        assert rows[k]["thinking"] and not quiet["thinking"] and quiet["lane"] == rows[k]["lane"], \
+            f"{k}: the thinking calls on every move's path are timed without thinking too"
+        assert quiet["parsed"] == quiet["n"] and quiet["mean_s"] < rows[k]["mean_s"], k
     for k in ("intake", "actor_cognition_hot", "actor_cognition_warm", "writeback", "narration", "render_lint"):
         assert rows[k]["parsed"] == rows[k]["n"] and not rows[k]["truncated"], k
     lint = rows["narration"]["lint"]
@@ -140,8 +145,15 @@ def test_the_settings_keep_the_design(fake_report, bench):
         assert lods.count(LOD.HOT) == hot_n and lods.count(LOD.WARM) >= warm_n, depth
     assert new.hot_cognition.lane == base.hot_cognition.lane and all(
         new.regimes[cc].lane == base.regimes[cc].lane for cc in CallClass), "the bench never moves a call"
+    assert new.hot_cognition.thinking == base.hot_cognition.thinking and all(
+        new.regimes[cc].thinking == base.regimes[cc].thinking for cc in CallClass), "nor turns thinking off: the owner's call"
     pj = fake_report["projection"]
     assert pj["other_hot_lane"] and set(pj["after"]) == {"quick", "balanced", "deep"}
+    assert all(pj["no_thinking"][d]["s"] < pj["after"][d]["s"] for d in pj["after"])
+    assert pj["no_thinking_settings"] == ["hot_cognition.thinking: false", "regimes.narration.thinking: false",
+                                          "regimes.render_lint.thinking: false"]
+    md = bench.markdown(fake_report)
+    assert "without thinking*" in md and "`regimes.render_lint.thinking: false`" in md
     kept, kept_changes = bench.recommend(fake_report, base, keep_budgets=True)
     assert kept.rules.scheduler.turn_budget_s == base.rules.scheduler.turn_budget_s
     assert not any("turn_budget_s" in c or "reserve_narration_s" in c for c in kept_changes)

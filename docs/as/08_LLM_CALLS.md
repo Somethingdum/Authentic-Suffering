@@ -196,14 +196,16 @@ one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 
   every long prompt — the same prompts, so long contexts are read once), what the prompt cache saves, writing
   speed with thinking off and on and how much of it is thinking, whether parallel requests add throughput, and
   every call class the game makes at its own regime (time, prompt size, thinking, whether `max_tokens` cut it
-  short, whether it parsed) — with the HOT decision timed on both lanes, and each narration draft put through
+  short, whether it parsed) — with the HOT decision timed on both lanes, the thinking calls on every move's path
+  (the HOT decision, the narration and its judge) timed without thinking too, and each narration draft put through
   the game's own code lint (how many would pass, which rules fail the rest: each failure costs a redraft). It writes `reports/bench.json` and a
   readable `reports/bench.md` (each lane's limits, the call table, a medium scene's turn time per depth with
-  the HOT minds on either lane, and what `--accept` would change). `--accept` writes the thinking switch,
+  the HOT minds on either lane and with those calls not thinking — the as_config.yaml lines to do that are
+  printed, never applied — and what `--accept` would change). `--accept` writes the thinking switch,
   JSON-with-thinking, prompt progress, `max_concurrency`, the stall window (only raised), the `max_tokens` of
   any call it saw cut short (raised), each regime's expected seconds, `estimated_call_s`, and turn budgets that
   still admit the minds each depth was designed for (`--keep-budgets` to leave them). It never moves a call to
-  another lane. On the owner's pair (5 and 19 tokens a second) a full run takes about three hours — run it
+  another lane and never turns thinking off (the owner's call). On the owner's pair (5 and 19 tokens a second) a full run takes about three hours — run it
   overnight; `--quick` about one. `--fake` runs it on two simulated lanes with known limits
   (`tools/as/benchsim.py`); the contract test checks that it finds them (p01 `test_bench_limits.py`).
 - `tools/as/eval.py` — plays the canonical scenarios with real models and reports: refusal rate on
