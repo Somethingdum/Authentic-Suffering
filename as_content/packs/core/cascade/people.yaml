@@ -778,3 +778,48 @@
       payload: {about: "$trigger.missed_attacker", claim: tried_to_kill_someone, seen: true}
   delay_s: 0
   cites: [D-161, D-126, docs/as/06_WORLD.md#6]
+# D-163 — the door shut on them (the owner: "If I treat them like shit, or do something just absolutely evil.
+# I do expect reactions, and proper ones."). Shutting a door with someone on the wrong side of it, with the
+# dead there or blood just spilled there, cost nothing. Whether it was the only choice is theirs to judge; that
+# it was done is not. The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-069
+  description: Someone shut the door on you and left you out there with the danger; you will not trust them, and you hold it against them.
+  trigger_event: PORTAL_CHANGE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: shut_out_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: shut_out}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: shut_out_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 2, cause: shut_out}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: shut_out_by(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} shut the door on you and left you out there.", strength: 3}
+  delay_s: 0
+  cites: [D-163, D-148]
+- schema: as.cascade.v1
+  id: CAS-070
+  description: Seeing someone shut the door on a person you love, with the danger on their side, costs them your trust, and the story travels.
+  trigger_event: PORTAL_CHANGE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_shut_out(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: shut_out_my_own}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_shut_out(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: shut_out_my_own}
+    - kind: create_rumour
+      target: saw_them_shut_out(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: shut_someone_out, seen: true}
+  delay_s: 0
+  cites: [D-163, D-162]

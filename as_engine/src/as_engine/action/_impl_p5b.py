@@ -951,6 +951,58 @@ def _left_in_danger(tx, event_id):
     return left, [h for h in saw if h != who and h not in mine and _controller(tx, h) != "human"]
 
 
+def _shut_out(tx, event_id):
+    """D-163: (those shut out on the dangerous side, the bonded ones who saw it from the near side) for a door shut."""
+    from ..society._impl_society import _controller
+    ev = _row(tx, "SELECT type, actor_id, payload, at FROM events WHERE event_id=?", (event_id,))
+    if ev is None or ev["type"] != "PORTAL_CHANGE" or not ev["actor_id"]:
+        return [], []
+    who = ev["actor_id"]
+    if not tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)):
+        return [], []
+    pl = json.loads(ev["payload"])
+    ch, before = pl.get("changes") or {}, pl.get("before") or {}
+    shuts = (before.get("is_open") == 1 and ch.get("is_open") == 0) or (before.get("is_locked") == 0 and ch.get("is_locked") == 1) \
+        or (ch.get("barricade") is not None and ch["barricade"] > (before.get("barricade") or 0))
+    if not shuts:
+        return [], []
+    pt = _row(tx, "SELECT place_a, place_b FROM portals WHERE portal_id=?", (pl.get("portal_id"),))
+    mine = _row(tx, "SELECT place_id FROM positions WHERE body_id=?", (who,))
+    if pt is None or mine is None or mine["place_id"] not in (pt["place_a"], pt["place_b"]):
+        return [], []
+    near = mine["place_id"]
+    far = pt["place_b"] if near == pt["place_a"] else pt["place_a"]
+    danger = tx.query_one("SELECT 1 FROM bodies b JOIN positions p ON p.body_id=b.body_id WHERE p.place_id=? AND b.kind='infected' "
+                          "AND b.alive=1", (far,)) or tx.query_one(
+        "SELECT 1 FROM events e JOIN positions p ON p.body_id=json_extract(e.payload,'$.body_id') WHERE e.type='HARM' AND "
+        "p.place_id=? AND e.at BETWEEN ? AND ?", (far, ev["at"] - 60_000, ev["at"]))
+    if not danger:
+        return [], []
+    heard = [r[0] for r in tx.query("SELECT DISTINCT p.holder_id FROM percept_log p JOIN positions s ON s.body_id=p.holder_id "
+                                    "JOIN bodies b ON b.body_id=p.holder_id JOIN actors a ON a.actor_id=p.holder_id WHERE "
+                                    "p.event_id=? AND s.place_id=? AND b.alive=1 ORDER BY p.holder_id", (event_id, far))]
+    out = [h for h in heard if h != who and _controller(tx, h) != "human" and not tx.query_one(
+        "SELECT 1 FROM open_loops WHERE holder_id=? AND kind='grudge' AND subject_ids LIKE ? AND text LIKE '%shut the door on you%' "
+        "AND created_at>? AND created_event NOT IN (SELECT event_id FROM events WHERE event_id=? OR cause_event_id=?)",
+        (h, f'%"{who}"%', ev["at"] - 3_600_000, event_id, event_id))]
+    if not out:
+        return [], []
+    hh = {}
+    for (h,) in tx.query("SELECT DISTINCT p.holder_id FROM percept_log p JOIN positions s ON s.body_id=p.holder_id WHERE "
+                         "p.event_id=? AND p.channel='visual' AND p.fidelity IN ('exact','partial') AND s.place_id=? "
+                         "ORDER BY p.holder_id", (event_id, near)):
+        if h == who or h in out or _controller(tx, h) == "human":
+            continue
+        homes = {r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (h,))}
+        for o in out:
+            loves = tx.query_one("SELECT 1 FROM relationships WHERE from_id=? AND to_id=? AND affection>=1", (h, o))
+            kin = homes & {r[0] for r in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (o,))}
+            if loves or kin:
+                hh[h] = True
+                break
+    return out, sorted(hh)
+
+
 def _theft_victims(tx, event_id):
     """D-129: of a taking's witnesses, those who believe the thing is their own or their household's."""
     ev = _row(tx, "SELECT actor_id, payload FROM events WHERE event_id=?", (event_id,))
@@ -1122,6 +1174,8 @@ def select(tx, selector, trigger):
         mates = {r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id WHERE "
                                         "m.group_id=? AND m.status IN ('member','probation') AND b.alive=1", (groups[0],))}
         return [h for h in _onlookers(tx, trigger, v) if h in mates and h not in (k[0], dead)]
+    if fn in ("shut_out_by", "saw_them_shut_out"):                  # D-163: the door shut on them
+        return _shut_out(tx, v)[0 if fn == "shut_out_by" else 1]
     if fn in ("attacked_by_someone", "attack_onlookers_of"):        # D-161: an attack that hurt nobody
         from ..society._impl_society import _controller
         a = _missed(tx, trigger)

@@ -638,6 +638,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_it_missed.py` | Owen's shot at Mara misses: she trusts him 2 less, fears him 2 more and holds that he tried to kill her; Alice and June, who saw the gun raised, trust him less, fear him and tell it — as something they saw (provenance 'witnessed'); a shove that hurt nobody costs a little trust and some resentment, no grudge, no talk; a shot that landed is CAS-036's, one at someone who had gone for him first is nothing new; never into the player's character |
 
+### 3.74 The door shut on them (P9; D-163)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_the_door_shut.py` | June shuts the back door on Nita with one of the dead in the alley: Nita trusts her 2 less, resents her and holds it (strength 3); Mara, who loves Nita and saw it, trusts June less, resents it and tells it; Alice, who saw it but has no tie to Nita, nothing; locking the door after is the same act, not a second grudge; with no danger out there, shutting a door is nothing |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

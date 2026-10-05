@@ -109,6 +109,21 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     saw_child_left_by(<path>)                 (D-148) for such a MOVE with someone left_in_danger_by it:
                                               the others still in from_place who saw it go — never the one
                                               leaving, one left, or the PC
+    shut_out_by(<path>)                       (D-163) for a PORTAL_CHANGE by someone with an actors row
+                                              that shuts the way (is_open 1 -> 0, is_locked 0 -> 1, or
+                                              barricade raised) while the place on the far side of it
+                                              from them is dangerous (as left_in_danger_by: one of the
+                                              dead alive there, or a HARM there in the 60 s up to it):
+                                              the living people with actors rows in that place who
+                                              perceived it (any percept of the event), never the one who
+                                              shut it or the PC, not twice in an hour (no grudge of theirs
+                                              naming the one who shut it whose text says they 'shut the
+                                              door on you', made in the hour up to it by another event)
+    saw_them_shut_out(<path>)                 (D-163) for such a PORTAL_CHANGE with someone shut_out_by
+                                              it: the holders of a visual EXACT or PARTIAL percept of it
+                                              on the near side who are bonded to one shut out (affection
+                                              >= 1 toward them, or one household) — never the one who
+                                              shut it, one shut out, or the PC
     attacked_by_someone(<path>)               (D-161) for an ACTION_COMPLETE of an attack that hurt
                                               nobody (trigger.missed_attacker present): the one it was
                                               made on — never the PC (C06)

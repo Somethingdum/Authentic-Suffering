@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-813 ids; 555 with their own statement, 258 named only in context.
+815 ids; 557 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -185,7 +185,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-066 | Someone tried to kill you — a shot or a blade that missed — when you were not fighting them; you will not trust them, you are afraid of them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
 | CAS-067 | Someone went for you — a blow, a grab, a shove that did not hurt — when you were not fighting them; you trust them less and resent it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
 | CAS-068 | Seeing someone try to kill a person who was not fighting them costs them your trust, makes you wary of them, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
+| CAS-069 | Someone shut the door on you and left you out there with the danger; you will not trust them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_the_door_shut.py` |
 | CAS-07 | CAS-07 an effect whose target resolves to no ids is a no-op, not an error; the rule still counts as fired for the decision audit. | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
+| CAS-070 | Seeing someone shut the door on a person you love, with the danger on their side, costs them your trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_the_door_shut.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |
