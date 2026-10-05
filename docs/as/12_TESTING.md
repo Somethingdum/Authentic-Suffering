@@ -660,7 +660,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p04_one_actor/test_how_they_spoke.py` | A heard line reads "spoke to you", "called out to you", "shouted to you" — never "spoke normal" or "spoke shout" |
+| `p04_one_actor/test_how_they_spoke.py` | A heard line reads "spoke to you", "called out to you", "shouted to you" — never "spoke normal" or "spoke shout"; (D-168) the speaker is "(someone you know)", never "(peer)" |
 
 ### 3.78 Asked, then said why (P4; D-167)
 

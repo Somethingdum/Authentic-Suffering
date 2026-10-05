@@ -4,7 +4,7 @@ Nerve: {{ ctx.packet.resolve_cur }} of {{ ctx.packet.resolve_max }}.
 
 WHAT THEY KNEW AND FACED
 {% for s in ctx.packet.perceived_now %}- {{ s.text }}
-{% endfor %}{% for u in ctx.packet.utterances %}- Heard: {% if u.words %}"{{ u.words }}"{% else %}(no words, only the tone){% endif %} ({{ u.form.value }}, {{ u.standing.value | replace('_',' ') }})
+{% endfor %}{% for u in ctx.packet.utterances %}- Heard: {% if u.words %}"{{ u.words }}"{% else %}(no words, only the tone){% endif %} ({{ u.form.value }}, from {{ standing_words[u.standing.value] }})
 {% endfor %}- In the middle of: {{ ctx.packet.commitments.current_task or "nothing" }}
 {% for d in ctx.packet.stakes.dependents %}- Depends on them: {{ d }}
 {% endfor %}

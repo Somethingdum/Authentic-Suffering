@@ -1,7 +1,9 @@
 """How they spoke (D-166). prompts/render.py VOLUME_WORDS; prompts/actor_cognition.user.j2.
 
 Every line a mind heard was written "P1 (peer) spoke normal to you", "spoke shout", "spoke whisper" — broken English
-in every actor's prompt, every turn. Now: whispered, spoke quietly, spoke, called out, shouted.
+in every actor's prompt, every turn. Now: whispered, spoke quietly, spoke, called out, shouted. And (D-168) the
+speaker's standing was the raw enum — "(peer)", "(valid order)" — now "(someone you know)", "(someone whose orders you
+follow)".
 """
 
 from __future__ import annotations
@@ -33,3 +35,4 @@ def test_called_out(scenario, volume, verb):
     line = next(x for x in text.splitlines() if "June, stay where you are." in x)
     assert f") {verb} to you, and you heard it" in line, line
     assert " spoke " + volume not in line
+    assert "(someone you know)" in line and "(peer)" not in line, "D-168: who they are to her, in words"
