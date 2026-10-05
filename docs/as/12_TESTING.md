@@ -809,6 +809,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_tied_up.py` | Mara awake and free cannot be tied (not offered; tried, she resists); held, asleep, or seen showing empty hands, she can; tied with the rope she has no free hands and cannot walk, the hand that held her lets go, June sees "hands and feet tied with a length of rope" (not "carrying" it) and Dale, at a distance, "tied up"; her first body line is "Your hands and feet are tied.", she can work at the knots and nothing that needs hands or legs, and Owen can untie her; someone held is told what has hold of them a turn later; untied by June she is free, the rope in June's hand, two trust, one warmth and a debt; untied by the man who tied her she owes nothing; working free takes seven three-minute tries in the room's seed and drops the rope at her feet; tied, she fears and resents Owen and holds it against him, and June, who saw her friend tied, trusts him one less; a tied corpse rises tied; the story's state lines open with what has hold of Owen, then that his hands and feet are tied |
 
+### 3.102 Bringing things in (P12; D-209)
+
+| File | What it proves |
+|---|---|
+| `p12_surfaces/test_importers.py` | A Word document's paragraphs, tabs and breaks come out as text; a card hidden in a PNG's tEXt or iTXt chunk is found, ccv3 over chara; a card becomes a draft person in `_drafts/` — name, what they know, depth from description and personality, three voice-line candidates from their own speech, every line of theirs in the example dialogue as an example with what was said first and by whom (the player's side never named; a line after her own has nobody speaking to her) — with what it lacks listed in plain language and its enabled lorebook entries as lore drafts; drafts never load and the `my_content` pack is made; the card in a picture the same; an item record comes in as canon, and the same file again overwrites nothing; a record that fails waits in `_drafts/` with the validator's lines; lore as JSON is written as `.md` and loads; documents go to intake; the Content screen's message passes the file through `_incoming/` and leaves nothing behind, refuses what is not base64, and writes nothing for a pack name that is not one |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

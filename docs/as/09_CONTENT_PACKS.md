@@ -422,6 +422,10 @@ the step's own label, which is on screen beside it. Keep each line under 80 char
 | SillyTavern / Chub character card: `.png` with a `chara` or `ccv3` text chunk, or `.json` with `spec: chara_card_v2/v3` | converted to a **draft** actor dossier (IMP-03): name → identity; description/personality → depth reference and trait/appearance seeds; scenario → knowledge; first message + example messages → up to three voice-line candidates (with `{{char}}`/`{{user}}` removed), and every line of theirs in the example messages → a voice example with the line said to them before it (D-116, §3.0); lorebook entries → lore drafts |
 | `.txt` / `.docx` / `.md` without front matter | not imported directly — use dossier intake (below) |
 
+(Built, D-209: a missing `my_content` pack is made on the first import; a record that already exists
+is never overwritten; lore given as YAML or JSON is written as a `.md`; a card's lorebook entries
+become `lore_<name>.md` drafts beside the person.)
+
 Every import that is not already complete lands in `my_content/_drafts/` with a sibling
 `<name>.gaps.md` that lists, in plain language, exactly what is missing ("voice needs three lines:
 low stakes, under pressure, at the limit"). Drafts never load (IMP-02). Move a finished draft out of

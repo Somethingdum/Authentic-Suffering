@@ -322,6 +322,15 @@ class OutContentReport(Strict):
     counts: dict[str, int] = Field(default_factory=dict)
 
 
+class OutImportResult(Strict):
+    """D-209: what a dropped file became (content.importers.ImportResult)."""
+    ok: bool
+    draft_path: str | None = Field(default=None, description="The draft waiting in _drafts/, relative to the content folder.")
+    gaps: list[str] = Field(default_factory=list, description="Plain-language lines: what the draft lacks or gets wrong.")
+    errors: list[str] = Field(default_factory=list, description="Why nothing came in.")
+    ref: str | None = Field(default=None, description="The canon ref when it came in as canon.")
+
+
 class OutCheat(Strict):
     persona_line: str
     ok: bool = True
@@ -432,7 +441,7 @@ IN_MODELS: dict[str, type[Strict] | None] = {
 
 OUT_MODELS: dict[str, type[Strict] | None] = {
     "welcome": OutWelcome, "state": OutState, "models": OutModels, "model_test_result": OutModelTest, "config": OutConfig,
-    "packs": OutPacks, "pcs": OutPCs, "content_report": OutContentReport, "import_result": None, "intake_progress": None,
+    "packs": OutPacks, "pcs": OutPCs, "content_report": OutContentReport, "import_result": OutImportResult, "intake_progress": None,
     "intake_result": None, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns, "run_deleted": OutRunDeleted,
     "run_loaded": OutRunLoaded, "saved": OutSaved, "turn_progress": OutTurnProgress, "turn_result": OutTurnResult,
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,

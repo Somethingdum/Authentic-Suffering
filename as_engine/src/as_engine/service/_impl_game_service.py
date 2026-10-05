@@ -748,7 +748,38 @@ class GameService:
         return replies
 
     async def on_content_import(self, msg):
-        raise NotImplementedError("P12")
+        import base64
+        import binascii
+        import re as _re
+
+        from ..content.importers import ImportResult, import_file
+        from ..contracts.protocol import OutImportResult
+        G = _G()
+        try:
+            data = base64.b64decode(msg.data_b64, validate=True)
+        except (binascii.Error, ValueError):
+            raise G.ServiceError("bad_request", G.BAD_REQUEST.format(where="data_b64", problem="is not base64")) from None
+        name = Path(msg.filename.replace("\\", "/")).name
+        if not name:
+            raise G.ServiceError("bad_request", G.BAD_REQUEST.format(where="filename", problem="has no name"))
+        content_dir = Path(self.config.content_dir)
+        if not _re.match(r"^[a-z0-9_]+$", msg.pack_id):
+            res = import_file(Path(name), msg.pack_id, content_dir)
+        else:
+            inbox = content_dir / msg.pack_id / "_incoming"
+            inbox.mkdir(parents=True, exist_ok=True)
+            f = inbox / name
+            try:
+                f.write_bytes(data)
+                res = import_file(f, msg.pack_id, content_dir)
+            except OSError as e:
+                res = ImportResult(ok=False, errors=[f"{name}: could not be saved ({e.strerror or e})."])
+            finally:
+                f.unlink(missing_ok=True)
+                if inbox.exists() and not any(inbox.iterdir()):
+                    inbox.rmdir()
+        return [out("import_result", OutImportResult(ok=res.ok, draft_path=res.draft_path, gaps=res.gaps, errors=res.errors,
+                                                     ref=res.ref))]
 
     async def on_intake_start(self, msg):
         raise NotImplementedError("P12")

@@ -114,6 +114,14 @@ Handlers (P8):
     ok = no issue of severity 'error', errors = the error messages, warnings = the other messages
     (loader order), counts = {kind: number of that pack's refs of that kind} (kinds with none
     left out)}].
+  on_content_import(InContentImport) (P12, D-209): data_b64 that is not base64 -> ServiceError(
+    'bad_request', BAD_REQUEST.format(where='data_b64', problem='is not base64')); a filename with no
+    name left once its folders are dropped -> the same with where 'filename', problem 'has no name'. A
+    pack_id that is not a slug -> [import_result {ok false, errors: [content.importers' line]}] with
+    nothing written. Else the bytes go to content_dir/pack_id/_incoming/<the filename's last part>
+    (folders made as needed; the loader never reads '_' folders), content.importers.import_file(that
+    file, pack_id, content_dir), and the file — and _incoming when it is left empty — is removed
+    whatever happened -> [import_result {ok, draft_path, gaps, errors, ref}].
   on_runs_list: [runs {runs: service.runs.list_runs(config)}].
   on_run_load(InRunLoad): busy -> BUSY. A loaded session is closed first (its store closed;
     session None), then session = service.runs.load_run(config, run_id, transport, save_slot)
@@ -280,9 +288,9 @@ Handlers (P10: the New Life wizard, worldgen and the quiet hours):
     on_run_new first await background.cancel().
 
 Later phases (PROTO-09; stubs raising NotImplementedError until then, so handle() answers
-not_built_yet): on_content_import, on_intake_start, on_quickmake_pc, on_new_life_here,
+not_built_yet): on_intake_start, on_quickmake_pc, on_new_life_here,
 on_worlds_list, on_world_export, on_world_import (P12). Built in P12 (D-105): on_death and
-on_death_reveal (below). In P8 a new run is made with
+on_death_reveal (below); (D-209) on_content_import (above). In P8 a new run is made with
 `as-engine new-scenario <scenario.yaml>` and opened with Continue / Load.
 
 Pushes: push(msg) awaits every subscriber in subscription order; a subscriber that raises is
@@ -484,7 +492,7 @@ class GameService:
         raise NotImplementedError("P12")
 
     async def on_content_import(self, msg):
-        """P12: content.importers."""
+        """P12 (D-209): content.importers — see the module docstring."""
         raise NotImplementedError("P12")
 
     async def on_intake_start(self, msg):
