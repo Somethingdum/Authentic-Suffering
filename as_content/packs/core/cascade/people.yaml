@@ -661,3 +661,58 @@
       payload: {due_s: 3600, group: "$kin_group_of(trigger.event_id)", reason: killed_one_of_us}
   delay_s: 0
   cites: [D-144, GRP-08, D-119]
+# D-148 — a child. Killing a child breaks something in the killer and costs everything (D-123); hurting one was any
+# other blow. And leaving your own child behind where the dead are, or where blood has just been spilled, cost
+# nothing — not with the child, not with anyone who saw you go.
+- schema: as.cascade.v1
+  id: CAS-063
+  description: Seeing someone hurt a child costs them your trust, shakes you, and the story travels.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["body(trigger.payload.body_id).age_years <= 14"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: hurt_a_child}
+    - kind: adjust_stress
+      target: assault_onlookers_of(trigger.event_id)
+      amount: 1
+    - kind: create_rumour
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.attacker", claim: hurt_a_child}
+  delay_s: 0
+  cites: [D-148, D-126]
+- schema: as.cascade.v1
+  id: CAS-064
+  description: Watching the one who looks after you leave you behind with the danger is never forgotten.
+  trigger_event: MOVE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: left_in_danger_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: left_behind}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: left_in_danger_by(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} ran and left you behind with the danger.", strength: 3}
+  delay_s: 0
+  cites: [D-148, D-141]
+- schema: as.cascade.v1
+  id: CAS-065
+  description: Seeing someone leave their own child behind with the danger costs them your trust, and the story travels.
+  trigger_event: MOVE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_child_left_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: left_their_child}
+    - kind: create_rumour
+      target: saw_child_left_by(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: left_their_child}
+  delay_s: 0
+  cites: [D-148, D-141]

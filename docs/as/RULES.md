@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-802 ids; 545 with their own statement, 257 named only in context.
+805 ids; 548 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -178,6 +178,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-060 | Seeing one of your own kill one of your own sours you on the group, and you weigh whether to stay. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_one_of_our_own.py` |
 | CAS-061 | Lying down to sleep under heavy strain, a person wakes three hours in. | as_content/packs/core/cascade/stress.yaml | `as_engine/narration/narrator.py`, `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_broken_nights.py` |
 | CAS-062 | Falling asleep where they stand under heavy strain, a person wakes three hours in. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_broken_nights.py` |
+| CAS-063 | Seeing someone hurt a child costs them your trust, shakes you, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_child.py` |
+| CAS-064 | Watching the one who looks after you leave you behind with the danger is never forgotten. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_child.py` |
+| CAS-065 | Seeing someone leave their own child behind with the danger costs them your trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_child.py` |
 | CAS-07 | CAS-07 an effect whose target resolves to no ids is a no-op, not an error; the rule still counts as fired for the decision audit. | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |

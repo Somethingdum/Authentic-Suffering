@@ -566,6 +566,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_a_line_they_dont_cross.py` | The intake is shown what Owen will never do (his card's wont list, in the prompt); answered 'wont', the player is told "Your character won't do that. It's a line they don't cross." and no second look is made |
 
+### 3.62 A child (P9; D-148)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_child.py` | Owen hits Eli (9) in front of June: she trusts him less, is shaken and tells it (CAS-063). Blood has just been spilled on the floor and Mara runs into the storeroom leaving Eli there: Eli trusts her 2 less and holds it (CAS-064, strength 3); June, who saw it, trusts her less and tells it (CAS-065). A quiet room is no danger: nobody is left behind |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

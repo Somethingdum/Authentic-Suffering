@@ -885,6 +885,37 @@ def _threatened(tx, trigger, event_id):
     return sorted(set(out))
 
 
+def _left_in_danger(tx, event_id):
+    """D-148: (the dependents left behind in a dangerous place, the others who saw them left) for a MOVE out of it."""
+    from ..society._impl_society import _controller
+    ev = _row(tx, "SELECT type, actor_id, payload, at FROM events WHERE event_id=?", (event_id,))
+    if ev is None or ev["type"] != "MOVE":
+        return [], []
+    pl = json.loads(ev["payload"])
+    who, frm = pl.get("body_id") or ev["actor_id"], pl.get("from_place")
+    if not frm or frm == pl.get("to_place") or not tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)):
+        return [], []
+    danger = tx.query_one("SELECT 1 FROM bodies b JOIN positions p ON p.body_id=b.body_id WHERE p.place_id=? AND b.kind='infected' "
+                          "AND b.alive=1", (frm,)) or tx.query_one(
+        "SELECT 1 FROM events e JOIN positions p ON p.body_id=json_extract(e.payload,'$.body_id') WHERE e.type='HARM' AND "
+        "p.place_id=? AND e.at BETWEEN ? AND ?", (frm, ev["at"] - 60_000, ev["at"]))
+    if not danger:
+        return [], []
+    mine = set()
+    for (g,) in tx.query("SELECT guardian_of FROM household_members WHERE actor_id=?", (who,)):
+        mine |= set(json.loads(g or "[]"))
+    saw = [r[0] for r in tx.query("SELECT DISTINCT p.holder_id FROM percept_log p JOIN positions s ON s.body_id=p.holder_id WHERE "
+                                  "p.event_id=? AND p.channel='visual' AND p.fidelity IN ('exact','partial') AND s.place_id=? "
+                                  "ORDER BY p.holder_id", (event_id, frm))]
+    left = [h for h in saw if h in mine and _controller(tx, h) != "human" and not tx.query_one(
+        "SELECT 1 FROM open_loops WHERE holder_id=? AND kind='grudge' AND subject_ids LIKE ? AND text LIKE '%left you behind%' "
+        "AND created_at>? AND created_event NOT IN (SELECT event_id FROM events WHERE event_id=? OR cause_event_id=?)",
+        (h, f'%"{who}"%', ev["at"] - 3_600_000, event_id, event_id))]
+    if not left:
+        return [], []
+    return left, [h for h in saw if h != who and h not in mine and _controller(tx, h) != "human"]
+
+
 def _theft_victims(tx, event_id):
     """D-129: of a taking's witnesses, those who believe the thing is their own or their household's."""
     ev = _row(tx, "SELECT actor_id, payload FROM events WHERE event_id=?", (event_id,))
@@ -1038,7 +1069,8 @@ def select(tx, selector, trigger):
                                 "('severe','catastrophic')", (h,)):
                 continue
             if tx.query_one("SELECT 1 FROM open_loops WHERE holder_id=? AND kind='grudge' AND subject_ids LIKE ? AND text LIKE "
-                            "'%left you bleeding%' AND created_at>?", (h, f'%"{who}"%', ev["at"] - 3_600_000)):
+                            "'%left you bleeding%' AND created_at>? AND created_event NOT IN (SELECT event_id FROM events WHERE event_id=? OR "
+                            "cause_event_id=?)", (h, f'%"{who}"%', ev["at"] - 3_600_000, v, v)):
                 continue
             out.append(h)
         return out
@@ -1055,6 +1087,8 @@ def select(tx, selector, trigger):
         mates = {r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id WHERE "
                                         "m.group_id=? AND m.status IN ('member','probation') AND b.alive=1", (groups[0],))}
         return [h for h in _onlookers(tx, trigger, v) if h in mates and h not in (k[0], dead)]
+    if fn in ("left_in_danger_by", "saw_child_left_by"):             # D-148: your own child, left behind
+        return _left_in_danger(tx, v)[0 if fn == "left_in_danger_by" else 1]
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
         from ..society._impl_society import _controller
         them = _threatened(tx, trigger, v)

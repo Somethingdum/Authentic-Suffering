@@ -89,7 +89,7 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               unhealed, unclotted severe or catastrophic wound; never the
                                               PC, and not twice in an hour (no grudge of theirs naming the
                                               one leaving whose text says they 'left you bleeding', made in
-                                              the hour up to it)
+                                              the hour up to it by another event)
     kin_group_of(<path>)                      (D-144) for a DEATH with trigger.killer: the groups the dead
                                               and the killer both belonged to (group_members rows; the
                                               dead's any status but 'departed' or 'expelled', the killer's
@@ -98,6 +98,17 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     kin_onlookers_of(<path>)                  (D-144) of onlookers_of, the living members ('member' or
                                               'probation') of the first kin_group_of group; never the
                                               killer, the dead or the PC
+    left_in_danger_by(<path>)                 (D-148) for a MOVE out of a place (as left_bleeding_by) by
+                                              someone with an actors row, while that place is dangerous
+                                              (an infected body there, alive; or a HARM there in the 60 s
+                                              up to it): those still in from_place who saw it go and whom
+                                              the one leaving is guardian_of (household_members
+                                              .guardian_of); never the PC, not twice in an hour (no grudge
+                                              of theirs naming the one leaving whose text says they 'left
+                                              you behind', made in the hour up to it by another event)
+    saw_child_left_by(<path>)                 (D-148) for such a MOVE with someone left_in_danger_by it:
+                                              the others still in from_place who saw it go — never the one
+                                              leaving, one left, or the PC
     loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
                                               EXACT or PARTIAL percept of it bonded (affection >= 1, or
                                               one household) to someone it threatened at weapon point
