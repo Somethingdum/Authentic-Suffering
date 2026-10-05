@@ -92,6 +92,12 @@ def to_intent(packet, affordances, output, *, lod, source, reaction=False):
                     return IntentError("bad_inscription", h)
                 src = packet.handles[h]
             inscription = InscriptionAct(text=ins.text, quotation_source=src)
+    elif is_intake and output.gesture is not None:             # D-136: the player's words are not a protocol
+        h = output.gesture
+        gopt = next((g for g in packet.gestures if g.handle == h), None)
+        if h[:1] == "G" and h in packet.handles and gopt is not None and gopt.hands <= packet.hands_free - bound.hands:
+            gid, _, tb = packet.handles[h].partition(":")
+            gesture = (gid, None if tb == "*" else tb)
     if bound.verb == Verb.SPEAK and speech is None:
         return IntentError("empty", output.choice)
     if is_intake:

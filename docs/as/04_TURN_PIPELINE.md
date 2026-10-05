@@ -78,7 +78,9 @@ The PC's menu is a short first list ranked for a mind deciding in the moment (24
 the player may mean anything the PC could do. So a first `NONE` (unless the words are not an action)
 gets **one second look** (INTAKE-07, D-121): the same call again with everything else the PC could
 do appended to the menu, the first handles unchanged. A miss costs one more Clerk call; a hit costs
-nothing extra.
+nothing extra. The words reach the PC's gestures too (INTAKE-08, D-136): the menu lists them under
+the options, and a nod, a shrug or empty hands held up goes with the option chosen (staying put, when
+it is the gesture alone) — everyone who sees the PC sees it; one the PC cannot make is dropped.
 INTAKE `choice = NONE` (on the second look, when there was one) ends the request with `turn_rejected` (reason code + a plain message built
 by code, e.g. `not_holding` → "You're not holding that.", plus the model's clarifying question when
 it asked one) — **the input is not consumed and no time passes**. `remainder` becomes the first

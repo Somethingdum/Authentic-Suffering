@@ -83,6 +83,13 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      meaning, the rest are A{n+1}.. — and ONE more INTAKE call is made with it; its answer is the
      answer (a 'NONE' there is the rejection, with its reason and clarify). Nothing more to show,
      or 'not_an_action': no second call.
+  INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up:
+     the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is
+     lanes.schemas.intake_schema(the packet's affordance handles, its gesture handles), and its
+     answer's ``gesture`` goes with the option chosen (action.intent INTENT-09: one that cannot be
+     made is dropped); with quotes the speech intent built above carries the gesture the IntakeOutput
+     alone would give (to_intent of the IntakeOutput; none when that is an IntentError). A gesture and
+     nothing else is the option to stay where you are (core wait_here), which the prompt says.
   INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time
   passes and the input is not consumed (the player can rephrase).
 

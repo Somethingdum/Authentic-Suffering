@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-790 ids; 534 with their own statement, 256 named only in context.
+791 ids; 535 with their own statement, 256 named only in context.
 
 
 ## ABUSE
@@ -679,6 +679,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTAKE-05 | INTAKE-05 (5) mode 'do': quotes = lanes.parse.extract_quotes(text); rest = the text with every quoted span ("…" or “…”) replaced by ' ', stripped; addressee = addressee_for(...) — ALWAYS called here, before anything els… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-06 | INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time passes and the input is not consumed (the player can rephrase). | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-07 | INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the call answers 'NONE' with a none_… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_second_look.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
+| INTAKE-08 | INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up: the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is lanes.schemas.intake_schem… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_players_hands.py` |
 
 ## INTENT
 
@@ -692,7 +693,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTENT-06 | *Intent construction and the intent barrier (P4/P5). Rules INTENT-01..09, SEG-01..02, L2, L3, L5.* | as_engine/action/intent.py | `as_engine/action/intent.py` | — |
 | INTENT-07 | * INTENT-07 pace (a decision's or the player's; a V1 answer's is 'normal'): 'normal', or one of the chosen option's paces (BoundAffordance.paces, copied from AffordanceDef.paces) — else IntentError 'unsupported_pace' (a… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_intent_v2.py` |
 | INTENT-08 | * INTENT-08 an Actor's answer (source 'model') with more than 100 words of speech (whitespace-separated), or more than 12 in a reaction (reaction=True) -> IntentError 'speech_too_long' (Actor Spec §7: long talk goes on… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
-| INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (B4: mind.packet GEST-01 / FOCUS-01) — else IntentError 'hallucinated_expression'. A gesture takes the hands the attempt leaves free: its… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p04_one_actor/test_intent_v2.py` |
+| INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (B4: mind.packet GEST-01 / FOCUS-01) — else IntentError 'hallucinated_expression'. A gesture takes the hands the attempt leaves free: its… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/mind/packet.py`, `as_engine/turn/intake.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p04_one_actor/test_intent_v2.py`, `contract/p07_slice/test_the_players_hands.py` |
 
 ## LANE
 

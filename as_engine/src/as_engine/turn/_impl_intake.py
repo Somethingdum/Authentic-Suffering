@@ -218,7 +218,8 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         async def ask(packet):
             ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes)
             req = build_request(session.config, CallClass.INTAKE, turn_index=turn_index, actor_id=pc, context=ctx,
-                                json_schema=intake_schema([a.handle for a in packet.affordances]), ctx=ctx)
+                                json_schema=intake_schema([a.handle for a in packet.affordances],
+                                                          [g.handle for g in packet.gestures]), ctx=ctx)
             resp = await session.client.call(req, IntakeOutput)
             if resp.parse_status != "ok":
                 raise Rejected("intake_failed", "That didn't come through clearly. Try saying it another way.")
@@ -246,7 +247,8 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
                                goal=(out.manner or _label(pkt, out.choice)), private_reason=PLAYER_REASON)
             it = to_intent(pkt, aff, co, lod=lod, source="human")
             if not isinstance(it, IntentError):
-                it = dataclasses.replace(it, manner=out.manner)
+                plain = to_intent(pkt, aff, out, lod=lod, source="human")   # INTAKE-08: the gesture the words make
+                it = dataclasses.replace(it, manner=out.manner, gesture=None if isinstance(plain, IntentError) else plain.gesture)
             info["addressee"] = addressee
         else:
             it = to_intent(pkt, aff, out, lod=lod, source="human")

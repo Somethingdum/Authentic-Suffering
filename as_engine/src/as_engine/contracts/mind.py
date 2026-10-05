@@ -348,7 +348,8 @@ class IntakeOutput(Strict):
     """INTAKE output for the player's Do-mode text (05_ACTORS.md §PC side of the firewall). The
     player's words reach the same action vocabulary as an actor's: ``pace`` is the mechanical mode
     ('carefully', 'quietly' -> careful; 'quickly', 'in a hurry' -> rushed) where the option supports
-    it; ``manner`` is colour only."""
+    it; ``manner`` is colour only; (D-136) ``gesture`` is a G# handle of the packet when the words
+    make one of its gestures alongside the option (a nod, a shrug, empty hands held up)."""
 
     choice: str = Field(description="Affordance handle or 'NONE'.")
     none_reason: Literal[
@@ -356,6 +357,7 @@ class IntakeOutput(Strict):
     ] | None = None
     pace: Literal["normal", "careful", "rushed"] = "normal"
     manner: str = Field(default="", max_length=120)
+    gesture: str | None = Field(default=None, description="G# handle of a gesture the player's words make, or null.")
     remainder: str | None = Field(default=None, max_length=200, description="Rest of a multi-step instruction, queued as a suggestion.")
     clarify: str | None = Field(default=None, max_length=200)
 

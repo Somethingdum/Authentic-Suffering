@@ -45,8 +45,10 @@ to_intent(packet, affordances, output, *, lod, source, reaction=False) -> Intent
     the chosen option's BoundAffordance.hands — else IntentError 'no_free_hand' (showing both
     empty hands cannot go with carrying a load in both). The Intent carries gesture = the G
     handle's value split at ':' into (gesture_id, body id or None) and attention = the F handle's
-    value (a body or portal id); both None otherwise (a V1 answer and the player's own words
-    carry neither). An inscription needs a chosen
+    value (a body or portal id); both None otherwise (a V1 answer carries neither). (D-136) An
+    IntakeOutput's gesture is read the same way, except that one which is not a G# key of
+    packet.handles, or needs hands the attempt does not leave, is dropped (gesture None) — the
+    player's words are not a protocol; the player's words carry no attention. An inscription needs a chosen
     option tagged 'write' (no core option is one yet), at most 35 words, and a quotation_source
     that is null or an S# / E# key of packet.handles whose percept or memory text contains the
     inscription text word for word — else IntentError 'bad_inscription'.

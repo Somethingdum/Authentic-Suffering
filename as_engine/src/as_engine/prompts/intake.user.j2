@@ -9,6 +9,8 @@ People and things they know are here:
 {% endfor %}
 Options:
 {% for a in ctx.packet.affordances %}- {{ a.handle }}: {{ a.label }}
-{% endfor %}
+{% endfor %}{% if ctx.packet.gestures %}Gestures (only alongside an option):
+{% for g in ctx.packet.gestures %}- {{ g.handle }}: {{ g.label }}
+{% endfor %}{% endif %}
 The player typed:
 {{ ctx.player_text }}

@@ -30,7 +30,9 @@ Dynamic enums (SCHEMA-02):
                       of subject_handles (the packet's P# and S# handles), or "maxItems": 0 when
                       there are none.
       A reaction passes no consult_kinds: its answer can only be a decision.
-  intake_schema(affordance_handles): IntakeOutput with choice enum = affordance_handles + ["NONE"].
+  intake_schema(affordance_handles, gesture_handles=()): IntakeOutput with choice enum =
+    affordance_handles + ["NONE"] and (D-136) gesture = one of gesture_handles or null (null only when
+    there are none).
   writeback_schema(percept_handles, entity_handles, loop_handles): every "because" field
       (string or list items) restricted to percept_handles; "about" to entity_handles + ["self","place"];
       "with" to entity_handles; LoopClose.loop to loop_handles. When loop_handles is empty,
@@ -173,11 +175,13 @@ def cognition_schema(affordance_handles: list[str], entity_handles: list[str], *
     return sch
 
 
-def intake_schema(affordance_handles: list[str]) -> dict[str, Any]:
+def intake_schema(affordance_handles: list[str], gesture_handles: tuple[str, ...] | list[str] = ()) -> dict[str, Any]:
     if not affordance_handles:
         raise ValueError("SCHEMA-03")
     sch = to_lm_schema(IntakeOutput)
     sch["properties"]["choice"] = {"type": "string", "enum": list(affordance_handles) + ["NONE"]}
+    sch["properties"]["gesture"] = ({"anyOf": [{"type": "string", "enum": list(gesture_handles)}, {"type": "null"}]}
+                                    if gesture_handles else {"type": "null"})
     return sch
 
 
