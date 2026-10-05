@@ -807,6 +807,28 @@ def _missed(tx, trig):
 _WOUND_DEATHS = ("blood_loss", "head_wound", "neck_wound", "harm")
 
 
+def _knew_infected(tx, holder, body, at):
+    """D-202: the holder knew ``body`` carried the infection — saw it bitten, saw it spread it, or keeps the
+    quarantine law on it."""
+    if not body:
+        return False
+    if tx.query_one("SELECT 1 FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? AND "
+                    "p.channel='visual' AND p.fidelity IN ('exact','partial') AND p.at<=? AND e.type='HARM' AND "
+                    "json_extract(e.payload,'$.type')='bite' AND json_extract(e.payload,'$.body_id')=?", (holder, at, body)):
+        return True
+    for (def_id,) in tx.query("SELECT json_extract(e.payload,'$.def_id') FROM percept_log p JOIN events e ON e.event_id=p.event_id "
+                              "WHERE p.holder_id=? AND p.channel='visual' AND p.fidelity IN ('exact','partial') AND p.at<=? AND "
+                              "e.type='ACTION_START' AND e.actor_id=?", (holder, at, body)):
+        try:
+            if "compulsion" in _def(tx, def_id or "").tags:
+                return True
+        except KeyError:
+            pass
+    return tx.query_one("SELECT 1 FROM open_loops l JOIN events o ON o.event_id=l.created_event JOIN events la ON "
+                        "la.event_id=o.cause_event_id WHERE l.holder_id=? AND l.status='open' AND la.type='LAW_APPLIED' AND "
+                        "json_extract(la.payload,'$.kind')='contamination' AND la.actor_id=?", (holder, body)) is not None
+
+
 def _onlookers(tx, trigger, event_id):
     """D-119: who saw the death or the blow land, and saw who did it."""
     from ..sense.optics import visibility
@@ -821,8 +843,9 @@ def _onlookers(tx, trigger, event_id):
                                        "fidelity IN ('exact','partial')", (e,))}
     from ..society._impl_society import _controller
     out = []
-    for h in sorted(saw - {killer, (trigger.payload or {}).get("body_id")}):
-        if _controller(tx, h) == "human":
+    dead = (trigger.payload or {}).get("body_id")
+    for h in sorted(saw - {killer, dead}):
+        if _controller(tx, h) == "human" or _knew_infected(tx, h, dead, trigger.at):      # D-202
             continue
         named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity IN "
                              "('exact','partial') AND at>=? AND at<=?", (h, killer, blow_at - 10_000, trigger.at)) is not None
@@ -1164,7 +1187,7 @@ def select(tx, selector, trigger):
         out = []
         for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                              "fidelity IN ('exact','partial') ORDER BY holder_id", (v,)):
-            if h in (attacker, victim) or _controller(tx, h) == "human":
+            if h in (attacker, victim) or _controller(tx, h) == "human" or _knew_infected(tx, h, victim, trigger.at):  # D-202
                 continue
             named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity "
                                  "IN ('exact','partial') AND at>=? AND at<=?", (h, attacker, trigger.at - 10_000, trigger.at))
@@ -1240,7 +1263,7 @@ def select(tx, selector, trigger):
             return [target] if _controller(tx, target) != "human" else []
         return [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                                        "fidelity IN ('exact','partial') ORDER BY holder_id", (start,))
-                if h not in (attacker, target) and _controller(tx, h) != "human"]
+                if h not in (attacker, target) and _controller(tx, h) != "human" and not _knew_infected(tx, h, target, trigger.at)]
     if fn in ("left_in_danger_by", "saw_child_left_by"):             # D-148: your own child, left behind
         return _left_in_danger(tx, v)[0 if fn == "left_in_danger_by" else 1]
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint

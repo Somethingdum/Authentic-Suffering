@@ -84,6 +84,14 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               PARTIAL percept of the start (it saw who stood in front of
                                               it) — unless an earlier such start by the same actor at it
                                               is on the same world day; never the player's character (C06)
+    (D-202) A safety precaution, not a killing (the owner: "An infected person is a threat to every non
+    infected."): onlookers_of, assault_onlookers_of and attack_onlookers_of — and so bonded_onlookers_of,
+    kin_onlookers_of and groups_that_saw, which are made from them — leave out every holder who knew the
+    one it was done to was infected: a visual EXACT or PARTIAL percept, at or before the trigger, of a
+    HARM of type 'bite' on that body or of an ACTION_START by that body of an affordance tagged
+    'compulsion', or an open loop about that body opened for a contamination LAW_APPLIED (D-188).
+    Grief (seen_clearly_by), strain (witnesses_of), the killer's own burden (actor(...)) and what the
+    one hurt feels themself (hurt_by_someone, attacked_by_someone) are untouched.
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
                                               (trigger.attacker present): the one hurt — never the
                                               player's character (what they feel is theirs, C06)

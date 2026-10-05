@@ -227,6 +227,8 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   group day re-checks anyone within one of their threshold, at most every 3 days.
 - **Standing** — the group's memory of a person (−5..+5) — lives in `group_standing`; laws and,
   from P10, deeds move it; it feeds trade and pressure.
+- **A safety precaution** (D-202): putting down someone you knew was infected — you saw the bite, saw them
+  spread it, or keep the contamination law on them — is no killing in your eyes; grief is grief either way.
 - **Kindness is remembered** (D-195, CAS-076/077): a gift into someone's hands or pockets earns the giver
   one trust; wounds tended while awake earn one trust, one warmth and a debt the one tended carries —
   once per world day from the same person; never written into the player's character. Seeing someone

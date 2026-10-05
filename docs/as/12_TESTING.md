@@ -791,6 +791,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_no_two_voices_alike.py` | Thirty adults dealt voices in one place get thirty different voices; with every voice taken one is still drawn; the pools hold at least 40 adult voices and 10 for each other age, no two opening with the same line; nobody born after the Fall gets a voice that remembers before it |
 
+### 3.99 A safety precaution (P9; D-202)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_safety_precaution.py` | June, who saw Alice bitten, does not judge Owen for putting her down — trust kept, no story told — while Mara, who did not, sees a killing; June still grieves; seeing Alice spit into a sleeper's mouth is knowing too |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
