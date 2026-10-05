@@ -641,3 +641,23 @@
       payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} walked away and left you bleeding.", strength: 2}
   delay_s: 0
   cites: [D-142, D-141]
+# D-144 — one of our own. When someone kills one of their own group in front of the rest of it, the rest wonder what
+# the group is worth: their grievance with it rises, and within the hour each weighs whether to stay (GRP-08 — leaving
+# starts as a plan, never at once).
+- schema: as.cascade.v1
+  id: CAS-060
+  description: Seeing one of your own kill one of your own sours you on the group, and you weigh whether to stay.
+  trigger_event: DEATH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: TENSION_CHANGE
+      target: kin_onlookers_of(trigger.event_id)
+      payload: {toward: "$kin_group_of(trigger.event_id)", delta: 20, cause: killed_one_of_us}
+    - kind: schedule_event
+      event_type: LOYALTY_CHECK
+      target: kin_onlookers_of(trigger.event_id)
+      payload: {due_s: 3600, group: "$kin_group_of(trigger.event_id)", reason: killed_one_of_us}
+  delay_s: 0
+  cites: [D-144, GRP-08, D-119]

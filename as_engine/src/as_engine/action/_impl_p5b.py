@@ -576,7 +576,7 @@ def _looks_up(tx, h, ev, pl, bonded):
     from ..physical.space import point_distance
     if ev.type == EventType.ACTION_START and pl.get("def_id") == "equip_item" and pl.get("item_id"):
         ref = tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (pl["item_id"],))
-        d = tx.canon.get(ref[0]) if ref else None
+        d = tx.canon.get(ref[0]) if ref and tx.canon.has(ref[0]) else None
         if d is not None and (getattr(d, "firearm", None) is not None or getattr(d, "melee", None) is not None):
             dd = point_distance(tx, h, ev.actor_id)
             if dd is not None and dd <= 20:
@@ -1042,6 +1042,19 @@ def select(tx, selector, trigger):
                 continue
             out.append(h)
         return out
+    if fn in ("kin_group_of", "kin_onlookers_of"):                   # D-144: one of our own killed one of our own
+        k = _killing(tx, trigger)
+        dead = (trigger.payload or {}).get("body_id")
+        if k is None or not dead:
+            return []
+        groups = sorted({r[0] for r in tx.query("SELECT d.group_id FROM group_members d JOIN group_members k ON k.group_id=d.group_id "
+                                                "WHERE d.actor_id=? AND d.status NOT IN ('departed','expelled') AND k.actor_id=? AND "
+                                                "k.status IN ('member','probation')", (dead, k[0]))})
+        if fn == "kin_group_of" or not groups:
+            return groups
+        mates = {r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id WHERE "
+                                        "m.group_id=? AND m.status IN ('member','probation') AND b.alive=1", (groups[0],))}
+        return [h for h in _onlookers(tx, trigger, v) if h in mates and h not in (k[0], dead)]
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
         from ..society._impl_society import _controller
         them = _threatened(tx, trigger, v)

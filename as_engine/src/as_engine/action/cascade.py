@@ -90,6 +90,14 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               PC, and not twice in an hour (no grudge of theirs naming the
                                               one leaving whose text says they 'left you bleeding', made in
                                               the hour up to it)
+    kin_group_of(<path>)                      (D-144) for a DEATH with trigger.killer: the groups the dead
+                                              and the killer both belonged to (group_members rows; the
+                                              dead's any status but 'departed' or 'expelled', the killer's
+                                              'member' or 'probation'), sorted — one of their own killed
+                                              one of their own
+    kin_onlookers_of(<path>)                  (D-144) of onlookers_of, the living members ('member' or
+                                              'probation') of the first kin_group_of group; never the
+                                              killer, the dead or the PC
     loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
                                               EXACT or PARTIAL percept of it bonded (affection >= 1, or
                                               one household) to someone it threatened at weapon point

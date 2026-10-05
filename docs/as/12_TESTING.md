@@ -542,6 +542,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_voices_hang_together.py` | For adults, children, teens and elders the three lines are always the set that belongs to the voice drawn; elders are not only their age (a dozen or more voices among a hundred); nobody born after the Fall remembers the world before it; whoever swears when nervous swears, whoever quotes scripture or apologises for everything never does; no line names another trade's work or a sex |
 
+### 3.58 One of our own (P9; D-144)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_one_of_our_own.py` | Owen kills Alice in front of June and Mara, all of Delgado's crew: the crew is the group they shared, June and Mara the crew who saw it; their grievance with the crew rises 20 (CAS-060) and an hour later each has a LOYALTY_CHECK for the crew, reason 'killed_one_of_us'. Mara kills the stranger: he was never one of theirs, nobody's loyalty is asked |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
