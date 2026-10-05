@@ -641,4 +641,39 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
             else f"Day {wt.day} since the Fall ({wt.part_of_day})")
     return AmbientPacket(actor_id=actor_id, name=name, voice=voice, where=place_phrase(pl["name"]) if pl else "",
                          when=when, doing=doing, state=[x for x in _body_lines(tx, actor_id) if x != "Unhurt."][:3],
-                         reached=reached, said=said, knows=knows, people=people, handles=handles)
+                         reached=reached, said=said, knows=knows, mind=[] if reached else _on_their_mind(tx, actor_id, turn_index),
+                         people=people, handles=handles)
+
+
+def _on_their_mind(tx, actor_id, turn_index):
+    # AMB-01 (D-257): in a quiet moment, what might be on their mind — their own records only
+    from .actor import fused
+    from .identity import end
+    d = fused(tx, actor_id)
+    c = []
+    life = getattr(d, "life", None)
+    proj = (getattr(life, "current_project", "") or "").strip() if life is not None else ""
+    if proj and "decided at worldgen" not in proj:
+        c.append(f"What you are working on: {end(proj)}")
+    lp = tx.query_one("SELECT text FROM open_loops WHERE holder_id=? AND status='open' ORDER BY strength DESC, created_at DESC, "
+                      "loop_id LIMIT 1", (actor_id,))
+    if lp is not None and lp[0]:
+        c.append(f"On your mind: {end(lp[0])}")
+    fears = list(getattr(life, "fears", []) or []) if life is not None else []
+    if fears:
+        c.append(f"What you are afraid of: {end(fears[0])}")
+    hist = [r[0] for r in tx.query("SELECT p.text FROM claim_holdings h JOIN propositions p ON p.prop_id = h.claim_id WHERE "
+                                   "h.holder_id=? AND h.believed=1 AND h.superseded_by IS NULL AND h.provenance='common' AND "
+                                   "p.predicate='history' ORDER BY h.claim_id", (actor_id,))]
+    if hist:
+        c.append(f"Something people here say: {end(hist[turn_index % len(hist)])}")
+    lore = []
+    for r in tx.query("SELECT lore_ref, belief FROM lore_held WHERE holder_id=? ORDER BY lore_ref, belief", (actor_id,)):
+        if tx.canon.has(r[0]) and r[1] < len(tx.canon.get(r[0]).beliefs):
+            lore.append(tx.canon.get(r[0]).beliefs[r[1]].text)
+    if lore:
+        c.append(f"Something you grew up hearing: {end(lore[turn_index % len(lore)])}")
+    if not c:
+        return []
+    k = turn_index % len(c)
+    return [c[(k + i) % len(c)] for i in range(min(2, len(c)))]

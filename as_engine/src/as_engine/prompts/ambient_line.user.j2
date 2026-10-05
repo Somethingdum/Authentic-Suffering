@@ -35,6 +35,13 @@ What you said last (never say it again):
 {% endfor %}
 {% endif %}
 
+{% if ctx.mind %}
+What might be on your mind (bring it up, or not):
+{% for m in ctx.mind %}
+- {{ m }}
+{% endfor %}
+{% endif %}
+
 {% if ctx.reached %}
 What just reached you, oldest first:
 {% for r in ctx.reached %}

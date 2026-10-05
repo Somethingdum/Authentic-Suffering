@@ -523,6 +523,7 @@ class AmbientPacket(Strict):
     reached: list[str]               # what has reached them since they last spoke, oldest first (max 4)
     said: list[str] = Field(default_factory=list)    # their own last lines (max 3): never say them again
     knows: list[str] = Field(default_factory=list)   # D-130: what people say about what is in front of them (max 2)
+    mind: list[str] = Field(default_factory=list)    # D-257: in a quiet moment, what is on their mind (max 2)
     people: list[AmbientPerson] = Field(default_factory=list)
     handles: dict[str, str] = Field(default_factory=dict)
 

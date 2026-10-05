@@ -322,6 +322,16 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
   said: their own last 3 voice_lines by (at, line_id), oldest first — never to be said again.
   knows: (D-130) the texts of mind.retrieval.lore_lines(tx, actor_id, turn_index, at, min(2,
     PacketRules.max_lore)) — what people say about what is in front of them.
+  mind: (D-257) only in a quiet moment (reached is []): what might be on their mind to bring up — or not —
+    from their own records, at most 2. Candidates, in this order, each when there is one: f'What you are
+    working on: {end(life.current_project)}' (the fused dossier's; not one that says 'decided at worldgen');
+    f'On your mind: {end(text)}' of their strongest 'open' loop (strength desc, created_at desc, loop_id);
+    f'What you are afraid of: {end(fears[0])}'; f'Something people here say: {end(text)}' of one of their live
+    believed holdings with provenance 'common' and predicate 'history' (by claim_id, the one at turn_index mod
+    their count); f'Something you grew up hearing: {end(text)}' of one of their lore_held lines (by lore_ref,
+    belief; the one at turn_index mod their count; its canon text). The two taken are the candidate at
+    turn_index mod their count and the one after it (wrapping): a room's small talk is about their lives and
+    what their world says, a different thing from turn to turn — never the same few words of the weather.
   people: the living human bodies, not themselves, that are the source of a percept of theirs this
     turn at <= ``at``, in order of first percept, at most 6: handle P1.., word = word_for, feeling =
     the TEMPER-08 words and then their relationship line (as the SkullPacket's), lower-cased and

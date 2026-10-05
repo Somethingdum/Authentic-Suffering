@@ -1074,6 +1074,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_names_in_a_sentence.py` | In a standard world (seed 7) no history line carries a 'The …' group's name capitalised inside it; no generated motive says "pump mechanic work" |
 
+### 3.146 On their mind (P7; D-257)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_on_their_mind.py` | Alice's quiet-moment packet holds two of what might be on her mind (her work, a loop, a fear, what people here say, what she grew up hearing) and the prompt shows them; over four turns it is not always the same two; when something was just said to her, none |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
