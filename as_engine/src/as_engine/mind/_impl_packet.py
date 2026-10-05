@@ -40,6 +40,21 @@ def _age(ms):
     return f"{n} day{'s' if n != 1 else ''} ago"
 
 
+def known_elsewhere(tx, holder, listed):
+    """SKULL-11 (D-153): people the holder knows by name, not yet listed and not seen dead — last seen first."""
+    out = []
+    for r in tx.query("SELECT a.subject_id FROM acquaintance a JOIN bodies b ON b.body_id = a.subject_id WHERE a.holder_id=? "
+                      "AND a.known_name IS NOT NULL AND a.subject_id != ? ORDER BY a.last_seen DESC, a.subject_id", (holder, holder)):
+        if len(out) >= tx.rules.packet.max_known_elsewhere:
+            break
+        if r[0] in listed or tx.query_one(
+                "SELECT 1 FROM percept_log p JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? AND e.type='DEATH' "
+                "AND json_extract(e.payload,'$.body_id')=? LIMIT 1", (holder, r[0])) is not None:
+            continue
+        out.append(r[0])
+    return out
+
+
 def whereabouts(tx, holder, body, rows, at):
     """PacketEntity.whereabouts (mind.packet; Actor Spec AC14)."""
     from .perception import place_phrase
@@ -256,6 +271,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
     for h in hh:
         for r in tx.query("SELECT actor_id FROM household_members WHERE household_id=? ORDER BY actor_id", (h,)):
             add(r[0])
+    for b in known_elsewhere(tx, actor_id, set(ents)):              # SKULL-11 (D-153)
+        add(b)
     ph = {}
     entities = []
     for i, b in enumerate(ents, 1):

@@ -271,6 +271,8 @@ class PacketRules(Strict):
     # [SAND] D-117 (THREAD-01, Actor Spec §11): how far back the conversation where a person is reaches
     thread_window_min: int = 30
     max_thread_lines: int = 8
+    # [SAND] D-153 (SKULL-11): people known by name who are not in sight, kept in mind, at most
+    max_known_elsewhere: int = 6
 
 
 class StyleRulesNumbers(Strict):

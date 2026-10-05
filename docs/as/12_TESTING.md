@@ -596,6 +596,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_in_the_right_person.py` | `retell` tells a second-person menu label in the first person and of a man, a woman or someone else (possessives, reflexives, 'you' as subject or object, 'are'/'were'/-s agreement, modals and past tenses untouched; a label with no 'you' is unchanged); the narrator's line of the PC's own choice is told of him ('Owen chose to take his Glock 19 into his hand.', no 'your'); a person's own memory of a choice is in the first person ('Chose to take my .38 revolver into my hand.', 'I chose to …') |
 
+### 3.67 People you know of (P7; D-153)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_people_you_know_of.py` | The player's character (no relationship rows, C06) keeps its crew in mind with where it last saw each ('June: last seen in the stockroom just now'); at most `max_known_elsewhere` of them, the most recently seen first, and never one it saw die; "I walk over to June and shove her." reaches an intake that lists June with where she was last seen and is told the first step is going there: the PC goes through the storeroom door and 'shove June' is the remainder |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

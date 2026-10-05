@@ -227,6 +227,9 @@ def entity_ids(tx, holder, rows):
     for h in tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (holder,)):
         for r in tx.query("SELECT actor_id FROM household_members WHERE household_id=? ORDER BY actor_id", (h[0],)):
             add(r[0])
+    from ._impl_packet import known_elsewhere
+    for b in known_elsewhere(tx, holder, set(ents)):                # SKULL-11 (D-153), as the packet
+        add(b)
     return ents
 
 

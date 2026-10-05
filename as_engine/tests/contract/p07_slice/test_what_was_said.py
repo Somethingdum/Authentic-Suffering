@@ -47,7 +47,8 @@ def test_what_people_say_is_kept_and_heard_the_next_turn(scenario, fake):
     first, second = packets(fake, w, "alice")
     assert first.thread == [], "nothing was said before the first moment"
     mara = next(e.handle for e in second.entities if second.handles[e.handle] == w.id("mara"))
-    assert [(x.speaker, x.words) for x in second.thread] == [(mara, "Quiet."), ("June", "What was that?")], \
+    june = next(e.handle for e in second.entities if second.handles[e.handle] == w.id("june"))   # D-153: kept in mind
+    assert [(x.speaker, x.words) for x in second.thread] == [(mara, "Quiet."), (june, "What was that?")], \
         "Alice heard both, in the order they were said, each named as she knows them"
     assert 'What was said here before this moment (oldest first)\n' in render(CallClass.ACTOR_COGNITION, p=second)[1].content
     _m1, m2 = packets(fake, w, "mara")

@@ -3,8 +3,8 @@ Where they are: {{ ctx.packet.position_text }}
 What they can perceive:
 {% for s in ctx.packet.perceived_now %}- {{ s.text }}
 {% endfor %}
-People and things they know are here:
-{% for e in ctx.packet.entities %}- {{ e.handle }}: {{ e.description }}
+People they know of (here, unless it says where they were last seen):
+{% for e in ctx.packet.entities %}- {{ e.handle }}: {{ e.description }}{{ ' (' ~ e.whereabouts ~ ')' if e.whereabouts and e.whereabouts != 'here' else '' }}
 {% else %}- nobody
 {% endfor %}
 Options:

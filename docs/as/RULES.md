@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-808 ids; 551 with their own statement, 257 named only in context.
+809 ids; 552 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -778,7 +778,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| MEM-01 | MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket (Stage 13, gate G13) Exactly what the holder perceived this turn and nothing else — the same selection and handles as the Skull Packet (mind.packe… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| MEM-01 | MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket (Stage 13, gate G13) Exactly what the holder perceived this turn and nothing else — the same selection and handles as the Skull Packet (mind.packe… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p07_slice/test_people_you_know_of.py` |
 | MEM-02 | MEM-02 apply_writeback(tx, holder_id, output, packet, at, turn_index, *, cue_ids) -> list[str] (Stage 14, gate G14: a mind writes nothing that cites what it did not perceive.) ``cue_ids`` = the registry cue ids (Canon c… | as_engine/mind/memory.py | `as_engine/audit/log.py`, `as_engine/mind/memory.py`, `as_engine/turn/pipeline.py` | `contract/p06_memory/test_memory.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p06_memory/test_promises.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | MEM-03 | MEM-03 writeback_groups(packets: dict[holder_id, AftermathPacket]) -> list[list[holder_id]] (B5, Actor Spec §13, AC11) Every named person reads what happened as themselves, even when several witnessed the same sound: ev… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | MEM-04 | MEM-04 episode always (even when every other item was dropped): EPISODE_WRITTEN (writer 'mind.memory', actor_id = holder, cause_event_id = the event of the first percept row in handle order whose event_id is a committed… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p06_memory/test_memory.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
@@ -1103,6 +1103,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | SKULL-08 | *Skull Packet builder (P4). THE ONLY CONSTRUCTOR OF SkullPacket. Rules SKULL-01..10, WILL-00, WILL-C,* | as_engine/mind/packet.py | `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py` |
 | SKULL-09 | *it (SKULL-09): a smaller prompt never costs a person their identity.* | as_engine/mind/identity.py | `as_engine/mind/identity.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p06_memory/test_memory_v2.py`, `contract/p06_memory/test_retrieval.py` |
 | SKULL-10 | SKULL-10 in `mind/packet`, P4; how a move reads, P3), build it now. A builder updating from an | 13_BUILD_ORDER §1 | `as_engine/mind/affordance.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py`, `as_engine/mind/temper.py`, `as_engine/turn/select.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_conversation_thread.py`, `contract/p04_one_actor/test_packet.py`, `contract/p10_world/test_new_life.py` |
+| SKULL-11 | SKULL-11 (D-153): people the holder knows by name, not yet listed and not seen dead — last seen first. | as_engine/mind/_impl_packet.py | `as_engine/mind/_impl_packet.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_packet.py`, `contract/p07_slice/test_people_you_know_of.py` |
 
 ## SLEEP
 

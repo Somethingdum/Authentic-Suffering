@@ -232,7 +232,10 @@ def test_present_heard_and_last_seen_are_different_things(scenario):
     at = crash_and_call(w)
     j = packet_for(w, "june", at)
     where = {j.handles[e.handle]: e.whereabouts for e in j.entities}
-    assert where == {w.id("mara"): "heard, not seen", w.id("pc"): "last seen in the sales floor just now"}
+    assert where == {w.id("mara"): "heard, not seen", w.id("pc"): "last seen in the sales floor just now",
+                     # D-153 (SKULL-11): the rest of the crew she knows by name, where she last saw them
+                     w.id("alice"): "last seen in the sales floor just now", w.id("eli"): "last seen in the office just now",
+                     w.id("nita"): "last seen in the rear alley just now"}
     owen = packet_for(w, "pc", at)
     assert {owen.handles[e.handle]: e.whereabouts for e in owen.entities}[w.id("mara")] == "here"
     m = packet_for(w, "mara", at + 2 * 3_600_000)

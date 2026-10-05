@@ -46,7 +46,13 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
   P1..Pn  bodies, each once, never the holder: (1) the source_id of those percepts, in percept
           order, when source_id is a body (items and portals are sources too — they are not
           entities); (2) bodies the holder has relationships rows toward, by to_id; (3) the other
-          members of the holder's households, by actor_id.
+          members of the holder's households, by actor_id; (4) (D-153, SKULL-11) known_elsewhere:
+          the bodies the holder knows by name (acquaintance.known_name not null) not yet listed
+          and whose death it has not perceived (no percept_log row of its own of a DEATH event of
+          that body), most recently seen first (acquaintance.last_seen descending, then
+          subject_id), at most PacketRules.max_known_elsewhere — people you know do not stop
+          existing when they leave the room (the player's character has no relationships rows at
+          all, C06: before this, its packet knew nobody it could not see).
   A1..An  affordances.options in AffordanceSet order, then consulted.options (so a consultation
           appends handles and never renumbers one already offered); the handle map value is the
           option's BoundAffordance.signature 'def_id:target:destination:item' ('*' for an empty

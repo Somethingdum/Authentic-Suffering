@@ -13,7 +13,8 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
   handles       S1..Sn over percepts and utterances together, in that order (one numbering);
                 P1..Pn bodies, each once, never the holder: the source_id of those rows when it is
                 a body, in row order, then bodies the holder has relationships rows toward (by
-                to_id), then the other members of its households (by actor_id); L1..Ln its open
+                to_id), then the other members of its households (by actor_id), then (D-153,
+                SKULL-11) mind.packet's known_elsewhere; L1..Ln its open
                 loops (below). ``handles`` maps each handle to its id (percept_id, body id, loop_id).
   percepts      non-speech rows as PerceivedItem(handle, channel, fidelity, text, source_handle =
                 the P-handle of source_id or None, seconds_ago = (at - row.at) / 1000).

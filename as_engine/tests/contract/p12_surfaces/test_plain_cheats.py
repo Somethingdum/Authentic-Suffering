@@ -181,8 +181,9 @@ def test_what_the_world_cannot_hold_is_shown_and_said_so(night, fake):
 # =========================================================================== Act / Say / Cheat
 def test_say_knows_who_it_is_for(night, scenario, fake):
     """D-103 (INTAKE addressee_for): with no chip chosen, a name the words start with picks the
-    listener — in Say, or in the quoted words of an Act — when that one is here; otherwise the words
-    go to the last one spoken to, and the view offers that one first."""
+    listener — in Say, or in the quoted words of an Act — when the character knows someone by that
+    name (D-153: here, or called through a door); otherwise the words go to the last one spoken to,
+    and the view offers that one first."""
     import json
 
     from as_engine.service.view import build_view
@@ -195,11 +196,13 @@ def test_say_knows_who_it_is_for(night, scenario, fake):
     mara = w.id("mara")
     assert play(s, "say", "Mara, keep it shut.").ok
     assert heard(w, 1) == mara
-    assert play(s, "say", "June, get in here.").ok           # June is in the stockroom
+    assert play(s, "say", "Ray, get in here.").ok            # nobody Owen knows by that name
     assert heard(w, 2) == mara
     with s.store.transaction() as tx:
         v = build_view(tx, s)
     assert s.extras["view_refs"][v.say_to] == mara
+    assert play(s, "say", "June, get in here.").ok           # D-153: June is in the stockroom; he calls her
+    assert heard(w, 3) == w.id("june")
 
     w2 = scenario("metal_fence")
     s2 = w2.session()
