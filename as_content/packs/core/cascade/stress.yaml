@@ -54,7 +54,7 @@
       payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: fed_someone_to_the_dead}
     - kind: create_rumour
       target: onlookers_of_act(trigger.event_id)
-      payload: {about: "$trigger.actor_id", claim: fed_someone_to_the_dead}
+      payload: {about: "$trigger.actor_id", claim: fed_someone_to_the_dead, seen: true}
   delay_s: 0
   cites: [TEMPER-06, docs/as/05_ACTORS.md#7.1]
 - schema: as.cascade.v1

@@ -670,6 +670,11 @@ def _path(tx, path, trig):
                 return _MISSING
             return how(tx, body, tx.query_one("SELECT at FROM events WHERE event_id=?", (k[2],))[0])
         return _MISSING
+    if path in ("trigger.missed_attacker", "trigger.missed_provoked", "trigger.missed_lethal"):   # D-161
+        a = _missed(tx, trig)
+        if a is None:
+            return _MISSING
+        return {"trigger.missed_attacker": a[0], "trigger.missed_provoked": a[2], "trigger.missed_lethal": a[3]}[path]
     if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
         a = _assault(tx, trig)
         if a is None:
@@ -765,6 +770,36 @@ def _assault(tx, trig):
     if dead is not None and dead[0] is not None and dead[0] < trig.at:
         return None                     # D-132: the dead put down — as everyone must — is no one hurt
     return attacker, _was_fighting(tx, victim, trig.at)
+
+
+def _missed(tx, trig):
+    """D-161: (attacker, target, provoked, lethal, start id) for an attack one person made on another that hurt nobody."""
+    if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "ACTION_COMPLETE" or not trig.cause_event_id:
+        return None
+    st = tx.query_one("SELECT actor_id, at, payload FROM events WHERE event_id=? AND type='ACTION_START'", (trig.cause_event_id,))
+    if st is None:
+        return None
+    pl = json.loads(st[2]) if isinstance(st[2], str) else (st[2] or {})
+    attacker, target = st[0], pl.get("target_id")
+    if not attacker or not target or attacker == target:
+        return None
+    try:
+        d = tx.canon.find("affordance", pl.get("def_id") or "")
+    except KeyError:
+        return None
+    if (d.verb.value if hasattr(d.verb, "value") else d.verb) != "attack":
+        return None
+    for who in (attacker, target):
+        if tx.query_one("SELECT 1 FROM actors a JOIN bodies b ON b.body_id=a.actor_id WHERE a.actor_id=? AND b.kind='human'",
+                        (who,)) is None:
+            return None
+    dead = tx.query_one("SELECT dead_at FROM bodies WHERE body_id=?", (target,))
+    if dead is not None and dead[0] is not None and dead[0] <= st[1]:
+        return None
+    if tx.query_one("SELECT 1 FROM events WHERE type='HARM' AND cause_event_id=? AND json_extract(payload,'$.body_id')=?",
+                    (trig.cause_event_id, target)) is not None:
+        return None                     # it landed: being hurt is CAS-036's
+    return attacker, target, _was_fighting(tx, target, st[1]), "lethal" in d.tags, trig.cause_event_id
 
 
 _WOUND_DEATHS = ("blood_loss", "head_wound", "neck_wound", "harm")
@@ -1087,6 +1122,17 @@ def select(tx, selector, trigger):
         mates = {r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id WHERE "
                                         "m.group_id=? AND m.status IN ('member','probation') AND b.alive=1", (groups[0],))}
         return [h for h in _onlookers(tx, trigger, v) if h in mates and h not in (k[0], dead)]
+    if fn in ("attacked_by_someone", "attack_onlookers_of"):        # D-161: an attack that hurt nobody
+        from ..society._impl_society import _controller
+        a = _missed(tx, trigger)
+        if a is None:
+            return []
+        attacker, target, start = a[0], a[1], a[4]
+        if fn == "attacked_by_someone":
+            return [target] if _controller(tx, target) != "human" else []
+        return [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                       "fidelity IN ('exact','partial') ORDER BY holder_id", (start,))
+                if h not in (attacker, target) and _controller(tx, h) != "human"]
     if fn in ("left_in_danger_by", "saw_child_left_by"):             # D-148: your own child, left behind
         return _left_in_danger(tx, v)[0 if fn == "left_in_danger_by" else 1]
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
@@ -1342,7 +1388,8 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
         else:
             raise ValueError(f"adjust cannot target {target}")
     elif eff.kind == "create_rumour":
-        rum.seed(tx, target, pl["about"], pl["claim"], at, turn_index, E, confidence=int(pl.get("confidence") or 3))
+        rum.seed(tx, target, pl["about"], pl["claim"], at, turn_index, E, confidence=int(pl.get("confidence") or 3),
+                 seen=bool(pl.get("seen")))                     # D-162: an eyewitness saw it
     elif eff.kind == "emit_event" and et == "INFECTED_DRIFT":
         from ..world import infected
         infected.attract(tx, target, pl["toward"], at, E, turn_index, reason=pl.get("reason") or "noise")

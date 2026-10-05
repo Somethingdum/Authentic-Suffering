@@ -632,6 +632,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p03_perception/test_what_they_call_them.py` | One of the dead is known by its infected type (thing_ref); Owen, who holds what everyone says about walkers, sees "a walker" and what everyone says about them comes to mind; someone never told sees "a shambling figure" |
 
+### 3.73 It missed; you saw it (P9; D-161, D-162)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_it_missed.py` | Owen's shot at Mara misses: she trusts him 2 less, fears him 2 more and holds that he tried to kill her; Alice and June, who saw the gun raised, trust him less, fear him and tell it — as something they saw (provenance 'witnessed'); a shove that hurt nobody costs a little trust and some resentment, no grudge, no talk; a shot that landed is CAS-036's, one at someone who had gone for him first is nothing new; never into the player's character |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

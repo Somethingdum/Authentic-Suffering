@@ -109,6 +109,13 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     saw_child_left_by(<path>)                 (D-148) for such a MOVE with someone left_in_danger_by it:
                                               the others still in from_place who saw it go — never the one
                                               leaving, one left, or the PC
+    attacked_by_someone(<path>)               (D-161) for an ACTION_COMPLETE of an attack that hurt
+                                              nobody (trigger.missed_attacker present): the one it was
+                                              made on — never the PC (C06)
+    attack_onlookers_of(<path>)               (D-161) for such an ACTION_COMPLETE: the holders of a
+                                              visual EXACT or PARTIAL percept of its ACTION_START (the
+                                              weapon raised, the swing), never the attacker, the one it
+                                              was made on, or the PC
     loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
                                               EXACT or PARTIAL percept of it bonded (affection >= 1, or
                                               one household) to someone it threatened at weapon point
@@ -228,7 +235,9 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
                                              p.text or TRACE_TEXT[p.kind], E, at, turn_index)         (P10)
                                              (TRACE_TEXT: the texts below, implemented)
   create_rumour                              world.rumours.seed(tx, target, p.about, p.claim, at,
-                                             turn_index, E, confidence = p.confidence or 3)            (P9)
+                                             turn_index, E, confidence = p.confidence or 3, seen =
+                                             bool(p.seen) — D-162: true for a rule whose targets saw
+                                             it happen, an eyewitness's own account)                    (P9)
   drain_resolve                              mind.resolve.drain(target, reason = payload.cause or
                                              'coerced', ...) for a target that is a living actor (anyone
                                              else: no-op). (D-123) payload.scale_by — the subject is
@@ -326,6 +335,13 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     'attack' by them after it (one in the same instant counts after: a feint is no surrender); for a
     DEATH someone caused: when the killing blow landed; otherwise missing — and trigger.attacker_provoked —
     true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
+    (D-161) trigger.missed_attacker, trigger.missed_provoked, trigger.missed_lethal — for an
+    ACTION_COMPLETE whose cause is an ACTION_START of an affordance whose verb is 'attack', by someone
+    with an actors row on a human body, at someone else with an actors row on a human body alive when
+    it started, that put no HARM on them (no HARM of that body caused by the start): the attacker;
+    whether the one it was made on was fighting a person in the 10 minutes up to the start (as
+    attacker_provoked); whether the def is tagged 'lethal' (a shot, a blade) — a miss, a dry click,
+    a grab that slips is still an attack; otherwise missing.
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

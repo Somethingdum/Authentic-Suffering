@@ -52,14 +52,19 @@ def _detail(words, addressed, known_as):
             "received_db": 60, "via_portal": None, "armed_at_me": False}
 
 
-def seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type="body"):
+def seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type="body", seen=False):
     from ..mind.perception import BeliefFromPercept, grant
     from ..world.rumours import claim_sentence
     rid = tx.mint("rum")
     sentence = claim_sentence(claim, _about_word(tx, holder_id, subject_type, about_id))
-    grant(tx, holder_id, event_id=f"rumour:{rid}", channel="speech", fidelity="exact", text="Word is: " + sentence, source_id=None,
-          at=at, turn_index=turn_index, beliefs=[BeliefFromPercept(subject_type, about_id, claim, sentence)],
-          detail=_detail(sentence, False, None), confidence=confidence)
+    if seen:                                                     # D-162: they saw it — they did not hear it said
+        grant(tx, holder_id, event_id=f"rumour:{rid}", channel="visual", fidelity="exact", text=sentence, source_id=None,
+              at=at, turn_index=turn_index, beliefs=[BeliefFromPercept(subject_type, about_id, claim, sentence)],
+              detail={}, confidence=confidence)
+    else:
+        grant(tx, holder_id, event_id=f"rumour:{rid}", channel="speech", fidelity="exact", text="Word is: " + sentence,
+              source_id=None, at=at, turn_index=turn_index, beliefs=[BeliefFromPercept(subject_type, about_id, claim, sentence)],
+              detail=_detail(sentence, False, None), confidence=confidence)
     h = _live_holding(tx, holder_id, about_id, claim, subject_type)
     tx.commit_event(Event(type=EventType.RUMOUR_SPREAD, writer="world.rumours", at=at, turn_index=turn_index, cause_event_id=cause_event_id,
                           payload={"rumour_id": rid, "teller_id": None, "listener_id": holder_id, "about_id": about_id, "claim": claim,

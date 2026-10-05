@@ -10,7 +10,7 @@ CLAIM_TEXT: claim slug -> sentence template ('{about}' = the listener's own word
   mind.perception.word_for). claim_sentence(claim, about_word) -> str: the template filled in, or
   for an unknown slug f"{about_word}: {slug with '_' as spaces}."; the first letter upper-cased.
 INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *,
-             subject_type='body') -> str
+             subject_type='body', seen=False) -> str
   (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed theft, CAS-013 for an
   off-screen death — and anything else that starts talk). rumour_id = tx.mint('rum'). First
   grant(tx, holder, event_id=f'rumour:{rumour_id}', channel 'speech', fidelity 'exact', text =
@@ -24,7 +24,10 @@ INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, con
   sentence = claim_sentence(claim, word_for(tx, holder, about_id)). P10: subject_type 'place' (talk
   about a place, not a person — world.hordes HRD-13 'horde_coming'): the belief is
   BeliefFromPercept('place', about_id, claim, sentence) and the about word is the place's name
-  (places.name) with a leading 'The' lower-cased; everything else is the same.
+  (places.name) with a leading 'The' lower-cased; everything else is the same. (D-162) ``seen``: the
+  holder saw it happen (an eyewitness rumour — a rule's payload seen: true): the grant is channel
+  'visual', fidelity 'exact', text = the sentence (no 'Word is: '), detail {} — so the belief's
+  provenance is 'witnessed' ("you saw it"), never talk they overheard; everything else is the same.
 INFO-02 spread_one(tx, rumour_id, teller_id, listener_id, at, turn_index, cause_event_id) -> Event
   The teller's live (superseded_by NULL) believed holding on the rumour's (subject_type,
   subject_id, predicate) must have confidence >= 1 — else ValueError. confidence = that - 1;
@@ -90,6 +93,7 @@ CLAIM_TEXT: dict[str, str] = {
     "fed_someone_to_the_dead": "{about} pushed someone to the dead to save themselves.",
     "killed_someone": "{about} killed someone who was not fighting back.",   # D-119
     "hurt_someone": "{about} hurt someone who was not fighting back.",       # D-126
+    "tried_to_kill_someone": "{about} tried to kill someone who was not fighting.",   # D-161
     "ate_the_dead": "{about} cut meat from a dead person's body.",           # D-133
     "beat_a_captive": "{about} beat someone who was held and could not fight back.",   # D-134
     "killed_a_captive": "{about} killed someone who was held.",              # D-134
@@ -115,7 +119,7 @@ def claim_sentence(claim: str, about_word: str) -> str:
 
 
 def seed(tx: "Tx", holder_id: str, about_id: str, claim: str, at: int, turn_index: int,
-         cause_event_id: str | None, confidence: int = 3, *, subject_type: str = "body") -> str:
+         cause_event_id: str | None, confidence: int = 3, *, subject_type: str = "body", seen: bool = False) -> str:
     raise NotImplementedError("P9")
 
 
