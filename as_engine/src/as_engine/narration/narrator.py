@@ -36,8 +36,20 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
         MOVE (from_place not null)  f"{pc} moves {perception.to_phrase(to anchor name)}." when it
           has a to_anchor, else f"{pc} goes into {perception.place_phrase(place name)}." when the
           place changed.
+        (D-171, SLEEP-03) sleeping and waking — the PC's POSTURE_CHANGE whose payload awareness is
+          'asleep', and every AWARENESS_CHANGE of this turn whose payload body_id is the PC (it
+          carries no actor_id): to 'asleep' f"{pc} fell asleep."; 'asleep' -> 'awake'
+          f"{pc} woke after about {affordance.duration_words(slept_ms / 1000)} asleep." (under a
+          minute: f"{pc} woke."); 'unconscious' -> 'awake' f"{pc} came to."; to 'unconscious'
+          f"{pc} blacked out."; any other change no line. The prose knows the night passed.
       The failure is the story: a failed check is told as a failure, never softened (NARR-02).
-  world_time_text  f"{format_clock(now)}, day {day} since the Fall ({part_of_day})".
+  world_time_text  f"{format_clock(now)}, day {day} since the Fall ({part_of_day})" — (D-172) prefixed
+                   f"{format_clock(t0)} to " when the turn took LONG_TURN_MS or more (a night slept,
+                   an hour's wait: the prose is told when it began, not only where it ended).
+  ASLEEP AT THE END (D-172, SLEEP-03) when the PC ends the turn alive and asleep or unconscious it
+                   perceives nobody: people_present and people_looks are empty, and
+                   choice_prompt_hint is f"{pc} asleep" (unconscious: f"{pc} senseless") whatever
+                   was said — nothing to answer, nothing faced.
   place_text       the PC's place name.       pc_name  pc.
   establish_place  turn_index == 1, or the PC has a MOVE this turn from one place to another;
                    place_details = narration.location.describe(tx, pc_id, now).description_lines then.
@@ -151,6 +163,7 @@ INTRUSION_LINE = "It comes back unasked: {text}"             # D-145 (NARR-11): 
 INTRUSION_STRESS = 7
 BROKEN_NIGHT_LINE = "You come awake in the dark, a few hours in, and you are not rested."   # D-146: pc_state_lines
 INTRUSION_MS = 3 * 24 * 3600 * 1000
+LONG_TURN_MS = 10 * 60 * 1000                                   # D-172: world_time_text tells when it began
 CHANNEL_KIND: dict[str, str] = {"visual": "sight", "auditory": "sound", "speech": "speech", "tactile": "touch",
                                 "olfactory": "smell", "vibration": "sound"}
 BAND_TEXT: dict[str, str] = {"clean": "It goes cleanly.", "cost": "It works, at a cost.", "fail": "It doesn't work.",

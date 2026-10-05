@@ -54,6 +54,23 @@ def _comprehension(tx, pc_id):
     return "low" if s <= 4 else ("high" if s >= 8 else "average")
 
 
+def _sleep_text(pc, etype, pl):
+    from ..mind.affordance import duration_words
+    to, frm = pl.get("awareness"), pl.get("from")
+    if etype == "POSTURE_CHANGE":
+        return f"{pc} fell asleep." if to == "asleep" else None
+    if to == "asleep":
+        return f"{pc} fell asleep."
+    if to == "unconscious":
+        return f"{pc} blacked out."
+    if to == "awake" and frm == "asleep":
+        ms = pl.get("slept_ms") or 0
+        return f"{pc} woke after about {duration_words(ms / 1000)} asleep." if ms >= 60_000 else f"{pc} woke."
+    if to == "awake" and frm == "unconscious":
+        return f"{pc} came to."
+    return None
+
+
 def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     from ..contracts.common import ANATOMY_WORDS, SEVERITY_WORDS
     from ..contracts.narration import NarratorLine, NarratorPacket, NarratorStyle
@@ -81,13 +98,16 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
                 text = _of_pc(text, sex)
             line = NarratorLine(seconds=max(0, p["at"] - t0) / 1000, kind=kind, text=text)
         entries.append((p["at"], p["ev_seq"] or 0, p["percept_id"], line))
-    for e in tx.query("SELECT * FROM events WHERE actor_id=? AND turn_index=? ORDER BY seq", (pc_id, turn_index)):
+    for e in tx.query("SELECT * FROM events WHERE turn_index=? AND (actor_id=? OR (type='AWARENESS_CHANGE' AND "
+                      "json_extract(payload,'$.body_id')=?)) ORDER BY seq", (turn_index, pc_id, pc_id)):
         e = dict(e)
         pl = json.loads(e["payload"])
         sec = max(0, e["at"] - t0) / 1000
         text = None
         kind = "outcome"
-        if e["type"] == "ACTION_START" and pl.get("def_id") == "wonder":     # CHEAT-14: it simply happens
+        if e["type"] in ("AWARENESS_CHANGE", "POSTURE_CHANGE"):               # D-171: the night passed
+            text = _sleep_text(pc, e["type"], pl)
+        elif e["type"] == "ACTION_START" and pl.get("def_id") == "wonder":     # CHEAT-14: it simply happens
             text = f"{pc} {pl.get('seen') or pl.get('label')}."
         elif e["type"] == "ACTION_START" and pl.get("def_id") != "speak":
             lbl = retell(TRAILING_PAREN.sub("", pl.get("label") or pl.get("def_id", "")), "third", sex)   # TEXT-01 (D-152)
@@ -187,11 +207,19 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         from ..mind.cues import cues_of
         if cues_of(tx, pc_id, turn_index, at) & {"threat_seen", "weapon_pointed"}:
             hint = "decide what to do about the threat"
+    from .narrator import LONG_TURN_MS
+    me = _row(tx, "SELECT alive, awareness FROM bodies WHERE body_id=?", (pc_id,))
+    if me["alive"] and me["awareness"] in ("asleep", "unconscious"):      # D-172: asleep at the end
+        people, looks_lines = [], []
+        hint = f"{pc} asleep" if me["awareness"] == "asleep" else f"{pc} senseless"
+    when = f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})"
+    if at - t0 >= LONG_TURN_MS:
+        when = f"{format_clock(t0)} to {when}"
     style = NarratorStyle.model_validate_json(_row(tx, "SELECT style_json FROM narrator_state WHERE id=1")["style_json"])
     rules = tx.canon.find("style", "narration")
     numbers = tx.rules.style
     return NarratorPacket(
-        turn_index=turn_index, world_time_text=f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})",
+        turn_index=turn_index, world_time_text=when,
         place_text=place["name"], pc_name=pc, pc_state_lines=state, comprehension=_comprehension(tx, pc_id), lines=lines,
         establish_place=establish, place_details=loc.description_lines if establish else [], people_present=people,
         people_looks=looks_lines,

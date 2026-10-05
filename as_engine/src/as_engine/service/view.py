@@ -58,7 +58,7 @@ build_view(tx, session) -> PlayView   (reads only)
            1. a remainder in session.extras['remainder'] -> 's1': label f"Continue: {remainder}",
               mode 'do', entry {'remainder', 'label'};
            2. the PC's AffordanceSet (enumerate_affordances(tx, pc, canon affordances, now,
-              world_clock.turn_index)) in enumerator order, without
+              world_clock.turn_index, waking=True) — SLEEP-03) in enumerator order, without
               WAIT options and without 'observe_area', and (P10) without an option whose ui_label
               repeats an earlier suggestion's (three of the dead read alike; the nearest comes
               first): the first 5 (4 after a remainder) -> label = ui_label, mode 'say' for SPEAK

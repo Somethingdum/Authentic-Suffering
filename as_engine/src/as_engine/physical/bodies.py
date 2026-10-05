@@ -32,6 +32,9 @@ Impairment (HARM-07) = clamp(pain // 2 + blood steps + needs steps, 0, H.impairm
 
 Capacity (``capacity``):
   conscious  = alive and awareness in (alert, awake, drowsy)
+  SLEEP-03 (D-171) capacity(store, body_id, as_awake=True) reads 'asleep' as awake: what the body
+  could do the moment it woke (the player's menu while the PC sleeps — SLEEP-02 wakes it first).
+  An unconscious body is never read as awake.
   mobile     = conscious and not restrained and NOT (both legs carry a wound with function_loss 2)
   can_run    = (H1) mobile and no unhealed wound on a leg or foot with function_loss >= 1 (a shot leg
                hobbles: you can walk, not run)
@@ -1283,10 +1286,10 @@ def treat(tx: "Tx", body_id: str, wound_id: str, method: str, by_actor: str, at:
         payload={"body_id": body_id, "wound_id": wound_id, "method": method, "by_actor": by_actor}))
 
 
-def capacity(store: "Store | Tx", body_id: str) -> Capacity:
+def capacity(store: "Store | Tx", body_id: str, as_awake: bool = False) -> Capacity:
     b = _b(store, body_id)
     ws = _wounds(store, body_id)
-    conscious = bool(b["alive"]) and b["awareness"] in ("alert", "awake", "drowsy")
+    conscious = bool(b["alive"]) and b["awareness"] in (("alert", "awake", "drowsy", "asleep") if as_awake else ("alert", "awake", "drowsy"))
     legs = {ANATOMY_SIDE[w["anatomy"]] for w in ws if ANATOMY_GROUP[w["anatomy"]] in ("leg",) and w["function_loss"] >= 2}
     mobile = conscious and not (b["restrained"] and not excepted(store, body_id)) and len(legs) < 2
     free = 0

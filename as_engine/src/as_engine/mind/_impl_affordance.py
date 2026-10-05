@@ -26,7 +26,7 @@ class Ctx:
     pass
 
 
-def _ctx(tx, actor_id, at, turn_index):
+def _ctx(tx, actor_id, at, turn_index, waking=False):
     from . import perception as P
     from ..physical import bodies
     from ._impl_p4a import fused
@@ -38,7 +38,7 @@ def _ctx(tx, actor_id, at, turn_index):
     c.place = c.pos["place_id"]
     c.actor = _row(tx, "SELECT * FROM actors WHERE actor_id=?", (actor_id,))
     c.dossier = fused(tx, actor_id)
-    c.cap = bodies.capacity(tx, actor_id)
+    c.cap = bodies.capacity(tx, actor_id, as_awake=waking)               # SLEEP-03 (D-171)
     c.skills = {s.domain.value if hasattr(s.domain, "value") else s.domain: s.rank for s in c.dossier.capability.skills}
     c.cues = set()
     for r in tx.query("SELECT cue_tags FROM lessons WHERE holder_id=? AND confidence>=1", (actor_id,)):
@@ -653,9 +653,9 @@ def _group(c, opt):
     return 6
 
 
-def enumerate_affordances(tx, actor_id, catalog, at, turn_index):
+def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
     from .resolve import gate as rgate
-    c = _ctx(tx, actor_id, at, turn_index)
+    c = _ctx(tx, actor_id, at, turn_index, waking)
     res = AffordanceSet(actor_id=actor_id)
     auth = None
     aa = json.loads(c.actor["accepted_authority"])

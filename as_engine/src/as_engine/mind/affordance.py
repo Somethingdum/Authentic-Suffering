@@ -3,7 +3,10 @@ SKULL-10 and AFF-11 (Actor v2: what the menu may know).
 
 CODE computes affordances -> the model chooses among them and motivates (plan §6.4).
 
-enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
+enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> AffordanceSet
+  SLEEP-03 (D-171) waking=True (the player's own menu: turn.intake, service.view): capacity is read
+  as_awake (physical.bodies) — a sleeping PC is offered what they could do on waking, and acting
+  wakes them (action.resolve SLEEP-02). Nobody else's menu is built waking.
   catalog = the AffordanceDefs in canon order (tx.canon.all('affordance') sorted by ref).
   Binding uses the actor's OWN knowledge (AFF-01); the truth layer is not consulted for target
   existence (the intent barrier re-checks against T0, stage 7). "This turn's percepts" here are
@@ -324,7 +327,7 @@ class AffordanceSet:
 
 
 def enumerate_affordances(tx: "Tx", actor_id: str, catalog: list["AffordanceDef"], at: int,
-                          turn_index: int) -> AffordanceSet:
+                          turn_index: int, waking: bool = False) -> AffordanceSet:
     raise NotImplementedError("P4")
 
 

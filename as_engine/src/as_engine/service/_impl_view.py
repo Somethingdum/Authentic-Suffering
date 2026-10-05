@@ -211,7 +211,7 @@ def build_view(tx, session):
                                exits_known=ex))
     # suggestions
     sugg, smap = [], {}
-    aff = enumerate_affordances(tx, pc, tx.canon.all("affordance"), at, T)
+    aff = enumerate_affordances(tx, pc, tx.canon.all("affordance"), at, T, waking=True)   # SLEEP-03 (D-171)
     rem = session.extras.get("remainder")
     if rem:
         smap["s1"] = {"remainder": rem, "label": f"Continue: {rem}"}

@@ -148,7 +148,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
     from ..narration.lint import record_pc_input
     pc = session.pc_id
     perception.compile_scene(tx, pc, t0, turn_index)
-    aff = enumerate_affordances(tx, pc, tx.canon.all("affordance"), t0, turn_index)
+    aff = enumerate_affordances(tx, pc, tx.canon.all("affordance"), t0, turn_index, waking=True)   # SLEEP-03 (D-171)
     pkt = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0)
     lod = LOD.WARM
     info = {"remainder": None, "addressee": None}

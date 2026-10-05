@@ -680,6 +680,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_of_him.py` | In a third-person story the PC's percepts reach the narrator told of him ("grabs at him", "his left arm"), quoted writing untouched; a second-person story keeps "you" |
 
+### 3.81 Waking up (P7; D-171, D-172)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_waking_up.py` | After a quiet night "I get up" is a turn like any other: the menu is what he could do on waking, he wakes and stands, and the story is told "Owen woke after about 8 hours asleep." before "Owen chose to stand up."; lying down to sleep is told "Owen fell asleep.", from when the turn began to when it ended, with nobody seen and the story ending on him asleep; June asleep still decides nothing (her menu is not built waking) and out cold is never read as asleep |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

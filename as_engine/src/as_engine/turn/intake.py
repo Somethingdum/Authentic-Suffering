@@ -10,7 +10,8 @@ a refusal.
 
 intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejected
   INTAKE-01 (1) perception.compile_scene(tx, pc, t0, turn_index); aff =
-     mind.affordance.enumerate_affordances(tx, pc, tx.canon.all('affordance'), t0, turn_index);
+     mind.affordance.enumerate_affordances(tx, pc, tx.canon.all('affordance'), t0, turn_index,
+     waking=True) (SLEEP-03, D-171: asleep, the player still chooses what the PC does on waking);
      packet = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0). info = {'remainder': None,
      'addressee': None}. text = (submit.text or '').strip() — every later use of "the text" means
      this stripped text.
