@@ -1205,7 +1205,7 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
         variant = rng.range_int(tx, SPE, f"variant:{n}", 0, 999)
         seed = PersonSeed(name=name, age=age, sex=sex, cohort=cohort_kind(age, dsf), occupation=occ, skills=skills,
                           special=special, variant=variant, settlement_name=s.name, group_name=groups[s.group_id].name,
-                          climate_heat=params.a.climate_heat)
+                          climate_heat=params.a.climate_heat, days_since_fall=dsf)
         seeds.append(((kind, s, role, site, sh), seed, band))
         n += 1
     # WORLDGEN_ACTOR for the first llm_dossiers
@@ -1607,6 +1607,7 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
                             special={L: 3 + rng.range_int(tx, SO, f"raider_special:{i}:{L}", 0, 4) for L in "SPECIAL"},
                             variant=rng.range_int(tx, SO, f"raider_variant:{i}", 0, 999),
                             settlement_name=zones[g.home_zone_id].name, group_name=g.name, climate_heat=params.a.climate_heat,
+                            days_since_fall=dsf,                             # D-251
                             voices_taken=tuple(gang_voices),                 # D-199: nobody in the gang sounds alike
                             voices_heard=world_voices(tx),                   # D-245: nor like anyone in the world
                             lives_heard=world_lives(tx))                     # D-247: nor anyone's life

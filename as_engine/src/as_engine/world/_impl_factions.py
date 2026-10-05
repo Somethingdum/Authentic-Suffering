@@ -309,7 +309,7 @@ def operator_dossier(rng, tx, group_id, k, sex, cause):
                       variant=rng.range_int(tx, "factions", f"decon_variant:{cause}:{k}", 0, 999),
                       settlement_name=sname, group_name=r[1], climate_heat=int((wp.get("a") or {}).get("climate_heat", 5)),
                       voices_taken=_voices_here(tx, s, group_id), voices_heard=world_voices(tx),   # D-245
-                      lives_heard=world_lives(tx))                                                          # D-247
+                      lives_heard=world_lives(tx), days_since_fall=int(dsf))                                # D-247, D-251
     d = skeleton_dossier(seed)
     d["id"] = d["id"] + f"_{k}_{(cause or 'x')[-6:]}"
     d["appearance"]["clothing_usual"] = D.appearance

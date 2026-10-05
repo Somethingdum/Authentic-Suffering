@@ -163,6 +163,7 @@ class PersonSeed:
     voices_heard: tuple[str, ...] = ()   # D-245: the first lines of the voices already given out anywhere in the world
     lives_taken: tuple[str, ...] = ()    # D-247: the motives, wounds, conflicts, habits, hopes and secrets given out where they live
     lives_heard: tuple[str, ...] = ()    # D-247: ... and anywhere in the world
+    days_since_fall: int | None = None   # D-251: how long ago the Fall came — what they were doing when it did
 
 
 @dataclass
@@ -318,16 +319,16 @@ _TRAITS = (
      "kept a whole bunkhouse laughing through a night under siege"),
     ("stubborn", "will not be moved once decided", "being overruled", "holds the line", "loses arguments badly",
      "refused to abandon the greenhouse when the fence fell"),
-    ("tender", "notices who is hurting", "someone crying", "stays with them", "falls behind on work",
+    ("tender", "notices who is hurting", "someone crying", "stays with whoever it is", "falls behind on work",
      "sat up three nights with a dying stranger"),
     ("cold", "keeps feelings out of it", "a sob story", "decides fast", "is not liked",
      "voted to turn away a family at the gate, and slept fine"),
     ("greedy", "always knows what things are worth", "a fair split", "trades hard", "is not trusted with stores",
-     "came back from a run with more than they reported"),
+     "came back from a run with more than was reported"),
     ("brave", "goes first", "someone in danger", "takes the risk", "has scars to show for it",
-     "pulled a man off the wall with three of them on the ladder"),
+     "pulled a man off the wall with three of the dead on the ladder"),
     ("bitter", "remembers every slight", "being blamed", "keeps score", "drives people off",
-     "still will not speak to the woman who took their bunk"),
+     "still will not speak to the woman who took the bunk by the stove"),
     ("devout", "prays before eating and before a run", "blasphemy", "trusts it will be all right", "frustrates the practical",
      "kept a service going every Sunday through the hungry months"),
 )
@@ -335,13 +336,13 @@ _KID_TRAITS = (
     ("curious", "pokes into everything", "something new", "wanders off", "gets into trouble",
      "found the way into the old shop through the vent"),
     ("shy", "hides behind grown-ups", "strangers", "goes silent", "gets overlooked",
-     "did not say a word for a week after they came"),
+     "did not say a word for a week after arriving"),
     ("bold", "dares the other children", "being called scared", "goes too far", "gets hurt",
      "climbed the water tower on a dare"),
     ("clingy", "never lets go of a hand", "being left", "follows everywhere", "gets underfoot",
      "slept at the foot of the watch tower so as not to be left"),
     ("helpful", "fetches and carries without being asked", "a grown-up struggling", "tries to help", "gets in the way",
-     "carried water all morning until their hands blistered"),
+     "carried water all morning until both hands blistered"),
     ("watchful", "notices everything", "grown-ups whispering", "listens in", "knows too much",
      "was the first to see the dead at the fence and said nothing until asked"),
 )
@@ -526,22 +527,22 @@ _KID_NEVER_SAY = (
 
 _MOTIVES = (
     ("keep {group} fed and safe", "does the work assigned, and some more"),
-    ("get their sister back from wherever the convoy took her", "asks every trader who passes"),
+    ("get a sister back from wherever the convoy took her", "asks every trader who passes"),
     ("earn a seat at the council table", "volunteers for whatever gets noticed"),
     ("never be hungry again", "puts a little of every ration aside"),
-    ("find out what happened to their old street", "plans a run nobody has approved"),
-    ("keep their hands clean", "takes the jobs nobody has to die for"),
-    ("be useful enough that nobody ever turns them out", "learns every trade they can"),
-    ("make up for something they did in the first winter", "takes the worst shifts without a word"),
-    ("get the children through to spring", "trades their own share for milk and medicine"),
+    ("find out what happened to the old street back home", "plans a run nobody has approved"),
+    ("keep clean hands", "takes the jobs nobody has to die for"),
+    ("be too useful ever to be turned out", "learns every trade on offer"),
+    ("make up for something done in the first winter", "takes the worst shifts without a word"),
+    ("get the children through to spring", "trades away rations for milk and medicine"),
     ("leave {settlement} for somewhere quieter", "trades for goods in secret, against the day"),
     ("keep the {occupation} work going", "fixes what breaks before anyone asks"),
     ("see every one of the dead put down properly", "goes out with a spade when the watch allows"),
-    ("pay back the people who took them in", "gives more than they are asked for"),
+    ("pay back the people who opened the gate that first winter", "gives more than is asked"),
     ("keep the peace between the families", "listens to everyone and repeats nothing"),
-    ("be left alone to do their work", "keeps their head down and their hands busy"),
-    ("get back at the crew that burned their old camp", "asks after them on every run"),
-    ("hold on to the last of their faith", "keeps the old prayers every night"),
+    ("be left alone to work", "keeps quiet and keeps working"),
+    ("get back at the crew that burned the old camp", "asks after that crew on every run"),
+    ("hold on to what is left of the faith", "keeps the old prayers every night"),
     ("be the one people come to", "always has a little of what is needed"),
 )
 _CONTRADICTIONS = (
@@ -549,11 +550,12 @@ _CONTRADICTIONS = (
     ("everyone deserves a chance", "strangers get people killed", "a child is at the gate", "a grown man is"),
     ("the rules keep us alive", "the rules are for people who never went out there", "the leader is watching",
      "nobody is"),
-    ("the dead were people once", "the dead are just meat now", "they knew the dead one", "they did not"),
+    ("the dead were people once", "the dead are just meat now", "the dead one was someone known",
+     "the dead one was a stranger"),
     ("hope is how we last", "hope is how we die", "the morning is quiet", "the dead are at the fence"),
     # D-248: more minds than one camp has people
-    ("a debt is a debt", "the dead cancel every debt", "someone owes them", "they owe someone"),
-    ("you never leave anyone behind", "the slow get everyone killed", "it is someone they know", "it is a stranger"),
+    ("a debt is a debt", "the dead cancel every debt", "it is time to collect", "it is time to pay"),
+    ("you never leave anyone behind", "the slow get everyone killed", "it is someone known", "it is a stranger"),
     ("a gun solves nothing", "a gun is the only thing anyone listens to", "it is quiet", "someone pushes"),
     ("{settlement} is worth dying for", "no wall is worth a life", "the gate holds", "the gate is breaking"),
     ("the truth matters", "a kind lie keeps people going", "it costs nothing", "someone is grieving"),
@@ -562,73 +564,90 @@ _CONTRADICTIONS = (
     ("someone is watching over us", "nobody is coming", "the morning is quiet", "someone has just died"),
 )
 _WONT = (("steal from the common store", "steal"), ("leave a wounded friend behind", "leave_wounded"),
-         ("hurt a child", "harm_dependent"), ("break their word", "break_promise"), ("turn on their own group", "betray_group"))
+         ("hurt a child", "harm_dependent"), ("break a promise", "break_promise"), ("turn on the group", "betray_group"),
+         # D-251: more lines than one camp has people
+         ("kill someone who has given up", "execute_prisoner"), ("hit anyone who cannot hit back", "attack_unarmed"),
+         ("walk off a watch", "abandon_post"), ("eat the dead, whatever the hunger", "eat_human"),
+         ("leave anyone to the dead to get away", "feed_to_dead"), ("hurt a prisoner for answers", "torture"),
+         ("lie to family", "lie_to_family"))
+_KID_WONT = (("steal from the common store", "steal"), ("leave a little one behind", "abandon_dependent"),
+             ("break a promise", "break_promise"), ("lie to family", "lie_to_family"))
+_WILL = ("work a double shift", "share a last meal", "stand a watch for someone sick", "lie to protect a friend",
+         # D-251
+         "carry someone who cannot walk", "go out after a child who wandered off", "speak up for someone being blamed",
+         "bury a stranger properly", "give up a bed to someone sick", "take the blame to keep the peace",
+         "walk a newcomer through the rules", "split the last of the medicine fairly")
+_KID_WILL = ("share the last sweet", "keep a secret for a friend", "look after the little ones", "carry water without being asked",
+             "stand up to a bigger kid", "sing to someone who is scared")
+_RISKS = ("takes risks only for friends", "takes risks for anyone", "takes no risk that is not needed", "takes risks to be noticed",
+          # D-251
+          "takes risks without thinking, and pays for it", "weighs every risk out loud first")
 _KID_MOTIVES = (
     ("be allowed up on the wall one day", "follows the watch around"),
-    ("keep the dog they found", "shares their food with it in secret"),
-    ("find their mum", "asks every newcomer if they have seen her"),
+    ("keep the stray dog", "shares food with it in secret"),
+    ("find mum again, wherever she is", "asks every newcomer about her"),
     ("be as brave as the grown-ups", "pretends not to cry"),
-    ("get the last of the sweets", "trades whatever they find"),
-    ("not be a bother", "does as they are told, quickly"),
+    ("get the last of the sweets", "trades whatever turns up"),
+    ("not be a bother", "does as told, quickly"),
 )
 _CONFLICTS = (
     "wants to leave and cannot abandon the others", "trusts the leader and hates what the leader asks",
     "wants to be kind and has learned that kindness gets people killed", "misses the old world and is ashamed of how little",
-    "wants a family and is terrified of losing one again", "believes in the rules and breaks them for the people they love",
-    "wants revenge on the ones who left them and needs their help now", "is proud of surviving and sick of what it cost",
+    "wants a family and is terrified of losing one again", "believes in the rules and bends every one for the people loved most",
+    "wants revenge on the ones who left everyone behind and needs those same people now", "is proud of surviving and sick of what it cost",
     "prays every night and no longer believes anyone hears", "wants to be needed and wants to be left alone",
     "loves someone in the settlement who should not know it", "would trade anything for a quiet life and is good at fighting",
 )
 _KID_CONFLICTS = (
-    "wants to be brave and is scared all the time", "wants to play and knows they must be quiet",
-    "misses someone and is told not to talk about them", "wants to grow up fast and wants someone to look after them",
+    "wants to be brave and is scared all the time", "wants to play and knows to stay quiet",
+    "misses someone whose name nobody will say", "wants to grow up fast and still wants looking after",
 )
 _WOUNDS = {
     "pre_fall_adult": (
         "lost family in the first week of the Fall", "left a friend behind at the stadium evacuation",
-        "shot their own brother when he turned", "was a nurse when the hospitals fell, and still smells it",
+        "shot a brother when he turned", "was a nurse when the hospitals fell, and still smells it",
         "hid in a freezer for two days while the street was eaten", "sold out a neighbour for a bag of rice in the first winter",
         "walked out of the city alone, past people begging for help", "was in the first quarantine camp when the fence came down",
-        "watched their child turn and could not do it themselves",
+        "watched a son turn and could not do it, and someone else had to",
         # D-247: more lives than one camp has people
-        "drove a bus and kept driving while they beat on the doors", "buried a family they had promised to come back for",
-        "held the line at the bridge until the order came to fire on the crowd", "lost their wife to a raider crew, not to the dead",
+        "drove a bus and kept driving while people beat on the doors", "came back for a family, as promised, and found the house open and empty",
+        "held the line at the bridge until the order came to fire on the crowd", "lost a wife to a raider crew, not to the dead",
         "opened the church doors to everyone the first night", "spent the first month on a roof watching the street below",
     ),
     "fall_child": (
         "was eight when the Fall came and remembers only the screaming", "grew up in the camps, moved from fence to fence",
-        "lost their parents on the road and was raised by strangers", "was carried out of the city in a laundry basket",
-        "was left at a gate with a note pinned to their coat",
-        "was hidden in a crawlspace while their family was taken", "remembers school only as the place the buses never came to",
-        "was traded between camps for food when they were ten", "grew up thinking the dead were a sickness that would pass",
+        "lost both parents on the road and was raised by strangers", "was carried out of the city in a laundry basket",
+        "was left at a gate with a note pinned to a coat",
+        "was hidden in a crawlspace while the family was taken", "remembers school only as the place the buses never came to",
+        "was traded between camps for food at ten years old", "grew up thinking the dead were a sickness that would pass",
         "lost a little brother on the march and never said his name again",
-        "was raised by a man who taught them to kill before he taught them to read",
+        "was raised by a man who taught killing before reading",
     ),
     "post_fall_born": (
-        "has never seen a city lit at night", "lost their mother to a fever last winter", "was born in a cellar during a raid",
-        "watched a neighbour turn when they were very small", "has never known a full stomach for a whole week",
-        "was taught to keep silent before they could talk", "lost a father on a supply run and was told he would come back",
-        "grew up on a wall, handing up ammunition", "watched the camp they were born in burn",
-        "was sold to another settlement for medicine in a hard winter", "has buried more friends than they have had birthdays",
+        "has never seen a city lit at night", "lost a mother to a fever last winter", "was born in a cellar during a raid",
+        "watched a neighbour turn, very small and standing too close", "has never known a full stomach for a whole week",
+        "was taught to keep silent before learning to talk", "lost a father on a supply run and was told he would come back",
+        "grew up on a wall, handing up ammunition", "watched the only home ever known burn",
+        "was sold to another settlement for medicine in a hard winter", "has buried more friends than there have been birthdays",
     ),
 }
 _ASPIRATIONS = ("a quiet year", "a roof that does not leak", "to see the sea again", "to grow something that lives",
-                "to be trusted with the stores", "a bed of their own", "to hear music again", "to be left alone",
-                "a wedding, a real one", "to find out if anyone is left at home", "to teach someone what they know",
+                "to be trusted with the stores", "a bed nobody else sleeps in", "to hear music again", "to be left alone",
+                "a wedding, a real one", "to find out if anyone is left at home", "to pass on everything learned",
                 "to sleep through one whole night")
-_KID_ASPIRATIONS = ("a dog of their own", "to see a real shop", "to learn to shoot", "to sleep in a proper bed",
+_KID_ASPIRATIONS = ("a dog to keep", "to see a real shop", "to learn to shoot", "to sleep in a proper bed",
                     "to be on the wall", "to have a birthday cake")
 _FEARS = ("the pump failing", "a fever in the camp", "the night watch sleeping", "being turned out", "fire",
-          "the dead getting in", "losing their hands", "the dark", "deep water", "being alone when it happens",
+          "the dead getting in", "losing the use of both hands", "the dark", "deep water", "being alone when it happens",
           "turning and not knowing it", "the council's vote")
 _KID_FEARS = ("the dark", "the dead at the fence", "being left behind", "loud noises", "the cellar", "being told off")
 _SIGNATURES = ("counts the water jugs every evening", "sleeps in boots", "keeps a list of the dead in a notebook",
-               "carves little animals from scrap wood", "talks to the chickens", "never sits with their back to a door",
-               "keeps a photo nobody else is allowed to see", "sharpens every blade they pass",
+               "carves little animals from scrap wood", "talks to the chickens", "always sits facing the door",
+               "keeps a photo nobody else is allowed to see", "sharpens every blade within reach",
                "writes the date on the wall each morning", "sings the same song at every burial",
                "hoards string and wire", "walks the fence before bed")
 _KID_SIGNATURES = ("carries a toy everywhere", "collects buttons", "draws on every wall", "follows the dogs",
-                   "hums to themselves", "asks for a story every night")
+                   "hums all day long", "asks for a story every night")
 _GESTURES = ("rubs the back of the neck", "taps two fingers on anything near", "cracks the knuckles",
              "pulls at an earlobe", "crosses the arms tight", "rubs a thumb over an old scar", "chews a thumbnail",
              "pats every pocket", "sets the jaw", "looks at the floor")
@@ -638,43 +657,185 @@ _MOVES = ("moves quickly and keeps to the walls", "goes very still and listens",
 _SILENCES = (
     (["the dead are mentioned", "leaders argue"], "arms folded, looking at the floor", "comfortable at work, uncomfortable in meetings"),
     (["someone cries", "the old world comes up"], "busy hands, eyes down", "comfortable with children, uncomfortable with officials"),
-    (["they are praised", "anyone asks about family"], "a fixed smile", "comfortable outdoors, uncomfortable in crowds"),
+    (["anyone gives praise", "anyone asks about family"], "a fixed smile", "comfortable outdoors, uncomfortable in crowds"),
     (["a decision has to be made", "a gun is drawn"], "very still, watching", "comfortable on watch, uncomfortable at meals"),
-    (["they are wrong", "a child is hurt"], "turns away", "comfortable alone, uncomfortable in a room full of people"),
-    (["money or trade comes up", "someone shouts"], "picks at their sleeve", "comfortable working, uncomfortable resting"),
+    (["being proved wrong", "a child is hurt"], "turns away", "comfortable alone, uncomfortable in a room full of people"),
+    (["money or trade comes up", "someone shouts"], "picks at a sleeve", "comfortable working, uncomfortable resting"),
     # D-248
     (["someone is punished", "the gate opens at night"], "jaw set, counting breaths", "comfortable on the wall, uncomfortable in the kitchen"),
     (["a name of the dead is said", "children ask questions"], "goes to the window", "comfortable with animals, uncomfortable with crowds"),
-    (["they are given orders", "food is shared out"], "hands in pockets, looking past people", "comfortable on a run, uncomfortable at home"),
-    (["blood is mentioned", "a stranger stares"], "rubs their wrists", "comfortable in the dark, uncomfortable in daylight"),
+    (["orders are given", "food is shared out"], "hands in pockets, looking past people", "comfortable on a run, uncomfortable at home"),
+    (["blood is mentioned", "a stranger stares"], "rubs at both wrists", "comfortable in the dark, uncomfortable in daylight"),
     (["a vote is called", "someone weeps"], "leaves the room", "comfortable at the fire, uncomfortable on watch"),
-    (["they are thanked", "someone says sorry"], "nods too often", "comfortable in a small group, uncomfortable alone"),
+    (["thanks are given", "someone says sorry"], "nods too often", "comfortable in a small group, uncomfortable alone"),
 )
-_STACKS = (
-    ["family", "own safety", "{group}", "strangers"], ["own safety", "family", "{group}", "strangers"],
-    ["{group}", "family", "own safety", "strangers"], ["family", "{group}", "strangers", "own safety"],
-    ["the children", "family", "{group}", "own safety"], ["their faith", "family", "{group}", "own safety"],
-    # D-248
-    ["the children", "{group}", "family", "own safety"], ["own safety", "{group}", "family", "strangers"],
-    ["family", "their faith", "own safety", "{group}"], ["{group}", "the children", "strangers", "own safety"],
-    ["the people they owe", "family", "{group}", "own safety"], ["the sick and the hurt", "{group}", "family", "own safety"],
+_STACKS = (   # D-251: what comes first, when the order flips, and the time it held — each its own
+    (["family", "own safety", "{group}", "strangers"], "a child alone outside the wall",
+     "went back out through the gate for a cousin with the dead already in the street"),
+    (["own safety", "family", "{group}", "strangers"], "someone of the family is cornered",
+     "stayed behind the barricade while others ran for the gate, and lived because of it"),
+    (["{group}", "family", "own safety", "strangers"], "what {group} asks would get a child killed",
+     "stayed on the wall during a raid while home burned two streets over"),
+    (["family", "{group}", "strangers", "own safety"], "a stranger is bleeding in the road",
+     "took a beating meant for a nephew and never said a word about it"),
+    (["the children", "family", "{group}", "own safety"], "the dead are already inside",
+     "held the nursery door through a whole night of the dead pushing at it"),
+    (["faith", "family", "{group}", "own safety"], "faith asks for someone to be left to die",
+     "prayed aloud all through a raid so the children would hear something besides screaming"),
+    (["the children", "{group}", "family", "own safety"], "family is in danger and nobody else is near",
+     "gave a seat on the last truck out to somebody else's child"),
+    (["own safety", "{group}", "family", "strangers"], "the gate is about to fall",
+     "hid in the stores during the first raid and never told a soul"),
+    (["family", "faith", "own safety", "{group}"], "{group} would starve without help",
+     "walked out of a council vote to sit with a sick mother"),
+    (["{group}", "the children", "strangers", "own safety"], "a leader orders something cruel",
+     "went over the wall alone to draw the dead off a supply team"),
+    (["old debts", "family", "{group}", "own safety"], "paying a debt would mean hurting a child",
+     "paid back a whole winter's food to the family that fed the camp in the hungry month"),
+    (["the sick and the hurt", "{group}", "family", "own safety"], "the sickness is a bite",
+     "sat with a fever case for a week when nobody else would go in"),
+)
+_KID_STACKS = (
+    (["family", "the other children", "own safety", "{group}"], "a grown-up says to hide",
+     "kept the little ones quiet in the root cellar all through a raid"),
+    (["own safety", "family", "the other children", "{group}"], "a friend is crying for help",
+     "ran back for a friend who fell at the gate"),
+    (["the other children", "family", "own safety", "{group}"], "family says to come home",
+     "shared a whole day's food with a new kid who had nothing"),
+    (["family", "own safety", "the other children", "{group}"], "a little one is lost",
+     "went looking for a lost little one past where children are allowed"),
+    (["family", "the animals", "own safety", "{group}"], "the dead are close",
+     "hid the hens in the cellar the night the fence came down"),
+    (["the grown-ups' rules", "family", "own safety", "the other children"], "a friend would get in trouble",
+     "told on a friend who went over the wall, and was right to"),
 )
 _TOWARD_STRANGERS = ("wary", "neutral", "warm", "hostile", "wary", "neutral")
 _ENCOUNTER = ("calls for the watch and keeps distance", "asks their name and business", "offers water and watches them drink it",
-              "puts themselves between the stranger and the children", "says nothing and fetches the leader",
+              "stands between the stranger and the children", "says nothing and fetches the leader",
               "keeps one hand on a weapon and talks")
 _SECRETS = ("none worth telling", "none worth telling", "none worth telling",
             "took food from the common store in the hungry month", "rode with a raider crew for a winter",
-            "left someone behind who might have lived", "was bitten once, and it never took", "lied about their trade to get in",
+            "left someone behind who might have lived", "was bitten once, and it never took", "lied about a trade to get in",
             # D-247: more secrets than one camp has people
             "keeps a stash of medicine buried outside the wall", "put down a sick child and told the mother it ran off",
             "deserted a watch the night the north camp was overrun", "hid a bitten partner for three days before it took",
             "left the gate unbarred the night of the fire and let someone else hang for it",
-            "steals a little from the medicine shelf for their own pain", "cannot read, and has hidden it from everyone",
+            "steals a little from the medicine shelf for an old pain", "cannot read, and has hidden it from everyone",
             "has a brother riding with a raider crew and still meets him", "killed a man over a can of food and buried him by the road",
             "traded someone's hiding place to a crew for safe passage")
 _DIALECTS = ("", "", "", "a northern accent that thickens when angry", "drops the 'g' on every -ing",
              "old army habits of speech", "a city voice gone rough", "slow country vowels")
+
+
+# D-251: where a person comes from and what they did before — the pack's people come from Kokomo and Terre Haute and
+# drove forklifts; a generated person came from "somewhere in the region" and did before the Fall what they do now.
+_BIRTHPLACES = (
+    "Gary, Indiana", "Toledo, Ohio", "Fort Wayne, Indiana", "Peoria, Illinois", "Flint, Michigan", "Dayton, Ohio",
+    "Muncie, Indiana", "Rockford, Illinois", "Akron, Ohio", "Evansville, Indiana", "Joliet, Illinois", "Kalamazoo, Michigan",
+    "Cedar Rapids, Iowa", "Duluth, Minnesota", "Green Bay, Wisconsin", "Springfield, Missouri", "Wichita, Kansas",
+    "Louisville, Kentucky", "Chattanooga, Tennessee", "Tulsa, Oklahoma", "El Paso, Texas", "Fresno, California",
+    "Tacoma, Washington", "Pittsburgh, Pennsylvania", "Buffalo, New York", "Baltimore, Maryland", "Atlanta, Georgia",
+    "Memphis, Tennessee", "Detroit, Michigan", "the South Side of Chicago", "Milwaukee, Wisconsin", "Lansing, Michigan",
+    "a farm outside Bloomington, Indiana", "a trailer park off Interstate 65", "a dairy farm in Wisconsin",
+    "an army base in Kentucky", "the Pine Ridge reservation in South Dakota", "Monterrey, Mexico, and then Chicago at six",
+    "Manila, and then Indianapolis at nine", "Lagos, and then Columbus, Ohio", "a small town in the Ozarks",
+    "the suburbs north of Indianapolis",
+)
+_BORN_AFTER = (
+    "{settlement}, inside the wall", "a cellar under {settlement}", "a camp on the road that is not there any more",
+    "the back of a moving truck, the year everyone ran", "a farmhouse the dead overran soon after",
+    "a quarantine camp, behind the wire", "a church that took everyone in, the first winter", "a houseboat on the river",
+    "a barn with the doors nailed shut", "a school gym full of cots",
+)
+_JOBS_BEFORE = (
+    "cashier at a grocery store", "long-haul trucker", "high-school history teacher", "line cook at a diner",
+    "nurse's aide at a care home", "roofer", "insurance claims adjuster", "mail carrier", "warehouse picker",
+    "bank teller", "plumber", "union electrician", "hairdresser", "bartender", "paramedic", "real-estate agent",
+    "call-centre worker", "farmhand", "auto mechanic at a dealership", "soldier, two tours", "county sheriff's deputy",
+    "youth pastor", "dental hygienist", "accountant", "school bus driver", "landscaper", "machinist",
+    "stay-at-home parent of three", "out of work and looking", "night-shift security guard", "veterinary technician",
+    "pharmacist", "carpenter", "factory line worker", "librarian", "delivery driver working three apps",
+)
+_FIT_BEFORE: dict[str, tuple[str, ...]] = {    # the work they do now, and the work it grew out of
+    "pump mechanic": ("plumber", "water-treatment plant operator", "heating and cooling repairman"),
+    "cook": ("line cook at a diner", "school cafeteria cook", "caterer"),
+    "watch guard": ("night-shift security guard", "soldier, two tours", "county sheriff's deputy"),
+    "medic": ("paramedic", "emergency-room nurse", "veterinary technician"),
+    "gardener": ("landscaper", "farmhand", "garden-centre worker"),
+    "quartermaster": ("warehouse manager", "grocery store manager", "army supply sergeant"),
+    "scavenger": ("repo man", "delivery driver working three apps", "junkyard hand"),
+    "hunter": ("roofer who hunted deer every fall", "game warden"),
+    "builder": ("carpenter", "construction foreman"),
+    "runner": ("high-school track coach", "bike courier"),
+    "trader": ("used-car salesman", "pawn-shop owner"),
+    "mechanic": ("auto mechanic at a dealership", "diesel mechanic"),
+    "teacher": ("third-grade teacher", "daycare worker"),
+    "tracker": ("park ranger", "search-and-rescue volunteer"),
+    "leader": ("union shop steward", "store manager", "army sergeant", "city councilman"),
+    "raider": ("bouncer", "out of work and looking", "prison inmate, two years left to serve"),
+}
+_JOBS_YOUNG = ("freshman at a state college", "stocking shelves at a big-box store", "a first job at a car wash",
+               "army recruit, fresh out of basic", "community-college student working nights")
+_JOBS_RETIRED = ("retired after thirty years at the post office", "retired railroad worker", "retired nurse",
+                 "retired farmer", "retired steelworker", "widowed and keeping bees", "retired schoolteacher")
+_SCHOOL = ((5, "too little to remember it"), (11, "in grade school"), (14, "in middle school"), (18, "in high school"))
+# What they tell people, and who they really stand with
+_CLAIMED = ("came to {settlement} early, with the first families", "walked in alone the second winter",
+            "came in with a trade caravan and stayed", "was here before the wall went up",
+            "says little more than the name of a home town", "came up from the south with a church group",
+            "was brought in half-dead off the road", "came in with a skill {group} needed",
+            "came over from another hold after a falling-out", "was a runner between the holds before settling here",
+            "came in with a family that is gone now", "was found sleeping in the stores and allowed to stay")
+_KID_CLAIMED = ("was born here, or near enough", "came in with a grandmother", "came in with an aunt and two cousins",
+                "was found on the road and kept", "came in on a parent's back", "came with the trade caravan and stayed")
+_ALLEGIANCE = ("{group}, all the way", "family first; {group} after", "whoever keeps {settlement} fed",
+               "the few people left from before the Fall", "nobody; anywhere safer would do", "the leader, more than {group}",
+               "the children of {settlement}", "the old crew from the road", "{group}, as long as it holds",
+               "God first, then {group}", "whoever is winning", "the sick and the old, who have nobody else")
+_RAIDER_CLAIMED = ("rode with {group} since the first winter", "was a settler once, before {group}",
+                   "joined {group} for the food and stayed for the rest", "walked out of a county jail the week the guards ran",
+                   "was traded to {group} for fuel and earned a place", "came up through the camps and out the other side")
+_RAIDER_ALLEGIANCE = ("{group}, while the take is good", "the one who leads {group}, and nobody else",
+                      "nobody; a crew is just a way to eat", "the two or three in {group} worth dying for",
+                      "a family left behind somewhere, sent food when there is a way")
+_KID_ALLEGIANCE = ("family", "the other children", "whoever is kind", "the grown-up from the road", "the dogs, really")
+# What they are in the middle of
+_PROJECTS = (
+    "teaching a neighbour's kid to read", "saving parts for a radio that might reach someone",
+    "digging a root cellar before the frost", "finding out who has been taking from the stores",
+    "sewing a coat that will last the winter", "fixing a bicycle for the long run to the next hold",
+    "talking the council into a second well", "learning to shoot left-handed", "drying meat for the hungry months",
+    "writing down the name of everyone in {settlement}, in case", "building a smokehouse out of salvage",
+    "training a dog to bark at the dead", "keeping bees in a hive made from a filing cabinet",
+    "patching the roof over the bunkhouse", "trading for boots before the snow", "mapping the streets past the wall",
+    "carving a headstone for someone lost last month", "getting a sick neighbour through a fever",
+)
+_WORK_PROJECTS: dict[str, tuple[str, ...]] = {
+    "pump mechanic": ("rebuilding the pump's worn seals before the dry months", "rigging a hand pump in case the motor dies"),
+    "cook": ("stretching the flour to the end of the month", "teaching two kids to cook for forty"),
+    "watch guard": ("closing the blind spot on the north side of the wall", "keeping a log of every sighting at the fence"),
+    "medic": ("boiling and rolling bandages for the next bad day", "growing willow bark for something like aspirin"),
+    "gardener": ("saving seed from the best of the beans", "turning the dead lot behind the wall into beds"),
+    "quartermaster": ("a full count of the stores, can by can", "trading the spare fuel for medicine"),
+    "scavenger": ("clearing the pharmacy two streets past the wall", "a run to the mall nobody has come back from"),
+    "hunter": ("setting a trapline along the creek", "tanning hides for winter boots"),
+    "builder": ("raising the wall another course of blocks", "a second gate, so there are two ways out"),
+    "runner": ("a faster route to the next hold", "carrying letters between the holds"),
+    "trader": ("a deal for salt with the next hold", "a cache of trade goods nobody knows about"),
+    "mechanic": ("getting the old truck running again", "a generator that runs on wood gas"),
+    "teacher": ("a reader for the children, written out by hand", "teaching the little ones the alphabet"),
+    "tracker": ("following a pack of the dead that keeps circling the hold", "marking safe trails with paint"),
+    "leader": ("holding {group} together through the winter", "a truce with the next hold"),
+    "raider": ("finding a softer hold to hit", "a stash of fuel nobody else in the crew knows about"),
+}
+_KID_PROJECTS = ("building a den behind the stores", "taming a stray cat", "learning to tie snares", "learning the letters",
+                 "a collection of bottle caps", "learning every name on the memorial wall", "teaching the dog to sit",
+                 "growing a bean in a cup")
+# How they came by what they can do (the card: "Mechanics: skilled. <this>")
+_LEARNED = ("Learned at {settlement}, the hard way.", "Taught by an old hand on the road.",
+            "Picked up in the camps, watching the grown-ups who knew how.", "Practised every day since the wall went up.",
+            "Learned from a book found in a dead man's truck, the first winter.", "Taught by the one who held the job before.")
+_LITERACY = {"pre_fall_adult": (2, 2, 2, 3, 3, 1), "fall_child": (1, 2, 2, 2, 1, 3), "post_fall_born": (0, 1, 1, 2)}
 
 
 _no_secret = tuple(x for x in _SECRETS if x == "none worth telling")     # D-247: most people have none; never dealt out
@@ -701,14 +862,21 @@ def _draw(seed: "PersonSeed", what: str, pool, n: int = 1):
 _FUSES: tuple[int, ...] = (3, 2, 4, 3, 1, 3, 5, 2, 4, 3)
 _OUTLETS: tuple[str, ...] = ("words", "fists", "cold", "words", "tears", "fists", "flight", "words", "cold", "fists")
 _PEEVES: tuple[str, ...] = (
-    "people taking more than their share", "being talked down to", "waste", "lazy watch shifts",
-    "anyone touching their things", "being told what to do by someone who does no work", "whining",
+    "people taking more than a fair share", "being talked down to", "waste", "lazy watch shifts",
+    "anyone touching the bedroll or the bag", "being told what to do by someone who does no work", "whining",
     "people who lie about little things",
 )
 _SETTLERS: tuple[str, ...] = (
     "a long walk on the wall", "hard work until the arms ache", "an hour alone", "a smoke",
     "talking it out the next day", "a drink, when there is one",
 )
+# D-251: a child is not calmed by a drink, nor reaches for a weapon
+_KID_PEEVES: tuple[str, ...] = ("being told to be quiet", "the big kids", "being left out", "being called a baby",
+                                "grown-ups whispering")
+_KID_SETTLERS: tuple[str, ...] = ("a hug from someone safe", "hiding somewhere small", "a story", "playing with the dogs",
+                                  "being left alone for a bit")
+_KID_MOVES = ("hides behind the nearest grown-up", "goes very still and listens", "cries without a sound", "runs for family",
+              "covers both ears", "holds on to the nearest hand")
 
 
 def life_texts(dossier: dict) -> tuple[str, ...]:
@@ -716,7 +884,8 @@ def life_texts(dossier: dict) -> tuple[str, ...]:
     motive.inner_conflict, motive.signature_behaviour, life.aspiration, persona.private.concealed_history,
     and (D-248) each trait's tag, each contradiction's belief_a, the decision stack's layers and the
     silence's goes_quiet_when (each joined with '|'), appearance.habit_gesture and movement_under_stress,
-    and each of voice.would_never_say."""
+    and each of voice.would_never_say; (D-251) identity.birthplace, persona.public.claimed_history,
+    persona.private.real_affiliation, life.current_project, each of life.fears and decision_stack.past_example."""
     m, life, priv = dossier.get("motive", {}), dossier.get("life", {}), dossier.get("persona", {}).get("private", {})
     ap = dossier.get("appearance", {})
     out = [m.get("motive"), m.get("past_wound"), m.get("inner_conflict"), m.get("signature_behaviour"), life.get("aspiration"),
@@ -726,6 +895,9 @@ def life_texts(dossier: dict) -> tuple[str, ...]:
     out += ["|".join(dossier.get("decision_stack", {}).get("layers", [])), "|".join(dossier.get("silence", {}).get("goes_quiet_when", [])),
             ap.get("habit_gesture"), ap.get("movement_under_stress")]
     out += list(dossier.get("voice", {}).get("would_never_say", []))
+    out += [dossier.get("identity", {}).get("birthplace"), dossier.get("persona", {}).get("public", {}).get("claimed_history"),
+            priv.get("real_affiliation"), life.get("current_project"), dossier.get("decision_stack", {}).get("past_example")]
+    out += list(life.get("fears", []))
     return tuple(x for x in out if x)
 
 
@@ -750,6 +922,37 @@ def world_voices(tx) -> tuple[str, ...]:
                                         "ORDER BY dossier_id") if r[0])
 
 
+def _a(word: str) -> str:
+    return ("an " if word[:1].lower() in "aeiou" else "a ") + word
+
+
+def _mid(name: str) -> str:
+    # D-251: a group's name inside a sentence — "the leader, more than the Diallo People"
+    return "the " + name[4:] if name.startswith("The ") else name
+
+
+def _before(seed: "PersonSeed", work: str) -> str:
+    # D-251: what they were doing when the Fall came
+    if seed.cohort == "post_fall_born":
+        return "not yet born"
+    at_fall = None if seed.days_since_fall is None else seed.age - seed.days_since_fall / 365
+    if seed.cohort == "fall_child":
+        return "in school" if at_fall is None else next((w for top, w in _SCHOOL if at_fall < top), "in high school")
+    if at_fall is not None and at_fall < 22:
+        return _draw(seed, "before", _JOBS_YOUNG)
+    if at_fall is not None and at_fall >= 65:
+        return _draw(seed, "before", _JOBS_RETIRED)
+    return _draw(seed, "before", _FIT_BEFORE.get(work, ()) * 6 + _JOBS_BEFORE)
+
+
+def _learned(seed: "PersonSeed", domain: str, i: int, work: str, before: str) -> str:
+    # D-251: where a skill came from — the work they did before the Fall, when it fits, else how they learned it since
+    if i == 0 and before in _FIT_BEFORE.get(work, ()):
+        return f"Years of it before the Fall, as {_a(before)}."
+    pool = _LEARNED if seed.cohort != "post_fall_born" else tuple(x for x in _LEARNED if "first winter" not in x and "wall went up" not in x)
+    return _draw(seed, f"learned:{domain}", pool).format(settlement=seed.settlement_name)
+
+
 def skeleton_dossier(seed: PersonSeed) -> dict:
     """A VALID generated ActorDossier dict from a PersonSeed (implemented; deterministic).
     Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the
@@ -769,9 +972,21 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     and of those one in seed.lives_heard only when every other is — two people in one camp do not both
     have hidden in a freezer for two days; (D-248) and so are their traits (by tag; two drawn, so at least
     two must be left), their contradiction (by belief_a as it reads there), decision stack, silence, habit
-    gesture, movement under stress and the three things they would never say; someone who
+    gesture, movement under stress and the three things they would never say; (D-251) and so are where they come
+    from (a real town for anyone born before the Fall — the pack's people come from Kokomo and Terre Haute — a place of
+    this world for anyone born after it), what they tell people of how they came, who they really stand with (a raider's, a raider's own), what
+    they are in the middle of (their work's own projects first) and what they fear; their decision stack carries its
+    own exception and the time it held. What they did before the Fall follows from when they were born
+    (seed.days_since_fall): 'not yet born', the school they were in, a first job, a retirement, or work — often the
+    work their trade now grew out of — and a skill that grew out of it says so ('Years of it before the Fall, as a
+    plumber.'); their one line is the trait people see, their work and the habit that marks them, never their name
+    again; how well they read follows their generation (and someone whose secret is that they cannot read cannot).
+    Every text said of the person on their own card ('You …') reads as English in the second person and the third
+    alike: it never calls them 'they', 'their' or 'them' (the card would say 'You won't: break their word.'); someone who
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
-    everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
+    everything never does. The temper still comes from ``variant`` (H1); (D-251) a child under 16 has a child's peeves
+    and is settled as a child is, and a child under 12 moves under stress as a child does (never 'reaches for the
+    nearest weapon'); the silence's comfortable/uncomfortable line is a sentence (capitalised). WORLDGEN_ACTOR may replace every
     unlocked field of it."""
     v = seed.variant
     first = seed.name.split()[0]
@@ -793,61 +1008,76 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         swear = max(swear, "frequent", key=_PROFANITY.index)
     elif any(k in x for x in tend for k in ("scripture", "polite to a fault", "says sorry")):
         swear = "none"
-    fmt = {"group": seed.group_name, "settlement": seed.settlement_name, "occupation": seed.occupation}
+    fmt = {"group": _mid(seed.group_name), "settlement": seed.settlement_name, "occupation": seed.occupation}
     motive, method = _draw(seed, "motive", _fresh(seed, _KID_MOTIVES if kid else _MOTIVES, lambda x: x[0].format(**fmt)))
     wounds = _WOUNDS.get(seed.cohort) or _WOUNDS["pre_fall_adult"]
     silence = _draw(seed, "silence", _fresh(seed, _SILENCES, lambda x: "|".join(x[0])))
-    wont = _draw(seed, "wont", _WONT)
-    stack = [x.format(**fmt) for x in _draw(seed, "stack", _fresh(seed, _STACKS, lambda st: "|".join(x.format(**fmt) for x in st)))]
-    skills = [{"domain": d, "rank": r, "evidence": f"{first} learned it the hard way at {seed.settlement_name}."}
-              for d, r in sorted(seed.skills.items())]
+    wont = _draw(seed, "wont", _KID_WONT if kid else _WONT)
+    layers, flips, held = _draw(seed, "stack", _fresh(seed, _KID_STACKS if kid else _STACKS,
+                                                      lambda st: "|".join(x.format(**fmt) for x in st[0])))
+    stack = [x.format(**fmt) for x in layers]
     looks = generated_looks(seed)
     work = seed.occupation if adult else "child"
+    before = _before(seed, work)                                                                   # D-251
+    skills = [{"domain": d, "rank": r, "evidence": _learned(seed, d, i, work, before)} for i, (d, r) in enumerate(sorted(seed.skills.items()))]
+    young = kid or teen or seed.cohort == "post_fall_born"
+    born = _draw(seed, "born", _fresh(seed, _BORN_AFTER if seed.cohort == "post_fall_born" else _BIRTHPLACES,
+                                      lambda x: x.format(**fmt))).format(**fmt)
+    signature = _draw(seed, "signature", _fresh(seed, _KID_SIGNATURES if kid else _SIGNATURES))
+    secret = "none worth telling" if kid or teen else _draw(seed, "secret", _no_secret + _fresh(seed, _real_secrets))
+    literacy = (0 if "cannot read" in secret else (0 if seed.age < 6 else 1) if kid else _draw(seed, "literacy", (1, 2, 2))
+                if teen else _draw(seed, "literacy", _LITERACY.get(seed.cohort, (2,))))
+    project = _draw(seed, "project", _fresh(seed, _KID_PROJECTS if kid else _WORK_PROJECTS.get(work, ()) + _PROJECTS,
+                                            lambda x: x.format(**fmt))).format(**fmt)
+    shown = t1[0].replace("_", " ")
+    one_line = f"{_a(shown).capitalize()} {'child' if not adult else work} at {seed.settlement_name} who {signature}."
+    if len(one_line) > 140:
+        one_line = f"{_a(shown).capitalize()} {'child' if not adult else work} at {seed.settlement_name}."
     return {
         "schema": "as.actor.v1", "id": "gen_" + "".join(c if c.isalnum() else "_" for c in seed.name.lower()),
         "generation": "generated",
         "identity": {"name": seed.name, "age": seed.age, "sex": seed.sex, "cohort": seed.cohort,
-                     "birthplace": "somewhere in the region", "occupation_before": work if adult else "school",
-                     "occupation_now": work,
-                     "one_line": f"{seed.name}, {'a ' + work if adult else 'a child'} at {seed.settlement_name}."},
+                     "birthplace": born, "occupation_before": before, "occupation_now": work, "one_line": one_line},
         "appearance": {"height_cm": (160 + (v % 30)) if adult else (90 + seed.age * 5),
                        "mass_kg": (55 + (v % 40)) if adult else (12 + seed.age * 3),
                        "build": _BUILD[v % len(_BUILD)], "hair": _hair_words(looks), "eyes": looks["eye_colour"],
                        "skin": looks["complexion"],
                        "distinguishing_marks": [f"{m['what']} {m['where']}" for m in looks["marks"]] or ["nothing anyone remembers"],
                        "clothing_usual": "patched work clothes" if adult else "hand-me-downs two sizes big",
-                       "movement_under_stress": _draw(seed, "moves", _fresh(seed, _MOVES)),
+                       "movement_under_stress": _draw(seed, "moves", _fresh(seed, _KID_MOVES if kid else _MOVES)),
                        "habit_gesture": _draw(seed, "gesture", _fresh(seed, _GESTURES)),
                        "relation_to_appearance": _draw(seed, "vanity", ("does not think about it", "keeps clean whatever it costs",
                                                                           "hides a scar", "wears something from before every day")),
                        "looks": looks},
-        "capability": {"special": dict(seed.special), "skills": skills, "literacy": 2 if adult else 1,
+        "capability": {"special": dict(seed.special), "skills": skills, "literacy": literacy,
                        "tech_literacy": 1},
         "motive": {"motive": motive.format(**fmt), "method": method,
-                   "moral_line": {"will": [_draw(seed, "will", ("work a double shift", "share their last meal",
-                                                                 "stand a watch for someone sick", "lie to protect a friend"))],
+                   "moral_line": {"will": [_draw(seed, "will", _KID_WILL if kid else _WILL)],
                                   "wont": [wont[0]], "wont_tags": [wont[1]]},
                    "inner_conflict": _draw(seed, "conflict", _fresh(seed, _KID_CONFLICTS if kid else _CONFLICTS)),
                    "past_wound": _draw(seed, "wound", _fresh(seed, wounds)),
-                   "signature_behaviour": _draw(seed, "signature", _fresh(seed, _KID_SIGNATURES if kid else _SIGNATURES)),
+                   "signature_behaviour": signature,
                    "risk_threshold": 3 + v % 4,
-                   "risk_text": _draw(seed, "risk", ("takes risks only for people they know", "takes risks for anyone",
-                                                     "takes no risks they do not have to", "takes risks to be noticed")),
+                   "risk_text": _draw(seed, "risk", _RISKS),
                    "resource_constraints": "owns what fits in one bag"},
-        "persona": {"public": {"shown_traits": [t1[0]], "claimed_history": f"came to {seed.settlement_name} early",
+        "persona": {"public": {"shown_traits": [t1[0]],
+                               "claimed_history": _draw(seed, "claimed", _fresh(seed, _RAIDER_CLAIMED if work == "raider" else
+                                                                                _KID_CLAIMED if young else _CLAIMED,
+                                                                                lambda x: x.format(**fmt))).format(**fmt),
                                "presented_affiliation": seed.group_name},
                     "private": {"true_goals": [motive.format(**fmt)],
-                                "concealed_history": "none worth telling" if kid or teen else _draw(seed, "secret", _no_secret + _fresh(seed, _real_secrets)),
-                                "real_affiliation": "their own people"}},
+                                "concealed_history": secret,
+                                "real_affiliation": _draw(seed, "allegiance", _fresh(seed, _RAIDER_ALLEGIANCE if work == "raider" else
+                                                                                     _KID_ALLEGIANCE if kid else _ALLEGIANCE,
+                                                                                     lambda x: x.format(**fmt))).format(**fmt)}},
         "traits": [dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t1)),
                    dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t2))],
         "contradictions": [dict(zip(("belief_a", "belief_b", "a_wins_when", "b_wins_when"),
                                     (x.format(**fmt) for x in _draw(seed, "contradiction",
                                                                     _fresh(seed, _CONTRADICTIONS, lambda c: c[0].format(**fmt))))))],
-        "decision_stack": {"layers": stack, "inversion_conditions": ["a raid on the settlement"],
-                           "past_example": "stayed on the wall during a raid instead of running home"},
+        "decision_stack": {"layers": stack, "inversion_conditions": [flips.format(**fmt)], "past_example": held.format(**fmt)},
         "silence": {"goes_quiet_when": list(silence[0]), "body_when_silent": silence[1],
-                    "comfortable_vs_uncomfortable": silence[2]},
+                    "comfortable_vs_uncomfortable": silence[2][:1].upper() + silence[2][1:]},     # D-251: a sentence
         "knowledge": {"knows": [f"the ways in and out of {seed.settlement_name}"]},
         "voice": {"capsule": f"{first} {tend[0]}; {tend[1]}.",
                   "speech_tendencies": list(tend),
@@ -857,13 +1087,13 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                   "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
         "life": {"aspiration": _draw(seed, "aspiration", _fresh(seed, _KID_ASPIRATIONS if kid else _ASPIRATIONS)),
-                 "current_project": f"keeping up with the work at {seed.settlement_name}",
-                 "fears": [_draw(seed, "fear", _KID_FEARS if kid else _FEARS)]},
+                 "current_project": project,
+                 "fears": [_draw(seed, "fear", _fresh(seed, _KID_FEARS if kid else _FEARS))]},
         "disposition": {"archetype_prior": "civilized", "toward_strangers": _draw(seed, "strangers", _TOWARD_STRANGERS),
                         "encounter_default": _draw(seed, "encounter", _ENCOUNTER)},
         "temper": {"fuse": _FUSES[(v // 5) % len(_FUSES)], "outlet": _OUTLETS[(v // 11) % len(_OUTLETS)],
-                   "grudge": (v // 7) % 4, "pet_peeves": [_PEEVES[(v // 3) % len(_PEEVES)]],
-                   "cools_down_by": _SETTLERS[(v // 13) % len(_SETTLERS)]},
+                   "grudge": (v // 7) % 4, "pet_peeves": [(_PEEVES if adult else _KID_PEEVES)[(v // 3) % len(_PEEVES if adult else _KID_PEEVES)]],
+                   "cools_down_by": (_SETTLERS if adult else _KID_SETTLERS)[(v // 13) % len(_SETTLERS if adult else _KID_SETTLERS)]},
         "tags": ["generated"],
     }
 

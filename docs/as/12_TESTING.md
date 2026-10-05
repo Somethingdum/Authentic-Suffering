@@ -1038,6 +1038,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_no_two_minds_alike.py` | In a standard world (seed 7) no two generated people of a group share a contradiction, a decision stack, a silence, a habit gesture or a thing they would never say; with every trait but one given out where they live, a person still draws two |
 
+### 3.140 A card about you (P10; D-251)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_a_card_about_you.py` | No text a generated card says of its person (outside their own quoted words) calls them 'they', 'their' or 'them', at every age and era; what they did before the Fall follows from when they were born (not yet born, too little, grade or high school, a first job, retired) and a trade that grew out of it says so on the skill; a real birthplace before the Fall, a place of this world after it; the one line does not repeat the name; whoever hides that they cannot read cannot, and adults do not all read alike; a child is settled and moves as a child; a raider tells a raider's story; in a standard world (seed 7) no two people of a group share a birthplace, a story of how they came, an allegiance, a project or the time their priorities held, and nobody shares a first line |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
