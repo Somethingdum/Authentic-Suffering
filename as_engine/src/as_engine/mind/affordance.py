@@ -190,6 +190,9 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
                   TAKE_COVER / HIDE, 5 SURRENDER, 6 anything else (attacks on bodies that are
                   not threats, shove) — facing a shambler with a gun in hand, 'shoot it' must
                   never lose its slot to 'crouch';
+    move group    (D-181) 0 a move to another place (its destination is a place) or one with no
+                  referent (leave by the nearest way out), 1 a move within the place — the
+                  side door to the yard is never crowded out by four ways to reach the car;
     hold group    0 defs tagged 'freeze', 1 verb OBSERVE, 2 verb GUARD, 3 the rest (so 'stay
                   where you are' and 'watch' are never crowded out by 'sleep').
   DISTANCE for an option bound to an anchor or portal = metres from that point to the actor's

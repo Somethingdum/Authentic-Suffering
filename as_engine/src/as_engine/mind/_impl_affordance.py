@@ -723,6 +723,8 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
             if ba.verb == Verb.SURRENDER:
                 return 5
             return 6
+        if g == 3:                       # D-181: going somewhere else before moving about the room
+            return 0 if (ba.destination_id or "").startswith("plc_") or not (ba.destination_id or ba.target_id) else 1
         if g != 6:
             return 0
         if "freeze" in ba.tags:
