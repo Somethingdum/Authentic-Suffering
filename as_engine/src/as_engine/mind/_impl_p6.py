@@ -320,9 +320,11 @@ def build_aftermath(tx, holder_id, turn_index, at):
         selfx.append(SelfExperience(handle=h, text=txt))
     d = fused(tx, holder_id)
     from .identity import compile_identity
+    from ._impl_lore import lore_lines
+    lore = [x["text"] for x in lore_lines(tx, holder_id, turn_index, at, tx.rules.packet.max_lore)]   # D-196
     return AftermathPacket(holder_id=holder_id, turn_index=turn_index, identity=compile_identity(d), percepts=percepts, utterances=utts, entities=entities, own_action_text=own,
                            own_expectation_text=expect, open_loops=loops, relationships=rel_lines, handles=handles,
-                           self_experiences=selfx)
+                           self_experiences=selfx, lore=lore)
 
 
 def writeback_groups(packets):

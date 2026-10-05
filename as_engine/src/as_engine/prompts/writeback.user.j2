@@ -17,6 +17,9 @@ WHAT THEY PERCEIVED
 {% for e in a.entities %}- {{ e.handle }}: {{ e.description }}
 {% else %}- nobody else
 {% endfor %}
+{% if a.lore %}WHAT THEY GREW UP HEARING ABOUT THIS (belief, not fact)
+{% for k in a.lore %}- {{ k }}
+{% endfor %}{% endif %}
 {% if a.relationships %}HOW THEY FELT BEFORE
 {% for r in a.relationships %}- {{ r.handle }}: {{ r.text }}
 {% endfor %}{% endif %}

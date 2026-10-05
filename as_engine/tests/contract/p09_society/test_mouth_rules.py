@@ -33,3 +33,27 @@ def test_a_bite_beside_you_brings_the_mouth_rules_to_mind(scenario):
         assert "bite_wound_seen" in cues_of(tx, w.id("mara"), 0, t + 1000)
         said = {x["lore_id"] for x in retrieval.lore_lines(tx, w.id("mara"), 0, t + 1000, 6)}
     assert {"core:lore/wet_strain", "core:lore/contamination_culture"} <= said, said
+
+
+def test_she_remembers_it_as_she_was_raised_to(scenario):
+    """D-196: the memory of what she saw is written with what she grew up hearing about it in mind."""
+    from as_engine.contracts.common import CallClass
+    from as_engine.mind import memory
+    from as_engine.prompts.render import render
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in (("june", 5.0), ("mara", 6.0)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        c = tx.commit_event(Event(type=EventType.OVERRIDE, writer="audit", at=t, turn_index=0, payload={"what": "test"}))
+        bodies.apply_harm(tx, w.id("june"), WoundSpec(Anatomy.ARM_L, WoundType.BITE, WoundSeverity.SIGNIFICANT), t, c.event_id, 0, w.rng)
+        perception.compile_scene(tx, w.id("mara"), t + 1000, 0)
+        a = memory.build_aftermath(tx, w.id("mara"), 0, t + 1000)
+    assert a.lore and any("bite" in x.lower() for x in a.lore), a.lore
+    user = render(CallClass.WRITEBACK, a=a, cue_ids=["bite_wound_seen"])[1].content
+    assert "WHAT THEY GREW UP HEARING ABOUT THIS (belief, not fact)\n- " in user
+    with w.store.transaction() as tx:
+        memory.queue_writeback(tx, w.id("mara"), 0, t + 1000)
+    ((turn, texts),) = memory.unprocessed(w.store, w.id("mara"))
+    assert turn == 0 and texts, "a memory not yet written is still read back raw, from the store"

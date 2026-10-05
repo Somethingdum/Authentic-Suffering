@@ -432,6 +432,8 @@ class AftermathPacket(Strict):
     own_expectation_text: str | None = None
     open_loops: list[LoopLine] = Field(default_factory=list)
     relationships: list[RelationshipLine] = Field(default_factory=list)
+    lore: list[str] = Field(default_factory=list, description="D-196: what this person grew up hearing about what "
+                            "reached them (mind.retrieval.lore_lines), as in their Skull Packet.")
     handles: dict[str, str] = Field(default_factory=dict)
 
 

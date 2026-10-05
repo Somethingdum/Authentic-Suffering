@@ -51,6 +51,10 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                 loop_id), at most PacketRules.max_open_loops: LoopLine(L#, kind, text).
   relationships RelationshipLine per P-handle with a relationships row from the holder, in handle
                 order, worded exactly as mind.packet words them.
+  lore          (D-196) the texts of mind.retrieval.lore_lines(tx, holder_id, turn_index, at,
+                PacketRules.max_lore), in its order: what this person grew up hearing about what
+                reached them, as their deciding packet has it — how they read what happened, which
+                can be wrong.
 
 MEM-03 writeback_groups(packets: dict[holder_id, AftermathPacket]) -> list[list[holder_id]]
   (B5, Actor Spec §13, AC11) Every named person reads what happened as themselves, even when
