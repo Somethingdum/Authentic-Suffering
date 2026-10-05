@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import inspect
 import json
 import math
@@ -1209,7 +1210,13 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
         n += 1
     # WORLDGEN_ACTOR for the first llm_dossiers
     hist = [(json.loads(r[1]), r[2]) for r in tx.query("SELECT hist_id, subject_ids, belief_text FROM history_events ORDER BY day, hist_id")]
-    skels = [skeleton_dossier(sd) for _slot, sd, _b in seeds]
+    skels, heard = [], {}
+    for i, (slot, sd, b) in enumerate(seeds):                     # D-199: voices dealt out, no repeats in one place
+        place = slot[1].settlement_id
+        sd = dataclasses.replace(sd, voices_taken=tuple(heard.get(place, ())))
+        seeds[i] = (slot, sd, b)
+        skels.append(skeleton_dossier(sd))
+        heard.setdefault(place, []).append(skels[-1]["voice"]["exemplars"]["low_stakes"])
     k = min(T["llm_dossiers"], len(seeds))
 
     def hist_for(gid):
@@ -1573,6 +1580,7 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
         n = 2 + (values["hostile_human"] >= 7) + (values["hostile_human"] >= 9)
         nrec = _first_names_record(canon)
         taken = _taken_names(tx)
+        gang_voices = []
         for i in range(n):
             cs = [(r[0], float(r[1])) for r in tx.query("SELECT sex, count FROM cohorts WHERE settlement_id IS NULL AND zone_id=? "
                                                        "AND archetype=? AND age_band='adult' AND count>0 ORDER BY sex",
@@ -1592,9 +1600,12 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
                             skills={"brawling": 1, "firearms": 1},
                             special={L: 3 + rng.range_int(tx, SO, f"raider_special:{i}:{L}", 0, 4) for L in "SPECIAL"},
                             variant=rng.range_int(tx, SO, f"raider_variant:{i}", 0, 999),
-                            settlement_name=zones[g.home_zone_id].name, group_name=g.name, climate_heat=params.a.climate_heat)
+                            settlement_name=zones[g.home_zone_id].name, group_name=g.name, climate_heat=params.a.climate_heat,
+                            voices_taken=tuple(gang_voices))                 # D-199: nobody in the gang sounds alike
+            sk = skeleton_dossier(sd)
+            gang_voices.append(sk["voice"]["exemplars"]["low_stakes"])
             aid = P.materialise(tx, rng, settlement_id=None, zone_id=g.home_zone_id, band="adult", sex=sex,
-                                dossier=skeleton_dossier(sd), place_id=tplace, at=at, turn_index=0, cause_event_id=None,
+                                dossier=sk, place_id=tplace, at=at, turn_index=0, cause_event_id=None,
                                 archetype=g.group_id, event_origin="worldgen")
             threat_ids.append(aid)
         if threat_ids:

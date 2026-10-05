@@ -155,6 +155,7 @@ class PersonSeed:
     settlement_name: str
     group_name: str
     climate_heat: int = 5       # LOOK-10: the region's climate_heat (1-10); what they dress for
+    voices_taken: tuple[str, ...] = ()   # D-199: the first lines of the voices already given out where they live
 
 
 @dataclass
@@ -359,6 +360,26 @@ _VOICES = (
     ("warm and teasing", "calls people 'love' or 'pet'"),
     ("whispers out of habit", "goes quiet when anyone shouts"),
     ("talks to the dead out loud", "mixes up names when tired"),
+    ("prices everything in trade", "haggles even with friends"),
+    ("talks like a soldier, by the numbers", "clipped radio habits"),
+    ("asks how everyone is feeling", "counsellor's habits from before"),
+    ("superstitious", "touches wood and counts to three"),
+    ("angry at God and says so", "loud"),
+    ("soft-spoken and exact", "never raises their voice, even now"),
+    ("cheerful in a way that unsettles people", "whistles"),
+    ("picks fights with words when drinking", "maudlin when sober"),
+    ("a mechanic's talk: everything is a machine", "fixes things while talking"),
+    ("formal, from somewhere official once", "talks in procedures"),
+    ("gentle with animals, short with people", "talks to dogs more than to anyone"),
+    ("mocks everything", "never gives a straight answer"),
+    ("stammers until there is a crisis", "apologises before speaking"),
+    ("lives by survival rules", "quotes their own rules by number"),
+    ("flirts out of habit", "deflects with charm"),
+    ("talks about food constantly", "measures time in meals"),
+    ("cold and transactional", "asks what's in it for them"),
+    ("hums bits of songs", "answers with half a tune"),
+    ("drops into Spanish when scared", "translates themself"),
+    ("grim and literal", "states the odds"),
 )
 _KID_VOICES = (
     ("asks 'why' about everything", "repeats what grown-ups said"),
@@ -367,6 +388,10 @@ _KID_VOICES = (
     ("brags", "tells made-up stories"),
     ("very serious for their age", "says grown-up words carefully"),
     ("chatters", "forgets to be quiet"),
+    ("collects things", "shows everyone their treasures"),
+    ("plays at being a guard", "salutes"),
+    ("afraid of the dark and says so", "holds on to sleeves"),
+    ("says what everyone is thinking", "blunt the way small children are"),
 )
 _TEEN_VOICES = (
     ("sarcastic", "rolls their eyes into every word"),
@@ -375,6 +400,10 @@ _TEEN_VOICES = (
     ("argues every rule", "knows everyone's business"),
     ("talks big about runs", "goes quiet around the dead"),
     ("polite to adults, savage to other kids", "keeps secrets badly"),
+    ("acts like nothing scares them", "dares people"),
+    ("quiet, draws on everything", "talks to one person only"),
+    ("never knew anything else", "thinks grown-ups are soft"),
+    ("desperate to be useful", "volunteers for everything"),
 )
 
 # D-143: each line set belongs to the voice at the same index — a person's lines sound like the person.
@@ -400,6 +429,26 @@ _EXEMPLARS = (
     ("Hello, pet. You look half starved.", "Pet, behind me. Don't argue.", "Not the little one. Take me instead."),
     ("There's tea. If you want it.", "Shh. Down. Stay down.", "Don't shout. Please don't shout at me."),
     ("Morning, Dad. Same as ever up here.", "Run, Sam. Ben. Whoever you are, run!", "You'd know what to do. You always knew. Tell me."),
+    ("That's worth two cans. Three, if it's clean.", "Leave the bag! It's not worth your neck!", "Name your price. Anything. Just bring him back."),
+    ("Copy. Moving to the wall.", "Contact left! Down, down!", "Negative. I'm not leaving him. Negative."),
+    ("How are you sitting with all this? Honestly.", "Breathe with me. In. Out. Now move.", "I can't fix this one. I can't fix anyone."),
+    ("Touch the frame on your way out. For luck.", "Three, two, one, go, while it looks away!", "We broke the count. I told you we broke the count."),
+    ("Look at that. Another lovely day He forgot about.", "MOVE! Are you deaf?", "Go on, then. Take me too. TAKE ME!"),
+    ("Would you pass that, please. Thank you.", "Behind me. Quietly. Thank you.", "Look at me. Stay with me. Just look at me."),
+    ("Morning! Nobody died in the night. Good start.", "Ooh, that's a lot of them. Let's not be here.", "Still smiling. See? Still smiling. Still..."),
+    ("Who drank the last of it? Who?", "Get off me, I can walk! I can... move!", "Everyone I like ends up in the ground. So don't."),
+    ("Hand me that. No, the other one. There she goes.", "It's seized! Push, push!", "Some things you can't put back together. I tried."),
+    ("Rations go by the list. No exceptions.", "Everyone to the assembly point. Now.", "There's no procedure for this. There's no procedure."),
+    ("Good girl. Who's hungry? Not you. Him.", "Easy, easy. Everybody still. She's scared.", "Not the dog too. Please. Not the dog too."),
+    ("Oh, a plan. How exciting. Do we get hats?", "Fine, fine, running. Look at me run.", "Ha. Funny. No. No, it isn't."),
+    ("I... sorry... I just thought... the roof leaks.", "Left. Go left. Now.", "I c-can't. Don't make me look."),
+    ("Rule four: never sleep where you ate.", "Rule one! Quiet! Rule one!", "There's no rule for this. I made them all and there's none."),
+    ("Well, aren't you a sight. Even filthy.", "Darling, I'd love to chat, but run.", "Don't be sweet to me now. I can't take sweet."),
+    ("Two meals till the run. One, if it's beans.", "Drop it! Drop the food and run!", "I'd give every meal I've got left. Every one."),
+    ("And what do I get?", "Your problem. Move or don't.", "...Fine. I'll stay. Don't make it a thing."),
+    ("La, la-la... sorry. Stuck in my head.", "Hup, hup, hup, go!", "I can't remember how it ends. The song. I can't."),
+    ("Bueno. Good. It's good.", "¡Vámonos! Go, go!", "Dios mío. No. No, no, no."),
+    ("Twelve of us. Food for nine. Do the sums.", "Thirty metres. We won't make it walking.", "The odds were never good. I knew. I still hoped."),
 )
 _KID_EXEMPLARS = (
     ("Why is the sky that colour?", "Mum said we have to be quiet.", "I want to go home. I want to go home."),
@@ -409,6 +458,10 @@ _KID_EXEMPLARS = (
     ("We have to ration it. That means a little bit every day.", "Everybody stay calm. That's what you say.", "Where did everybody go?"),
     ("And the dog went under the fence and I said no and he did it anyway and", "Sorry! Sorry. I'm quiet now. I'm quiet.",
      "I don't like it here anymore."),
+    ("Look, a button. A gold one. It's mine now.", "My bag! I need my bag!", "Somebody took my things. All my things."),
+    ("Halt! Who goes there? ...Oh. It's you.", "Everybody in! Guard says!", "I was supposed to be watching. I was watching."),
+    ("Can you leave the light? Just a bit?", "Hold my hand. Hold it!", "It's so dark. Where are you? Where are you?"),
+    ("Why does that man smell?", "That lady's bleeding a lot.", "Is she dead? She's dead, isn't she."),
 )
 _TEEN_EXEMPLARS = (
     ("Oh good. Beans again. My favourite.", "Run! Don't wait for me!", "You don't get to tell me it's okay."),
@@ -417,6 +470,10 @@ _TEEN_EXEMPLARS = (
     ("Heard the watch talking about you.", "That rule's stupid and you know it. Move!", "I just want one normal day. One."),
     ("Is that a real gun? Can I hold it?", "Get down, get down!", "I hate this. I hate all of you."),
     ("Nobody asked you.", "Not a word. Not one word.", "I'm not a kid. Stop treating me like one."),
+    ("Bet I could get over that fence in five seconds.", "Come on! What are you, scared?", "I'm not crying. Shut up. I'm not."),
+    ("...I drew the wall. You want to see?", "Go. I'll follow. Go.", "I don't want to draw anymore."),
+    ("You lot cry about everything.", "Stab it in the eye. It's easy. Watch.", "Is this all there is? Is this it?"),
+    ("I'll take watch. I'll take two watches.", "Let me go first! I'm small, I'll fit!", "I wasn't fast enough. I should've been faster."),
 )
 # Elders draw from the adult voices and these (D-143): an old person is not only their age.
 _ELDER_VOICES = (
@@ -426,6 +483,10 @@ _ELDER_VOICES = (
     ("tells stories about before", "talks to fill a silence"),
     ("blunt as a hammer", "worries out loud"),
     ("speaks slowly", "reads the weather in their bones"),
+    ("keeps the names of the dead", "writes everything in a notebook"),
+    ("gruff, old soldier", "thinks the young are soft"),
+    ("gentle and forgetful", "asks after people long gone"),
+    ("cutting and wise", "answers a question with a question"),
 )
 _ELDER_EXEMPLARS = (
     ("In my day we had a word for this. Several.", "Get the young ones in first.", "I've buried enough. I'll not bury you."),
@@ -434,6 +495,10 @@ _ELDER_EXEMPLARS = (
     ("Before all this I sold shoes. Imagine.", "Steady. Steady hands.", "Leave me the pistol and go."),
     ("You're too thin. Eat.", "Bar the door, quick now.", "It should have been me first. Not him."),
     ("Weather's turning. Knees never lie.", "Not that way, that's the river.", "I'm tired, love. So very tired."),
+    ("I write them all down. Somebody should.", "In! Count heads as you go!", "Another page. I'm running out of pages."),
+    ("At your age we carried twice that.", "Backs to the wall! Form up!", "I outlived my whole unit. And now you."),
+    ("Has anyone seen my sister? She was just here.", "Is it the noise again? Should we hide?", "Oh. That's right. She's gone. I keep forgetting."),
+    ("And who told you that? And did you believe them?", "Why are you still standing there?", "What's left to save? Tell me. What's left?"),
 )
 _PROFANITY = ("none", "rare", "frequent", "constant")
 
@@ -605,7 +670,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     post_fall_born) and work, so no two people in a settlement share a whole inner life and a child never
     talks like a pump mechanic. (D-143) A voice and its lines are one draw — the lines sound like the voice
     (an elder draws from the adult voices and the elders' own; nobody born after the Fall draws one that
-    remembers the world before it) — and the profanity follows it: someone who
+    remembers the world before it) — and the profanity follows it: (D-199) a voice whose first line is in
+    seed.voices_taken is drawn only when every voice open to them is taken — nobody in one place sounds like
+    someone else there while there are voices left; someone who
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
     everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
     unlocked field of it."""
@@ -621,6 +688,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     if seed.cohort == "post_fall_born":       # D-143: nobody born after the Fall tells stories about before it
         pairs = tuple(p for p in pairs if not any(k in " ".join(p[0] + p[1]) for k in ("before", "old world", "old words",
                                                                                       "old city", "used to say")))
+    pairs = tuple(p for p in pairs if p[1][0] not in seed.voices_taken) or pairs    # D-199: not a voice already here
     tend, ex = _draw(seed, "voice", pairs)                             # D-143: the lines go with the voice
     swear = _draw(seed, "profanity", ("none", "rare", "rare", "frequent", "constant"))
     if any("swear" in x for x in tend):

@@ -785,6 +785,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_kindness.py` | Owen's gift earns Mara's trust once a world day, and the next day's again; Mara's gift writes nothing into Owen; taking is not giving; June tending Alice's wound while she is awake earns one trust, one warmth and "June tended your wounds. You owe them.", the day's care counting once and the next day's deepening the debt; asleep she never knew who; tending yourself owes no one |
 
+### 3.98 No two voices alike in one place (P10; D-199)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_no_two_voices_alike.py` | Thirty adults dealt voices in one place get thirty different voices; with every voice taken one is still drawn; the pools hold at least 40 adult voices and 10 for each other age, no two opening with the same line; nobody born after the Fall gets a voice that remembers before it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
