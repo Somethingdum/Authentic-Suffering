@@ -356,6 +356,8 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms, land_by=N
             for k, seg in enumerate(segs, 1):
                 pl = {"words": seg, "volume": vol, "to": list(i.speech.to), "source_db": R.speech_db[vol],
                       "armed": _armed(tx, i.actor_id), "utterance_id": st.event_id, "segment": k, "segments": len(segs)}
+                if i.source == "ambient":                            # D-232: a line of the room
+                    pl["ambient"] = True
                 due = say_at + _m.ceil(1000 * before / 2.5)
                 before += len(seg.split())
                 if k == 1 and due == wave_at:

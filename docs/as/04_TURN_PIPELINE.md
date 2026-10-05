@@ -178,7 +178,9 @@ for the PC the window closes on it so the player answers.
   `rethink_turns` turns — it runs COLD and goes on with what it
   was doing, and the room's lines still reach it. Of those due only because it has been a while
   (and that have thought before), a third take stock in a wave, by actor id; the rest come up in
-  the next (D-231): a room that took stock together does not do it again all in one turn.
+  the next (D-231): a room that took stock together does not do it again all in one turn. A line of the
+  room (AMB-02) said to nobody is not talk to take in for everyone who heard it, nor a memory to write
+  (D-232); said to someone, it is theirs.
 - COLD: `action.intent.plan_continuation` — the same decision still running. **LOD is a reasoning
   tier only**: it never changes competence, morality or knowledge (LOD-01).
 - **The room talks (D-128, AMB-01..03).** COLD people never chose words with a model, so a crowd

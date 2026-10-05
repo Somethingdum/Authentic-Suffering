@@ -941,6 +941,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_spread_out.py` | After the night at Delgado's, with every mind's only flag 'restless', of those who thought with a model in the first turn only the first third by actor id keep salience in the next turn's first wave; anyone who never thought with a model keeps it |
 
+### 3.124 The room's lines (P7; D-232)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_rooms_lines.py` | Mara's ambient "Cold again tonight." to nobody, heard clearly by June, sets neither of them thinking the next turn and is not worth a memory to either; said to June it is both for her; the same words not from the room's lines are talk as before; the resolver marks an ambient intent's SPEECH ambient and no other |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -169,14 +169,17 @@ MEM-19 (B5, fidelity C10; Actor Spec §13) A memory job is never lost to a faile
 MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing new is not sent to be
   remembered. True when the packet holds an utterance — (D-227) one whose words they made out (fidelity
   exact or partial), or said to them (addressed_to_me), or raised or shouted: a voice through a wall,
-  too low to make out and said to someone else, is not by itself worth a memory; or a percept whose (channel, text) is not that
+  too low to make out and said to someone else, is not by itself worth a memory; (D-232) nor is a line
+  of the room (its event a SPEECH whose payload has ambient: true) not said to them (payload 'to'
+  does not hold the holder) — or a percept whose (channel, text) is not that
   of any of the holder's percept_log rows of turn_index - 1 (news is new: the same doors still shut,
   the same woman still at the window are not); or one of the holder's own events of this turn
   (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
   that is not quiet. Quiet: an ACTION_START
   whose affordance (canon.find('affordance', payload.def_id)) has its verb in QUIET_VERBS and (D-200) no
   'threat_response' tag — standing between someone and the danger is not holding still — and an
-  ACTION_COMPLETE whose band is clean or missing and whose cause is such a start. Else False — the
+  ACTION_COMPLETE whose band is clean or missing and whose cause is such a start, and (D-232) a SPEECH
+  of a line of the room (payload ambient: true). Else False — the
   raw percepts stay in percept_log either way.
 """
 
@@ -268,8 +271,13 @@ def unprocessed(store: "Store | Tx", holder_id: str) -> list[tuple[int, list[str
     return out
 def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index: int) -> bool:
     import json
-    if any(u.fidelity.value in ("exact", "partial") or u.addressed_to_me or u.volume.value in ("raised", "shout")
-           for u in packet.utterances):                                  # D-227: a voice through the wall is not
+    def offhand(u):                                                  # D-232: a line of the room, not to them
+        r = tx.query_one("SELECT e.payload FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.percept_id=?",
+                         (packet.handles.get(u.handle),))
+        pl = json.loads(r[0]) if r is not None else {}
+        return bool(pl.get("ambient")) and holder_id not in (pl.get("to") or [])
+    if any((u.fidelity.value in ("exact", "partial") or u.addressed_to_me or u.volume.value in ("raised", "shout"))
+           and not offhand(u) for u in packet.utterances):               # D-227: a voice through the wall is not
         return True
     before = {(r[0], r[1]) for r in tx.query("SELECT channel, text FROM percept_log WHERE holder_id=? AND turn_index=?",
                                              (holder_id, turn_index - 1))}
@@ -289,6 +297,8 @@ def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index:
                 quiet.add(e[0])
                 continue
         if e[1] == "ACTION_COMPLETE" and e[2] in quiet and pl.get("band") in (None, "clean"):
+            continue
+        if e[1] == "SPEECH" and pl.get("ambient"):                    # D-232: an offhand remark of their own
             continue
         return True
     return False

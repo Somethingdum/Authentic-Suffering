@@ -162,9 +162,13 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     restless = tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition','actor_reaction') "
                             "AND status='ok' AND turn_index BETWEEN ? AND ?",          # D-190
                             (actor_id, turn_index - tx.rules.scheduler.rethink_turns + 1, turn_index - 1)) is None
-    talk = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='speech' "
-                        "AND (source_id IS NULL OR source_id != ?)", (actor_id, turn_index - 1, actor_id)) is not None \
-        or tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH'", (actor_id, turn_index - 1)) is not None
+    talk = tx.query_one("SELECT 1 FROM percept_log p LEFT JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? AND "
+                        "p.turn_index=? AND p.channel='speech' AND (p.source_id IS NULL OR p.source_id != ?) AND "
+                        "(e.payload IS NULL OR json_extract(e.payload,'$.ambient') IS NULL OR EXISTS "
+                        "(SELECT 1 FROM json_each(e.payload,'$.to') WHERE value=?))",             # D-232: a remark to nobody
+                        (actor_id, turn_index - 1, actor_id, actor_id)) is not None \
+        or tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH' AND "
+                        "json_extract(payload,'$.ambient') IS NULL", (actor_id, turn_index - 1)) is not None
     fresh = tx.query_one("SELECT 1 FROM open_loops l JOIN events e ON e.event_id = l.created_event WHERE l.holder_id=? "
                          "AND l.status='open' AND e.turn_index=?", (actor_id, turn_index - 1)) is not None          # D-191
     from ..mind.affordance import NEED_PRESSING

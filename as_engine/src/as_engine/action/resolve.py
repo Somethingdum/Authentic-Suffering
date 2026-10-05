@@ -34,7 +34,8 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms, land_by=None)
        action.intent.segments(speech.text) in order. Segment k (1-based, of n) is one SPEECH
        {words: the segment, volume, to: [ids] | ['everyone'], source_db =
        AcousticRules.speech_db[volume], armed: the actor holds an item with a firearm or melee
-       block in a hand, utterance_id: this ACTION_START's event id, segment: k, segments: n}
+       block in a hand, utterance_id: this ACTION_START's event id, segment: k, segments: n} — (D-232)
+       plus ambient: true when the intent's source is 'ambient' (a line of the room, AMB-03)
        (writer 'action.propagate', actor_id = the speaker, cause = the start; D-117, DOS-05: when the
        speaker has an actors row and the segment's words, stripped, are not empty, the SPEECH also
        inserts voice_lines {line_id (tx.mint('vln')), actor_id = the speaker, text = those words, at =
