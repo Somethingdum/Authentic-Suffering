@@ -28,6 +28,17 @@ What each level reveals (VIS-03): clear = identity if known to the observer, hel
 visible (severe+), action; partial = rough description (build, clothing colour), gross action;
 silhouette = 'a figure', moving or still.
 
+leaving(observer, subject, from_place, to_place, at_ms) -> Visibility   (D-141, VIS-06)
+  How a body that has just gone out of the observer's place was seen going (visibility, after the
+  MOVE, asks where it is now — through a shut door or into the dark, nowhere the observer can see):
+  none when the observer is not alive, asleep, unconscious or dead, or is not in from_place, or no
+  portal (a wall never) joins from_place and to_place; else the subject is taken at that portal's
+  point on from_place's side (the first such portal by portal_id; physical.space.portal_point):
+  light = from_place's light there (the light rule above, at that point; a light the subject
+  holds counts, it goes with them), thermal as above, distance = physical.space.distance_to_point,
+  concealment 0, hidden = the MOVE's payload hidden, moved = true; attention (FOCUS-02) on the
+  subject or on that portal +1, set on anything else -1. band(score).
+
 observed_social(observer, subjects, behaviour) (VIS-04): leaning close, whispering, passing an item
 low, a sudden silence — produce VISUAL percepts with an inference hint even when speech was NONE
 (CROWD-05).
@@ -80,20 +91,25 @@ def light_at(store: "Store | Tx", body_id: str, at_ms: int) -> int:
     """P5 (checks need it; factor it out of ``visibility``): the light that falls on this body —
     the 'light' rule of the module docstring for a subject, without the thermal substitution."""
     subject_id = body_id   # the contract names it body_id
+    pos = _row(store, "SELECT * FROM positions WHERE body_id=?", (subject_id,))
+    return _light_point(store, pos["place_id"], pos["x_m"], pos["y_m"], at_ms)
+
+
+def _light_point(store, place_id, x_m, y_m, at_ms, carried_by=None):
     from ..kernel.clock import daylight_level
     from ..physical.space import distance_m
-    pos = _row(store, "SELECT * FROM positions WHERE body_id=?", (subject_id,))
-    pl = _row(store, "SELECT * FROM places WHERE place_id=?", (pos["place_id"],))
+    pl = _row(store, "SELECT * FROM places WHERE place_id=?", (place_id,))
     if pl["indoor"]:
         light = pl["light_level"]
     else:
         c = _row(store, "SELECT weather FROM world_clock WHERE id=1")
         light = daylight_level(at_ms, c["weather"])
     canon = store.canon if getattr(store, "canon", None) is not None else store.store.canon
-    for r in store.query("SELECT i.def_ref, i.props, p.x_m, p.y_m FROM items i JOIN positions p ON p.body_id=i.holder_body "
-                         "WHERE p.place_id=? AND i.holder_slot IN ('hand_l','hand_r')", (pos["place_id"],)):
+    for r in store.query("SELECT i.def_ref, i.props, p.x_m, p.y_m, p.body_id FROM items i JOIN positions p ON p.body_id=i.holder_body "
+                         "WHERE (p.place_id=? OR p.body_id=?) AND i.holder_slot IN ('hand_l','hand_r')", (place_id, carried_by)):
         d = canon.get(r[0])
-        if d.kind == "light" and _json.loads(r[1]).get("on") and distance_m(r[2], r[3], pos["x_m"], pos["y_m"]) <= 6.0:
+        near = r[4] == carried_by or (distance_m(r[2], r[3], x_m, y_m) <= 6.0)
+        if d.kind == "light" and _json.loads(r[1]).get("on") and near:
             light = max(light, 3)
     return light
 
@@ -129,4 +145,34 @@ def visibility(store: "Store | Tx", observer_id: str, subject_id: str, at_ms: in
             pr = store.query_one("SELECT anchor_a, anchor_b FROM portals WHERE portal_id=?", (A,))
             hit = pr is not None and pos["anchor_id"] in (pr[0], pr[1])
         sc += 1 if hit else -1
+    return band(sc)
+
+
+def leaving(store: "Store | Tx", observer_id: str, subject_id: str, from_place: str, to_place: str, at_ms: int) -> Visibility:
+    """D-141 (VIS-06): how a body that has just gone out of the observer's place was seen going."""
+    from ..physical.space import distance_to_point, portal_point
+    ob = _row(store, "SELECT * FROM bodies WHERE body_id=?", (observer_id,))
+    if ob is None or not ob["alive"] or ob["awareness"] in ("asleep", "unconscious", "dead"):
+        return "none"
+    here = _row(store, "SELECT place_id FROM positions WHERE body_id=?", (observer_id,))
+    if here is None or here["place_id"] != from_place or from_place == to_place:
+        return "none"
+    pr = _row(store, "SELECT portal_id, anchor_a, anchor_b FROM portals WHERE kind != 'wall' AND ((place_a=? AND place_b=?) OR "
+                     "(place_a=? AND place_b=?)) ORDER BY portal_id LIMIT 1", (from_place, to_place, to_place, from_place))
+    if pr is None:
+        return "none"
+    x, y = portal_point(store, pr["portal_id"], from_place)
+    light = _light_point(store, from_place, x, y, at_ms, carried_by=subject_id)
+    if _thermal(store, observer_id) and light <= 1:
+        light = 4
+    p = _json.loads(ob["special"])["P"]
+    d = distance_to_point(store, observer_id, from_place, x, y) or 0.0
+    mv = store.query_one("SELECT json_extract(payload,'$.hidden') FROM events WHERE type='MOVE' AND actor_id=? AND at<=? "
+                         "ORDER BY seq DESC LIMIT 1", (subject_id, at_ms))
+    sc = visibility_score(light, p, d, 0, bool(mv and mv[0]), True)
+    r = store.query_one("SELECT json_extract(payload,'$.attention') FROM events WHERE type='ACTION_START' AND actor_id=? AND at<=? "
+                        "ORDER BY seq DESC LIMIT 1", (observer_id, at_ms))
+    A = r[0] if r else None
+    if A:
+        sc += 1 if A in (subject_id, pr["portal_id"]) else -1
     return band(sc)

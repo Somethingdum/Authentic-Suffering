@@ -81,6 +81,15 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               its actor, alive, when no RESOLVE_CHANGE of theirs with
                                               reason 'protected_dependent' falls in the 24 h up to it
                                               (once a day, however often they do it)
+    left_bleeding_by(<path>)                  (D-142) for a MOVE out of a place (payload from_place set and
+                                              not to_place) by someone with an actors row: those still in
+                                              from_place (positions, as the sweep runs) who hold a visual
+                                              EXACT or PARTIAL percept of it, are bonded to the one leaving
+                                              (affection >= 1 toward them, or one household) and have an
+                                              unhealed, unclotted severe or catastrophic wound; never the
+                                              PC, and not twice in an hour (no grudge of theirs naming the
+                                              one leaving whose text says they 'left you bleeding', made in
+                                              the hour up to it)
     loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
                                               EXACT or PARTIAL percept of it bonded (affection >= 1, or
                                               one household) to someone it threatened at weapon point

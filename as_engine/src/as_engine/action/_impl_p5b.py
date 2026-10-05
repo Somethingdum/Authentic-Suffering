@@ -1019,6 +1019,29 @@ def select(tx, selector, trigger):
                         "'protected_dependent' AND at>? AND at<=?", (ev["actor_id"], ev["at"] - 86_400_000, ev["at"])):
             return []
         return [ev["actor_id"]]
+    if fn == "left_bleeding_by":                                     # D-142: walked out on
+        from ..society._impl_society import _controller
+        ev = _row(tx, "SELECT type, actor_id, payload, at FROM events WHERE event_id=?", (v,))
+        if ev is None or ev["type"] != "MOVE":
+            return []
+        pl = json.loads(ev["payload"])
+        who, frm = pl.get("body_id") or ev["actor_id"], pl.get("from_place")
+        if not frm or frm == pl.get("to_place") or not tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)):
+            return []
+        out = []
+        for (h,) in tx.query("SELECT DISTINCT p.holder_id FROM percept_log p JOIN positions s ON s.body_id=p.holder_id WHERE "
+                             "p.event_id=? AND p.channel='visual' AND p.fidelity IN ('exact','partial') AND s.place_id=? "
+                             "ORDER BY p.holder_id", (v, frm)):
+            if h == who or _controller(tx, h) == "human" or not _bonded_to(tx, h, who):
+                continue
+            if not tx.query_one("SELECT 1 FROM wounds WHERE body_id=? AND healed_at IS NULL AND clotted=0 AND severity IN "
+                                "('severe','catastrophic')", (h,)):
+                continue
+            if tx.query_one("SELECT 1 FROM open_loops WHERE holder_id=? AND kind='grudge' AND subject_ids LIKE ? AND text LIKE "
+                            "'%left you bleeding%' AND created_at>?", (h, f'%"{who}"%', ev["at"] - 3_600_000)):
+                continue
+            out.append(h)
+        return out
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
         from ..society._impl_society import _controller
         them = _threatened(tx, trigger, v)

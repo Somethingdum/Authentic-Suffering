@@ -55,7 +55,10 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
            visual, for holders who can see the event's body (MOVE/ACTION_*/ITEM_TRANSFER: the
            actor; HARM/DEATH/FALSE_DEATH: the harmed body; PORTAL_CHANGE: holders in either place
            of the portal within line of sight rules for its point, i.e. same place as the portal
-           side, or seeing through it) at visibility >= silhouette, evaluated at the event's at.
+           side, or seeing through it) at visibility >= silhouette, evaluated at the event's at —
+           (D-141) for a MOVE out of a place that the holder cannot see the body in afterwards
+           (visibility 'none' where it went), at optics.leaving(holder, body, from_place,
+           to_place, at): those left behind see it go.
            Fidelity: clear -> exact, partial -> partial, silhouette -> visual_only. Text:
            render_event. source_id = the body for clear/partial, NULL for silhouette (for
            PORTAL_CHANGE: the actor when visible, else NULL).
@@ -607,6 +610,8 @@ def _perceive_event(tx, holder, ev, turn_index):
     if subj is None or subj == holder:
         return out
     lvl = optics.visibility(tx, holder, subj, ev["at"])
+    if lvl == "none" and t == "MOVE" and payload.get("from_place") and payload.get("from_place") != payload.get("to_place"):
+        lvl = optics.leaving(tx, holder, subj, payload["from_place"], payload["to_place"], ev["at"])   # D-141: seen going
     if lvl == "none":
         return out
     rf = _cap(ref(tx, holder, subj, lvl))

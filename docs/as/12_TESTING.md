@@ -524,6 +524,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p08_ui_protocol/test_the_guide_knows.py` | GUIDE-04: asked about crawlers, the guide is given only the crawler lore Owen holds and what he has learned about them ('You know: …', the 'Knows: ' dropped); a question about bleeding touches none of it; asked whether the head matters he is told what he heard, the wrong saying too; lore and lessons he does not hold never come through |
 
+### 3.55 Seen going (P5; D-141)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_seen_going.py` | VIS-06: Mara walks into the storeroom; where she went June cannot see her, but she sees her go at the doorway ('Mara moves away.', source Mara). Someone in another place, or asleep, sees nobody go |
+
+### 3.56 Left behind (P9; D-142)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_left_behind.py` | June, bleeding from a deep cut, watches Mara (whom she loves) walk out: she trusts her 2 less and holds a grudge (CAS-059); a minute later it is not counted again. Owen walks out on her the same way (she has come to love him): the same, nothing written into Owen. A scratch, someone she does not love, or June out cold: nobody is left behind |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

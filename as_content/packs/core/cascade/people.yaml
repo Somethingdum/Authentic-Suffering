@@ -622,3 +622,22 @@
       payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: stripped_the_helpless}
   delay_s: 0
   cites: [D-138]
+# D-142 — left behind. leave_wounded was a line a card could draw, and walking out on someone who loves you while
+# they bleed cost nothing. Now the one left behind sees it, and does not forget it.
+- schema: as.cascade.v1
+  id: CAS-059
+  description: Watching someone you love walk away while you lie bleeding costs them your trust, and you hold it against them.
+  trigger_event: MOVE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: left_bleeding_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: left_bleeding}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: left_bleeding_by(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} walked away and left you bleeding.", strength: 2}
+  delay_s: 0
+  cites: [D-142, D-141]

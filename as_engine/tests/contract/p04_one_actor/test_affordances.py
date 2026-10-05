@@ -300,7 +300,8 @@ def test_the_dead_are_not_people(scenario):
     """requires.target_kinds on the social options, and the speech and wound bindings (P10): nobody
     talks the dead down, signals to them, speaks to them or dresses their wounds — they can still be
     shot, struck, shoved or followed. (The PC and the other twin wait in the yard behind the shut
-    side door, so twin_a knows no other body and every binding on the shambler shows.)"""
+    side door, so every binding on the shambler shows; D-141: twin_a saw them go, and may call after
+    them — never to the shambler.)"""
     from as_engine.kernel.rng import Rng
     from as_engine.physical import bodies, space
     from as_engine.physical.bodies import WoundSpec
@@ -324,7 +325,9 @@ def test_the_dead_are_not_people(scenario):
     tried = {r.def_id for r in a.rejected if r.target_id in (sh, wound)}
     assert not (on_it | tried) & ({"speak", "shield_dependent"} | TREAT), (on_it, tried)
     assert {"shoot_head", "shove", "follow_body"} <= on_it
-    assert [o.target_id for o in a.options if o.def_id == "speak"] == [None], "only 'anyone who can hear'"
+    spoken = [o.target_id for o in a.options if o.def_id == "speak"]
+    assert None in spoken and sh not in spoken, "anyone who can hear, never the dead"
+    assert set(spoken) - {None} <= {w.id("pc"), w.id("twin_b")}, "only those she saw go"
 
 
 def test_skull_10_nobody_is_known_before_they_are_seen(scenario):
