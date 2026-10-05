@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from ..mind.perception import the_name
 
 LIGHT_WORDS = {0: "pitch dark", 1: "dim", 2: "low light", 3: "lit", 4: "bright"}
 KIND_WORDS = {"room": "room", "building": "building", "street": "street", "outdoor": "open space", "vehicle": "vehicle",
@@ -134,9 +135,9 @@ def describe(tx, pc_id, at, refs=None):
         parts = []
         if best:
             b = best[0]
-            parts.append(f"The {b['name']} would stop a bullet." if b["cover"] >= 3 else f"The {b['name']} gives some cover.")
+            parts.append(f"{the_name(b['name'])} would stop a bullet." if b["cover"] >= 3 else f"{the_name(b['name'])} gives some cover.")
         if hide:
-            parts.append(f"The {hide[0]['name']} would hide you.")
+            parts.append(f"{the_name(hide[0]['name'])} would hide you.")
         if parts:
             lines.append(" ".join(parts))
     # can_see

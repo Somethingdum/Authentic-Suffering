@@ -5,6 +5,7 @@ import json
 import math
 
 from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+from ..mind.perception import the_name
 
 DAY = 86_400_000
 H = 3_600_000
@@ -824,7 +825,7 @@ def propagate(tx, outcome_events, at, turn_index):
                     ap = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (e.actor_id,))
                     if ap and ap[0] in (pr["place_a"], pr["place_b"]):
                         side = ap[0]
-                trace_create(tx, side, "damage", f"The {pr['name']} has been forced.", e.event_id, e.at, turn_index)
+                trace_create(tx, side, "damage", f"{the_name(pr['name'])} has been forced.", e.event_id, e.at, turn_index)
         elif t == "DEATH":
             if p.get("cause") != "offscreen":
                 pos = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (p.get("body_id"),))

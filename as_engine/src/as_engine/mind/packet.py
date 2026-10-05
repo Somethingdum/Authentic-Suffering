@@ -65,8 +65,8 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
           gesture's label with {target} = the P-handle's description.
   F1..Fn  (B4, FOCUS-01) attention points: every P-handle whose whereabouts is 'here', in P
           order (label f'Keep your eyes on {description}'), then every portal of the actor's
-          place the actor has a visual percept of this turn, by portal_id (label f'Watch the
-          {portal name}': a door you can see is the door). Handle value = the body or portal id. A reaction packet
+          place the actor has a visual percept of this turn, by portal_id (label f'Watch {thing_phrase(
+          portal name)}' — D-237: 'Watch the way to Pump house': a door you can see is the door). Handle value = the body or portal id. A reaction packet
           offers neither G nor F handles (its answer is short; Actor Spec §7).
   ``handles`` maps every handle to its internal id (percept_id, body id, signature, loop_id,
   episode_id) and is never rendered. tests/helpers.handle_for finds an option by def and referent.
@@ -308,7 +308,7 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
     nobody talks to the air on code's time — unless (D-150) ``idle``: then reached is [] (a quiet
     moment), and None only when nobody of ``people`` (below) is in their place now (nobody to talk to).
   voice: the fused dossier's — the capsule; 'How you talk: ' + the tendencies, each a sentence (a '.' added to one
-    that does not end in '.', '!', '?' or '"'), joined ' '; f'Easy:
+    that does not end in '.', '!', '?' or '"'; D-237: its first letter upper-cased), joined ' '; f'Easy:
     "{low_stakes}"', f'Under pressure: "{under_pressure}"', f'At the limit: "{at_the_limit}"';
     'You would never say: ' + each never-say in quotes joined '; '; the profanity line (none 'You do
     not swear.', rare 'You rarely swear.', frequent 'You swear often.', constant 'You swear all the

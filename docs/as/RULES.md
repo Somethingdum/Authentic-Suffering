@@ -492,7 +492,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py` |
+| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p10_world/test_a_voice_that_reads.py` |
 | FOCUS-02 | Eyes on one thing: it is seen one step better, everything else one step worse, until the next attempt (`sense.optics.visibility`). | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/resolve.py`, `as_engine/sense/optics.py` | `contract/p05_many_actors/test_gestures.py` |
 
 ## FREE
@@ -538,7 +538,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | GEO-00 | *Geometry model (one authority, rule GEO-00): the store. Places form a graph; portals are the edges.* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/region.py` | `contract/p02_space_bodies/test_space.py`, `contract/p10_world/test_region.py` |
-| GEO-01 | *'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact/damaged}.'* | as_engine/mind/perception.py | `as_engine/mind/perception.py`, `as_engine/narration/location.py`, `as_engine/physical/space.py`, `as_content/packs/core/affordances/portals.yaml` | `contract/p02_space_bodies/test_space.py`, `contract/p07_slice/test_location_view.py` |
+| GEO-01 | *'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact/damaged}.' (D-237:* | as_engine/mind/perception.py | `as_engine/mind/perception.py`, `as_engine/narration/location.py`, `as_engine/physical/space.py`, `as_content/packs/core/affordances/portals.yaml` | `contract/p02_space_bodies/test_space.py`, `contract/p07_slice/test_location_view.py` |
 | GEO-02 | *Body clearance (GEO-02, used by ``admits``):* | as_engine/physical/space.py | `as_engine/physical/space.py` | — |
 | GEO-03 | GEO-03/04 (P10): the building's rooms, portals, containers and loot, the first time (see the | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_engine/world/worldgen/region.py`, `as_content/packs/core/buildings/commercial.yaml` | `contract/p10_world/test_discovery.py`, `contract/p10_world/test_region.py` |
 | GEO-04 | *3 Loot (GEO-04 / WG-32): per room with a loot_table, in room order, stream f"loot:{place_id}:{room* | as_engine/physical/space.py | `as_engine/physical/space.py`, `as_content/packs/core/buildings/commercial.yaml`, `as_content/packs/core/loot/tables.yaml` | `contract/p10_world/test_discovery.py` |

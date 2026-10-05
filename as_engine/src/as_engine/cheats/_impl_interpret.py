@@ -6,6 +6,7 @@ import difflib
 import json
 
 from . import _impl_cheats as C
+from ..mind.perception import the_name, thing_phrase
 
 _SEVERITIES = ("minor", "significant", "severe", "catastrophic")
 _AXES = ("trust", "fear", "respect", "affection", "resentment", "obligation")
@@ -313,7 +314,7 @@ async def _do(tx, s, o, a, at, T):
         return True, f"made {n} {what} at {C._name(tx, a['to'])}", f"{n} {what} now lie at {C._name(tx, a['to'])}.", evs
     if o == "destroy":
         nm = C._name(tx, a["target"])
-        return True, f"unmade {nm}", f"The {nm} is gone.", [objects.destroy(tx, a["target"], at, None, T)]
+        return True, f"unmade {nm}", f"{the_name(nm)} is gone.", [objects.destroy(tx, a["target"], at, None, T)]
     if o == "spawn":
         beings, kinds = s.extras["_cheat_scene_map"]["beings"], s.extras["_cheat_scene_map"]["kinds"]
         what = kinds.get(a["what"]) or beings.get(a["what"])
@@ -414,7 +415,7 @@ async def _do(tx, s, o, a, at, T):
               "broken": {"damage": 3, "is_open": 1, "is_locked": 0, "barricade": 0}}[st]
         ev = space.portal_change_event(tx, a["door"], ch, at, None, None, T)
         nm = C._name(tx, a["door"])
-        return True, f"the {nm} is {st}", f"The {nm} is {st} now.", [ev]
+        return True, f"{thing_phrase(nm)} is {st}", f"{the_name(nm)} is {st} now.", [ev]
     if o == "blast":
         cause = C._ev(tx, "cheats", [], {"command": "blast", "at": a["at"], "size": a["size"]}, at, T)
         evs = bodies.blast(tx, s.rng, a["at"], a["size"], at, T, cause.event_id)

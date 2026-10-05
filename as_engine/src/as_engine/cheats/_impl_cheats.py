@@ -245,7 +245,7 @@ def resolve(tx, pc_id, kind, name):
 
 def _name(tx, i):
     for sql in ("SELECT display_name FROM actors WHERE actor_id=?", "SELECT name FROM places WHERE place_id=?",
-                "SELECT name FROM groups WHERE group_id=?"):
+                "SELECT name FROM groups WHERE group_id=?", "SELECT name FROM portals WHERE portal_id=?"):   # D-237
         r = tx.query_one(sql, (i,))
         if r is not None:
             return r[0]

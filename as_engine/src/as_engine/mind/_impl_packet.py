@@ -252,7 +252,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
     from .actor import fused, recent_lines
     from .identity import compile_identity
     from .firewall import classify_form, classify_standing, effective_form
-    from .perception import at_phrase, place_phrase
+    from .perception import at_phrase, place_phrase, thing_phrase
     from .memory import unprocessed
     if lod == LOD.COLD:
         raise ValueError("COLD actors get no packet")
@@ -426,7 +426,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
                 continue
             fi += 1
             handles[f"F{fi}"] = pid
-            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Watch the {pr['name']}"))
+            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Watch {thing_phrase(pr['name'])}"))   # D-237
     wt = world_time(at)
     fields = dict(
         actor_id=actor_id, turn_index=turn_index, lod=lod,
@@ -601,7 +601,7 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
         else:
             reached.append(p["text"])
     v = fused(tx, actor_id).voice
-    voice = [v.capsule, "How you talk: " + " ".join(t if t.rstrip().endswith((".", "!", "?", '"')) else t.rstrip() + "."
+    voice = [v.capsule, "How you talk: " + " ".join(_cap(t if t.rstrip().endswith((".", "!", "?", '"')) else t.rstrip() + ".")
                                                    for t in v.speech_tendencies),
              f"Easy: \"{v.exemplars.low_stakes}\"", f"Under pressure: \"{v.exemplars.under_pressure}\"",
              f"At the limit: \"{v.exemplars.at_the_limit}\"",

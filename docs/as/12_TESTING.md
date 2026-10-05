@@ -971,6 +971,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_told_right.py` | "Mara tells you to get down", "they owe you their life", "you mostly trust them", "before you could move", "more than you can carry", "before you're seen", "what you grew up hearing" told of her and of me read as English; every one of the packet's words for a feeling does |
 
+### 3.129 A voice that reads (P10, P12; D-237)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_a_voice_that_reads.py` | Every generated habit starts with something they do and calls them nothing like "they"; a generated person's capsule is their name and their two habits, and the card lists each habit as a sentence, for a child, a teenager, an adult and an elder; a way named "the way to the alley" is "The way to the alley is open." and is watched as "Watch the way to the alley" |
+| `p12_surfaces/test_the_door_by_name.py` | "Open the office door" tells the Boss "The office door is open now." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

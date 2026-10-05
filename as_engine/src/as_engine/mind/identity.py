@@ -77,7 +77,7 @@ IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard   (``dossier`
       forget.'} (implemented data below).
   'voice' ('How you talk'):
     end(voice.capsule)                                           [voice.capsule]
-    f'How you tend to speak: {" ".join(end(t) for t in speech_tendencies)}'
+    f'How you tend to speak: {" ".join(cap(end(t)) for t in speech_tendencies)}'   (D-237: each a sentence)
                                                                  [voice.speech_tendencies]
     f'Your voice when it is easy: "{exemplars.low_stakes}"'      [voice.exemplars.low_stakes]
     f'Under pressure: "{exemplars.under_pressure}"'              [voice.exemplars.under_pressure]
@@ -279,7 +279,7 @@ def compile_identity(dossier: ActorDossier | PCDossier, *, minimum: bool = False
 
     v = d.voice
     add("voice", end(v.capsule), "voice.capsule")
-    add("voice", f"How you tend to speak: {' '.join(end(t) for t in v.speech_tendencies)}", "voice.speech_tendencies")
+    add("voice", f"How you tend to speak: {' '.join(cap(end(t)) for t in v.speech_tendencies)}", "voice.speech_tendencies")
     add("voice", f'Your voice when it is easy: "{v.exemplars.low_stakes}"', "voice.exemplars.low_stakes")
     add("voice", f'Under pressure: "{v.exemplars.under_pressure}"', "voice.exemplars.under_pressure")
     add("voice", f'At your limit: "{v.exemplars.at_the_limit}"', "voice.exemplars.at_the_limit")

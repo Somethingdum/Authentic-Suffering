@@ -229,7 +229,9 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
   render_pain(wound): f'Pain: {SEVERITY_WORDS[severity]} {type} wound to the
       {ANATOMY_WORDS[anatomy]}.' (contracts.common; e.g. 'Pain: a deep stab wound to the left arm.').
   render_portal(portal): f'The {name} is {open|closed}{, barricaded}{, damaged}.' — never
-      'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact|damaged}.'
+      'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact|damaged}.' (D-237:
+      'The {name}' here and wherever a sentence opens on a thing's name is thing_phrase(name) with its
+      first letter upper-cased — 'the way to Pump house' is open, not 'The the way …')
 
 F1a — what someone looks like to this holder (the owner: appearance helps you judge the situation
 and people).
@@ -512,8 +514,8 @@ def render_visual(tx: "Tx", holder_id: str, subject_id: str, level: str) -> str:
 def render_portal(tx, portal_id):
     p = _row(tx, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
     if p["kind"] == "fence":
-        return f"The {p['name']} is {'damaged' if p['damage'] else 'intact'}."
-    s = f"The {p['name']} is {'open' if p['is_open'] else 'closed'}"
+        return f"{the_name(p['name'])} is {'damaged' if p['damage'] else 'intact'}."
+    s = f"{the_name(p['name'])} is {'open' if p['is_open'] else 'closed'}"
     if p["barricade"]:
         s += ", barricaded"
     if p["damage"]:
@@ -725,7 +727,7 @@ def _perceive_event(tx, holder, ev, turn_index):
         else:
             what = "is damaged"
         vis = optics.visibility(tx, holder, actor, ev["at"]) if actor and actor != holder else "none"
-        out.append(grant(tx, holder, event_id=ev["event_id"], channel="visual", fidelity="exact", text=f"The {pr['name']} {what}.",
+        out.append(grant(tx, holder, event_id=ev["event_id"], channel="visual", fidelity="exact", text=f"{the_name(pr['name'])} {what}.",
                          source_id=actor if vis in ("clear", "partial") else None, at=ev["at"], turn_index=turn_index, detail={"level": "clear"}))
         return out
     if subj == holder and t == "HARM":
@@ -1011,6 +1013,13 @@ def place_phrase(name: str) -> str:
 def thing_phrase(name: str) -> str:
     """'counter' -> 'the counter'; a name that already starts with 'the ' is unchanged (implemented)."""
     return name if name.lower().startswith("the ") else f"the {name}"
+
+
+def the_name(name: str) -> str:
+    """A thing's name opening a sentence (D-237, implemented): thing_phrase(name) with its first letter
+    upper-cased — 'counter' -> 'The counter', 'the way to Pump house' -> 'The way to Pump house'."""
+    t = thing_phrase(name)
+    return t[:1].upper() + t[1:]
 
 
 RETELL_OBJECT_AFTER = frozenset({"on", "from", "to", "at", "with", "for", "behind", "near", "toward", "towards", "around",
