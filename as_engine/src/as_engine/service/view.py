@@ -67,6 +67,9 @@ build_view(tx, session) -> PlayView   (reads only)
               mode 'do', entry {'signature', 'label': 'Wait and watch'}.
            Refs 's1', 's2', … in that order. Suggestions are only the PC's own bound options —
            never story directions (UI-SUG-02).
+           (OUT-02, D-173) A PC alive and 'unconscious' has no options: the one suggestion is 's1'
+           'Let the time pass', mode 'do', entry {'label': 'Let the time pass'} (turn.intake acts on
+           nothing the player sends while he is out cold).
   lanes    LanesView(A = LaneStatus('Main model', ok = not client.is_down(A), model), B =
            LaneStatus('Second model', …)).
   mechanics  settings.show_mechanics 'off' -> None; else MechanicsReceipt(lines): one line per

@@ -148,6 +148,16 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
     from ..narration.lint import record_pc_input
     pc = session.pc_id
     perception.compile_scene(tx, pc, t0, turn_index)
+    me = tx.query_one("SELECT alive, awareness FROM bodies WHERE body_id=?", (pc,))
+    if me[0] and me[1] == "unconscious":                     # OUT-02 (D-173): out cold, the time passes
+        from ..action.intent import Intent
+        from ..mind.affordance import BoundAffordance
+        d = tx.canon.find("affordance", "wait_here")
+        o = BoundAffordance(def_id=d.id, verb=d.verb, label=d.label, ui_label=d.ui_label, est_duration_s=d.duration.base_s,
+                            noise_db=d.noise_db, tags=tuple(d.tags))
+        record_input(tx, turn_index, submit.mode, (submit.text or "").strip(), {"senseless": True})
+        return (Intent(actor_id=pc, bound=o, speech=None, manner="", goal="", private_reason="", source="human", lod=LOD.WARM),
+                {"remainder": None, "addressee": None, "senseless": True})
     aff = enumerate_affordances(tx, pc, tx.canon.all("affordance"), t0, turn_index, waking=True)   # SLEEP-03 (D-171)
     pkt = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0)
     lod = LOD.WARM
@@ -168,7 +178,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
             text, mode = entry["remainder"], "do"
             raw_mode = "do"   # typed words offered back as a chip: replayed as text
         else:
-            opt = next((o for o in aff.options if o.signature == entry["signature"]), None)
+            opt = next((o for o in aff.options if o.signature == entry.get("signature")), None)
             if opt is None:
                 raise Rejected("suggestion_stale", "That option is gone; things have changed.")
             if opt.def_id == "speak":

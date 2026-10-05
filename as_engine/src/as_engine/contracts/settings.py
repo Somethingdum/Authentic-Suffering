@@ -176,6 +176,8 @@ class HarmRules(Strict):
     minor_clot_min: float = 10.0
     unconscious_at_blood_loss_pct: float = 30.0
     death_at_blood_loss_pct: float = 40.0
+    blood_regain_pct_per_h: float = 0.5    # [SAND] D-173 OUT-01: blood comes back while nothing bleeds (30 % in 60 h)
+    blood_regain_after_min: float = 60.0   # [SAND] D-173 OUT-01: ... from this long after the newest wound
     doom_horizon_min: float = 30.0          # D-106 DOOM-01: certain death this close is a doom (up to half an hour)
     doom_infection_lead_min: float = 5.0    # D-106 DOOM-02: the strain's death is known this far ahead
     doom_overdue_min: float = 2.0           # D-106 DOOM-05: the safety net's slack after death_by

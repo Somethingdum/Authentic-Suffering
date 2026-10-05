@@ -112,6 +112,10 @@ async def simulate(ctx):
         await _progress(ctx, 2)
         _ledger(tx, T, 2, "ok", {"full_state_hash": hashing.full_state_hash(store)}, 2 if ctx.strict else 1)
         ctx.horizon = select.horizon(tx, ctx.pc_intent, t0)
+        if ctx.info.get("senseless"):                       # OUT-02 (D-173): out cold until he comes to
+            came = bodies.comes_to_at(tx, s.pc_id, t0)
+            if came is not None:
+                ctx.horizon = max(t0 + select.MIN_WINDOW_MS, min(ctx.horizon, came))
         # ---------------- waves
         wave_idx, wave_at, reacting = 0, t0, None
         catalog = tx.canon.all("affordance")
@@ -167,7 +171,7 @@ async def simulate(ctx):
             await _progress(ctx, 6)
             intents = await cognition.decide(tx, s, plan, affs, T, wave_at, reaction=wave_idx > 0, answered=ctx.answered,
                                              audits=ctx.judged)
-            if wave_idx == 0:
+            if wave_idx == 0 and not ctx.info.get("senseless"):
                 intents[s.pc_id] = cognition.urge_pc(tx, rng, s.pc_id, ctx.pc_intent, T, wave_at)
             asks = {a: cognition.asks_for(tx, a, T, ctx.answered) for a in sorted(intents)}
             # 7 barrier

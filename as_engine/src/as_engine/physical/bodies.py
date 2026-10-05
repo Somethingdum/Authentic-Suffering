@@ -48,6 +48,12 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
   step may be shorter) and sets progressed_at = to_ms. Per step, in this order:
   1. blood: each bleeding wound adds effective_bleed x (the part of the step it bled, in minutes)
      — a minor wound bleeds only until its clot time, then clots (WOUND_PROGRESS);
+     OUT-01 (D-173) a living body of kind human, lurker or animal that lost no blood in the step
+     gets some back: blood_loss_pct = max(0, blood_loss_pct - H.blood_regain_pct_per_h x the hours
+     of the step after regain_from) — regain_from = the newest of its wounds' created_at (healed or
+     not) + H.blood_regain_after_min (no wounds: 0) — one WOUND_PROGRESS {body_id, change:
+     'recovering', blood_loss_pct} when it changed. A step of an out-cold body ends at
+     comes_to_at(tx, body, step start) when that falls inside it, so it comes to at that moment;
   2. needs (P10: only for bodies of kind human, lurker or animal that have a needs row — an infected
      body's needs never change): stage = min(6, max(0, floor(hours since last_drink/last_meal/
      last_sleep / the stage period))) (P9: a meal or drink may be later than a step's end — the
@@ -90,7 +96,10 @@ Death test (DEATH-01..05) runs whenever harm lands and at every progress step, f
        or an unhealed HEAD or NECK wound is catastrophic
        or thirst/hunger/cold/heat stage >= N.death_stage (6)
        or a 'wet' infection reached the pathway's death_at_h
-    else AWARENESS_CHANGE to 'unconscious' (once) if blood_loss_pct >= H.unconscious_at_blood_loss_pct.
+    else AWARENESS_CHANGE to 'unconscious' (once) if blood_loss_pct >= H.unconscious_at_blood_loss_pct;
+    else (OUT-01, D-173) an 'unconscious' body (false_dead_until NULL) whose blood_loss_pct is below it
+       comes to: AWARENESS_CHANGE {body_id, awareness: 'awake', from: 'unconscious'} (posture stays
+       'lying'; no cause event) — out cold is not for ever.
   infected (not lurker):
     true DEATH if an unhealed HEAD or NECK wound is catastrophic and of type gunshot, stab, crush
        or blunt (brainstem / upper-spine junction destroyed) -> bodies.core_intact = 0;
@@ -851,6 +860,11 @@ def death_test(tx: "Tx", body_id: str, at: int, turn_index: int, rng: "Rng",
             target_ids=[body_id], cause_event_id=cause_event_id,
             writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "unconscious", "posture": "lying"})],
             payload={"body_id": body_id, "awareness": "unconscious", "from": b["awareness"]}))
+    if (b["awareness"] == "unconscious" and b["false_dead_until"] is None
+            and b["blood_loss_pct"] < H.unconscious_at_blood_loss_pct):              # OUT-01 (D-173): coming to
+        return tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
+            target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "awake"})],
+            payload={"body_id": body_id, "awareness": "awake", "from": "unconscious"}))
     return None
 
 
@@ -1129,6 +1143,10 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
                 cands.append(dt)
     if b["false_dead_until"] is not None and b["false_dead_until"] > t:
         cands.append(b["false_dead_until"])
+    if (b["awareness"] == "unconscious" and b["false_dead_until"] is None and b["kind"] in ("human", "lurker", "animal")
+            and b["blood_loss_pct"] >= H.unconscious_at_blood_loss_pct and H.blood_regain_pct_per_h > 0):   # OUT-01: coming to
+        over = b["blood_loss_pct"] - H.unconscious_at_blood_loss_pct
+        cands.append(max(t, _regain_from(tx, body_id, H)) + int(_math.ceil(over / H.blood_regain_pct_per_h * 3_600_000)) + 1000)
     if _care_subject(tx, b):
         C = _rules(tx).condition
         for step in (C.weather_step_min * MIN, C.cold_step_min * MIN):
@@ -1174,6 +1192,9 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
         for x in _doom_times(tx, body_id):   # D-107: a step ends where the screaming starts or the shock passes
             if t < x < end:
                 end = x
+        came = comes_to_at(tx, body_id, t)   # OUT-01 (D-173): ... and where an out-cold body comes to
+        if came is not None and t < came < end:
+            end = came
         # 1 blood
         add = 0.0
         for w in _wounds(tx, body_id):
@@ -1194,6 +1215,12 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
             tx.commit_event(Event(type=EventType.WOUND_PROGRESS, writer="physical.bodies", at=end, turn_index=turn_index,
                 target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"blood_loss_pct": nb, "progressed_at": end})],
                 payload={"body_id": body_id, "change": "bleeding", "blood_loss_pct": nb}))
+        elif b["blood_loss_pct"] > 0 and b["kind"] in ("human", "lurker", "animal"):     # OUT-01 (D-173): it comes back
+            nb = max(0.0, b["blood_loss_pct"] - H.blood_regain_pct_per_h * max(0, end - max(t, _regain_from(tx, body_id, H))) / 3_600_000)
+            if nb != b["blood_loss_pct"]:
+                tx.commit_event(Event(type=EventType.WOUND_PROGRESS, writer="physical.bodies", at=end, turn_index=turn_index,
+                    target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"blood_loss_pct": nb, "progressed_at": end})],
+                    payload={"body_id": body_id, "change": "recovering", "blood_loss_pct": nb}))
         # 2 needs (P10: living kinds only)
         n = tx.query_one("SELECT * FROM needs WHERE body_id=?", (body_id,)) if b["kind"] in ("human", "lurker", "animal") else None
         if n is not None:
@@ -1302,6 +1329,30 @@ def capacity(store: "Store | Tx", body_id: str, as_awake: bool = False) -> Capac
     hobbled = any(ANATOMY_GROUP[w["anatomy"]] in ("leg", "foot") and w["function_loss"] >= 1 for w in ws)
     return Capacity(mobile=mobile, hands_free=free, can_speak=can_speak, conscious=conscious, impairment=b["impairment"],
                     can_run=mobile and not hobbled)
+
+
+def comes_to_at(store: "Store | Tx", body_id: str, at: int) -> int | None:
+    """OUT-01 (D-173) When an out-cold body will come to if nothing changes: for a living body of kind
+    human, lurker or animal whose awareness is 'unconscious', not false-dead, and none of whose
+    wounds bleeds now (every unclotted, unhealed wound's effective bleed is 0): max(at, regain_from)
+    + ceil((blood_loss_pct - H.unconscious_at_blood_loss_pct) / H.blood_regain_pct_per_h hours) +
+    1000 ms (``at`` when it is already below; regain_from as progress step 1 says). Anything else
+    (awake, bleeding, false-dead, dead, no regain) -> None."""
+    H = _rules(store).harm
+    b = _b(store, body_id)
+    if (not b["alive"] or b["awareness"] != "unconscious" or b["false_dead_until"] is not None
+            or b["kind"] not in ("human", "lurker", "animal") or H.blood_regain_pct_per_h <= 0):
+        return None
+    if any(_eff_bleed(H, w) > 0 for w in _wounds(store, body_id) if not w["clotted"]):
+        return None
+    over = b["blood_loss_pct"] - H.unconscious_at_blood_loss_pct
+    return at if over < 0 else max(at, _regain_from(store, body_id, H)) + int(_math.ceil(over / H.blood_regain_pct_per_h * 3_600_000)) + 1000
+
+
+def _regain_from(store, body_id, H):
+    """OUT-01: blood comes back from this long after the newest wound."""
+    r = store.query_one("SELECT MAX(created_at) FROM wounds WHERE body_id=?", (body_id,))
+    return 0 if r is None or r[0] is None else int(r[0] + H.blood_regain_after_min * MIN)
 
 
 def wake(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> Event | None:

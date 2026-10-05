@@ -15,6 +15,12 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      packet = build_packet(tx, pc, LOD.WARM, aff, turn_index, t0). info = {'remainder': None,
      'addressee': None}. text = (submit.text or '').strip() — every later use of "the text" means
      this stripped text.
+  OUT-02 (1a, D-173) Out cold. When the PC is alive and its awareness is 'unconscious' (right after
+     the scene compile, before the menu — a senseless body has none): no model call, nothing the
+     player typed or picked is acted on; the intent is the canon 'wait_here' def bound as it stands
+     (def_id, verb, label, ui_label, est_duration_s = duration.base_s, noise_db, tags), source
+     'human', lod WARM; info gains 'senseless': True; record_input(tx, turn_index, submit.mode,
+     text, {'senseless': True}). The time passes (turn.pipeline OUT-02): the world goes on around him.
   DOOM-07 (1b, D-106) The doomed cannot tell. When the PC is alive and doomed
      (physical.bodies.doomed(tx, pc) is not None), submit.mode is 'do' or 'say' and the text is not
      empty: one DOOM_GUARD call (lane B; build_request(config, DOOM_GUARD, turn_index = T, actor_id =

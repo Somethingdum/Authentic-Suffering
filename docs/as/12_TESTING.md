@@ -686,6 +686,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_waking_up.py` | After a quiet night "I get up" is a turn like any other: the menu is what he could do on waking, he wakes and stands, and the story is told "Owen woke after about 8 hours asleep." before "Owen chose to stand up."; lying down to sleep is told "Owen fell asleep.", from when the turn began to when it ended, with nobody seen and the story ending on him asleep; June asleep still decides nothing (her menu is not built waking) and out cold is never read as asleep |
 
+### 3.82 Out cold (P7; D-173)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_out_cold.py` | June out cold at 32 % with the bleeding long stopped comes to at exactly the moment four hours of blood are back (comes_to_at, progress), where she lay, and the blood keeps coming back; not while a wound bleeds, and nothing comes back in the first hour after a wound; the player's character out cold: whatever is typed, no model is asked and he does nothing, the time passes until he comes to and the story says so; the view offers one chip, "Let the time pass", and pressing it plays the turn |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

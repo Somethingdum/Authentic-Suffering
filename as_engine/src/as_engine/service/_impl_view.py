@@ -232,6 +232,10 @@ def build_view(tx, session):
         r = f"s{len(sugg) + 1}"
         smap[r] = {"signature": wait.signature, "label": "Wait and watch"}
         sugg.append(SuggestionView(ref=r, label="Wait and watch", mode="do"))
+    me = tx.query_one("SELECT alive, awareness FROM bodies WHERE body_id=?", (pc,))
+    if me[0] and me[1] == "unconscious":                 # OUT-02 (D-173): out cold, nothing to choose
+        smap = {"s1": {"label": "Let the time pass"}}
+        sugg = [SuggestionView(ref="s1", label="Let the time pass", mode="do")]
     session.extras["suggestions"] = smap
     # lanes
     c = session.client

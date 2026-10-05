@@ -95,7 +95,9 @@ simulate — stages 0-12 in ONE store transaction:
     S6 cognition: intents = await turn.cognition.decide(tx, session, plan, affs, T, wave_at,
        reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = (W1, D-80)
        turn.cognition.urge_pc(tx, rng, pc, pc_intent, T, wave_at) (the PC's intent goes through the
-       same barrier and resolver as everyone's, L12). asks = {a: turn.cognition.asks_for(tx, a, T,
+       same barrier and resolver as everyone's, L12) — except (OUT-02, D-173) when the intake's info
+       says 'senseless': the PC does nothing (no intents[pc]), and the window (select.horizon of the
+       placeholder wait) also ends at physical.bodies.comes_to_at(tx, pc, t0) when that is not None. asks = {a: turn.cognition.asks_for(tx, a, T,
        answered) for a in sorted(intents)}.
     S7 barrier: action.intent.barrier(tx, [intents[a] for a in sorted(intents)]).
     S8 resolve: action.resolve.resolve_wave(tx, rng, those, wave_at, T, horizon_ms=horizon);

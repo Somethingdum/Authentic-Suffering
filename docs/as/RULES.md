@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-816 ids; 558 with their own statement, 258 named only in context.
+818 ids; 560 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -849,6 +849,13 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | OPS-06 | OPS-06 depart(tx, rng, at, turn_index, cause) -> list[Event] (the loyalty plan acted on) Per actor (by id) with an open loop of kind 'plan' whose text starts with "Leave " and whose created_at <= at - W.defect_after_day… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p04_one_actor/test_knowledge_menus.py` |
 | OPS-07 | OPS-07 The hurt are tended (C01: a wound kills when nobody could stop it, not because the party was off-screen). Right after outcome(...) at 'arrive': per mover (by id), per unhealed wound of theirs (by wound_id) that i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_world_day.py` |
 | OPS-08 | OPS-08 launch(tx, group_id, kind, participants, origin, destination, at, turn_index, cause, *, target_id=None) -> str (OPS-01's daily plan and world.factions FAC-04 DECON) op_id = tx.mint('ops'); FACTION_OPERATION {op_i… | as_engine/world/worldmove.py | `as_engine/world/worldmove.py` | `contract/p10_world/test_operations.py` |
+
+## OUT
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| OUT-01 | OUT-01 (D-173) a living body of kind human, lurker or animal that lost no blood in the step gets some back: blood_loss_pct = max(0, blood_loss_pct - H.blood_regain_pct_per_h x the hours of the step after regain_from) —… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p07_slice/test_out_cold.py` |
+| OUT-02 | OUT-02 (1a, D-173) Out cold. When the PC is alive and its awareness is 'unconscious' (right after the scene compile, before the menu — a senseless body has none): no model call, nothing the player typed or picked is act… | as_engine/turn/intake.py | `as_engine/service/view.py`, `as_engine/turn/intake.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_out_cold.py` |
 
 ## PARKOUR
 
