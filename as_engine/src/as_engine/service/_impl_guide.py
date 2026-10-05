@@ -41,6 +41,28 @@ def pc_facts(view, last_narration):
     return f[:MAX_FACTS]
 
 
+def pc_knows(store, pc_id, question):
+    # GUIDE-04 (D-140): the lore the PC grew up hearing and the lessons they hold, as the question touches them
+    from .guide import MAX_LESSONS, MAX_LORE
+    canon = store.canon
+    q = question.lower()
+    lore = []
+    for r in store.query("SELECT lore_ref, belief, confidence FROM lore_held WHERE holder_id=?", (pc_id,)):
+        if not canon.has(r[0]):
+            continue
+        e = canon.get(r[0])
+        if r[1] < len(e.beliefs) and any(re.search(r"(?<![\w])" + re.escape(a.lower()) + r"(?![\w])", q) for a in e.about):
+            lore.append((-r[2], r[0], r[1], e.beliefs[r[1]].text))
+    out = [f"People say (what you grew up hearing, not what you saw): {x[3]}" for x in sorted(lore)[:MAX_LORE]]
+    words = {w for w in re.findall(r"[a-z]+", q) if len(w) >= 5}
+    n = 0
+    for (text,) in store.query("SELECT text FROM lessons WHERE holder_id=? ORDER BY at, lesson_id", (pc_id,)):
+        if n < MAX_LESSONS and words & set(re.findall(r"[a-z]+", text.lower())):
+            out.append("You know: " + (text[len("Knows: "):] if text.startswith("Knows: ") else text))
+            n += 1
+    return out
+
+
 async def answer(session, question, view):
     from ..contracts.calls import GuideContext
     from ..contracts.common import CallClass
@@ -54,8 +76,8 @@ async def answer(session, question, view):
     turn = st.query_one("SELECT turn_index FROM world_clock")[0]
     from ..cheats.commands import is_cheat_question
     cq = is_cheat_question(question) and st.meta("cheat_active") != "1"     # CHEAT-03: the in-world deflection
-    ctx = GuideContext(question=question, pc_name=view.pc_name, pc_facts=pc_facts(view, last), rules_snippets=rules_for(question),
-                       cheat_query=cq)
+    ctx = GuideContext(question=question, pc_name=view.pc_name, pc_facts=pc_facts(view, last) + pc_knows(st, session.pc_id, question),
+                       rules_snippets=rules_for(question), cheat_query=cq)
     req = build_request(session.config, CallClass.GUIDE, turn_index=None, context=ctx, ctx=ctx)
     resp = await session.client.call(req)
     text = resp.text.strip() if resp.parse_status == "ok" and resp.text and resp.text.strip() else GUIDE_DOWN

@@ -31,10 +31,20 @@ pc_facts(view, last_narration) -> list[str]   (in this order, then the first MAX
   f"You feel {impairment_word}." unless it is 'clear-headed';
   f"Resolve: {cur} of {max} ({word}).";
   f"What just happened: {last_narration}" when last_narration is not None.
+GUIDE-04 (D-140) What the character grew up hearing, and knows. The world's lore reaches the
+  guide only as the PC holds it (mind's lore_held and lessons rows of the PC — their own knowledge,
+  never the world's truth):
+pc_knows(store, pc_id, question) -> list[str]
+  lore: the PC's lore_held rows whose canon lore entry has an ``about`` phrase in the question
+  (whole words, case-insensitive), by (confidence descending, lore ref, belief), at most MAX_LORE:
+  f"People say (what you grew up hearing, not what you saw): {the belief's text}"; then lessons:
+  the PC's lessons rows (by at, lesson_id) whose text shares a word of five letters or more with the
+  question (lowercase runs of a-z), at most MAX_LESSONS: f"You know: {text}" with a leading
+  'Knows: ' dropped. An entry the canon no longer has is skipped.
 answer(session, question, view) -> str   (async)
   last = the text of the newest story_log entry of kind 'narration' (None when there is none);
   turn = world_clock.turn_index. ctx = GuideContext(question = question, pc_name = view.pc_name,
-  pc_facts = pc_facts(view, last), rules_snippets = rules_for(question), cheat_query =
+  pc_facts = pc_facts(view, last) + (D-140) pc_knows(store, session.pc_id, question), rules_snippets = rules_for(question), cheat_query =
   cheats.commands.is_cheat_question(question) and meta cheat_active != '1' (P12, CHEAT-03: a
   question about cheats before activation gets the in-world deflection)). request =
   lanes.requests.build_request(session.config, CallClass.GUIDE, turn_index=None, context=ctx,
@@ -55,6 +65,8 @@ if TYPE_CHECKING:
 
 MAX_TOPICS = 3
 MAX_FACTS = 30
+MAX_LORE = 4
+MAX_LESSONS = 3
 GUIDE_DOWN = "The guide couldn't answer just now. Try again in a moment."
 
 GENERAL = ("Use Do for actions (\"I check the back door\"), Say for words spoken aloud (choose who you are talking "
@@ -116,3 +128,4 @@ def pc_facts(view: "PlayView", last_narration: str | None) -> list[str]:
 async def answer(session: "Session", question: str, view: "PlayView") -> str:
     raise NotImplementedError("P8")
 from ._impl_guide import rules_for, pc_facts, answer  # noqa
+from ._impl_guide import pc_knows  # noqa

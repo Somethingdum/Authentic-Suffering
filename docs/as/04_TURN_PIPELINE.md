@@ -71,7 +71,7 @@ nothing on the turn's bar. Under each bar, one rotating line about the step (con
 | **Do** text | quoted spans → speech (verbatim, PARSE-05); the rest → INTAKE (lane B, `intake_schema` with the PC's affordance handles) | Yes |
 | **Say** text, mode "exact" | `speak` affordance to the chosen addressee (default: the person the PC last spoke with or is facing; the UI's "To:" chip overrides); words verbatim | No |
 | **Say** text, mode "my way" (opt-in only: `pc_voice` is `exact` unless the player turns it on, D-113) | SAY_MY_WAY (lane A, the Writer) turns the idea into the PC's line; `survived` recorded | Yes |
-| **Ask** | GUIDE (lane B), answered by `service/guide.py` in P8 from the play view the player already sees plus plain rules text — **not a turn**: no event, no time passes; only the call log and two story entries are written (PROTO-07, GUIDE-01..03) | Yes |
+| **Ask** | GUIDE (lane B), answered by `service/guide.py` in P8 from the play view the player already sees, (D-140) the lore the character grew up hearing and the lessons they hold that the question touches, plus plain rules text — **not a turn**: no event, no time passes; only the call log and two story entries are written (PROTO-07, GUIDE-01..03) | Yes |
 | Contains `2508` / starts with `/` after activation | cheats (P12, routed by the service; see CHEATS.md) | Maybe |
 
 The PC's menu is a short first list ranked for a mind deciding in the moment (24 options, AFF-07);

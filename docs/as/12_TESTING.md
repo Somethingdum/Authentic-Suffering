@@ -518,6 +518,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_shielding.py` | Mara puts herself between Eli and the danger: one point of Resolve back; again an hour later, nothing; the next day, one more (CAS-058, once a day). Waiting is not shielding: protecting_today selects no one |
 
+### 3.54 What the character grew up hearing (P8; D-140)
+
+| File | What it proves |
+|---|---|
+| `p08_ui_protocol/test_the_guide_knows.py` | GUIDE-04: asked about crawlers, the guide is given only the crawler lore Owen holds and what he has learned about them ('You know: …', the 'Knows: ' dropped); a question about bleeding touches none of it; asked whether the head matters he is told what he heard, the wrong saying too; lore and lessons he does not hold never come through |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-795 ids; 539 with their own statement, 256 named only in context.
+796 ids; 540 with their own statement, 256 named only in context.
 
 
 ## ABUSE
@@ -521,6 +521,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | GUIDE-01 | GUIDE-01 Ask is not a turn: no event is committed, no time passes, nobody in the world hears it. The only writes are bookkeeping: the call in lm_calls and two story_log entries. | as_engine/service/guide.py | `as_engine/service/guide.py` | `contract/p08_ui_protocol/test_guide.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
 | GUIDE-02 | GUIDE-02 The guide knows only what the character knows (pc_facts) plus plain rules text (rules_for); it never sees the world's hidden state. | as_engine/service/guide.py | `as_engine/service/guide.py` | `contract/p08_ui_protocol/test_guide.py` |
 | GUIDE-03 | GUIDE-03 A failed call is not an error: the player gets GUIDE_DOWN and can ask again. | as_engine/service/guide.py | `as_engine/service/guide.py` | `contract/p08_ui_protocol/test_turns_protocol.py` |
+| GUIDE-04 | GUIDE-04 (D-140) What the character grew up hearing, and knows. The world's lore reaches the guide only as the PC holds it (mind's lore_held and lessons rows of the PC — their own knowledge, never the world's truth): | as_engine/service/guide.py | `as_engine/service/guide.py` | `contract/p08_ui_protocol/test_the_guide_knows.py` |
 
 ## HALLUC
 
