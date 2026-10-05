@@ -18,7 +18,7 @@
   label: "Talk {target} down: slow, steady, keep them from panicking"
   ui_label: "Try to calm {target}"
   binds: body
-  requires: {target_kinds: [human]}
+  requires: {target_kinds: [human], target_distressed: true}
   range: audible
   duration: {base_s: 8}
   noise_db: 0

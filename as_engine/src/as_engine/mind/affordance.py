@@ -71,7 +71,12 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
               (a visual percept of this turn, up to ``at``, at clear or partial, of a body of kind
               'infected' whose point — space.point_distance — is within that many metres of the actor);
               (P12, D-107) requires.despair (physical.bodies.mind_of(tx, actor) is not None, or
-              resolve_cur 0: "not at the end of their rope")
+              resolve_cur 0: "not at the end of their rope"); (D-155) requires.target_distressed
+              (a percept of the actor's, turn_index this turn or the one before and at <= ``at``, of
+              the bound target in distress: a speech percept whose source is the target with
+              detail.volume 'raised' or 'shout', or one of a NOISE event of payload kind 'screaming'
+              or 'scream' whose source is the target, or one of a HARM event whose payload body_id
+              is the target: "they are not in a state")
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def
               with only skill_or_belief_cue needs the cue)
     belief    (every requires.belief_cues held — e.g. 'knows_headshot_rule')

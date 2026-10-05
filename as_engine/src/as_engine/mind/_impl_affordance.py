@@ -381,6 +381,18 @@ def _range_ok(c, d, o):
     return True
 
 
+def _distressed(c, target):
+    """D-155: the actor heard the target shout or scream, or perceived it hurt, this turn or the one before."""
+    if not target:
+        return False
+    return c.tx.query_one(
+        "SELECT 1 FROM percept_log p LEFT JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? AND p.turn_index>=? "
+        "AND p.at<=? AND ((p.source_id=? AND p.channel='speech' AND json_extract(p.detail,'$.volume') IN ('raised','shout')) "
+        "OR (p.source_id=? AND e.type='NOISE' AND json_extract(e.payload,'$.kind') IN ('screaming','scream')) "
+        "OR (e.type='HARM' AND json_extract(e.payload,'$.body_id')=?)) LIMIT 1",
+        (c.me, c.turn - 1, c.at, target, target, target)) is not None
+
+
 def _physical(c, d, o):
     from ..physical import space
     q = d.requires
@@ -409,6 +421,8 @@ def _physical(c, d, o):
         from ..physical.bodies import mind_of
         if mind_of(c.tx, c.me) is None and c.actor["resolve_cur"] > 0:
             return "not at the end of their rope"
+    if q.target_distressed and not _distressed(c, o.get("target_id")):     # D-155
+        return "they are not in a state"
     if c.cap.hands_free < q.hands_free:
         return "hands full"
     if not _range_ok(c, d, o):

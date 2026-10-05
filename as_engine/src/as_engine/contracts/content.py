@@ -158,6 +158,9 @@ class AffordanceRequires(Strict):
                                             "infected body) within this many metres of it.")
     despair: bool = Field(default=False, description="D-107: offered only to someone who can't take any more — a "
                           "doomed mind the talk has marked (physical.bodies.mind_of) or Resolve at 0.")
+    target_distressed: bool = Field(default=False, description="D-155: offered only toward someone the actor heard "
+                                    "shout or scream, or saw or heard hurt, this turn or the one before (talking a "
+                                    "calm person down is no option, and it took a slot on every menu).")
 
 
 class DurationSpec(Strict):

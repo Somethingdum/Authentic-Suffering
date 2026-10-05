@@ -608,6 +608,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_what_the_lint_wants.py` | The narration prompt states the lint's rules before any draft (no three sentences in a row starting with the same word, the active voice, no moods named) and lists the names the PC knows, the packet's allowed_names; no names, no list |
 
+### 3.69 Nobody to calm (P4; D-155)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_nobody_to_calm.py` | In a quiet room nobody is offered to calm (each is refused at the physical gate); someone heard shouting, then someone seen hurt, is |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
