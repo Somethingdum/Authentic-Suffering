@@ -77,6 +77,13 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               who tended it) — unless an earlier TREATMENT of it by
                                               by_actor is on the same world day (a day's care counts
                                               once); never the player's character (C06)
+    shielded_by(<path>)                       (D-200) for an ACTION_START of an affordance tagged
+                                              'protect_dependent' whose payload target_id is not the
+                                              actor (someone with an actors row): that target, when it
+                                              has an actors row, is alive and holds a visual EXACT or
+                                              PARTIAL percept of the start (it saw who stood in front of
+                                              it) — unless an earlier such start by the same actor at it
+                                              is on the same world day; never the player's character (C06)
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
                                               (trigger.attacker present): the one hurt — never the
                                               player's character (what they feel is theirs, C06)

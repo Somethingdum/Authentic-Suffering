@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-829 ids; 570 with their own statement, 259 named only in context.
+830 ids; 571 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -195,6 +195,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-075 | Someone seen spitting into what people eat and drink, by members of a settlement, comes under that settlement's contamination law. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_law_kept.py` |
 | CAS-076 | Being given something by someone earns them a little of your trust — a day's gifts count once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
 | CAS-077 | Someone who tends your wounds while you are awake to know it earns your trust and warmth, and you owe them — a day's care counts once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
+| CAS-078 | Seeing someone put themselves between you and the danger earns them your trust and warmth — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |
@@ -810,7 +811,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | MEM-17 | MEM-17 refusals: the holder's refusals with status 'standing' or 'reopened' whose requester_id is in M — a standing refusal comes back when the one who asked is here or named (WILL-05) — ordered (created_at, refusal_id)… | as_engine/mind/retrieval.py | `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py` | `contract/p06_memory/test_retrieval.py`, `contract/p07_slice/test_slice_refusal.py` |
 | MEM-18 | MEM-18 (B5, Actor Spec §13, AC13: valid handle syntax alone does not make an interpretation follow from its source) unknown_names(tx, holder_id, text) -> list[str]: the names in ``text`` of people the holder never learn… | as_engine/mind/memory.py | `as_engine/cheats/commands.py`, `as_engine/mind/consult.py`, `as_engine/mind/memory.py`, `as_engine/mind/retrieval.py`, `as_engine/service/background.py` | `contract/p06_memory/test_memory_v2.py`, `contract/p10_world/test_background.py` |
 | MEM-19 | MEM-19 (B5, fidelity C10; Actor Spec §13) A memory job is never lost to a failed call. Owner 'mind.memory' (memory_jobs: job_key PRIMARY KEY = f'{holder_id}:{turn_index}', holder_id, turn_index, status 'pending' / 'done… | as_engine/mind/memory.py | `as_engine/contracts/settings.py`, `as_engine/mind/memory.py`, `as_engine/mind/packet.py`, `as_engine/turn/pipeline.py` | `contract/p06_memory/test_memory_v2.py`, `contract/p07_slice/test_memory_jobs.py` |
-| MEM-20 | MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing new is not sent to be remembered. True when the packet holds an utterance; or a percept whose (channel, text) is not that of any of the ho… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p07_slice/test_nothing_new.py` |
+| MEM-20 | MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing new is not sent to be remembered. True when the packet holds an utterance; or a percept whose (channel, text) is not that of any of the ho… | as_engine/mind/memory.py | `as_engine/mind/memory.py` | `contract/p07_slice/test_nothing_new.py`, `contract/p09_society/test_kindness.py` |
 
 ## MIG
 

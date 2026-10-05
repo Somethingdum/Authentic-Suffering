@@ -1127,6 +1127,28 @@ def select(tx, selector, trigger):
         if tx.query_one(earlier, (giver, seq, trigger.at // 86_400_000, who)):
             return []
         return [who]
+    if fn == "shielded_by":                                          # D-200: someone stood between you and it
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        who, by = pl.get("target_id"), trigger.actor_id
+        try:
+            tags = _def(tx, pl.get("def_id") or "").tags
+        except KeyError:
+            return []
+        if "protect_dependent" not in tags or not who or who == by or _controller(tx, who) in (None, "human") \
+                or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (by,)) is None:
+            return []
+        if not tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (who,))[0]:
+            return []
+        if tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND event_id=? AND channel='visual' AND "
+                        "fidelity IN ('exact','partial')", (who, v)) is None:
+            return []
+        seq = tx.query_one("SELECT seq FROM events WHERE event_id=?", (v,))[0]
+        if tx.query_one("SELECT 1 FROM events WHERE type='ACTION_START' AND actor_id=? AND seq<? AND at/86400000=? AND "
+                        "json_extract(payload,'$.target_id')=? AND json_extract(payload,'$.def_id')=?",
+                        (by, seq, trigger.at // 86_400_000, who, pl.get("def_id"))):
+            return []
+        return [who]
     if fn == "hurt_by_someone":                                      # D-126: the one hurt, never the PC
         a = _assault(tx, trigger)
         victim = (trigger.payload or {}).get("body_id")

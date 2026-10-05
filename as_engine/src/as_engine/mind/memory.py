@@ -159,7 +159,8 @@ MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing
   the same woman still at the window are not); or one of the holder's own events of this turn
   (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
   that is not quiet. Quiet: an ACTION_START
-  whose affordance (canon.find('affordance', payload.def_id)) has its verb in QUIET_VERBS, and an
+  whose affordance (canon.find('affordance', payload.def_id)) has its verb in QUIET_VERBS and (D-200) no
+  'threat_response' tag — standing between someone and the danger is not holding still — and an
   ACTION_COMPLETE whose band is clean or missing and whose cause is such a start. Else False — the
   raw percepts stay in percept_log either way.
 """
@@ -262,10 +263,11 @@ def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index:
         pl = json.loads(e[3]) if isinstance(e[3], str) else (e[3] or {})
         if e[1] == "ACTION_START":
             try:
-                verb = tx.canon.find("affordance", pl.get("def_id") or "").verb
+                d = tx.canon.find("affordance", pl.get("def_id") or "")
+                verb, tags = d.verb, d.tags
             except KeyError:
-                verb = None
-            if getattr(verb, "value", verb) in QUIET_VERBS:
+                verb, tags = None, []
+            if getattr(verb, "value", verb) in QUIET_VERBS and "threat_response" not in tags:   # D-200
                 quiet.add(e[0])
                 continue
         if e[1] == "ACTION_COMPLETE" and e[2] in quiet and pl.get("band") in (None, "clean"):

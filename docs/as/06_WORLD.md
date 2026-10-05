@@ -229,7 +229,8 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   from P10, deeds move it; it feeds trade and pressure.
 - **Kindness is remembered** (D-195, CAS-076/077): a gift into someone's hands or pockets earns the giver
   one trust; wounds tended while awake earn one trust, one warmth and a debt the one tended carries —
-  once per world day from the same person; never written into the player's character.
+  once per world day from the same person; never written into the player's character. Seeing someone
+  put themselves between you and the danger earns them one trust and one warmth the same way (D-200).
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

@@ -131,3 +131,49 @@ def test_asleep_she_never_knew_who(scenario):
     with w.store.transaction() as tx:
         ev = bodies.treat(tx, w.id("alice"), wid, "clean", w.id("alice"), t + 2000, None, 0)
         assert cascade.select(tx, "cared_for_by(trigger.event_id)", ev) == [], "tending yourself is no kindness owed"
+
+
+def shield(w, by, who, at):
+    from as_engine.mind import perception
+    from as_engine.physical import space
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", at, None, 0)
+        for x, px in ((by, 5.0), (who, 6.0)):
+            tx.commit_event(space.move_event(tx, w.id(x), w.id("sales_floor"), None, px, 4.0, at, None, 0))
+        st = tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=at + 100, turn_index=0,
+                                   actor_id=w.id(by), payload={"actor_id": w.id(by), "def_id": "shield_dependent", "verb": "guard",
+                                                               "target_id": w.id(who), "visible": True,
+                                                               "seen": "steps in front of {target}"}))
+        perception.compile_aftermath(tx, w.id(who), [st], at + 300, 0)
+        cascade.sweep(tx, [st], rules(w, "CAS-078"), at + 500, 0)
+    return st
+
+
+def test_someone_stood_between_you_and_it(scenario):
+    """D-200: Alice saw June step in front of her when the dead came through the door."""
+    w = scenario("metal_fence")
+    t = now(w)
+    awake(w, "alice", t)
+    w.store.conn.execute("DELETE FROM relationships WHERE from_id = ? AND to_id = ?", (w.id("alice"), w.id("june")))
+    shield(w, "june", "alice", t + 1000)
+    assert (rel(w, "alice", "june", "trust"), rel(w, "alice", "june", "affection")) == (1, 1)
+    shield(w, "june", "alice", t + 5000)
+    assert rel(w, "alice", "june", "trust") == 1, "once a day"
+
+
+def test_shielding_is_not_holding_still(scenario):
+    """D-200 (MEM-20): standing between someone and the danger is worth remembering even with nothing new in view;
+    waiting is not."""
+    from as_engine.mind import memory
+    w = scenario("metal_fence")
+    t = now(w)
+    with w.store.transaction() as tx:
+        for turn, def_id, verb in ((7, "shield_dependent", "guard"), (8, "wait_here", "wait")):
+            tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=t + turn, turn_index=turn,
+                                  actor_id=w.id("june"), payload={"actor_id": w.id("june"), "def_id": def_id, "verb": verb,
+                                                                  "target_id": w.id("alice") if turn == 7 else None}))
+        shielded = memory.build_aftermath(tx, w.id("june"), 7, t + 100)
+        waited = memory.build_aftermath(tx, w.id("june"), 8, t + 100)
+        assert not shielded.percepts and not waited.percepts
+        assert memory.worth_writing(tx, w.id("june"), shielded, 7)
+        assert not memory.worth_writing(tx, w.id("june"), waited, 8)

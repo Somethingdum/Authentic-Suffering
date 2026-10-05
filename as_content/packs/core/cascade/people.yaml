@@ -959,3 +959,20 @@
       payload: {kind: debt_owing, subject: "$trigger.payload.by_actor", text: "{subject} tended your wounds. You owe them.", strength: 2}
   delay_s: 0
   cites: [D-195, D-194]
+- schema: as.cascade.v1
+  id: CAS-078
+  description: Seeing someone put themselves between you and the danger earns them your trust and warmth — once a day.
+  trigger_event: ACTION_START
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: shielded_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: 1, cause: shielded_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: shielded_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: affection, delta: 1, cause: shielded_by}
+  delay_s: 0
+  cites: [D-200, D-195]
