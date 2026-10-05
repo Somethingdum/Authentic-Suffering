@@ -1374,8 +1374,16 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
         if "{whom}" in text and pl.get("whom"):                       # D-179: who it was done to, in their word
             from ..mind.perception import word_for
             text = text.replace("{whom}", "you" if pl["whom"] == target else word_for(tx, target, pl["whom"]))
-        open_loop(tx, target, pl["kind"], text, [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
-                  trig.event_id, at, turn_index)
+        lid = open_loop(tx, target, pl["kind"], text, [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
+                        trig.event_id, at, turn_index)
+        if (tx.query_one("SELECT MAX(seq) FROM events")[0] or 0) == before:          # D-194: the same wrong done again
+            row = tx.query_one("SELECT created_event FROM open_loops WHERE loop_id=?", (lid,))
+            mine = tx.query_one("SELECT 1 FROM events WHERE event_id=? AND cause_event_id=?", (row[0], trig.event_id)) or \
+                tx.query_one("SELECT 1 FROM events WHERE type='LOOP_STRENGTH' AND cause_event_id=? AND "
+                             "json_extract(payload,'$.loop_id')=?", (trig.event_id, lid))
+            if mine is None:
+                from ..mind.mind import strengthen_loop
+                strengthen_loop(tx, lid, 1, trig.event_id, at, turn_index)
         return _events_since(tx, before)
     if eff.kind == "recover_resolve":                                # D-122
         from ..mind.resolve import recover

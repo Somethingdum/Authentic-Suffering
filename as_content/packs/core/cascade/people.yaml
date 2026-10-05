@@ -262,7 +262,7 @@
 # player's character is never one of those changed (C06).
 - schema: as.cascade.v1
   id: CAS-036
-  description: Being hurt by someone you were not fighting costs them your trust, makes you afraid of them, and you hold it against them.
+  description: Being hurt by someone you were not fighting costs them your trust, makes you afraid of them and angry with them, and you hold it against them — harder each time.
   trigger_event: HARM
   where: {}
   preconditions: ["trigger.attacker_provoked == false"]
@@ -276,11 +276,15 @@
       target: hurt_by_someone(trigger.event_id)
       payload: {toward: "$trigger.attacker", axis: fear, delta: 1, cause: hurt_by}
     - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: hurt_by_someone(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: resentment, delta: 1, cause: hurt_by}
+    - kind: emit_event
       event_type: LOOP_OPENED
       target: hurt_by_someone(trigger.event_id)
       payload: {kind: grudge, subject: "$trigger.attacker", text: "{subject} hurt you, and you were not fighting them.", strength: 2}
   delay_s: 0
-  cites: [D-126, TEMPER-02, docs/as/05_ACTORS.md#7.1]
+  cites: [D-126, D-194, TEMPER-02, docs/as/05_ACTORS.md#7.1]
 - schema: as.cascade.v1
   id: CAS-037
   description: Seeing someone hurt a person who was not fighting them costs the attacker the onlookers' trust, and the story travels.

@@ -217,6 +217,11 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
                                              strength = payload.strength or 2, cause = E)               (P6)
                                              (D-179) '{whom}' in the text is the holder's word for
                                              payload.whom (perception.word_for; 'you' when it is them)
+                                             (D-194) the same wrong done again: when the holder already
+                                             holds that loop open (LOOP-02: open_loop commits nothing)
+                                             and it was not opened or deepened for this same E, it
+                                             deepens instead — mind.mind.strengthen_loop(tx, it, +1, E,
+                                             at, turn_index) (clamped at 3: nothing at the bound)
                                              (E = the triggering event's id; '$trigger.…' payload values
                                              are resolved like targets, CAS-05)
   (P9; p = the effect payload with '$' values resolved, E = the trigger, at, turn_index as given)

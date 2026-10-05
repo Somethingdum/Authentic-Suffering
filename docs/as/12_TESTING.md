@@ -773,6 +773,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_mouth_rules.py` | Mara, beside June with a fresh bite in a lit room, has the bite_wound_seen cue, and both the wet strain's lore and the mouth rules come to mind |
 
+### 3.96 The same wrong again (P9; D-194)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_the_same_wrong_again.py` | Alice, hit by Owen for nothing, resents him one more and holds "Owen hurt you, and you were not fighting them." at 2; hit again, she holds it at 3; the same blow swept twice deepens it once, and a third blow leaves it at 3 |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
