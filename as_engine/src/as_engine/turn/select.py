@@ -98,6 +98,9 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     fresh_loop        (D-191) it holds an 'open' loop (open_loops) whose created_event is an event of
                       turn_index - 1: a goal, a fear, a grudge, a plan formed since it last decided —
                       what it now wants is acted on, not left for when it next takes stock.
+    pressing_need     (D-198) its needs row has hunger_stage, thirst_stage or fatigue_stage >=
+                      mind.affordance.NEED_PRESSING: a body that wants food, water or sleep badly is
+                      a decision to make (D-182 puts what answers it first on the menu).
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written
   before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules

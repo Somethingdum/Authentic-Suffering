@@ -103,3 +103,20 @@ def test_what_they_now_want_is_acted_on(scenario):
     with w.store.transaction() as tx:
         mind.close_loop(tx, lid, "abandoned", "test:2", t, 3)
     assert not fresh(4), "a loop let go is nothing to act on"
+
+
+def test_a_body_that_needs_something_decides(scenario):
+    """D-198: with nothing else going on, someone starving or dead on their feet still has a decision to make — the
+    COLD default would have them keep watching the door."""
+    from as_engine.mind.affordance import NEED_PRESSING
+    w = scenario("metal_fence")
+    t = now(w)
+
+    def flags():
+        with w.store.transaction() as tx:
+            return select.salience_flags(tx, w.id("june"), [w.id("june")], w.id("pc"), 3, t)
+
+    assert flags()["pressing_need"] is False
+    w.store.conn.execute("UPDATE needs SET fatigue_stage = ? WHERE body_id = ?", (NEED_PRESSING, w.id("june")))
+    assert flags()["pressing_need"] is True
+    assert select.salience(flags(), False, EngineConfig().rules.scheduler.salience_weights) > 0
