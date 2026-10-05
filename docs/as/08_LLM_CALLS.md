@@ -46,11 +46,13 @@ belongs on:
 
 * **Writer** — everything narrative: every word the player reads as story (narration, the Voice, Willis, the
   recap, the Journal's scene summaries, and the player's own line when they opt in to say-my-way), the
-  thinking decisions of the people who matter most (HOT actor cognition), and the long-context creative work
+  thinking decisions of the people who matter most (HOT actor cognition — and a HOT reaction: someone the
+  player has just spoken to answers on the Writer), and the long-context creative work
   (worldgen history / people / opening, dossier intake, quick-make).
 * **Clerk** — rapid, clearly scoped background work: a call whose answer is *closed* (a schema or a short
   verdict), *checked by code*, *stateless*, fits in about 8K tokens of context, and whose failure is *cheap*
-  (a fallback exists): intake, the WARM minds, reactions, repair, writeback, the audits and the lint judge,
+  (a fallback exists): intake, the WARM minds, the reactions with little at stake (a sound, a glance — the
+  room's small talk), repair, writeback, the audits and the lint judge,
   rumours, the guide, reflection, the cheat interpreter and persona, the doom guard.
 
 Lanes are roles, not a pool: a call goes to the lane its regime names and is never moved to balance load
@@ -132,7 +134,7 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | intake | B | no | IntakeOutput (dynamic enum) | player Do text | player prose would leak unperceived facts into intent; free text can't be trusted to map to legal options |
 | actor_cognition (HOT) | A (`hot_cognition.lane`) | yes | ActorReplyV2 (dynamic enums; a decision or one consultation first) | salient/mandatory Actors | Skull Law becomes an instruction instead of a fact; F2 returns |
 | actor_cognition (WARM) | B | no | ActorReplyV2 | other Actors in budget with something new, talk last turn, or due to take stock (D-190) | same, for more people per turn at no wall-clock cost |
-| actor_reaction | B | no | ActorReplyV2 (a decision; no consultation) | reaction waves | Actors could not respond within the same instant |
+| actor_reaction | B (HOT: `hot_cognition.lane`, A, thinking on) | no (HOT: yes) | ActorReplyV2 (a decision; no consultation) | reaction waves, planned like any wave: HOT for the mandatory and salience ≥ `hot_min_salience` (someone spoken to), else WARM | Actors could not respond within the same instant |
 | intent_repair | B | no | ActorReplyV2 (a decision only) | one per failed structured call | a malformed answer would cost the Actor its turn |
 | writeback | B | no | WritebackOutput | per holder (each a memory job, retried when it fails), after commit | memory becomes objective; two people remember the same thing; a failed call forgets |
 | portrayal_audit | B | yes | PortrayalVerdict | targeted pre-check + retrospective | "would they do that?" answered by the one who did it |
@@ -166,7 +168,7 @@ and reports what changed. A call whose ablation shows no measurable degradation 
 Wall-clock of a turn = the critical path through the call DAG with two concurrent slots, not the
 number of calls. A WARM call (the Clerk) beside a HOT call (the Writer) is free. These budgets size the
 cognition wave only; they never cut a call off (LANE-10). Planning figures (`[SAND]`, replaced by
-`bench`): intake ≈ 2.3 s, HOT cognition ≈ 21 s, WARM ≈ 3.6 s, reaction ≈ 2.5 s, writeback ≈ 3.7 s,
+`bench`): intake ≈ 2.3 s, HOT cognition ≈ 21 s (a HOT reaction — someone answering the player — the same), WARM ≈ 3.6 s, reaction ≈ 2.5 s, writeback ≈ 3.7 s,
 audit ≈ 2.6 s, narration ≈ 18.6 s, lint judge ≈ 2.1 s → a medium scene (5 Actors: 2 HOT, 3 WARM,
 one reaction wave) ≈ 48–50 s. **Turn depth** setting: quick (40 s budget, 1 HOT), balanced (75 s,
 2 HOT), deep (150 s, 3 HOT). Mandatory Actors always get a call, even past budget.
