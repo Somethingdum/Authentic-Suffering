@@ -94,6 +94,39 @@ Dossier intake (IMP-05, the 'dump a big document in' path — e.g. the Ghost fac
      overwrite a non-empty string); 4. validate; 5. write draft + gaps; 6. report progress
      (intake_progress) after each section. The user reviews and moves the draft into the pack.
   The engine never auto-publishes an intake draft into canon (IMP-06).
+
+D-210 — dossier intake, the details (IMP-05/06):
+INTAKE_SECTION_TOKENS = 12_000 (mind.packet.estimate_tokens).
+intake_sections(text) -> list[str]: blocks = the text split before every line that starts with '#'
+  (a heading; the text before the first heading is a block when not blank); consecutive blocks are
+  joined ('\\n') while the joined text stays within INTAKE_SECTION_TOKENS; a block over it alone is cut
+  the same way on blank-line paragraph boundaries ('\\n\\n' between them), and a paragraph over it at
+  the last whitespace before 4 x INTAKE_SECTION_TOKENS characters (a hard cut when there is none).
+  Each section stripped; empty ones dropped. Blank text -> [].
+field_guide(target_kind) -> str: one line per field of the kind's contract (actor ActorDossier, pc
+  PCDossier, faction FactionDossier, lore LoreEntry), depth first in declaration order, as
+  '<path>: <what>' + ' — <description>' when the field has one (its first 160 characters) — path
+  dotted, with '[]' after a list of records; what: 'text', 'whole number', 'number', 'yes/no',
+  'one of a | b | ...', 'list of <what>', 'pair of whole numbers', 'mapping'; a nested record is
+  not a line of its own (its fields are). Left out: schema, id, generation, writers_notes.
+intake_document(client, text, target_kind, pack_id, content_dir, *, name='document', on_section=None)
+  -> ImportResult   (async)
+  pack_id not a slug, or target_kind not one of actor / pc / faction / lore -> errors; no sections
+  -> errors [f"{name}: there is nothing in it to read."]. For section i of n (1-based): request =
+  lanes.requests.build_request(client.config, CallClass.DOSSIER_INTAKE, turn_index=0,
+  context=DossierIntakeContext(target_kind, source_text=section, pack_id, fields=field_guide(kind)),
+  json_schema=None, ctx=the same) -> await client.call(request, None); parse_status 'ok' and
+  lanes.parse.extract_json(text) a mapping -> merged into the draft; anything else (a raised lane
+  error included) -> gap f"section {i} of {n}: the model gave nothing usable."; then
+  await on_section(i, n) when given. merge(a, b): mappings key by key (recursively); lists: b's
+  items not already in a appended in order; a value in a that is not None, '' or [] kept, else b's.
+  The model's '_conflicts' (text or a list of text) leaves the draft and each becomes a gap
+  f"conflict: {text}" (after the section gaps). Then: schema = the kind's schema id; actor and pc
+  get generation 'imported'; id = the draft's id when it matches the slug pattern, else the id rule
+  (as for cards) over identity.name (actor, pc), name (faction) or title (lore), else over ``name``,
+  else f"intake_{kind}". Validated with the kind's contract; its errors become gaps as for cards.
+  Written to <pack>/_drafts/<id>.yaml (lore: <id>.md, front matter only) with <id>.gaps.md beside
+  it -> ok, draft_path, gaps — a draft even when nothing is missing (IMP-06).
 """
 
 from __future__ import annotations
@@ -121,4 +154,23 @@ def extract_card_json(png_bytes: bytes) -> dict | None:
 
 def docx_text(docx_bytes: bytes) -> str:
     raise NotImplementedError("P12")
+
+
+INTAKE_SECTION_TOKENS = 12_000
+
+
+def intake_sections(text: str) -> list[str]:
+    raise NotImplementedError("D-210")
+
+
+def field_guide(target_kind: str) -> str:
+    raise NotImplementedError("D-210")
+
+
+async def intake_document(client, text: str, target_kind: str, pack_id: str, content_dir: str | Path, *,
+                          name: str = "document", on_section=None) -> ImportResult:
+    raise NotImplementedError("D-210")
+
+
 from ._impl_importers import docx_text, extract_card_json, import_file  # noqa: E402,F811
+from ._impl_importers import field_guide, intake_document, intake_sections  # noqa: E402,F811

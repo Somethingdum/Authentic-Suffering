@@ -655,8 +655,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | IMP-02 | *Importers (P12). Rules IMP-01..06. Nothing imported enters canon until the validator passes;* | as_engine/content/importers.py | `as_engine/content/importers.py`, `as_engine/content/pack.py` | `contract/p12_surfaces/test_importers.py` |
 | IMP-03 | *Importers (P12). Rules IMP-01..06. Nothing imported enters canon until the validator passes;* | as_engine/content/importers.py | `as_engine/content/importers.py` | `contract/p12_surfaces/test_importers.py` |
 | IMP-04 | *Importers (P12). Rules IMP-01..06. Nothing imported enters canon until the validator passes;* | as_engine/content/importers.py | `as_engine/content/importers.py` | — |
-| IMP-05 | *Importers (P12). Rules IMP-01..06. Nothing imported enters canon until the validator passes;* | as_engine/content/importers.py | `as_engine/content/importers.py` | — |
-| IMP-06 | *The engine never auto-publishes an intake draft into canon (IMP-06).* | as_engine/content/importers.py | `as_engine/content/importers.py` | — |
+| IMP-05 | *Importers (P12). Rules IMP-01..06. Nothing imported enters canon until the validator passes;* | as_engine/content/importers.py | `as_engine/content/importers.py` | `contract/p12_surfaces/test_intake.py` |
+| IMP-06 | *The engine never auto-publishes an intake draft into canon (IMP-06).* | as_engine/content/importers.py | `as_engine/content/importers.py`, `as_engine/service/game_service.py` | — |
 
 ## INF
 

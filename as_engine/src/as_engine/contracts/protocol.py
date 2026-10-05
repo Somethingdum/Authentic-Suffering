@@ -331,6 +331,13 @@ class OutImportResult(Strict):
     ref: str | None = Field(default=None, description="The canon ref when it came in as canon.")
 
 
+class OutIntakeProgress(Strict):
+    """D-210: sections of a document read so far."""
+    name: str
+    done: int = Field(ge=0)
+    total: int = Field(ge=0)
+
+
 class OutCheat(Strict):
     persona_line: str
     ok: bool = True
@@ -441,8 +448,8 @@ IN_MODELS: dict[str, type[Strict] | None] = {
 
 OUT_MODELS: dict[str, type[Strict] | None] = {
     "welcome": OutWelcome, "state": OutState, "models": OutModels, "model_test_result": OutModelTest, "config": OutConfig,
-    "packs": OutPacks, "pcs": OutPCs, "content_report": OutContentReport, "import_result": OutImportResult, "intake_progress": None,
-    "intake_result": None, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns, "run_deleted": OutRunDeleted,
+    "packs": OutPacks, "pcs": OutPCs, "content_report": OutContentReport, "import_result": OutImportResult, "intake_progress": OutIntakeProgress,
+    "intake_result": OutImportResult, "quickmake_result": None, "worldgen_progress": OutWorldgenProgress, "runs": OutRuns, "run_deleted": OutRunDeleted,
     "run_loaded": OutRunLoaded, "saved": OutSaved, "turn_progress": OutTurnProgress, "turn_result": OutTurnResult,
     "turn_rejected": OutTurnRejected, "guide_answer": OutGuideAnswer, "view": OutView, "story": OutStory,
     "death": OutDeath, "doom": OutDoom, "cheat_activated": OutCheat, "cheat_result": OutCheat, "lanes_status": OutLanes,

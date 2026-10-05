@@ -327,3 +327,211 @@ def import_file(path: str | Path, pack_id: str, content_dir: str | Path) -> Impo
     except (yaml.YAMLError, json.JSONDecodeError, UnicodeDecodeError) as e:
         return ImportResult(ok=False, errors=[f"{src.name}: could not be read ({str(e).splitlines()[0]})."])
     return ImportResult(ok=False, errors=[f"{src.name}: the game does not know what to do with a '{ext or 'no'}' file."])
+
+
+# ---------------------------------------------------------------------------------------------- intake (D-210)
+_KIND_MODEL = {"actor": ("ActorDossier", "as.actor.v1"), "pc": ("PCDossier", "as.pc.v1"),
+               "faction": ("FactionDossier", "as.faction.v1"), "lore": ("LoreEntry", "as.lore.v1")}
+_SKIP = {"schema_id", "id", "generation", "writers_notes"}
+
+
+def _cut(text: str, limit_tokens: int, sep: str, inner) -> list[str]:
+    from ..mind.packet import estimate_tokens
+    out: list[str] = []
+    cur = ""
+    for piece in text.split(sep) if sep else [text]:
+        if not piece.strip():
+            continue
+        joined = f"{cur}{sep}{piece}" if cur else piece
+        if estimate_tokens(joined) <= limit_tokens:
+            cur = joined
+            continue
+        if cur:
+            out.append(cur)
+        if estimate_tokens(piece) <= limit_tokens:
+            cur = piece
+        else:
+            out += inner(piece)
+            cur = ""
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _hard(paragraph: str) -> list[str]:
+    from .importers import INTAKE_SECTION_TOKENS
+    n = 4 * INTAKE_SECTION_TOKENS
+    out = []
+    rest = paragraph
+    while len(rest) > n:
+        cut = max(rest.rfind(" ", 0, n), rest.rfind("\n", 0, n), rest.rfind("\t", 0, n))
+        cut = cut if cut > 0 else n
+        out.append(rest[:cut])
+        rest = rest[cut:]
+    if rest.strip():
+        out.append(rest)
+    return out
+
+
+def intake_sections(text: str) -> list[str]:
+    from .importers import INTAKE_SECTION_TOKENS
+    if not (text or "").strip():
+        return []
+    blocks, cur = [], []
+    for line in text.splitlines():
+        if line.startswith("#") and cur:
+            blocks.append("\n".join(cur))
+            cur = []
+        cur.append(line)
+    if cur:
+        blocks.append("\n".join(cur))
+    blocks = [b for b in blocks if b.strip()]
+    out: list[str] = []
+    cur_s = ""
+    from ..mind.packet import estimate_tokens
+    for b in blocks:
+        joined = f"{cur_s}\n{b}" if cur_s else b
+        if estimate_tokens(joined) <= INTAKE_SECTION_TOKENS:
+            cur_s = joined
+            continue
+        if cur_s:
+            out.append(cur_s)
+        if estimate_tokens(b) <= INTAKE_SECTION_TOKENS:
+            cur_s = b
+        else:
+            out += _cut(b, INTAKE_SECTION_TOKENS, "\n\n", _hard)
+            cur_s = ""
+    if cur_s:
+        out.append(cur_s)
+    return [s.strip() for s in out if s.strip()]
+
+
+def _what(ann) -> tuple[str, object | None]:
+    """(words, nested model or None) for a field annotation."""
+    import types
+    import typing
+
+    from pydantic import BaseModel
+    origin = typing.get_origin(ann)
+    args = [a for a in typing.get_args(ann) if a is not type(None)]
+    if origin in (typing.Union, types.UnionType):
+        return _what(args[0]) if len(args) == 1 else ("text", None)
+    if origin is typing.Literal:
+        return "one of " + " | ".join(str(a) for a in typing.get_args(ann)), None
+    if origin in (list, tuple, set, frozenset):
+        if origin is tuple and len(args) == 2 and all(a is int for a in args):
+            return "pair of whole numbers", None
+        inner, model = _what(args[0]) if args else ("text", None)
+        return (f"list of {inner}", model)
+    if origin is dict:
+        return "mapping", None
+    if isinstance(ann, type) and issubclass(ann, BaseModel):
+        return "record", ann
+    if ann is bool:
+        return "yes/no", None
+    if ann is int:
+        return "whole number", None
+    if ann is float:
+        return "number", None
+    import enum
+    if isinstance(ann, type) and issubclass(ann, enum.Enum):
+        return "one of " + " | ".join(str(m.value) for m in ann), None
+    return "text", None
+
+
+def _guide(model, prefix: str, out: list[str]) -> None:
+    for fname, f in model.model_fields.items():
+        if not prefix and fname in _SKIP:
+            continue
+        path = f"{prefix}{f.alias or fname}" if f.alias and f.alias != "schema" else f"{prefix}{fname}"
+        words, nested = _what(f.annotation)
+        if nested is not None:
+            _guide(nested, path + ("[]." if words.startswith("list of") else "."), out)
+            continue
+        desc = (f.description or "").strip()
+        out.append(f"{path}: {words}" + (f" — {desc[:160]}" if desc else ""))
+
+
+def field_guide(target_kind: str) -> str:
+    from .pack import _model
+    out: list[str] = []
+    _guide(_model(_KIND_MODEL[target_kind][0]), "", out)
+    return "\n".join(out)
+
+
+def _merge(a, b):
+    if isinstance(a, dict) and isinstance(b, dict):
+        out = dict(a)
+        for k, v in b.items():
+            out[k] = _merge(out[k], v) if k in out else v
+        return out
+    if isinstance(a, list) and isinstance(b, list):
+        return a + [x for x in b if x not in a]
+    return a if a not in (None, "", []) else b
+
+
+async def intake_document(client, text: str, target_kind: str, pack_id: str, content_dir, *, name: str = "document",
+                          on_section=None) -> ImportResult:
+    from pydantic import ValidationError
+
+    from ..contracts.calls import DossierIntakeContext
+    from ..contracts.common import CallClass
+    from ..lanes.parse import extract_json
+    from ..lanes.requests import build_request
+    from .pack import _model
+    content_dir = Path(content_dir)
+    if not _SLUG.match(pack_id or ""):
+        return ImportResult(ok=False, errors=[f"'{pack_id}' is not a pack name the game can use (lower-case letters, "
+                                              "digits and '_')."])
+    if target_kind not in _KIND_MODEL:
+        return ImportResult(ok=False, errors=[f"'{target_kind}' is not something a document can become."])
+    sections = intake_sections(text)
+    if not sections:
+        return ImportResult(ok=False, errors=[f"{name}: there is nothing in it to read."])
+    guide = field_guide(target_kind)
+    draft: dict = {}
+    gaps: list[str] = []
+    n = len(sections)
+    for i, section in enumerate(sections, start=1):
+        ctx = DossierIntakeContext(target_kind=target_kind, source_text=section, pack_id=pack_id, fields=guide)
+        part = None
+        try:
+            req = build_request(client.config, CallClass.DOSSIER_INTAKE, turn_index=0, context=ctx, json_schema=None, ctx=ctx)
+            resp = await client.call(req, None)
+            if resp.parse_status == "ok":
+                part = extract_json(resp.text)
+        except Exception:  # noqa: BLE001 — a lane that fails costs this section, not the document
+            part = None
+        if isinstance(part, dict):
+            draft = _merge(draft, part)
+        else:
+            gaps.append(f"section {i} of {n}: the model gave nothing usable.")
+        if on_section is not None:
+            await on_section(i, n)
+    conflicts = draft.pop("_conflicts", None)
+    for c in ([conflicts] if isinstance(conflicts, str) else conflicts or []):
+        gaps.append(f"conflict: {c}")
+    cname, schema = _KIND_MODEL[target_kind]
+    draft["schema"] = schema
+    if target_kind in ("actor", "pc"):
+        draft["generation"] = "imported"
+    named = {"actor": (draft.get("identity") or {}).get("name"), "pc": (draft.get("identity") or {}).get("name"),
+             "faction": draft.get("name"), "lore": draft.get("title")}[target_kind]
+    rid = draft.get("id") if isinstance(draft.get("id"), str) and _SLUG.match(draft["id"]) else (
+        _slug(str(named or "")) or _slug(Path(name).stem) or f"intake_{target_kind}")
+    draft = {"schema": schema, "id": rid, **{k: v for k, v in draft.items() if k not in ("schema", "id")}}
+    try:
+        _model(cname).model_validate(draft)
+    except ValidationError as e:
+        gaps += _plain(e.errors())
+    pack = _pack_dir(content_dir, pack_id)
+    drafts = pack / "_drafts"
+    drafts.mkdir(exist_ok=True)
+    if target_kind == "lore":
+        target = drafts / f"{rid}.md"
+        target.write_text("---\n" + yaml.safe_dump(draft, sort_keys=False, allow_unicode=True) + "---\n", encoding="utf-8")
+    else:
+        target = drafts / f"{rid}.yaml"
+        target.write_text(yaml.safe_dump(draft, sort_keys=False, allow_unicode=True, width=120), encoding="utf-8")
+    _write_gaps(drafts / f"{rid}.gaps.md", gaps)
+    return ImportResult(ok=True, draft_path=_rel(content_dir, target), gaps=gaps)

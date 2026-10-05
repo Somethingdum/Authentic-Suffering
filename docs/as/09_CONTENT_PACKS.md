@@ -447,6 +447,10 @@ playable character, faction, lore) and drop a `.md`, `.txt` or `.docx`.
 5. Progress shows per section. **Nothing becomes canon until you move the draft into the pack**
    (IMP-06).
 
+(Built, D-210: the Writer is given the record's whole field list, one line per field; what the model
+says contradicts itself is listed in the gaps as `conflict: …`, and a section the model could not
+answer is listed too. A `.docx` is read as text first.)
+
 How to lay out a lore document so intake maps it cleanly — one heading per record, truth and
 belief, numbers not moods, and the questions the next document should answer — is
 `docs/as/LORE_STRUCTURE.md`.

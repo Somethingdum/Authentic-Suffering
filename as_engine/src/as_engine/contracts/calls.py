@@ -210,3 +210,4 @@ class DossierIntakeContext(Strict):
     target_kind: Literal["actor", "pc", "faction", "lore"]
     source_text: str
     pack_id: str
+    fields: str = Field(default="", description="D-210: content.importers.field_guide(target_kind) — the field names it may fill.")

@@ -815,6 +815,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p12_surfaces/test_importers.py` | A Word document's paragraphs, tabs and breaks come out as text; a card hidden in a PNG's tEXt or iTXt chunk is found, ccv3 over chara; a card becomes a draft person in `_drafts/` — name, what they know, depth from description and personality, three voice-line candidates from their own speech, every line of theirs in the example dialogue as an example with what was said first and by whom (the player's side never named; a line after her own has nobody speaking to her) — with what it lacks listed in plain language and its enabled lorebook entries as lore drafts; drafts never load and the `my_content` pack is made; the card in a picture the same; an item record comes in as canon, and the same file again overwrites nothing; a record that fails waits in `_drafts/` with the validator's lines; lore as JSON is written as `.md` and loads; documents go to intake; the Content screen's message passes the file through `_incoming/` and leaves nothing behind, refuses what is not base64, and writes nothing for a pack name that is not one |
 
+### 3.103 A document becomes a record (P12; D-210)
+
+| File | What it proves |
+|---|---|
+| `p12_surfaces/test_intake.py` | A short document is one section; headings start sections that join while they fit; a block too big is cut between paragraphs and a paragraph too big is cut hard; the Writer's field list names every field with its kind and description (never schema, id, generation, writers_notes); a two-section document makes one call per section, each seeing its own text and the field list, and merges into one draft — a filled field never overwritten, lists grown — with the model's conflicts and the missing fields listed and progress per section; a section the model fails is listed; lore comes out as a `.md` draft; an empty document calls nothing; the Content screen's message answers at once with the number of sections, then pushes progress and the result — a draft, never canon |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

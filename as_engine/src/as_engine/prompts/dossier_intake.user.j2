@@ -1,5 +1,7 @@
 Target record: {{ ctx.target_kind }} (pack: {{ ctx.pack_id }})
-Field names you may fill are listed in the schema you must follow.
-
+{% if ctx.fields %}FIELDS YOU MAY FILL (dotted paths; leave out every field this section does not support):
+{{ ctx.fields }}
+{% else %}Field names you may fill are listed in the schema you must follow.
+{% endif %}
 DOCUMENT SECTION
 {{ ctx.source_text }}

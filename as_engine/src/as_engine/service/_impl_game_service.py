@@ -782,7 +782,44 @@ class GameService:
                                                      ref=res.ref))]
 
     async def on_intake_start(self, msg):
-        raise NotImplementedError("P12")
+        import base64
+        import binascii
+
+        from ..content.importers import docx_text, intake_document, intake_sections
+        from ..contracts.protocol import OutImportResult, OutIntakeProgress
+        G = _G()
+        self._not_busy()
+        if getattr(self, "intake_task", None) is not None and not self.intake_task.done():
+            raise G.ServiceError("busy", G.BUSY)
+        try:
+            data = base64.b64decode(msg.data_b64, validate=True)
+        except (binascii.Error, ValueError):
+            raise G.ServiceError("bad_request", G.BAD_REQUEST.format(where="data_b64", problem="is not base64")) from None
+        name = Path(msg.filename.replace("\\", "/")).name
+        if not name:
+            raise G.ServiceError("bad_request", G.BAD_REQUEST.format(where="filename", problem="has no name"))
+        if name.lower().endswith(".docx"):
+            try:
+                text = docx_text(data)
+            except ValueError:
+                return [out("intake_result", OutImportResult(ok=False, errors=[f"{name}: is not a Word document the game can read."]))]
+        else:
+            text = data.decode("utf-8", "replace")
+
+        async def step(i, n):
+            await self.push(out("intake_progress", OutIntakeProgress(name=name, done=i, total=n)))
+
+        async def run():
+            try:
+                res = await intake_document(self.client, text, msg.target_kind, msg.pack_id, Path(self.config.content_dir),
+                                            name=name, on_section=step)
+                done = OutImportResult(ok=res.ok, draft_path=res.draft_path, gaps=res.gaps, errors=res.errors, ref=res.ref)
+            except Exception:  # noqa: BLE001
+                log.exception("intake failed")
+                done = OutImportResult(ok=False, errors=[G.INTERNAL])
+            await self.push(out("intake_result", done))
+        self.intake_task = asyncio.create_task(run())
+        return [out("intake_progress", OutIntakeProgress(name=name, done=0, total=len(intake_sections(text))))]
 
     async def on_quickmake_pc(self, msg):
         raise NotImplementedError("P12")
