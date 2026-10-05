@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-791 ids; 535 with their own statement, 256 named only in context.
+794 ids; 538 with their own statement, 256 named only in context.
 
 
 ## ABUSE
@@ -150,7 +150,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-035 | A day and more without sleep wears a person's will down, and more every eight hours after. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-036 | Being hurt by someone you were not fighting costs them your trust, makes you afraid of them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_putting_down_the_dead.py` |
 | CAS-037 | Seeing someone hurt a person who was not fighting them costs the attacker the onlookers' trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
-| CAS-038 | A threat made with a weapon in hand leaves whoever it was made to afraid of the one who made it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py` |
+| CAS-038 | A threat made with a weapon in hand leaves whoever it was made to afraid of the one who made it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_your_own.py` |
 | CAS-039 | Seeing someone take what is yours costs them your trust, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_is_done_lasts.py` |
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-040 | Seeing someone hurt a person you love, who was not fighting them, is not forgiven. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
@@ -169,6 +169,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-052 | Seeing someone hit a person who had their hands up costs them your trust, shakes you, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_up.py` |
 | CAS-053 | Seeing someone kill a person who had given up shakes everyone who saw it, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_up.py` |
 | CAS-054 | Killing someone who had given up costs the killer the trust of everyone who saw it, even when they had been fighting before. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_up.py` |
+| CAS-055 | Seeing someone you love threatened at weapon point costs the one who did it your trust, and you resent them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_your_own.py` |
+| CAS-056 | Seeing someone strip the body of someone you loved is held against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_your_own.py` |
+| CAS-057 | Seeing someone strip a living person who cannot stop them costs them your trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_your_own.py` |
 | CAS-06 | CAS-06 schedule_event, and any rule with delay_s > 0, enqueues a CASCADE_EFFECT queue row (kernel.clock.QUEUE_TYPES) instead of emitting now: kernel.clock.schedule(tx, due, 'CASCADE_EFFECT', target, {rule_id, effect_ind… | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_engine/turn/timers.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py`, `contract/p09_society/test_timers_society.py` |
 | CAS-07 | CAS-07 an effect whose target resolves to no ids is a no-op, not an error; the rule still counts as fired for the decision audit. | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |

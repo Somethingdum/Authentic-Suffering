@@ -869,6 +869,22 @@ def _gave_up(seen):
     return out
 
 
+def _threatened(tx, trigger, event_id):
+    """D-126: who a SPEECH threatened at weapon point (addressed, armed at them, a threat in its words), the PC
+    included; never the speaker."""
+    from ..mind.firewall import classify_form
+    out = []
+    for h, det in tx.query("SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' ORDER BY "
+                           "holder_id", (event_id,)):
+        d = json.loads(det) if isinstance(det, str) else (det or {})
+        if not (d.get("addressed_to_me") and d.get("armed_at_me")) or h == trigger.actor_id:
+            continue
+        form = classify_form(d.get("words") or "")
+        if (form.value if hasattr(form, "value") else form) == "threat":
+            out.append(h)
+    return sorted(set(out))
+
+
 def _theft_victims(tx, event_id):
     """D-129: of a taking's witnesses, those who believe the thing is their own or their household's."""
     ev = _row(tx, "SELECT actor_id, payload FROM events WHERE event_id=?", (event_id,))
@@ -984,18 +1000,17 @@ def select(tx, selector, trigger):
                 out.append(h)
         return out
     if fn == "threatened_by":                                        # D-126: a threat at weapon point
-        from ..mind.firewall import classify_form
         from ..society._impl_society import _controller
-        out = []
-        for h, det in tx.query("SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' ORDER BY "
-                               "holder_id", (v,)):
-            d = json.loads(det) if isinstance(det, str) else (det or {})
-            if not (d.get("addressed_to_me") and d.get("armed_at_me")) or h == trigger.actor_id or _controller(tx, h) == "human":
-                continue
-            form = classify_form(d.get("words") or "")
-            if (form.value if hasattr(form, "value") else form) == "threat":
-                out.append(h)
-        return sorted(set(out))
+        return [h for h in _threatened(tx, trigger, v) if _controller(tx, h) != "human"]
+    if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
+        from ..society._impl_society import _controller
+        them = _threatened(tx, trigger, v)
+        if not them:
+            return []
+        heard = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel IN ('speech','visual') "
+                                        "AND fidelity IN ('exact','partial')", (v,))}
+        return sorted(h for h in heard - set(them) - {trigger.actor_id}
+                      if _controller(tx, h) != "human" and any(_bonded_to(tx, h, x) for x in them))
     if fn == "settlements_seeing":                                   # D-124
         from ..society._impl_society import settlement_of as _stl_of
         dead = (trigger.payload or {}).get("body_id")

@@ -75,6 +75,11 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               a threat in themselves (mind.firewall.classify_form without
                                               the weapon: "or I'll", "I'll kill you" — an armed "Quiet."
                                               is not one); never the speaker or the PC
+    loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
+                                              EXACT or PARTIAL percept of it bonded (affection >= 1, or
+                                              one household) to someone it threatened at weapon point
+                                              (as threatened_by, the PC counted among those threatened);
+                                              never the speaker, one threatened, or the PC
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)

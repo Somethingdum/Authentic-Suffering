@@ -572,3 +572,53 @@
       payload: {toward: "$trigger.killer", axis: trust, delta: -2, cause: killed_one_who_gave_up}
   delay_s: 0
   cites: [D-135, D-119]
+# D-138 — someone you love at gunpoint, and the body of someone you loved stripped. A threat at weapon point frightens
+# the one it is made to (CAS-038); whoever loves them — the player's character among those threatened — holds it
+# against the one who made it. Taking clothes from the dead is how people live now, unless the dead was yours.
+- schema: as.cascade.v1
+  id: CAS-055
+  description: Seeing someone you love threatened at weapon point costs the one who did it your trust, and you resent them.
+  trigger_event: SPEECH
+  where: {armed: true}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_threatened(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: threatened_your_own}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_threatened(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: threatened_your_own}
+  delay_s: 0
+  cites: [D-138, D-126]
+- schema: as.cascade.v1
+  id: CAS-056
+  description: Seeing someone strip the body of someone you loved is held against them.
+  trigger_event: ACTION_START
+  where: {def_id: strip_clothing}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: stripped_your_own}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} stripped the clothes off someone you loved while they lay there.", strength: 2}
+  delay_s: 0
+  cites: [D-138]
+- schema: as.cascade.v1
+  id: CAS-057
+  description: Seeing someone strip a living person who cannot stop them costs them your trust.
+  trigger_event: ACTION_START
+  where: {def_id: strip_clothing}
+  preconditions: ["body(trigger.payload.target_id).alive == 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: stripped_the_helpless}
+  delay_s: 0
+  cites: [D-138]

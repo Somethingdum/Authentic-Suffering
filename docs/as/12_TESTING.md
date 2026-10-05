@@ -504,7 +504,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p05_many_actors/test_what_makes_you_look_up.py` | Material percepts (REACT-01): Mara takes a knife out of her pocket — news to June; glasses out of a pocket are not. Alice pulls at June's clothes — news to June and to Mara, who loves her, not to Owen. Owen takes the ledger out of Alice's hand — news to her. Mara beckons June — news to June; a shrug is news to nobody. June swung at Mara and Mara holds up empty hands — news to June alone; a minute and a half later it is no fight |
+| `p05_many_actors/test_what_makes_you_look_up.py` | Material percepts (REACT-01): Mara takes a knife out of her pocket — news to June; glasses out of a pocket are not. June lies dead and Alice starts taking her clothes — news to Mara, who loved her, not to Owen. Owen takes the ledger out of Alice's hand — news to her. Mara beckons June — news to June; a shrug is news to nobody. June swung at Mara and Mara holds up empty hands — news to June alone; a minute and a half later it is no fight |
+
+### 3.52 Your own (P9; D-138)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_your_own.py` | Owen holds his Glock on June and threatens her: June fears him (CAS-038), Mara, who loves her, trusts him less and resents him (CAS-055), Alice is unmoved. Alice holds a knife on Owen: nothing is written into Owen, but June, who has come to love him, holds it against Alice. June lies dead and Alice strips her: Mara trusts Alice less and holds a grudge (CAS-056), CAS-057 does not fire (the dead are stripped every day). June out cold and stripped: Mara trusts Alice 2 less in all (CAS-056, CAS-057); Owen unchanged |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

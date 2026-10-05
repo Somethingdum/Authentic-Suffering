@@ -1,9 +1,9 @@
 """What makes you look up (D-137). Rule REACT-01 (action/reactions.py material_holders).
 
 A reaction inside the turn used to need a blow, a gun pointed, a word to you, a loud noise or the dead coming
-near. Someone drawing a knife beside you, pulling your clothes off, taking what is yours out of your hand,
-beckoning you, or the one you were fighting putting their hands up — all waited for next turn, while the world
-went on around you. Now each is news the moment you see it.
+near. Someone drawing a knife beside you, stripping the body of someone you loved, taking what is yours out of
+your hand, beckoning you, or the one you were fighting putting their hands up — all waited for next turn, while
+the world went on around you. Now each is news the moment you see it.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from as_engine.action.effects import SEEN
 from as_engine.action.reactions import material_holders
 from as_engine.contracts.events import Event, EventType
 from as_engine.mind import perception
-from as_engine.physical import objects, space
+from as_engine.physical import bodies, objects, space
 from as_engine.physical.objects import Holder
 from as_engine.testing.scenario import load_scenario
 
@@ -90,11 +90,13 @@ def test_a_knife_drawn(floor):
     assert seen(w, start(w, "mara", "equip_item", t + 5000, verb="manipulate", item=glasses), t + 5200) == set()
 
 
-def test_something_done_to_you(floor):
-    """Alice pulls at June's clothes: it is news to June, and to Mara, who loves her — not to Owen."""
+def test_something_done_to_yours(floor):
+    """June is dead on the floor and Alice starts taking her clothes: it is news to Mara, who loved her — not to Owen."""
     w = floor()
     t = now(w)
-    assert seen(w, start(w, "alice", "strip_clothing", t + 500, verb="manipulate", target="june"), t + 700) == {"june", "mara"}
+    with w.store.transaction() as tx:
+        bodies.kill(tx, w.id("june"), "blood_loss", t + 100, 0, w.rng)
+    assert seen(w, start(w, "alice", "strip_clothing", t + 500, verb="manipulate", target="june"), t + 700) == {"mara"}
 
 
 def test_your_things_taken(floor):

@@ -150,8 +150,8 @@ hold a percept from a second after a reaction that comes before it. Every mind d
 had perceived **by its own moment** — the packet, the options, recall and salience read only
 percepts with `at <= at` (SKULL-10, D-63). What is material also covers the dead: one of them seen
 moving to within 20 m is news to whoever sees it, and it ends the player's watch (REACT-01, D-65).
-And (D-137) a weapon drawn within 20 m, something done to you or someone you love (clothes pulled
-off, a body cut), what is yours taken, a gesture made at you, and the one you were fighting
+And (D-137) a weapon drawn within 20 m, something done to you or someone you love, even dead
+(their clothes taken, their body cut), what is yours taken, a gesture made at you, and the one you were fighting
 putting their hands up: each is news the moment it is seen — a reaction wave for the people, and
 for the PC the window closes on it so the player answers.
 
