@@ -93,7 +93,10 @@ narrate(client, packet, style_rules, numbers, *, config, all_known_names, turn_i
   voice (few sentences of was / were and a participle), no mood named in the abstract, and a
   person named only by a name of packet.allowed_names — listed as f"Names {pc} knows (use no other
   proper name outside quoted speech; describe anyone else): {', '.join(allowed_names)}" when not
-  empty. Every draft thrown away is a whole new one on the slow lane.
+  empty. Every draft thrown away is a whole new one on the slow lane. (D-157) A speech line shows
+  its speaker with a capital first letter and its exact words; one whose words are None (only
+  the tone was heard) shows its text ("A woman says quietly; the words are lost.") — never a
+  quoted "None" for the prose to put in someone's mouth.
   A call whose parse_status is not 'ok' or whose text is empty after strip() still counts as an
   attempt and leaves ``fix`` as it was. The draft is the text stripped. Each draft: report =
   lint.lint_prose(draft, packet, style_rules, numbers, all_known_names); when the code lint

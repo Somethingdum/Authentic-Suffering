@@ -19,7 +19,7 @@ TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
 {% for l in k.pc_state_lines %}- {{ l }}
 {% endfor %}{% endif %}
 WHAT {{ k.pc_name | upper }} PERCEIVED, IN ORDER
-{% for l in k.lines %}- at +{{ '%.1f' % l.seconds }}s ({{ l.kind }}): {% if l.kind == 'speech' %}{{ l.speaker or 'Someone' }} said: "{{ l.words }}"{% else %}{{ l.text }}{% endif %}
+{% for l in k.lines %}{% set who = l.speaker or 'Someone' %}- at +{{ '%.1f' % l.seconds }}s ({{ l.kind }}): {% if l.kind == 'speech' and l.words %}{{ who[:1] | upper }}{{ who[1:] }} said: "{{ l.words }}"{% else %}{{ l.text }}{% endif %}
 
 {% else %}- Nothing changes.
 {% endfor %}

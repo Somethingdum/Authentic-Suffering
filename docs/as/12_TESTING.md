@@ -606,7 +606,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p07_slice/test_what_the_lint_wants.py` | The narration prompt states the lint's rules before any draft (no three sentences in a row starting with the same word, the active voice, no moods named) and lists the names the PC knows, the packet's allowed_names; no names, no list |
+| `p07_slice/test_what_the_lint_wants.py` | The narration prompt states the lint's rules before any draft (no three sentences in a row starting with the same word, the active voice, no moods named) and lists the names the PC knows, the packet's allowed_names; no names, no list; (D-157) a line of which only the tone was heard shows what was heard, never a quoted "None", to the Writer and to the judge, and a speaker is capitalised |
 
 ### 3.69 Nobody to calm (P4; D-155)
 
