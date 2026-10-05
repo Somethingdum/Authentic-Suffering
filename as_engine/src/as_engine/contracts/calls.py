@@ -29,7 +29,7 @@ class PersonVoiceContext(Strict):
     """PERSON_VOICE input (D-149, service.background BG-03): who they are, how their card says they talk, what
     they have actually said, and what they have been through with the PC — all of it their own."""
     name: str
-    card: list[str] = Field(default_factory=list, description="Plain lines: age, work, generation, the voice capsule and "
+    card: list[str] = Field(default_factory=list, description="Plain lines: age, work, (D-261) where they come from, generation, the voice capsule and "
                             "tendencies, the three example lines, motive, past wound.")
     lines_said: list[str] = Field(default_factory=list, description="What they have said aloud, oldest first.")
     with_pc: list[str] = Field(default_factory=list, description="Their own memories of the PC, oldest first.")

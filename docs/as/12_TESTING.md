@@ -1098,6 +1098,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_the_writer_knows_where_they_come_from.py` | Every WORLDGEN_ACTOR brief says where that person comes from and what they did before the Fall, exactly as their card keeps it, and what they are in the middle of |
 
+### 3.150 How they sound (P10; D-261)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_how_they_sound.py` | The card a voice is written from says where they come from and, in the dossier's own words, how they sound; a dossier with no dialect notes adds no line and no blank |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -104,8 +104,9 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   saw the same row) is not retold to nobody; if it ever reaches someone new, it goes as it began.
   voicing (D-149): in one read transaction, d = mind.actor.fused(tx, actor); PersonVoiceContext(name =
   the first word of its display name, card = [f"{age}, {sex}; {occupation_now} (before: {occupation_before})",
-  the cohort as words, f"How they talk: {voice.capsule}", f"Habits of speech: {'; '.join(tendencies)}" (D-246:
-  left out when the capsule already holds every one of them),
+  (D-261) f"From: {birthplace}", the cohort as words, f"How they talk: {voice.capsule}", f"Habits of speech: {'; '.join(tendencies)}" (D-246:
+  left out when the capsule already holds every one of them), (D-261) f"How they sound: {voice.dialect_notes}" when there
+  are any — where someone grew up and the way their speech sounds are most of what a voice is,
   each exemplar as f'When nothing is at stake: "{low_stakes}"' / f'Under pressure: ...' / f'At the
   end of their rope: ...', f"What they want: {motive.motive}", f"What happened to them: {motive.past_wound}"],
   lines_said = the text of their newest R.voice_lines voice_lines rows (by at, line_id), oldest first,
