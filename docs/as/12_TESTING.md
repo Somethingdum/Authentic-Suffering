@@ -1080,6 +1080,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_on_their_mind.py` | Alice's quiet-moment packet holds two of what might be on her mind (her work, a loop, a fear, what people here say, what she grew up hearing) and the prompt shows them; over four turns it is not always the same two; when something was just said to her, none |
 
+### 3.147 One thing to take off (P4; D-258)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_one_thing_to_take_off.py` | In a generated world, everyone who wears two things or more is offered at most one to take off on the first menu, after every other thing to do with their hands; the clothing defs are tagged 'clothing' and stripping the dead 'loot' |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

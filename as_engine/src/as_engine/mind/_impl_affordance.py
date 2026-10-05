@@ -673,6 +673,11 @@ def _opt_distance(c, ba, att, dist_from_me):
     return dist_from_me
 
 
+def _wardrobe(ba):
+    """D-258: a change of one's own clothes (a def tagged 'clothing', not 'loot')."""
+    return "clothing" in ba.tags and "loot" not in ba.tags
+
+
 def _pressing(c, ba):
     """D-182: an option that answers a need at stage NEED_PRESSING or more (food, water, rest)."""
     from .affordance import NEED_PRESSING
@@ -774,7 +779,9 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
         if g == 3:                       # D-181: going somewhere else before moving about the room
             return 0 if (ba.destination_id or "").startswith("plc_") or not (ba.destination_id or ba.target_id) else 1
         if g == 4:                       # D-182: what the body is crying out for first
-            return 0 if _pressing(c, ba) else 1
+            if _pressing(c, ba):
+                return 0
+            return 2 if _wardrobe(ba) else 1   # D-258: changing clothes never crowds out doing something
         if g != 6:
             return 0
         if "freeze" in ba.tags or (not c.threats and _pressing(c, ba)):
@@ -792,7 +799,7 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
     for x in cands:
         g = _group(c, x[2])
         n = per_def.get(x[2].def_id, 0)
-        if n >= 3:
+        if n >= (1 if _wardrobe(x[2]) else 3):          # D-258: one piece of clothing offered, not three
             continue
         per_def[x[2].def_id] = n + 1
         groups.setdefault(g, []).append(x)

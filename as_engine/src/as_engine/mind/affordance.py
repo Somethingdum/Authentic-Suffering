@@ -197,7 +197,9 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
                   side door to the yard is never crowded out by four ways to reach the car;
     act group     (D-182) 0 an option that answers a PRESSING need — tagged 'food' with the
                   actor's needs.hunger_stage >= NEED_PRESSING, 'water' with thirst_stage >= it —
-                  1 the rest: the starving see the food they carry first;
+                  1 the rest: the starving see the food they carry first; (D-258) 2 a change of one's own
+                  clothes (a def tagged 'clothing', not 'loot'): taking off a jacket never crowds out
+                  doing something;
     hold group    0 defs tagged 'freeze' and (D-182, only with no threat this turn) defs tagged
                   'rest' when fatigue_stage >= NEED_PRESSING — the exhausted see sleep; 1 verb
                   OBSERVE, 2 verb GUARD, 3 the rest (so 'stay where you are' and 'watch' are never
@@ -208,7 +210,8 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
   goes: the source point when the source is in its place, else the point on its side of the portal
   the sound arrived through (percept detail 'via_portal'); with no sound this turn, the actor's
   own position. (So after a crash out back the anchors toward the storeroom door come first.)
-  Walking the sorted list, each group keeps at most 3 options per def_id. The packet list is then
+  Walking the sorted list, each group keeps at most 3 options per def_id — (D-258) 1 for a change of one's
+  own clothes: "Take off your sweatshirt", "... your jacket", "... your jeans" took three places of a menu. The packet list is then
   filled ROUND-ROBIN: round 1 takes the first option of every non-empty group in rank order, round
   2 the second of each, and so on, until PacketRules.max_affordances options are taken or every
   group is exhausted — every kind of response gets a slot before any kind gets a second one (a
