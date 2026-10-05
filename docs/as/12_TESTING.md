@@ -978,6 +978,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p10_world/test_a_voice_that_reads.py` | Every generated habit starts with something they do and calls them nothing like "they"; a generated person's capsule is their name and their two habits, and the card lists each habit as a sentence, for a child, a teenager, an adult and an elder; a way named "the way to the alley" is "The way to the alley is open." and is watched as "Watch the way to the alley" |
 | `p12_surfaces/test_the_door_by_name.py` | "Open the office door" tells the Boss "The office door is open now." |
 
+### 3.130 What they are in the middle of (P10; D-238)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_what_they_are_in_the_middle_of.py` | A new run's Owen is working on the opening's first objective, and his card says so — never "decided at worldgen" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

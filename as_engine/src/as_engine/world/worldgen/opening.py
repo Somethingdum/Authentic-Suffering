@@ -80,6 +80,11 @@ async place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region, peo
     its budget at a word boundary. QC-4: cites_entity_ids non-empty and all among the listed ids,
     cites_params non-empty and all A/B names. Failing -> one more call with fields['error'] = the
     problem; failing again -> fallback_opening(...) (code; qc patch "QC-4: opening written by code").
+    (D-238) Then what the run has them in the middle of: MATERIALIZE {actor_id: the PC, source:
+    'opening'} (writer 'mind.actor', origin 'worldgen', actor_id = the PC) inserting a dossier_deltas
+    row {path 'life.current_project', op 'set', value = the opening's first_objective, event_id
+    'opening', at} — a pack PC's own project is the card's placeholder ("— decided at worldgen."),
+    which every prompt of theirs showed as what they were working on.
   7 PC survival history (WG-33): texts = the non-empty recap fields formative_incident_1,
     formative_incident_2, unresolved_complication, survival_pattern (in that order, at most 5), then
     code lines f"{first name} got through the first weeks near {start zone name}." and f"{first name}

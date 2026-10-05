@@ -1707,6 +1707,10 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
             opening = fallback_opening(pc.identity.name, places[start]["name"], [(c, name_of(c)) for c in contacts], tkind,
                                        threat_ids, tname, values)
             patches.append("QC-4: opening written by code")
+    commit(tx, EventType.MATERIALIZE, "mind.actor", at, [                  # D-238: what they are in the middle of
+        W("dossier_deltas", {"delta_id": tx.mint("ddl"), "actor_id": body, "event_id": "opening", "path": "life.current_project",
+                             "op": "set", "value_json": json.dumps(opening.first_objective), "at": at})],
+        {"actor_id": body, "source": "opening"}, actor_id=body)
     # 7 survival history
     fn = pc.identity.name.split()[0]
     texts = [t for t in (pc.recap.formative_incident_1, pc.recap.formative_incident_2, pc.recap.unresolved_complication,
