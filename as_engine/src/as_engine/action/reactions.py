@@ -5,6 +5,11 @@ material_holders(tx, new_events, turn_index) -> list[tuple[str, int]]
   the pipeline decides what to do with it, L12) that holds a percept of one of ``new_events``
   (percept_log.event_id in their ids), the percept is MATERIAL (REACT-01) when any of:
     a speech percept addressed to the holder at EXACT or PARTIAL;
+    (D-262) a speech percept at EXACT or PARTIAL of a SPEECH whose payload 'to' names a bonded body
+      (as below; not the holder or the speaker) and whose words, as heard, are a threat
+      (mind.firewall.classify_form, no weapon) or hold an entry of mind.temper.INSULT_WORDS —
+      someone you love threatened or called names in front of you; and a visual percept of a GESTURE
+      of action.effects.CONTEMPT_GESTURES whose payload target_id is a bonded body;
     an auditory percept of a NOISE whose payload source_db >= 80, or whose source point is within
       10 m of the holder, at PARTIAL or better;
     a visual percept of a HARM, DEATH or FALSE_DEATH on the holder or on a bonded body (affection

@@ -50,6 +50,14 @@ TEMPER-03 provocations(tx, holder_id, turn_index, at) -> list[Provocation]: read
                    whose payload actor_id is set, is not the holder, and is the source of a visual
                    percept of the holder in the same window (it saw who did it): toward_id = that
                    actor_id
+    threatened_bonded (D-262) a speech percept NOT addressed to the holder, of a SPEECH whose payload 'to'
+                   names a living body, not the source, the holder has affection >= 2 toward, whose words
+                   (classify_form(detail.words, weapon_pointed_at_receiver = the event payload's armed and the
+                   source of a visual percept of the holder in the same window — it sees the weapon in their
+                   hand, as the one spoken to would)) are a THREAT — someone they love threatened in front of them
+    insulted_bonded  (D-262) the same whose words contain an entry of INSULT_WORDS; or a visual percept of a
+                   GESTURE by the source whose payload gesture is in action.effects.CONTEMPT_GESTURES and whose
+                   payload target_id is such a body
     stole_from     a visual percept of an ITEM_TRANSFER by the source of an item the holder
                    believes it owns (a live believed 'owner' claim holding of the holder whose
                    object_value is the holder — as mind.affordance reads ownership)
@@ -195,7 +203,8 @@ INSULT_WORDS: tuple[str, ...] = (
 @dataclass(frozen=True)
 class Provocation:
     toward_id: str
-    kind: str        # struck | shoved | grabbed | threatened | ordered_about | insulted | harmed_bonded | stole_from | reeked | bared
+    kind: str        # struck | shoved | grabbed | threatened | ordered_about | insulted | harmed_bonded | threatened_bonded
+    #                  | insulted_bonded | stole_from | reeked | bared
     event_id: str | None     # None for TEMPER-09's (what they are, not something they did)
 
 
@@ -258,6 +267,12 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
     aa = tx.query_one("SELECT accepted_authority FROM actors WHERE actor_id=?", (holder_id,))
     authority = set(_j.loads(aa[0])) if aa else set()
     rels = {r[0]: r[1] for r in tx.query("SELECT to_id, affection FROM relationships WHERE from_id=?", (holder_id,))}
+
+    def loved(b, src):                                               # D-262: someone they love, alive, not the one saying it
+        if not b or b in (holder_id, src) or rels.get(b, 0) < 2:
+            return False
+        a = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (b,))
+        return bool(a and a[0])
     tm = temper_of(tx, holder_id)
     rages = set(tm.rages_at)
     forgiven = {r[0] for r in tx.query("SELECT json_extract(payload,'$.toward_id') FROM events WHERE type='TEMPER_CHANGE' "
@@ -298,6 +313,10 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
             from ..action.effects import CONTEMPT_GESTURES
             if pl.get("gesture") in CONTEMPT_GESTURES:
                 add(src, "insulted", eid)
+        if ch == "visual" and typ == "GESTURE" and human_src and loved(pl.get("target_id"), src):          # D-262
+            from ..action.effects import CONTEMPT_GESTURES
+            if pl.get("gesture") in CONTEMPT_GESTURES:
+                add(src, "insulted_bonded", eid)
         if ch == "visual" and typ == "ACTION_START" and human_src and pl.get("target_id") == holder_id:
             if pl.get("def_id") == "shove":
                 add(src, "shoved", eid)
@@ -320,6 +339,14 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 else:
                     add(src, "wish_forgiven", eid)
                     forgiven.add(src)
+        dear = [b for b in (pl.get("to") or []) if loved(b, src)] if ch == "speech" and typ == "SPEECH" else []
+        if dear and human_src and not det.get("addressed_to_me"):                                       # D-262
+            words = det.get("words", "") or ""
+            at_them = bool(pl.get("armed")) and src in seen_sources            # what it sees: the weapon in their hand
+            if classify_form(words, weapon_pointed_at_receiver=at_them) == UtteranceForm.THREAT:
+                add(src, "threatened_bonded", eid)
+            if any(_words_have(words, x) for x in INSULT_WORDS):
+                add(src, "insulted_bonded", eid)
         if ch == "visual" and typ == "HARM":
             who = pl.get("actor_id")
             if (pl.get("body_id") and rels.get(pl["body_id"], 0) >= 2 and who and who != holder_id
@@ -349,8 +376,8 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 kept.append(Provocation(pv.toward_id, "ingratitude", pv.event_id))
         out = kept
     order = {k: i for i, k in enumerate(("struck", "shoved", "grabbed", "threatened", "ordered_about", "insulted",
-                                          "harmed_bonded", "stole_from", "worshipped", "wished_upon", "wish_forgiven",
-                                          "ingratitude"))}
+                                          "harmed_bonded", "threatened_bonded", "insulted_bonded", "stole_from",
+                                          "worshipped", "wished_upon", "wish_forgiven", "ingratitude"))}
     # per event, kinds in the documented order; events in percept order
     firsts = {}
     for i, pv in enumerate(out):

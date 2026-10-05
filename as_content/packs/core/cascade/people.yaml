@@ -1556,3 +1556,51 @@
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
   delay_s: 0
   cites: [D-253, D-216]
+# D-262 — said to someone you love. Hurt someone in front of the people who love them and they hated you for it
+# (TEMPER-03 harmed_bonded, CAS-040); hold a gun on them and it cost you (CAS-055). But call a woman's son a useless
+# little shit to his face, or tell her friend you'll break her arm, with nothing in your hand, and she stood there
+# and felt nothing about you. Now she does — once an hour, however often it is said. The player's character is
+# never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-115
+  description: Hearing someone you love threatened, even bare-handed, costs the one who did it your trust, and you resent them.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_threatened_bare(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: threatened_your_own}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_threatened_bare(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: threatened_your_own}
+  delay_s: 0
+  cites: [D-262, D-138]
+- schema: as.cascade.v1
+  id: CAS-116
+  description: Hearing someone you love insulted to their face is something you hold against the one who did it.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_insulted(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: insulted_your_own}
+  delay_s: 0
+  cites: [D-262, D-219]
+- schema: as.cascade.v1
+  id: CAS-117
+  description: Seeing someone you love spat at or given the finger is something you hold against the one who did it.
+  trigger_event: GESTURE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: loved_ones_insulted(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: insulted_your_own}
+  delay_s: 0
+  cites: [D-262, D-204]

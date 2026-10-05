@@ -285,6 +285,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   face, a person carries the story (`insulted_someone`, `threatened_someone` — "Owen insulted you.") — once: the same
   wrong again is the story they already tell — and whoever believes them when it is told thinks less of the one who
   did it (an insult costs a point of respect, a threat a point of trust). The player's character never tells it.
+- **Said to someone you love** (D-262, TEMPER-03, CAS-115..117): whoever hears someone they love threatened — with
+  nothing in the speaker's hand; at weapon point it is CAS-055 — trusts the one who said it a point less and resents
+  them; hearing them called names, or seeing them spat at or given the finger, is resented. Once an hour, however
+  often it is said; it angers them there and then (heat, and a reaction this turn), and enough of it breaks them.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

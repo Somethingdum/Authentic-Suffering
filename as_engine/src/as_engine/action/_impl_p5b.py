@@ -550,6 +550,9 @@ def material_holders(tx, new_events, turn_index):
             mat = True
         if p["channel"] == "speech" and det.get("armed_at_me"):
             mat = True
+        if p["channel"] == "speech" and not mat and ev.type == EventType.SPEECH and p["fidelity"] in ("exact", "partial") \
+                and set(pl.get("to") or []) & (_bonded(tx, h) - {h, ev.actor_id}) and _wounding(det.get("words") or ""):
+            mat = True                                               # D-262: someone you love, threatened or called names
         if p["channel"] == "auditory" and ev.type == EventType.NOISE and p["fidelity"] in ("exact", "partial"):
             if pl.get("source_db", 0) >= 80:
                 mat = True
@@ -583,11 +586,20 @@ def material_holders(tx, new_events, turn_index):
                     if dd is not None and dd <= 20:
                         from .reactions import DEAD_NEAR_M
                         mat = dd <= DEAD_NEAR_M or not _dead_seen_near(tx, h, ev, turn_index)   # D-233
+            if not mat and ev.type == EventType.GESTURE and pl.get("target_id") in bonded - {h, ev.actor_id}:
+                from .effects import CONTEMPT_GESTURES
+                mat = pl.get("gesture") in CONTEMPT_GESTURES         # D-262: spat at in front of you
             if not mat:
                 mat = _looks_up(tx, h, ev, pl, bonded)               # D-137
         if mat and h not in found:
             found[h] = p["at"]
     return sorted(found.items(), key=lambda kv: (kv[1], kv[0]))
+
+
+def _wounding(words):
+    """D-262: words that are a threat (mind.firewall.classify_form, no weapon) or hold an entry of mind.temper.INSULT_WORDS."""
+    from ..mind.temper import INSULT_WORDS, _words_have
+    return _is_threat({"words": words}) or any(_words_have(words, x) for x in INSULT_WORDS)
 
 
 def _dead_seen_near(tx, h, ev, turn_index):
@@ -1163,6 +1175,51 @@ def _to_their_face(tx, trigger, event_id, *, violent):
     return sorted(set(out))
 
 
+def _wronged(tx, event_id, insult):
+    """D-262: (the one who said or did it, its at and seq, who it threatened bare — or, ``insult``, insulted — and the
+    holders who heard or saw it) for a SPEECH (or, insulting, a GESTURE); None when it is neither."""
+    ev = _row(tx, "SELECT type, actor_id, at, seq, payload FROM events WHERE event_id=?", (event_id,))
+    if ev is None or not ev["actor_id"] or ev["type"] not in (("SPEECH", "GESTURE") if insult else ("SPEECH",)):
+        return None
+    who, typ = ev["actor_id"], ev["type"]
+    pl = json.loads(ev["payload"]) if isinstance(ev["payload"], str) else (ev["payload"] or {})
+    chan = "speech" if typ == "SPEECH" else "visual"
+    rows = [(h, json.loads(d) if isinstance(d, str) else (d or {})) for h, d in tx.query(
+        "SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel=? AND fidelity IN ('exact','partial') "
+        "ORDER BY holder_id", (event_id, chan))]
+    if not insult:
+        them = {h for h, d in rows if h != who and d.get("addressed_to_me") and not d.get("armed_at_me") and _is_threat(d)}
+    elif typ == "GESTURE":
+        t = pl.get("target_id")
+        them = {t} if t and t != who and _insult_in(tx, typ, who, pl, {}, t) else set()
+    else:
+        them = {h for h, d in rows if h != who and _insult_in(tx, typ, who, pl, d, h)}
+    return who, ev["at"], ev["seq"], them, [h for h, _d in rows]
+
+
+def _loved_ones_wronged(tx, event_id, insult):
+    """D-262: who saw or heard someone they are bonded to threatened bare (or insulted) — once an hour per one who did
+    it. Never the one who did it, one wronged, or the PC."""
+    from ..society._impl_society import _controller
+    w = _wronged(tx, event_id, insult)
+    if w is None or not w[3]:
+        return []
+    who, at, seq, them, holders = w
+    out = []
+    for h in sorted(set(holders) - them - {who}):
+        if _controller(tx, h) in (None, "human") or not any(_bonded_to(tx, h, x) for x in sorted(them)):
+            continue
+        types = "('SPEECH','GESTURE')" if insult else "('SPEECH')"
+        before = [r[0] for r in tx.query(f"SELECT DISTINCT e.event_id FROM percept_log p JOIN events e ON e.event_id=p.event_id "
+                                         f"WHERE p.holder_id=? AND e.actor_id=? AND e.type IN {types} AND e.at>? AND e.seq<?",
+                                         (h, who, at - 3_600_000, seq))]
+        if any((lambda b: b is not None and any(_bonded_to(tx, h, x) for x in sorted(b[3]) if x != h))(_wronged(tx, e, insult))
+               for e in before):
+            continue                                             # once an hour, however often
+        out.append(h)
+    return out
+
+
 def _insult_in(tx, typ, actor, payload, detail, holder):
     """D-219: is this SPEECH percept (detail) or GESTURE (payload) an insult made at ``holder``?"""
     if typ == "GESTURE":
@@ -1596,6 +1653,10 @@ def select(tx, selector, trigger):
                                         "AND fidelity IN ('exact','partial')", (v,))}
         return sorted(h for h in heard - set(them) - {trigger.actor_id}
                       if _controller(tx, h) != "human" and any(_bonded_to(tx, h, x) for x in them))
+    if fn == "loved_ones_threatened_bare":                           # D-262: someone you love, threatened bare-handed
+        return _loved_ones_wronged(tx, v, insult=False)
+    if fn == "loved_ones_insulted":                                  # D-262: someone you love, insulted
+        return _loved_ones_wronged(tx, v, insult=True)
     if fn == "settlements_seeing":                                   # D-124
         from ..society._impl_society import settlement_of as _stl_of
         dead = (trigger.payload or {}).get("body_id")

@@ -226,6 +226,24 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               one household) to someone it threatened at weapon point
                                               (as threatened_by, the PC counted among those threatened);
                                               never the speaker, one threatened, or the PC
+    loved_ones_threatened_bare(<path>)        (D-262) for a SPEECH: the holders of a speech EXACT or
+                                              PARTIAL percept of it bonded (as loved_ones_threatened) to
+                                              someone it threatened with nothing pointed at them (a speech
+                                              percept of it addressed to them, not armed_at_me, whose words
+                                              as heard are a threat; the PC counted among them), unless
+                                              they held such a threat by the speaker at someone they are
+                                              bonded to in the hour before (an earlier SPEECH by the
+                                              speaker, by seq); never the speaker, one threatened, or the PC
+    loved_ones_insulted(<path>)               (D-262) for a SPEECH or a GESTURE: the holders of an EXACT or
+                                              PARTIAL percept of it (speech for a SPEECH, visual for a
+                                              GESTURE) bonded to someone it insulted — a speech percept of
+                                              it addressed to them whose words hold an entry of
+                                              mind.temper.INSULT_WORDS (the PC counted among them), or the
+                                              gesture's payload target_id for one of
+                                              action.effects.CONTEMPT_GESTURES — unless they held such an
+                                              insult by the same one at someone they are bonded to in the
+                                              hour before (by seq); never the one who made it, one
+                                              insulted, or the PC
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)

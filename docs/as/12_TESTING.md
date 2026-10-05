@@ -1104,6 +1104,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_how_they_sound.py` | The card a voice is written from says where they come from and, in the dossier's own words, how they sound; a dossier with no dialect notes adds no line and no blank |
 
+### 3.151 Said to someone you love (P9; D-262)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_said_to_someone_you_love.py` | Owen calls June a useless bitch, or says he'll break her arm, with Mara beside her: Mara is provoked (insulted_bonded / threatened_bonded, with the strain a threat costs) and Alice, to whom June is nothing, is not; Mara resents him (CAS-116) or trusts him less and resents him (CAS-115), once an hour; an order is a threat to June only with the gun on her, and a threat at gunpoint is CAS-055's; spitting at June is CAS-117's; the PC's anger is on record but no rule ever selects the PC |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
