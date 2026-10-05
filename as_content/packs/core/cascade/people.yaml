@@ -823,3 +823,22 @@
       payload: {about: "$trigger.actor_id", claim: shut_someone_out, seen: true}
   delay_s: 0
   cites: [D-163, D-162]
+# D-180 — someone you love nearly killed. A shot at a person you love that missed was answered like any
+# onlooker's (CAS-068): a little less trust, a little wary. Watching someone try to kill your own is not that.
+- schema: as.cascade.v1
+  id: CAS-071
+  description: Seeing someone try to kill a person you love, who was not fighting them, is not forgiven.
+  trigger_event: ACTION_COMPLETE
+  where: {}
+  preconditions: ["trigger.missed_provoked == false", "trigger.missed_lethal == true"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: bonded_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.missed_attacker", axis: trust, delta: -1, cause: tried_to_kill_my_own}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: bonded_onlookers_of(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.missed_attacker", text: "{subject} tried to kill {whom}, someone you love.", strength: 3, whom: "$trigger.missed_target"}
+  delay_s: 0
+  cites: [D-180, D-161, D-129]

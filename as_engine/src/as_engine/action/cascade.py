@@ -50,7 +50,9 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     bonded_onlookers_of(<path>)               (D-129) for a HARM with trigger.attacker: of
                                               assault_onlookers_of, for a DEATH with trigger.killer: of
                                               onlookers_of — those bonded to the one hurt or killed
-                                              (affection >= 1 toward them, or one household)
+                                              (affection >= 1 toward them, or one household); (D-180)
+                                              for an ACTION_COMPLETE with trigger.missed_attacker: of
+                                              attack_onlookers_of, bonded to trigger.missed_target
     humiliated_by(<path>)                     (D-129) for a SPEECH: the holders of an EXACT or PARTIAL
                                               speech percept of it addressed to them whose words hold an
                                               entry of mind.temper.INSULT_WORDS (whole words), when

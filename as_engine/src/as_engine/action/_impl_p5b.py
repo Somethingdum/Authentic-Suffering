@@ -1064,6 +1064,9 @@ def select(tx, selector, trigger):
         from ..society._impl_society import _controller
         return [h for h in _theft_victims(tx, v) if _controller(tx, h) != "human"]
     if fn == "bonded_onlookers_of":                                  # D-129: someone they love, hurt or killed
+        missed = _missed(tx, trigger)
+        if missed is not None:                                       # D-180: ... or nearly
+            return [h for h in select(tx, "attack_onlookers_of(trigger.event_id)", trigger) if _bonded_to(tx, h, missed[1])]
         body = (trigger.payload or {}).get("body_id")
         seen = select(tx, "assault_onlookers_of(trigger.event_id)", trigger) if _assault(tx, trigger) is not None \
             else _onlookers(tx, trigger, v)
