@@ -45,7 +45,10 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   skill (domain, rank): atlas.ROLE_PEOPLE[role] for a post, ('leader', 'leadership', 2) for a
   leader, rng.choice(atlas.FREE_OCCUPATIONS) for an adult or elder resident, ('child', none) for
   younger ones; special = 3 + rng.range_int(0, 4) per letter in 'SPECIAL' order; variant =
-  rng.range_int(0, 999). Dossier = skeleton_dossier(seed) (implemented below).
+  rng.range_int(0, 999). Dossier = skeleton_dossier(seed) (implemented below), the seeds dealt in slot
+  order with (D-199) voices_taken = the first lines already given out in the same settlement and (D-245)
+  voices_heard = world_voices(tx) then every first line given out before in this stage (WG8's raider gang
+  likewise: voices_taken = the gang's, voices_heard = world_voices(tx)).
   The FIRST T['llm_dossiers'] generated people (slot order) get a WORLDGEN_ACTOR call each, all
   started together (asyncio.gather) and applied in slot order (P10: await progress(done, total) as each
   answer arrives, whatever its outcome): context WorldgenContext(stage='WG6',
@@ -156,6 +159,7 @@ class PersonSeed:
     group_name: str
     climate_heat: int = 5       # LOOK-10: the region's climate_heat (1-10); what they dress for
     voices_taken: tuple[str, ...] = ()   # D-199: the first lines of the voices already given out where they live
+    voices_heard: tuple[str, ...] = ()   # D-245: the first lines of the voices already given out anywhere in the world
 
 
 @dataclass
@@ -662,6 +666,12 @@ _SETTLERS: tuple[str, ...] = (
 )
 
 
+def world_voices(tx) -> tuple[str, ...]:
+    """D-245: the first lines (voice.exemplars.low_stakes) of every dossier in the world, by dossier_id (implemented)."""
+    return tuple(r[0] for r in tx.query("SELECT json_extract(baseline_json, '$.voice.exemplars.low_stakes') FROM dossiers "
+                                        "ORDER BY dossier_id") if r[0])
+
+
 def skeleton_dossier(seed: PersonSeed) -> dict:
     """A VALID generated ActorDossier dict from a PersonSeed (implemented; deterministic).
     Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the
@@ -672,7 +682,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     (an elder draws from the adult voices and the elders' own; nobody born after the Fall draws one that
     remembers the world before it) — and the profanity follows it: (D-199) a voice whose first line is in
     seed.voices_taken is drawn only when every voice open to them is taken — nobody in one place sounds like
-    someone else there while there are voices left; someone who
+    someone else there while there are voices left; (D-245) and of those, one whose first line is in
+    seed.voices_heard only when every one of them is — a settler and a Ghost two miles apart do not greet the
+    player with the same words while the world has voices left; someone who
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
     everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
     unlocked field of it."""
@@ -689,6 +701,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         pairs = tuple(p for p in pairs if not any(k in " ".join(p[0] + p[1]) for k in ("before", "old world", "old words",
                                                                                       "old city", "used to say")))
     pairs = tuple(p for p in pairs if p[1][0] not in seed.voices_taken) or pairs    # D-199: not a voice already here
+    pairs = tuple(p for p in pairs if p[1][0] not in seed.voices_heard) or pairs    # D-245: nor one heard anywhere yet
     tend, ex = _draw(seed, "voice", pairs)                             # D-143: the lines go with the voice
     swear = _draw(seed, "profanity", ("none", "rare", "rare", "frequent", "constant"))
     if any("swear" in x for x in tend):

@@ -1014,6 +1014,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_said_once.py` | Mara with a generated voice: the capsule once, no "How you talk:" repeating it, "How you sound: drops the 'g' on every -ing."; a written voice keeps its habits line |
 
+### 3.136 No two strangers alike (P10; D-245)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_no_two_strangers_alike.py` | A standard world (seed 7, where three pairs of strangers shared a voice) has no two generated people with the same first line; a seed whose every voice but one has been heard gets that one |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
