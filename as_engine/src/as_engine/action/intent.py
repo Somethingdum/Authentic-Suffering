@@ -102,9 +102,12 @@ segments(text) -> list[str]   (SEG-01, P5; Actor Spec §9: a long speech does no
   The words of ``text`` (whitespace-separated), in order, cut into segments of at most
   SEGMENT_WORDS (8): each segment takes the next 8 words; when more words follow those 8, it ends
   instead after the LAST of its words 4..8 (counting from 1) that ends with one of . , ; : ! ? …
-  or — when there is one, else after the 8th. Words are joined with single spaces; an empty text
-  -> []. ('June, stay where you are. Nita is checking the cans out back.' -> ['June, stay where
-  you are.', 'Nita is checking the cans out back.'])
+  or — when there is one, else after the 8th — (D-239) except that when none of them ends a clause
+  and only 1 to 3 words would follow its 8th, it takes half of the words left, rounded up, so a word
+  is not left to be said on its own seconds later ('I ask the nearest person what's going on here.'
+  -> ['I ask the nearest person', "what's going on here."]). Words are joined with single spaces; an
+  empty text -> []. ('June, stay where you are. Nita is checking the cans out back.' -> ['June, stay
+  where you are.', 'Nita is checking the cans out back.'])
 
 intent_to_dict(intent) -> dict / intent_from_dict(d) -> Intent   JSON-safe round trip (queue rows,
   pending_reactions): every Intent, SpeechAct and BoundAffordance field (pace, delivery, timing and
@@ -197,6 +200,8 @@ def segments(text: str) -> list[str]:
                     cut = j
             if cut is not None:
                 chunk = chunk[:cut + 1]
+            elif len(words) - i - SEGMENT_WORDS < 4:                     # D-239: no word left on its own
+                chunk = chunk[:(len(words) - i + 1) // 2]
         out.append(" ".join(chunk))
         i += len(chunk)
     return out

@@ -984,6 +984,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_what_they_are_in_the_middle_of.py` | A new run's Owen is working on the opening's first objective, and his card says so — never "decided at worldgen" |
 
+### 3.131 A word not left on its own (P5; D-239)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_a_word_not_left_alone.py` | "I ask the nearest person what's going on here." goes out as "I ask the nearest person" and "what's going on here."; nine and seventeen words split without a stranded tail; for every length up to seventeen words, no segment after the first is shorter than four words |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
