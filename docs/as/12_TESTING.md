@@ -1092,6 +1092,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p03_perception/test_the_way_out.py` | A way named after the place on one side reads 'the way out to <the other side>' from inside it and as named from outside; the scene says so; what someone inside is offered never calls it the way in and never names where it leads twice, and they watch 'the way out' |
 
+### 3.149 The Writer knows where they come from (P10; D-260)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_the_writer_knows_where_they_come_from.py` | Every WORLDGEN_ACTOR brief says where that person comes from and what they did before the Fall, exactly as their card keeps it, and what they are in the middle of |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

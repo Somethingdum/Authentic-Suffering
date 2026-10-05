@@ -1022,13 +1022,18 @@ def _brief_person(seed, role, skel=None, history=(), dsf=None, lore=()):
     c = getattr(seed.cohort, "value", seed.cohort)
     if c in COHORT_WORDS:
         lines.append(COHORT_WORDS[c])
+    ident = (skel or {}).get("identity") or {}
+    if ident.get("birthplace"):                                    # D-260: fixed facts the life is built on
+        lines.append(f"They come from {ident['birthplace']}; before the Fall: {ident.get('occupation_before') or 'unknown'}. "
+                     "These stay as they are: build their life on them.")
     if skel:
         m, v, lf = skel.get("motive") or {}, skel.get("voice") or {}, skel.get("life") or {}
         fears = lf.get("fears")
         fears = ", ".join(fears) if isinstance(fears, list) else fears
         sketch = [("How they talk", v.get("capsule")), ("What drives them", m.get("motive")), ("What hurt them", m.get("past_wound")),
                   ("What pulls them two ways", m.get("inner_conflict")), ("What they hope for", lf.get("aspiration")),
-                  ("What they fear", fears), ("What they always do", m.get("signature_behaviour"))]
+                  ("What they fear", fears), ("What they always do", m.get("signature_behaviour")),
+                  ("What they are in the middle of", lf.get("current_project"))]                      # D-260
         lines.append("A sketch of them to build on: keep its spirit, make it specific and their own.")
         lines += [f"- {k}: {x}" for k, x in sketch if x]
     if history:

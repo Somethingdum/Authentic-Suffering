@@ -57,9 +57,11 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   each: name, age, sex, settlement, group and work; 'It is day N since the Fall, Y years on.'; what
   their cohort remembers (post_fall_born 'Born after the Fall: they have never known any other
   world.', fall_child 'A child when the Fall came: they remember a little of the world before.',
-  pre_fall_adult 'Grown when the Fall came: they remember the world before, and losing it.'); 'A
+  pre_fall_adult 'Grown when the Fall came: they remember the world before, and losing it.'); (D-260) f'They come
+  from {birthplace}; before the Fall: {occupation_before}. These stay as they are: build their life on them.' (the
+  skeleton's identity, which the answer cannot change); 'A
   sketch of them to build on: keep its spirit, make it specific and their own.' then the skeleton's
-  voice capsule, motive, past wound, inner conflict, aspiration, fears and signature behaviour as
+  voice capsule, motive, past wound, inner conflict, aspiration, fears, signature behaviour and (D-260) current project as
   '- <what>: <text>' lines; 'What happened here, as people tell it:' then the history belief texts
   (at most 8); 'What people around them say, and they believe too (...)' then every core-lore
   belief held by 'common', their cohort or their group's faction (content_ref) — the Writer wrote
