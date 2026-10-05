@@ -22,7 +22,8 @@ scene(tx, session) -> CheatScene   (CHEAT-16: who and what "that", "him", "the d
   places: 'L0', then the places a portal joins to here, then the PC's known_places, by place_id:
     {handle, label = name, kind}.
   doors: 'D1', … the portals of here, by portal_id: {handle, label = name, kind, note = 'open' |
-    'closed' | 'locked' | 'barricaded' | 'broken'}.
+    'closed' | 'locked' | 'barricaded' | 'broken'; '' for a climb, a gap or an edge — D-240, there is
+    no door to it}.
   items: 'I1', … the items the PC holds or carries, then the items lying here, by item_id: {handle,
     label = the def name}.
   groups: 'G1', … every group, by group_id: {handle, label = name}.

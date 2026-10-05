@@ -231,7 +231,13 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
   render_portal(portal): f'The {name} is {open|closed}{, barricaded}{, damaged}.' — never
       'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact|damaged}.' (D-237:
       'The {name}' here and wherever a sentence opens on a thing's name is thing_phrase(name) with its
-      first letter upper-cased — 'the way to Pump house' is open, not 'The the way …')
+      first letter upper-cased — 'the way to Pump house' is open, not 'The the way …'); (D-240) a way
+      nobody walks through (physical.space.PARKOUR_KINDS) has no door to be open or closed: a climb
+      f'The {name} could be climbed, about {h} metres up.' (height_cm; none: '… could be climbed.'),
+      a gap f'The {name} is about {w} metres across.' (gap_cm; none: '… is open air.'), an edge
+      f'The {name} drops about {h} metres.' (height_cm; none: '… drops away.') — as the play view
+      words them (narration.location, D-108): h = height_cm / 100 rounded half up, at least 1
+      ('metre' for one), w = gap_cm / 100 to one decimal.
 
 F1a — what someone looks like to this holder (the owner: appearance helps you judge the situation
 and people).
@@ -511,8 +517,20 @@ def render_visual(tx: "Tx", holder_id: str, subject_id: str, level: str) -> str:
     return f"{r} {verb}{where}{held}{wounds}."
 
 
+def _metres(cm):
+    v = max(1, int(cm / 100 + 0.5))                                     # as the play view says it (D-108)
+    return f"about {v} metre{'' if v == 1 else 's'}"
+
+
 def render_portal(tx, portal_id):
     p = _row(tx, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
+    if p["kind"] in ("climb", "gap", "edge"):                           # D-240: there is no door to it
+        nm = the_name(p["name"])
+        if p["kind"] == "gap":
+            return f"{nm} is about {p['gap_cm'] / 100:.1f} metres across." if p["gap_cm"] else f"{nm} is open air."
+        if p["kind"] == "edge":
+            return f"{nm} drops {_metres(p['height_cm'])}." if p["height_cm"] else f"{nm} drops away."
+        return f"{nm} could be climbed, {_metres(p['height_cm'])} up." if p["height_cm"] else f"{nm} could be climbed."
     if p["kind"] == "fence":
         return f"{the_name(p['name'])} is {'damaged' if p['damage'] else 'intact'}."
     s = f"{the_name(p['name'])} is {'open' if p['is_open'] else 'closed'}"

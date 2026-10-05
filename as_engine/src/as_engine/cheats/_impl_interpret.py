@@ -81,7 +81,8 @@ def _scene(tx, session):
     doors = []
     for i, r in enumerate(tx.query("SELECT portal_id, name, kind, is_open, is_locked, barricade, damage FROM portals "
                                    "WHERE place_a=? OR place_b=? ORDER BY portal_id", (here, here)), 1):
-        state = ("broken" if r[6] >= 3 else "locked" if r[4] else "barricaded" if r[5] else "open" if r[3] else "closed")
+        state = ("" if r[2] in ("climb", "gap", "edge") else                       # D-240: no door to it
+                 "broken" if r[6] >= 3 else "locked" if r[4] else "barricaded" if r[5] else "open" if r[3] else "closed")
         h = f"D{i}"
         ids[h] = ("portal", r[0])
         doors.append(SceneEntry(handle=h, label=r[1], kind=r[2], note=state))

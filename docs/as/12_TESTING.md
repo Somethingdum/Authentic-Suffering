@@ -990,6 +990,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_a_word_not_left_alone.py` | "I ask the nearest person what's going on here." goes out as "I ask the nearest person" and "what's going on here."; nine and seventeen words split without a stranded tail; for every length up to seventeen words, no segment after the first is shorter than four words |
 
+### 3.132 A way up is not a door (P5; D-240)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_a_way_up_is_not_a_door.py` | On the rooftops the drainpipe "could be climbed, about 5 metres up", the gaps are "about 1.6 / 2.8 metres across", the market roof's edge "drops about 5 metres" — none open or closed; a door is still "The office door is closed." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
