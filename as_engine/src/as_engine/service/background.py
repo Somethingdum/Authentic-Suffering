@@ -95,7 +95,13 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   RUMOUR_PEOPLE; places = the places.name of the holder's known_places, ordered (last_seen desc,
   place_id), the first RUMOUR_PLACES — the people and places a twist may name (INFO-06)); request = build_request(config,
   RUMOUR_DISTORT, turn_index=T, actor_id=holder, context=ctx, json_schema = to_lm_schema(
-  RumourDistortion), ctx=ctx); resp = await client.call(request, RumourDistortion) (no repair).
+  RumourDistortion), ctx=ctx); resp = await client.call(request, RumourDistortion) (no repair) —
+  (D-250) unless the holder has nobody to tell: in no group they belong to (member or probation) is
+  there a society.group.contacts of theirs who is not the rumour's subject and holds no live
+  (superseded_by NULL) holding on its (subject_type, subject_id, predicate) — world.rumours.spread_day's
+  own audience. Then no call is made: JobResult(answer = RumourDistortion(operation 'none',
+  retold_claim = claim_text), calls ()) — a story everyone around them already knows (all eight who
+  saw the same row) is not retold to nobody; if it ever reaches someone new, it goes as it began.
   voicing (D-149): in one read transaction, d = mind.actor.fused(tx, actor); PersonVoiceContext(name =
   the first word of its display name, card = [f"{age}, {sex}; {occupation_now} (before: {occupation_before})",
   the cohort as words, f"How they talk: {voice.capsule}", f"Habits of speech: {'; '.join(tendencies)}" (D-246:

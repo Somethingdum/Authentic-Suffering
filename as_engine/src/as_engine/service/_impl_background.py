@@ -131,6 +131,23 @@ def _voicings(store, T):
     return [B.Job(kind="voicing", subject_id=a, rumour_id=None, request_key=f"voicing:{a}") for _n, a in sorted(out)[:R.max_voicings]]
 
 
+def _someone_to_tell(store, holder, rumour_id):
+    # BG-02 (D-250): spread_day's audience — a contact in one of their groups who is not the subject and does not know it
+    from ..society.group import contacts
+    p = _row(store, "SELECT p.subject_type, p.subject_id, p.predicate FROM rumours r JOIN propositions p ON p.prop_id = r.prop_id "
+                    "WHERE r.rumour_id=?", (rumour_id,))
+    for (g,) in store.query("SELECT group_id FROM group_members WHERE actor_id=? AND status IN ('member','probation') "
+                            "ORDER BY group_id", (holder,)):
+        for c in contacts(store, holder, g):
+            if c == p["subject_id"]:
+                continue
+            if store.query_one("SELECT 1 FROM claim_holdings h JOIN propositions q ON q.prop_id = h.claim_id WHERE h.holder_id=? "
+                               "AND h.superseded_by IS NULL AND q.subject_type=? AND q.subject_id IS ? AND q.predicate=?",
+                               (c, p["subject_type"], p["subject_id"], p["predicate"])) is None:
+                return True
+    return False
+
+
 def pending(store, turn_index):
     T = turn_index
     keys = {json.loads(pl).get("request_key")
@@ -205,6 +222,9 @@ async def run_job(session, job):
     # retelling
     with store.transaction() as tx:
         ctx = _rumour_context(tx, job.rumour_id, job.subject_id)
+        nobody = not _someone_to_tell(tx, job.subject_id, job.rumour_id)
+    if nobody:                                                     # D-250: no call for talk nobody will hear
+        return B.JobResult(job=job, answer=RumourDistortion(operation="none", retold_claim=ctx.claim_text), calls=())
     req = build_request(session.config, CallClass.RUMOUR_DISTORT, turn_index=T, actor_id=job.subject_id, context=ctx,
                         json_schema=to_lm_schema(RumourDistortion), ctx=ctx)
     resp = await client.call(req, RumourDistortion)

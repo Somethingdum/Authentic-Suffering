@@ -1,4 +1,4 @@
-"""A story in their own words (D-235). service/background.py BG-03 retelling (RumourContext); mind/retrieval.py
+"""A story in their own words (D-235); talk nobody will hear (D-250). service/background.py BG-03 retelling (RumourContext); mind/retrieval.py
 LORE-04 lore_about; prompts/rumour_distort.*.j2.
 
 Between turns everyone who holds a story passes on their own version of it (INFO-06) — but the call that asked for
@@ -15,9 +15,9 @@ import asyncio
 import pytest
 from test_background import next_turn, now, retelling, seed
 
-from as_engine.contracts.common import CallClass
+from as_engine.contracts.common import CallClass, RelationAxis
 from as_engine.contracts.mind import RumourDistortion
-from as_engine.mind import actor, retrieval
+from as_engine.mind import actor, mind, retrieval
 from as_engine.prompts.render import render
 from as_engine.service import background as bg
 from as_engine.world import rumours
@@ -26,6 +26,8 @@ pytestmark = pytest.mark.phase(10)
 
 
 def asked(w, fake, who, rid):
+    with w.store.transaction() as tx:                       # someone to tell it to (D-250): she trusts June
+        mind.relate(tx, w.id(who), w.id("june"), RelationAxis.TRUST, 1, None, now(w), 0)
     fake.fail(CallClass.RUMOUR_DISTORT, "grammar_fail")
     res = asyncio.run(bg.run_job(w.session(), retelling(w, who, rid)))
     assert res.failed
@@ -57,11 +59,11 @@ def test_she_tells_it_as_she_talks_and_feels(scenario, fake):
     assert ctx.voice[0] == f"How they talk: {v.capsule}" and ctx.voice[1].startswith("Habits of speech: ")
     assert ctx.feeling == "She mostly trusts them; she respects them.", "Nita toward Mara: trust 1, respect 2"
     assert ctx.lore and ctx.lore[0] == "A bite is a death sentence, full stop.", "what she grew up hearing about bites"
-    assert ctx.people[0] == "Mara" and {"June", "Owen"} <= set(ctx.people), "the people she knows by name"
+    assert ctx.people[:2] == ["June", "Mara"] and "Owen" in ctx.people, "those she is closest to first, then by name"
     assert "Dale" not in " ".join(ctx.people), "the stranger is a description to her, not a name"
     system, user = (m.content for m in render(CallClass.RUMOUR_DISTORT, ctx=ctx))
     assert "How they feel about the one it is about: She mostly trusts them" in user
-    assert "People they know by name: Mara, " in user
+    assert "People they know by name: June, Mara, " in user
     assert "never as \"I\", \"we\" or \"you\"" in system
     assert "Keep the one it is about in it" in system and "it stays their doing" in system, \
         "a story's wrong is charged to the one it is about (D-216): a twist may not hand it to someone else"
@@ -75,3 +77,20 @@ def test_what_a_story_brings_to_mind(scenario):
         lied = retrieval.lore_about(tx, w.id("nita"), "Mara lied to people here.", [w.id("mara")], 3)
     assert [x["lore_id"] for x in bitten] == ["core:lore/wet_strain"] * 2
     assert lied == []
+
+
+def test_nobody_to_tell(scenario, fake):
+    """(D-250) Everyone she could tell already knows it: no model call is made, and her version is the story as it
+    began ('none'), never asked again."""
+    w = scenario("metal_fence")
+    rid = seed(w, "nita", "stranger", "lied")
+    with w.store.transaction() as tx:
+        rumours.spread_one(tx, rid, w.id("nita"), w.id("mara"), now(w), 0, None)
+    T = next_turn(w)
+    job = retelling(w, "nita", rid)
+    assert job in bg.jobs(w.store, T), "the job is still dealt (BG-02)"
+    res = asyncio.run(bg.run_job(w.session(), job))
+    assert res.calls == () and fake.calls(CallClass.RUMOUR_DISTORT) == []
+    with w.store.transaction() as tx:
+        bg.commit(tx, job, res, now(w), T)
+    assert job not in bg.jobs(w.store, T + 1)

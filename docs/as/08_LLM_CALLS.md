@@ -140,7 +140,7 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 | portrayal_audit | B | yes | PortrayalVerdict | targeted pre-check + retrospective | "would they do that?" answered by the one who did it |
 | narration | A | yes | prose | every turn | the renderer would see hidden state |
 | render_lint | B | yes | RenderLintJudgement | every narration draft | leaks and invented dialogue would ship |
-| rumour_distort | B | no | RumourDistortion | between turns, a fresh story's holders (at most four): what they were told, in their voice, bent by how they feel about the one it is about and what they grew up hearing (D-235) | second-hand information would transmit perfectly, and everyone would tell it the same way |
+| rumour_distort | B | no | RumourDistortion | between turns, a fresh story's holders (at most four): what they were told, in their voice, bent by how they feel about the one it is about and what they grew up hearing (D-235); never for a holder with nobody to tell (D-250) | second-hand information would transmit perfectly, and everyone would tell it the same way |
 | cascade_advisory | B | no | CascadeSuggestion | when lanes idle | the cascade table would never learn (output is design debt, never committed) |
 | guide | B | no | text | Ask mode | — (player help; no turn) |
 | reflection | B | no | ReflectionOutput | idle time between turns | Actors would not grow new goals/grudges off-screen |

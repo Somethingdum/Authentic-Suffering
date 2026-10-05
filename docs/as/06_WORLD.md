@@ -581,6 +581,7 @@ on and twisted again, so talk drifts as it travels — how they talk, how they f
 about (someone they love they make excuses for; someone they hate they make worse), what they grew up
 hearing that the story touches, and the people and places they know by name, the only ones a twist
 may name. It is said about the people in it, never as "I" or "you": whoever hears it believes those words.
+A holder with nobody to tell — everyone around them already knows it — is not asked at all (D-250).
 **Horde talk** (P10): a rumour may be about a place — 'horde_coming' — seeded by the Mega Horde's
 signs and by a route watch's report (§5.3, §2.8), and passed on like any other.
 
