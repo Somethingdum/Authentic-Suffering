@@ -174,7 +174,8 @@ def _bindings(c, d):
     if b in ("none", "self"):
         if d.id == "keep_working" and not (c.task or c.put_down):
             return []
-        if d.id == "surrender" and not c.threats:
+        if d.id == "surrender" and not any(_row(c.tx, "SELECT kind FROM bodies WHERE body_id=?", (t,))["kind"] == "human"
+                                           for t in c.threats):         # D-241: the dead take no one's surrender
             return []
         if eff == "work_free":                               # D-208: only while bound
             from ..physical.bodies import tied
@@ -761,14 +762,14 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
                 return 0
             if "protect_dependent" in ba.tags:
                 return 1
+            if ba.verb == Verb.SURRENDER:        # D-243: a person threatens (D-241): hands up before running
+                return 1
             if ba.verb in (Verb.FLEE, Verb.ESCAPE):
                 return 2
             if "feed_to_dead" in ba.tags:
                 return 3
             if ba.verb in (Verb.TAKE_COVER, Verb.HIDE):
                 return 4
-            if ba.verb == Verb.SURRENDER:
-                return 5
             return 6
         if g == 3:                       # D-181: going somewhere else before moving about the room
             return 0 if (ba.destination_id or "").startswith("plc_") or not (ba.destination_id or ba.target_id) else 1

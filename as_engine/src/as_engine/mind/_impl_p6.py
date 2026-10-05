@@ -301,16 +301,20 @@ def build_aftermath(tx, holder_id, turn_index, at):
     from ..contracts.mind import SelfExperience
     selfx = []
     band_words = {"clean": "It went cleanly.", "cost": "It worked, at a cost.", "fail": "It did not work.", "break": "It went badly wrong."}
-    for e in tx.query("SELECT event_id, type, payload FROM events WHERE actor_id=? AND turn_index=? AND at<=? "
+    spoke = set()                                                        # D-242: saying it is not a deed to report done
+    for e in tx.query("SELECT event_id, type, payload, cause_event_id FROM events WHERE actor_id=? AND turn_index=? AND at<=? "
                       "AND type IN ('SPEECH','ACTION_START','ACTION_COMPLETE','ACTION_BLOCKED') ORDER BY seq", (holder_id, turn_index, at)):
         pl = _j(e["payload"])
         if e["type"] == "SPEECH":
             txt = f'I said: "{pl["words"]}"'
         elif e["type"] == "ACTION_START":
             if pl["def_id"] == "speak":
+                spoke.add(e["event_id"])
                 continue
             lab = retell(_PAREN.sub("", pl.get("label") or pl["def_id"]), "first")     # TEXT-01 (D-152)
             txt = f"I chose to {lab[:1].lower() + lab[1:]}."
+        elif e["type"] == "ACTION_COMPLETE" and e["cause_event_id"] in spoke:
+            continue
         elif e["type"] == "ACTION_COMPLETE":
             txt = band_words.get(pl.get("band"), "I did it.")
         else:

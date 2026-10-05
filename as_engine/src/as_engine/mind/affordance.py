@@ -187,9 +187,11 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
     threat group  0 an ATTACK on a threat, 1 a def tagged 'protect_dependent', 2 verbs FLEE /
                   ESCAPE, 3 (H1) a def tagged 'feed_to_dead' (someone else between you and the
                   dead: the way out a frightened person sees right after running), 4 verbs
-                  TAKE_COVER / HIDE, 5 SURRENDER, 6 anything else (attacks on bodies that are
+                  TAKE_COVER / HIDE, 6 anything else (attacks on bodies that are
                   not threats, shove) — facing a shambler with a gun in hand, 'shoot it' must
-                  never lose its slot to 'crouch';
+                  never lose its slot to 'crouch'; (D-243) SURRENDER ranks 1 with protect_dependent —
+                  it is only offered when a living person threatens (D-241), and with a man's gun on
+                  you two ways to run and two ways to take cover must not crowd out raising your hands;
     move group    (D-181) 0 a move to another place (its destination is a place) or one with no
                   referent (leave by the nearest way out), 1 a move within the place — the
                   side door to the yard is never crowded out by four ways to reach the car;
@@ -250,6 +252,8 @@ enumerate it too, one option per combination (then capped by the selection rules
                        they put down last (CAS-014 pauses a task when they start anything else; without
                        this it could never be taken up again); {target} = that task's label
   surrender            only when a threat was perceived this turn (nobody gives up to an empty room)
+                       that is a living person (bodies.kind 'human' — D-241: the dead take no one's
+                       surrender; hands up to a walker is only standing still in front of it)
   flee_threat          body = each threat this turn (A THREAT above)
   shield_dependent     only when a threat was perceived this turn; body = each known body that is
                        not a threat and that the actor is guardian_of, shares a household with, or

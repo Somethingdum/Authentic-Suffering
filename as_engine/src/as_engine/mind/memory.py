@@ -44,7 +44,8 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                                    for def_id 'speak')
                   ACTION_COMPLETE  by payload.band: clean 'It went cleanly.', cost 'It worked, at a
                                    cost.', fail 'It did not work.', break 'It went badly wrong.';
-                                   no band: 'I did it.'
+                                   no band: 'I did it.' — (D-242) none for the completion of a
+                                   'speak' start (cause_event_id): its SPEECH lines say it
                   ACTION_BLOCKED   'I could not do it.'
                 What the holder felt, never why: 'It did not work.', not 'the lock was broken'.
   open_loops    the holder's loops with status 'open', ordered (strength desc, created_at desc,

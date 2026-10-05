@@ -996,6 +996,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_a_way_up_is_not_a_door.py` | On the rooftops the drainpipe "could be climbed, about 5 metres up", the gaps are "about 1.6 / 2.8 metres across", the market roof's edge "drops about 5 metres" — none open or closed; a door is still "The office door is closed." |
 
+### 3.133 Nobody gives up to the dead; hands up before running (P4; D-241, D-243)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_no_hands_up_to_the_dead.py` | Facing only the shambler, the dead are a threat and running is offered but giving up is not even tried; a man's gun on the player makes giving up an option, and it is on the first menu beside running and cover |
+
+### 3.134 A word said is not a deed done (P6; D-242)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_a_word_said.py` | June says "Quiet. Something's out back." and her own experience of the turn is that line alone — no "I did it." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
