@@ -863,6 +863,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_let_them_in.py` | June opens the back door with one of the dead in the alley and it walks in on Mara and Alice: both trust her two less, hold it against her and tell it — never June or Owen judging — and only the first of the dead through counts; Owen opening it is judged like anyone; opened for Nita, who comes in with the dead behind her, it is a rescue; six minutes on, or the living coming in, is nothing |
 
+### 3.111 To your face (P9; D-219)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_to_your_face.py` | Owen calls June a useless idiot with nobody else there: she resents him a point more, once an hour however often he says it, and again an hour on; ordinary words are nothing; with Mara on the floor it is the humiliation (CAS-042), not this; the finger or spitting at her alone counts, pointing does not; an insult to the player's character changes nothing in him |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -268,6 +268,9 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   minutes before, onto living people, whoever saw who opened it and has the dead among them trusts that person two
   less and holds it against them, and the story ("let the dead in") travels. Opening it to let someone in, with
   the dead behind them, is a rescue.
+- **To your face** (D-219, CAS-107/108): an insult, or spitting at someone or giving them the finger, with nobody
+  else there leaves a point of resentment toward the one who did it, once an hour however often; with an audience
+  it is the humiliation of CAS-042/079.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

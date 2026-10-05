@@ -220,6 +220,15 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)
+    insulted_to_their_face(<path>)            (D-219) for a SPEECH or a GESTURE: the holder it insulted —
+                                              a speech percept addressed to them whose words hold an
+                                              entry of mind.temper.INSULT_WORDS (as humiliated_by), or
+                                              a gesture of action.effects.CONTEMPT_GESTURES whose payload
+                                              target_id is them — when nobody else but the one who made
+                                              it holds an EXACT or PARTIAL percept of it (speech for a
+                                              SPEECH, visual for a GESTURE: with an audience it is
+                                              humiliated_by's), unless that one insulted them so in the
+                                              hour before (by seq); never the PC
     saw_them_let_in(<path>)                   (D-218) for a MOVE with trigger.let_in_by: the holders of a
                                               visual EXACT or PARTIAL percept of the opening PORTAL_CHANGE
                                               who are alive, with an actors row, in the place the dead

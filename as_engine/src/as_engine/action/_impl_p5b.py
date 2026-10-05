@@ -1136,6 +1136,43 @@ def _to_their_face(tx, trigger, event_id, *, violent):
     return sorted(set(out))
 
 
+def _insult_in(tx, typ, actor, payload, detail, holder):
+    """D-219: is this SPEECH percept (detail) or GESTURE (payload) an insult made at ``holder``?"""
+    if typ == "GESTURE":
+        from ..action.effects import CONTEMPT_GESTURES
+        return payload.get("gesture") in CONTEMPT_GESTURES and payload.get("target_id") == holder
+    from ..mind.temper import INSULT_WORDS, _words_have
+    return bool(detail.get("addressed_to_me")) and any(_words_have(detail.get("words") or "", x) for x in INSULT_WORDS)
+
+
+def _insulted_alone(tx, trigger, event_id):
+    """D-219: who a SPEECH or GESTURE insulted to their face with nobody else there to hear or see it (with an
+    audience it is humiliated_by's), the first time in the hour the one who made it did; never the PC."""
+    from ..society._impl_society import _controller
+    ev = _row(tx, "SELECT type, actor_id, at, seq, payload FROM events WHERE event_id=?", (event_id,))
+    if ev is None or ev["type"] not in ("SPEECH", "GESTURE") or not ev["actor_id"]:
+        return []
+    who, typ = ev["actor_id"], ev["type"]
+    pl = json.loads(ev["payload"]) if isinstance(ev["payload"], str) else (ev["payload"] or {})
+    chan = "speech" if typ == "SPEECH" else "visual"
+    rows = [(h, json.loads(d) if isinstance(d, str) else (d or {})) for h, d in tx.query(
+        "SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel=? AND fidelity IN ('exact','partial') "
+        "ORDER BY holder_id", (event_id, chan))]
+    others = {h for h, _d in rows} - {who}
+    out = []
+    for h, d in rows:
+        if h == who or others - {h} or _controller(tx, h) in (None, "human") or not _insult_in(tx, typ, who, pl, d, h):
+            continue
+        before = tx.query("SELECT e.type, e.payload, p.detail FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE "
+                          "p.holder_id=? AND e.actor_id=? AND e.type IN ('SPEECH','GESTURE') AND e.at>? AND e.seq<?",
+                          (h, who, ev["at"] - 3_600_000, ev["seq"]))
+        if any(_insult_in(tx, t_, who, json.loads(p_) if isinstance(p_, str) else (p_ or {}),
+                          json.loads(d_) if isinstance(d_, str) else (d_ or {}), h) for t_, p_, d_ in before):
+            continue                                             # once an hour, however often
+        out.append(h)
+    return out
+
+
 def _left_in_danger(tx, event_id):
     """D-148: (the dependents left behind in a dangerous place, the others who saw them left) for a MOVE out of it."""
     from ..society._impl_society import _controller
@@ -1527,6 +1564,8 @@ def select(tx, selector, trigger):
         holders = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                                           "fidelity IN ('exact','partial')", (v,))} - {dead}
         return sorted({s for s in (_stl_of(tx, h) for h in holders) if s})
+    if fn == "insulted_to_their_face":                              # D-219: no one else there to see it
+        return _insulted_alone(tx, trigger, v)
     if fn == "saw_them_let_in":                                      # D-218: the dead let in on them
         from ..society._impl_society import _controller
         r = _let_in(tx, trigger)
