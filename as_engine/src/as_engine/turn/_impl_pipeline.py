@@ -460,8 +460,8 @@ async def after_commit(ctx, notices):
             holders = [r[0] for r in tx.query("SELECT DISTINCT p.holder_id FROM percept_log p JOIN bodies b ON b.body_id=p.holder_id "
                                               "WHERE p.turn_index=? AND b.alive=1 ORDER BY p.holder_id", (T,))]
             packets = {h: build_aftermath(tx, h, T, at) for h in holders}
-            packets = {h: p for h, p in packets.items() if p.percepts or p.utterances}
-            from ..mind.memory import queue_writeback
+            from ..mind.memory import queue_writeback, worth_writing
+            packets = {h: p for h, p in packets.items() if (p.percepts or p.utterances) and worth_writing(tx, h, p, T)}
             keys = {h: queue_writeback(tx, h, T, at) for h in sorted(packets)}
             R_m = store.rules.memory
             retry = [dict(r) for r in tx.query("SELECT * FROM memory_jobs WHERE status='failed' AND attempts < ? AND turn_index < ? "

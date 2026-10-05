@@ -131,7 +131,7 @@ a failure triggers ONE `INTENT_REPAIR` on lane B **with** the schema (LANE-06).
 |---|---|---|---|---|---|
 | intake | B | no | IntakeOutput (dynamic enum) | player Do text | player prose would leak unperceived facts into intent; free text can't be trusted to map to legal options |
 | actor_cognition (HOT) | A (`hot_cognition.lane`) | yes | ActorReplyV2 (dynamic enums; a decision or one consultation first) | salient/mandatory Actors | Skull Law becomes an instruction instead of a fact; F2 returns |
-| actor_cognition (WARM) | B | no | ActorReplyV2 | other Actors in budget | same, for more people per turn at no wall-clock cost |
+| actor_cognition (WARM) | B | no | ActorReplyV2 | other Actors in budget with something new, talk last turn, or due to take stock (D-190) | same, for more people per turn at no wall-clock cost |
 | actor_reaction | B | no | ActorReplyV2 (a decision; no consultation) | reaction waves | Actors could not respond within the same instant |
 | intent_repair | B | no | ActorReplyV2 (a decision only) | one per failed structured call | a malformed answer would cost the Actor its turn |
 | writeback | B | no | WritebackOutput | per holder (each a memory job, retried when it fails), after commit | memory becomes objective; two people remember the same thing; a failed call forgets |

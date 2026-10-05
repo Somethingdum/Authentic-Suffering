@@ -1541,7 +1541,9 @@ def plan_cognition(candidates, config, turn_depth, lanes_up):
             tot[hot_lane] += S.estimated_call_s["actor_cognition_hot"]
             i += 1
     cold = False
-    for a, _s, mand in order[i:]:
+    for a, sal, mand in order[i:]:
+        if not mand and sal <= 0:                          # D-190: nothing new, nothing to decide
+            cold = True
         if cold and not mand:
             plan.lod[a] = LOD.COLD
             continue

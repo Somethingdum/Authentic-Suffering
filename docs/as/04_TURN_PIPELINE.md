@@ -169,7 +169,10 @@ for the PC the window closes on it so the player answers.
   (`structured_with_thinking`): `supported` → json_schema on the call; otherwise the call is made
   without a schema, the JSON is extracted from the text, and a failure goes to one INTENT_REPAIR on
   lane B with the schema (LANE-06).
-- WARM: `regimes[actor_cognition]` (lane B, thinking off, json_schema).
+- WARM: `regimes[actor_cognition]` (lane B, thinking off, json_schema). Not for a mind with salience
+  0 that is not mandatory (D-190): nothing new, nothing at stake, nothing owed, no talk last turn, and
+  it took stock with a model in the last `rethink_turns` turns — it runs COLD and goes on with what it
+  was doing, and the room's lines still reach it.
 - COLD: `action.intent.plan_continuation` — the same decision still running. **LOD is a reasoning
   tier only**: it never changes competence, morality or knowledge (LOD-01).
 - **The room talks (D-128, AMB-01..03).** COLD people never chose words with a model, so a crowd
@@ -267,7 +270,8 @@ A degraded turn is honest and recorded; a guessed turn is corruption (plan §5.3
 - **Aftermath** (13): per holder, only its own percepts of this transaction's events; holders
   with nothing perceived get no packet.
 - **Writeback** (14): every person gets their own call (MEM-03, Actor v2 B5b); the PC gets
-  writeback too (its Journal and recap come from it). Each is a memory job (MEM-19): a failed call
+  writeback too (its Journal and recap come from it). Not someone with nothing new (D-189, MEM-20):
+  no talk, nothing perceived that was not there last turn, and only holding still themselves. Each is a memory job (MEM-19): a failed call
   writes nothing, is logged, and is tried again at later turns, and until it is done the person's
   next packet carries what they did and saw raw.
 - **Audits** (15): the leak scan is a SQL query — every `claim_holdings` row acquired this

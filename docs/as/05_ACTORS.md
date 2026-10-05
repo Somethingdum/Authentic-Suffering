@@ -363,8 +363,9 @@ timing; the person chooses only what goes with what.
 
 ### 9.1 Aftermath → writeback (every turn)
 
-After commit, each mind that perceived anything gets an `AftermathPacket` with only its own
-percepts (L8). WRITEBACK (lane B) returns: an episode in the mind's own voice with salience; beliefs
+After commit, each mind that perceived anything new gets an `AftermathPacket` with only its own
+percepts (L8) — the same doors still shut and a turn spent holding still are not sent to be remembered
+(D-189, MEM-20). WRITEBACK (lane B) returns: an episode in the mind's own voice with salience; beliefs
 (each citing the percepts that caused it); relationship changes (−2..+2 on one axis, citing a
 percept); new open loops — **goals, desires, grudges, fears, questions, plans, promises, debts,
 secrets kept** — each citing a percept; closed loops; an optional lesson with cue tags. Items that

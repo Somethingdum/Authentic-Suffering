@@ -87,6 +87,14 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       stays one until answered) mind.packet.thread_lines(tx, actor_id, turn_index, at,
                       names = the body id itself, the run's PacketRules) holds a line marked unanswered:
                       a question put to it here, earlier, that it has not answered.
+    restless          (D-190) it has had no actor_cognition or actor_reaction call with status 'ok'
+                      (lm_calls rows with its actor_id) in the turns turn_index -
+                      SchedulerRules.rethink_turns + 1 .. turn_index - 1: it last took stock that many
+                      turns ago or more (or never) — someone with nothing new to go on still looks up
+                      now and then and goes after what they want. (rethink_turns 1: always.)
+    talk_last_turn    (D-190) in turn_index - 1 it held a speech percept (any fidelity) whose source is
+                      not itself, or committed a SPEECH itself: a conversation is going on, and what
+                      was said after it last decided is still to be taken in.
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written
   before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules

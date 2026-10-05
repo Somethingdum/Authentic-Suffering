@@ -149,6 +149,15 @@ MEM-19 (B5, fidelity C10; Actor Spec §13) A memory job is never lost to a faile
     turn_index) and the texts of its self_experiences then its percepts, in handle order. So,
     before this person's next decision, what they did and saw is in their packet even when the
     summary failed (mind.packet 'unprocessed').
+MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing new is not sent to be
+  remembered. True when the packet holds an utterance; or a percept whose (channel, text) is not that
+  of any of the holder's percept_log rows of turn_index - 1 (news is new: the same doors still shut,
+  the same woman still at the window are not); or one of the holder's own events of this turn
+  (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
+  that is not quiet. Quiet: an ACTION_START
+  whose affordance (canon.find('affordance', payload.def_id)) has its verb in QUIET_VERBS, and an
+  ACTION_COMPLETE whose band is clean or missing and whose cause is such a start. Else False — the
+  raw percepts stay in percept_log either way.
 """
 
 from __future__ import annotations
@@ -162,6 +171,8 @@ if TYPE_CHECKING:
     from ..kernel.store import Store, Tx
 
 BONDED_KINDS: tuple[str, ...] = ("parent", "child", "sibling", "spouse", "partner")
+
+QUIET_VERBS: frozenset[str] = frozenset({"wait", "observe", "guard", "continue_task"})   # D-189: holding still
 
 
 def build_aftermath(tx: "Tx", holder_id: str, turn_index: int, at: int) -> AftermathPacket:
@@ -233,4 +244,30 @@ def unprocessed(store: "Store | Tx", holder_id: str) -> list[tuple[int, list[str
         a = build_aftermath(store, holder_id, tix, at)
         out.append((tix, [o.text for o in a.self_experiences] + [p.text for p in a.percepts]))
     return out
+def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index: int) -> bool:
+    import json
+    if packet.utterances:
+        return True
+    before = {(r[0], r[1]) for r in tx.query("SELECT channel, text FROM percept_log WHERE holder_id=? AND turn_index=?",
+                                             (holder_id, turn_index - 1))}
+    if any((p.channel, p.text) not in before for p in packet.percepts):
+        return True
+    quiet = set()
+    for e in tx.query("SELECT event_id, type, cause_event_id, payload FROM events WHERE actor_id=? AND turn_index=? AND type IN "
+                      "('SPEECH','ACTION_START','ACTION_COMPLETE','ACTION_BLOCKED') ORDER BY seq", (holder_id, turn_index)):
+        pl = json.loads(e[3]) if isinstance(e[3], str) else (e[3] or {})
+        if e[1] == "ACTION_START":
+            try:
+                verb = tx.canon.find("affordance", pl.get("def_id") or "").verb
+            except KeyError:
+                verb = None
+            if getattr(verb, "value", verb) in QUIET_VERBS:
+                quiet.add(e[0])
+                continue
+        if e[1] == "ACTION_COMPLETE" and e[2] in quiet and pl.get("band") in (None, "clean"):
+            continue
+        return True
+    return False
+
+
 from ._impl_p6 import build_aftermath, writeback_groups, apply_writeback  # noqa

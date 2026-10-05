@@ -253,7 +253,7 @@ def test_plan_cognition_keeps_the_writer_for_what_matters():
     fast lane, and the Writer's time goes to the people something is happening to."""
     cfg = EngineConfig()
     p = plan_cognition([("mara", 1.0, False), ("nita", 3.0, False), ("eli", 0.0, False)], cfg, "balanced", {Lane.A, Lane.B})
-    assert p.lod == {"nita": LOD.HOT, "mara": LOD.WARM, "eli": LOD.WARM}
+    assert p.lod == {"nita": LOD.HOT, "mara": LOD.WARM, "eli": LOD.COLD}, "and nothing at all: no call (D-190)"
     q = plan_cognition([("june", 0.0, True), ("alice", 2.0, False)], cfg, "balanced", {Lane.A, Lane.B})
     assert q.lod == {"june": LOD.HOT, "alice": LOD.WARM}, "a mandatory mind is HOT whatever its salience"
 

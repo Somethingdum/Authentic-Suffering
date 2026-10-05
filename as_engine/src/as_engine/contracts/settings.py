@@ -238,6 +238,7 @@ class SchedulerRules(Strict):
     reserve_narration_s: float = 25.0
     max_hot: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})
     hot_min_salience: float = 3.0   # [SAND] D-175: below this (and not mandatory) a mind thinks on the warm lane
+    rethink_turns: int = 3          # [SAND] D-190: with nothing new, a mind takes stock with a model every this many turns
     max_ambient: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})  # D-128 AMB-02
     max_reaction_waves: int = 3
     estimated_call_s: dict[str, float] = Field(default_factory=lambda: {
@@ -247,7 +248,7 @@ class SchedulerRules(Strict):
     salience_weights: dict[str, float] = Field(default_factory=lambda: {
         "mandatory": 100.0, "unique_info": 3.0, "loudest_percept": 2.0, "addressed": 4.0, "in_conflict": 3.0,
         "interrupt_trigger": 5.0, "open_loop_with_pc": 1.0, "dependent_present": 1.0, "visible_to_pc": 1.0,
-        "grievance_near": 3.0, "owed_answer": 3.0,
+        "grievance_near": 3.0, "owed_answer": 3.0, "restless": 0.5, "talk_last_turn": 1.0,
     })
 
 

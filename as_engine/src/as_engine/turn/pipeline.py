@@ -172,7 +172,8 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
   the calls; they are recorded in the stage-17 transaction.
   S13 aftermath: holders = the distinct holders of this turn's percepts whose bodies are alive
     (sorted); packet = mind.memory.build_aftermath(tx, h, T, now) each; only packets with at least
-    one percept or utterance go on. (B5, MEM-19) Each holder that goes on has its job queued:
+    one percept or utterance, and (D-189) worth writing (mind.memory.worth_writing(tx, h, packet, T)),
+    go on. (B5, MEM-19) Each holder that goes on has its job queued:
     key = mind.memory.queue_writeback(tx, h, T, now). The retries: the memory_jobs rows with status
     'failed', attempts < RulesConfig.memory.writeback_retries and turn_index < T, ordered
     (turn_index, holder_id), at most RulesConfig.memory.max_retry_jobs, each with its packet

@@ -152,9 +152,15 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
                 break
     from ..mind.packet import thread_lines
     owed = any(x.unanswered for x in thread_lines(tx, actor_id, turn_index, at, lambda b: b, tx.rules.packet))
+    restless = tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition','actor_reaction') "
+                            "AND status='ok' AND turn_index BETWEEN ? AND ?",          # D-190
+                            (actor_id, turn_index - tx.rules.scheduler.rethink_turns + 1, turn_index - 1)) is None
+    talk = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='speech' "
+                        "AND (source_id IS NULL OR source_id != ?)", (actor_id, turn_index - 1, actor_id)) is not None \
+        or tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH'", (actor_id, turn_index - 1)) is not None
     return {"unique_info": unique, "loudest_percept": loudest, "addressed": addressed, "in_conflict": in_conflict,
             "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis,
-            "grievance_near": griev, "owed_answer": owed}
+            "grievance_near": griev, "owed_answer": owed, "restless": restless, "talk_last_turn": talk}
 
 
 def salience(flags, is_mandatory, weights):
