@@ -7,5 +7,8 @@ What {{ ctx.name }} has said, oldest first:
 {% endfor %}{% if ctx.with_pc %}
 What {{ ctx.name }} remembers of the time with the other person, oldest first:
 {% for l in ctx.with_pc %}- {{ l }}
+{% endfor %}{% endif %}{% if ctx.heard %}
+What {{ ctx.name }} grew up hearing, and believes:
+{% for l in ctx.heard %}- {{ l }}
 {% endfor %}{% endif %}
 Write how {{ ctx.name }} talks now.

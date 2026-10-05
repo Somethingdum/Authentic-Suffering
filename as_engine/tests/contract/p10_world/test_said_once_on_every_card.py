@@ -1,4 +1,4 @@
-"""Said once on every card (D-246). mind/identity.py (the voice section); service/background.py BG-03 voicing card.
+"""Said once on every card (D-246); what they grew up hearing (D-249). mind/identity.py (the voice section); service/background.py BG-03 voicing card.
 
 For a generated person — most of a world — the voice capsule is their two habits, and every card that shows how they
 talk listed them twice: the decision card ("Victor is soft-spoken and exact; never shouts, even now." then "How you
@@ -17,6 +17,7 @@ from as_engine.contracts.common import CallClass
 from as_engine.contracts.dossier import ActorDossier
 from as_engine.contracts.events import Event, EventType, WriteOp, WriteRecord
 from as_engine.mind import identity
+from as_engine.prompts.render import render
 from as_engine.service import background as bg
 from as_engine.world.worldgen import people
 
@@ -55,3 +56,21 @@ def test_the_card_a_voice_is_written_from(scenario, fake):
     [req] = fake.calls(CallClass.PERSON_VOICE)
     assert "How they talk: Mara is grim and literal; states the odds." in req.context.card
     assert not any(c.startswith("Habits of speech") for c in req.context.card)
+
+
+def test_the_voice_is_written_knowing_what_they_grew_up_hearing(scenario, fake):
+    """(D-249) The card a voice is written from carries what they grew up hearing — their people's words first."""
+    w = scenario("metal_fence")
+    fake.fail(CallClass.PERSON_VOICE, "grammar_fail")
+    job = bg.Job(kind="voicing", subject_id=w.id("june"), rumour_id=None, request_key=f"voicing:{w.id('june')}:lore")
+    asyncio.run(bg.run_job(w.session(), job))
+    [req] = fake.calls(CallClass.PERSON_VOICE)
+    held = [tuple(r) for r in w.store.query("SELECT lore_ref, belief, confidence, provenance FROM lore_held WHERE holder_id = ?",
+                                            (w.id("june"),))]
+    assert held and 0 < len(req.context.heard) <= bg.VOICE_LORE
+    rank = {"group": 0, "childhood": 1, "common": 2}
+    best = sorted(held, key=lambda r: (rank.get(r[3], 3), -r[2], r[0], r[1]))[0]
+    assert req.context.heard[0] == w.canon.get(best[0]).beliefs[best[1]].text
+    system, user = (m.content for m in render(CallClass.PERSON_VOICE, ctx=req.context))
+    assert "grew up hearing, and believes:\n- " + req.context.heard[0] in user
+    assert "what they call the dead" in system

@@ -33,6 +33,8 @@ class PersonVoiceContext(Strict):
                             "tendencies, the three example lines, motive, past wound.")
     lines_said: list[str] = Field(default_factory=list, description="What they have said aloud, oldest first.")
     with_pc: list[str] = Field(default_factory=list, description="Their own memories of the PC, oldest first.")
+    heard: list[str] = Field(default_factory=list, description="D-249: what they grew up hearing — their people's "
+                             "words first — at most VOICE_LORE lines.")
 
 
 class RepairContext(Strict):

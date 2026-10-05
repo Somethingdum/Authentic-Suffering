@@ -1020,11 +1020,11 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_no_two_strangers_alike.py` | A standard world (seed 7, where three pairs of strangers shared a voice) has no two generated people with the same first line; a seed whose every voice but one has been heard gets that one |
 
-### 3.137 Said once on every card (P10; D-246)
+### 3.137 Said once on every card; what they grew up hearing (P10; D-246, D-249)
 
 | File | What it proves |
 |---|---|
-| `p10_world/test_said_once_on_every_card.py` | A generated Victor's decision card has his capsule and no "How you tend to speak" echo while Mara's written card keeps it; the card her voice is written from, once her capsule holds her habits, has no "Habits of speech" line |
+| `p10_world/test_said_once_on_every_card.py` | A generated Victor's decision card has his capsule and no "How you tend to speak" echo while Mara's written card keeps it; the card her voice is written from, once her capsule holds her habits, has no "Habits of speech" line; (D-249) June's card carries what she grew up hearing, her people's words first, and the prompt shows it |
 
 ### 3.138 No two lives alike (P10; D-247)
 

@@ -104,7 +104,10 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   end of their rope: ...', f"What they want: {motive.motive}", f"What happened to them: {motive.past_wound}"],
   lines_said = the text of their newest R.voice_lines voice_lines rows (by at, line_id), oldest first,
   with_pc = the summaries of their newest 6 episodes (quarantined 0) whose subject_ids include the PC,
-  oldest first); request = build_request(config, PERSON_VOICE, turn_index=T, actor_id, context=ctx,
+  oldest first, (D-249) heard = the belief texts of their lore_held rows (the canon lore entry's belief
+  by index), ordered (provenance 'group' first, then 'childhood', then 'common'; confidence desc; lore_ref;
+  belief), the first VOICE_LORE — what they grew up hearing colours the words they reach for);
+  request = build_request(config, PERSON_VOICE, turn_index=T, actor_id, context=ctx,
   json_schema = to_lm_schema(PersonVoice), ctx=ctx); resp = await client.call(request, PersonVoice)
   (no repair).
   A final parse_status other than 'ok' -> JobResult(failed=True) (committed as nothing).
@@ -181,6 +184,7 @@ QUIET_HOURS = "Everyone else catches up…"   # the progress label while a turn 
 RUMOUR_LORE: int = 3      # BG-03 (D-235): what they grew up hearing that a story touches, at most
 RUMOUR_PEOPLE: int = 10   # BG-03 (D-235): the people a teller knows by name, at most
 RUMOUR_PLACES: int = 8    # BG-03 (D-235): the places a teller knows, at most
+VOICE_LORE: int = 3       # BG-03 (D-249): what someone grew up hearing, on the card their voice is written from
 
 
 @dataclass(frozen=True)

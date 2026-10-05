@@ -277,7 +277,12 @@ def _voice_context(tx, actor):
     if pc is not None:
         with_pc = [r[0] for r in tx.query("SELECT summary FROM episodes WHERE holder_id=? AND quarantined=0 AND subject_ids LIKE ? "
                                           "ORDER BY at DESC, episode_id DESC LIMIT 6", (actor, f'%"{pc[0]}"%'))][::-1]
-    return PersonVoiceContext(name=name, card=[c for c in card if c], lines_said=said, with_pc=with_pc)
+    rank = {"group": 0, "childhood": 1, "common": 2}                # D-249: their people's words first
+    lore = sorted(tx.query("SELECT lore_ref, belief, confidence, provenance FROM lore_held WHERE holder_id=?", (actor,)),
+                  key=lambda r: (rank.get(r["provenance"], 3), -r["confidence"], r["lore_ref"], r["belief"]))
+    heard = [tx.canon.get(r["lore_ref"]).beliefs[r["belief"]].text for r in lore
+             if tx.canon.has(r["lore_ref"]) and r["belief"] < len(tx.canon.get(r["lore_ref"]).beliefs)][:_B().VOICE_LORE]
+    return PersonVoiceContext(name=name, card=[c for c in card if c], lines_said=said, with_pc=with_pc, heard=heard)
 
 
 def commit(tx, job, result, at, turn_index):
