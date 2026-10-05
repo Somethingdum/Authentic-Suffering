@@ -1032,6 +1032,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_no_two_lives_alike.py` | In a standard world (seed 7) no two generated people of one group share a motive, wound, conflict, signature habit, hope or real secret; a seed whose every wound but one has been heard gets that one; once every real secret but one is given out where they live, an adult has that one or none |
 
+### 3.139 No two minds alike (P10; D-248)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_no_two_minds_alike.py` | In a standard world (seed 7) no two generated people of a group share a contradiction, a decision stack, a silence, a habit gesture or a thing they would never say; with every trait but one given out where they live, a person still draws two |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

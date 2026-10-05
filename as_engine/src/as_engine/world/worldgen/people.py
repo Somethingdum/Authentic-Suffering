@@ -551,6 +551,15 @@ _CONTRADICTIONS = (
      "nobody is"),
     ("the dead were people once", "the dead are just meat now", "they knew the dead one", "they did not"),
     ("hope is how we last", "hope is how we die", "the morning is quiet", "the dead are at the fence"),
+    # D-248: more minds than one camp has people
+    ("a debt is a debt", "the dead cancel every debt", "someone owes them", "they owe someone"),
+    ("you never leave anyone behind", "the slow get everyone killed", "it is someone they know", "it is a stranger"),
+    ("a gun solves nothing", "a gun is the only thing anyone listens to", "it is quiet", "someone pushes"),
+    ("{settlement} is worth dying for", "no wall is worth a life", "the gate holds", "the gate is breaking"),
+    ("the truth matters", "a kind lie keeps people going", "it costs nothing", "someone is grieving"),
+    ("the sick should be cared for", "the sick should be put out", "it is a fever", "it is a bite"),
+    ("work earns food", "nobody should go hungry", "the stores are full", "a child is hungry"),
+    ("someone is watching over us", "nobody is coming", "the morning is quiet", "someone has just died"),
 )
 _WONT = (("steal from the common store", "steal"), ("leave a wounded friend behind", "leave_wounded"),
          ("hurt a child", "harm_dependent"), ("break their word", "break_promise"), ("turn on their own group", "betray_group"))
@@ -633,11 +642,22 @@ _SILENCES = (
     (["a decision has to be made", "a gun is drawn"], "very still, watching", "comfortable on watch, uncomfortable at meals"),
     (["they are wrong", "a child is hurt"], "turns away", "comfortable alone, uncomfortable in a room full of people"),
     (["money or trade comes up", "someone shouts"], "picks at their sleeve", "comfortable working, uncomfortable resting"),
+    # D-248
+    (["someone is punished", "the gate opens at night"], "jaw set, counting breaths", "comfortable on the wall, uncomfortable in the kitchen"),
+    (["a name of the dead is said", "children ask questions"], "goes to the window", "comfortable with animals, uncomfortable with crowds"),
+    (["they are given orders", "food is shared out"], "hands in pockets, looking past people", "comfortable on a run, uncomfortable at home"),
+    (["blood is mentioned", "a stranger stares"], "rubs their wrists", "comfortable in the dark, uncomfortable in daylight"),
+    (["a vote is called", "someone weeps"], "leaves the room", "comfortable at the fire, uncomfortable on watch"),
+    (["they are thanked", "someone says sorry"], "nods too often", "comfortable in a small group, uncomfortable alone"),
 )
 _STACKS = (
     ["family", "own safety", "{group}", "strangers"], ["own safety", "family", "{group}", "strangers"],
     ["{group}", "family", "own safety", "strangers"], ["family", "{group}", "strangers", "own safety"],
     ["the children", "family", "{group}", "own safety"], ["their faith", "family", "{group}", "own safety"],
+    # D-248
+    ["the children", "{group}", "family", "own safety"], ["own safety", "{group}", "family", "strangers"],
+    ["family", "their faith", "own safety", "{group}"], ["{group}", "the children", "strangers", "own safety"],
+    ["the people they owe", "family", "{group}", "own safety"], ["the sick and the hurt", "{group}", "family", "own safety"],
 )
 _TOWARD_STRANGERS = ("wary", "neutral", "warm", "hostile", "wary", "neutral")
 _ENCOUNTER = ("calls for the watch and keeps distance", "asks their name and business", "offers water and watches them drink it",
@@ -691,28 +711,37 @@ _SETTLERS: tuple[str, ...] = (
 )
 
 
-LIFE_PATHS: tuple[str, ...] = ("$.motive.motive", "$.motive.past_wound", "$.motive.inner_conflict",
-                               "$.motive.signature_behaviour", "$.life.aspiration", "$.persona.private.concealed_history")
-
-
 def life_texts(dossier: dict) -> tuple[str, ...]:
-    """D-247: a generated dossier's own life, as LIFE_PATHS name it (implemented)."""
+    """D-247: a dossier's own life as texts (implemented): motive.motive, motive.past_wound,
+    motive.inner_conflict, motive.signature_behaviour, life.aspiration, persona.private.concealed_history,
+    and (D-248) each trait's tag, each contradiction's belief_a, the decision stack's layers and the
+    silence's goes_quiet_when (each joined with '|'), appearance.habit_gesture and movement_under_stress,
+    and each of voice.would_never_say."""
     m, life, priv = dossier.get("motive", {}), dossier.get("life", {}), dossier.get("persona", {}).get("private", {})
-    return tuple(x for x in (m.get("motive"), m.get("past_wound"), m.get("inner_conflict"), m.get("signature_behaviour"),
-                             life.get("aspiration"), priv.get("concealed_history")) if x)
+    ap = dossier.get("appearance", {})
+    out = [m.get("motive"), m.get("past_wound"), m.get("inner_conflict"), m.get("signature_behaviour"), life.get("aspiration"),
+           priv.get("concealed_history")]
+    out += [t.get("tag") for t in dossier.get("traits", [])]
+    out += [c.get("belief_a") for c in dossier.get("contradictions", [])]
+    out += ["|".join(dossier.get("decision_stack", {}).get("layers", [])), "|".join(dossier.get("silence", {}).get("goes_quiet_when", [])),
+            ap.get("habit_gesture"), ap.get("movement_under_stress")]
+    out += list(dossier.get("voice", {}).get("would_never_say", []))
+    return tuple(x for x in out if x)
 
 
 def world_lives(tx) -> tuple[str, ...]:
-    """D-247: the LIFE_PATHS texts of every dossier in the world, by dossier_id then path (implemented)."""
-    cols = ", ".join(f"json_extract(baseline_json, '{p}')" for p in LIFE_PATHS)
-    return tuple(x for r in tx.query(f"SELECT {cols} FROM dossiers ORDER BY dossier_id") for x in r if x)
+    """D-247: life_texts of every dossier in the world, by dossier_id (implemented)."""
+    import json
+    return tuple(x for r in tx.query("SELECT baseline_json FROM dossiers ORDER BY dossier_id") for x in life_texts(json.loads(r[0])))
 
 
-def _fresh(seed: "PersonSeed", pool, text=lambda x: x):
-    # D-247: not a life already given out here, then not one heard anywhere — while the table has others
+def _fresh(seed: "PersonSeed", pool, text=lambda x: x, n: int = 1):
+    # D-247: not a life already given out here, then not one heard anywhere — while the table has n others
     pool = tuple(pool)
-    here = tuple(x for x in pool if text(x) not in seed.lives_taken) or pool
-    return tuple(x for x in here if text(x) not in seed.lives_heard) or here
+    here = tuple(x for x in pool if text(x) not in seed.lives_taken)
+    here = here if len(here) >= n else pool
+    fresh = tuple(x for x in here if text(x) not in seed.lives_heard)
+    return fresh if len(fresh) >= n else here
 
 
 def world_voices(tx) -> tuple[str, ...]:
@@ -738,7 +767,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     out — most people have none) are drawn the same way (_fresh): of the table, one
     whose text (a motive as it reads at their settlement) is in seed.lives_taken only when every other is,
     and of those one in seed.lives_heard only when every other is — two people in one camp do not both
-    have hidden in a freezer for two days; someone who
+    have hidden in a freezer for two days; (D-248) and so are their traits (by tag; two drawn, so at least
+    two must be left), their contradiction (by belief_a as it reads there), decision stack, silence, habit
+    gesture, movement under stress and the three things they would never say; someone who
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
     everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
     unlocked field of it."""
@@ -746,7 +777,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     first = seed.name.split()[0]
     adult = seed.age >= 16
     kid, teen, elder = seed.age < 12, 12 <= seed.age < 18, seed.age >= 60
-    traits = _draw(seed, "traits", _KID_TRAITS if kid else _TRAITS, 2)
+    traits = _draw(seed, "traits", _fresh(seed, _KID_TRAITS if kid else _TRAITS, lambda t: t[0], 2), 2)   # D-248
     t1, t2 = traits
     voices, lines = ((_KID_VOICES, _KID_EXEMPLARS) if kid else (_TEEN_VOICES, _TEEN_EXEMPLARS) if teen else
                      (_VOICES + _ELDER_VOICES, _EXEMPLARS + _ELDER_EXEMPLARS) if elder else (_VOICES, _EXEMPLARS))
@@ -765,9 +796,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     fmt = {"group": seed.group_name, "settlement": seed.settlement_name, "occupation": seed.occupation}
     motive, method = _draw(seed, "motive", _fresh(seed, _KID_MOTIVES if kid else _MOTIVES, lambda x: x[0].format(**fmt)))
     wounds = _WOUNDS.get(seed.cohort) or _WOUNDS["pre_fall_adult"]
-    silence = _draw(seed, "silence", _SILENCES)
+    silence = _draw(seed, "silence", _fresh(seed, _SILENCES, lambda x: "|".join(x[0])))
     wont = _draw(seed, "wont", _WONT)
-    stack = [x.format(**fmt) for x in _draw(seed, "stack", _STACKS)]
+    stack = [x.format(**fmt) for x in _draw(seed, "stack", _fresh(seed, _STACKS, lambda st: "|".join(x.format(**fmt) for x in st)))]
     skills = [{"domain": d, "rank": r, "evidence": f"{first} learned it the hard way at {seed.settlement_name}."}
               for d, r in sorted(seed.skills.items())]
     looks = generated_looks(seed)
@@ -785,8 +816,8 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                        "skin": looks["complexion"],
                        "distinguishing_marks": [f"{m['what']} {m['where']}" for m in looks["marks"]] or ["nothing anyone remembers"],
                        "clothing_usual": "patched work clothes" if adult else "hand-me-downs two sizes big",
-                       "movement_under_stress": _draw(seed, "moves", _MOVES),
-                       "habit_gesture": _draw(seed, "gesture", _GESTURES),
+                       "movement_under_stress": _draw(seed, "moves", _fresh(seed, _MOVES)),
+                       "habit_gesture": _draw(seed, "gesture", _fresh(seed, _GESTURES)),
                        "relation_to_appearance": _draw(seed, "vanity", ("does not think about it", "keeps clean whatever it costs",
                                                                           "hides a scar", "wears something from before every day")),
                        "looks": looks},
@@ -811,7 +842,8 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         "traits": [dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t1)),
                    dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t2))],
         "contradictions": [dict(zip(("belief_a", "belief_b", "a_wins_when", "b_wins_when"),
-                                    (x.format(**fmt) for x in _draw(seed, "contradiction", _CONTRADICTIONS))))],
+                                    (x.format(**fmt) for x in _draw(seed, "contradiction",
+                                                                    _fresh(seed, _CONTRADICTIONS, lambda c: c[0].format(**fmt))))))],
         "decision_stack": {"layers": stack, "inversion_conditions": ["a raid on the settlement"],
                            "past_example": "stayed on the wall during a raid instead of running home"},
         "silence": {"goes_quiet_when": list(silence[0]), "body_when_silent": silence[1],
@@ -820,7 +852,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         "voice": {"capsule": f"{first} {tend[0]}; {tend[1]}.",
                   "speech_tendencies": list(tend),
                   "exemplars": {"low_stakes": ex[0], "under_pressure": ex[1], "at_the_limit": ex[2]},
-                  "would_never_say": _draw(seed, "never", _KID_NEVER_SAY if kid else _NEVER_SAY, 3),
+                  "would_never_say": _draw(seed, "never", _fresh(seed, _KID_NEVER_SAY if kid else _NEVER_SAY, n=3), 3),
                   "profanity": "none" if kid else swear,
                   "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
