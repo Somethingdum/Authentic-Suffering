@@ -1727,6 +1727,15 @@ def _guardian_of(tx, actor, subject):
                         "WHERE value=?)", (actor, subject)) is not None
 
 
+def _close_to(tx, actor, subject):
+    """D-221: love, not liking — affection >= 2 toward them, or one household."""
+    r = tx.query_one("SELECT affection FROM relationships WHERE from_id=? AND to_id=?", (actor, subject))
+    if r is not None and r[0] >= 2:
+        return True
+    return tx.query_one("SELECT 1 FROM household_members a JOIN household_members b ON a.household_id=b.household_id "
+                        "WHERE a.actor_id=? AND b.actor_id=?", (actor, subject)) is not None
+
+
 def _bonded_to(tx, actor, subject):
     """D-123: affection >= 1 toward them, or one household."""
     r = tx.query_one("SELECT affection FROM relationships WHERE from_id=? AND to_id=?", (actor, subject))
@@ -1787,6 +1796,8 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
         if "{whom}" in text and pl.get("whom"):                       # D-179: who it was done to, in their word
             from ..mind.perception import word_for
             text = text.replace("{whom}", "you" if pl["whom"] == target else word_for(tx, target, pl["whom"]))
+            if pl["whom"] != target and not _close_to(tx, target, pl["whom"]):   # D-221: a friend is not a loved one
+                text = text.replace(", someone you loved", ", a friend of yours").replace(", someone you love", ", a friend of yours")
         lid = open_loop(tx, target, pl["kind"], text, [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
                         trig.event_id, at, turn_index)
         if (tx.query_one("SELECT MAX(seq) FROM events")[0] or 0) == before:          # D-194: the same wrong done again

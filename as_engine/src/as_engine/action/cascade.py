@@ -325,7 +325,10 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
                                              text = payload.text, subject_ids = [payload.subject] or [],
                                              strength = payload.strength or 2, cause = E)               (P6)
                                              (D-179) '{whom}' in the text is the holder's word for
-                                             payload.whom (perception.word_for; 'you' when it is them)
+                                             payload.whom (perception.word_for; 'you' when it is them);
+                                             (D-221) then ', someone you love' / ', someone you loved'
+                                             reads ', a friend of yours' when the holder is not close
+                                             to payload.whom (affection below 2 and no one household)
                                              (D-194) the same wrong done again: when the holder already
                                              holds that loop open (LOOP-02: open_loop commits nothing)
                                              and it was not opened or deepened for this same E, it

@@ -875,6 +875,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_cast_out.py` | Finn cast out of Pumpwell: expelled from the settlers, out of his household, off the watch with his post left vacant, told he cannot stay, and everyone else set to keep him out — once; a standing that falls to -3 casts Jude out, and not before; the player's character can be cast out, with nothing written into him; hurting one of their own in front of them costs a point once a day; Jude cutting Finn's throat in front of Wade and Kit is the end of it; Tomas cast out leads no more |
 
+### 3.113 A friend of yours (P9; D-221)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_friend_of_yours.py` | June, a friend of Cal's (affection 1), holds "Ray shoved Cal, a friend of yours, to the dead."; loving him (affection 2), "Ray shoved Cal, someone you love, to the dead." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
