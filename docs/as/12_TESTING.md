@@ -748,6 +748,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_seen_spreading_it.py` | June, across the room, watching Alice spit into sleeping Eli's mouth has the `spreader_signs` cue and what she grew up hearing about the wet strain or the mouth rules comes to mind; Alice's own act is no sign to her; an ordinary act is no sign |
 
+### 3.92 A law kept (P9; D-188)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_law_kept.py` | Mae, who saw Hal bitten in Pumpwell's yard, holds the goal of the contamination quarantine in the law's own words; Otis in the shed holds nothing; Hal holds the fear of it; a second bite is the same law; with Owen bitten among his own, Mae means to see him quarantined and nothing is written into Owen; Hal seen spitting into sleeping Otis's mouth brings the law on both (Otis, asleep, does not know; Hal does), into the water on Hal alone |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

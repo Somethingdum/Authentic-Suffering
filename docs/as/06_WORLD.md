@@ -171,7 +171,9 @@ declares a `SHORTAGE` (CAS-004 water, CAS-016 food), and a shortage cuts the rat
 the leadership by 10 and schedules a loyalty check for the head of the worst-hit household an
 hour later (CAS-006). Laws are the content law defs active in the settlement; applying a punishing
 law (curfew, weapons, ration, trade, theft, noise, visitors) costs the subject 1 group standing;
-protective laws (contamination, intake, quarantine) cost nothing.
+protective laws (contamination, intake, quarantine) cost nothing. A law in force is kept by people
+(D-188): whoever of the settlement saw what brought it on holds a goal in the law's own words, and
+the one it falls on, knowing, holds the fear of it — never written into the player's character.
 
 **The canonical cascade (ECON-01)** fires end-to-end from one injury, every hop citing its rule
 (core pack `cascade/economy.yaml`; `~>` = scheduled, fires later at depth 0 — CAS-06):

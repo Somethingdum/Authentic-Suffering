@@ -890,3 +890,33 @@
       payload: {about: "$trigger.actor_id", claim: spoiled_the_food, seen: true}
   delay_s: 0
   cites: [D-186, D-77, D-162]
+- schema: as.cascade.v1
+  id: CAS-074
+  description: Someone seen spitting into a sleeper's mouth, by members of a settlement, comes under that settlement's contamination law — and so does the one it was put into.
+  trigger_event: ACTION_START
+  where: {def_id: spit_in_mouth}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LAW_APPLIED
+      target: settlements_seeing(trigger.event_id)
+      payload: {law: contamination_quarantine, subject: "$trigger.actor_id", where_in_force: true}
+    - kind: emit_event
+      event_type: LAW_APPLIED
+      target: settlements_seeing(trigger.event_id)
+      payload: {law: contamination_quarantine, subject: "$trigger.payload.target_id", where_in_force: true}
+  delay_s: 0
+  cites: [D-188, D-124, D-77]
+- schema: as.cascade.v1
+  id: CAS-075
+  description: Someone seen spitting into what people eat and drink, by members of a settlement, comes under that settlement's contamination law.
+  trigger_event: ACTION_START
+  where: {def_id: spit_into}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LAW_APPLIED
+      target: settlements_seeing(trigger.event_id)
+      payload: {law: contamination_quarantine, subject: "$trigger.actor_id", where_in_force: true}
+  delay_s: 0
+  cites: [D-188, D-124, D-77]

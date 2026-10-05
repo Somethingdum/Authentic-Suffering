@@ -93,7 +93,8 @@ def test_a_bite_in_the_yard_is_the_settlement_s_business(yard):
         assert cascade.select(tx, "settlements_seeing(trigger.event_id)", ev) == [w.id("pumpwell")], \
             "Mae saw it — Hal's own bite is not a sighting, and Owen belongs to no settlement"
         out = cascade.sweep(tx, [ev], rule(w), t + 1000, 0)
-    assert [e.rule_cited for e in out] == ["CAS-015"]
+    assert [(e.type, e.rule_cited) for e in out] == [(EventType.LAW_APPLIED, "CAS-015"), (EventType.LOOP_OPENED, "CAS-015"),
+                                                     (EventType.LOOP_OPENED, "CAS-015")], "and kept by people (D-188)"
     assert law_applied(w) == [{"actor_id": w.id("hal"), "law": "core:law/contamination_quarantine"}]
 
 

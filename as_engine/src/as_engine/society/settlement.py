@@ -109,6 +109,15 @@ STL-09 apply_law(tx, settlement_id, law, subject_id, at, turn_index, cause_event
   PUNISHING ('curfew', 'weapons', 'ration', 'trade', 'theft', 'noise', 'visitors'):
   mind.mind.adjust_group_standing(tx, the settlement's group, subject_id, -1, the LAW_APPLIED id,
   at, turn_index). Protective laws (contamination, intake, quarantine, ...) change no standing.
+  (D-188) A law in force is kept by people. When the subject is a living body: every member or
+  probation member of the settlement's group (sorted ids) who is alive, is not the subject, is not
+  controlled by 'human' (C06), and has a visual percept_log row at fidelity exact or partial of
+  ``cause_event_id`` (they saw what brought the law on) holds mind.mind.open_loop(kind 'goal', text
+  "{subject} comes under the <law name, lower case>. <the law's enforcement>" (no enforcement ->
+  the first sentence alone), subject_ids [subject], strength 2, cause = the LAW_APPLIED id); and
+  the subject, when they are one of that group too, not controlled by 'human' and either hold any
+  percept_log row of ``cause_event_id`` or are its actor (they know what happened), holds open_loop(kind 'fear',
+  "You come under the <law name, lower case> of <settlement name>.", [], 3, the LAW_APPLIED id).
 STL-10 settlement_of(store, entity_id) -> str | None: an id of kind 'stl' -> itself when it exists;
   'wkp' -> workplaces.settlement_id; 'plc' -> the settlement whose place_id it is; 'hh' ->
   households.settlement_id, else the settlement of its lowest-id living member; 'act' -> the

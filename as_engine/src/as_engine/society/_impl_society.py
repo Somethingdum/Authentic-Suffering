@@ -912,7 +912,33 @@ def apply_law(tx, settlement_id, law, subject_id, at, turn_index, cause_event_id
     if d.kind in PUNISHING and s["group_id"]:
         from ..mind.mind import adjust_group_standing
         adjust_group_standing(tx, s["group_id"], subject_id, -1, ev.event_id, at, turn_index)
+    _kept_by_people(tx, s, d, subject_id, at, turn_index, cause_event_id, ev.event_id)
     return ev
+
+
+def _kept_by_people(tx, s, d, subject_id, at, turn_index, cause_event_id, law_event_id):
+    # D-188: whoever saw what brought the law on means to see it kept; the subject knows what is coming
+    from ..mind.mind import open_loop
+    alive = _row(tx, "SELECT alive FROM bodies WHERE body_id=?", (subject_id,))
+    if not s["group_id"] or not cause_event_id or alive is None or not alive["alive"]:
+        return
+    name = d.name.strip().lower()
+    first = f"{{subject}} comes under the {name}."
+    goal = f"{first} {d.enforcement.strip()}" if d.enforcement.strip() else first
+    members = [r["actor_id"] for r in _rows(tx, "SELECT gm.actor_id FROM group_members gm JOIN bodies b ON b.body_id = gm.actor_id "
+                                                 "WHERE gm.group_id=? AND gm.status IN ('member','probation') AND b.alive=1 "
+                                                 "ORDER BY gm.actor_id", (s["group_id"],))]
+    for m in members:
+        if _controller(tx, m) in (None, "human"):
+            continue
+        if m == subject_id:
+            if _row(tx, "SELECT 1 AS x FROM percept_log WHERE holder_id=? AND event_id=? LIMIT 1", (m, cause_event_id)) \
+                    or _row(tx, "SELECT 1 AS x FROM events WHERE event_id=? AND actor_id=?", (cause_event_id, m)):
+                open_loop(tx, m, OpenLoopKind.FEAR.value, f"You come under the {name} of {s['name']}.", [], 3, law_event_id, at, turn_index)
+            continue
+        if _row(tx, "SELECT 1 AS x FROM percept_log WHERE holder_id=? AND event_id=? AND channel='visual' AND "
+                    "fidelity IN ('exact','partial') LIMIT 1", (m, cause_event_id)):
+            open_loop(tx, m, OpenLoopKind.GOAL.value, goal, [subject_id], 2, law_event_id, at, turn_index)
 
 
 def settlement_of(store, entity_id):

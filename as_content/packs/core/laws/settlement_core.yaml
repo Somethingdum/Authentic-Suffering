@@ -46,7 +46,7 @@
   id: contamination_quarantine
   name: Contamination Quarantine
   kind: contamination
-  text: Anyone confirmed bitten, clawed by something unidentified, or showing fever and confusion is moved to the quarantine room and is not to be handled or freed by anyone but the designated caretaker.
+  text: Anyone confirmed bitten, clawed by something unidentified, showing fever and confusion, or seen putting their spit into another's mouth, food or water — and anyone it was put into — is moved to the quarantine room and is not to be handled or freed by anyone but the designated caretaker.
   affordance_effects:
     - {affordance_tag: protect_dependent, effect: cost, applies_to: members, cost_note: "Interfering with a quarantine placement to protect a bitten relative is understood, but it is still a violation leadership will act on."}
   enforcement: Whoever confirms the exposure reports it immediately; the caretaker and one witness move the person to quarantine together, never one person alone.
