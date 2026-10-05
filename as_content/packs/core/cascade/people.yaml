@@ -1112,3 +1112,30 @@
       payload: {toward: "$trigger.payload.tied_by", axis: resentment, delta: 1, cause: tied_up_someone_of_yours}
   delay_s: 0
   cites: [D-208, D-202]
+# D-213: woke to find it gone — someone went through their things while they were out.
+- schema: as.cascade.v1
+  id: CAS-086
+  description: Waking to find something of yours taken while you slept or lay out cold sets you to finding out who.
+  trigger_event: AWARENESS_CHANGE
+  where: {awareness: awake}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: found_things_gone(trigger.event_id)
+      payload: {kind: goal, text: "Someone went through your things while you were out. Find out who.", strength: 2}
+  delay_s: 0
+  cites: [D-213, D-129]
+- schema: as.cascade.v1
+  id: CAS-087
+  description: Woken and stood up to find something of yours taken while you slept sets you to finding out who.
+  trigger_event: POSTURE_CHANGE
+  where: {awareness: awake}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: found_things_gone(trigger.event_id)
+      payload: {kind: goal, text: "Someone went through your things while you were out. Find out who.", strength: 2}
+  delay_s: 0
+  cites: [D-213, D-129]

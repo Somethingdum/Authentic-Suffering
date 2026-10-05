@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-837 ids; 578 with their own statement, 259 named only in context.
+840 ids; 581 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -204,6 +204,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-083 | Being tied up by someone, awake to know who, leaves you afraid of them and angry with them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_tied_up.py` |
 | CAS-084 | Someone who unties you, when they are not the one who tied you, earns your trust and warmth, and you owe them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_tied_up.py` |
 | CAS-085 | Seeing someone tie up a person you love costs them your trust, and you resent it — unless you knew the one tied was infected. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_tied_up.py` |
+| CAS-086 | Waking to find something of yours taken while you slept or lay out cold sets you to finding out who. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_gone_when_you_wake.py` |
+| CAS-087 | Woken and stood up to find something of yours taken while you slept sets you to finding out who. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_gone_when_you_wake.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
@@ -524,6 +526,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | GEST-01 | The packet offers the gestures the person's free hands allow — nod, shake of the head, shrug; pointing, beckoning or waving someone off toward each person here; a finger to the lips; both empty hands shown (`mind.packet… | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py` |
 | GEST-02 | A gesture takes the hands the attempt leaves free (`INTENT-09`: 'no_free_hand'); contact is never a gesture — a touch, a grab, covering a mouth is an attempt of its own. | 05_ACTORS §7.2 | — | — |
 | GEST-03 | A gesture goes out with the attempt as a GESTURE event: seen at clear or partial, never heard; 'Mara points at you.' (`action.resolve`, `mind.perception`). | 05_ACTORS §7.2 | `as_engine/action/resolve.py`, `as_engine/mind/perception.py` | `contract/p05_many_actors/test_gestures.py` |
+
+## GONE
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| GONE-01 | GONE-01 below for them at once. Dedup: a holder receives at most ONE percept per (event_id, channel) — granting again is a no-op returning the existing percept_id. This is what lets the per-wave scene compile and the af… | as_engine/mind/perception.py | `as_engine/action/cascade.py`, `as_engine/mind/perception.py` | `contract/p09_society/test_gone_when_you_wake.py` |
 
 ## GRP
 

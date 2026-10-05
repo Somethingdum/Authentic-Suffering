@@ -1232,6 +1232,15 @@ def select(tx, selector, trigger):
             return [held]
         return [h for h in saw if h not in (who, held, holder) and _controller(tx, h) not in (None, "human")
                 and tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (h,))[0] and _bonded_to(tx, h, held)]
+    if fn == "found_things_gone":                                    # D-213: woke to find it gone
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        who = pl.get("body_id")
+        if pl.get("awareness") != "awake" or not who or _controller(tx, who) in (None, "human"):
+            return []
+        got = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND at=? AND channel='tactile' AND "
+                           "json_extract(detail,'$.gone')=1", (who, trigger.at))
+        return [who] if got else []
     if fn in ("tied_up_by", "saw_them_tied"):                        # D-208: tied up
         from ..society._impl_society import _controller
         pl = trigger.payload or {}

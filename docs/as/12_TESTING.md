@@ -827,6 +827,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p03_perception/test_one_search.py` | One sound-path search from a place gives, for every place, what a search for that place alone gives (every pair on metal_fence); the route search gives the same distance and the same portals as the search before D-212 (kept in the test) for every pair of bodies in different places on three scenarios; a request schema made once still gives every caller its own copy (enums set on one never reach another) |
 
+### 3.105 Gone when you wake (P9; D-213)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_gone_when_you_wake.py` | Mara, robbed in her sleep of the jerky in her pocket and the bottle in the pack on her back, wakes to "Your pack of jerky is gone." and "Your bottle of water is gone." and sets out to find out who — not knowing who; the same loss is found once; what she saw taken and what she moved herself are not gone; a slamming door that wakes her has her find it at once; the player's character finds it too, with nothing written into him |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

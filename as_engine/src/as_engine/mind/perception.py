@@ -78,10 +78,22 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
   events (it knows what it did through its own action record, mind.memory).
   Unconscious and dead holders perceive nothing; asleep holders only sounds, per acoustics. When a
   reception has wakes = True, perception grants the TONE_ONLY percept and then calls
-  physical.bodies.wake(tx, holder, at, cause_event_id = the sound's event, turn_index).
+  physical.bodies.wake(tx, holder, at, cause_event_id = the sound's event, turn_index) — and, woken,
+  GONE-01 below for them at once.
   Dedup: a holder receives at most ONE percept per (event_id, channel) — granting again is a
   no-op returning the existing percept_id. This is what lets the per-wave scene compile and the
   aftermath share events without double counting.
+  GONE-01 (D-213) Waking to find things gone: the holder's own AWARENESS_CHANGE (or POSTURE_CHANGE)
+  whose payload awareness is 'awake' — waking, or coming to — among the events compile_scene reads
+  (this turn's, at <= at; neither type is sensory) or compile_aftermath is given, is the moment they
+  check what they carry. out = the at of their latest AWARENESS_CHANGE / POSTURE_CHANGE whose payload awareness is
+  'asleep' or 'unconscious', at or before it (none: nothing is checked). For every ITEM_TRANSFER with
+  out < at <= the waking's at, in seq order, by someone else (actor_id set and not the holder),
+  taken from them — payload from {kind 'body', id: the holder}, or {kind 'container', id: C} with C
+  carried by the holder now (C, or the container holding C, up to a body, is in their hands, worn
+  or packed) — whose item is not with them now and of which they hold no percept: one TACTILE
+  EXACT percept (event_id = that ITEM_TRANSFER, source_id NULL, detail {gone: true, item_id}) "Your
+  <ItemDef.name> is gone." (its plural and 'are' when the item's qty > 1). They do not know who.
 
 compile_scene(tx, holder_id, at, turn_index) -> list[str]   (Stage 3, every wave)
   1. The standing view (skip when the holder is not conscious): for every other body B (alive or
@@ -556,6 +568,52 @@ def _conscious(tx, holder):
     return b["alive"] and b["awareness"] in ("alert", "awake", "drowsy")
 
 
+def _carried_by(tx, item_id, holder):
+    """D-213: the item, or the container holding it (up the chain), is on the holder's body."""
+    seen = set()
+    while item_id and item_id not in seen:
+        seen.add(item_id)
+        r = _row(tx, "SELECT holder_body, container_id FROM items WHERE item_id=?", (item_id,))
+        if r is None:
+            return False
+        if r["holder_body"] is not None:
+            return r["holder_body"] == holder
+        item_id = r["container_id"]
+    return False
+
+
+def _gone(tx, holder, ev, turn_index):
+    """GONE-01 (D-213): what was taken from the holder while they were out, found as they come back."""
+    wake_at = ev["at"]
+    r = tx.query_one("SELECT MAX(at) FROM events WHERE type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND "
+                     "json_extract(payload,'$.body_id')=? AND json_extract(payload,'$.awareness') IN ('asleep','unconscious') "
+                     "AND at<=?", (holder, wake_at))
+    if r is None or r[0] is None:
+        return []
+    canon = _canon(tx)
+    out = []
+    for t in tx.query("SELECT event_id, actor_id, payload FROM events WHERE type='ITEM_TRANSFER' AND at>? AND at<=? ORDER BY seq",
+                      (r[0], wake_at)):
+        if not t["actor_id"] or t["actor_id"] == holder:
+            continue
+        pl = _json.loads(t["payload"]) if isinstance(t["payload"], str) else t["payload"]
+        frm = pl.get("from") or {}
+        if not ((frm.get("kind") == "body" and frm.get("id") == holder) or
+                (frm.get("kind") == "container" and _carried_by(tx, frm.get("id"), holder))):
+            continue
+        iid = pl.get("item_id")
+        it = _row(tx, "SELECT def_ref, qty FROM items WHERE item_id=?", (iid,))
+        if it is None or _carried_by(tx, iid, holder):
+            continue
+        if tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND event_id=?", (holder, t["event_id"])):
+            continue
+        d = canon.get(it["def_ref"])
+        text = f"Your {d.plural} are gone." if it["qty"] > 1 and getattr(d, "plural", None) else f"Your {d.name} is gone."
+        out.append(grant(tx, holder, event_id=t["event_id"], channel="tactile", fidelity="exact", text=text, source_id=None,
+                         at=wake_at, turn_index=turn_index, detail={"gone": True, "item_id": iid}))
+    return out
+
+
 def _perceive_event(tx, holder, ev, turn_index):
     from ..sense import acoustics, optics
     out = []
@@ -589,7 +647,9 @@ def _perceive_event(tx, holder, ev, turn_index):
                                      "via_portal": r.path_portals[-1] if r.path_portals else None}))
             if r.wakes:
                 from ..physical.bodies import wake
-                wake(tx, holder, ev["at"], ev["event_id"], turn_index)
+                w = wake(tx, holder, ev["at"], ev["event_id"], turn_index)
+                if w is not None:                                     # GONE-01 (D-213): woken, they check
+                    out += _woke(tx, holder, {"payload": w.payload, "at": w.at}, turn_index)
         else:
             to = payload.get("to", ["everyone"])
             addressed = holder in to
@@ -613,7 +673,9 @@ def _perceive_event(tx, holder, ev, turn_index):
                                      "armed_at_me": bool(payload.get("armed")) and addressed and visible}))
             if r.wakes:
                 from ..physical.bodies import wake
-                wake(tx, holder, ev["at"], ev["event_id"], turn_index)
+                w = wake(tx, holder, ev["at"], ev["event_id"], turn_index)
+                if w is not None:                                     # GONE-01 (D-213): woken, they check
+                    out += _woke(tx, holder, {"payload": w.payload, "at": w.at}, turn_index)
         return out
     if not _conscious(tx, holder):
         return out
@@ -798,7 +860,27 @@ def compile_scene(tx: "Tx", holder_id: str, at: int, turn_index: int) -> list[st
                                payload={"holder_id": holder_id, "bookkeeping": True}))
     for ev in _events_rows(tx, turn_index, at):
         out += [p for p in _perceive_event(tx, holder_id, ev, turn_index) if p not in out]
+    for ev in tx.query("SELECT * FROM events WHERE turn_index=? AND at<=? AND type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') "
+                       "ORDER BY seq", (turn_index, at)):
+        out += [p for p in _woke(tx, holder_id, dict(ev), turn_index) if p not in out]   # GONE-01 (D-213)
     return out
+
+
+def _gone_ids(tx, holder, row, turn_index):
+    """GONE-01 for compile_aftermath: the ITEM_TRANSFER ids of the percepts granted (they are returned by event id)."""
+    granted = _woke(tx, holder, dict(row), turn_index)
+    if not granted:
+        return []
+    ph = ",".join("?" * len(granted))
+    return [r[0] for r in tx.query(f"SELECT event_id FROM percept_log WHERE percept_id IN ({ph})", tuple(granted))]
+
+
+def _woke(tx, holder, ev, turn_index):
+    """GONE-01 (D-213): the holder's own waking or coming to is when they find what is gone."""
+    pl = _json.loads(ev["payload"]) if isinstance(ev["payload"], str) else ev["payload"]
+    if pl.get("body_id") != holder or pl.get("awareness") != "awake" or not _conscious(tx, holder):
+        return []
+    return _gone(tx, holder, ev, turn_index)
 
 
 def compile_aftermath(tx: "Tx", holder_id: str, events: list["Event"], at: int, turn_index: int) -> list[str]:
@@ -808,6 +890,8 @@ def compile_aftermath(tx: "Tx", holder_id: str, events: list["Event"], at: int, 
         row = _row(tx, "SELECT * FROM events WHERE event_id=?", (eid,))
         if row and row["type"] in SENSORY_TYPES:
             _perceive_event(tx, holder_id, row, turn_index)
+        elif row and row["type"] in ("AWARENESS_CHANGE", "POSTURE_CHANGE"):
+            ids += [r for r in _gone_ids(tx, holder_id, row, turn_index) if r not in ids]   # GONE-01 (D-213)
         ids.append(eid)
     if not ids:
         return []

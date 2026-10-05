@@ -97,6 +97,12 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               (D-208), or the one held was not fighting a person in the
                                               10 minutes up to it (as trigger.attacker_provoked) — never
                                               the player's character (C06)
+    found_things_gone(<path>)                 (D-213) for an AWARENESS_CHANGE or POSTURE_CHANGE whose payload
+                                              awareness is 'awake': its body (payload body_id), when it
+                                              has an actors row and holds a GONE-01 percept (channel
+                                              tactile, detail gone true) at the trigger's at — they woke
+                                              to find something taken — never the player's character
+                                              (C06: what the player makes of it is theirs)
     tied_up_by(<path>)                        (D-208) for a CONTROL_ESTABLISH whose payload carries
                                               tied_by (a tie, physical.bodies.tie_event) by someone with
                                               an actors row who is not the one tied: the one tied, when

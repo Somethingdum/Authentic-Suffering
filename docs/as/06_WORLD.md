@@ -246,6 +246,9 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   Whoever unties them, not being the one who tied them, earns two trust and one warmth, and they owe
   them. A corpse that was tied rises tied. And anyone held — by a hand or the dead — knows it every
   turn it lasts, not only the moment it happened.
+- **Gone when you wake** (D-213, CAS-086/087): what someone else took from a sleeper, or from a bag still
+  on them, is found when they wake or come to ("Your pack of jerky is gone."), once; they do not know
+  who, and they set out to find out. A theft seen is D-129's.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later
