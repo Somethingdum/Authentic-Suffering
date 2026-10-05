@@ -472,6 +472,11 @@ def _moral_tags(c, d, o):
                                                   for r in c.tx.query("SELECT def_ref FROM items WHERE holder_body=? AND holder_slot IN ('hand_l','hand_r')", (t,)))
                 if not armed:
                     tags.append("attack_unarmed")
+                held = _row(c.tx, "SELECT restrained FROM bodies WHERE body_id=?", (t,))
+                if held and held["restrained"]:                 # D-134: someone who cannot fight or get away
+                    tags.append("torture")
+                    if "kill_human" in tags or "kill_child" in tags:
+                        tags.append("execute_prisoner")
     if t and t.startswith("itm_") and d.binds in ("item_reachable", "container"):
         hh = {r[0] for r in c.tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (c.me,))}
         owners = [r[0] for r in c.tx.query(

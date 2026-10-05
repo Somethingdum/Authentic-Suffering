@@ -15,7 +15,7 @@ player are in `STAGE_LABELS` (never engine words).
 | 3 | perceive | CODE | `perception.compile_scene` for every candidate actor | **G3** every percept row granted by `perception.grant` |
 | 4 | select | CODE | salience, mandatory set (`turn/select.py`), LOD plan (`lanes.scheduler.plan_cognition`) | **G4** mandatory set ⊆ HOT∪WARM |
 | 5 | afford | CODE | `AffordanceSet` per HOT/WARM/COLD actor | **G5** every option passes the physical gate for that body |
-| 6 | cognition | LM(A+B) | `ActorReplyV2` per HOT/WARM actor (a decision, or one consultation then a decision); plan continuation for COLD (`turn/cognition.py`) | **G6** schema-valid; choice ∈ offered handles; echo check on speech; targeted portrayal pre-check (§3.3, P11) |
+| 6 | cognition | LM(A+B) | `ActorReplyV2` per HOT/WARM actor (a decision, or one consultation then a decision); plan continuation for COLD, and (D-128) one short `ambient_line` on lane B for the most salient COLD people in the PC's place (`turn/cognition.py`) | **G6** schema-valid; choice ∈ offered handles; echo check on speech; targeted portrayal pre-check (§3.3, P11) |
 | 7 | barrier | CODE | validated `Intent` list; nothing mutated yet | **G7** every referent resolves at T0 or is marked for ACTION_BLOCKED |
 | 8 | resolve | CODE | outcome events (checks, conflicts, effects); how each mind answered what it was asked (refusals recorded, `turn/cognition.record_responses`) | **G8** each intent resolved exactly once; every draw in `prng_ledger` |
 | 9 | propagate | CODE | sound, sight, evidence, harm follow-ons | **G9** conservation holds (items, bodies, cohorts) |

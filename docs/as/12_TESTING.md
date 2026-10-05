@@ -482,6 +482,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_eating_the_dead.py` | Alice, a knife in hand by June's body, is offered to cut meat from it, and the body gives raw meat by its mass; Owen and Mara watch: Mara (never Owen) trusts Alice 2 less, fears her, is shaken and tells it, and — she loved June — holds a grudge of strength 3; Alice carries it (stress, Resolve). Shoving someone to the dead (CAS-022) is never written into Owen |
 
+### 3.48 Captives (P9; D-134)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_captives.py` | Alice holds Mara; Owen hits her: she was held when it landed, Alice and June saw it, June trusts Owen less, is shaken and tells it (CAS-049). Mara had swung at Owen, was taken, and Owen kills her: CAS-025 does not count it (she had been fighting), CAS-050/051 do — June is shaken, tells it, and trusts him 2 less. June's card says never 'torture': with Mara free she may hit her; with Mara held the blow is off her menu (gate 'moral') |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

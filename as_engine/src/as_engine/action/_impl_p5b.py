@@ -629,6 +629,17 @@ def _path(tx, path, trig):
         if k is None:
             return _MISSING
         return k[0] if path == "trigger.killer" else k[1]
+    if path == "trigger.victim_held":                             # D-134: a captive
+        typ = trig.type.value if hasattr(trig.type, "value") else trig.type
+        body = (trig.payload or {}).get("body_id")
+        if typ == "HARM" and body:
+            return _held_when(tx, body, trig.at)
+        if typ == "DEATH":
+            k = _killing(tx, trig)
+            if k is None:
+                return _MISSING
+            return _held_when(tx, body, tx.query_one("SELECT at FROM events WHERE event_id=?", (k[2],))[0])
+        return _MISSING
     if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
         a = _assault(tx, trig)
         if a is None:
@@ -794,6 +805,19 @@ def _theft_witnesses(tx, event_id):
         if any(o and o not in theirs for o in owners):
             out.append(holder)
     return out
+
+
+def _held_when(tx, body_id, at):
+    """D-134: held (gripped or tied) when it happened: grips taken on it up to ``at`` outnumber those let go, or it is
+    restrained now and still alive (a fixture's ropes leave no grip events)."""
+    est = tx.query_one("SELECT COUNT(*) FROM events WHERE type='CONTROL_ESTABLISH' AND json_extract(payload,'$.target_id')=? "
+                       "AND at<=?", (body_id, at))[0]
+    rel = tx.query_one("SELECT COUNT(*) FROM events WHERE type='CONTROL_RELEASE' AND json_extract(payload,'$.target_id')=? "
+                       "AND at<=?", (body_id, at))[0]
+    if est > rel:
+        return True
+    b = tx.query_one("SELECT restrained, alive FROM bodies WHERE body_id=?", (body_id,))
+    return b is not None and bool(b[0]) and bool(b[1])
 
 
 def _theft_victims(tx, event_id):

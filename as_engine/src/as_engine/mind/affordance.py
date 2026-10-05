@@ -126,7 +126,11 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
     leave_wounded     the same kinds of option while a body the actor has affection >= 1 toward
                       stands in that place and was seen at clear this turn with an unhealed,
                       unclotted severe or catastrophic wound (seen at clear = the wound is visible);
-    steal             via moral_tags_if_target 'owned' (see target kinds below).
+    steal             via moral_tags_if_target 'owned' (see target kinds below);
+    torture           (D-134) an attack-verb option on a human who is held (bodies.restrained:
+                      gripped or tied) — hurting someone who cannot fight back or get away;
+    execute_prisoner  (D-134) such an option that also carries kill_human or kill_child: killing
+                      a captive.
   A THREAT this turn = a known body that is infected (bodies.kind 'infected': its shape and gait
   show it, though not its type), or the actor of an event this actor perceived this turn that was
   a HARM, an ACTION_START with payload verb 'attack', or a SPEECH whose percept detail has

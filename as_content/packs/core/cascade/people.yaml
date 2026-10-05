@@ -472,3 +472,53 @@
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
   delay_s: 0
   cites: [D-133, INFO-02]
+# D-134 — captives. Hurting someone who is held and cannot fight back or get away, or killing them, is a line of its
+# own (moral tags torture, execute_prisoner): whoever sees it is shaken and tells it — even when the captive had been
+# fighting before they were taken.
+- schema: as.cascade.v1
+  id: CAS-049
+  description: Seeing someone beat a person who is held costs them your trust, shakes you, and the story travels.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.victim_held == true"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: beat_a_captive}
+    - kind: adjust_stress
+      target: assault_onlookers_of(trigger.event_id)
+      amount: 1
+    - kind: create_rumour
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.attacker", claim: beat_a_captive}
+  delay_s: 0
+  cites: [D-134]
+- schema: as.cascade.v1
+  id: CAS-050
+  description: Seeing someone kill a person who was held shakes everyone who saw it, and the story travels.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.victim_held == true"]
+  effects:
+    - kind: adjust_stress
+      target: onlookers_of(trigger.event_id)
+      amount: 1
+    - kind: create_rumour
+      target: onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.killer", claim: killed_a_captive}
+  delay_s: 0
+  cites: [D-134, D-119]
+- schema: as.cascade.v1
+  id: CAS-051
+  description: Killing a captive costs the killer the trust of everyone who saw it, even when the captive had been fighting before they were taken.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.victim_held == true and trigger.killer_provoked == true"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.killer", axis: trust, delta: -2, cause: killed_a_captive}
+  delay_s: 0
+  cites: [D-134, D-119]
