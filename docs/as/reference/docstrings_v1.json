@@ -851,11 +851,15 @@
  },
  "as_engine.kernel.hashing": {
   "<module>": {
-   "doc": "State hashing (P0). Implemented canonicalisation rules; table iteration is yours to write.\n\nHash algorithm (must be exactly this):\n  sha256 over, for each included table in sorted(table name) order:\n      b\"T:\" + name + b\"\n\"\n      then each row ordered by the table's primary key columns (rowid order for tables without\n      an explicit PK), encoded as canonical_json(list(row values in column order)) + b\"\n\".\n  SQLite REAL values are formatted with repr(float) by canonical_json.\nExcluded tables: see kernel.ownership WORLD_HASH_EXCLUDED / FULL_HASH_EXCLUDED, plus sqlite\ninternal tables and FTS shadow tables (names starting with 'episodes_fts').",
+   "doc": "State hashing (P0). Implemented canonicalisation rules; table iteration is yours to write.\n\nHash algorithm (must be exactly this; D-223 made it a hash of table digests so that a turn's hash no longer\nreads the whole history):\n  table digest of a table = sha256 over b\"T:\" + name + b\"\n\", then each row encoded as\n      canonical_json(list(row values in column order)) + b\"\n\", the rows ordered by the table's\n      primary key columns (rowid order for tables without an explicit PK) — except the APPEND_ONLY\n      tables (rows only ever inserted: events, percept_log, prng_ledger), whose rows go in rowid\n      (insertion) order, so the digest of what was already there is carried forward and only the rows\n      added since are read.\n  state hash = sha256 over, for each included table in sorted(table name) order:\n      b\"T:\" + name + b\"\n\" + table digest (hex) + b\"\n\".\n  SQLite REAL values are formatted with repr(float) by canonical_json.\n  The carried-forward digest of an APPEND_ONLY table is used only when the row it ended on is still\n  there with the same content and the table holds exactly the rows it counted plus those after it\n  (a rolled-back transaction, or anything else, recomputes it whole).\nExcluded tables: see kernel.ownership WORLD_HASH_EXCLUDED / FULL_HASH_EXCLUDED, plus sqlite\ninternal tables and FTS shadow tables (names starting with 'episodes_fts').",
    "sig": ""
   },
+  "_append_digest": {
+   "doc": "D-223: the digest of an APPEND_ONLY table, carried forward from the last time it was taken.",
+   "sig": "(store, t)"
+  },
   "table_digest": {
-   "doc": "sha256 of one table (same row encoding). Used by the commit gate and diagnostics.",
+   "doc": "sha256 of one table (same row encoding). Used by the state hashes, the commit gate and diagnostics.",
    "sig": "(store: 'Store', table: str) -> str"
   }
  },

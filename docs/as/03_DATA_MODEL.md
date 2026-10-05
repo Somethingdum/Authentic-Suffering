@@ -137,9 +137,12 @@ PC's stay in one place; `SCENE_START` / `SCENE_END`).
 
 ## 9. Hashing
 
-`kernel/hashing.py` defines the exact algorithm: sha256 over tables in name order, rows in primary
-key order, canonical JSON per row. `world_state_hash` excludes bookkeeping; `full_state_hash`
-additionally covers counters, rng streams, the prng ledger and the event log.
+`kernel/hashing.py` defines the exact algorithm: sha256 over the digests of the tables in name order;
+a table's digest is sha256 over its rows in primary key order, canonical JSON per row — except the
+tables that are only ever added to (events, percept_log, prng_ledger), whose rows go in insertion
+order so the digest is carried forward and a turn reads only what it added (D-223). `world_state_hash`
+excludes bookkeeping; `full_state_hash` additionally covers counters, rng streams, the prng ledger and
+the event log.
 
 - **DET-01** (event-apply replay): replaying every event onto an empty store with the same meta
   reproduces `world_state_hash` exactly.

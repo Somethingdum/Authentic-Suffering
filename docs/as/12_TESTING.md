@@ -887,6 +887,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_word_of_a_death.py` | Mae, told by Finn that her husband Hal is dead, loses a point of Resolve (word_of_a_death); Kit, not close to him, nothing; told again by Kit, Mae grieves once; Hal told his daughter Pip is dead is broken (lost_dependent, CAS-030) and not drained twice; the player's character told it is not changed |
 
+### 3.115 A hash that keeps up (P0; D-223)
+
+| File | What it proves |
+|---|---|
+| `p00_substrate/test_hash_keeps_up.py` | After more events and an rng draw the carried-forward digest is used and both state hashes equal a cold reading; a turn rolled back after it was hashed, its rows then taken by other events, is not carried; different events still hash differently |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
