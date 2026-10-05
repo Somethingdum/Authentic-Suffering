@@ -650,6 +650,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_my_way_words_only.py` | With "say it my way" on, a rewritten line keeps its words ("*shrugs* Fine. (looks away) Whatever." says "Fine. Whatever."); a line that is only a direction says what was typed; a line withheld is "Your character won't do that" and nothing is said |
 
+### 3.76 How much (P4; D-165)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_how_much.py` | Feelings are worded by how far they went: "You do not trust them at all; you are terrified of them; you will not forgive them." against "You are wary of them; they make you uneasy; something they did still rankles."; contempt, hatred and debts likewise |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

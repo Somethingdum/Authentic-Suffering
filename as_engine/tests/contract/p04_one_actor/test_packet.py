@@ -282,12 +282,13 @@ def test_relationships_and_entities(scenario):
     rel = {j.handles[r.handle]: r.text for r in j.relationships}
     assert ent[w.id("mara")].description == "Mara" and ent[w.id("mara")].relation_summary == "your friend"
     assert ent[w.id("pc")].relation_summary is None, "an acquaintance is not a named relation"
-    assert rel[w.id("mara")] == "You trust them; you care about them."
-    assert rel[w.id("pc")] == "You trust them."
+    assert rel[w.id("mara")] == "You trust them; you like them."       # D-165: trust 2, affection 1
+    assert rel[w.id("pc")] == "You mostly trust them."                  # trust 1
     m = packet_for(w, "mara", at)
     ment = {m.handles[e.handle]: e for e in m.entities}
     assert ment[w.id("eli")].relation_summary == "your child"
-    assert {m.handles[r.handle]: r.text for r in m.relationships}[w.id("eli")] == "You trust them; you love them."
+    assert {m.handles[r.handle]: r.text for r in m.relationships}[w.id("eli")] == \
+        "You would trust them with your life; you love them."           # D-165: trust 3, affection 3
     a = packet_for(w, "alice", at)
     assert {a.handles[r.handle]: r.text for r in a.relationships}[w.id("pc")] == "No strong feelings."
 

@@ -122,19 +122,26 @@ def _name_or_desc(tx, holder, body):
     return with_article(describe(tx, holder, body))
 
 
+REL_WORDS = {                                                     # D-165: how much, not only which way
+    "trust": {3: "you would trust them with your life", 2: "you trust them", 1: "you mostly trust them",
+              -1: "you are wary of them", -2: "you distrust them", -3: "you do not trust them at all"},
+    "fear": {1: "they make you uneasy", 2: "you fear them", 3: "you are terrified of them"},
+    "respect": {1: "you think well of them", 2: "you respect them", 3: "you look up to them",
+                -1: "you think little of them", -2: "you look down on them", -3: "you despise them"},
+    "affection": {1: "you like them", 2: "you care about them", 3: "you love them",
+                  -1: "you dislike them", -2: "you can't stand them", -3: "you hate them"},
+    "resentment": {1: "something they did still rankles", 2: "you resent them", 3: "you will not forgive them"},
+    "obligation": {1: "you owe them", 2: "you owe them a great deal", 3: "you owe them your life",
+                   -1: "they owe you", -2: "they owe you a great deal", -3: "they owe you their life"},
+}
+
+
 def _rel_text(r):
     parts = []
-    if r["trust"] > 0: parts.append("you trust them")
-    if r["trust"] < 0: parts.append("you distrust them")
-    if r["fear"] > 0: parts.append("you fear them")
-    if r["respect"] > 0: parts.append("you respect them")
-    if r["respect"] < 0: parts.append("you look down on them")
-    if 1 <= r["affection"] <= 2: parts.append("you care about them")
-    if r["affection"] >= 3: parts.append("you love them")
-    if r["affection"] < 0: parts.append("you dislike them")
-    if r["resentment"] > 0: parts.append("you resent them")
-    if r["obligation"] > 0: parts.append("you owe them")
-    if r["obligation"] < 0: parts.append("they owe you")
+    for axis, words in REL_WORDS.items():
+        v = max(-3, min(3, int(r[axis] or 0)))
+        if v:
+            parts.append(words[v])
     return _cap("; ".join(parts)) + "." if parts else "No strong feelings."
 
 

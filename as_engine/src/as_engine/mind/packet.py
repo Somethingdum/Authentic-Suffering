@@ -149,12 +149,20 @@ Fields (second person, plain English):
   relationships     RelationshipLine(handle, text) per entity with a relationships row from the
                     holder, in entity order. text = the non-zero axes, in the order trust, fear,
                     respect, affection, resentment, obligation, joined with '; ', first letter
-                    capitalised, ending '.': trust > 0 'you trust them', < 0 'you distrust them';
-                    fear > 0 'you fear them'; respect > 0 'you respect them', < 0 'you look down
-                    on them'; affection 1-2 'you care about them', 3 'you love them', < 0 'you
-                    dislike them'; resentment > 0 'you resent them'; obligation > 0 'you owe
-                    them', < 0 'they owe you'. All zero -> 'No strong feelings.'
-                    e.g. 'You trust them; you love them.'
+                    capitalised, ending '.' — (D-165) worded by how much, not only which way
+                    (values -3..3; REL_WORDS in the implementation): trust 3 'you would trust them
+                    with your life', 2 'you trust them', 1 'you mostly trust them', -1 'you are wary
+                    of them', -2 'you distrust them', -3 'you do not trust them at all'; fear 1 'they
+                    make you uneasy', 2 'you fear them', 3 'you are terrified of them'; respect 1 'you
+                    think well of them', 2 'you respect them', 3 'you look up to them', -1 'you think
+                    little of them', -2 'you look down on them', -3 'you despise them'; affection 1
+                    'you like them', 2 'you care about them', 3 'you love them', -1 'you dislike
+                    them', -2 'you can't stand them', -3 'you hate them'; resentment 1 'something they
+                    did still rankles', 2 'you resent them', 3 'you will not forgive them';
+                    obligation 1 'you owe them', 2 'you owe them a great deal', 3 'you owe them your
+                    life', -1 'they owe you', -2 'they owe you a great deal', -3 'they owe you their
+                    life'. All zero -> 'No strong feelings.'
+                    e.g. 'You would trust them with your life; you love them.'
   beliefs           BeliefLine per live believed holding (believed = 1, superseded_by NULL; the
                     text is the proposition's, or for a claims row '<predicate> <value>'), best
                     PacketRules.max_beliefs by (confidence desc, acquired_at desc, claim_id asc).
