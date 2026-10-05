@@ -198,12 +198,13 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         from .narrator import BROKEN_NIGHT_LINE                  # D-146: a night broken
         state.append(BROKEN_NIGHT_LINE)
     allowed = {pc, _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"]}
+    people = set(back_names)
     for r in tx.query("SELECT DISTINCT a.known_name FROM percept_log p JOIN acquaintance a ON a.holder_id=p.holder_id AND a.subject_id=p.source_id "
                       "WHERE p.holder_id=? AND p.turn_index=? AND a.known_name IS NOT NULL", (pc_id, turn_index)):
-        allowed.add(r[0])
+        people.add(r[0])
+    allowed |= people | {n.split()[0] for n in people if n and n.split()}           # D-264: a man known by his full name
     for r in tx.query("SELECT pl.name FROM known_places k JOIN places pl ON pl.place_id=k.place_id WHERE k.holder_id=?", (pc_id,)):
         allowed.add(r[0])
-    allowed |= back_names
     hint = None
     for p in tx.query("SELECT detail FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='speech' AND fidelity IN ('exact','partial') "
                       "ORDER BY at, percept_id", (pc_id, turn_index)):

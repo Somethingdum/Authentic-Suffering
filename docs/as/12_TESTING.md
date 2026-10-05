@@ -1110,6 +1110,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_said_to_someone_you_love.py` | Owen calls June a useless bitch, or says he'll break her arm, with Mara beside her: Mara is provoked (insulted_bonded / threatened_bonded, with the strain a threat costs) and Alice, to whom June is nothing, is not; Mara resents him (CAS-116) or trusts him less and resents him (CAS-115), once an hour; an order is a threat to June only with the gun on her, and a threat at gunpoint is CAS-055's; spitting at June is CAS-117's; the PC's anger is on record but no rule ever selects the PC |
 
+### 3.152 Settling in (P6; D-263)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_settling_in.py` | June saw Mara standing by the counter last turn; Mara sitting, lying, crouching or lying flat there now is not worth a memory; Mara lying still, a revolver in her hand, bleeding badly, or at the back door is; so is Alice where June saw Mara |
+
+### 3.153 His first name (P7; D-264)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_his_first_name.py` | Owen knows Mara as "Mara Voss": the narrator may write "Mara Voss" and "Mara" (DISC-NAME passes); knowing her only as "Mara", "Mara Voss" is still rejected, and nobody he does not perceive is allowed |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

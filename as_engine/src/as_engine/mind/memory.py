@@ -178,7 +178,11 @@ MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing
   percept of an ACTION_START or ACTION_COMPLETE, by another, of an affordance whose verb is in QUIET_VERBS
   without the 'threat_response' tag — a COMPLETE only with a clean or missing band: "Keisha stops and
   watches"), nor, on the run's first turn (no percept_log row of turn_index - 1 at all), a standing view
-  (event_id 'scene:…': the people and the place they were already among); or one of the holder's own
+  (event_id 'scene:…': the people and the place they were already among), nor (D-263) a standing view of
+  someone the holder held a standing view of at turn_index - 1 (same source_id, a 'scene:…' event) whose
+  text differs from that one only in how they hold themselves (mind.perception's posture verbs
+  'stands', 'crouches', 'sits', 'lies', 'lies flat' — never 'lies still', a body: sitting down, getting
+  up, lying down to rest); or one of the holder's own
   events of this turn
   (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
   that is not quiet. Quiet: an ACTION_START
@@ -275,6 +279,12 @@ def unprocessed(store: "Store | Tx", holder_id: str) -> list[tuple[int, list[str
         a = build_aftermath(store, holder_id, tix, at)
         out.append((tix, [o.text for o in a.self_experiences] + [p.text for p in a.percepts]))
     return out
+def _bearing(text):
+    """D-263: a standing view with how they hold themselves taken out ('lies still', a body, stays)."""
+    import re
+    return re.sub(r"\b(stands|crouches|sits|lies flat|lies(?! still))\b", "~", text or "", count=1)
+
+
 def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index: int) -> bool:
     import json
     def offhand(u):                                                  # D-232: a line of the room, not to them
@@ -290,12 +300,18 @@ def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index:
     first = tx.query_one("SELECT 1 FROM percept_log WHERE turn_index=? LIMIT 1", (turn_index - 1,)) is None
 
     def still(p):                                                    # D-254: nothing in it to remember
-        r = tx.query_one("SELECT q.event_id, e.type, e.actor_id, e.payload FROM percept_log q LEFT JOIN events e ON "
-                         "e.event_id = q.event_id WHERE q.percept_id=?", (packet.handles.get(p.handle),))
+        r = tx.query_one("SELECT q.event_id, e.type, e.actor_id, e.payload, q.source_id FROM percept_log q LEFT JOIN events "
+                         "e ON e.event_id = q.event_id WHERE q.percept_id=?", (packet.handles.get(p.handle),))
         if r is None:
             return False
         if first and (r[0] or "").startswith("scene:"):              # the run's first turn: where they already were
             return True
+        if (r[0] or "").startswith("scene:") and r[4]:               # D-263: only sat down, got up, lay down
+            seen = [x[0] for x in tx.query("SELECT text FROM percept_log WHERE holder_id=? AND turn_index=? AND "
+                                           "source_id=? AND channel=? AND event_id LIKE 'scene:%'",
+                                           (holder_id, turn_index - 1, r[4], getattr(p.channel, "value", p.channel)))]
+            if any(_bearing(x) == _bearing(p.text) for x in seen):
+                return True
         if r[1] not in ("ACTION_START", "ACTION_COMPLETE") or r[2] == holder_id:
             return False
         pl = json.loads(r[3]) if isinstance(r[3], str) else (r[3] or {})

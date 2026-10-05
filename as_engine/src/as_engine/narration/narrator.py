@@ -96,7 +96,9 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of
                    its percepts this turn, the names of the places it knows (known_places), and
-                   (D-145) the PC's known_name for the bodies of what came back (NARR-11).
+                   (D-145) the PC's known_name for the bodies of what came back (NARR-11); (D-264) with
+                   each such known_name of a person, its first word — "Marcus" of "Marcus Castillo":
+                   a man known by his full name is called by his first.
   pc_beliefs       (D-197) the texts of mind.retrieval.lore_lines(tx, pc_id, turn_index, now,
                    PacketRules.max_lore) that are not among the texts of lore_lines(tx, pc_id,
                    turn_index - 1, now, the same n): what the PC grew up hearing about what is in front

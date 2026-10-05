@@ -367,7 +367,7 @@ timing; the person chooses only what goes with what.
 
 After commit, each mind that perceived anything new gets an `AftermathPacket` with only its own
 percepts (L8) — the same doors still shut, a turn spent holding still and a voice through the wall nobody could make out are not
-sent to be remembered (D-189, D-227, D-254, MEM-20) — and what they grew up hearing about it (D-196), which colours how they read it, and what they had been told before about the people in front of them, and by whom (D-226), so they can find out they were lied to — whether it was a lie or a mistake is their own judgment (AC09). WRITEBACK (lane B) returns: an episode in the mind's own voice with salience; beliefs
+sent to be remembered (D-189, D-227, D-254, D-263, MEM-20) — and what they grew up hearing about it (D-196), which colours how they read it, and what they had been told before about the people in front of them, and by whom (D-226), so they can find out they were lied to — whether it was a lie or a mistake is their own judgment (AC09). WRITEBACK (lane B) returns: an episode in the mind's own voice with salience; beliefs
 (each citing the percepts that caused it); relationship changes (−2..+2 on one axis, citing a
 percept); new open loops — **goals, desires, grudges, fears, questions, plans, promises, debts,
 secrets kept** — each citing a percept; closed loops; an optional lesson with cue tags. Items that
@@ -451,7 +451,7 @@ The narrator is a mind whose skull is the PC's (L9). `narration/narrator.py`:
   words the PC heard (fragments included). Place details only when establishing a place.
 - **Rules** (prompt + code lint): write only what is listed; never another mind's interior; never
   "unknown to", "meanwhile", "while you were gone"; quoted speech must match committed speech
-  (DISC-SPEECH); names only if the PC knows them (DISC-NAME); one uninterrupted scene; no headings,
+  (DISC-SPEECH); names only if the PC knows them (DISC-NAME; D-264: someone known by a full name may be called by the first); one uninterrupted scene; no headings,
   lists, stats or menus.
 - **Comprehension layer** (NARR-05): the PC's Perception and Intelligence decide how much of a
   tactic the prose explains ("Anya shoots the raider" vs "Anya lays down measured fire on the
