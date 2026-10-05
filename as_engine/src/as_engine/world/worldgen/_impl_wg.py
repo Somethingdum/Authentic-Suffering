@@ -1030,7 +1030,8 @@ def _brief_person(seed, role, skel=None, history=(), dsf=None, lore=()):
         m, v, lf = skel.get("motive") or {}, skel.get("voice") or {}, skel.get("life") or {}
         fears = lf.get("fears")
         fears = ", ".join(fears) if isinstance(fears, list) else fears
-        sketch = [("How they talk", v.get("capsule")), ("What drives them", m.get("motive")), ("What hurt them", m.get("past_wound")),
+        sketch = [("How they talk", v.get("capsule")), ("How they sound", v.get("dialect_notes")),          # D-271
+                  ("What drives them", m.get("motive")), ("What hurt them", m.get("past_wound")),
                   ("What pulls them two ways", m.get("inner_conflict")), ("What they hope for", lf.get("aspiration")),
                   ("What they fear", fears), ("What they always do", m.get("signature_behaviour")),
                   ("What they are in the middle of", lf.get("current_project"))]                      # D-260

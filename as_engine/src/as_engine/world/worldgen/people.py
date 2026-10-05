@@ -61,7 +61,8 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   from {birthplace}; before the Fall: {occupation_before}. These stay as they are: build their life on them.' (the
   skeleton's identity, which the answer cannot change); 'A
   sketch of them to build on: keep its spirit, make it specific and their own.' then the skeleton's
-  voice capsule, motive, past wound, inner conflict, aspiration, fears, signature behaviour and (D-260) current project as
+  voice capsule, (D-271) dialect notes ('How they sound', when any), motive, past wound, inner conflict, aspiration, fears,
+  signature behaviour and (D-260) current project as
   '- <what>: <text>' lines; 'What happened here, as people tell it:' then the history belief texts
   (at most 8); 'What people around them say, and they believe too (...)' then every core-lore
   belief held by 'common', their cohort or their group's faction (content_ref) — the Writer wrote

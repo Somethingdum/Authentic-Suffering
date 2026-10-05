@@ -1096,7 +1096,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p10_world/test_the_writer_knows_where_they_come_from.py` | Every WORLDGEN_ACTOR brief says where that person comes from and what they did before the Fall, exactly as their card keeps it, and what they are in the middle of |
+| `p10_world/test_the_writer_knows_where_they_come_from.py` | Every WORLDGEN_ACTOR brief says where that person comes from and what they did before the Fall, exactly as their card keeps it, what they are in the middle of, and (D-271) how they sound when the skeleton says |
 
 ### 3.150 How they sound (P10; D-261)
 

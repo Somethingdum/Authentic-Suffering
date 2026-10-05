@@ -1,4 +1,5 @@
-"""The Writer knows where they come from (D-260). world/worldgen/people.py WG6 brief (WORLDGEN_ACTOR).
+"""The Writer knows where they come from (D-260), and how they sound (D-271). world/worldgen/people.py WG6 brief
+(WORLDGEN_ACTOR).
 
 Where a generated person comes from and what they did before the Fall are fixed by their skeleton (D-251) and copied
 over whatever the Writer answers — but the Writer was never told them, so it could write a wound in a city the card
@@ -30,14 +31,15 @@ def test_the_fixed_facts_are_in_the_brief(tmp_path):
         idents = {}
         for (j,) in s.store.query("SELECT baseline_json FROM dossiers WHERE source = 'generated'"):
             d = json.loads(j)
-            idents[d["identity"]["name"]] = (d["identity"], d["life"].get("current_project"))
+            idents[d["identity"]["name"]] = (d["identity"], d["life"].get("current_project"), d["voice"].get("dialect_notes"))
         asked = fake.calls(CallClass.WORLDGEN_ACTOR)
         assert asked
         for r in asked:
             u = r.messages[-1].content
             name = u.split(",", 1)[0]
-            ident, project = idents[name]
+            ident, project, sound = idents[name]
             assert f"They come from {ident['birthplace']}; before the Fall: {ident['occupation_before']}." in u, name
             assert f"- What they are in the middle of: {project}" in u, name
+            assert (f"- How they sound: {sound}" in u) is bool(sound), name     # D-271: where they learned to talk
     finally:
         s.store.close()
