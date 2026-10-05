@@ -1210,15 +1210,19 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
         n += 1
     # WORLDGEN_ACTOR for the first llm_dossiers
     hist = [(json.loads(r[1]), r[2]) for r in tx.query("SELECT hist_id, subject_ids, belief_text FROM history_events ORDER BY day, hist_id")]
-    from .people import world_voices
+    from .people import life_texts, world_lives, world_voices
     skels, heard, heard_all = [], {}, list(world_voices(tx))
+    lived, lived_all = {}, list(world_lives(tx))
     for i, (slot, sd, b) in enumerate(seeds):                     # D-199: voices dealt out, no repeats in one place
         place = slot[1].settlement_id
-        sd = dataclasses.replace(sd, voices_taken=tuple(heard.get(place, ())), voices_heard=tuple(heard_all))   # D-245
+        sd = dataclasses.replace(sd, voices_taken=tuple(heard.get(place, ())), voices_heard=tuple(heard_all),   # D-245
+                                 lives_taken=tuple(lived.get(place, ())), lives_heard=tuple(lived_all))          # D-247
         seeds[i] = (slot, sd, b)
         skels.append(skeleton_dossier(sd))
         heard.setdefault(place, []).append(skels[-1]["voice"]["exemplars"]["low_stakes"])
         heard_all.append(skels[-1]["voice"]["exemplars"]["low_stakes"])
+        lived.setdefault(place, []).extend(life_texts(skels[-1]))
+        lived_all.extend(life_texts(skels[-1]))
     k = min(T["llm_dossiers"], len(seeds))
 
     def hist_for(gid):
@@ -1466,7 +1470,7 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
     from ...physical import bodies, objects, space
     from .. import _impl_p10 as P
     from .opening import Opening, fallback_opening
-    from .people import PersonSeed, skeleton_dossier, world_voices
+    from .people import PersonSeed, skeleton_dossier, world_lives, world_voices
     values = flat_values(params)
     dsf = params.days_since_fall
     zones = {z.zone_id: z for z in region.zones}
@@ -1604,7 +1608,8 @@ async def place_pc(client, rng, tx, pc_ref, pc, params, placement, plan, region,
                             variant=rng.range_int(tx, SO, f"raider_variant:{i}", 0, 999),
                             settlement_name=zones[g.home_zone_id].name, group_name=g.name, climate_heat=params.a.climate_heat,
                             voices_taken=tuple(gang_voices),                 # D-199: nobody in the gang sounds alike
-                            voices_heard=world_voices(tx))                   # D-245: nor like anyone in the world
+                            voices_heard=world_voices(tx),                   # D-245: nor like anyone in the world
+                            lives_heard=world_lives(tx))                     # D-247: nor anyone's life
             sk = skeleton_dossier(sd)
             gang_voices.append(sk["voice"]["exemplars"]["low_stakes"])
             aid = P.materialise(tx, rng, settlement_id=None, zone_id=g.home_zone_id, band="adult", sex=sex,

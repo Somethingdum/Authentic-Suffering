@@ -47,8 +47,9 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   younger ones; special = 3 + rng.range_int(0, 4) per letter in 'SPECIAL' order; variant =
   rng.range_int(0, 999). Dossier = skeleton_dossier(seed) (implemented below), the seeds dealt in slot
   order with (D-199) voices_taken = the first lines already given out in the same settlement and (D-245)
-  voices_heard = world_voices(tx) then every first line given out before in this stage (WG8's raider gang
-  likewise: voices_taken = the gang's, voices_heard = world_voices(tx)).
+  voices_heard = world_voices(tx) then every first line given out before in this stage, and (D-247)
+  lives_taken / lives_heard the same for life_texts (WG8's raider gang likewise: voices_taken = the
+  gang's, voices_heard = world_voices(tx), lives_heard = world_lives(tx)).
   The FIRST T['llm_dossiers'] generated people (slot order) get a WORLDGEN_ACTOR call each, all
   started together (asyncio.gather) and applied in slot order (P10: await progress(done, total) as each
   answer arrives, whatever its outcome): context WorldgenContext(stage='WG6',
@@ -160,6 +161,8 @@ class PersonSeed:
     climate_heat: int = 5       # LOOK-10: the region's climate_heat (1-10); what they dress for
     voices_taken: tuple[str, ...] = ()   # D-199: the first lines of the voices already given out where they live
     voices_heard: tuple[str, ...] = ()   # D-245: the first lines of the voices already given out anywhere in the world
+    lives_taken: tuple[str, ...] = ()    # D-247: the motives, wounds, conflicts, habits, hopes and secrets given out where they live
+    lives_heard: tuple[str, ...] = ()    # D-247: ... and anywhere in the world
 
 
 @dataclass
@@ -578,15 +581,26 @@ _WOUNDS = {
         "hid in a freezer for two days while the street was eaten", "sold out a neighbour for a bag of rice in the first winter",
         "walked out of the city alone, past people begging for help", "was in the first quarantine camp when the fence came down",
         "watched their child turn and could not do it themselves",
+        # D-247: more lives than one camp has people
+        "drove a bus and kept driving while they beat on the doors", "buried a family they had promised to come back for",
+        "held the line at the bridge until the order came to fire on the crowd", "lost their wife to a raider crew, not to the dead",
+        "opened the church doors to everyone the first night", "spent the first month on a roof watching the street below",
     ),
     "fall_child": (
         "was eight when the Fall came and remembers only the screaming", "grew up in the camps, moved from fence to fence",
         "lost their parents on the road and was raised by strangers", "was carried out of the city in a laundry basket",
         "was left at a gate with a note pinned to their coat",
+        "was hidden in a crawlspace while their family was taken", "remembers school only as the place the buses never came to",
+        "was traded between camps for food when they were ten", "grew up thinking the dead were a sickness that would pass",
+        "lost a little brother on the march and never said his name again",
+        "was raised by a man who taught them to kill before he taught them to read",
     ),
     "post_fall_born": (
         "has never seen a city lit at night", "lost their mother to a fever last winter", "was born in a cellar during a raid",
         "watched a neighbour turn when they were very small", "has never known a full stomach for a whole week",
+        "was taught to keep silent before they could talk", "lost a father on a supply run and was told he would come back",
+        "grew up on a wall, handing up ammunition", "watched the camp they were born in burn",
+        "was sold to another settlement for medicine in a hard winter", "has buried more friends than they have had birthdays",
     ),
 }
 _ASPIRATIONS = ("a quiet year", "a roof that does not leak", "to see the sea again", "to grow something that lives",
@@ -631,9 +645,20 @@ _ENCOUNTER = ("calls for the watch and keeps distance", "asks their name and bus
               "keeps one hand on a weapon and talks")
 _SECRETS = ("none worth telling", "none worth telling", "none worth telling",
             "took food from the common store in the hungry month", "rode with a raider crew for a winter",
-            "left someone behind who might have lived", "was bitten once, and it never took", "lied about their trade to get in")
+            "left someone behind who might have lived", "was bitten once, and it never took", "lied about their trade to get in",
+            # D-247: more secrets than one camp has people
+            "keeps a stash of medicine buried outside the wall", "put down a sick child and told the mother it ran off",
+            "deserted a watch the night the north camp was overrun", "hid a bitten partner for three days before it took",
+            "left the gate unbarred the night of the fire and let someone else hang for it",
+            "steals a little from the medicine shelf for their own pain", "cannot read, and has hidden it from everyone",
+            "has a brother riding with a raider crew and still meets him", "killed a man over a can of food and buried him by the road",
+            "traded someone's hiding place to a crew for safe passage")
 _DIALECTS = ("", "", "", "a northern accent that thickens when angry", "drops the 'g' on every -ing",
              "old army habits of speech", "a city voice gone rough", "slow country vowels")
+
+
+_no_secret = tuple(x for x in _SECRETS if x == "none worth telling")     # D-247: most people have none; never dealt out
+_real_secrets = tuple(x for x in _SECRETS if x != "none worth telling")
 
 
 def _draw(seed: "PersonSeed", what: str, pool, n: int = 1):
@@ -666,6 +691,30 @@ _SETTLERS: tuple[str, ...] = (
 )
 
 
+LIFE_PATHS: tuple[str, ...] = ("$.motive.motive", "$.motive.past_wound", "$.motive.inner_conflict",
+                               "$.motive.signature_behaviour", "$.life.aspiration", "$.persona.private.concealed_history")
+
+
+def life_texts(dossier: dict) -> tuple[str, ...]:
+    """D-247: a generated dossier's own life, as LIFE_PATHS name it (implemented)."""
+    m, life, priv = dossier.get("motive", {}), dossier.get("life", {}), dossier.get("persona", {}).get("private", {})
+    return tuple(x for x in (m.get("motive"), m.get("past_wound"), m.get("inner_conflict"), m.get("signature_behaviour"),
+                             life.get("aspiration"), priv.get("concealed_history")) if x)
+
+
+def world_lives(tx) -> tuple[str, ...]:
+    """D-247: the LIFE_PATHS texts of every dossier in the world, by dossier_id then path (implemented)."""
+    cols = ", ".join(f"json_extract(baseline_json, '{p}')" for p in LIFE_PATHS)
+    return tuple(x for r in tx.query(f"SELECT {cols} FROM dossiers ORDER BY dossier_id") for x in r if x)
+
+
+def _fresh(seed: "PersonSeed", pool, text=lambda x: x):
+    # D-247: not a life already given out here, then not one heard anywhere — while the table has others
+    pool = tuple(pool)
+    here = tuple(x for x in pool if text(x) not in seed.lives_taken) or pool
+    return tuple(x for x in here if text(x) not in seed.lives_heard) or here
+
+
 def world_voices(tx) -> tuple[str, ...]:
     """D-245: the first lines (voice.exemplars.low_stakes) of every dossier in the world, by dossier_id (implemented)."""
     return tuple(r[0] for r in tx.query("SELECT json_extract(baseline_json, '$.voice.exemplars.low_stakes') FROM dossiers "
@@ -684,7 +733,12 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     seed.voices_taken is drawn only when every voice open to them is taken — nobody in one place sounds like
     someone else there while there are voices left; (D-245) and of those, one whose first line is in
     seed.voices_heard only when every one of them is — a settler and a Ghost two miles apart do not greet the
-    player with the same words while the world has voices left; someone who
+    player with the same words while the world has voices left; (D-247) their motive, past wound, inner
+    conflict, signature behaviour, aspiration and secret (a real one: 'none worth telling' is never dealt
+    out — most people have none) are drawn the same way (_fresh): of the table, one
+    whose text (a motive as it reads at their settlement) is in seed.lives_taken only when every other is,
+    and of those one in seed.lives_heard only when every other is — two people in one camp do not both
+    have hidden in a freezer for two days; someone who
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
     everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
     unlocked field of it."""
@@ -709,7 +763,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     elif any(k in x for x in tend for k in ("scripture", "polite to a fault", "says sorry")):
         swear = "none"
     fmt = {"group": seed.group_name, "settlement": seed.settlement_name, "occupation": seed.occupation}
-    motive, method = _draw(seed, "motive", _KID_MOTIVES if kid else _MOTIVES)
+    motive, method = _draw(seed, "motive", _fresh(seed, _KID_MOTIVES if kid else _MOTIVES, lambda x: x[0].format(**fmt)))
     wounds = _WOUNDS.get(seed.cohort) or _WOUNDS["pre_fall_adult"]
     silence = _draw(seed, "silence", _SILENCES)
     wont = _draw(seed, "wont", _WONT)
@@ -742,9 +796,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                    "moral_line": {"will": [_draw(seed, "will", ("work a double shift", "share their last meal",
                                                                  "stand a watch for someone sick", "lie to protect a friend"))],
                                   "wont": [wont[0]], "wont_tags": [wont[1]]},
-                   "inner_conflict": _draw(seed, "conflict", _KID_CONFLICTS if kid else _CONFLICTS),
-                   "past_wound": _draw(seed, "wound", wounds),
-                   "signature_behaviour": _draw(seed, "signature", _KID_SIGNATURES if kid else _SIGNATURES),
+                   "inner_conflict": _draw(seed, "conflict", _fresh(seed, _KID_CONFLICTS if kid else _CONFLICTS)),
+                   "past_wound": _draw(seed, "wound", _fresh(seed, wounds)),
+                   "signature_behaviour": _draw(seed, "signature", _fresh(seed, _KID_SIGNATURES if kid else _SIGNATURES)),
                    "risk_threshold": 3 + v % 4,
                    "risk_text": _draw(seed, "risk", ("takes risks only for people they know", "takes risks for anyone",
                                                      "takes no risks they do not have to", "takes risks to be noticed")),
@@ -752,7 +806,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         "persona": {"public": {"shown_traits": [t1[0]], "claimed_history": f"came to {seed.settlement_name} early",
                                "presented_affiliation": seed.group_name},
                     "private": {"true_goals": [motive.format(**fmt)],
-                                "concealed_history": "none worth telling" if kid or teen else _draw(seed, "secret", _SECRETS),
+                                "concealed_history": "none worth telling" if kid or teen else _draw(seed, "secret", _no_secret + _fresh(seed, _real_secrets)),
                                 "real_affiliation": "their own people"}},
         "traits": [dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t1)),
                    dict(zip(("tag", "manifests", "triggers", "causes", "costs", "example"), t2))],
@@ -770,7 +824,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                   "profanity": "none" if kid else swear,
                   "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
-        "life": {"aspiration": _draw(seed, "aspiration", _KID_ASPIRATIONS if kid else _ASPIRATIONS),
+        "life": {"aspiration": _draw(seed, "aspiration", _fresh(seed, _KID_ASPIRATIONS if kid else _ASPIRATIONS)),
                  "current_project": f"keeping up with the work at {seed.settlement_name}",
                  "fears": [_draw(seed, "fear", _KID_FEARS if kid else _FEARS)]},
         "disposition": {"archetype_prior": "civilized", "toward_strangers": _draw(seed, "strangers", _TOWARD_STRANGERS),

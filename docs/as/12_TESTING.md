@@ -1026,6 +1026,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_said_once_on_every_card.py` | A generated Victor's decision card has his capsule and no "How you tend to speak" echo while Mara's written card keeps it; the card her voice is written from, once her capsule holds her habits, has no "Habits of speech" line |
 
+### 3.138 No two lives alike (P10; D-247)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_no_two_lives_alike.py` | In a standard world (seed 7) no two generated people of one group share a motive, wound, conflict, signature habit, hope or real secret; a seed whose every wound but one has been heard gets that one; once every real secret but one is given out where they live, an adult has that one or none |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

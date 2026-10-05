@@ -289,7 +289,7 @@ def _voices_here(tx, settlement_id, group_id):
 
 
 def operator_dossier(rng, tx, group_id, k, sex, cause):
-    from ..world.worldgen.people import PersonSeed, skeleton_dossier, world_voices
+    from ..world.worldgen.people import PersonSeed, skeleton_dossier, world_lives, world_voices
     r = tx.query_one("SELECT content_ref, name FROM groups WHERE group_id=?", (group_id,))
     rec = _rec(tx, r[0])
     D = rec.behaviour.decon
@@ -308,7 +308,8 @@ def operator_dossier(rng, tx, group_id, k, sex, cause):
                       skills={"firearms": 2, "melee": 1, "athletics": 1}, special=special,
                       variant=rng.range_int(tx, "factions", f"decon_variant:{cause}:{k}", 0, 999),
                       settlement_name=sname, group_name=r[1], climate_heat=int((wp.get("a") or {}).get("climate_heat", 5)),
-                      voices_taken=_voices_here(tx, s, group_id), voices_heard=world_voices(tx))   # D-245
+                      voices_taken=_voices_here(tx, s, group_id), voices_heard=world_voices(tx),   # D-245
+                      lives_heard=world_lives(tx))                                                          # D-247
     d = skeleton_dossier(seed)
     d["id"] = d["id"] + f"_{k}_{(cause or 'x')[-6:]}"
     d["appearance"]["clothing_usual"] = D.appearance

@@ -89,7 +89,8 @@ FAC-04 DECON (B.decon; Ghosts_6: "If any Ghost is confirmed killed by human acti
   every living person (not the player's) who is a member or on probation in the enclave settlement's
   group or ``group_id``, or is positioned at the enclave's place (a teammate just made), sorted by actor
   id — a new operator does not sound like the people they live among — and (D-245) voices_heard =
-  worldgen.people.world_voices(tx) — nor, while there are voices left, like anyone in the world — then
+  worldgen.people.world_voices(tx) — nor, while there are voices left, like anyone in the world — and
+  (D-247) lives_heard = worldgen.people.world_lives(tx) — nor lives anyone's life — then
   id += f"_{k}_{cause[-6:]}",
   appearance.clothing_usual = B.decon.appearance, appearance.distinguishing_marks = ['a small smile
   stitched at the left chest'], social.memberships = [{faction: the record's ref, role 'operator',
