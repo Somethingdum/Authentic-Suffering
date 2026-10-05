@@ -1044,6 +1044,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_a_card_about_you.py` | No text a generated card says of its person (outside their own quoted words) calls them 'they', 'their' or 'them', at every age and era; what they did before the Fall follows from when they were born (not yet born, too little, grade or high school, a first job, retired) and a trade that grew out of it says so on the skill; a real birthplace before the Fall, a place of this world after it; the one line does not repeat the name; whoever hides that they cannot read cannot, and adults do not all read alike; a child is settled and moves as a child; a raider tells a raider's story; in a standard world (seed 7) no two people of a group share a birthplace, a story of how they came, an allegiance, a project or the time their priorities held, and nobody shares a first line |
 
+### 3.141 Talk already answered (P7; D-252)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_talk_already_answered.py` | A line June heard and reacted to after it reached her (a later WARM wave in the ledger and an ok call) is not talk to take in next turn; one that reached her after she decided, or in the very wave she decided in, is; a failed call took nothing in (decided_at None); two turns of the player talking to June: on the second her wave-0 salience is 0 (COLD), she says no line to the room, and she reacts when the words land |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -83,7 +83,10 @@ simulate — stages 0-12 in ONE store transaction:
        what a snap does is turn.cognition step 4.
     S4 select: minds = the conscious cands; for each: select.mandatory(tx, a, T, wave_at, horizon,
        pc_intent (wave 0) | None, FORCED (wave 0) | empty), select.salience(select.salience_flags(
-       tx, a, minds, pc, T, wave_at), mandatory, weights) — (D-231) except that of the minds whose
+       tx, a, minds, pc, T, wave_at), mandatory, weights) — (D-252) at wave 0, for the one the PC speaks
+       to (pc_intent.bound.verb 'speak', its target_id), with talk_last_turn, owed_answer and restless
+       False: the conversation waits for the words, which are taken in when they land (REACT-01, D-206)
+       — what else is going on still counts; (D-231) except that of the minds whose
        only salience is 'restless' (not mandatory; salience 0 without it) and that have taken stock
        with a model before (an lm_calls row of theirs, actor_cognition or actor_reaction, status
        'ok' — one who never has decides now), sorted by actor id, only
@@ -100,7 +103,7 @@ simulate — stages 0-12 in ONE store transaction:
     S5 afford: affs = {a: enumerate_affordances(tx, a, canon affordances, wave_at, T) for a in
        plan.lod}.
     S6 cognition: intents = await turn.cognition.decide(tx, session, plan, affs, T, wave_at,
-       reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = (W1, D-80)
+       reaction = wave > 0, answered = answered, listening = {the one the PC speaks to, S4} at wave 0); wave 0 adds intents[pc] = (W1, D-80)
        turn.cognition.urge_pc(tx, rng, pc, pc_intent, T, wave_at) (the PC's intent goes through the
        same barrier and resolver as everyone's, L12) — except (OUT-02, D-173) when the intake's info
        says 'senseless': the PC does nothing (no intents[pc]), and the window is select.horizon(tx,

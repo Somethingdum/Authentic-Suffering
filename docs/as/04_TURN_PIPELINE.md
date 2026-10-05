@@ -232,7 +232,10 @@ dependent_in_danger; gripped; touched or hurt); addressed by name; one of its st
 triggers is present (a guard told to answer a loud noise hears one); its task ends inside the
 window; the PC's intent targets it.
 (D-206) The player speaking to someone does not make them mandatory: they hear the words when they land and
-answer in the reaction wave.
+answer in the reaction wave. (D-252) Nor does the conversation so far make them think first: at wave 0 the one
+spoken to has talk last turn, an open question and being due to take stock set aside, and says no line to the
+room; and talk last turn is only what was said at or after the moment someone last decided with a model —
+what they heard and answered in a reaction wave is taken in.
 
 Salience = Σ `SchedulerRules.salience_weights` over the true flags: `unique_info` (holds a
 PARTIAL+ percept no other candidate holds), `loudest_percept`, `addressed`, `in_conflict`,

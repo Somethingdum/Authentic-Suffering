@@ -107,7 +107,19 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       was said after it last decided is still to be taken in — (D-232) except a line of
                       the room (a SPEECH whose payload has ambient: true, AMB-03) not said to it (its
                       payload 'to' does not hold the actor), and its own such lines: an offhand remark
-                      reaches everyone without setting the whole room thinking.
+                      reaches everyone without setting the whole room thinking. (D-252) Talk already
+                      answered is not news: with D = decided_at(tx, actor_id, turn_index - 1), only a
+                      speech percept at >= D counts (said at or after the moment it last decided: what
+                      is said in the wave it decides in lands after the decision, and a reaction comes
+                      after what it reacts to), and its own
+                      SPEECH only when D is None — someone who heard a line and answered it in the
+                      reaction wave has taken it in; a conversation does not cost a call before the
+                      next line arrives and another when it lands.
+SEL-03 decided_at(tx, actor_id, turn_index) -> int | None   (D-252)
+  When it last decided with a model in that turn: None when it has no lm_calls row of that turn with
+  call class actor_cognition or actor_reaction and status 'ok'; else the greatest ``at`` of the waves
+  of that turn's stage-4 ledger detail (turn.pipeline S4: {'waves': [{wave, at, lod, ...}]}) whose lod
+  gives it 'hot' or 'warm' (None when there is none).
     fresh_loop        (D-191) it holds an 'open' loop (open_loops) whose created_event is an event of
                       turn_index - 1: a goal, a fear, a grudge, a plan formed since it last decided —
                       what it now wants is acted on, not left for when it next takes stock.
@@ -180,6 +192,10 @@ def conscious(tx: "Tx", actor_id: str) -> bool:
 def mandatory(tx: "Tx", actor_id: str, turn_index: int, at: int, horizon_ms: int, pc_intent: "Intent | None",
               forced: frozenset[str] | set[str] = frozenset()) -> bool:
     raise NotImplementedError("P7")
+
+
+def decided_at(tx: "Tx", actor_id: str, turn_index: int) -> int | None:
+    raise NotImplementedError("D-252")
 
 
 def salience_flags(tx: "Tx", actor_id: str, cands: list[str], pc_id: str, turn_index: int, at: int) -> dict[str, bool]:

@@ -142,11 +142,16 @@ async def simulate(ctx):
             await _progress(ctx, 4)
             minds = [c for c in cands if select.conscious(tx, c)]
             W = tx.rules.scheduler.salience_weights
+            pi = ctx.pc_intent if wave_idx == 0 else None
+            spoken_to = pi.bound.target_id if pi is not None and getattr(pi.bound.verb, "value", pi.bound.verb) == "speak" else None
             flagged = []
             for a in minds:
                 mand = select.mandatory(tx, a, T, wave_at, ctx.horizon, ctx.pc_intent if wave_idx == 0 else None,
                                         forced if wave_idx == 0 else frozenset())
-                flagged.append((a, select.salience_flags(tx, a, minds, s.pc_id, T, wave_at), mand))
+                f = select.salience_flags(tx, a, minds, s.pc_id, T, wave_at)
+                if a == spoken_to:              # D-252: the one spoken to waits to hear it (the talk is taken in when it lands)
+                    f = {**f, "talk_last_turn": False, "owed_answer": False, "restless": False}
+                flagged.append((a, f, mand))
             only = sorted(a for a, f, m in flagged if not m and f.get("restless")
                           and select.salience({**f, "restless": False}, False, W) == 0
                           and tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition',"
@@ -173,7 +178,7 @@ async def simulate(ctx):
             # 6 cognition
             await _progress(ctx, 6)
             intents = await cognition.decide(tx, s, plan, affs, T, wave_at, reaction=wave_idx > 0, answered=ctx.answered,
-                                             audits=ctx.judged)
+                                             audits=ctx.judged, listening=frozenset({spoken_to} - {None}))
             if wave_idx == 0 and not ctx.info.get("senseless"):
                 intents[s.pc_id] = cognition.urge_pc(tx, rng, s.pc_id, ctx.pc_intent, T, wave_at)
             asks = {a: cognition.asks_for(tx, a, T, ctx.answered) for a in sorted(intents)}

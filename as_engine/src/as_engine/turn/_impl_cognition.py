@@ -63,7 +63,8 @@ def consequential(tx, actor_id, affordances, turn_index, answered):
     return bool(asks_for(tx, actor_id, turn_index, answered)) or bool(getattr(affordances, "threats", []))
 
 
-async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), calls_ok=True, audits=None):
+async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), calls_ok=True, audits=None,
+                 listening=frozenset()):
     # Returns {actor_id: Intent} for every actor in plan.lod but those held in place (HOLD-01).
     from ..action.intent import plan_continuation
     from ..audit.log import repair as log_repair
@@ -98,7 +99,8 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
         st[a] = {"pkt": pkt, "req": req, "repair": False}
         jobs.append(j)
     cold = {a: plan_continuation(tx, a, affs[a], at, turn_index) for a in sorted(plan.lod) if plan.lod[a] == LOD.COLD}
-    room = _ambient_jobs(tx, session, plan, cold, turn_index, at, reaction=reaction)   # AMB-02 (D-128), AMB-04 (D-150)
+    room = _ambient_jobs(tx, session, plan, cold, turn_index, at, reaction=reaction,   # AMB-02 (D-128), AMB-04 (D-150)
+                         listening=listening)
     jobs += [j for _pk, j in room.values()]
     results = await run_jobs(session.client, jobs) if jobs else {}
 
@@ -204,7 +206,7 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
     return out
 
 
-def _ambient_jobs(tx, session, plan, cold, turn_index, at, *, reaction=False):
+def _ambient_jobs(tx, session, plan, cold, turn_index, at, *, reaction=False, listening=frozenset()):
     # AMB-02 (D-128): {actor: (packet, Job)} — the COLD people in the PC's place who get a line
     from ..contracts.common import LOD, CallClass, Lane
     from ..contracts.mind import AmbientLine
@@ -227,7 +229,7 @@ def _ambient_jobs(tx, session, plan, cold, turn_index, at, *, reaction=False):
                         lane_pref=Lane.B, est_s=cfg.rules.scheduler.estimated_call_s["ambient_line"]))
     able = []
     for a in plan.order:
-        if plan.lod.get(a) != LOD.COLD or a == session.pc_id or cold.get(a) is None:
+        if plan.lod.get(a) != LOD.COLD or a == session.pc_id or cold.get(a) is None or a in listening:   # D-252
             continue
         if tx.query_one("SELECT 1 FROM actors a JOIN positions p ON p.body_id = a.actor_id WHERE a.actor_id=? AND "
                         "a.controller='model' AND p.place_id=?", (a, here[0])) is None:

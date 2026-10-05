@@ -89,6 +89,17 @@ def mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=frozen
     return False
 
 
+def decided_at(tx, actor_id, turn_index):
+    """D-252 (SEL-03): when it last decided with a model in that turn, or None."""
+    if tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND turn_index=? AND call_class IN ('actor_cognition',"
+                    "'actor_reaction') AND status='ok'", (actor_id, turn_index)) is None:
+        return None
+    r = tx.query_one("SELECT detail FROM turn_ledger WHERE turn_index=? AND stage=4", (turn_index,))
+    waves = json.loads(r[0]).get("waves", []) if r is not None else []
+    ats = [w["at"] for w in waves if (w.get("lod") or {}).get(actor_id) in ("hot", "warm")]
+    return max(ats) if ats else None
+
+
 def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     from ..mind.cues import cues_of
     cues = cues_of(tx, actor_id, turn_index, at)
@@ -162,13 +173,14 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     restless = tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition','actor_reaction') "
                             "AND status='ok' AND turn_index BETWEEN ? AND ?",          # D-190
                             (actor_id, turn_index - tx.rules.scheduler.rethink_turns + 1, turn_index - 1)) is None
+    decided = decided_at(tx, actor_id, turn_index - 1)          # D-252: what it took in when it last decided
     talk = tx.query_one("SELECT 1 FROM percept_log p LEFT JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? AND "
                         "p.turn_index=? AND p.channel='speech' AND (p.source_id IS NULL OR p.source_id != ?) AND "
                         "(e.payload IS NULL OR json_extract(e.payload,'$.ambient') IS NULL OR EXISTS "
-                        "(SELECT 1 FROM json_each(e.payload,'$.to') WHERE value=?))",             # D-232: a remark to nobody
-                        (actor_id, turn_index - 1, actor_id, actor_id)) is not None \
-        or tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH' AND "
-                        "json_extract(payload,'$.ambient') IS NULL", (actor_id, turn_index - 1)) is not None
+                        "(SELECT 1 FROM json_each(e.payload,'$.to') WHERE value=?)) AND p.at >= ?",   # D-232: a remark to nobody
+                        (actor_id, turn_index - 1, actor_id, actor_id, -1 if decided is None else decided)) is not None \
+        or (decided is None and tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH' AND "
+                                             "json_extract(payload,'$.ambient') IS NULL", (actor_id, turn_index - 1)) is not None)
     fresh = tx.query_one("SELECT 1 FROM open_loops l JOIN events e ON e.event_id = l.created_event WHERE l.holder_id=? "
                          "AND l.status='open' AND e.turn_index=?", (actor_id, turn_index - 1)) is not None          # D-191
     from ..mind.affordance import NEED_PRESSING

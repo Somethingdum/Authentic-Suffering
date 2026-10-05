@@ -1,7 +1,8 @@
 """Stage 6 (cognition) and the stage-8 reading of answers (P7). Rules LOD-01/02, LANE-06, INTENT-02,
 AMB-02..03, ECHO-02, WILL-04..11, REPLY-01..02, HOLD-01..02, L6, L7. docs/as/04_TURN_PIPELINE.md §3.3.
 
-decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), audits=None) -> dict[actor_id, Intent]
+decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(), audits=None,
+       listening=frozenset()) -> dict[actor_id, Intent]
   ``answered`` = the pipeline's set of (actor, speech event) pairs already answered this turn (HOLD-02
   reads it). ``audits`` (P11): a list the pipeline keeps; when given, every actor whose final
   intent has source 'model' is appended at the end, in sorted order, as audit.portrayal.Judged(
@@ -139,7 +140,8 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
      crowd stood mute while two or three people talked. When lane B is up (session.client.is_down(
      Lane.B) is false — a line never falls over to lane A: the Writer is not spent on background
      talk), the COLD actors of plan.order (most salient first) that qualify get one AMBIENT_LINE call
-     each, at most SchedulerRules.max_ambient[session.settings.turn_depth]: not the PC; controller
+     each, at most SchedulerRules.max_ambient[session.settings.turn_depth]: not the PC; (D-252) not one
+     of ``listening`` (the one the PC is speaking to: they wait to hear it, and answer when it lands); controller
      'model'; in the PC's place (positions); no SPEECH of theirs this turn (one line a turn); no
      pending ACTION_LAND (kernel.clock.pending_for: words start an action anew, RESOLVE-01, so a line
      never cuts off what someone is in the middle of); their continuation (plan_continuation(tx,
@@ -320,7 +322,8 @@ class DecisionHeld(Rejected):
 
 
 async def decide(tx: "Tx", session: "Session", plan: "CognitionPlan", affs: dict, turn_index: int, at: int, *,
-                 reaction: bool, answered: set | frozenset = frozenset(), audits: list | None = None) -> dict[str, "Intent"]:
+                 reaction: bool, answered: set | frozenset = frozenset(), audits: list | None = None,
+                 listening: set | frozenset = frozenset()) -> dict[str, "Intent"]:
     raise NotImplementedError("P7")
 
 
