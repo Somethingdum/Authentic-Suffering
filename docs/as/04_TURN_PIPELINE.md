@@ -172,7 +172,8 @@ for the PC the window closes on it so the player answers.
 - WARM: `regimes[actor_cognition]` (lane B, thinking off, json_schema). Not for a mind with salience
   0 that is not mandatory (D-190): nothing new, nothing at stake, nothing owed, no talk last turn, no
   goal, fear or plan formed since it last decided (D-191), no pressing hunger, thirst or fatigue
-  (D-198), and it took stock with a model in the last
+  it has not yet decided knowing (D-198, D-228), no child of its own beside it in danger and no
+  business with the player while he is there (D-228), and it took stock with a model in the last
   `rethink_turns` turns — it runs COLD and goes on with what it
   was doing, and the room's lines still reach it.
 - COLD: `action.intent.plan_continuation` — the same decision still running. **LOD is a reasoning

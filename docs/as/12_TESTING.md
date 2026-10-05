@@ -917,6 +917,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p06_memory/test_a_voice_through_the_wall.py` | Mara, who caught only the tone of Owen's normal voice, said to everyone, and nothing else that turn, is not sent to be remembered; words made out (partial or exact), a raised or shouted voice, or words said to her are |
 
+### 3.120 What stands still is not news (P7; D-228)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_standing_is_not_news.py` | June, tired past the pressing stage and never asked, has pressing_need; once she has decided it is gone, back when it gets worse (even in the turn she decided), gone when she decides again, back after NEED_NEWS_TURNS; Mara with Eli asleep beside her has no dependent_present until she is in conflict (something grabs her); Nita's question about the man with the axe counts out in the lot only when he comes out there |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

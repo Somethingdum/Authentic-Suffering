@@ -79,8 +79,12 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     in_conflict       its cues include threat_seen or weapon_pointed, or it has a tactile percept;
     interrupt_trigger a cue present is a trigger of its standing orders or in its first active
                       task's interrupt_on;
-    open_loop_with_pc it has an 'open' loop whose subject_ids contain pc_id;
-    dependent_present a body it is guardian_of (household_members.guardian_of) is in its place;
+    open_loop_with_pc it has an 'open' loop whose subject_ids contain pc_id — (D-228) and the PC is in its
+                      place or it holds an EXACT or PARTIAL percept of the PC this turn (up to ``at``):
+                      unfinished business with someone who is right there, not wherever they are;
+    dependent_present a body it is guardian_of (household_members.guardian_of) is in its place —
+                      (D-228) while it is in_conflict: a child of its own beside it is what is at stake
+                      when there is danger, not a decision to make every quiet minute;
     visible_to_pc     the PC holds a visual percept of it this turn (up to ``at``) at EXACT or
                       PARTIAL;
     grievance_near    (H1) another living body in its place toward which mind.temper.heat(tx, actor,
@@ -103,7 +107,13 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       what it now wants is acted on, not left for when it next takes stock.
     pressing_need     (D-198) its needs row has hunger_stage, thirst_stage or fatigue_stage >=
                       mind.affordance.NEED_PRESSING: a body that wants food, water or sleep badly is
-                      a decision to make (D-182 puts what answers it first on the menu).
+                      a decision to make (D-182 puts what answers it first on the menu) — (D-228) when
+                      it is news: it has made no decision (an lm_calls row with its actor_id, call
+                      class actor_cognition or actor_reaction, status 'ok') in the last
+                      NEED_NEWS_TURNS turns, or a NEED_STAGE event of its body (payload body_id) at a
+                      stage >= NEED_PRESSING has a turn_index >= its last such decision's. Once it has
+                      decided knowing it, the same hunger is not asked about again every turn;
+                      'restless' still has it take stock every rethink_turns.
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written
   before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules
@@ -146,6 +156,7 @@ LOUD_MEMORY_MS = 10 * 60 * 1000
 MAX_WINDOW_MS = 8 * 3600 * 1000
 MIN_WINDOW_MS = 3000
 REACT_MARGIN_MS = 3000
+NEED_NEWS_TURNS = 24          # D-228 (SEL-03 pressing_need): how far back a decision about a need is looked for
 
 
 def active_area(tx: "Tx", pc_id: str, turn_index: int) -> list[str]:

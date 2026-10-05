@@ -133,11 +133,15 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     interrupt = bool(cues & trig)
     loop_pc = any(pc_id in json.loads(r[0]) for r in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND status='open'", (actor_id,)))
     here = _place(tx, actor_id)
+    if loop_pc:                                                      # D-228: business with someone right there
+        loop_pc = (here is not None and _place(tx, pc_id) == here) or any(
+            p["source_id"] == pc_id and p["fidelity"] in ("exact", "partial") for p in mine)
     dep = False
     for r in tx.query("SELECT guardian_of FROM household_members WHERE actor_id=?", (actor_id,)):
         for d in json.loads(r[0]):
             if here is not None and _place(tx, d) == here:
                 dep = True
+    dep = dep and in_conflict                                        # D-228: at stake when there is danger
     vis = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? AND channel='visual' "
                        "AND source_id=? AND fidelity IN ('exact','partial')", (pc_id, turn_index, at, actor_id)) is not None
     from ..mind import temper as _tm
@@ -164,6 +168,14 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     from ..mind.affordance import NEED_PRESSING
     nd = tx.query_one("SELECT MAX(hunger_stage, thirst_stage, fatigue_stage) FROM needs WHERE body_id=?", (actor_id,))
     pressing = nd is not None and nd[0] is not None and nd[0] >= NEED_PRESSING                         # D-198
+    if pressing:                                                     # D-228: a need is news until decided on
+        from .select import NEED_NEWS_TURNS
+        last = tx.query_one("SELECT MAX(turn_index) FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition',"
+                            "'actor_reaction') AND status='ok' AND turn_index BETWEEN ? AND ?",
+                            (actor_id, turn_index - NEED_NEWS_TURNS, turn_index))[0]
+        pressing = last is None or tx.query_one(
+            "SELECT 1 FROM events WHERE type='NEED_STAGE' AND turn_index>=? AND json_extract(payload,'$.body_id')=? AND "
+            "json_extract(payload,'$.stage')>=?", (last, actor_id, NEED_PRESSING)) is not None
     return {"unique_info": unique, "loudest_percept": loudest, "addressed": addressed, "in_conflict": in_conflict,
             "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis,
             "grievance_near": griev, "owed_answer": owed, "restless": restless, "talk_last_turn": talk, "fresh_loop": fresh, "pressing_need": pressing}
