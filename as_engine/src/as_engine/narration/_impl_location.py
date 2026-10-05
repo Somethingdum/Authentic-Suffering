@@ -201,7 +201,9 @@ def describe(tx, pc_id, at, refs=None):
         if pr["damage"] >= 2:
             st.append("broken")
         leads = _row(tx, "SELECT name FROM places WHERE place_id=?", (other,))["name"] if other in known else "unknown"
-        exits.append(ExitView(ref=_assign(refs, "x", pr["portal_id"], local), label=pr["name"], state_words=st, leads_to=leads))
+        from ..mind.perception import portal_name                     # D-259: as it reads from here
+        exits.append(ExitView(ref=_assign(refs, "x", pr["portal_id"], local), label=portal_name(tx, pr["portal_id"], place["place_id"]),
+                              state_words=st, leads_to=leads))
     # dangers
     dangers = []
     for r in tx.query("SELECT p.text, h.provenance FROM claim_holdings h JOIN propositions p ON p.prop_id=h.claim_id "

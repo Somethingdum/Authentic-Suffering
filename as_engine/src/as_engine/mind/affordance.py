@@ -210,6 +210,9 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
   goes: the source point when the source is in its place, else the point on its side of the portal
   the sound arrived through (percept detail 'via_portal'); with no sound this turn, the actor's
   own position. (So after a crash out back the anchors toward the storeroom door come first.)
+  (D-259) A label's {target} for a portal is perception.portal_name(tx, portal, the actor's place), and when it
+  already ends with the {destination} words the template's ' into {destination}' is left out ("Go through the
+  way out to the crossroads", not "... into the crossroads").
   Walking the sorted list, each group keeps at most 3 options per def_id — (D-258) 1 for a change of one's
   own clothes: "Take off your sweatshirt", "... your jacket", "... your jeans" took three places of a menu. The packet list is then
   filled ROUND-ROBIN: round 1 takes the first option of every non-empty group in rank order, round

@@ -66,7 +66,8 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
   F1..Fn  (B4, FOCUS-01) attention points: every P-handle whose whereabouts is 'here', in P
           order (label f'Keep your eyes on {description}'), then every portal of the actor's
           place the actor has a visual percept of this turn, by portal_id (label f'Watch {thing_phrase(
-          portal name)}' — D-237: 'Watch the way to Pump house': a door you can see is the door). Handle value = the body or portal id. A reaction packet
+          portal name)}' — D-237: 'Watch the way to Pump house': a door you can see is the door; (D-259) the name
+          is perception.portal_name(tx, portal, the actor's place): from inside, 'Watch the way out to the yard'). Handle value = the body or portal id. A reaction packet
           offers neither G nor F handles (its answer is short; Actor Spec §7).
   ``handles`` maps every handle to its internal id (percept_id, body id, signature, loop_id,
   episode_id) and is never rendered. tests/helpers.handle_for finds an option by def and referent.

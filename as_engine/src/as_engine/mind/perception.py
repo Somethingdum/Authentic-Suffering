@@ -228,7 +228,8 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       name>'. (Past or present is fixed per phrase above.)
   render_pain(wound): f'Pain: {SEVERITY_WORDS[severity]} {type} wound to the
       {ANATOMY_WORDS[anatomy]}.' (contracts.common; e.g. 'Pain: a deep stab wound to the left arm.').
-  render_portal(portal): f'The {name} is {open|closed}{, barricaded}{, damaged}.' — never
+  render_portal(portal, from_place=None): f'The {name} is {open|closed}{, barricaded}{, damaged}.' — (D-259) name =
+      portal_name(tx, portal, from_place): compile_scene passes the holder's place — never
       'locked' (a lock is not visible, GEO-01); a fence: f'The {name} is {intact|damaged}.' (D-237:
       'The {name}' here and wherever a sentence opens on a thing's name is thing_phrase(name) with its
       first letter upper-cased — 'the way to Pump house' is open, not 'The the way …'); (D-240) a way
@@ -522,8 +523,9 @@ def _metres(cm):
     return f"about {v} metre{'' if v == 1 else 's'}"
 
 
-def render_portal(tx, portal_id):
-    p = _row(tx, "SELECT * FROM portals WHERE portal_id=?", (portal_id,))
+def render_portal(tx, portal_id, from_place=None):
+    p = dict(_row(tx, "SELECT * FROM portals WHERE portal_id=?", (portal_id,)))
+    p["name"] = portal_name(tx, portal_id, from_place)                  # D-259: as it reads from where one is
     if p["kind"] in ("climb", "gap", "edge"):                           # D-240: there is no door to it
         nm = the_name(p["name"])
         if p["kind"] == "gap":
@@ -843,7 +845,7 @@ def compile_scene(tx: "Tx", holder_id: str, at: int, turn_index: int) -> list[st
                 out.append(grant(tx, holder_id, event_id=ev_id, channel="visual", fidelity=_LEVEL_FID[optics.band(sc)],
                                  text=f"{_cap(nm)} {where}.", source_id=it["item_id"], at=at, turn_index=turn_index, detail={"level": optics.band(sc)}))
         for pr in tx.query("SELECT portal_id FROM portals WHERE (place_a=? OR place_b=?) AND kind != 'wall' ORDER BY portal_id", (hp["place_id"], hp["place_id"])):
-            out.append(grant(tx, holder_id, event_id=ev_id, channel="visual", fidelity="exact", text=render_portal(tx, pr[0]),
+            out.append(grant(tx, holder_id, event_id=ev_id, channel="visual", fidelity="exact", text=render_portal(tx, pr[0], hp["place_id"]),
                              source_id=pr[0], at=at, turn_index=turn_index, detail={"level": "clear"}))
         if optics.light_at(tx, holder_id, at) > 0:
             for tr in tx.query("SELECT trace_id, text FROM traces WHERE place_id=? ORDER BY created_at, trace_id", (hp["place_id"],)):
@@ -1031,6 +1033,25 @@ def place_phrase(name: str) -> str:
 def thing_phrase(name: str) -> str:
     """'counter' -> 'the counter'; a name that already starts with 'the ' is unchanged (implemented)."""
     return name if name.lower().startswith("the ") else f"the {name}"
+
+
+def portal_name(tx, portal_id: str, from_place: str | None = None) -> str:
+    """A way's name as it reads from where one is (D-259, implemented): worldgen names the way into a site from
+    outside ('the way to the Salazar house'); from inside that place it is f'the way out to {place_phrase(the other
+    side)}' — never 'Go through the way to the Salazar house' from inside the Salazar house. Any other name, or no
+    ``from_place``, is the name as it is."""
+    p = _row(tx, "SELECT name, place_a, place_b FROM portals WHERE portal_id=?", (portal_id,))
+    name = p["name"]
+    if from_place is None or not name.lower().startswith("the way to "):
+        return name
+    if from_place not in (p["place_a"], p["place_b"]):
+        return name
+    here = _row(tx, "SELECT name FROM places WHERE place_id=?", (from_place,))["name"]
+    to = name[len("the way to "):].strip().lower()
+    if to.removeprefix("the ") != here.strip().lower().removeprefix("the "):
+        return name
+    other = p["place_b"] if p["place_a"] == from_place else p["place_a"]
+    return f"the way out to {place_phrase(_row(tx, 'SELECT name FROM places WHERE place_id=?', (other,))['name'])}"
 
 
 def the_name(name: str) -> str:

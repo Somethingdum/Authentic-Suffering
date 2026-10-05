@@ -624,7 +624,7 @@ def _label(c, d, o, tmpl, ui):
     elif t and t.startswith("itm_"):
         parts["target"] = P.thing_phrase(_item_name(c, t))
     elif t and t.startswith("prt_"):
-        parts["target"] = P.thing_phrase(_row(c.tx, "SELECT name FROM portals WHERE portal_id=?", (t,))["name"])
+        parts["target"] = P.thing_phrase(P.portal_name(c.tx, t, c.place))      # D-259: as it reads from here
     dest = o.get("destination_id")
     if dest and dest.startswith("anc_"):
         parts["destination"] = P.thing_phrase(_row(c.tx, "SELECT name FROM anchors WHERE anchor_id=?", (dest,))["name"])
@@ -638,6 +638,8 @@ def _label(c, d, o, tmpl, ui):
     parts["duration"] = duration_words(o["est"])
     for k in ("target", "destination", "item"):
         parts.setdefault(k, "")
+    if parts["destination"] and parts["target"].endswith(parts["destination"]):   # D-259: "the way out to the yard" leads there
+        tmpl = tmpl.replace(" into {destination}", "")
     return tmpl.format(**parts)
 
 

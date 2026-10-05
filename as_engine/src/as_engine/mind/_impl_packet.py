@@ -426,7 +426,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
                 continue
             fi += 1
             handles[f"F{fi}"] = pid
-            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Watch {thing_phrase(pr['name'])}"))   # D-237
+            from .perception import portal_name
+            pts.append(ExpressionOption(handle=f"F{fi}", label=f"Watch {thing_phrase(portal_name(tx, pid, pos['place_id']))}"))   # D-237, D-259
     wt = world_time(at)
     fields = dict(
         actor_id=actor_id, turn_index=turn_index, lod=lod,

@@ -39,7 +39,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | AFF-04 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-05 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-06 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
-| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/turn/intake.py` | `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_one_thing_to_take_off.py`, `contract/p04_one_actor/test_the_way_out.py`, `contract/p04_one_actor/test_what_the_body_wants.py`, `contract/p05_many_actors/test_temper_in_packet.py`, `contract/p07_slice/test_the_second_look.py` |
+| AFF-07 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/turn/intake.py` | `contract/p03_perception/test_the_way_out.py`, `contract/p04_one_actor/test_affordances.py`, `contract/p04_one_actor/test_one_thing_to_take_off.py`, `contract/p04_one_actor/test_the_way_out.py`, `contract/p04_one_actor/test_what_the_body_wants.py`, `contract/p05_many_actors/test_temper_in_packet.py`, `contract/p07_slice/test_the_second_look.py` |
 | AFF-08 | *Affordance enumeration: what THIS body could attempt at all (P4). Rules AFF-01..09, L6/L7,* | as_engine/mind/affordance.py | `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_affordances.py` |
 | AFF-09 | (named only by tests) |  | — | `contract/p04_one_actor/test_affordances.py` |
 | AFF-10 | *source_event = the MATERIALIZE, at} — as the scenario loader seeds them (AFF-10) — when there are* | as_engine/mind/actor.py | `as_engine/mind/actor.py`, `as_engine/mind/affordance.py`, `as_engine/mind/cues.py` | — |
@@ -494,7 +494,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p10_world/test_a_voice_that_reads.py` |
+| FOCUS-01 | The packet offers where to keep your eyes: each person here, each door of the room you can see (`mind.packet`). | 05_ACTORS §7.2 | `as_engine/action/intent.py`, `as_engine/mind/packet.py` | `contract/p03_perception/test_the_way_out.py`, `contract/p04_one_actor/test_expressions.py`, `contract/p10_world/test_a_voice_that_reads.py` |
 | FOCUS-02 | Eyes on one thing: it is seen one step better, everything else one step worse, until the next attempt (`sense.optics.visibility`). | 05_ACTORS §7.2 | `as_engine/action/effects.py`, `as_engine/action/resolve.py`, `as_engine/sense/optics.py` | `contract/p05_many_actors/test_gestures.py` |
 
 ## FREE

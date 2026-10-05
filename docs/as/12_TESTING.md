@@ -1086,6 +1086,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_one_thing_to_take_off.py` | In a generated world, everyone who wears two things or more is offered at most one to take off on the first menu, after every other thing to do with their hands; the clothing defs are tagged 'clothing' and stripping the dead 'loot' |
 
+### 3.148 The way out (P3; D-259)
+
+| File | What it proves |
+|---|---|
+| `p03_perception/test_the_way_out.py` | A way named after the place on one side reads 'the way out to <the other side>' from inside it and as named from outside; the scene says so; what someone inside is offered never calls it the way in and never names where it leads twice, and they watch 'the way out' |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
