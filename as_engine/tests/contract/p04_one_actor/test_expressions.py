@@ -107,7 +107,8 @@ def test_hands_full_leaves_only_what_needs_none(room):
     w = room()
     pkt, _ = packet(w, "june")
     assert pkt.hands_free == 0
-    assert {g[1].split(":")[0] for g in gestures(pkt)} == {"nod", "shake_head", "shrug"}
+    assert {g[1].split(":")[0] for g in gestures(pkt)} == {"nod", "shake_head", "shrug", "spit_at"}, \
+        "spitting at someone's feet needs no hands (D-204)"
     assert all(g[3] == 0 for g in gestures(pkt))
 
 

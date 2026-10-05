@@ -33,3 +33,28 @@ def test_said_to_wound(words):
 ])
 def test_ordinary_words_are_not(words):
     assert not wounds(words), words
+
+
+@pytest.mark.parametrize("gesture, wounds_her", [("spit_at", True), ("the_finger", True), ("point_at", False)])
+def test_contempt_without_a_word(scenario, gesture, wounds_her):
+    """D-204: spitting at someone's feet, or giving them the finger, is an insult (TEMPER-03); pointing is not."""
+    from as_engine.action.effects import GESTURES
+    from as_engine.contracts.events import Event, EventType
+    from as_engine.mind import perception, temper
+    from as_engine.physical import space
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in (("pc", 5.0), ("june", 6.5)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        ev = tx.commit_event(Event(type=EventType.GESTURE, writer="action.propagate", at=t + 100, turn_index=0, actor_id=w.id("pc"),
+                                   payload={"actor_id": w.id("pc"), "gesture": gesture, "target_id": w.id("june")}))
+        perception.compile_aftermath(tx, w.id("june"), [ev], t + 200, 0)
+        seen = tx.query_one("SELECT text FROM percept_log WHERE holder_id = ? AND event_id = ?", (w.id("june"), ev.event_id))
+        got = [(p.kind, p.event_id) for p in temper.provocations(tx, w.id("june"), 0, t + 200)]
+    assert seen is not None and "you" in seen[0] and "you's" not in seen[0], seen
+    assert (("insulted", ev.event_id) in got) is wounds_her, got
+    assert gesture in GESTURES
+    if gesture == "spit_at":
+        assert seen[0] == "Owen spits at your feet.", seen

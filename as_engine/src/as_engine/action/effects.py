@@ -454,7 +454,11 @@ GESTURES: dict[str, Gesture] = {
     "wave_off": Gesture("wave {target} off", "waves {target} off", 1, True),
     "hush": Gesture("put a finger to your lips", "puts a finger to their lips", 1, False),
     "empty_hands": Gesture("show your empty hands", "holds up empty hands", 2, False),
+    "spit_at": Gesture("spit at {target}'s feet", "spits at {target}'s feet", 0, True),         # D-204: contempt
+    "the_finger": Gesture("give {target} the finger", "gives {target} the finger", 1, True),
 }
+
+CONTEMPT_GESTURES: frozenset[str] = frozenset({"spit_at", "the_finger"})   # D-204: made at you, they are an insult
 
 # What an observer sees when the action STARTS (perception fills the placeholders per holder).
 SEEN: dict[str, str | None] = {

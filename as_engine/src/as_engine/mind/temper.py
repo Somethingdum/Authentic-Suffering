@@ -40,7 +40,9 @@ TEMPER-03 provocations(tx, holder_id, turn_index, at) -> list[Provocation]: read
                    actors.accepted_authority
     insulted       a speech percept with detail.addressed_to_me whose words contain an entry of
                    INSULT_WORDS as whole words (case-insensitive) — a hint, never proof of motive
-                   (Actor Spec §10); how the person reads it later (writeback) is what lasts
+                   (Actor Spec §10); how the person reads it later (writeback) is what lasts; or
+                   (D-204) a visual percept of a GESTURE by the source whose payload gesture is in
+                   action.effects.CONTEMPT_GESTURES and whose payload target_id is the holder
     harmed_bonded  a visual percept of a HARM (its source is the one hurt) whose payload body_id is
                    a body the holder has affection >= 2 toward (relationships from the holder), alive
                    when it landed (D-132: bodies.dead_at NULL or not before the HARM — the dead put
@@ -284,6 +286,10 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
         ch = p["channel"]
         if ch == "tactile" and human_src:
             add(src, "struck", eid)
+        if ch == "visual" and typ == "GESTURE" and human_src and pl.get("target_id") == holder_id:      # D-204
+            from ..action.effects import CONTEMPT_GESTURES
+            if pl.get("gesture") in CONTEMPT_GESTURES:
+                add(src, "insulted", eid)
         if ch == "visual" and typ == "ACTION_START" and human_src and pl.get("target_id") == holder_id:
             if pl.get("def_id") == "shove":
                 add(src, "shoved", eid)

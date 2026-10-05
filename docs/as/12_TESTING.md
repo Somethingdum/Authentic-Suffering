@@ -761,11 +761,11 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p07_slice/test_nothing_new.py` | After two quiet turns, whoever perceived nothing that was not there the turn before is not sent to be remembered, and everyone sent has something; a non-mandatory mind with salience 0 is COLD; a mind takes stock with a model every third turn; after Mara's "Quiet." and June's "What was that?", everyone who heard any of it — and June, who asked — takes it in the next turn; (D-191) a goal formed the turn before gives a decision this turn, and not once let go; (D-198) a pressing need gives salience |
 | `p05_many_actors/test_reactions_cascade_plan.py` | (D-190) nothing at all for someone: no call |
 
-### 3.94 Names called (P5; D-192)
+### 3.94 Names called (P5; D-192, D-204)
 
 | File | What it proves |
 |---|---|
-| `p05_many_actors/test_names_called.py` | "You're a whore, Mara.", "Go to hell, June.", "Eli, you're a waste of space." and the rest wound (TEMPER-03 'insulted'), "you’re" as a phone types it too; "Take the garbage out back.", "The water's filthy.", "Don't fool around." and other ordinary words do not |
+| `p05_many_actors/test_names_called.py` | "You're a whore, Mara.", "Go to hell, June.", "Eli, you're a waste of space." and the rest wound (TEMPER-03 'insulted'), "you’re" as a phone types it too; "Take the garbage out back.", "The water's filthy.", "Don't fool around." and other ordinary words do not; (D-204) spitting at June's feet or giving her the finger insults her and pointing does not, and she sees "Owen spits at your feet." |
 
 ### 3.95 The mouth rules (P9; D-193, D-196, D-197, D-201)
 

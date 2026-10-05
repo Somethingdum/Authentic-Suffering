@@ -71,7 +71,8 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
            holders who see the actor at clear or partial (a silhouette's hands are not read):
            fidelity exact / partial; text f"{Ref} {seen}." with Ref as for ACTION_START and seen
            = action.effects.GESTURES[payload.gesture].seen, {target} = word_for(holder,
-           payload.target_id) — 'you' when the holder is the target ('Mara points at you.');
+           payload.target_id) — 'you' when the holder is the target ('Mara points at you.'), and (D-204)
+           "{target}'s" -> 'your' then ('Owen spits at your feet.');
            source_id = the actor. The one it is made toward is a holder like any other.
   The holder never perceives its own MOVE / ACTION_* / ITEM_TRANSFER / SPEECH / GESTURE / NOISE-it-caused
   events (it knows what it did through its own action record, mind.memory).
@@ -619,8 +620,9 @@ def _perceive_event(tx, holder, ev, turn_index):
         g = GESTURES[payload["gesture"]]
         tgt = payload.get("target_id")
         tw = "you" if tgt == holder else (word_for(tx, holder, tgt) if tgt else "")
+        seen = g.seen.replace("{target}'s", "your") if tgt == holder else g.seen                    # D-204
         out.append(grant(tx, holder, event_id=ev["event_id"], channel="visual", fidelity=_LEVEL_FID[lvl],
-                         text=f"{_cap(ref(tx, holder, actor, lvl))} {g.seen.format(target=tw)}.", source_id=actor, at=ev["at"],
+                         text=f"{_cap(ref(tx, holder, actor, lvl))} {seen.format(target=tw)}.", source_id=actor, at=ev["at"],
                          turn_index=turn_index, detail={"level": lvl}))
         return out
     if t in ("MOVE", "ACTION_START", "ACTION_COMPLETE", "ITEM_TRANSFER"):
