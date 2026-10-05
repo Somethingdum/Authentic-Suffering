@@ -139,7 +139,7 @@ PC's stay in one place; `SCENE_START` / `SCENE_END`).
 
 `kernel/hashing.py` defines the exact algorithm: sha256 over the digests of the tables in name order;
 a table's digest is sha256 over its rows in primary key order, canonical JSON per row — except the
-tables that are only ever added to (events, percept_log, prng_ledger), whose rows go in insertion
+tables that are only ever added to (events, narration, percept_log, player_inputs, prng_ledger), whose rows go in insertion
 order so the digest is carried forward and a turn reads only what it added (D-223); a carried digest is
 kept only once the transaction it was taken in commits (D-224). `world_state_hash`
 excludes bookkeeping; `full_state_hash` additionally covers counters, rng streams, the prng ledger and

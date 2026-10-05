@@ -5,7 +5,8 @@ reads the whole history):
   table digest of a table = sha256 over b"T:" + name + b"\n", then each row encoded as
       canonical_json(list(row values in column order)) + b"\n", the rows ordered by the table's
       primary key columns (rowid order for tables without an explicit PK) — except the APPEND_ONLY
-      tables (rows only ever inserted: events, percept_log, prng_ledger), whose rows go in rowid
+      tables (rows only ever inserted: events, narration, percept_log, player_inputs, prng_ledger),
+      whose rows go in rowid
       (insertion) order, so the digest of what was already there is carried forward and only the rows
       added since are read.
   state hash = sha256 over, for each included table in sorted(table name) order:
@@ -31,7 +32,7 @@ def _tables(store):
     return [r[0] for r in store.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'episodes_fts%' ORDER BY name")]
 
 
-APPEND_ONLY: tuple[str, ...] = ("events", "percept_log", "prng_ledger")   # D-223: rows are only ever inserted
+APPEND_ONLY: tuple[str, ...] = ("events", "narration", "percept_log", "player_inputs", "prng_ledger")   # D-223/D-224: rows only inserted
 
 
 def _digest_into(h, store, t):

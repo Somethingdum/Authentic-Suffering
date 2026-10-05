@@ -43,13 +43,15 @@ def _age(ms):
 def known_elsewhere(tx, holder, listed):
     """SKULL-11 (D-153): people the holder knows by name, not yet listed and not seen dead — last seen first."""
     out = []
-    for r in tx.query("SELECT a.subject_id FROM acquaintance a JOIN bodies b ON b.body_id = a.subject_id WHERE a.holder_id=? "
-                      "AND a.known_name IS NOT NULL AND a.subject_id != ? ORDER BY a.last_seen DESC, a.subject_id", (holder, holder)):
+    for r in tx.query("SELECT a.subject_id, b.alive, b.dead_at FROM acquaintance a JOIN bodies b ON b.body_id = a.subject_id WHERE "
+                      "a.holder_id=? AND a.known_name IS NOT NULL AND a.subject_id != ? ORDER BY a.last_seen DESC, a.subject_id",
+                      (holder, holder)):
         if len(out) >= tx.rules.packet.max_known_elsewhere:
             break
-        if r[0] in listed or tx.query_one(
-                "SELECT 1 FROM percept_log p JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? AND e.type='DEATH' "
-                "AND json_extract(e.payload,'$.body_id')=? LIMIT 1", (holder, r[0])) is not None:
+        if r[0] in listed or (not r[1] and r[2] is not None and tx.query_one(      # D-224: only the dead were seen dead —
+                "SELECT 1 FROM events e WHERE e.at=? AND +e.type='DEATH' AND json_extract(e.payload,'$.body_id')=? AND EXISTS "
+                "(SELECT 1 FROM percept_log p WHERE p.event_id=e.event_id AND p.holder_id=?) LIMIT 1",   # their death, by its time
+                (r[2], r[0], holder)) is not None):
             continue
         out.append(r[0])
     return out
