@@ -736,6 +736,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_rested_they_wake.py` | June, sixteen hours awake, sleeps eight and wakes rested at that moment (fatigue paid); a nap is at least an hour; the player's character is never woken this way (SLEEP-02) |
 
+### 3.90 Seen spreading it (P9; D-186)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_seen_spreading_it.py` | June watching Alice spit into sleeping Eli's mouth trusts her two less, fears her, and holds "Alice spat into the mouth of Eli while they slept."; Mara, his mother, holds a grudge that names him; the player's character holds nothing; spitting into the water is answered and told too |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

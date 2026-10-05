@@ -842,3 +842,51 @@
       payload: {kind: grudge, subject: "$trigger.missed_attacker", text: "{subject} tried to kill {whom}, someone you love.", strength: 3, whom: "$trigger.missed_target"}
   delay_s: 0
   cites: [D-180, D-161, D-129]
+# D-186 — seen spreading it. The wet strain's compulsion (W1, D-77) makes its host spit into the mouths of
+# sleepers and into what people eat and drink; it is code's act, never a choice. Nobody who saw it shrugged it
+# off: whoever saw it trusts the host less and fears them, the story travels, and whoever loves the sleeper
+# does not forgive it. The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-072
+  description: Seeing someone spit into a sleeper's mouth costs them your trust, makes you afraid of them, and the story travels.
+  trigger_event: ACTION_START
+  where: {def_id: spit_in_mouth}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: spat_in_a_mouth}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: spat_in_a_mouth}
+    - kind: create_rumour
+      target: onlookers_of_act(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: spat_in_a_mouth, seen: true, whom: "$trigger.payload.target_id"}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} spat into the mouth of {whom}, someone you love, while they slept.", strength: 3, whom: "$trigger.payload.target_id"}
+  delay_s: 0
+  cites: [D-186, D-77, D-162]
+- schema: as.cascade.v1
+  id: CAS-073
+  description: Seeing someone spit into what people eat and drink costs them your trust, makes you afraid of them, and the story travels.
+  trigger_event: ACTION_START
+  where: {def_id: spit_into}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: spoiled_the_food}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of_act(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: spoiled_the_food}
+    - kind: create_rumour
+      target: onlookers_of_act(trigger.event_id)
+      payload: {about: "$trigger.actor_id", claim: spoiled_the_food, seen: true}
+  delay_s: 0
+  cites: [D-186, D-77, D-162]
