@@ -96,7 +96,13 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     owed_answer       (D-117, Actor Spec §11: being addressed creates a decision opportunity — and it
                       stays one until answered) mind.packet.thread_lines(tx, actor_id, turn_index, at,
                       names = the body id itself, the run's PacketRules) holds a line marked unanswered:
-                      a question put to it here, earlier, that it has not answered.
+                      a question put to it here, earlier, that it has not answered — (D-270) and one
+                      reached it after it last decided: when it has an actor_cognition or actor_reaction
+                      call with status 'ok' in a turn before turn_index, with D = decided_at(tx, it, the
+                      latest such turn) not None, some speech percept of it of a turn before turn_index
+                      with at > D, addressed_to_me, at fidelity exact or partial, is a question
+                      (mind.firewall.classify_form). Letting a question pass is an answer: it is not put
+                      to them again every turn (the thread still says they have not answered).
     restless          (D-190) it has had no actor_cognition or actor_reaction call with status 'ok'
                       (lm_calls rows with its actor_id) in the turns turn_index -
                       SchedulerRules.rethink_turns + 1 .. turn_index - 1: it last took stock that many

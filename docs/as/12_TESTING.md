@@ -1152,6 +1152,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_a_question_with_an_axe_in_hand.py` | Owen, the Glock in his hand, asks Mara a question or makes a remark: no weapon_pointed, nobody on her threat list; an order, "Hands where I can see them." or a threat said so: both; words lost under a gun still threaten |
 
+### 3.159 Letting it pass (P7; D-270)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_letting_it_pass.py` | Mara, asked whether the water is safe, reacts and says nothing: the question is not owed again, and the next turn she is not made to decide; asked again after she decided, it is owed |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

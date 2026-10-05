@@ -170,6 +170,16 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
                 break
     from ..mind.packet import thread_lines
     owed = any(x.unanswered for x in thread_lines(tx, actor_id, turn_index, at, lambda b: b, tx.rules.packet))
+    if owed:                                                         # D-270: letting it pass is an answer
+        last = tx.query_one("SELECT MAX(turn_index) FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition',"
+                            "'actor_reaction') AND status='ok' AND turn_index<?", (actor_id, turn_index))[0]
+        d = decided_at(tx, actor_id, last) if last is not None else None
+        if d is not None:
+            from ..contracts.common import UtteranceForm
+            from ..mind.firewall import classify_form
+            owed = any(classify_form((json.loads(r[0]) or {}).get("words") or "") == UtteranceForm.QUESTION for r in tx.query(
+                "SELECT detail FROM percept_log WHERE holder_id=? AND channel='speech' AND turn_index<? AND at>? AND "
+                "fidelity IN ('exact','partial') AND json_extract(detail,'$.addressed_to_me')", (actor_id, turn_index, d)))
     restless = tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition','actor_reaction') "
                             "AND status='ok' AND turn_index BETWEEN ? AND ?",          # D-190
                             (actor_id, turn_index - tx.rules.scheduler.rethink_turns + 1, turn_index - 1)) is None

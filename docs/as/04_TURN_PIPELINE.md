@@ -242,7 +242,8 @@ PARTIAL+ percept no other candidate holds), `loudest_percept`, `addressed`, `in_
 `interrupt_trigger` (a standing order's trigger crossed), `open_loop_with_pc`,
 `dependent_present`, `visible_to_pc`, `grievance_near` (H1: someone they can hardly stand is right
 there), `owed_answer` (D-117: a question put to them here earlier that they have not answered — being
-asked stays a reason to decide until they answer, Actor Spec §11). A flag the weights do not name counts
+asked stays a reason to decide until they answer, Actor Spec §11 — D-270: or until they have made up their
+mind after it; letting a question pass is an answer, and only a question asked since puts it to them again). A flag the weights do not name counts
 nothing. Ties break by actor id.
 
 ## 4. Failure, rollback and degradation
