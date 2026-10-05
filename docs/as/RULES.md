@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-841 ids; 582 with their own statement, 259 named only in context.
+843 ids; 584 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -151,7 +151,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-035 | A day and more without sleep wears a person's will down, and more every eight hours after. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-036 | Being hurt by someone you were not fighting costs them your trust, makes you afraid of them and angry with them, and you hold it against them — harder each time. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_it_missed.py`, `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_the_same_wrong_again.py` |
 | CAS-037 | Seeing someone hurt a person who was not fighting them costs the attacker the onlookers' trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
-| CAS-038 | A threat made with a weapon in hand leaves whoever it was made to afraid of the one who made it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_your_own.py` |
+| CAS-038 | A threat made with a weapon in hand leaves whoever it was made to afraid of the one who made it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_being_hurt.py`, `contract/p09_society/test_said_to_your_face.py`, `contract/p09_society/test_your_own.py` |
 | CAS-039 | Seeing someone take what is yours costs them your trust, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_is_done_lasts.py` |
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-040 | Seeing someone hurt a person you love, who was not fighting them, is not forgiven. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
@@ -207,7 +207,9 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-086 | Waking to find something of yours taken while you slept or lay out cold sets you to finding out who. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_gone_when_you_wake.py` |
 | CAS-087 | Woken and stood up to find something of yours taken while you slept sets you to finding out who. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_gone_when_you_wake.py` |
 | CAS-088 | Seeing someone shove a person you love to the dead is never forgiven. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_fed_to_the_dead.py` |
+| CAS-089 | Being threatened to your face costs the one who did it some of your trust, and you resent it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_to_your_face.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
+| CAS-090 | A threat from someone you have seen hurt a person frightens you, weapon or no weapon. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_to_your_face.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |

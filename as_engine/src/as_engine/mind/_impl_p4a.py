@@ -128,6 +128,18 @@ def gate(resolve_cur, definition, authority_name=None):
 # ---------------------------------------------------------------- firewall
 
 _THREAT = ("or i'll", "or i will", "or else", "i'll kill", "i will kill", "i'll hurt", "i'll shoot", "don't make me", "last warning", "you'll regret")
+_VIOLENCE = ("kill", "hurt", "shoot", "stab", "cut", "gut", "slit", "strangle", "choke", "drown", "beat", "bash", "break", "end",
+             "burn", "skin", "cripple", "blind", "smash", "bury", "feed", "murder", "shank", "blow", "waste", "gouge", "snap")
+_THREAT_RE = re.compile(                                            # D-215: a promise of violence, said to them
+    r"\b(?:i'll|i will|i'm going to|i am going to|i'm gonna|im gonna|i'ma|imma|we'll|we will|we're going to|we're gonna|"
+    r"we are going to)\s+(?:(?!not\b|never\b)[a-z']+\s+){0,2}?(?:" + "|".join(_VIOLENCE) + r")\b"
+    r"(?:\s+(?:all of|every one of|each of|the (?:shit|hell|life|crap) out of|up))?\s+(?:you|ya|y'all|yourself)\b"
+    r"|\b(?:i'll|i will|i'm going to|i am going to|i'm gonna|im gonna|i'ma|imma|we'll|we will|we're going to|we're gonna|"
+    r"we are going to)\s+(?:(?!not\b|never\b)[a-z']+\s+){0,2}?(?:" + "|".join(_VIOLENCE) + r")\b\s+your\s+(?:[a-z']+\s+)?"
+    r"(?:head|face|skull|throat|neck|legs?|arms?|knees?|kneecaps?|teeth|brains?|heart|guts|eyes?|fingers?|hands?|ribs|nose|"
+    r"jaw|back|spine|life|balls)\b"
+    r"|\byou(?:'re| are) (?:a )?dead\b(?! to\b)|\bdead (?:man|woman|meat)\b|\byou(?:'ll| will) pay for\b|\bmake you pay\b"
+    r"|\byou(?:'ll| will) be sorry\b|\bbullet (?:in|through) (?:you|your)\b")
 _OFFER = ("i'll give", "i will give", "i can give", "in exchange", "trade you", "i'll trade", "how about i", "i'll pay", "for your trouble")
 _REQUEST = ("please", "could you", "can you", "would you", "will you", "would you mind", "i need you to", "help me")
 _CLAIMS = ("i'm in charge", "i am in charge", "that's an order", "orders", "i'm the boss", "you work for me")
@@ -145,9 +157,9 @@ def _imperative(t):
 
 
 def classify_form(text, *, weapon_pointed_at_receiver=False):
-    t = text.lower().strip()
+    t = text.lower().strip().replace("\u2019", "'").replace("\u2018", "'")      # D-215: a phone's curly apostrophe
     imp = _imperative(t)
-    if (weapon_pointed_at_receiver and imp) or any(x in t for x in _THREAT):
+    if (weapon_pointed_at_receiver and imp) or any(x in t for x in _THREAT) or _THREAT_RE.search(t):
         return UtteranceForm.THREAT
     if any(x in t for x in _OFFER):
         return UtteranceForm.OFFER

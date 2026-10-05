@@ -253,6 +253,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   trust of whoever saw it and starts the story; the one shoved holds it against them for good, and so does
   whoever loves them and saw it. The first bite the dead land on them within two minutes is the shover's, and
   so is their death within ten: it is answered as hurting and killing someone who was not fighting.
+- **Said to your face** (D-215, CAS-089/090): a threat — "I'm gonna kill you", "you're dead", "I'll break your
+  arm" — said to someone costs the one who said it a point of their trust and a point of resentment, once an
+  hour however often it is said; from someone they have seen hurt a person it frightens them too (at weapon
+  point, CAS-038's fear).
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

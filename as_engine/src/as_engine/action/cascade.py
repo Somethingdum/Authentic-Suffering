@@ -143,6 +143,18 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               a threat in themselves (mind.firewall.classify_form without
                                               the weapon: "or I'll", "I'll kill you" — an armed "Quiet."
                                               is not one); never the speaker or the PC
+    threatened_to_their_face(<path>)          (D-215) for a SPEECH: the holders of an EXACT or PARTIAL
+                                              speech percept of it addressed to them whose words, as
+                                              heard, are a threat (classify_form, no weapon) — armed or
+                                              not — unless they heard the speaker threaten them so in
+                                              the hour before (an earlier SPEECH by the speaker, by
+                                              seq, held addressed to them, a threat); never the speaker
+                                              or the PC
+    threatened_by_the_violent(<path>)         (D-215) of threatened_to_their_face, those with nothing
+                                              pointed at them (detail armed_at_me false: at weapon
+                                              point the fear is threatened_by's) who hold a visual
+                                              EXACT or PARTIAL percept of a HARM, at or before it,
+                                              whose payload actor_id is the speaker, on someone else
     protecting_today(<path>)                  (D-139) for an ACTION_START of a def tagged
                                               'protect_dependent' (shield_dependent: offered only under a
                                               threat, at someone the actor guards, lives with or loves):

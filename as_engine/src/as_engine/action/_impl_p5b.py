@@ -1044,6 +1044,42 @@ def _threatened(tx, trigger, event_id):
     return sorted(set(out))
 
 
+def _is_threat(d):
+    from ..mind.firewall import classify_form
+    form = classify_form(d.get("words") or "")
+    return (form.value if hasattr(form, "value") else form) == "threat"
+
+
+def _to_their_face(tx, trigger, event_id, *, violent):
+    """D-215: who a SPEECH threatened to their face — addressed to them, a threat in its words — the first time in the
+    hour the speaker did; ``violent``: of those, the ones with nothing pointed at them who have seen the speaker hurt a
+    person. Never the speaker or the PC."""
+    from ..society._impl_society import _controller
+    ev = _row(tx, "SELECT actor_id, at, seq FROM events WHERE event_id=? AND type='SPEECH'", (event_id,))
+    if ev is None or not ev["actor_id"]:
+        return []
+    who = ev["actor_id"]
+    out = []
+    for h, det in tx.query("SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' AND fidelity IN "
+                           "('exact','partial') ORDER BY holder_id", (event_id,)):
+        d = json.loads(det) if isinstance(det, str) else (det or {})
+        if h == who or not d.get("addressed_to_me") or not _is_threat(d) or _controller(tx, h) in (None, "human"):
+            continue
+        before = tx.query("SELECT p.detail FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? AND "
+                          "p.channel='speech' AND e.type='SPEECH' AND e.actor_id=? AND e.at>? AND e.seq<?",
+                          (h, who, ev["at"] - 3_600_000, ev["seq"]))
+        if any((lambda x: x.get("addressed_to_me") and _is_threat(x))(json.loads(b[0]) if isinstance(b[0], str) else (b[0] or {}))
+               for b in before):
+            continue                                             # once an hour, however often it is said
+        if violent and (d.get("armed_at_me") or tx.query_one(
+                "SELECT 1 FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? AND p.channel='visual' "
+                "AND p.fidelity IN ('exact','partial') AND e.type='HARM' AND json_extract(e.payload,'$.actor_id')=? AND "
+                "json_extract(e.payload,'$.body_id')!=? AND e.at<=?", (h, who, who, ev["at"])) is None):
+            continue
+        out.append(h)
+    return sorted(set(out))
+
+
 def _left_in_danger(tx, event_id):
     """D-148: (the dependents left behind in a dangerous place, the others who saw them left) for a MOVE out of it."""
     from ..society._impl_society import _controller
@@ -1349,6 +1385,8 @@ def select(tx, selector, trigger):
     if fn == "threatened_by":                                        # D-126: a threat at weapon point
         from ..society._impl_society import _controller
         return [h for h in _threatened(tx, trigger, v) if _controller(tx, h) != "human"]
+    if fn in ("threatened_to_their_face", "threatened_by_the_violent"):   # D-215: a threat, armed or not
+        return _to_their_face(tx, trigger, v, violent=fn == "threatened_by_the_violent")
     if fn == "protecting_today":                                     # D-139: once a day, however often
         ev = _row(tx, "SELECT type, actor_id, payload, at FROM events WHERE event_id=?", (v,))
         if ev is None or ev["type"] != "ACTION_START" or not ev["actor_id"]:

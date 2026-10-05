@@ -1164,3 +1164,37 @@
       payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} shoved {whom}, someone you love, to the dead.", strength: 3, whom: "$trigger.payload.target_id"}
   delay_s: 0
   cites: [D-214, D-129, TEMPER-06]
+# D-215 — said to your face. A threat with nothing in hand cost the one who made it nothing, and "I'm gonna fucking
+# kill you" was not even heard as one. Being threatened to your face is remembered — once an hour, however often
+# it is said — and from someone you have seen hurt a person, it frightens. (At weapon point the fear is CAS-038's.)
+# The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-089
+  description: Being threatened to your face costs the one who did it some of your trust, and you resent it.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: threatened_to_their_face(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: threatened_me}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: threatened_to_their_face(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: threatened_me}
+  delay_s: 0
+  cites: [D-215, D-126, TEMPER-03]
+- schema: as.cascade.v1
+  id: CAS-090
+  description: A threat from someone you have seen hurt a person frightens you, weapon or no weapon.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: threatened_by_the_violent(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: threatened_by_the_violent}
+  delay_s: 0
+  cites: [D-215, D-126]

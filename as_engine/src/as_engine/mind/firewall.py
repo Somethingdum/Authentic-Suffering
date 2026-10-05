@@ -4,10 +4,17 @@ A request never becomes an action. It becomes an event perceived by an Actor, wh
 independently chooses a response.
 
 classify_form(text, *, weapon_pointed_at_receiver=False) -> UtteranceForm   (pure, WILL-10)
-  Lowercase, strip. Checks in order, first match wins:
+  Lowercase, strip, (D-215) curly apostrophes made straight. Checks in order, first match wins:
   THREAT   if weapon_pointed_at_receiver and the text is imperative, OR it contains any of:
            "or i'll", "or i will", "or else", "i'll kill", "i will kill", "i'll hurt", "i'll shoot",
-           "don't make me", "last warning", "you'll regret"
+           "don't make me", "last warning", "you'll regret", OR (D-215) a promise of violence said to
+           them: "i'll" / "i will" / "i'm going to" / "i'm gonna" / "imma" / "we'll" / "we're going to"
+           (...), up to two words that are not "not" or "never" ("fucking"), a verb of violence
+           (_impl_p4a._VIOLENCE: kill, hurt, shoot, stab, cut, break, end, feed, ...) and "you" / "ya"
+           / "y'all" / "yourself" ("all of", "the shit out of", "up" between allowed) or "your" and a
+           part of the body or "life" ("I'll break your arm"; never "I'll cut your hair"), or
+           "you're dead" (not "dead to"), "dead man", "you'll pay for", "make you pay", "you'll be
+           sorry", "a bullet in your" — "I'll never hurt you" and "they'll kill you out there" are not
   OFFER    if it contains any of: "i'll give", "i will give", "i can give", "in exchange", "trade you",
            "i'll trade", "how about i", "i'll pay", "for your trouble"
   REQUEST  if it contains any of: "please", "could you", "can you", "would you", "will you",

@@ -839,6 +839,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_fed_to_the_dead.py` | Ray shoves Cal to the dead in front of June, who loves him, and Nita, who does not: June loses three trust and holds a grudge for the shove itself, Nita two, the player's character nothing; the dead's first bite is Ray's — Cal, June and Nita answer it as an assault, though they saw the bite (they did not know he carried it when he was shoved), and the later bites are the dead's; Cal's death of it is Ray's killing — June's grudge for someone she loved, Nita's fear and her story, Ray's own burden; a bite three minutes on is nobody's |
 
+### 3.107 Said to your face (P9; D-215)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_said_to_your_face.py` | A promise of violence is a threat however it is put — sworn at, typed with a phone's apostrophe, "you're dead", "I'll break your arm" — and kind words, warnings and "I'll cut your hair" are not; Owen's bare-handed threat costs him a point of Alice's trust and a point of resentment, not her fear, once an hour however often he says it; after she saw him cut Mara it frightens her too; at gunpoint it is CAS-038's fear and CAS-089's trust, not CAS-090; a threat to the player's character changes nothing in him |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
