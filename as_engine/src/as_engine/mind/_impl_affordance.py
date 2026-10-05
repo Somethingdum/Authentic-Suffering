@@ -214,6 +214,11 @@ def _bindings(c, d):
                         "dist": _dist_pt(c, *pt)})
     elif b == "body":
         cands = c.threats if d.id == "flee_threat" else c.known_bodies
+        if eff in ("break_grip", "let_go"):                 # D-207: a hand that is there
+            from ..physical.bodies import grips_on
+            mine = {r[0] for r in c.tx.query("SELECT target_id FROM grips WHERE holder_id=?", (c.me,))}
+            hold = set(grips_on(c.tx, c.me)) if eff == "break_grip" else mine
+            cands = [t for t in c.known_bodies if t in hold]
         if d.id == "shield_dependent":
             if not c.threats:
                 return []

@@ -117,6 +117,10 @@ Death test (DEATH-01..05) runs whenever harm lands and at every progress step, f
        here) converted to minutes (round(h x 60)); the body's
        awareness becomes 'unconscious' and posture 'lying' (it LOOKS dead — perception renders a
        still body); a type with reanimation_window_h null never false-dies (it truly dies).
+  (D-207) A hand that can no longer hold lets go: right after a DEATH, a FALSE_DEATH, an
+  AWARENESS_CHANGE to 'unconscious', or (progress) the collapse into 'asleep', loosen(tx, body, at,
+  that event's id, turn_index) — the CONTROL_RELEASEs are committed but not returned (the body
+  was dead, out cold or asleep; whoever it held is free).
   DEATH writes bodies: alive 0, dead_at = at, death_event = the cause event id (the HARM or
   progress-step trigger), awareness 'dead', posture 'lying'; payload {body_id, cause, cause_event_id}
   with cause in blood_loss | head_wound | neck_wound | thirst | hunger | cold | heat | infection |
@@ -790,6 +794,7 @@ def _death_ev(tx, body_id, at, turn_index, cause, cause_event_id, extra=None, rn
     ev = tx.commit_event(Event(type=EventType.DEATH, writer="physical.bodies", at=at, turn_index=turn_index,
         target_ids=[body_id], cause_event_id=cause_event_id, links=links,
         writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values=vals)], payload=payload))
+    loosen(tx, body_id, at, ev.event_id, turn_index)                               # D-207: a dead hand lets go
     if pathway is not None:
         from ..kernel import clock
         pw = _canon(tx).find("pathway", pathway)
@@ -824,11 +829,13 @@ def death_test(tx: "Tx", body_id: str, at: int, turn_index: int, rng: "Rng",
             lo, hi = round(t.reanimation_window_h[0] * 60), round(t.reanimation_window_h[1] * 60)
             mins = rng.range_int(tx, "infected", f"false_death:{body_id}", lo, hi)
             until = at + mins * MIN
-            return tx.commit_event(Event(type=EventType.FALSE_DEATH, writer="physical.bodies", at=at, turn_index=turn_index,
+            ev = tx.commit_event(Event(type=EventType.FALSE_DEATH, writer="physical.bodies", at=at, turn_index=turn_index,
                 target_ids=[body_id], cause_event_id=cause_event_id,
                 writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id},
                                     values={"false_dead_until": until, "awareness": "unconscious", "posture": "lying"})],
                 payload={"body_id": body_id, "false_dead_until": until}))
+            loosen(tx, body_id, at, ev.event_id, turn_index)                       # D-207
+            return ev
         return None
     # alive kinds
     person = b["kind"] in ("human", "lurker") and _doomable(tx, body_id)
@@ -863,10 +870,12 @@ def death_test(tx: "Tx", body_id: str, at: int, turn_index: int, rng: "Rng",
             return _death_ev(tx, body_id, at, turn_index, "infection" if d["kind"] in ("infection", "bitten") else "blood_loss",
                              cause_event_id, rng=rng)
     if b["blood_loss_pct"] >= H.unconscious_at_blood_loss_pct and b["awareness"] != "unconscious":
-        return tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
+        ev = tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
             target_ids=[body_id], cause_event_id=cause_event_id,
             writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "unconscious", "posture": "lying"})],
             payload={"body_id": body_id, "awareness": "unconscious", "from": b["awareness"]}))
+        loosen(tx, body_id, at, ev.event_id, turn_index)                           # D-207
+        return ev
     if (b["awareness"] == "unconscious" and b["false_dead_until"] is None
             and b["blood_loss_pct"] < H.unconscious_at_blood_loss_pct):              # OUT-01 (D-173): coming to
         return tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
@@ -1260,6 +1269,7 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
                         out.append(tx.commit_event(Event(type=EventType.AWARENESS_CHANGE, writer="physical.bodies", at=end, turn_index=turn_index,
                             target_ids=[body_id], writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values={"awareness": "asleep", "posture": "lying"})],
                             payload={"body_id": body_id, "awareness": "asleep", "from": bb["awareness"]})))
+                        loosen(tx, body_id, end, out[-1].event_id, turn_index)      # D-207
         out += _care_step(tx, body_id, t, end, turn_index)
         # 3 infection
         for inf in tx.query("SELECT * FROM infections WHERE body_id=?", (body_id,)):
@@ -1472,7 +1482,8 @@ def posture_event(tx: "Tx", body_id: str, posture: str, at: int, cause_event_id:
     otherwise) and, when ``awareness`` is given, bodies.awareness — only 'asleep' or 'awake' may be
     set this way (ValueError otherwise; a dead or unconscious body -> ValueError). payload
     awareness is null when not given. A change to the same posture is still committed (a
-    deliberate act)."""
+    deliberate act). (D-207) Falling asleep this way lets go too: loosen(tx, body_id, at, the
+    POSTURE_CHANGE id, turn_index) when ``awareness`` is 'asleep'."""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     if posture not in _POSTURES:
         raise ValueError(f"bad posture {posture}")
@@ -1484,10 +1495,13 @@ def posture_event(tx: "Tx", body_id: str, posture: str, at: int, cause_event_id:
         if awareness not in ("asleep", "awake"):
             raise ValueError("only asleep / awake")
         vals["awareness"] = awareness
-    return tx.commit_event(Event(type=EventType.POSTURE_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
-                                 actor_id=body_id, cause_event_id=cause_event_id,
-                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values=vals)],
-                                 payload={"body_id": body_id, "posture": posture, "from": bb["posture"], "awareness": awareness}))
+    ev = tx.commit_event(Event(type=EventType.POSTURE_CHANGE, writer="physical.bodies", at=at, turn_index=turn_index,
+                               actor_id=body_id, cause_event_id=cause_event_id,
+                               writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id}, values=vals)],
+                               payload={"body_id": body_id, "posture": posture, "from": bb["posture"], "awareness": awareness}))
+    if awareness == "asleep":
+        loosen(tx, body_id, at, ev.event_id, turn_index)                           # D-207
+    return ev
 
 
 def grips_on(store: "Store | Tx", target_id: str) -> list[str]:
@@ -1515,8 +1529,7 @@ def release_event(tx: "Tx", holder_id: str, target_id: str, at: int, cause_event
                   turn_index: int) -> Event:
     """P5. Commit CONTROL_RELEASE {holder_id, target_id} deleting the grips row; the target's
     restrained becomes 0 when no other grip on it remains. No such grip -> ValueError. A body
-    that dies or falls unconscious keeps no grips: effects release them (the resolver checks
-    grips of incapable holders at every landing)."""
+    that dies or falls unconscious keeps no grips (D-207: loosen)."""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     if not tx.query_one("SELECT 1 FROM grips WHERE holder_id=? AND target_id=?", (holder_id, target_id)):
         raise ValueError("no such grip")
@@ -1527,6 +1540,50 @@ def release_event(tx: "Tx", holder_id: str, target_id: str, at: int, cause_event
     return tx.commit_event(Event(type=EventType.CONTROL_RELEASE, writer="physical.bodies", at=at, turn_index=turn_index,
                                  actor_id=holder_id, cause_event_id=cause_event_id, target_ids=[target_id], writes=writes,
                                  payload={"holder_id": holder_id, "target_id": target_id}))
+
+
+GRIP_REACH_M = 1.5   # D-207: as far as a hand on someone reaches (the 'touch' range, mind.affordance)
+
+
+def loosen(tx: "Tx", body_id: str, at: int, cause_event_id: str | None, turn_index: int) -> list[Event]:
+    """D-207 — a hand that can no longer hold lets go. For every grip the body holds (grips rows with
+    holder_id = body_id, by target_id): release_event(tx, body_id, target, at, cause_event_id,
+    turn_index) when
+      the holder is dead, false-dead (false_dead_until set) or its awareness is 'unconscious',
+        'asleep' or 'dead' — a dead hand, a fainting one, a sleeping one;
+      the one held has no positions row, is in another place, or is farther than GRIP_REACH_M
+        (space.point_distance) — the holder walked off, or the one held was moved away;
+      (INF-16) the holder is of kind 'infected' and the one held is dead and died
+        RulesConfig.infected.feed_on_dead_min minutes or more before ``at`` — it has done feeding.
+    Returns the CONTROL_RELEASEs committed, in order (none -> []). Called right after the DEATH,
+    FALSE_DEATH and AWARENESS_CHANGE to 'unconscious' or 'asleep' this module commits (cause = that
+    event; those releases are committed but are not among the events the committing function
+    returns), by action.resolve after every landing, and by world.infected at every step."""
+    rows = tx.query("SELECT target_id FROM grips WHERE holder_id=? ORDER BY target_id", (body_id,))
+    if not rows:
+        return []
+    b = _b(tx, body_id)
+    gone = (b is None or not b["alive"] or b["false_dead_until"] is not None
+            or b["awareness"] in ("unconscious", "asleep", "dead"))
+    mine = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (body_id,))
+    out = []
+    for (t,) in rows:
+        let = gone
+        if not let:
+            theirs = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (t,))
+            if mine is None or theirs is None or mine[0] != theirs[0]:
+                let = True
+            else:
+                from .space import point_distance
+                d = point_distance(tx, body_id, t)
+                let = d is None or d > GRIP_REACH_M
+        if not let and b["kind"] == "infected":
+            tb = tx.query_one("SELECT alive, dead_at FROM bodies WHERE body_id=?", (t,))
+            if tb is None or (not tb[0] and (tb[1] is None or at - tb[1] >= _rules(tx).infected.feed_on_dead_min * MIN)):
+                let = True
+        if let:
+            out.append(release_event(tx, body_id, t, at, cause_event_id, turn_index))
+    return out
 
 
 _NEED_COL = {"thirst": ("thirst_stage", "last_drink_ms"), "hunger": ("hunger_stage", "last_meal_ms"),

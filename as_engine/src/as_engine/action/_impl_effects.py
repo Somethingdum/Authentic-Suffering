@@ -1140,8 +1140,20 @@ def h_shove(tx, rng, intent, land_at, ctx, d):
     if won:
         if _body(tx, t)["awareness"] not in ("unconscious", "dead"):
             posture_event(tx, t, "lying", land_at, ctx.start_event_id, ctx.turn_index)
+        from ..physical.bodies import release_event          # D-207: knocked down, it loses its hold
+        for (held,) in tx.query("SELECT target_id FROM grips WHERE holder_id=? ORDER BY target_id", (t,)):
+            release_event(tx, t, held, land_at, ctx.start_event_id, ctx.turn_index)
         return _done("knocked_down", CheckBand.CLEAN if how == "clean" else CheckBand.COST)
     return _done("braced", CheckBand.FAIL)
+
+
+def h_let_go(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import release_event              # D-207
+    t = intent.bound.target_id
+    if not tx.query_one("SELECT 1 FROM grips WHERE holder_id=? AND target_id=?", (intent.actor_id, t)):
+        return _done("free")
+    release_event(tx, intent.actor_id, t, land_at, ctx.start_event_id, ctx.turn_index)
+    return _done("let_go")
 
 
 def h_shove_toward(tx, rng, intent, land_at, ctx, d):
@@ -1581,7 +1593,7 @@ HANDLERS = {
     "barricade_portal": h_barricade, "unbarricade_portal": h_unbarricade, "force_portal": h_force, "peek_portal": h_peek,
     "pick_up": h_pick_up, "drop_item": h_drop, "give_item": h_give, "take_from": h_take_from, "put_into": h_put_into,
     "search_container": h_search, "search_place": h_search, "equip": h_equip, "holster": h_holster, "reload": h_reload,
-    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "shove": h_shove, "shove_toward": h_shove_toward, "butcher": h_butcher, "spit": h_spit, "wash": h_wash, "smear": h_smear, "take_off": h_take_off,
+    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "let_go": h_let_go, "shove": h_shove, "shove_toward": h_shove_toward, "butcher": h_butcher, "spit": h_spit, "wash": h_wash, "smear": h_smear, "take_off": h_take_off,
     "change_into": h_change_into, "strip": h_strip,
     "disarm": h_disarm, "take_cover": h_take_cover, "hide": h_take_cover, "crouch": h_posture, "stand": h_posture,
     "go_prone": h_posture, "observe": h_hold, "wait": h_hold, "guard": h_hold, "sleep": h_hold, "rest": h_hold,

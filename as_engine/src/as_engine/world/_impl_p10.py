@@ -453,6 +453,7 @@ def step(tx, rng, row, fired, turn_index):
     cause = fired.event_id
     if not active(tx, b):
         return []
+    bodies.loosen(tx, b, at, cause, turn_index)              # D-207
     from .hordes import fold
     folded = fold(tx, b, at, turn_index, cause)
     if folded:

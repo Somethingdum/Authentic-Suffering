@@ -110,6 +110,17 @@
   effect: break_grip
   tags: [escape, threat_response]
 - schema: as.affordance.v1
+  id: let_go
+  verb: manipulate
+  label: "Let go of {target}"
+  ui_label: "Let go of {target}"
+  binds: body
+  range: touch
+  duration: {base_s: 0.5}
+  noise_db: 0
+  effect: let_go
+  tags: [control, release]
+- schema: as.affordance.v1
   id: shove
   verb: attack
   label: "Shove {target} away from you"

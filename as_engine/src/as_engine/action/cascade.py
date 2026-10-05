@@ -88,6 +88,21 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               PARTIAL percept of the start (it saw who stood in front of
                                               it) — unless an earlier such start by the same actor at it
                                               is on the same world day; never the player's character (C06)
+    rescued_by(<path>)                        (D-207) for a CONTROL_RELEASE with trigger.rescuer: the
+                                              one held, when it has an actors row, is alive, awake or
+                                              drowsy, held by nobody any more (bodies.grips_on empty:
+                                              still in another hand is not saved), holds a visual EXACT
+                                              or PARTIAL percept of the rescuer's act (it saw who), and
+                                              the holder was of kind 'infected' or the one held was not
+                                              fighting a person in the 10 minutes up to it (as
+                                              trigger.attacker_provoked) — never the player's character
+                                              (C06)
+    saw_them_saved(<path>)                    (D-207) for such a release (the holder and the one held as
+                                              in rescued_by: alive, free, the holder infected or the held
+                                              not fighting): the holders of a visual EXACT or PARTIAL
+                                              percept of the rescuer's act who are bonded to the one held
+                                              (affection >= 1 toward them, or one household) — never the
+                                              rescuer, the one held, the holder or the PC
     (D-202) A safety precaution, not a killing (the owner: "An infected person is a threat to every non
     infected."): onlookers_of, assault_onlookers_of and attack_onlookers_of — and so bonded_onlookers_of,
     kin_onlookers_of and groups_that_saw, which are made from them — leave out every holder who knew the
@@ -398,6 +413,13 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     whether the one it was made on was fighting a person in the 10 minutes up to the start (as
     attacker_provoked); whether the def is tagged 'lethal' (a shot, a blade) — a miss, a dry click,
     a grab that slips is still an attack; otherwise missing.
+    (D-207) trigger.rescuer — for a CONTROL_RELEASE (payload holder_id, target_id): who pulled the one
+    held free. The act behind the release is its cause event when that is an ACTION_START, or — when
+    the cause is a DEATH, FALSE_DEATH or AWARENESS_CHANGE of the holder (payload body_id) — that
+    event's own cause: an ACTION_START itself, a HARM the HARM's cause. That act must be an
+    ACTION_START with payload verb 'attack' and target_id the holder, by someone with an actors row who
+    is neither the holder nor the one held; otherwise missing (letting go, breaking free, a hand that
+    walked off, the dead done feeding — nobody's rescue).
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

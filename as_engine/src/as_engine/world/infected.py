@@ -149,7 +149,10 @@ step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handle
   (writer 'action.resolve', actor_id = it, cause = the fired timer), schedules its next
   INFECTED_STEP at at + R.step_min_s (payload {body_id}) and returns [that event]: no step toward
   anything, no bite.
-  b = payload.body_id, at = row.due_at, cause = fired. Not active -> [] (no new row). Then
+  b = payload.body_id, at = row.due_at, cause = fired. Not active -> [] (no new row). (D-207)
+  physical.bodies.loosen(tx, b, at, cause, turn_index): a grip it can no longer keep is let go
+  (its prey gone, out of reach, or dead past INF-16's window — a hand left on a corpse kept it out
+  of its horde for ever). Then
   world.hordes.fold(tx, b, at, turn_index, fired.event_id) (HRD-18): not empty -> the body went
   back into its count; those events are returned and nothing else happens (no new row).
   1 Arrive: payload.leg {to_place, x_m, y_m, portal_id} (None -> skip): the portal (when there is

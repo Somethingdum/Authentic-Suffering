@@ -470,6 +470,12 @@ def _land(tx, rng, i, la, ctx):
                               actor_id=i.actor_id, cause_event_id=ctx.start_event_id,
                               payload={"actor_id": i.actor_id, "def_id": i.bound.def_id, "result": lg.result,
                                        "band": lg.band.value if lg.band is not None else None, "visible": False}))
+    from ..physical.bodies import grips_on, loosen          # D-207: a hand out of reach lets go
+    near = {i.actor_id, *grips_on(tx, i.actor_id)}
+    if i.bound.target_id:
+        near |= set(grips_on(tx, i.bound.target_id))
+    for b in sorted(near):
+        loosen(tx, b, (lg.complete_at or la) if not lg.blocked else la, ctx.start_event_id, ctx.turn_index)
     return lg
 
 
@@ -677,6 +683,9 @@ def _path(tx, path, trig):
             return _MISSING
         return {"trigger.missed_attacker": a[0], "trigger.missed_target": a[1], "trigger.missed_provoked": a[2],
                 "trigger.missed_lethal": a[3]}[path]
+    if path == "trigger.rescuer":                                  # D-207: pulled free
+        r = _rescue(tx, trig)
+        return _MISSING if r is None else r[0]
     if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
         a = _assault(tx, trig)
         if a is None:
@@ -743,6 +752,45 @@ def _killing(tx, trig):
     if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (killer,)) is None:
         return None
     return killer, _was_fighting(tx, dead, blow["at"]), blow["event_id"]
+
+
+def _rescue(tx, trig):
+    """D-207: (rescuer, the one held, the holder, the rescuer's ACTION_START) for a CONTROL_RELEASE someone else
+    brought about by going for the holder, else None."""
+    if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "CONTROL_RELEASE":
+        return None
+    pl = trig.payload or {}
+    holder, held = pl.get("holder_id"), pl.get("target_id")
+    c = _row(tx, "SELECT event_id, type, actor_id, cause_event_id, payload FROM events WHERE event_id=?",
+             (trig.cause_event_id,)) if trig.cause_event_id else None
+    if c is not None and c["type"] in ("DEATH", "FALSE_DEATH", "AWARENESS_CHANGE"):
+        if (json.loads(c["payload"] or "{}")).get("body_id") != holder or not c["cause_event_id"]:
+            return None
+        c = _row(tx, "SELECT event_id, type, actor_id, cause_event_id, payload FROM events WHERE event_id=?", (c["cause_event_id"],))
+        if c is not None and c["type"] == "HARM":
+            c = _row(tx, "SELECT event_id, type, actor_id, cause_event_id, payload FROM events WHERE event_id=?",
+                     (c["cause_event_id"],)) if c["cause_event_id"] else None
+    if c is None or c["type"] != "ACTION_START":
+        return None
+    a = json.loads(c["payload"] or "{}")
+    who = c["actor_id"]
+    if a.get("verb") != "attack" or a.get("target_id") != holder or not who or who in (holder, held):
+        return None
+    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)) is None:
+        return None
+    return who, held, holder, c["event_id"]
+
+
+def _freed(tx, r, at):
+    """D-207: the one held is alive, held by nobody now, and it was a rescue — from the dead, or from someone they were
+    not fighting."""
+    from ..physical.bodies import grips_on
+    who, held, holder, _act = r
+    b = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (held,))
+    if b is None or not b[0] or grips_on(tx, held):
+        return False
+    k = tx.query_one("SELECT kind FROM bodies WHERE body_id=?", (holder,))
+    return (k is not None and k[0] == "infected") or not _was_fighting(tx, held, at)
 
 
 def _was_fighting(tx, who, until):
@@ -1162,6 +1210,21 @@ def select(tx, selector, trigger):
         if tx.query_one(earlier, (giver, seq, trigger.at // 86_400_000, who)):
             return []
         return [who]
+    if fn in ("rescued_by", "saw_them_saved"):                       # D-207: pulled free
+        from ..society._impl_society import _controller
+        r = _rescue(tx, trigger)
+        if r is None or not _freed(tx, r, trigger.at):
+            return []
+        who, held, holder, act = r
+        saw = [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                      "fidelity IN ('exact','partial') ORDER BY holder_id", (act,))]
+        if fn == "rescued_by":
+            aw = tx.query_one("SELECT awareness FROM bodies WHERE body_id=?", (held,))
+            if _controller(tx, held) in (None, "human") or aw[0] not in ("awake", "drowsy") or held not in saw:
+                return []
+            return [held]
+        return [h for h in saw if h not in (who, held, holder) and _controller(tx, h) not in (None, "human")
+                and tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (h,))[0] and _bonded_to(tx, h, held)]
     if fn == "shielded_by":                                          # D-200: someone stood between you and it
         from ..society._impl_society import _controller
         pl = trigger.payload or {}

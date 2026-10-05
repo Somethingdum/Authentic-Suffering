@@ -65,6 +65,9 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms, land_by=None)
      * else Landing = effects.land(... EffectCtx(horizon_ms = cut, …)); commit ACTION_BLOCKED {actor_id, def_id, cause} at land_at
        when landing.blocked, else ACTION_COMPLETE {actor_id, def_id, result, band, visible: false}
        at landing.complete_at or land_at. Cause of both = the ACTION_START.
+     * (D-207) then physical.bodies.loosen(tx, b, that time, the ACTION_START, turn_index) for
+       the actor and for every body that grips the actor or the act's target (bodies.grips_on),
+       by body_id: a holder who walked off, or whose prey was pushed out of reach, lets go.
   3. Each intent resolves exactly once (G8). Every draw is in prng_ledger (the rng does that).
   Returns every event the wave committed (including those committed by modules), in seq order.
 say_pending(tx, row, turn_index) -> list[Event]   (SEG-03..04)

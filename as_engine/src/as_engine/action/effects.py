@@ -212,7 +212,12 @@ Per effect (result strings in quotes; 'done' unless noted):
   grapple            opposed S + brawling vs target A + brawling; attacker wins -> grip_event.
                      'grabbed' / 'slipped'.
   break_grip         opposed S + brawling vs the gripper's S + brawling; wins -> release_event.
-  shove              opposed S + brawling vs S; wins -> target posture 'lying' ('knocked_down').
+  let_go             (D-207) the actor's grip on the target -> release_event (cause the
+                     ACTION_START); 'let_go'. No grip -> 'free'. No check, no noise.
+  shove              opposed S + brawling vs S; wins -> target posture 'lying' ('knocked_down');
+                     (D-207) and a body knocked down loses its hold: every grip the target holds
+                     (bodies.grips_on rows with it as holder, by target_id) -> release_event (cause
+                     the ACTION_START) — the way to pull one of the dead off someone.
   shove_toward       (H1 — shove_toward_dead) the def's opposed check: S + brawling vs the target's
                      A + athletics (keeping your feet); a target that is not conscious and mobile does
                      not defend and loses. NOISE as shove. The attacker loses -> 'braced' (FAIL).
@@ -417,7 +422,7 @@ EFFECT_IDS: tuple[str, ...] = (
     "close_portal", "lock_portal", "unlock_portal", "barricade_portal", "unbarricade_portal",
     "force_portal", "peek_portal", "pick_up", "drop_item", "give_item", "take_from", "put_into",
     "search_container", "search_place", "equip", "holster", "reload", "strike_melee", "shoot",
-    "grapple", "break_grip", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
+    "grapple", "break_grip", "let_go", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
     "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
@@ -483,6 +488,7 @@ SEEN: dict[str, str | None] = {
     "change_into": "changes into {item}",
     "strip_clothing": "pulls {item} off {target}",
     "break_grip": "twists against {target}'s grip",
+    "let_go": "lets go of {target}",                            # D-207
     "shove": "shoves {target}",
     "disarm": "grabs for {target}'s weapon",
     "pick_up_item": "reaches for {target}",

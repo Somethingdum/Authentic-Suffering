@@ -992,3 +992,63 @@
       payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: humiliated}
   delay_s: 0
   cites: [D-204, D-129]
+# D-207: someone pulled you free — out of the dead's hands, or out of someone's grip.
+- schema: as.cascade.v1
+  id: CAS-080
+  description: Someone who gets you out of the dead's hands, while you are awake to see who, earns your trust and warmth, and you owe them your life.
+  trigger_event: CONTROL_RELEASE
+  where: {}
+  preconditions: ["body(trigger.payload.holder_id).kind == 'infected'"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: trust, delta: 2, cause: saved_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: affection, delta: 1, cause: saved_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: rescued_by(trigger.event_id)
+      payload: {kind: debt_owing, subject: "$trigger.rescuer", text: "{subject} got you out of the dead's hands. You owe them your life.", strength: 3}
+  delay_s: 0
+  cites: [D-207, D-195]
+- schema: as.cascade.v1
+  id: CAS-081
+  description: Someone who gets you free of a person holding you, when you were not fighting, earns your trust and warmth, and you owe them.
+  trigger_event: CONTROL_RELEASE
+  where: {}
+  preconditions: ["body(trigger.payload.holder_id).kind != 'infected'"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: trust, delta: 2, cause: freed_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: affection, delta: 1, cause: freed_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: rescued_by(trigger.event_id)
+      payload: {kind: debt_owing, subject: "$trigger.rescuer", whom: "$trigger.payload.holder_id", text: "{subject} got you free of {whom}. You owe them.", strength: 3}
+  delay_s: 0
+  cites: [D-207, D-195]
+- schema: as.cascade.v1
+  id: CAS-082
+  description: Seeing someone pull a person you love free earns them your trust and warmth.
+  trigger_event: CONTROL_RELEASE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_saved(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: trust, delta: 1, cause: saved_someone_of_yours}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_saved(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: affection, delta: 1, cause: saved_someone_of_yours}
+  delay_s: 0
+  cites: [D-207]

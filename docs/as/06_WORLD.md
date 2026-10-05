@@ -233,6 +233,11 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   one trust; wounds tended while awake earn one trust, one warmth and a debt the one tended carries —
   once per world day from the same person; never written into the player's character. Seeing someone
   put themselves between you and the danger earns them one trust and one warmth the same way (D-200).
+- **Pulled free** (D-207, CAS-080..082): whoever gets you out of the dead's hands — a killing blow, a
+  shove that knocks it off you — while you are awake to see who, earns two trust and one warmth, and
+  you owe them your life (a debt of strength 3); out of a person's grip, when you were not fighting
+  them, the same. Those who love you and saw it trust and warm to them by one. A hand that is dead,
+  out cold, asleep or out of reach lets go; breaking free yourself owes nobody.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

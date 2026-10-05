@@ -228,6 +228,9 @@ enumerate it too, one option per combination (then capped by the selection rules
                        requires.held_item_tags (the gun, the blade — never the other hand's thing)
   shoot_*, strike_*, finish_downed   body x the held weapon (item = the weapon)
   punch, grapple, shove, disarm, break_grip, calm_person, signal, watch_target  body only
+  break_grip / let_go  (D-207) only a body that grips the actor (physical.bodies.grips_on(actor)) /
+                       only a body the actor grips (a grips row with the actor as holder) — you
+                       feel a hand on you; nobody is offered to break a grip that is not there
   strip_clothing       (F1c) body x each worn clothing piece of it that no other worn piece of it
                        covers from outside (none at the same slot in an outer layer — what can be
                        pulled off first), in worn() order; only a body of kind 'human' with
