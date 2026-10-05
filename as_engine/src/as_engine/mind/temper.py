@@ -145,6 +145,14 @@ TEMPER-10 (P12, D-79, D-102 — the owner, on Willis: "he's completely unphased 
   'wish_forgiven' and whose heat is below threshold // 2 -> feeling "they asked you for a wonder as if you
   were a genie; you let it pass this once — tell them, seriously and without harm, never again".
 WORSHIP_WORDS and WISH_WORDS are implemented data (routing hints, like INSULT_WORDS).
+TEMPER-11 (D-253) What was said to their face is the story they tell. In take_in, after the provocations are
+  taken in and before the breaking point (not for the PC), for each provocation (in order) whose kind is a key of
+  STORIES ('insulted' -> 'insulted_someone', 'threatened' -> 'threatened_someone') and whose event_id is set, once per
+  (toward, claim): unless the holder already holds a live believed holding on ('body', toward_id, claim) — the same
+  wrong again is the story they already tell — world.rumours.seed(tx, holder, toward_id, claim, at, turn_index,
+  kernel.events.committed_or_none(tx, event_id), seen=True, whom_id=holder) ("Owen insulted you."). Whoever believes
+  it when it is told thinks less of the one it is about (core CAS-113: respect, CAS-114: trust). STORIES is
+  implemented data.
 
 Off-screen friction between the people of a settlement is society.settlement STL-15 (P9).
 
@@ -396,6 +404,27 @@ def _set_heat(tx, holder_id, toward_id, h, kind, event_id, cause, at, turn_index
                                           "heat": h}))
 
 
+STORIES: dict[str, str] = {"insulted": "insulted_someone", "threatened": "threatened_someone"}   # TEMPER-11 (D-253)
+
+
+def _tell_of(tx, holder_id, provs, at, turn_index):
+    # TEMPER-11 (D-253): an insult or a threat to their face is the story they tell — once
+    from ..kernel.events import committed_or_none
+    from ..world import rumours
+    told = set()
+    for pv in provs:
+        claim = STORIES.get(pv.kind)
+        if claim is None or pv.event_id is None or (pv.toward_id, claim) in told:
+            continue
+        told.add((pv.toward_id, claim))
+        if tx.query_one("SELECT 1 FROM claim_holdings h JOIN propositions p ON p.prop_id = h.claim_id WHERE h.holder_id=? AND "
+                        "h.superseded_by IS NULL AND h.believed=1 AND p.subject_type='body' AND p.subject_id=? AND p.predicate=?",
+                        (holder_id, pv.toward_id, claim)) is not None:
+            continue
+        rumours.seed(tx, holder_id, pv.toward_id, claim, at, turn_index, committed_or_none(tx, pv.event_id), seen=True,
+                     whom_id=holder_id)
+
+
 def take_in(tx: "Tx", rng: "Rng", holder_id: str, turn_index: int, at: int) -> Outburst | None:
     import json as _j
     from ..contracts.events import Event, EventType
@@ -411,6 +440,7 @@ def take_in(tx: "Tx", rng: "Rng", holder_id: str, turn_index: int, at: int) -> O
     pc = tx.query_one("SELECT value FROM meta WHERE key='pc_actor_id'")
     if pc and pc[0] == holder_id:
         return None
+    _tell_of(tx, holder_id, provs, at, turn_index)                       # TEMPER-11 (D-253)
     last = {}
     for i, pv in enumerate(provs):
         last[pv.toward_id] = (i, pv.event_id)

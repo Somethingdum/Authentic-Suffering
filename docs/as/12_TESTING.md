@@ -1050,6 +1050,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_talk_already_answered.py` | A line June heard and reacted to after it reached her (a later WARM wave in the ledger and an ok call) is not talk to take in next turn; one that reached her after she decided, or in the very wave she decided in, is; a failed call took nothing in (decided_at None); two turns of the player talking to June: on the second her wave-0 salience is 0 (COLD), she says no line to the room, and she reacts when the words land |
 
+### 3.142 Talked about (P9; D-253)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_talked_about.py` | The player calls June a useless idiot (or says he'll kill her) to her face: she carries the story ("… insulted you.", "… threatened you."), once however often he says it, and nothing is written into the player's character; told by Finn, whom she believes, Kit loses a point of respect (insult, CAS-113) or trust (threat, CAS-114) toward Jude; shamed in front of others, June resents the player (CAS-042's RELATION_CHANGE is not hidden by its own drain) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

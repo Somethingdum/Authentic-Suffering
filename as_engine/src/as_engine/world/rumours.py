@@ -113,6 +113,8 @@ CLAIM_TEXT: dict[str, str] = {
     "let_the_dead_in": "{about} opened the way and let the dead in on people.",   # D-218
     "lost_it": "{about} lost it and went for someone.",
     "fell_out": "{about} had a screaming row with someone.",
+    "insulted_someone": "{about} insulted someone to their face.",          # D-253
+    "threatened_someone": "{about} threatened someone.",                     # D-253
 }
 CLAIM_WHOM: dict[str, str] = {                                             # D-179 INFO-08: the one it was done to
     "killed_someone": "{about} killed {whom}, who was not fighting back.",
@@ -127,6 +129,8 @@ CLAIM_WHOM: dict[str, str] = {                                             # D-1
     "killed_one_who_gave_up": "{about} killed {whom}, who had given up.",
     "hurt_a_child": "{about} hurt {whom}, a child.",
     "spat_in_a_mouth": "{about} spat into the mouth of {whom} while they slept.",
+    "insulted_someone": "{about} insulted {whom}.",                          # D-253
+    "threatened_someone": "{about} threatened {whom}.",                      # D-253
 }
 
 

@@ -281,6 +281,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **A theft seen** (D-225, CAS-112): whoever sees someone take what they know is another's — not their own, which
   is CAS-039's — trusts the taker a point less, once a day however much is taken, and carries the story (CAS-012).
   Not knowing whose it is, or thinking it is the taker's own, costs nothing.
+- **Talked about** (D-253, TEMPER-11, CAS-113/114): insulted, shown contempt or threatened to their
+  face, a person carries the story (`insulted_someone`, `threatened_someone` — "Owen insulted you.") — once: the same
+  wrong again is the story they already tell — and whoever believes them when it is told thinks less of the one who
+  did it (an insult costs a point of respect, a threat a point of trust). The player's character never tells it.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

@@ -1526,3 +1526,33 @@
       payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: saw_a_theft}
   delay_s: 0
   cites: [D-225, D-216, AFF-11]
+# D-253 — talked about. Being insulted or threatened to your face was held against the one who did it, and that was
+# all: nobody else ever heard of it. Now it is the story the one it was done to tells (mind.temper TEMPER-11), and
+# whoever hears it, from someone they believe, thinks less of the one who did it — an insult costs their respect, a
+# threat their trust. The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-113
+  description: Hearing, from someone they believe, that a person insulted someone to their face costs that person some of the listener's respect.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: insulted_someone, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: respect, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-253, D-216]
+- schema: as.cascade.v1
+  id: CAS-114
+  description: Hearing, from someone they believe, that a person threatened someone costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: threatened_someone, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-253, D-216]

@@ -306,8 +306,9 @@ makes the snap, when it comes, code's act:
 - **Heat** (`tempers`, per person toward another) builds from what they perceive done or said to
   them — struck, shoved, grabbed, threatened, ordered about by someone they don't answer to,
   insulted, their own people hurt, their things taken — each once, and fades an hour at a time;
-  a grudge keeps it warm. The breaking point is `fuse x 2 - stress // 3`: the more stressed, the
-  shorter. (F1c, TEMPER-09) Heat also builds from what someone *is*, not only what they did: the
+  a grudge keeps it warm. (D-253, TEMPER-11) An insult or a threat to their face is also the story
+  they tell — once — and whoever believes it thinks less of the one who did it. The breaking point is
+  `fuse x 2 - stress // 3`: the more stressed, the shorter. (F1c, TEMPER-09) Heat also builds from what someone *is*, not only what they did: the
   reek of the dead on a person close by grates again every ten minutes, faster than it fades; a
   naked adult in plain sight is a jolt of strain and heat, again every half hour.
 - **The packet says it**: "You are close to breaking." / "You are at the end of your rope."; beside

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-866 ids; 608 with their own statement, 258 named only in context.
+869 ids; 611 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -156,7 +156,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-04 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-040 | Seeing someone hurt a person you love, who was not fighting them, is not forgiven. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
 | CAS-041 | Seeing someone kill a person you loved, who was not fighting them, leaves a grudge that does not let go. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
-| CAS-042 | Being insulted in front of others wears a person down, and they resent the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py`, `contract/p09_society/test_what_is_done_lasts.py` |
+| CAS-042 | Being insulted in front of others wears a person down, and they resent the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_talked_about.py`, `contract/p09_society/test_to_your_face.py`, `contract/p09_society/test_what_is_done_lasts.py` |
 | CAS-043 | Being held and made to watch someone you love hurt breaks something in a person. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_putting_down_the_dead.py`, `contract/p09_society/test_what_is_done_lasts.py` |
 | CAS-044 | Being held and made to watch someone you love die breaks something in a person. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-045 | Seeing someone cut meat from a person's body costs them your trust, leaves you afraid of them and shaken, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_eating_the_dead.py` |
@@ -232,6 +232,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-110 | Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
 | CAS-111 | Word that someone you love is dead wears you down, if you believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_of_a_death.py` |
 | CAS-112 | Seeing someone take what you know belongs to another costs them a little of your trust — a day's takings count once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_theft_seen.py` |
+| CAS-113 | Hearing, from someone they believe, that a person insulted someone to their face costs that person some of the listener's respect. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/temper.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_talked_about.py` |
+| CAS-114 | Hearing, from someone they believe, that a person threatened someone costs that person some of the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/temper.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_talked_about.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |
@@ -1286,6 +1288,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | TEMPER-08 | TEMPER-08 (H1) A person knows their own state: body_lines gains the strain line, each entity its PacketEntity.feeling, and a snap of outlet 'words' this wave sets SkullPacket.outburst — all as mind.temper TEMPER-08 word… | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/temper.py` | `contract/p05_many_actors/test_temper_in_packet.py` |
 | TEMPER-09 | TEMPER-09 (F1c, D-86) What people cannot stand to be near — the owner: smeared in the dead "I'm going to smell like hell, look like hell. And people aren't gonna want to be around me for very long till I shower"; and wa… | as_engine/mind/temper.py | `as_engine/mind/temper.py` | `contract/p05_many_actors/test_care.py`, `contract/p07_slice/test_narration_care.py` |
 | TEMPER-10 | TEMPER-10 (P12, D-79, D-102 — the owner, on Willis: "he's completely unphased by most blatant disrespect ... unless he has on his own whim provided you with something valuable"; "he hates being asked for magical gifts,… | as_engine/mind/temper.py | `as_engine/action/effects.py`, `as_engine/mind/temper.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p12_surfaces/test_willis.py` |
+| TEMPER-11 | TEMPER-11 (D-253) What was said to their face is the story they tell. In take_in, after the provocations are taken in and before the breaking point (not for the PC), for each provocation (in order) whose kind is a key o… | as_engine/mind/temper.py | `as_engine/mind/temper.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_talked_about.py` |
 
 ## TEXT
 

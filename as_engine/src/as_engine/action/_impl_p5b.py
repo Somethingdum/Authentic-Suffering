@@ -1304,10 +1304,12 @@ def _theft_victims(tx, event_id):
     return out
 
 
-def _drained_lately(tx, actor, reason, at):
-    """D-129: a Resolve drain of this reason in the hour up to ``at`` (once an hour, however often it happens)."""
+def _drained_lately(tx, actor, reason, at, trigger_id=None):
+    """D-129: a Resolve drain of this reason in the hour up to ``at`` (once an hour, however often it happens) — (D-253)
+    not counting one this very trigger caused (a rule's first effect must not hide the target from its next)."""
     return tx.query_one("SELECT 1 FROM events WHERE type='RESOLVE_CHANGE' AND actor_id=? AND json_extract(payload,'$.reason')=? "
-                        "AND at>? AND at<=?", (actor, reason, at - 3_600_000, at)) is not None
+                        "AND at>? AND at<=? AND (cause_event_id IS NULL OR cause_event_id != ?)",
+                        (actor, reason, at - 3_600_000, at, trigger_id or "")) is not None
 
 
 def select(tx, selector, trigger):
@@ -1367,7 +1369,7 @@ def select(tx, selector, trigger):
             return []
         saw = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND fidelity IN "
                                       "('exact','partial')", (v,))}
-        if who not in saw or not (saw - {who, trigger.actor_id}) or _drained_lately(tx, who, "humiliated_publicly", trigger.at):
+        if who not in saw or not (saw - {who, trigger.actor_id}) or _drained_lately(tx, who, "humiliated_publicly", trigger.at, trigger.event_id):
             return []
         return [who]
     if fn == "humiliated_by":                                        # D-129: insulted in front of others
@@ -1382,7 +1384,7 @@ def select(tx, selector, trigger):
                 continue
             if not any(_words_have(d.get("words") or "", x) for x in INSULT_WORDS):
                 continue
-            if not any(o not in (h, trigger.actor_id) for o, _d in heard) or _drained_lately(tx, h, "humiliated_publicly", trigger.at):
+            if not any(o not in (h, trigger.actor_id) for o, _d in heard) or _drained_lately(tx, h, "humiliated_publicly", trigger.at, trigger.event_id):
                 continue
             out.append(h)
         return sorted(set(out))
@@ -1395,7 +1397,7 @@ def select(tx, selector, trigger):
             if h in (body, doer) or not _bonded_to(tx, h, body):
                 continue
             held = tx.query_one("SELECT restrained FROM bodies WHERE body_id=?", (h,))
-            if held is None or not held[0] or _drained_lately(tx, h, "made_to_watch", trigger.at):
+            if held is None or not held[0] or _drained_lately(tx, h, "made_to_watch", trigger.at, trigger.event_id):
                 continue
             out.append(h)
         return out

@@ -64,7 +64,9 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               entry of mind.temper.INSULT_WORDS (whole words), when
                                               someone else besides the speaker heard it too (an
                                               audience), and no RESOLVE_CHANGE of theirs with reason
-                                              'humiliated_publicly' in the hour up to it; never the
+                                              'humiliated_publicly' in the hour up to it (D-253: but one
+                                              this very event caused — the rule's own drain — does not
+                                              hide them from its other effects); never the
                                               speaker or the PC. (D-204) For a GESTURE whose gesture is
                                               in action.effects.CONTEMPT_GESTURES: its target, when it
                                               holds a visual EXACT or PARTIAL percept of it and so does
@@ -74,7 +76,8 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               or PARTIAL percept of it who are held (bodies.restrained)
                                               and bonded to the one hurt (as above), never that body or
                                               the one who did it, with no RESOLVE_CHANGE of theirs with
-                                              reason 'made_to_watch' in the hour up to it
+                                              reason 'made_to_watch' in the hour up to it (D-253: one this
+                                              very event caused does not count)
     given_to(<path>)                          (D-195) for an ITEM_TRANSFER whose ``from`` is the body
                                               of the event's actor (someone with an actors row) and whose
                                               ``to`` is another living body with an actors row: that
