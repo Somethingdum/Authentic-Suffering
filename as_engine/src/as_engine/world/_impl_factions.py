@@ -71,8 +71,8 @@ def _seat_holders(store, group_id, rec, seats):
         if ld.seat == first:
             who = [leader] if leader else []
         else:
-            who = [r[0] for r in store.query("SELECT actor_id FROM group_members WHERE group_id=? AND role=? ORDER BY actor_id",
-                                             (group_id, ld.seat))]
+            who = [r[0] for r in store.query("SELECT actor_id FROM group_members WHERE group_id=? AND role=? AND status IN "
+                                             "('member','probation') ORDER BY actor_id", (group_id, ld.seat))]
         for a in who:
             b = store.query_one("SELECT alive FROM bodies WHERE body_id=?", (a,))
             if b and b[0]:

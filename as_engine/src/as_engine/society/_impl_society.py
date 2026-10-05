@@ -1040,10 +1040,14 @@ def g_members(store, group_id, living=True):
 
 
 def leader_of(store, group_id):
+    def gone(a):                                                 # D-220: cast out, or left
+        return _row(store, "SELECT 1 FROM group_members WHERE group_id=? AND actor_id=? AND status IN ('expelled','departed')",
+                    (group_id, a)) is not None
     g = _row(store, "SELECT leader_id FROM groups WHERE group_id=?", (group_id,))
-    if g and g["leader_id"] and _alive(store, g["leader_id"]):
+    if g and g["leader_id"] and _alive(store, g["leader_id"]) and not gone(g["leader_id"]):
         return g["leader_id"]
-    for r in _rows(store, "SELECT actor_id FROM group_members WHERE group_id=? AND role='leader' ORDER BY actor_id", (group_id,)):
+    for r in _rows(store, "SELECT actor_id FROM group_members WHERE group_id=? AND role='leader' AND status IN ('member','probation') "
+                          "ORDER BY actor_id", (group_id,)):
         if _alive(store, r["actor_id"]):
             return r["actor_id"]
     return None

@@ -7,8 +7,9 @@ never an animosity roll (SEL-06); what others feel TOWARD the PC changes through
 
 members(store, group_id, living=True) -> list[str]: actor ids with a group_members row of status
   'member' or 'probation', sorted; living=True keeps the living.
-leader_of(store, group_id) -> str | None: groups.leader_id when it is set and alive; else the living
-  member with role 'leader' (lowest id); else None.
+leader_of(store, group_id) -> str | None: groups.leader_id when it is set and alive and (D-220) their
+  row in the group is not 'expelled' or 'departed'; else the living member (status 'member' or
+  'probation') with role 'leader' (lowest id); else None.
 GRP-01 tension_of(store, a_id, b_id) -> int: tension.score of the row (a_id, b_id), 0 without one.
   Tension is directional: what a (an actor or a group) holds against b.
 GRP-02 adjust_tension(tx, a_id, b_id, delta, cause_text, at, turn_index, cause_event_id) ->

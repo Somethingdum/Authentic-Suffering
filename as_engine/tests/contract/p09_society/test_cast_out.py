@@ -132,3 +132,13 @@ def test_a_killing_in_front_of_them_is_the_end_of_it(settle):
     sweep(w, strike(w, at, WoundSeverity.CATASTROPHIC), ("CAS-027", "CAS-109", "CAS-110"), at + 2000)
     assert status(w, "jude") == "expelled"
     assert "Pumpwell has cast you out. You cannot stay." in loops(w, "jude")
+
+
+def test_a_leader_cast_out_leads_no_more(settle):
+    w = settle
+    g = w.id("settlers")
+    assert group.leader_of(w.store, g) == w.id("tomas")
+    with w.store.transaction() as tx:
+        cause = accident(tx, now(w), "the settlement has had enough of him")
+        group.cast_out(tx, g, w.id("tomas"), now(w), 0, cause.event_id)
+    assert group.leader_of(w.store, g) != w.id("tomas")
