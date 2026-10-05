@@ -80,6 +80,8 @@ class SayMyWayContext(Strict):
 class ReflectionContext(Strict):
     packet: SkullPacket
     recent_episodes: list[str]
+    cue_ids: list[str] = Field(default_factory=list, description="D-234: the cue words a lesson may be tagged with (the "
+                               "canon's cue ids, as the writeback is given them); a tag outside them is dropped (BG-04).")
 
 
 class RumourContext(Strict):

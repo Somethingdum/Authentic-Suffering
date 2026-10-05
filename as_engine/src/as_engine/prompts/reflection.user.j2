@@ -1,7 +1,27 @@
 {{ ctx.packet.identity.as_text() }}
+{% if ctx.cue_ids %}
+
+Cue words a lesson may be tagged with: {{ ctx.cue_ids | join(', ') }}
+{% endif %}{% if ctx.packet.lore %}
+
+What they grew up hearing about what is around them (belief, not fact):
+{% for k in ctx.packet.lore %}- {{ k }}
+{% endfor %}{% endif %}{% if ctx.packet.lessons %}
+
+What experience has taught them:
+{% for k in ctx.packet.lessons %}- {{ k }}
+{% endfor %}{% endif %}{% if ctx.packet.beliefs %}
+
+What they believe:
+{% for b in ctx.packet.beliefs %}- {{ b.text }} ({{ b.provenance_text }}, {{ b.age_text }})
+{% endfor %}{% endif %}{% if ctx.packet.relationships %}
+
+How they feel about the people around them:
+{% for r in ctx.packet.relationships %}{% for e in ctx.packet.entities if e.handle == r.handle %}- {{ e.description }}: {{ r.text }}
+{% endfor %}{% endfor %}{% endif %}
 
 Recent memories:
-{% for e in ctx.recent_episodes %}- {{ e }}
+{% for e in ctx.recent_episodes %}- R{{ loop.index }}: {{ e }}
 {% endfor %}
 Things hanging over them:
 {% for l in ctx.packet.open_loops %}- {{ l.handle }} ({{ l.kind.value | replace('_',' ') }}): {{ l.text }}

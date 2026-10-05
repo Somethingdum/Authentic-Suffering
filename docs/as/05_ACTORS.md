@@ -394,7 +394,10 @@ the player's reading speed** (BG-07): which reflections a boundary owes is fixed
 turn left it, and the next turn first finishes whatever is still owed, so answering at once and
 waiting an hour give the same people the same thoughts. Results are REFLECTION events (recorded as
 an external input; replay re-applies them without a model call). A reference to anything the packet
-did not offer is dropped and logged. This is how people build their own internal state over days.
+did not offer is dropped and logged. The person reflects as themselves: the call shows what they grew
+up hearing, what experience taught them, what they believe and how they feel about the people around
+them, and the cue words a lesson may be tagged with (D-234). This is how people build their own
+internal state over days.
 
 ### 9.3 Retrieval (what a mind gets back)
 

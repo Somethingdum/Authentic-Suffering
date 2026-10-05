@@ -953,6 +953,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_the_dead_coming_on.py` | The shambler coming on at 6.3 m is material to Sam; a step closer at 5.7 m is not; within 5 m it is; the next turn its first step is news again; a second of the dead behind the first, 5.1 m off, is not news, and is when it is upon him |
 
+### 3.126 The quiet hours see the whole mind (P10; D-234)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_the_quiet_hours_see.py` | June's reflection call carries the canon's cue words and its prompt lists them; her new memory is "R1" and the answer is told to cite R labels; how she feels about the people around her is in the prompt |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

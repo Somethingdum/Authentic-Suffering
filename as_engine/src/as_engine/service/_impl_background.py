@@ -152,7 +152,8 @@ def _reflection_request(session, packet, recent, turn_index):
     from ..contracts.mind import ReflectionOutput
     from ..lanes.requests import build_request
     from ..lanes.schemas import to_lm_schema
-    ctx = ReflectionContext(packet=packet, recent_episodes=recent)
+    cue_ids = [c.id for c in session.store.canon.by_kind.get("cue", {}).values()]     # D-234: what a lesson may be tagged
+    ctx = ReflectionContext(packet=packet, recent_episodes=recent, cue_ids=cue_ids)
     schema = to_lm_schema(ReflectionOutput)
     return build_request(session.config, CallClass.REFLECTION, turn_index=turn_index, actor_id=packet.actor_id,
                          context=ctx, json_schema=schema, ctx=ctx), schema

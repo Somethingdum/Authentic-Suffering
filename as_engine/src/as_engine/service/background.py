@@ -70,7 +70,8 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   mind.affordance.enumerate_affordances(tx, actor, canon affordances, at, T), packet =
   mind.packet.build_packet(tx, actor, LOD.WARM, affordances, T, at), and the new episodes (BG-02;
   the newest R.max_episodes of them, oldest first). The call happens after that transaction has
-  ended: ReflectionContext(packet, recent_episodes = those summaries); request =
+  ended: ReflectionContext(packet, recent_episodes = those summaries, cue_ids = the canon's cue ids in
+  canon order — (D-234) the words a lesson may be tagged with); request =
   lanes.requests.build_request(config, REFLECTION, turn_index=T, actor_id, context=ctx,
   json_schema = lanes.schemas.to_lm_schema(ReflectionOutput), ctx=ctx); resp = await
   lanes.repair.call_with_repair(client, request, ReflectionOutput, repair_builder = a function
