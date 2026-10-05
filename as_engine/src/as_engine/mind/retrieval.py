@@ -58,7 +58,9 @@ MEM-14 episodes: the holder's episodes with decayed 0 and (B5, MEM-18) quarantin
   Anchors (anchor 1) come first and always: ordered (salience desc, at desc, episode_id), at most 2.
   Then the rest by score = salience + (20 when any subject_id is in K) + (15 when the episode
   matches the speech query) + recency_bonus(hours since episode.at), ordered (score desc,
-  episode_id asc), until max_memories entries in total (anchors count toward it).
+  episode_id asc), until max_memories entries in total (anchors count toward it). (D-272) An episode whose
+  summary, stripped and case-blind, is that of one already listed is left out: the same memory twice is one
+  memory, and its slot goes to another.
   Speech query: the content words of this turn's perceived speech (detail.words of the holder's
   speech rows, in row order): lowercase runs of letters and apostrophes with 4 or more letters,
   not in STOPWORDS, first occurrence kept; each double-quoted, joined with ' OR '. An episode

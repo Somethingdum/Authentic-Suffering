@@ -1158,6 +1158,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_letting_it_pass.py` | Mara, asked whether the water is safe, reacts and says nothing: the question is not owed again, and the next turn she is not made to decide; asked again after she decided, it is owed |
 
+### 3.160 The same memory twice (P6; D-272)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_the_same_memory_twice.py` | Two episodes with the same summary (case and spacing aside) take one of two memory slots — the newer — and the other slot goes to a different memory |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

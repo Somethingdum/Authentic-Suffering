@@ -578,7 +578,13 @@ def retrieve(tx, holder_id, turn_index, at, *, max_beliefs, max_memories, max_lo
         score = e["salience"] + (20 if set(_j(e["subject_ids"])) & K else 0) + (15 if e["rowid"] in match else 0) + recency_bonus((at - e["at"]) / 3_600_000)
         rest.append((score, e))
     rest.sort(key=lambda x: (-x[0], x[1]["episode_id"]))
-    chosen = [(None, e) for e in anchors] + rest
+    chosen, told = [], set()
+    for s_, e in [(None, e) for e in anchors] + rest:                 # D-272: the same memory twice is one memory
+        key = (e["summary"] or "").strip().casefold()
+        if key in told:
+            continue
+        told.add(key)
+        chosen.append((s_, e))
     out.episodes = [{"episode_id": e["episode_id"], "summary": e["summary"], "at": e["at"], "salience": e["salience"], "anchor": e["anchor"],
                      "score": s} for s, e in chosen[:max_memories]]
     # lessons
