@@ -193,8 +193,13 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
     move group    (D-181) 0 a move to another place (its destination is a place) or one with no
                   referent (leave by the nearest way out), 1 a move within the place — the
                   side door to the yard is never crowded out by four ways to reach the car;
-    hold group    0 defs tagged 'freeze', 1 verb OBSERVE, 2 verb GUARD, 3 the rest (so 'stay
-                  where you are' and 'watch' are never crowded out by 'sleep').
+    act group     (D-182) 0 an option that answers a PRESSING need — tagged 'food' with the
+                  actor's needs.hunger_stage >= NEED_PRESSING, 'water' with thirst_stage >= it —
+                  1 the rest: the starving see the food they carry first;
+    hold group    0 defs tagged 'freeze' and (D-182, only with no threat this turn) defs tagged
+                  'rest' when fatigue_stage >= NEED_PRESSING — the exhausted see sleep; 1 verb
+                  OBSERVE, 2 verb GUARD, 3 the rest (so 'stay where you are' and 'watch' are never
+                  crowded out by 'sleep' — unless they can hardly keep their eyes open).
   DISTANCE for an option bound to an anchor or portal = metres from that point to the actor's
   ATTENTION POINT; for any other referent = metres from the actor; 0 with no referent. The
   attention point is where the actor's loudest sound this turn came from, as far as its own place
@@ -332,6 +337,9 @@ class AffordanceSet:
 def enumerate_affordances(tx: "Tx", actor_id: str, catalog: list["AffordanceDef"], at: int,
                           turn_index: int, waking: bool = False) -> AffordanceSet:
     raise NotImplementedError("P4")
+
+
+NEED_PRESSING = 2   # D-182 (AFF-07): a need at this stage puts what answers it first ("You are tired.")
 
 
 def duration_words(seconds: float) -> str:

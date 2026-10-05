@@ -39,6 +39,7 @@ def _ctx(tx, actor_id, at, turn_index, waking=False):
     c.actor = _row(tx, "SELECT * FROM actors WHERE actor_id=?", (actor_id,))
     c.dossier = fused(tx, actor_id)
     c.cap = bodies.capacity(tx, actor_id, as_awake=waking)               # SLEEP-03 (D-171)
+    c.needs = _row(tx, "SELECT thirst_stage, hunger_stage, fatigue_stage FROM needs WHERE body_id=?", (actor_id,)) or {}
     c.skills = {s.domain.value if hasattr(s.domain, "value") else s.domain: s.rank for s in c.dossier.capability.skills}
     c.cues = set()
     for r in tx.query("SELECT cue_tags FROM lessons WHERE holder_id=? AND confidence>=1", (actor_id,)):
@@ -634,6 +635,15 @@ def _opt_distance(c, ba, att, dist_from_me):
     return dist_from_me
 
 
+def _pressing(c, ba):
+    """D-182: an option that answers a need at stage NEED_PRESSING or more (food, water, rest)."""
+    from .affordance import NEED_PRESSING
+    n = c.needs
+    return bool(("food" in ba.tags and (n.get("hunger_stage") or 0) >= NEED_PRESSING)
+                or ("water" in ba.tags and (n.get("thirst_stage") or 0) >= NEED_PRESSING)
+                or ("rest" in ba.tags and (n.get("fatigue_stage") or 0) >= NEED_PRESSING))
+
+
 def _group(c, opt):
     v = opt.verb
     if v == Verb.CONTINUE_TASK:
@@ -725,9 +735,11 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
             return 6
         if g == 3:                       # D-181: going somewhere else before moving about the room
             return 0 if (ba.destination_id or "").startswith("plc_") or not (ba.destination_id or ba.target_id) else 1
+        if g == 4:                       # D-182: what the body is crying out for first
+            return 0 if _pressing(c, ba) else 1
         if g != 6:
             return 0
-        if "freeze" in ba.tags:
+        if "freeze" in ba.tags or (not c.threats and _pressing(c, ba)):
             return 0
         if ba.verb == Verb.OBSERVE:
             return 1

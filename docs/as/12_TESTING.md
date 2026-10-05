@@ -723,11 +723,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_who_it_was.py` | The sentence names the one it was done to when there is a word for them ("Owen tried to kill Mara, who was not fighting."; "you" when it was the holder) and not otherwise; June, who saw Owen fire at Mara, believes it of Mara; Alice, told it by June, hears "someone"; (D-180) June, who loves Mara, trusts him two less and holds "Owen tried to kill Mara, someone you love." |
 
-### 3.88 The way out is on the list (P4; D-181)
+### 3.88 The way out is on the list; what the body wants (P4; D-181, D-182)
 
 | File | What it proves |
 |---|---|
 | `p04_one_actor/test_the_way_out.py` | In the garage the side door to the yard is on the first menu, right after the nearest way out and before the ways to reach the car; creeping about the room is still offered |
+| `p04_one_actor/test_what_the_body_wants.py` | (D-182) June exhausted sees sleep at the head of her waiting options; starving with jerky in her pocket, she is offered to eat it |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
