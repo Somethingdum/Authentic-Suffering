@@ -38,7 +38,13 @@ LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict]
   one, or an item that is such a source whose def_ref is one; mind.cues.cues_of(tx, holder,
   turn_index, at) meets the entry's ``when``. Each thing once before any twice: the entries ordered
   by their best line (confidence desc, then lore_ref), each entry's lines (confidence desc, belief);
-  round by round, the next line of every entry that has one, in that order; the first n. Entries {lore_id, belief, text (the entry's belief text), confidence, provenance}. retrieve fills
+  round by round, the next line of every entry that has one, in that order; the first n. Entries {lore_id, belief, text (the entry's belief text), confidence, provenance}.
+  (D-201) What ordinary survivors say about the people in front of you: for each faction (a canon
+  faction ref) that is the content_ref of a group a body of those VISUAL percepts belongs to (member
+  or probation), that the holder belongs to no group of, and that no lore entry of the canon names
+  among its ``entities`` (a faction with lore of its own is spoken of through it), the faction's belief_text joins the
+  entries as {lore_id: the faction ref, belief: 0, text: belief_text, confidence: 2, provenance:
+  'common'} — whether or not the holder holds any lore. retrieve fills
   Retrieved.lore with lore_lines(..., n = RulesConfig.packet.max_lore).
 MEM-14 episodes: the holder's episodes with decayed 0 and (B5, MEM-18) quarantined 0.
   Anchors (anchor 1) come first and always: ordered (salience desc, at desc, episode_id), at most 2.

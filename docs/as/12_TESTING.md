@@ -767,11 +767,11 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_names_called.py` | "You're a whore, Mara.", "Go to hell, June.", "Eli, you're a waste of space." and the rest wound (TEMPER-03 'insulted'), "you’re" as a phone types it too; "Take the garbage out back.", "The water's filthy.", "Don't fool around." and other ordinary words do not |
 
-### 3.95 The mouth rules (P9; D-193, D-196, D-197)
+### 3.95 The mouth rules (P9; D-193, D-196, D-197, D-201)
 
 | File | What it proves |
 |---|---|
-| `p09_society/test_mouth_rules.py` | Mara, beside June with a fresh bite in a lit room, has the bite_wound_seen cue, and both the wet strain's lore and the mouth rules come to mind; (D-196) her memory of it is written with that lore in its prompt, and read back raw from the store until it is; (D-197) Owen, beside her, has what he grew up hearing in the Writer's prompt the turn it first comes up, and not again the next turn |
+| `p09_society/test_mouth_rules.py` | Mara, beside June with a fresh bite in a lit room, has the bite_wound_seen cue, and both the wet strain's lore and the mouth rules come to mind; (D-196) her memory of it is written with that lore in its prompt, and read back raw from the store until it is; (D-197) Owen, beside her, has what he grew up hearing in the Writer's prompt the turn it first comes up, and not again the next turn; (D-201) a stranger who sees one of Delgado's crew recalls what survivors say about them, and the crew never think it of their own |
 
 ### 3.96 The same wrong again (P9; D-194)
 

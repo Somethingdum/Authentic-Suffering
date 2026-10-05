@@ -59,8 +59,6 @@ def lore_lines(tx, holder_id, turn_index, at, n):
     from ._impl_p6 import select_percepts
     from .cues import cues_of
     held = [dict(r) for r in tx.query("SELECT lore_ref, belief, confidence, provenance FROM lore_held WHERE holder_id=?", (holder_id,))]
-    if not held:
-        return []
     rows = select_percepts(tx, holder_id, turn_index, at)
     speech = []
     for p in rows:
@@ -86,6 +84,11 @@ def lore_lines(tx, holder_id, turn_index, at, n):
     cues = None
     hit = {}
     out = []
+    mine = group_refs_of(tx, holder_id)
+    told = {x for r in tx.canon.refs("lore") for x in tx.canon.get(r).entities}
+    for ref in sorted(seen - mine - told):                            # D-201: what people say about that crowd
+        if ref.split(":", 1)[-1].startswith("faction/") and tx.canon.has(ref):
+            out.append({"lore_id": ref, "belief": 0, "text": tx.canon.get(ref).belief_text, "confidence": 2, "provenance": "common"})
     for h in held:
         ref = h["lore_ref"]
         if not tx.canon.has(ref):

@@ -81,3 +81,21 @@ def test_what_owen_was_always_told(scenario):
     user = render(CallClass.NARRATION, k=first, words=w.store.rules.style.narration_words[first.length], fix=[])[1].content
     assert "What Owen grew up hearing about this" in user
     assert second.pc_beliefs == [], "it came to mind once; she is still there, and it is not said again"
+
+
+def test_what_people_say_about_that_crowd(scenario):
+    """D-201: a faction's belief_text — what ordinary survivors say about them — comes to mind on seeing one of them;
+    nobody thinks it of their own."""
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in (("stranger", 5.0), ("mara", 6.0), ("june", 7.0)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        for who in ("stranger", "june"):
+            perception.compile_scene(tx, w.id(who), t + 1000, 0)
+        theirs = retrieval.lore_lines(tx, w.id("stranger"), 0, t + 1000, 6)
+        ours = retrieval.lore_lines(tx, w.id("june"), 0, t + 1000, 6)
+    crew = w.canon.get("core:faction/delgados_crew").belief_text
+    assert {"lore_id": "core:faction/delgados_crew", "belief": 0, "text": crew, "confidence": 2, "provenance": "common"} in theirs
+    assert all(x["lore_id"] != "core:faction/delgados_crew" for x in ours), "not of your own"
