@@ -563,9 +563,38 @@ def material_holders(tx, new_events, turn_index):
                     dd = distance_to_point(tx, h, pl["to_place"], pl["x_m"], pl["y_m"])
                     if dd is not None and dd <= 20:
                         mat = True
+            if not mat:
+                mat = _looks_up(tx, h, ev, pl, bonded)               # D-137
         if mat and h not in found:
             found[h] = p["at"]
     return sorted(found.items(), key=lambda kv: (kv[1], kv[0]))
+
+
+def _looks_up(tx, h, ev, pl, bonded):
+    """D-137: a weapon drawn near you, something done to you or yours, your things taken, a gesture at you, or the
+    one you were fighting giving up."""
+    from ..physical.space import point_distance
+    if ev.type == EventType.ACTION_START and pl.get("def_id") == "equip_item" and pl.get("item_id"):
+        ref = tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (pl["item_id"],))
+        d = tx.canon.get(ref[0]) if ref else None
+        if d is not None and (getattr(d, "firearm", None) is not None or getattr(d, "melee", None) is not None):
+            dd = point_distance(tx, h, ev.actor_id)
+            if dd is not None and dd <= 20:
+                return True
+    if ev.type == EventType.ACTION_START and pl.get("verb") == "manipulate" and pl.get("target_id") in bonded:
+        return True
+    if ev.type == EventType.ITEM_TRANSFER and h in _theft_victims(tx, ev.event_id):
+        return True
+    if ev.type == EventType.GESTURE and pl.get("target_id") == h:
+        return True
+    gave_up = ((ev.type == EventType.GESTURE and pl.get("gesture") == "empty_hands")
+               or (ev.type == EventType.ACTION_START and pl.get("verb") == "surrender"))
+    if gave_up and ev.actor_id:
+        return tx.query_one(
+            "SELECT 1 FROM events WHERE type='ACTION_START' AND at BETWEEN ? AND ? AND json_extract(payload,'$.verb')='attack' "
+            "AND ((actor_id=? AND json_extract(payload,'$.target_id')=?) OR (actor_id=? AND json_extract(payload,'$.target_id')=?))",
+            (ev.at - 60_000, ev.at, h, ev.actor_id, ev.actor_id, h)) is not None
+    return False
 
 
 def reaction_time(tx, rng, holder_id, trigger_at):

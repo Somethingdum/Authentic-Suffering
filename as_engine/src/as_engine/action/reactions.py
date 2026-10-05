@@ -18,7 +18,18 @@ material_holders(tx, new_events, turn_index) -> list[tuple[str, int]]
       def), ending within 20 m of the holder (a sentinel noticing a stranger);
     (P10) a visual percept of a MOVE by an infected body (bodies.kind 'infected'), however made,
       ending within 20 m of the holder (physical.space.distance_to_point): the dead coming near
-      are always news, and a watch ends when they do.
+      are always news, and a watch ends when they do;
+    (D-137) a visual percept of an ACTION_START of equip_item whose item is a weapon (its def has a
+      firearm or a melee block) by a body within 20 m of the holder (a weapon drawn);
+    a visual percept of an ACTION_START with verb 'manipulate' whose target is the holder or a
+      bonded body (something done to you or yours: clothes pulled off, gore smeared, a body cut);
+    a visual percept of an ITEM_TRANSFER that takes what the holder knows is theirs (action.cascade's
+      theft victims, D-129: into another's hands, the holder believing it theirs, their household's or
+      their group's);
+    a visual percept of a GESTURE made toward the holder (payload target_id the holder);
+    a visual percept of a surrender (an ACTION_START with verb 'surrender', or a GESTURE
+      'empty_hands') by a body the holder was fighting: an ACTION_START with verb 'attack' by either
+      of them at the other in the 60 s up to it.
   (Visual percepts count at level clear or partial, as the detail records them.)
   Returns (holder_id, trigger_at) pairs sorted by (trigger_at, holder_id), trigger_at = the
   earliest material percept's ``at`` for that holder. A holder whose own event is the trigger is

@@ -924,7 +924,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| REACT-01 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_content/packs/core/cues.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_infected.py`, `contract/p10_world/test_new_life.py` |
+| REACT-01 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py`, `as_content/packs/core/cues.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p05_many_actors/test_what_makes_you_look_up.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_infected.py`, `contract/p10_world/test_new_life.py` |
 | REACT-02 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | REACT-03 | *Reaction gate and waves (Stage 11, P5). Rules TIME-02, TIME-04, REACT-01..04.* | as_engine/action/reactions.py | `as_engine/action/reactions.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 

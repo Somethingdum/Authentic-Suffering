@@ -500,6 +500,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_players_hands.py` | "I nod.": the INTAKE schema's gesture enum and the prompt list the PC's gestures, the answer's nod goes with staying put, and a GESTURE 'nod' by the PC is committed. 'I hold up my empty hands. "Don't shoot."' (the Glock pocketed first): the PC stays put, says the words and shows empty hands. A gesture handle the PC was not offered is dropped and the turn still runs |
 
+### 3.51 What makes you look up (P5; D-137)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_what_makes_you_look_up.py` | Material percepts (REACT-01): Mara takes a knife out of her pocket — news to June; glasses out of a pocket are not. Alice pulls at June's clothes — news to June and to Mara, who loves her, not to Owen. Owen takes the ledger out of Alice's hand — news to her. Mara beckons June — news to June; a shrug is news to nobody. June swung at Mara and Mara holds up empty hands — news to June alone; a minute and a half later it is no fight |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
