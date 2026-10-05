@@ -86,7 +86,9 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
   The results must equal stepping minute by minute, but an implementation may jump over steps in
   which nothing can change (no bleeding wound, no stage or timer boundary) — a 6-hour off-screen
   tick must not cost 360 database round trips per body. (F1c: for a body LOOK-08/09 apply to, the
-  weather and cold steps and the next day of grime are boundaries too.)
+  cold steps and the next day of grime are boundaries too — D-185: not the weather steps, which
+  LOOK-08 counts however many a step crosses: the condition comes out the same, in a third of the
+  steps.)
   Heal checks run once, at to_ms. Returned events are committed, in the order produced.
   The call ends with one physical.bodies event at to_ms that writes progressed_at (and pain /
   impairment when they changed): IMPAIRMENT_CHANGE {body_id, impairment} when impairment changed —
@@ -1156,8 +1158,8 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H, rested=None):
         cands.append(max(t, _regain_from(tx, body_id, H)) + int(_math.ceil(over / H.blood_regain_pct_per_h * 3_600_000)) + 1000)
     if _care_subject(tx, b):
         C = _rules(tx).condition
-        for step in (C.weather_step_min * MIN, C.cold_step_min * MIN):
-            cands.append((t // step + 1) * step)
+        step = C.cold_step_min * MIN          # D-185: not the weather steps — LOOK-08 counts every one a step crosses
+        cands.append((t // step + 1) * step)
         gh = int(C.grime_every_h * 3_600_000)
         cands.append(b["washed_at"] + ((t - b["washed_at"]) // gh + 1) * gh)
     nxt = min(c for c in cands if c > t) if any(c > t for c in cands) else to_ms

@@ -38,6 +38,8 @@ Record kinds (the ``kind`` part of a ref, and the key of Canon.by_kind):
   bare id (Canon.find('cue', id)); infected types, states, quirks and pathways are also referenced
   by bare id inside content (quirks:, applies_to:, rise_as:, inherits:, BodySpec.infected).
   Bare ids are unique per kind across all packs (CNT-03), so Canon.find(kind, bare_id) is exact.
+  (D-185) find reads an index by bare id, rebuilt when a kind's record count changes — it is
+  called on every resolve, every menu and every rule, and walked the whole kind each time.
 Loading order: packs sorted so every depends_on comes first (a missing dependency or a cycle is a
   CNT-04 error on pack.yaml); within a pack, folders in the table order above, files sorted by
   name, records in file order.
@@ -172,6 +174,7 @@ class Canon:
     packs: list[LoadedPack] = field(default_factory=list)
     by_kind: dict[str, dict[str, BaseModel]] = field(default_factory=dict)
     content_hash: str = ""
+    _index: dict = field(default_factory=dict, repr=False, compare=False)   # D-185: kind -> (count, {bare: rec})
 
     def get(self, ref: str) -> BaseModel:
         kind = ref.split(":", 1)[1].split("/", 1)[0]
@@ -185,10 +188,17 @@ class Canon:
 
     def find(self, kind: str, bare_id: str) -> BaseModel:
         """The record of ``kind`` whose bare id is ``bare_id`` (implemented). KeyError if none."""
-        for r, rec in self.by_kind.get(kind, {}).items():
-            if r.rsplit("/", 1)[1] == bare_id:
-                return rec
-        raise KeyError(f"{kind}/{bare_id}")
+        recs = self.by_kind.get(kind, {})
+        idx = self._index.get(kind)
+        if idx is None or idx[0] != len(recs):
+            m: dict[str, BaseModel] = {}
+            for r, rec in recs.items():
+                m.setdefault(r.rsplit("/", 1)[1], rec)
+            idx = self._index[kind] = (len(recs), m)
+        try:
+            return idx[1][bare_id]
+        except KeyError:
+            raise KeyError(f"{kind}/{bare_id}") from None
 
     def has(self, ref: str) -> bool:
         try:
@@ -475,7 +485,42 @@ def cheat_records(content_dir: str | Path) -> dict:
     return out
 
 
+_CANON_MEMO: dict = {}          # D-185: (pack files and their sizes and times) -> (canon, issues)
+_CANON_MEMO_MAX = 8
+
+
+def _files_signature(pack_dirs) -> tuple:
+    """What the packs are made of right now: every file under them with its size and modification time."""
+    import os
+    out = []
+    for d in pack_dirs:
+        root = Path(d).resolve()
+        files = []
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames.sort()
+            for f in sorted(filenames):
+                st = os.stat(os.path.join(dirpath, f))
+                files.append((os.path.relpath(os.path.join(dirpath, f), root), st.st_size, st.st_mtime_ns))
+        out.append((str(root), tuple(files)))
+    return tuple(out)
+
+
 def load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:
+    """(D-185) The same packs, unchanged on disk (every file's size and modification time), give the same
+    compiled Canon without parsing them again — a world, a scenario and the worldgen each loading the core
+    pack paid most of a second for it; the issues list is a fresh copy each time."""
+    key = _files_signature(pack_dirs)
+    hit = _CANON_MEMO.get(key)
+    if hit is not None:
+        return hit[0], list(hit[1])
+    canon, issues = _load_canon(pack_dirs)
+    if len(_CANON_MEMO) >= _CANON_MEMO_MAX:
+        _CANON_MEMO.pop(next(iter(_CANON_MEMO)))
+    _CANON_MEMO[key] = (canon, list(issues))
+    return canon, issues
+
+
+def _load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]:
     from ..action.effects import EFFECT_IDS
     from ..world.worldgen.conditions import ConditionSyntaxError, parse
     issues: list[ContentIssue] = []
