@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-806 ids; 549 with their own statement, 257 named only in context.
+807 ids; 550 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -707,6 +707,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTENT-07 | * INTENT-07 pace (a decision's or the player's; a V1 answer's is 'normal'): 'normal', or one of the chosen option's paces (BoundAffordance.paces, copied from AffordanceDef.paces) — else IntentError 'unsupported_pace' (a… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py` | `contract/p04_one_actor/test_intent_v2.py` |
 | INTENT-08 | * INTENT-08 an Actor's answer (source 'model') with more than 100 words of speech (whitespace-separated), or more than 12 in a reaction (reaction=True) -> IntentError 'speech_too_long' (Actor Spec §7: long talk goes on… | as_engine/action/intent.py | `as_engine/action/intent.py` | `contract/p04_one_actor/test_intent_v2.py` |
 | INTENT-09 | * INTENT-09 gesture and attention must be null or a G# / F# key of packet.handles (B4: mind.packet GEST-01 / FOCUS-01) — else IntentError 'hallucinated_expression'. A gesture takes the hands the attempt leaves free: its… | as_engine/action/intent.py | `as_engine/action/intent.py`, `as_engine/mind/affordance.py`, `as_engine/mind/packet.py`, `as_engine/turn/intake.py` | `contract/p04_one_actor/test_expressions.py`, `contract/p04_one_actor/test_intent_v2.py`, `contract/p07_slice/test_the_players_hands.py` |
+| INTENT-10 | INTENT-10 (D-151): the words alone — stage directions, stray quotes and spaces gone. | as_engine/action/_impl_intent.py | `as_engine/action/_impl_intent.py`, `as_engine/action/intent.py` | `contract/p04_one_actor/test_words_only.py` |
 
 ## LANE
 

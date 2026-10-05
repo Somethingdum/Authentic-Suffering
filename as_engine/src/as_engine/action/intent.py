@@ -25,6 +25,12 @@ to_intent(packet, affordances, output, *, lod, source, reaction=False) -> Intent
     'speech_too_long' (Actor Spec §7: long talk goes on over further decisions). The player's own
     words are never refused for length. delivery and timing are copied into the SpeechAct (a V1
     speech: ordinary, alongside).
+  * INTENT-10 (D-151) words only. A model's speech (source 'model') is what is said aloud: anything
+    between asterisks (*sighs*) or in brackets ([...], (...)) is a stage direction and is dropped, and
+    so are double quotes (the story quotes the words itself); whitespace is collapsed — before the
+    length rule; nothing left
+    -> no speech (a SPEAK choice then -> IntentError 'empty'). The player's own words are never
+    touched.
   * SEG-02 speech takes time (TIME-05; Actor Spec §9): an utterance of n words takes u = n / 2.5
     seconds, however short. A SPEAK choice: est_duration_s = max(its est_duration_s, u). Any other
     choice: timing 'alongside' -> max(est_duration_s, u) (the words overlap the attempt); 'before'

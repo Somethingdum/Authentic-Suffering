@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import dataclasses
+import re
 
 from ..contracts.common import Verb
 
@@ -10,6 +11,14 @@ PACE = {"careful": (1.5, -6.0), "rushed": (0.6, 6.0)}
 
 def _words(text):
     return len(text.split())
+
+
+_DIRECTION = re.compile(r"\*[^*]*\*|\[[^\]]*\]|\([^)]*\)")
+
+
+def _said_aloud(text):
+    """INTENT-10 (D-151): the words alone — stage directions, stray quotes and spaces gone."""
+    return " ".join(_DIRECTION.sub(" ", text).replace('"', " ").replace("“", " ").replace("”", " ").split())
 
 
 def to_intent(packet, affordances, output, *, lod, source, reaction=False):
@@ -26,6 +35,9 @@ def to_intent(packet, affordances, output, *, lod, source, reaction=False):
         return IntentError("hallucinated_choice", output.choice)
     speech = None
     sp = None if is_intake else output.speech
+    if sp is not None and source == "model":                    # INTENT-10 (D-151): words only
+        said = _said_aloud(sp.text)
+        sp = sp.model_copy(update={"text": said}) if said else None
     if sp is not None:
         to = []
         for h in sp.to:

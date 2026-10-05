@@ -584,6 +584,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_quiet.py` | A calm lit floor: nothing reached Mara, but in a quiet moment with people around she gets a packet with nothing reached and someone to talk to, and says one line (the prompt says it is a quiet moment); Alice says nothing. The next turn it is Alice's line. Not in a reaction wave, not when someone has already spoken in the room this turn (no call at all), and never alone in an empty street |
 
+### 3.65 Words only (P4; D-151)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_words_only.py` | A model's speech keeps only the words: '*sighs* Fine.' says 'Fine.', bracketed and parenthesised directions and double quotes go, spaces are collapsed; nothing but a direction is no speech (a speak choice is 'empty', any other choice goes ahead silent); the player's own '*waves* Hi.' is said as typed |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
