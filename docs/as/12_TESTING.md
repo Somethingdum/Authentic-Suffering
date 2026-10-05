@@ -1128,6 +1128,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_room_as_one.py` | Five people stopping to watch are two lines and "Three others do the same." right after the second; three are three lines; four people heading for the back door are four lines — only holding still is gathered |
 
+### 3.155 Where they learned to talk (P10; D-266)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_where_they_learned_to_talk.py` | A grown person sounds like their birthplace (its own line, no two alike, every birthplace has one); a child of the Fall like the camps, one born after it like this world; a child under 12 has no dialect; no line calls the person 'they' |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

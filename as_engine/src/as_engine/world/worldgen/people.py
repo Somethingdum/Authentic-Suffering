@@ -729,6 +729,72 @@ _SECRETS = ("none worth telling", "none worth telling", "none worth telling",
             "traded someone's hiding place to a crew for safe passage")
 _DIALECTS = ("", "", "", "a northern accent that thickens when angry", "drops the 'g' on every -ing",
              "old army habits of speech", "a city voice gone rough", "slow country vowels")
+# D-266: how someone sounds follows where they learned to talk — a grown man from Monterrey does not have "a northern
+# accent", and a woman born in a cellar after the Fall never heard Pittsburgh.
+_SOUNDS: dict[str, str] = {
+    "Gary, Indiana": "Region talk — 'youse', and 'over by' for near",
+    "Toledo, Ohio": "flat Great Lakes vowels; 'pop' for soda",
+    "Fort Wayne, Indiana": "northern Indiana, flat and fast",
+    "Peoria, Illinois": "plain central Illinois, a little nasal",
+    "Flint, Michigan": "hard Michigan vowels; 'the Shop' for the plant",
+    "Dayton, Ohio": "southwest Ohio flat; 'you guys' for anybody",
+    "Muncie, Indiana": "small-city Hoosier, polite until it isn't",
+    "Rockford, Illinois": "northern Illinois vowels, and 'ya know' at the end of everything",
+    "Akron, Ohio": "northeast Ohio, clipped and flat",
+    "Evansville, Indiana": "the river's southern lilt; 'y'all' slips in",
+    "Joliet, Illinois": "Chicagoland — 'da' for 'the' when riled",
+    "Kalamazoo, Michigan": "Michigan vowels; 'ope' at every near-collision",
+    "Cedar Rapids, Iowa": "flat Iowa plainness; 'you bet' for yes",
+    "Duluth, Minnesota": "long Minnesota O's; 'you betcha' and 'oh for cute'",
+    "Green Bay, Wisconsin": "Wisconsin vowels; 'bubbler' for a drinking fountain",
+    "Springfield, Missouri": "Ozark-edged Missouri — 'Missour-uh'",
+    "Wichita, Kansas": "plain Kansas, slow and dry",
+    "Louisville, Kentucky": "Kentucky soft — 'fixin' to', and the city said in two syllables",
+    "Chattanooga, Tennessee": "an East Tennessee drawl — 'reckon', 'yonder'",
+    "Tulsa, Oklahoma": "an Oklahoma twang; 'might could'",
+    "El Paso, Texas": "border English with Spanish in it — 'órale', 'ándale'",
+    "Fresno, California": "Central Valley California; 'hella' when excited",
+    "Tacoma, Washington": "even Pacific Northwest, hard to rattle by voice alone",
+    "Pittsburgh, Pennsylvania": "Pittsburghese — 'yinz', 'n'at', 'the car needs washed'",
+    "Buffalo, New York": "Buffalo's flat A's; 'the' in front of every road",
+    "Baltimore, Maryland": "Bawlmer — 'hon', 'down the ocean'",
+    "Atlanta, Georgia": "a Georgia drawl; 'y'all' for one person or twenty",
+    "Memphis, Tennessee": "a Memphis drawl that never hurries",
+    "Detroit, Michigan": "Detroit — 'what up doe', and the Mitten for the state",
+    "the South Side of Chicago": "South Side Chicago — 'on my mama' to swear it is true",
+    "Milwaukee, Wisconsin": "Milwaukee vowels; 'ainah?' at the end of a sentence",
+    "Lansing, Michigan": "mid-Michigan plain, apologising to furniture",
+    "a farm outside Bloomington, Indiana": "southern Indiana farm talk; 'holler' for a valley",
+    "a trailer park off Interstate 65": "Hoosier backroads; 'ain't' and 'reckon'",
+    "a dairy farm in Wisconsin": "Wisconsin farm vowels; 'come here once' and 'oh ya'",
+    "an army base in Kentucky": "an army brat's — every accent and none; 'roger' for yes",
+    "the Pine Ridge reservation in South Dakota": "a reservation English that takes its time; a Lakota word or two with family",
+    "Monterrey, Mexico, and then Chicago at six": "Spanish when angry or scared — 'híjole', 'no manches' — Chicago English the rest of the time",
+    "Manila, and then Indianapolis at nine": "Tagalog with family and under the breath — 'ay naku', 'anak' for any child",
+    "Lagos, and then Columbus, Ohio": "Nigerian English when tired — 'wahala' for trouble, 'sha' — Ohio flat the rest of the time",
+    "a small town in the Ozarks": "Ozark talk — 'might could', 'tump over'",
+    "the suburbs north of Indianapolis": "careful suburban Indianapolis; never swears in front of children",
+}
+_CAMP_SOUNDS = (       # a child when it came: they learned to talk again in the camps
+    "camp talk — 'a run' for any trip outside the wall, 'hot' for anywhere the dead are thick",
+    "a kid's slang that never grew up; 'swear' and 'for real' to mean yes",
+    "a radio voice, copied off the emergency broadcasts of the first years",
+    "counts in winters, never in years",
+    "grown-up words come out wrong, picked up from adults arguing",
+    "the old brand names for things nobody has seen in years",
+    "talks fast and quiet, the way the first camps taught every child to",
+    "says 'back when' for anything before the Fall, and nothing more about it",
+)
+_BORN_SOUNDS = (       # born after it: the only world they know is this one (lore: 'before-times')
+    "'before-times' for the old world, said like a place you could walk to",
+    "never learned to talk loud; even angry, it comes out low",
+    "counts in days since, never in dates",
+    "the old words for things nobody has any more come out wrong — 'tee-vee', 'the inner-net'",
+    "talks like the old folks of the camp, sayings and all",
+    "no small talk at all; says what is needed and stops",
+    "names a thing by its use — 'the burning stuff', 'the cutting tool'",
+    "asks what the old words meant — 'weekend', 'vacation' — and does not believe the answer",
+)
 
 
 # D-251: where a person comes from and what they did before — the pack's people come from Kokomo and Terre Haute and
@@ -926,6 +992,15 @@ def world_voices(tx) -> tuple[str, ...]:
                                         "ORDER BY dossier_id") if r[0])
 
 
+def _sound(seed: "PersonSeed", born: str) -> str:
+    # D-266: where they learned to talk
+    if seed.cohort == "post_fall_born":
+        return _draw(seed, "dialect", _fresh(seed, _BORN_SOUNDS))
+    if seed.cohort == "fall_child":
+        return _draw(seed, "dialect", _fresh(seed, _CAMP_SOUNDS))
+    return _SOUNDS.get(born) or _draw(seed, "dialect", _DIALECTS)
+
+
 def _a(word: str) -> str:
     return ("an " if word[:1].lower() in "aeiou" else "a ") + word
 
@@ -990,7 +1065,11 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
     everything never does. The temper still comes from ``variant`` (H1); (D-251) a child under 16 has a child's peeves
     and is settled as a child is, and a child under 12 moves under stress as a child does (never 'reaches for the
-    nearest weapon'); the silence's comfortable/uncomfortable line is a sentence (capitalised). WORLDGEN_ACTOR may replace every
+    nearest weapon'); the silence's comfortable/uncomfortable line is a sentence (capitalised). (D-266) How they sound
+    (voice.dialect_notes) follows where they learned to talk: grown before the Fall, the town they come from (_SOUNDS
+    by birthplace; another place, _DIALECTS); a child when it came, the camps they grew up in (_CAMP_SOUNDS); born
+    after it, the only world they know (_BORN_SOUNDS — 'before-times' for the old world, as their generation says
+    it); each of the two fresh as the rest; a child under 12 has none. WORLDGEN_ACTOR may replace every
     unlocked field of it."""
     v = seed.variant
     first = seed.name.split()[0]
@@ -1088,7 +1167,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                   "exemplars": {"low_stakes": ex[0], "under_pressure": ex[1], "at_the_limit": ex[2]},
                   "would_never_say": _draw(seed, "never", _fresh(seed, _KID_NEVER_SAY if kid else _NEVER_SAY, n=3), 3),
                   "profanity": "none" if kid else swear,
-                  "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
+                  "dialect_notes": "" if kid else _sound(seed, born)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
         "life": {"aspiration": _draw(seed, "aspiration", _fresh(seed, _KID_ASPIRATIONS if kid else _ASPIRATIONS)),
                  "current_project": project,
