@@ -83,7 +83,13 @@ simulate — stages 0-12 in ONE store transaction:
        what a snap does is turn.cognition step 4.
     S4 select: minds = the conscious cands; for each: select.mandatory(tx, a, T, wave_at, horizon,
        pc_intent (wave 0) | None, FORCED (wave 0) | empty), select.salience(select.salience_flags(
-       tx, a, minds, pc, T, wave_at), mandatory, weights); plan = lanes.scheduler.plan_cognition(
+       tx, a, minds, pc, T, wave_at), mandatory, weights) — (D-231) except that of the minds whose
+       only salience is 'restless' (not mandatory; salience 0 without it) and that have taken stock
+       with a model before (an lm_calls row of theirs, actor_cognition or actor_reaction, status
+       'ok' — one who never has decides now), sorted by actor id, only
+       the first ceil(n / SchedulerRules.rethink_turns) keep it this wave: a room that took stock
+       together does not all take stock again in the same turn; the rest stay restless and come up
+       in the next; plan = lanes.scheduler.plan_cognition(
        [(a, salience, mandatory)], config, settings.turn_depth, lanes_up); plan.overrun ->
        audit.log.repair('budget_overrun', 4, 'SCHED-01', {notes}). The wave's record {wave, at,
        lod: {actor: lod value}, salience: {actor: number}, mandatory: sorted ids} goes into the

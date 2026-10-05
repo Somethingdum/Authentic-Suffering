@@ -935,6 +935,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_watching_on.py` | On the lit sales floor Mara sees June stop and watch once; June going on watching is not seen again (seen null, no percept); June turning to watch the storeroom door is; crouching twice is seen twice |
 
+### 3.123 Spread out (P7; D-231)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_spread_out.py` | After the night at Delgado's, with every mind's only flag 'restless', of those who thought with a model in the first turn only the first third by actor id keep salience in the next turn's first wave; anyone who never thought with a model keeps it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

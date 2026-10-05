@@ -141,12 +141,18 @@ async def simulate(ctx):
             # 4 select
             await _progress(ctx, 4)
             minds = [c for c in cands if select.conscious(tx, c)]
-            sel = []
+            W = tx.rules.scheduler.salience_weights
+            flagged = []
             for a in minds:
                 mand = select.mandatory(tx, a, T, wave_at, ctx.horizon, ctx.pc_intent if wave_idx == 0 else None,
                                         forced if wave_idx == 0 else frozenset())
-                flags = select.salience_flags(tx, a, minds, s.pc_id, T, wave_at)
-                sel.append((a, select.salience(flags, mand, tx.rules.scheduler.salience_weights), mand))
+                flagged.append((a, select.salience_flags(tx, a, minds, s.pc_id, T, wave_at), mand))
+            only = sorted(a for a, f, m in flagged if not m and f.get("restless")
+                          and select.salience({**f, "restless": False}, False, W) == 0
+                          and tx.query_one("SELECT 1 FROM lm_calls WHERE actor_id=? AND call_class IN ('actor_cognition',"
+                                           "'actor_reaction') AND status='ok' LIMIT 1", (a,)) is not None)
+            due = -(-len(only) // max(1, tx.rules.scheduler.rethink_turns))           # D-231: spread out, not all at once
+            sel = [(a, select.salience({**f, "restless": False} if a in only[due:] else f, m, W), m) for a, f, m in flagged]
             plan = plan_cognition(sel, cfg, s.settings.turn_depth, ctx.lanes_up)
             if plan.overrun:
                 log_repair(tx, "budget_overrun", 4, "SCHED-01", {"notes": plan.notes}, T, wave_at)
