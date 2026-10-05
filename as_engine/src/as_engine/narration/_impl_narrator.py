@@ -194,7 +194,21 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         people_looks=looks_lines,
         choice_prompt_hint=hint, allowed_names=sorted(allowed), style=style, length=settings.narration_length,
         person=settings.narration_person, tense=settings.narration_tense, banned_phrases=list(rules.banned_phrases),
-        intensity=settings.intensity, player_input_echo_block=echo_block(tx, turn_index, numbers))
+        intensity=settings.intensity, player_input_echo_block=_unlicensed(echo_block(tx, turn_index, numbers),
+                                                                          [ln for ln in lines if not (ln.kind == "speech" and ln.speaker == pc)],
+                                                                          loc.description_lines if establish else [],
+                                                                          people, looks_lines, numbers))
+
+
+def _unlicensed(block, lines, details, people, looks, numbers):
+    """D-169: the player's word runs the packet's own words do not hold — the world's words are the narrator's."""
+    from .lint import content_ngrams
+    own = set()
+    texts = [ln.text for ln in lines] + [ln.words or "" for ln in lines] + list(details) + list(people) + list(looks)
+    for t in texts:
+        if t:
+            own |= content_ngrams(t, numbers.echo_n, numbers.echo_min_content_tokens)
+    return [g for g in block if g not in own]
 
 
 def packet_hash(packet):

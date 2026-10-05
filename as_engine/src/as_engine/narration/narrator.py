@@ -80,7 +80,11 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    weapon_pointed, "decide what to do about the threat"; else None.
   style = narrator_state; banned_phrases = the canon 'narration' style list; length / person /
   tense / intensity from settings; player_input_echo_block = narration.lint.echo_block(tx,
-  turn_index, rules.style).
+  turn_index, rules.style) — (D-169) minus every n-gram the packet's own words hold
+  (content_ngrams of each line's text and words — but the PC's own speech lines, which are the
+  player's words — the place details, the people present and their looks, with the same n and
+  minimum): what the world says itself ("goes through the back door into the rear alley") is the
+  narrator's to use, even when the player happened to type it too.
 
 narrate(client, packet, style_rules, numbers, *, config, all_known_names, turn_index)
     -> (prose, findings, attempts, passed)   (NARR-06..08)

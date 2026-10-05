@@ -668,6 +668,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_asked_then_said.py` | A question followed by a reason is a question ("you got any rounds to spare? I'm down to six."); a request or an order with a question in it stays a request or an order |
 
+### 3.79 The world's words (P7; D-169)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_worlds_words.py` | The player typed "the back door into the alley"; the story's own line says "through the back door into the rear alley": those word runs are the narrator's to use, while the player's own "quick as a stray cat" stays blocked |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
