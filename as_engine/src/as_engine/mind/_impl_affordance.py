@@ -106,7 +106,9 @@ def _ctx(tx, actor_id, at, turn_index, waking=False):
                           "WHERE p.holder_id=? AND e.actor_id=? AND p.turn_index=? AND p.at<=?", (actor_id, b, turn_index, at)):
             pl = json.loads(e[1]) if isinstance(e[1], str) else e[1]
             dt = json.loads(e[2])
-            if e[0] == "HARM" or (e[0] == "ACTION_START" and pl.get("verb") == "attack") or (e[0] == "SPEECH" and dt.get("armed_at_me")):
+            from .firewall import armed_threat
+            if e[0] == "HARM" or (e[0] == "ACTION_START" and pl.get("verb") == "attack") or (
+                    e[0] == "SPEECH" and dt.get("armed_at_me") and armed_threat(dt.get("words") or "")):      # D-269
                 attacked = True
         if k == "infected" or attacked:
             c.threats.append(b)

@@ -21,12 +21,18 @@ classify_form(text, *, weapon_pointed_at_receiver=False) -> UtteranceForm   (pur
            "would you mind", "i need you to", "help me"
   (imperative) = the first word — or the second when the first ends with a comma (a name:
            "June, stay put") — with every character that is not a letter or apostrophe removed,
-           is in IMPERATIVE_VERBS ("Quiet." "Don't move!" "Stay there.")
+           is in IMPERATIVE_VERBS ("Quiet." "Don't move!" "Stay there." — D-269 — "Hands up.")
   ORDER    if imperative (standing decides VALID_ORDER vs DEMAND later: ORDER form is only kept
            when standing == VALID_ORDER, otherwise the form becomes DEMAND)
   QUESTION if it ends with "?" — or (D-167) any sentence in it does ("You got any rounds to spare?
            I'm down to six." asks; people ask and then say why)
   STATEMENT otherwise.
+
+armed_threat(words) -> bool   (pure, D-269)
+  What a weapon in the speaker's hand makes of words said to you (a speech percept's detail.armed_at_me):
+  a threat when classify_form(words, weapon_pointed_at_receiver=True) is THREAT — an order, a demand, a
+  promise of violence — or when no words were made out (a man with a gun shouting at you); a question
+  or a remark stays one. mind.cues weapon_pointed and mind.affordance's threats read it.
 
 classify_standing(tx, speaker_id, receiver_id, text) -> Standing   (WILL-04)
   Read ONLY the receiver's mind (accepted_authority, relationships, acquaintance, group standing).
@@ -153,6 +159,7 @@ IMPERATIVE_VERBS: frozenset[str] = frozenset({
     "sit", "stand", "kneel", "tell", "show", "hand", "lock", "unlock", "hide", "shoot", "kill",
     "keep", "let", "look", "listen", "carry", "fetch", "find", "search", "check", "fix", "back",
     "quiet", "freeze", "don't", "hurry", "duck", "down", "shush", "turn", "step", "throw", "lower",
+    "hands",    # D-269: "Hands up." "Hands where I can see them." — an order with no verb in front
 })
 
 REQUEST_PATTERNS: tuple[tuple[str, str], ...] = (
@@ -188,6 +195,12 @@ def classify_form(text: str, *, weapon_pointed_at_receiver: bool = False) -> Utt
 
 def classify_standing(tx: "Tx", speaker_id: str, receiver_id: str, text: str) -> Standing:
     raise NotImplementedError("P4")
+
+
+def armed_threat(words: str) -> bool:
+    if not (words or "").strip():
+        return True
+    return classify_form(words, weapon_pointed_at_receiver=True) == UtteranceForm.THREAT
 
 
 def effective_form(form: UtteranceForm, standing: Standing) -> UtteranceForm:

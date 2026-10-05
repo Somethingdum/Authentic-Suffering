@@ -148,7 +148,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> Af
   A THREAT this turn = a known body that is infected (bodies.kind 'infected': its shape and gait
   show it, though not its type), or the actor of an event this actor perceived this turn that was
   a HARM, an ACTION_START with payload verb 'attack', or a SPEECH whose percept detail has
-  armed_at_me (a weapon in hand while it spoke to this actor). The set's ``threats`` lists them
+  armed_at_me (a weapon in hand while it spoke to this actor) and whose words, read with the weapon,
+  are a threat (mind.firewall.armed_threat, D-269: "Is the water safe?" from a man with an axe in
+  his hand is a question). The set's ``threats`` lists them
   (body ids, in known-body order; turn.cognition HOLD-02 reads it).
   Survivors become BoundAffordance(def_id, verb, target_id, destination_id, item_id, label,
   ui_label, est_duration_s, noise_db, cost_note, risk_note, check, tags, paces, hands). est_duration_s =

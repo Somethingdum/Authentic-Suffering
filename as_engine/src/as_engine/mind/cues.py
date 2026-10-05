@@ -31,7 +31,9 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
                     holder body has no visible P of this turn at an earlier ``at`` (D-208: a tie has
                     no holder body — never)
   weapon_pointed    a visible P of an ACTION_START whose def is shoot_center_mass / shoot_head
-                    with target_id = the holder, or a speech P with detail.armed_at_me
+                    with target_id = the holder, or a speech P with detail.armed_at_me whose words,
+                    read with the weapon (mind.firewall.armed_threat), are a threat — (D-269) a
+                    question or a remark from someone with a weapon in hand is not a weapon on you
   threat_seen       weapon_pointed, or a visible P of a HARM / ACTION_START with payload verb
                     'attack', or a visible P whose source body is infected
   infected_seen     a visible P whose source body kind is 'infected'

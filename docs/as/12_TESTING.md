@@ -1146,6 +1146,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_what_you_really_want.py` | A generated card whose hidden goal is its stated want has no 'What you really want' line; a different hidden want stays alone on it; an allegiance said once; the pack's cards keep theirs |
 
+### 3.158 A question with an axe in hand (P5; D-269)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_a_question_with_an_axe_in_hand.py` | Owen, the Glock in his hand, asks Mara a question or makes a remark: no weapon_pointed, nobody on her threat list; an order, "Hands where I can see them." or a threat said so: both; words lost under a gun still threaten |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

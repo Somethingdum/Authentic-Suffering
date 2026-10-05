@@ -239,7 +239,9 @@ threat it is logged as **coerced**, becoming grievance, fear and an open loop, n
 2. **Classification (code).** Form: request · demand · order · threat · offer · question ·
    statement (`mind/firewall.py::classify_form`). Standing is read from the **receiver's** record:
    hostile · valid order · subordinate · claimed authority · peer · stranger. A stranger's
-   imperative is a demand, not an order (WILL-04).
+   imperative is a demand, not an order (WILL-04). A weapon in the speaker's hand makes an order a
+   threat — and only what reads as a threat with it puts the weapon on the one spoken to (D-269):
+   a question from a man with an axe in his hand is a question.
 3. **Cost is present.** When an utterance is addressed to the Actor, the packet's commitments,
    stakes and resources sections are mandatory (WILL-C).
 4. **The response ladder** is computed *after* the choice by comparing the chosen option with the

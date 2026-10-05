@@ -270,7 +270,8 @@ def cues_of(tx, holder_id, turn_index, at):
                 words = set(re.findall(r"[a-z']+", det.get("words", "").lower()))
                 if names & words:
                     out.add("addressed_by_name")
-            if det.get("armed_at_me"):
+            from ..mind.firewall import armed_threat
+            if det.get("armed_at_me") and armed_threat(det.get("words") or ""):      # D-269
                 out.add("weapon_pointed")
                 out.add("threat_seen")
                 if p["source_id"]:
