@@ -120,11 +120,10 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   (D-134), someone who gave up (D-135), eating the dead (D-133), one of their own group (D-144: grievance and a loyalty check). Still open: a settlement's law response (a law
   against killing changes what worldgen writes — the owner's call), the PC's nerve (intrusive memories:
   D-145; broken nights: D-146).
-- **People the PC gets to know** (after D-127): a generated person's skeleton now has its own voice and
-  inner life, but only a model can give them their own words and history. Proposed: when the PC has met a
-  skeleton person (an acquaintance row) and they have been HOT, a quiet-hours job (service.background)
-  rewrites their unlocked voice fields (capsule, tendencies, exemplars, examples) on the Writer — a few
-  hundred tokens, a minute at 5 tokens a second — so the people who matter grow into themselves.
+- **People the PC gets to know** (D-149, built): a generated person who has exchanged three lines with the
+  PC has their voice written once in the quiet hours (PERSON_VOICE: capsule, habits, example lines) from
+  what they actually said. On the Clerk by default; the owner may move it to the Writer. Still open: their
+  history and voice examples (D-116) written the same way.
 - **Resolve, still open after D-122 / D-123 / D-129 / D-139**: one drain of 05 §5 has nothing to hang on (a
   sustained fear scene: it needs a notion of a scene that goes on — the dead at the door for minutes, a
   gun held on someone — that nothing records yet); hunger drains per stage (every 84 h without food), not per day — a daily

@@ -105,7 +105,30 @@ def jobs(store, turn_index):
                 continue
             ret.append(B.Job(kind="retelling", subject_id=h, rumour_id=r["rumour_id"],
                              request_key=f"retelling:{h}:{r['rumour_id']}"))
-    return out + ret[:R.max_retellings]
+    return out + ret[:R.max_retellings] + _voicings(store, T)
+
+
+def _voicings(store, T):
+    # BG-02 (D-149): generated people the PC has got to know, once each
+    B = _B()
+    R = store.rules.background
+    pc = store.query_one("SELECT actor_id FROM actors WHERE controller='human' ORDER BY actor_id LIMIT 1")
+    if pc is None:
+        return []
+    pc = pc[0]
+    out = []
+    for a, base in store.query("SELECT a.actor_id, d.baseline_json FROM actors a JOIN dossiers d ON d.dossier_id=a.dossier_id "
+                               "ORDER BY a.actor_id"):
+        if a == pc or not _eligible(store, a) or json.loads(base).get("generation") != "generated":
+            continue
+        if store.query_one("SELECT 1 FROM events WHERE type='VOICE_WRITTEN' AND actor_id=? AND turn_index<?", (a, T)):
+            continue
+        n = store.query_one(
+            "SELECT COUNT(*) FROM events e WHERE e.type='SPEECH' AND ((e.actor_id=? AND EXISTS (SELECT 1 FROM json_each(e.payload,'$.to') "
+            "WHERE value=?)) OR (e.actor_id=? AND EXISTS (SELECT 1 FROM json_each(e.payload,'$.to') WHERE value=?)))", (pc, a, a, pc))[0]
+        if n >= R.voice_min_exchanges:
+            out.append((-n, a))
+    return [B.Job(kind="voicing", subject_id=a, rumour_id=None, request_key=f"voicing:{a}") for _n, a in sorted(out)[:R.max_voicings]]
 
 
 def pending(store, turn_index):
@@ -116,9 +139,11 @@ def pending(store, turn_index):
     for (pl,) in store.query("SELECT payload FROM events WHERE type='RUMOUR_DISTORTED' AND turn_index=?", (T,)):
         d = json.loads(pl)
         retold.add((d.get("rumour_id"), d.get("holder_id")))
+    voiced = {r[0] for r in store.query("SELECT actor_id FROM events WHERE type='VOICE_WRITTEN' AND turn_index=?", (T,))}
     return [j for j in jobs(store, T)
             if not (j.kind == "reflection" and j.request_key in keys)
-            and not (j.kind == "retelling" and (j.rumour_id, j.subject_id) in retold)]
+            and not (j.kind == "retelling" and (j.rumour_id, j.subject_id) in retold)
+            and not (j.kind == "voicing" and j.subject_id in voiced)]
 
 
 def _reflection_request(session, packet, recent, turn_index):
@@ -167,6 +192,17 @@ async def run_job(session, job):
             return B.JobResult(job=job, failed=True, calls=tuple(calls))
         return B.JobResult(job=job, answer={"output": ReflectionOutput.model_validate(resp.parsed),
                                             "handles": dict(packet.handles)}, calls=tuple(calls))
+    if job.kind == "voicing":                                      # BG-03 (D-149)
+        from ..contracts.calls import PersonVoiceContext
+        from ..contracts.mind import PersonVoice
+        with store.transaction() as tx:
+            ctx = _voice_context(tx, job.subject_id)
+        req = build_request(session.config, CallClass.PERSON_VOICE, turn_index=T, actor_id=job.subject_id, context=ctx,
+                            json_schema=to_lm_schema(PersonVoice), ctx=ctx)
+        resp = await client.call(req, PersonVoice)
+        if resp.parse_status != "ok":
+            return B.JobResult(job=job, failed=True, calls=tuple(calls))
+        return B.JobResult(job=job, answer=PersonVoice.model_validate(resp.parsed), calls=tuple(calls))
     # retelling
     from ..contracts.calls import RumourContext
     with store.transaction() as tx:
@@ -183,6 +219,34 @@ async def run_job(session, job):
     return B.JobResult(job=job, answer=RumourDistortion.model_validate(resp.parsed), calls=tuple(calls))
 
 
+_COHORT_WORDS = {"pre_fall_adult": "Grown when the Fall came: remembers the world before, and losing it.",
+                 "fall_child": "A child when the Fall came: remembers a little of the world before.",
+                 "post_fall_born": "Born after the Fall: has never known any other world."}
+
+
+def _voice_context(tx, actor):
+    # BG-03 (D-149): who they are, how the card says they talk, what they said, what they went through with the PC
+    from ..contracts.calls import PersonVoiceContext
+    from ..mind.actor import fused
+    d = fused(tx, actor)
+    i, v, m = d.identity, d.voice, d.motive
+    name = (tx.query_one("SELECT display_name FROM actors WHERE actor_id=?", (actor,))[0] or i.name).split()[0]
+    card = [f"{i.age}, {i.sex}; {i.occupation_now} (before: {i.occupation_before})",
+            _COHORT_WORDS.get(getattr(i.cohort, "value", i.cohort), ""),
+            f"How they talk: {v.capsule}", f"Habits of speech: {'; '.join(v.speech_tendencies)}",
+            f'When nothing is at stake: "{v.exemplars.low_stakes}"', f'Under pressure: "{v.exemplars.under_pressure}"',
+            f'At the end of their rope: "{v.exemplars.at_the_limit}"', f"What they want: {m.motive}",
+            f"What happened to them: {m.past_wound}"]
+    n = tx.rules.background.voice_lines
+    said = [r[0] for r in tx.query("SELECT text FROM voice_lines WHERE actor_id=? ORDER BY at DESC, line_id DESC LIMIT ?", (actor, n))][::-1]
+    pc = tx.query_one("SELECT actor_id FROM actors WHERE controller='human' ORDER BY actor_id LIMIT 1")
+    with_pc = []
+    if pc is not None:
+        with_pc = [r[0] for r in tx.query("SELECT summary FROM episodes WHERE holder_id=? AND quarantined=0 AND subject_ids LIKE ? "
+                                          "ORDER BY at DESC, episode_id DESC LIMIT 6", (actor, f'%"{pc[0]}"%'))][::-1]
+    return PersonVoiceContext(name=name, card=[c for c in card if c], lines_said=said, with_pc=with_pc)
+
+
 def commit(tx, job, result, at, turn_index):
     from ..audit.log import repair
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
@@ -194,6 +258,8 @@ def commit(tx, job, result, at, turn_index):
     if result.failed or result.answer is None:
         return []
     first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    if job.kind == "voicing":                                      # BG-04 (D-149)
+        return [_commit_voice(tx, job, result.answer, at, turn_index)]
     if job.kind == "retelling":
         retell(tx, job.rumour_id, job.subject_id, result.answer, at, turn_index)
         from ..action._impl_p5b import _events_since
@@ -249,6 +315,32 @@ def commit(tx, job, result, at, turn_index):
     from ..action._impl_p5b import _events_since
     cascade.sweep(tx, _events_since(tx, first), tx.canon.all("cascade"), at, turn_index)   # D-125
     return _events_since(tx, first)
+
+
+def _commit_voice(tx, job, out, at, turn_index):
+    from ..content.safety import unsafe_terms
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    actor = job.subject_id
+    age = tx.query_one("SELECT age_years FROM bodies WHERE body_id=?", (actor,))
+    young = age is not None and age[0] is not None and age[0] < 18
+    parts = []
+    if out.capsule and 20 <= len(out.capsule.strip()) <= 500:
+        parts.append(("voice.capsule", out.capsule.strip()))
+    tend = [t.strip() for t in out.tendencies if t and t.strip()]
+    if len(tend) >= 2:
+        parts.append(("voice.speech_tendencies", tend))
+    for k in ("low_stakes", "under_pressure", "at_the_limit"):
+        x = getattr(out, k)
+        if x and len(x.strip()) >= 5:
+            parts.append((f"voice.exemplars.{k}", x.strip()))
+    if young:
+        parts = [(p, v) for p, v in parts if not unsafe_terms(json.dumps(v))]
+    writes = [WriteRecord(op=WriteOp.INSERT, table="dossier_deltas", values={
+        "delta_id": tx.mint("ddl"), "actor_id": actor, "event_id": "voicing", "path": p, "op": "set",
+        "value_json": json.dumps(v), "at": at}) for p, v in parts]
+    return tx.commit_event(Event(type=EventType.VOICE_WRITTEN, writer="mind.actor", at=at, turn_index=turn_index, actor_id=actor,
+                                 origin="sim", writes=writes,
+                                 payload={"actor_id": actor, "request_key": job.request_key, "output": out.model_dump(mode="json")}))
 
 
 class BackgroundRunner:

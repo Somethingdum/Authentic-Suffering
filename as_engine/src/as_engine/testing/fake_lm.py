@@ -279,6 +279,8 @@ class FakeTransport:
             return "Done, Boss. Reality bent exactly as ordered."
         if cc == CallClass.AMBIENT_LINE:     # D-128: unscripted, the room stays quiet
             return {"line": None, "to": None, "volume": "normal"}
+        if cc == CallClass.PERSON_VOICE:     # D-149: unscripted, the card stays as it was
+            return {"capsule": None, "tendencies": [], "low_stakes": None, "under_pressure": None, "at_the_limit": None}
         if cc == CallClass.PROBE:
             return {"ok": True}
         if cc in (CallClass.WORLDGEN_HISTORY, CallClass.WORLDGEN_ACTOR, CallClass.WORLDGEN_OPENING):

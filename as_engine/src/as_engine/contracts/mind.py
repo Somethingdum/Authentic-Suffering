@@ -529,6 +529,17 @@ class AmbientLine(Strict):
     volume: Literal["low", "normal", "raised"] = "normal"
 
 
+class PersonVoice(Strict):
+    """PERSON_VOICE output (D-149): a generated person's voice, written from what they have actually said. Each
+    field is null (or empty) to keep what the card has."""
+
+    capsule: str | None = Field(default=None, max_length=200, description="How they talk, one sentence, third person.")
+    tendencies: list[str] = Field(default_factory=list, max_length=3, description="Two or three habits of speech.")
+    low_stakes: str | None = Field(default=None, max_length=160, description="A line of theirs when nothing is at stake.")
+    under_pressure: str | None = Field(default=None, max_length=160, description="A line of theirs when it is.")
+    at_the_limit: str | None = Field(default=None, max_length=160, description="A line of theirs at the end of their rope.")
+
+
 class WillisRoast(Strict):
     """WILLIS_ROAST output (D-105): what Willis says to the dead, line by line."""
 

@@ -62,6 +62,7 @@ from ..contracts.mind import (
     CheatPlan,
     DoomGuardOutput,
     IntakeOutput,
+    PersonVoice,
     PortrayalVerdict,
     ReflectionOutput,
     RumourDistortion,
@@ -99,6 +100,7 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
     CallClass.THE_VOICE: VoiceMessage,
     CallClass.DOOM_GUARD: DoomGuardOutput,
     CallClass.AMBIENT_LINE: AmbientLine,
+    CallClass.PERSON_VOICE: PersonVoice,
     CallClass.PROBE: None,
 }
 

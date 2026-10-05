@@ -572,6 +572,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_child.py` | Owen hits Eli (9) in front of June: she trusts him less, is shaken and tells it (CAS-063). Blood has just been spilled on the floor and Mara runs into the storeroom leaving Eli there: Eli trusts her 2 less and holds it (CAS-064, strength 3); June, who saw it, trusts her less and tells it (CAS-065). A quiet room is no danger: nobody is left behind |
 
+### 3.63 People you get to know (P10; D-149)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_people_you_get_to_know.py` | June (made generated) and Owen exchange three lines: the boundary has a voicing job for her; it is asked with her card, the lines she actually said and her name; its answer becomes her voice (capsule, habits, example lines) and she is not voiced again, at this boundary or later. Unanswered (the fake model has nothing to say), her card stands and she is not asked again. An authored person, or someone who said one word to Owen, is never voiced |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

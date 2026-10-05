@@ -27,7 +27,8 @@ async def resimulate(config, run_id, *, pack_dirs=None):
     report = []
     from ._impl_session import change_settings
     between = [dict(c) for c in orig.query(
-        "SELECT seq, type, at, turn_index, payload FROM events WHERE type IN ('SETTINGS_CHANGE','REFLECTION','RUMOUR_DISTORTED') "
+        "SELECT seq, type, at, turn_index, payload FROM events WHERE type IN ('SETTINGS_CHANGE','REFLECTION','RUMOUR_DISTORTED',"
+        "'VOICE_WRITTEN') "
         "ORDER BY seq")]
     between = [c for c in between if c["type"] != "SETTINGS_CHANGE" or "field" in json.loads(c["payload"])]
     done = set()
@@ -66,12 +67,15 @@ async def resimulate(config, run_id, *, pack_dirs=None):
 
 def _recommit_one(s, e):
     # BG-05: one quiet-hours event, re-applied from its recorded payload.
-    from ..contracts.mind import ReflectionOutput, RumourDistortion
+    from ..contracts.mind import PersonVoice, ReflectionOutput, RumourDistortion
     from . import background as B
     pl = json.loads(e["payload"])
     if e["type"] == "REFLECTION":
         job = B.Job(kind="reflection", subject_id=pl["actor_id"], rumour_id=None, request_key=pl["request_key"])
         res = B.JobResult(job=job, answer={"output": ReflectionOutput.model_validate(pl["output"]), "handles": pl["handles"]})
+    elif e["type"] == "VOICE_WRITTEN":                                 # D-149
+        job = B.Job(kind="voicing", subject_id=pl["actor_id"], rumour_id=None, request_key=pl["request_key"])
+        res = B.JobResult(job=job, answer=PersonVoice.model_validate(pl["output"]))
     else:
         job = B.Job(kind="retelling", subject_id=pl["holder_id"], rumour_id=pl["rumour_id"],
                     request_key=f"retelling:{pl['holder_id']}:{pl['rumour_id']}")

@@ -115,6 +115,7 @@ def default_regimes() -> dict[CallClass, CallRegime]:
         CallClass.THE_VOICE: CallRegime(lane=A, temperature=1.0, max_tokens=6144, deadline_s=240, thinking=True),
         CallClass.DOOM_GUARD: CallRegime(lane=B, temperature=0.0, max_tokens=40, deadline_s=15),
         CallClass.AMBIENT_LINE: CallRegime(lane=B, temperature=0.9, max_tokens=120, deadline_s=15),
+        CallClass.PERSON_VOICE: CallRegime(lane=B, temperature=0.9, max_tokens=500, deadline_s=30),
         CallClass.PROBE: CallRegime(lane=B, temperature=0.0, max_tokens=64, deadline_s=30),
     }
 
@@ -524,6 +525,9 @@ class BackgroundRules(Strict):
     max_reflections: int = 2       # per turn boundary
     max_retellings: int = 4        # per turn boundary
     max_episodes: int = 8          # the newest new episodes a reflection is shown
+    voice_min_exchanges: int = 3   # D-149: words passed between the PC and a generated person before their voice is written
+    max_voicings: int = 1          # D-149: per turn boundary
+    voice_lines: int = 12          # D-149: the newest lines they said that the writing is shown
 
 
 class RulesConfig(Strict):

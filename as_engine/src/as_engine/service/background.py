@@ -45,12 +45,20 @@ BG-02 jobs(store, turn_index) -> list[Job]   (pure read; order is the run order)
   is eligible and has no entry in the row's distortions — an entry whose RUMOUR_DISTORTED event
   (rumour_id, holder_id) is of turn T does not count — by holder id; at most R.max_retellings (the
   first in that order). Reflections come first in the list, then retellings.
-  Job(kind 'reflection' | 'retelling', subject_id (actor id / holder id), rumour_id (retelling),
-  request_key = 'reflection:' + actor + ':' + the eligibility key, or 'retelling:' + holder +
-  ':' + rumour id).
+  (D-149) Voicing — a generated person the PC has got to know has their voice written from what they
+  have actually said, once: each eligible actor whose dossier baseline has generation 'generated',
+  with no VOICE_WRITTEN event of a turn before T (one of turn T does not count), and at least
+  R.voice_min_exchanges SPEECH events between them and the PC (the PC: the actors row with
+  controller 'human') — spoken by the PC with the actor in payload ``to``, or by the actor with the
+  PC in it; sorted by (exchanges descending, actor id), at most R.max_voicings. Reflections come
+  first in the list, then retellings, then voicings.
+  Job(kind 'reflection' | 'retelling' | 'voicing', subject_id (actor id / holder id), rumour_id
+  (retelling), request_key = 'reflection:' + actor + ':' + the eligibility key, 'retelling:' + holder
+  + ':' + rumour id, or 'voicing:' + actor).
 pending(store, turn_index) -> list[Job]: jobs(store, turn_index) without the jobs already
   committed: a reflection whose request_key is the payload.request_key of a REFLECTION event of
-  turn T, a retelling with a RUMOUR_DISTORTED event of turn T for its (rumour_id, holder_id).
+  turn T, a retelling with a RUMOUR_DISTORTED event of turn T for its (rumour_id, holder_id), a
+  voicing with a VOICE_WRITTEN event of turn T for its actor.
 BG-03 async run_job(session, job) -> JobResult   (no store writes; the model call only)
   (JobResult.answer: reflection {'output': ReflectionOutput, 'handles': packet.handles};
   retelling the RumourDistortion). T = world_clock.turn_index. Every call goes through its own
@@ -74,6 +82,16 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   holder's confidence from world.rumours.holders); request = build_request(config,
   RUMOUR_DISTORT, turn_index=T, actor_id=holder, context=ctx, json_schema = to_lm_schema(
   RumourDistortion), ctx=ctx); resp = await client.call(request, RumourDistortion) (no repair).
+  voicing (D-149): in one read transaction, d = mind.actor.fused(tx, actor); PersonVoiceContext(name =
+  the first word of its display name, card = [f"{age}, {sex}; {occupation_now} (before: {occupation_before})",
+  the cohort as words, f"How they talk: {voice.capsule}", f"Habits of speech: {'; '.join(tendencies)}",
+  each exemplar as f'When nothing is at stake: "{low_stakes}"' / f'Under pressure: ...' / f'At the
+  end of their rope: ...', f"What they want: {motive.motive}", f"What happened to them: {motive.past_wound}"],
+  lines_said = the text of their newest R.voice_lines voice_lines rows (by at, line_id), oldest first,
+  with_pc = the summaries of their newest 6 episodes (quarantined 0) whose subject_ids include the PC,
+  oldest first); request = build_request(config, PERSON_VOICE, turn_index=T, actor_id, context=ctx,
+  json_schema = to_lm_schema(PersonVoice), ctx=ctx); resp = await client.call(request, PersonVoice)
+  (no repair).
   A final parse_status other than 'ok' -> JobResult(failed=True) (committed as nothing).
 BG-04 commit(tx, job, result, at, turn_index) -> list[Event]   (its own transaction, between turns)
   (D-125) Last, action.cascade.sweep(tx, every event committed above, the canon cascade rules, at,
@@ -104,9 +122,17 @@ BG-04 commit(tx, job, result, at, turn_index) -> list[Event]   (its own transact
   turn_index, at).
   retelling: world.rumours.retell(tx, job.rumour_id, job.subject_id, result.answer, at,
   turn_index) -> [its event] (or [] when it returns None).
-BG-05 Replay: service.replay.resimulate re-commits every REFLECTION and RUMOUR_DISTORTED event of
-  the recorded run between the same turns as they were, from their payloads (no model call; see
-  service/replay.py).
+  voicing (D-149): one VOICE_WRITTEN {actor_id, request_key, output: the answer as JSON} (writer
+  'mind.actor', actor_id, origin 'sim') — the recorded external input replay re-applies — writing
+  a dossier_deltas row {delta_id (kind 'ddl'), actor_id, event_id 'voicing', op 'set', value_json, at}
+  for each part the answer gives and the card can take: capsule (20 to 500 characters) ->
+  'voice.capsule'; tendencies (two or more, each non-empty) -> 'voice.speech_tendencies'; each
+  exemplar (five or more characters) -> 'voice.exemplars.<low_stakes | under_pressure |
+  at_the_limit>'. For someone under 18 a part holding a content.safety.unsafe_terms term is not
+  written. Nothing to write still commits the event (their voice has been looked at: once each).
+BG-05 Replay: service.replay.resimulate re-commits every REFLECTION, RUMOUR_DISTORTED and (D-149)
+  VOICE_WRITTEN event of the recorded run between the same turns as they were, from their payloads
+  (no model call; see service/replay.py).
 BG-06 Nothing here reads the truth layer; a reflection packet is the actor's own (Skull law).
 
 class BackgroundRunner — GameService's handle on the quiet hours (BG-01), built with asyncio.
@@ -141,7 +167,7 @@ QUIET_HOURS = "Everyone else catches up…"   # the progress label while a turn 
 
 @dataclass(frozen=True)
 class Job:
-    kind: Literal["reflection", "retelling"]
+    kind: Literal["reflection", "retelling", "voicing"]
     subject_id: str
     rumour_id: str | None
     request_key: str

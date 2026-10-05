@@ -21,7 +21,7 @@ resimulate(config, run_id, *, pack_dirs=None) -> list[dict]
       service.session.change_settings — not the {source: 'run_start'} one):
       service.session.change_settings(tx, session, {field: payload.new}). A replay therefore makes
       the same settings change at the same moment the player did;
-      (P10, BG-05) a REFLECTION or RUMOUR_DISTORTED (the quiet hours, whose effects the ledger's
+      (P10, BG-05) a REFLECTION, RUMOUR_DISTORTED or (D-149) VOICE_WRITTEN (the quiet hours, whose effects the ledger's
       hash of the turn before does not include; those of turn 0 come before turn 1): below;
     mode 'suggestion' -> session.extras['suggestions'] = {'r1': {'signature': mapped.signature,
       'label': raw_text}} and InTurnSubmit(mode='do', suggestion_ref='r1');
@@ -41,7 +41,9 @@ resimulate(config, run_id, *, pack_dirs=None) -> list[dict]
       RUMOUR_DISTORTED -> Job('retelling', payload.holder_id, payload.rumour_id,
         f"retelling:{holder_id}:{rumour_id}") and JobResult(answer = RumourDistortion(operation =
         payload.operation, retold_claim = payload.text or 'none')) (a refused retelling was
-        recorded as operation 'none' and so is refused again, the same way).
+        recorded as operation 'none' and so is refused again, the same way);
+      VOICE_WRITTEN (D-149) -> Job('voicing', payload.actor_id, None, payload.request_key) and
+        JobResult(answer = PersonVoice.model_validate(payload.output)).
   Both stores are closed at the end (whatever happens). Returns the entries.
 """
 

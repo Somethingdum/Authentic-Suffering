@@ -54,6 +54,7 @@ class CallClass(StrEnum):
     THE_VOICE = "the_voice"               # P12, D-106: the Voice before and after a death (service.voice)
     DOOM_GUARD = "doom_guard"             # P12, D-106: the doomed cannot tell (turn.intake DOOM-07)
     AMBIENT_LINE = "ambient_line"         # D-128: a COLD person in the PC's place says something (turn.cognition AMB-02)
+    PERSON_VOICE = "person_voice"         # D-149: the quiet hours write the voice of a generated person the PC has met (BG-02)
     PROBE = "probe"
 
 

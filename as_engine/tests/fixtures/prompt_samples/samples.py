@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 
 from as_engine.contracts.calls import (
+    PersonVoiceContext,
     AuditContext,
     ChainBeat,
     CheatInterpretContext,
@@ -181,5 +182,18 @@ def render_kwargs() -> dict[CallClass, dict]:
             people=[AmbientPerson(handle="P1", word="Mara", feeling="you trust them; you care about them"),
                     AmbientPerson(handle="P2", word="Owen")],
             handles={"P1": "act_000002", "P2": "act_000001"})},
+        CallClass.PERSON_VOICE: {"ctx": PersonVoiceContext(   # D-149: a generated watchman Owen has talked with
+            name="Tomas",
+            card=["41, male; watcher (before: forklift driver)",
+                  "Grown when the Fall came: remembers the world before, and losing it.",
+                  "How they talk: Tomas hums while working; trails off mid-thought.",
+                  "Habits of speech: hums while working; trails off mid-thought",
+                  'When nothing is at stake: "Hm-hm-hm... sorry, what was that?"', 'Under pressure: "Quiet, quiet..."',
+                  'At the end of their rope: "I don\'t... I don\'t remember what I came in for."',
+                  "What they want: be left alone to do their work", "What happened to them: lost family in the first winter"],
+            lines_said=["You're the one from the truck.", "Fence is fine. Fence is always fine till it isn't.",
+                        "Don't stand there. They see the light.", "My boy liked trucks. Big ones."],
+            with_pc=["The new man asked about the fence and actually listened.",
+                     "Owen stood the night watch with me and didn't talk. I liked that."])},
         CallClass.PROBE: {"ctx": ProbeContext(probe="hello")},
     }

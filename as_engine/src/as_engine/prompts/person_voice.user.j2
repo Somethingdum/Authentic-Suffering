@@ -1,0 +1,11 @@
+{{ ctx.name }}, as they were sketched:
+{% for l in ctx.card %}- {{ l }}
+{% endfor %}
+What {{ ctx.name }} has said, oldest first:
+{% for l in ctx.lines_said %}- "{{ l }}"
+{% else %}- nothing yet
+{% endfor %}{% if ctx.with_pc %}
+What {{ ctx.name }} remembers of the time with the other person, oldest first:
+{% for l in ctx.with_pc %}- {{ l }}
+{% endfor %}{% endif %}
+Write how {{ ctx.name }} talks now.
