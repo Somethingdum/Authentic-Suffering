@@ -75,6 +75,40 @@ def _sleep_text(pc, etype, pl):
     return None
 
 
+def _as_one(tx, pc_id, entries):
+    """D-265: more than two people holding still the same way keep the first two lines; the rest are one line."""
+    from ..contracts.narration import NarratorLine
+    from ..mind.memory import QUIET_VERBS
+    from .location import NUMBER_WORDS
+    groups = {}
+    for i, (at, seq, pid, line) in enumerate(entries):
+        if not pid or line.kind != "sight":
+            continue
+        r = _row(tx, "SELECT e.type, e.actor_id, e.payload FROM percept_log p JOIN events e ON e.event_id=p.event_id "
+                     "WHERE p.percept_id=?", (pid,))
+        if r is None or r["type"] != "ACTION_START" or not r["actor_id"] or r["actor_id"] == pc_id:
+            continue
+        pl = json.loads(r["payload"]) if isinstance(r["payload"], str) else (r["payload"] or {})
+        try:
+            d = tx.canon.find("affordance", pl.get("def_id") or "")
+        except KeyError:
+            continue
+        if getattr(d.verb, "value", d.verb) in QUIET_VERBS and "threat_response" not in d.tags:
+            groups.setdefault((pl.get("def_id"), pl.get("target_id")), []).append(i)
+    drop, add = set(), []
+    for idx in groups.values():
+        idx = sorted(idx, key=lambda i: entries[i][:3])
+        if len(idx) < 4:                                             # two and one more: just say the third
+            continue
+        rest = idx[2:]
+        drop |= set(rest)
+        at, seq, pid, line = entries[idx[1]]
+        n = len(rest)
+        add.append((at, seq, pid + "~", NarratorLine(seconds=line.seconds, kind="sight",
+                                                     text=f"{NUMBER_WORDS[n] if n < len(NUMBER_WORDS) else 'Many'} others do the same.")))
+    return [e for i, e in enumerate(entries) if i not in drop] + add
+
+
 def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     from ..contracts.common import ANATOMY_WORDS, SEVERITY_WORDS
     from ..contracts.narration import NarratorLine, NarratorPacket, NarratorStyle
@@ -135,6 +169,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
                 text = f"{pc} moves {to_phrase(an)}."
         if text:
             entries.append((e["at"], e["seq"], "", NarratorLine(seconds=sec, kind=kind, text=text)))
+    entries = _as_one(tx, pc_id, entries)                             # D-265: the room as one
     entries.sort(key=lambda x: (x[0], x[1], x[2]))
     lines = [x[3] for x in entries]
     pos = _row(tx, "SELECT place_id FROM positions WHERE body_id=?", (pc_id,))
@@ -198,11 +233,11 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         from .narrator import BROKEN_NIGHT_LINE                  # D-146: a night broken
         state.append(BROKEN_NIGHT_LINE)
     allowed = {pc, _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"]}
-    people = set(back_names)
+    named = set(back_names)
     for r in tx.query("SELECT DISTINCT a.known_name FROM percept_log p JOIN acquaintance a ON a.holder_id=p.holder_id AND a.subject_id=p.source_id "
                       "WHERE p.holder_id=? AND p.turn_index=? AND a.known_name IS NOT NULL", (pc_id, turn_index)):
-        people.add(r[0])
-    allowed |= people | {n.split()[0] for n in people if n and n.split()}           # D-264: a man known by his full name
+        named.add(r[0])
+    allowed |= named | {n.split()[0] for n in named if n and n.split()}            # D-264: a man known by his full name
     for r in tx.query("SELECT pl.name FROM known_places k JOIN places pl ON pl.place_id=k.place_id WHERE k.holder_id=?", (pc_id,)):
         allowed.add(r[0])
     hint = None

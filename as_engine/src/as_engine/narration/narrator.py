@@ -19,7 +19,13 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
       bodies.sex) outside double quotes ("A walker lunges and grabs at him.", never "at you" beside
       "Owen chose to hit it"); a speech
       line also gets speaker = detail.speaker_known_as and words = detail.words (None when empty:
-      only the tone was heard).
+      only the tone was heard). (D-265) The room as one: when more than three of these lines are of
+      others holding still the same way — sight lines of an ACTION_START by a body other than the PC
+      of an affordance whose verb is in mind.memory.QUIET_VERBS without the 'threat_response' tag,
+      with the same payload def_id and target_id — the first two (by the order below) stay and the
+      rest become one sight line, at the second's time and place in the order, f"{N} others do the
+      same." (N = location.NUMBER_WORDS[n], 'Many' past twelve): nine people stopping to watch are
+      two people and seven others, not nine sentences to retell.
     * the PC's own events of this turn (events.actor_id = the PC), kind 'outcome' unless noted:
         ACTION_START (not the 'speak' def) f"{pc} chose to {label}." — label = payload.label (else
           payload.def_id) with a trailing parenthetical removed (TRAILING_PAREN), told of the PC

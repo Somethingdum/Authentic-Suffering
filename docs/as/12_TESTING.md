@@ -1120,7 +1120,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p07_slice/test_his_first_name.py` | Owen knows Mara as "Mara Voss": the narrator may write "Mara Voss" and "Mara" (DISC-NAME passes); knowing her only as "Mara", "Mara Voss" is still rejected, and nobody he does not perceive is allowed |
+| `p07_slice/test_his_first_name.py` | Owen knows Mara as "Mara Voss": the narrator may write "Mara Voss" and "Mara" (DISC-NAME passes); knowing her only as "Mara", "Mara Voss" is still rejected, and nobody he does not perceive is allowed; who he can see is still what he sees of them, never a list of names |
+
+### 3.154 The room as one (P7; D-265)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_room_as_one.py` | Five people stopping to watch are two lines and "Three others do the same." right after the second; three are three lines; four people heading for the back door are four lines — only holding still is gathered |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

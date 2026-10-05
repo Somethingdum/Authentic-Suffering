@@ -46,6 +46,9 @@ def test_known_by_her_full_name(scenario, canon):
     k, names = owen_looks(w, "Mara Voss")
     assert {"Mara Voss", "Mara"} <= set(k.allowed_names)
     assert disc("Mara Voss looks up from the window. Mara says nothing.", k, names, canon) == []
+    assert any(p.startswith("Mara Voss ") and p.endswith(".") for p in k.people_present), \
+        "who he can see is still what he sees of them, not a list of names"
+    assert not set(k.people_present) & set(k.allowed_names)
 
 
 def test_a_surname_he_never_heard(scenario, canon):

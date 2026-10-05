@@ -451,7 +451,7 @@ The narrator is a mind whose skull is the PC's (L9). `narration/narrator.py`:
   words the PC heard (fragments included). Place details only when establishing a place.
 - **Rules** (prompt + code lint): write only what is listed; never another mind's interior; never
   "unknown to", "meanwhile", "while you were gone"; quoted speech must match committed speech
-  (DISC-SPEECH); names only if the PC knows them (DISC-NAME; D-264: someone known by a full name may be called by the first); one uninterrupted scene; no headings,
+  (DISC-SPEECH); names only if the PC knows them (DISC-NAME; D-264: someone known by a full name may be called by the first); (D-265) many people holding still the same way reach it as two and "N others do the same"; one uninterrupted scene; no headings,
   lists, stats or menus.
 - **Comprehension layer** (NARR-05): the PC's Perception and Intelligence decide how much of a
   tactic the prose explains ("Anya shoots the raider" vs "Anya lays down measured fire on the
