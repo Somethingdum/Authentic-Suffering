@@ -65,6 +65,18 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               and bonded to the one hurt (as above), never that body or
                                               the one who did it, with no RESOLVE_CHANGE of theirs with
                                               reason 'made_to_watch' in the hour up to it
+    given_to(<path>)                          (D-195) for an ITEM_TRANSFER whose ``from`` is the body
+                                              of the event's actor (someone with an actors row) and whose
+                                              ``to`` is another living body with an actors row: that
+                                              body — unless an earlier ITEM_TRANSFER from the giver's
+                                              body to it is on the same world day (at // 86 400 000: a
+                                              day's gifts count once); never the player's character (C06)
+    cared_for_by(<path>)                      (D-195) for a TREATMENT whose payload by_actor has an
+                                              actors row and is not payload body_id: that body, when it
+                                              has an actors row, is alive and awake or drowsy (it knew
+                                              who tended it) — unless an earlier TREATMENT of it by
+                                              by_actor is on the same world day (a day's care counts
+                                              once); never the player's character (C06)
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
                                               (trigger.attacker present): the one hurt — never the
                                               player's character (what they feel is theirs, C06)

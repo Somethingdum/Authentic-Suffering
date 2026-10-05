@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-827 ids; 568 with their own statement, 259 named only in context.
+829 ids; 570 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -193,6 +193,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-073 | Seeing someone spit into what people eat and drink costs them your trust, makes you afraid of them, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_seen_spreading_it.py` |
 | CAS-074 | Someone seen spitting into a sleeper's mouth, by members of a settlement, comes under that settlement's contamination law — and so does the one it was put into. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_law_kept.py` |
 | CAS-075 | Someone seen spitting into what people eat and drink, by members of a settlement, comes under that settlement's contamination law. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_law_kept.py` |
+| CAS-076 | Being given something by someone earns them a little of your trust — a day's gifts count once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
+| CAS-077 | Someone who tends your wounds while you are awake to know it earns your trust and warmth, and you owe them — a day's care counts once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |

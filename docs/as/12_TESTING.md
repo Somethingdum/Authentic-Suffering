@@ -779,6 +779,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_the_same_wrong_again.py` | Alice, hit by Owen for nothing, resents him one more and holds "Owen hurt you, and you were not fighting them." at 2; hit again, she holds it at 3; the same blow swept twice deepens it once, and a third blow leaves it at 3 |
 
+### 3.97 Kindness is remembered (P9; D-195)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_kindness.py` | Owen's gift earns Mara's trust once a world day, and the next day's again; Mara's gift writes nothing into Owen; taking is not giving; June tending Alice's wound while she is awake earns one trust, one warmth and "June tended your wounds. You owe them.", the day's care counting once and the next day's deepening the debt; asleep she never knew who; tending yourself owes no one |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -924,3 +924,38 @@
       payload: {law: contamination_quarantine, subject: "$trigger.actor_id", where_in_force: true}
   delay_s: 0
   cites: [D-188, D-124, D-77]
+# D-195: kindness is remembered too — what is given, and the hands that tend you.
+- schema: as.cascade.v1
+  id: CAS-076
+  description: Being given something by someone earns them a little of your trust — a day's gifts count once.
+  trigger_event: ITEM_TRANSFER
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: given_to(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: 1, cause: given_by}
+  delay_s: 0
+  cites: [D-195]
+- schema: as.cascade.v1
+  id: CAS-077
+  description: Someone who tends your wounds while you are awake to know it earns your trust and warmth, and you owe them — a day's care counts once.
+  trigger_event: TREATMENT
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: cared_for_by(trigger.event_id)
+      payload: {toward: "$trigger.payload.by_actor", axis: trust, delta: 1, cause: cared_for_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: cared_for_by(trigger.event_id)
+      payload: {toward: "$trigger.payload.by_actor", axis: affection, delta: 1, cause: cared_for_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: cared_for_by(trigger.event_id)
+      payload: {kind: debt_owing, subject: "$trigger.payload.by_actor", text: "{subject} tended your wounds. You owe them.", strength: 2}
+  delay_s: 0
+  cites: [D-195, D-194]

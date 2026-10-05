@@ -1100,6 +1100,33 @@ def select(tx, selector, trigger):
                 continue
             out.append(h)
         return out
+    if fn in ("given_to", "cared_for_by"):                           # D-195: kindness is remembered
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        if fn == "given_to":
+            frm, to = pl.get("from") or {}, pl.get("to") or {}
+            giver = trigger.actor_id
+            if frm.get("kind") != "body" or to.get("kind") != "body" or frm.get("id") != giver or to.get("id") == giver:
+                return []
+            who = to.get("id")
+            earlier = ("SELECT 1 FROM events WHERE type='ITEM_TRANSFER' AND actor_id=? AND seq<? AND at/86400000=? AND "
+                       "json_extract(payload,'$.from.id')=actor_id AND json_extract(payload,'$.to.kind')='body' AND "
+                       "json_extract(payload,'$.to.id')=?")
+        else:
+            giver, who = pl.get("by_actor"), pl.get("body_id")
+            if not giver or giver == who:
+                return []
+            earlier = ("SELECT 1 FROM events WHERE type='TREATMENT' AND actor_id=? AND seq<? AND at/86400000=? AND "
+                       "json_extract(payload,'$.body_id')=?")
+        if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (giver,)) is None or _controller(tx, who) in (None, "human"):
+            return []
+        b = tx.query_one("SELECT alive, awareness FROM bodies WHERE body_id=?", (who,))
+        if b is None or not b[0] or (fn == "cared_for_by" and b[1] not in ("awake", "drowsy")):
+            return []
+        seq = tx.query_one("SELECT seq FROM events WHERE event_id=?", (v,))[0]
+        if tx.query_one(earlier, (giver, seq, trigger.at // 86_400_000, who)):
+            return []
+        return [who]
     if fn == "hurt_by_someone":                                      # D-126: the one hurt, never the PC
         a = _assault(tx, trigger)
         victim = (trigger.payload or {}).get("body_id")
