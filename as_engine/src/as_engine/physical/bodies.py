@@ -63,7 +63,12 @@ Time (``progress``) integrates in steps of 60 000 ms from bodies.progressed_at t
      -> NEED_STAGE {body_id, need, stage}; fatigue reaching 6 while conscious -> AWARENESS_CHANGE
      {body_id, awareness: 'asleep', from} with posture 'lying' (collapse; fatigue never kills);
      (D-122, SLEEP-01) a body asleep at the step's start holds its fatigue where it was — waking
-     (wake) pays the sleep off;
+     (wake) pays the sleep off; SLEEP-04 (D-183) a step of a body that rested_at(tx, body) gives a
+     time for ends there, and a step that starts at or after that time starts with wake(tx, body,
+     the step's start, None, turn_index): rested, they wake — a sleeper with no timetable no longer
+     sleeps until a sound wakes them (a progress that ends exactly then leaves them asleep: the
+     next one wakes them at that moment). rested_at is read once per progress call and again only
+     when the body falls asleep inside it;
      then (F1c) the condition over time (LOOK-08) and the cold (LOOK-09);
   3. infection: each infections row's stage = the last pathway stage whose starts_at_h <= hours
      since exposed_at; a change -> INFECTION_STAGE {body_id, pathway, stage};
@@ -1114,7 +1119,7 @@ def fall(tx: "Tx", rng: "Rng", body_id: str, height_m: float, at: int, turn_inde
     return out
 
 
-def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
+def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H, rested=None):
     """The next time after t at which anything in a progress step can change, when nothing bleeds;
     None when something bleeds (step minute by minute)."""
     body_id = b["body_id"]
@@ -1143,6 +1148,8 @@ def _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H):
                 cands.append(dt)
     if b["false_dead_until"] is not None and b["false_dead_until"] > t:
         cands.append(b["false_dead_until"])
+    if rested is not None and rested > t:                                # SLEEP-04 (D-183)
+        cands.append(rested)
     if (b["awareness"] == "unconscious" and b["false_dead_until"] is None and b["kind"] in ("human", "lurker", "animal")
             and b["blood_loss_pct"] >= H.unconscious_at_blood_loss_pct and H.blood_regain_pct_per_h > 0):   # OUT-01: coming to
         over = b["blood_loss_pct"] - H.unconscious_at_blood_loss_pct
@@ -1177,16 +1184,27 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
     heat = 1 + (params["climate_heat"] - 5) * 0.08
     periods = {"thirst": N.thirst_stage_every_h * heat, "hunger": N.hunger_stage_every_h, "fatigue": N.fatigue_stage_every_h}
     lastcol = {"thirst": "last_drink_ms", "hunger": "last_meal_ms", "fatigue": "last_sleep_ms"}
+    slept = b["awareness"]                                               # SLEEP-04 (D-183): once per call,
+    rested = rested_at(tx, body_id) if slept == "asleep" else None      # again only if they fall asleep in it
     while t < to_ms:
         end = min(t + STEP_MS, to_ms)
         b = _b(tx, body_id)
         if not b["alive"]:
             break
+        if b["awareness"] != slept:
+            slept = b["awareness"]
+            rested = rested_at(tx, body_id) if slept == "asleep" else None
+        if rested is not None and rested <= t:                           # rested, they wake
+            w = wake(tx, body_id, t, None, turn_index)
+            if w is not None:
+                out.append(w)
+            b = _b(tx, body_id)
+            slept, rested = b["awareness"], None
         if b["kind"] in ("human", "lurker") and doomed(tx, body_id) is None and _doomable(tx, body_id):
             _doom_check(tx, b, t, turn_index, None, rng)   # DOOM-01 / DOOM-02 at the step's start, before it can kill
         if b["kind"] in ("human", "lurker"):
             _doom_step(tx, body_id, t, turn_index)          # DOOM-09 / DOOM-11
-        jump = _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H)
+        jump = _next_boundary(tx, b, t, to_ms, periods, lastcol, canon, H, rested)
         if jump is not None and jump > end:
             end = jump
         for x in _doom_times(tx, body_id):   # D-107: a step ends where the screaming starts or the shock passes
@@ -1195,6 +1213,8 @@ def progress(tx: "Tx", body_id: str, to_ms: int, turn_index: int, rng: "Rng") ->
         came = comes_to_at(tx, body_id, t)   # OUT-01 (D-173): ... and where an out-cold body comes to
         if came is not None and t < came < end:
             end = came
+        if rested is not None and t < rested < end:                      # SLEEP-04: ... and where they wake rested
+            end = rested
         # 1 blood
         add = 0.0
         for w in _wounds(tx, body_id):
@@ -1329,6 +1349,41 @@ def capacity(store: "Store | Tx", body_id: str, as_awake: bool = False) -> Capac
     hobbled = any(ANATOMY_GROUP[w["anatomy"]] in ("leg", "foot") and w["function_loss"] >= 1 for w in ws)
     return Capacity(mobile=mobile, hands_free=free, can_speak=can_speak, conscious=conscious, impairment=b["impairment"],
                     can_run=mobile and not hobbled)
+
+
+def rested_at(store: "Store | Tx", body_id: str) -> int | None:
+    """SLEEP-04 (D-183) When a sleeper wakes rested: for a living body of kind human or lurker whose
+    awareness is 'asleep', with a needs row and an actors row whose controller is not 'human' (the
+    player decides when the PC wakes, SLEEP-02) and no pending ROUTINE_STEP queue row (a timetable
+    wakes its own, ROUT-06): fell + max(N.min_sleep_h hours, debt / N.sleep_pays) — fell and debt
+    as wake (SLEEP-01) computes them, as of now (the hours awake owed when they fell asleep).
+    Anyone else -> None."""
+    b = _b(store, body_id)
+    if not b["alive"] or b["awareness"] != "asleep" or b["kind"] not in ("human", "lurker"):
+        return None
+    a = store.query_one("SELECT controller FROM actors WHERE actor_id=?", (body_id,))
+    n = store.query_one("SELECT last_sleep_ms FROM needs WHERE body_id=?", (body_id,))
+    if a is None or a[0] == "human" or n is None:
+        return None
+    if store.query_one("SELECT 1 FROM event_queue WHERE subject_id=? AND type='ROUTINE_STEP' AND status='pending' LIMIT 1",
+                       (body_id,)) is not None:
+        return None
+    fell = _fell_asleep(store, body_id, None)
+    if fell is None:
+        return None
+    N = _rules(store).needs
+    debt = max(0, fell - n[0])
+    return int(fell + max(N.min_sleep_h * 3_600_000, _math.ceil(debt / N.sleep_pays)))
+
+
+def _fell_asleep(store, body_id, at):
+    """SLEEP-01: the earliest asleep event of this body after its latest waking (at or before ``at``)."""
+    woke = store.query_one("SELECT MAX(seq) FROM events WHERE type='AWARENESS_CHANGE' AND json_extract(payload,'$.body_id')=? "
+                           "AND json_extract(payload,'$.awareness')='awake'", (body_id,))[0] or 0
+    sql = ("SELECT MIN(at) FROM events WHERE type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND seq>? AND "
+           "json_extract(payload,'$.body_id')=? AND json_extract(payload,'$.awareness')='asleep'")
+    r = store.query_one(sql + (" AND at<=?" if at is not None else ""), (woke, body_id) + ((at,) if at is not None else ()))
+    return r[0] if r and r[0] is not None else None
 
 
 def comes_to_at(store: "Store | Tx", body_id: str, at: int) -> int | None:

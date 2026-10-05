@@ -730,6 +730,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p04_one_actor/test_the_way_out.py` | In the garage the side door to the yard is on the first menu, right after the nearest way out and before the ways to reach the car; creeping about the room is still offered |
 | `p04_one_actor/test_what_the_body_wants.py` | (D-182) June exhausted sees sleep at the head of her waiting options; starving with jerky in her pocket, she is offered to eat it |
 
+### 3.89 Rested, they wake (P7; D-183)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_rested_they_wake.py` | June, sixteen hours awake, sleeps eight and wakes rested at that moment (fatigue paid); a nap is at least an hour; the player's character is never woken this way (SLEEP-02) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

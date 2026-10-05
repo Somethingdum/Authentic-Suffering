@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-821 ids; 562 with their own statement, 259 named only in context.
+822 ids; 563 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -1010,7 +1010,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | ROUT-03 | ROUT-03 step_for(store, actor_id, hour) -> Step / None: the step whose window contains ``hour`` (0..23); None without a routine. | as_engine/society/routine.py | `as_engine/society/routine.py` | `contract/p09_society/test_routine.py` |
 | ROUT-04 | ROUT-04 next_boundary(store, actor_id, after_ms) -> int / None: the smallest t > after_ms whose minute and second are 0 and whose hour is the start_hh of one of the actor's steps. None without a routine. | as_engine/society/routine.py | `as_engine/society/routine.py` | `contract/p09_society/test_routine.py` |
 | ROUT-05 | ROUT-05 COLD option (action.intent.plan_continuation step 5): OPTION_FOR = {'sleep': 'sleep', 'work': 'observe_area'}; 'free' and 'play' have none (the step is skipped). | as_engine/society/routine.py | `as_engine/society/routine.py` | `contract/p09_society/test_routine.py`, `contract/p09_society/test_timers_society.py` |
-| ROUT-06 | ROUT-06 step(tx, rng, row, fired, turn_index) -> list[Event] (the ROUTINE_STEP handler) actor = row['subject_id'], at = row['due_at'], cause = fired.event_id. The outcome: 'ended' steps_for is empty (dead, left the sett… | as_engine/society/routine.py | `as_engine/society/routine.py` | `contract/p09_society/test_routine.py` |
+| ROUT-06 | ROUT-06 step(tx, rng, row, fired, turn_index) -> list[Event] (the ROUTINE_STEP handler) actor = row['subject_id'], at = row['due_at'], cause = fired.event_id. The outcome: 'ended' steps_for is empty (dead, left the sett… | as_engine/society/routine.py | `as_engine/physical/bodies.py`, `as_engine/society/routine.py` | `contract/p09_society/test_routine.py` |
 | ROUT-07 | ROUT-07 ensure_timers(tx, settlement_id, at, turn_index) -> list[str] For each named member of the settlement (sorted) with a routine and no pending ROUTINE_STEP row (kernel.clock.pending_for): kernel.clock.schedule(tx,… | as_engine/society/routine.py | `as_engine/society/routine.py` | — |
 
 ## RUN
@@ -1125,9 +1125,10 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| SLEEP-01 | SLEEP-01 (D-122) Waking from 'asleep' pays the sleep: slept_ms = at - fell, fell = the earliest at | as_engine/physical/bodies.py | `as_engine/action/resolve.py`, `as_engine/physical/bodies.py`, `as_content/packs/core/cascade/stress.yaml` | `contract/p07_slice/test_sleep_rests_you.py` |
-| SLEEP-02 | * SLEEP-02 (D-122) the player decides when the PC wakes: for the human-controlled actor, when the def's effect is not 'sleep', physical.bodies.wake(tx, actor, wave_at, None, turn_index) first (a no-op unless asleep or d… | as_engine/action/resolve.py | `as_engine/action/resolve.py`, `as_engine/mind/affordance.py`, `as_engine/physical/bodies.py` | `contract/p07_slice/test_sleep_rests_you.py`, `contract/p07_slice/test_waking_up.py` |
+| SLEEP-01 | SLEEP-01: the earliest asleep event of this body after its latest waking (at or before ``at``). | as_engine/physical/bodies.py | `as_engine/action/resolve.py`, `as_engine/physical/bodies.py`, `as_content/packs/core/cascade/stress.yaml` | `contract/p07_slice/test_sleep_rests_you.py` |
+| SLEEP-02 | * SLEEP-02 (D-122) the player decides when the PC wakes: for the human-controlled actor, when the def's effect is not 'sleep', physical.bodies.wake(tx, actor, wave_at, None, turn_index) first (a no-op unless asleep or d… | as_engine/action/resolve.py | `as_engine/action/resolve.py`, `as_engine/mind/affordance.py`, `as_engine/physical/bodies.py` | `contract/p07_slice/test_rested_they_wake.py`, `contract/p07_slice/test_sleep_rests_you.py`, `contract/p07_slice/test_waking_up.py` |
 | SLEEP-03 | SLEEP-03 (D-171) waking=True (the player's own menu: turn.intake, service.view): capacity is read as_awake (physical.bodies) — a sleeping PC is offered what they could do on waking, and acting wakes them (action.resolve… | as_engine/mind/affordance.py | `as_engine/mind/affordance.py`, `as_engine/narration/narrator.py`, `as_engine/physical/bodies.py`, `as_engine/service/view.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_waking_up.py` |
+| SLEEP-04 | SLEEP-04 (D-183) When a sleeper wakes rested: for a living body of kind human or lurker whose | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p07_slice/test_rested_they_wake.py` |
 
 ## SMELL
 
