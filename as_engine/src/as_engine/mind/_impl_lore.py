@@ -103,6 +103,10 @@ def lore_lines(tx, holder_id, turn_index, at, n):
         if hit[ref] and h["belief"] < len(e.beliefs):
             out.append({"lore_id": ref, "belief": h["belief"], "text": e.beliefs[h["belief"]].text, "confidence": h["confidence"],
                         "provenance": h["provenance"]})
+    return _pick(out, n)
+
+
+def _pick(out, n):
     by = {}
     for x in sorted(out, key=lambda x: (-x["confidence"], x["belief"])):
         by.setdefault(x["lore_id"], []).append(x)
@@ -112,3 +116,26 @@ def lore_lines(tx, holder_id, turn_index, at, n):
         picked += [by[r][k] for r in order if len(by[r]) > k][:n - len(picked)]
         k += 1
     return picked
+
+
+def lore_about(tx, holder_id, words, subject_ids, n):
+    # LORE-04 (D-235): what the holder grew up hearing that a story touches
+    from .perception import thing_ref
+    refs = set()
+    for b in subject_ids:
+        ref = thing_ref(tx, b)
+        if ref:
+            refs.add(ref)
+        refs |= group_refs_of(tx, b)
+    told = {x for r in tx.canon.refs("lore") for x in tx.canon.get(r).entities}
+    out = [{"lore_id": ref, "belief": 0, "text": tx.canon.get(ref).belief_text, "confidence": 2, "provenance": "common"}
+           for ref in sorted(refs - group_refs_of(tx, holder_id) - told)
+           if ref.split(":", 1)[-1].startswith("faction/") and tx.canon.has(ref)]
+    for h in tx.query("SELECT lore_ref, belief, confidence, provenance FROM lore_held WHERE holder_id=?", (holder_id,)):
+        if not tx.canon.has(h["lore_ref"]):
+            continue
+        e = tx.canon.get(h["lore_ref"])
+        if h["belief"] < len(e.beliefs) and (any(_says(words, a) for a in e.about) or set(e.entities) & refs):
+            out.append({"lore_id": h["lore_ref"], "belief": h["belief"], "text": e.beliefs[h["belief"]].text,
+                        "confidence": h["confidence"], "provenance": h["provenance"]})
+    return _pick(out, n)

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-865 ids; 607 with their own statement, 258 named only in context.
+866 ids; 608 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -93,7 +93,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | BG-01 | BG-01: the terminal has no idle time, so they happen before the next move). The store is closed at the end; exit 0. | as_engine/cli.py | `as_engine/cli.py`, `as_engine/service/background.py`, `as_engine/service/game_service.py` | `contract/p10_world/test_background.py`, `contract/p10_world/test_progress.py` |
 | BG-02 | BG-02 jobs(store, turn_index) -> list[Job] (pure read; order is the run order) The boundary's plan, read from the world as turn T = turn_index left it: every REFLECTION and RUMOUR_DISTORTED event of turn T (the boundary… | as_engine/service/background.py | `as_engine/contracts/settings.py`, `as_engine/service/background.py` | `contract/p10_world/test_background.py`, `contract/p10_world/test_people_you_get_to_know.py` |
-| BG-03 | BG-03 async run_job(session, job) -> JobResult (no store writes; the model call only) (JobResult.answer: reflection {'output': ReflectionOutput, 'handles': packet.handles}; retelling the RumourDistortion). T = world_clo… | as_engine/service/background.py | `as_engine/contracts/calls.py`, `as_engine/service/background.py`, `as_engine/service/progress.py` | `contract/p10_world/test_activity.py`, `contract/p10_world/test_background.py`, `contract/p10_world/test_people_you_get_to_know.py`, `contract/p10_world/test_the_quiet_hours_see.py` |
+| BG-03 | BG-03): its lore_held rows whose entry has one of its ``about`` phrases in ``words`` (whole words, any case), or names among its ``entities`` the mind.perception.thing_ref of a body of ``subject_ids`` or the content_ref… | as_engine/mind/retrieval.py | `as_engine/contracts/calls.py`, `as_engine/mind/retrieval.py`, `as_engine/service/background.py`, `as_engine/service/progress.py` | `contract/p10_world/test_a_story_in_their_words.py`, `contract/p10_world/test_activity.py`, `contract/p10_world/test_background.py`, `contract/p10_world/test_people_you_get_to_know.py`, `contract/p10_world/test_the_quiet_hours_see.py` |
 | BG-04 | BG-04 commit(tx, job, result, at, turn_index) -> list[Event] (its own transaction, between turns) (D-125) Last, action.cascade.sweep(tx, every event committed above, the canon cascade rules, at, turn_index) — a promise… | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p07_slice/test_promises_answered.py`, `contract/p10_world/test_background.py`, `contract/p10_world/test_people_you_get_to_know.py`, `contract/p10_world/test_the_quiet_hours_see.py` |
 | BG-05 | BG-05 Replay: service.replay.resimulate re-commits every REFLECTION, RUMOUR_DISTORTED and (D-149) VOICE_WRITTEN event of the recorded run between the same turns as they were, from their payloads (no model call; see serv… | as_engine/service/background.py | `as_engine/service/background.py`, `as_engine/service/replay.py` | `contract/p10_world/test_background.py` |
 | BG-06 | BG-06 Nothing here reads the truth layer; a reflection packet is the actor's own (Skull law). | as_engine/service/background.py | `as_engine/service/background.py` | `contract/p10_world/test_background.py` |
@@ -725,7 +725,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INFO-03 | *Rumours (P9). Owner 'world.rumours' (rumours). Rules INFO-01..07. docs/as/06_WORLD.md §6.* | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-04 | INFO-04 holders(store, rumour_id) -> list[tuple[str, int]]: (holder_id, confidence) of every live believed holding on the rumour's (subject_type, subject_id, predicate), sorted by holder_id. | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-05 | INFO-05 spread_day(tx, group_id, at, turn_index, cause_event_id) -> list[Event] (society.group.day calls it.) For each rumours row (by rumour_id) with created_at > at - R.rumour_quiet_days * DAY: tellers = the living me… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
-| INFO-06 | INFO-06 Retelling (P10; service/background.py runs the RUMOUR_DISTORT calls between turns): what a holder passes on is their own version. retell(tx, rumour_id, holder_id, answer, at, turn_index) -> Event / None: answer… | as_engine/world/rumours.py | `as_engine/service/background.py`, `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py`, `contract/p10_world/test_background.py` |
+| INFO-06 | INFO-06 Retelling (P10; service/background.py runs the RUMOUR_DISTORT calls between turns): what a holder passes on is their own version. retell(tx, rumour_id, holder_id, answer, at, turn_index) -> Event / None: answer… | as_engine/world/rumours.py | `as_engine/service/background.py`, `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py`, `contract/p10_world/test_a_story_in_their_words.py`, `contract/p10_world/test_background.py` |
 | INFO-07 | INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type='body', seen=False, whom_id=None) -> str (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed th… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_it_missed.py` |
 | INFO-08 | *upper-cased. INFO-08 (D-179) with a whom_word and a CLAIM_WHOM template for the claim, that* | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_who_it_was.py` |
 
@@ -827,6 +827,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..17, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | LORE-02 | LORE-02 (D-130): what everyone around them says, as they grew up hearing it. A person (an actors | as_engine/mind/actor.py | `as_engine/mind/_impl_lore.py`, `as_engine/mind/actor.py`, `as_engine/mind/retrieval.py`, `as_engine/world/worldgen/_impl_wg.py` | `contract/p06_memory/test_everyone_knows.py` |
 | LORE-03 | LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict] What people say about what is in front of the holder: its lore_held rows (mind.actor.seed_lore, | as_engine/mind/retrieval.py | `as_engine/mind/_impl_lore.py`, `as_engine/mind/actor.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py` | `contract/p03_perception/test_what_they_call_them.py`, `contract/p06_memory/test_everyone_knows.py`, `contract/p09_society/test_mouth_rules.py` |
+| LORE-04 | LORE-04 (D-235) lore_about(tx, holder_id, words, subject_ids, n) -> list[dict] What the holder grew up hearing that a story touches (the quiet hours' retelling, service.background | as_engine/mind/retrieval.py | `as_engine/mind/retrieval.py` | `contract/p10_world/test_a_story_in_their_words.py` |
 
 ## MEM
 
@@ -1290,7 +1291,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| TEXT-01 | TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara', | as_engine/mind/perception.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py`, `as_engine/narration/narrator.py`, `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p07_slice/test_in_the_right_person.py`, `contract/p07_slice/test_the_place_told_of_him.py` |
+| TEXT-01 | TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara', | as_engine/mind/perception.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py`, `as_engine/narration/narrator.py`, `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p07_slice/test_in_the_right_person.py`, `contract/p07_slice/test_the_place_told_of_him.py`, `contract/p07_slice/test_told_right.py` |
 
 ## THREAD
 

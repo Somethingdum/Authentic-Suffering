@@ -88,6 +88,11 @@ class RumourContext(Strict):
     teller_identity: str
     claim_text: str
     teller_confidence: int
+    voice: list[str] = Field(default_factory=list, description="D-235: how the teller talks (their capsule and habits of speech).")
+    feeling: str = Field("", description="D-235: how the teller feels about the one the story is about, in the third person; '' when nothing.")
+    lore: list[str] = Field(default_factory=list, description="D-235: what the teller grew up hearing that the story touches (LORE-04).")
+    people: list[str] = Field(default_factory=list, description="D-235: the names the teller knows people by — the only people a twist may name (INFO-06).")
+    places: list[str] = Field(default_factory=list, description="D-235: the places the teller knows — the only places a twist may name (INFO-06).")
 
 
 class ProbeContext(Strict):

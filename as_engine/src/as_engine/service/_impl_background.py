@@ -168,8 +168,6 @@ async def run_job(session, job):
     from ..lanes.schemas import to_lm_schema
     from ..mind.affordance import enumerate_affordances
     from ..mind.packet import build_packet
-    from ..mind.perception import word_for
-    from ..world.rumours import claim_sentence, holders
     from ..lanes.client import LaneClient
     B = _B()
     store = session.store
@@ -205,19 +203,52 @@ async def run_job(session, job):
             return B.JobResult(job=job, failed=True, calls=tuple(calls))
         return B.JobResult(job=job, answer=PersonVoice.model_validate(resp.parsed), calls=tuple(calls))
     # retelling
-    from ..contracts.calls import RumourContext
     with store.transaction() as tx:
-        p = _row(tx, "SELECT p.* FROM rumours r JOIN propositions p ON p.prop_id=r.prop_id WHERE r.rumour_id=?", (job.rumour_id,))
-        conf = dict(holders(tx, job.rumour_id)).get(job.subject_id, 0)
-        name = tx.query_one("SELECT display_name FROM actors WHERE actor_id=?", (job.subject_id,))[0]
-        text = claim_sentence(p["predicate"], word_for(tx, job.subject_id, p["subject_id"]))
-    ctx = RumourContext(teller_identity=name, claim_text=text, teller_confidence=conf)
+        ctx = _rumour_context(tx, job.rumour_id, job.subject_id)
     req = build_request(session.config, CallClass.RUMOUR_DISTORT, turn_index=T, actor_id=job.subject_id, context=ctx,
                         json_schema=to_lm_schema(RumourDistortion), ctx=ctx)
     resp = await client.call(req, RumourDistortion)
     if resp.parse_status != "ok":
         return B.JobResult(job=job, failed=True, calls=tuple(calls))
     return B.JobResult(job=job, answer=RumourDistortion.model_validate(resp.parsed), calls=tuple(calls))
+
+
+def _rumour_context(tx, rumour_id, holder):
+    # BG-03 retelling (D-235): what they were told, in their own voice, with what they feel and grew up hearing
+    from ..contracts.calls import RumourContext
+    from ..mind.actor import fused
+    from ..mind._impl_packet import _rel_text
+    from ..mind.perception import retell, word_for
+    from ..mind.retrieval import lore_about
+    from ..world.rumours import claim_sentence, holders
+    B = _B()
+    p = _row(tx, "SELECT p.* FROM rumours r JOIN propositions p ON p.prop_id=r.prop_id WHERE r.rumour_id=?", (rumour_id,))
+    conf = dict(holders(tx, rumour_id)).get(holder, 0)
+    name = tx.query_one("SELECT display_name FROM actors WHERE actor_id=?", (holder,))[0]
+    own = tx.query_one("SELECT q.text FROM claim_holdings h JOIN propositions q ON q.prop_id = h.claim_id WHERE h.holder_id=? "
+                       "AND h.superseded_by IS NULL AND h.believed=1 AND q.subject_type=? AND q.subject_id IS ? AND q.predicate=? "
+                       "ORDER BY h.acquired_at DESC, h.claim_id LIMIT 1", (holder, p["subject_type"], p["subject_id"], p["predicate"]))
+    text = own[0] if own is not None else claim_sentence(p["predicate"], word_for(tx, holder, p["subject_id"]))
+    v = fused(tx, holder).voice
+    said = (v.capsule or "").lower()
+    voice = [x for x, ok in ((f"How they talk: {v.capsule}", v.capsule),
+                             (f"Habits of speech: {'; '.join(v.speech_tendencies)}",
+                              any(t.lower() not in said for t in v.speech_tendencies))) if ok]
+    body = p["subject_type"] == "body"
+    sex = tx.query_one("SELECT sex FROM bodies WHERE body_id=?", (holder,))
+    rel = tx.query_one("SELECT * FROM relationships WHERE from_id=? AND to_id=?", (holder, p["subject_id"])) if body else None
+    feeling = retell(_rel_text(rel), "third", sex[0] if sex else None) if rel is not None else ""
+    lore = [x["text"] for x in lore_about(tx, holder, text, [p["subject_id"]] if body else [], B.RUMOUR_LORE)]
+    rows = tx.query("SELECT a.subject_id, a.known_name, COALESCE(ABS(r.trust) + ABS(r.affection), 0) AS w FROM acquaintance a "
+                    "JOIN bodies b ON b.body_id = a.subject_id LEFT JOIN relationships r ON r.from_id = a.holder_id AND "
+                    "r.to_id = a.subject_id WHERE a.holder_id=? AND a.known_name IS NOT NULL AND a.known_name != '' AND b.alive=1",
+                    (holder,))
+    people = [r["known_name"] for r in sorted(rows, key=lambda r: (-r["w"], r["known_name"], r["subject_id"]))][:B.RUMOUR_PEOPLE]
+    places = [r[0] for r in tx.query("SELECT p.name FROM known_places k JOIN places p ON p.place_id = k.place_id WHERE "
+                                     "k.holder_id=? AND p.name IS NOT NULL ORDER BY k.last_seen DESC, k.place_id LIMIT ?",
+                                     (holder, B.RUMOUR_PLACES))]
+    return RumourContext(teller_identity=name, claim_text=text, teller_confidence=conf, voice=voice, feeling=feeling,
+                         lore=lore, people=people, places=places)
 
 
 _COHORT_WORDS = {"pre_fall_adult": "Grown when the Fall came: remembers the world before, and losing it.",

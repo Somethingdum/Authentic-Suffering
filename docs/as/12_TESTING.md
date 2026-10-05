@@ -959,6 +959,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_the_quiet_hours_see.py` | June's reflection call carries the canon's cue words and its prompt lists them; her new memory is "R1" and the answer is told to cite R labels; how she feels about the people around her is in the prompt |
 
+### 3.127 A story in their own words (P10; D-235)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_a_story_in_their_words.py` | Mara's twisted version, heard by Nita, is what Nita is asked to retell; Nita's retelling of "Mara was bitten." carries how she talks, that she mostly trusts and respects Mara, what she grew up hearing about bites, and the people she knows by name (not the stranger's); the prompt shows them and forbids "I", "we" and "you"; lore_about finds the wet strain's lines for a bite and nothing for a lie |
+
+### 3.128 Told right (P7; D-236)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_told_right.py` | "Mara tells you to get down", "they owe you their life", "you mostly trust them", "before you could move", "more than you can carry", "before you're seen", "what you grew up hearing" told of her and of me read as English; every one of the packet's words for a feeling does |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -78,9 +78,22 @@ BG-03 async run_job(session, job) -> JobResult   (no store writes; the model cal
   returning lanes.requests.repair_request(config, the failed request, {raw: resp.text, error:
   resp.error or resp.parse_status}, packet, the same schema)).
   retelling: in one read transaction, p = the rumour's propositions row; RumourContext(
-  teller_identity = the holder's actors.display_name, claim_text = world.rumours.claim_sentence(
-  p.predicate, mind.perception.word_for(tx, holder, p.subject_id)), teller_confidence = the
-  holder's confidence from world.rumours.holders); request = build_request(config,
+  teller_identity = the holder's actors.display_name, claim_text = (D-235) the text of the holder's
+  own live (superseded_by NULL) believed holding on p's (subject_type, subject_id, predicate) — what
+  they were told, as they were told it, so a twist heard is passed on and twisted again — else
+  world.rumours.claim_sentence(p.predicate, mind.perception.word_for(tx, holder, p.subject_id)),
+  teller_confidence = the holder's confidence from world.rumours.holders, and (D-235) what makes the
+  story theirs: voice = [f"How they talk: {capsule}", f"Habits of speech: {'; '.join(tendencies)}"]
+  from mind.actor.fused (a line with nothing to say left out — the habits line too when the capsule
+  already holds every one of them, as a generated person's does); feeling = for a 'body' subject the
+  holder has a relationships row toward, the packet's words for it (mind.packet relationships,
+  D-165) told in the third person by the holder's bodies.sex (mind.perception.retell(text, 'third',
+  sex)), else ''; lore = the texts of mind.retrieval.lore_about(tx, holder, claim_text, [p.subject_id]
+  for a 'body' subject else [], RUMOUR_LORE); people = the known_name of each of the holder's
+  acquaintance rows that has one, about a living body, ordered (-(|trust| + |affection|) of the
+  holder's relationships row toward them (0 without one), known_name, subject_id), the first
+  RUMOUR_PEOPLE; places = the places.name of the holder's known_places, ordered (last_seen desc,
+  place_id), the first RUMOUR_PLACES — the people and places a twist may name (INFO-06)); request = build_request(config,
   RUMOUR_DISTORT, turn_index=T, actor_id=holder, context=ctx, json_schema = to_lm_schema(
   RumourDistortion), ctx=ctx); resp = await client.call(request, RumourDistortion) (no repair).
   voicing (D-149): in one read transaction, d = mind.actor.fused(tx, actor); PersonVoiceContext(name =
@@ -164,6 +177,9 @@ if TYPE_CHECKING:
 
 
 QUIET_HOURS = "Everyone else catches up…"   # the progress label while a turn waits on them (BG-01)
+RUMOUR_LORE: int = 3      # BG-03 (D-235): what they grew up hearing that a story touches, at most
+RUMOUR_PEOPLE: int = 10   # BG-03 (D-235): the people a teller knows by name, at most
+RUMOUR_PLACES: int = 8    # BG-03 (D-235): the places a teller knows, at most
 
 
 @dataclass(frozen=True)

@@ -575,7 +575,12 @@ will not deal (SOC-03). The PC hears gossip like anyone, and it appears in the j
 **Distortion** (INFO-06): when a holder retells a fresh rumour in the quiet hours (§7), one
 `RUMOUR_DISTORT` call may drop a detail, shift an attribution, sharpen an emotion or add an
 inference — never invent who is in it (a retelling that names a person or place the holder does not
-know is refused, and the holder passes the words on as they heard them). In P9 the words pass on exactly and `rumours.distortions` stays `[]`.
+know is refused, and the holder passes on the story as it began). In P9 the words pass on exactly and `rumours.distortions` stays `[]`.
+The call is the teller's own (D-235): it is given what they were told — a twist they heard is passed
+on and twisted again, so talk drifts as it travels — how they talk, how they feel about the one it is
+about (someone they love they make excuses for; someone they hate they make worse), what they grew up
+hearing that the story touches, and the people and places they know by name, the only ones a twist
+may name. It is said about the people in it, never as "I" or "you": whoever hears it believes those words.
 **Horde talk** (P10): a rumour may be about a place — 'horde_coming' — seeded by the Mega Horde's
 signs and by a route watch's report (§5.3, §2.8), and passed on like any other.
 

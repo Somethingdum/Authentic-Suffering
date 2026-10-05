@@ -46,6 +46,14 @@ LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict]
   entries as {lore_id: the faction ref, belief: 0, text: belief_text, confidence: 2, provenance:
   'common'} — whether or not the holder holds any lore. retrieve fills
   Retrieved.lore with lore_lines(..., n = RulesConfig.packet.max_lore).
+LORE-04 (D-235) lore_about(tx, holder_id, words, subject_ids, n) -> list[dict]
+  What the holder grew up hearing that a story touches (the quiet hours' retelling, service.background
+  BG-03): its lore_held rows whose entry has one of its ``about`` phrases in ``words`` (whole words,
+  any case), or names among its ``entities`` the mind.perception.thing_ref of a body of
+  ``subject_ids`` or the content_ref of a group such a body belongs to (member or probation); and (as
+  D-201) the belief_text of such a faction that the holder belongs to no group of and that no lore
+  entry names among its entities. Ordered and cut as LORE-03 (each thing once before any twice); the
+  same entry shape.
 MEM-14 episodes: the holder's episodes with decayed 0 and (B5, MEM-18) quarantined 0.
   Anchors (anchor 1) come first and always: ordered (salience desc, at desc, episode_id), at most 2.
   Then the rest by score = salience + (20 when any subject_id is in K) + (15 when the episode
@@ -112,7 +120,11 @@ def lore_lines(tx: "Tx", holder_id: str, turn_index: int, at: int, n: int) -> li
     raise NotImplementedError("D-130")
 
 
+def lore_about(tx: "Tx", holder_id: str, words: str, subject_ids: list[str], n: int) -> list[dict]:
+    raise NotImplementedError("D-235")
+
+
 def recency_bonus(hours_since: float) -> float:
     raise NotImplementedError("P6")
 from ._impl_p6 import retrieve, recency_bonus  # noqa
-from ._impl_lore import lore_lines  # noqa: E402,F811
+from ._impl_lore import lore_about, lore_lines  # noqa: E402,F811

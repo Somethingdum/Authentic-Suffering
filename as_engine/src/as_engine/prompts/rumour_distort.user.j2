@@ -1,3 +1,13 @@
 The teller: {{ ctx.teller_identity }}
+{% for l in ctx.voice %}{{ l }}
+{% endfor %}
 How sure they are: {{ ctx.teller_confidence }} of 3
 What they believe: {{ ctx.claim_text }}
+{% if ctx.feeling %}How they feel about the one it is about: {{ ctx.feeling }}
+{% endif %}{% if ctx.lore %}
+What they grew up hearing that it touches (belief, not fact):
+{% for l in ctx.lore %}- {{ l }}
+{% endfor %}{% endif %}{% if ctx.people or ctx.places %}
+{% endif %}{% if ctx.people %}People they know by name: {{ ctx.people | join(", ") }}
+{% endif %}{% if ctx.places %}Places they know: {{ ctx.places | join(", ") }}
+{% endif %}

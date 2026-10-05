@@ -1015,13 +1015,35 @@ def thing_phrase(name: str) -> str:
 
 RETELL_OBJECT_AFTER = frozenset({"on", "from", "to", "at", "with", "for", "behind", "near", "toward", "towards", "around",
                                  "past", "beside", "against", "over", "under", "into", "onto", "of", "by", "about",
-                                 "between", "after", "before", "like", "than", "off", "without"})
+                                 "between", "after", "before", "like", "than", "off", "without",
+                                 # D-236: verbs whose 'you' is their object ('tells you to go', 'they owe you')
+                                 "tell", "tells", "told", "make", "makes", "made", "let", "lets", "owe", "owes", "owed",
+                                 "give", "gives", "gave", "help", "helps", "helped", "ask", "asks", "asked", "need",
+                                 "needs", "needed", "want", "wants", "wanted", "show", "shows", "showed", "leave",
+                                 "leaves", "left", "call", "calls", "called", "save", "saves", "saved", "warn", "warns",
+                                 "warned", "pay", "pays", "paid", "keep", "keeps", "kept", "take", "takes", "took",
+                                 "bring", "brings", "brought", "send", "sends", "sent", "hurt", "hurts", "hit", "hits",
+                                 "push", "pushes", "pushed", "pull", "pulls", "pulled", "grab", "grabs", "grabbed",
+                                 "hold", "holds", "held", "trust", "trusts", "trusted", "love", "loves", "loved", "hate",
+                                 "hates", "hated", "follow", "follows", "followed", "watch", "watches", "watched",
+                                 "find", "finds", "found", "touch", "touches", "touched", "kill", "kills", "killed",
+                                 "bit", "bitten", "feed", "feeds", "fed", "drag", "drags", "dragged", "stop", "stops",
+                                 "stopped", "got", "cast", "blame", "blames", "blamed", "thank", "thanks", "thanked"})
 RETELL_MODALS = frozenset({"can", "could", "will", "would", "shall", "should", "may", "might", "must"})
 RETELL_ADVERBS = frozenset({"never", "always", "still", "just", "already", "really", "also", "only", "often", "ever",
-                            "even", "then", "first", "once"})
+                            "even", "then", "first", "once",
+                            # D-236
+                            "mostly", "usually", "rarely", "hardly", "barely", "nearly", "almost", "sometimes",
+                            "probably", "certainly", "truly", "simply", "actually", "finally", "suddenly", "quietly",
+                            "slowly", "quickly", "badly"})
 RETELL_NOT_VERBS = frozenset({"and", "or", "not", "too", "all", "both", "alone", "yourself", "two", "three"})
 RETELL_PAST = frozenset({"knew", "saw", "did", "had", "went", "came", "took", "made", "said", "got", "heard", "left",
-                         "thought", "found", "kept", "held", "ran", "fell", "gave", "told", "felt", "lost", "brought"})
+                         "thought", "found", "kept", "held", "ran", "fell", "gave", "told", "felt", "lost", "brought",
+                         # D-236
+                         "grew", "began", "became", "wore", "drove", "rode", "sat", "stood", "spoke", "wrote", "broke",
+                         "chose", "forgot", "swore", "hid", "shot", "fought", "caught", "taught", "bought", "slept",
+                         "woke", "met", "meant", "won", "led", "threw", "ate", "drank", "bit", "hung", "dug", "fed",
+                         "sent", "spent", "built", "paid", "sold", "struck", "stole", "froze", "shook", "understood"})
 _RETELL_WORDS = {"first": ("I", "me", "my", "mine", "myself"), "male": ("he", "him", "his", "his", "himself"),
                  "female": ("she", "her", "her", "hers", "herself"), "they": ("they", "them", "their", "theirs", "themselves")}
 
@@ -1045,8 +1067,11 @@ def retell(text: str, person: str, sex: str | None = None) -> str:
     else they / them / their / theirs / themselves. Whole words only, case-insensitive; a word
     that began with a capital keeps one ('I' always has one):
       'yourself' -> the reflexive; 'yours' -> the possessive pronoun; 'your' -> the possessive;
-      'you' -> the object form when the word before it is in RETELL_OBJECT_AFTER or no word
-        follows it in the text ('grip on you' -> 'grip on him'); else the subject form, and the
+      'you' -> the object form when the word before it is in RETELL_OBJECT_AFTER (a preposition,
+        or — D-236 — a verb whose 'you' is its object: 'tells you to go', 'they owe you their
+        life') and the word after it is not a modal, 'are', 'were' or a contraction ('before you
+        could', 'more than you can' keep the subject), or when no word follows it in the text
+        ('grip on you' -> 'grip on him'); else the subject form, and the
         word after it agrees: 'are' -> am / is / are, 'were' -> was / was / were, a modal
         (RETELL_MODALS) or any other word for I and they unchanged, any other word for he / she
         its -s form ('know' -> 'knows', 'watch' -> 'watches', 'carry' -> 'carries', 'have' ->
@@ -1086,7 +1111,10 @@ def retell(text: str, person: str, sex: str | None = None) -> str:
         elif lw == "you":
             prev = parts[words[n - 1]].lower() if n > 0 else None
             nxt = words[n + 1] if n + 1 < len(words) else None
-            if prev in RETELL_OBJECT_AFTER or nxt is None:
+            lead = nxt is not None and (parts[nxt].lower() in RETELL_MODALS | {"are", "were"} or      # D-236: 'before
+                                        (parts[nxt].lower() in ("re", "ve", "ll", "d")               # you could'
+                                         and parts[nxt - 1] in ("'", "\u2019")))
+            if (prev in RETELL_OBJECT_AFTER and not lead) or nxt is None:
                 new = obj
             else:
                 new = subj
