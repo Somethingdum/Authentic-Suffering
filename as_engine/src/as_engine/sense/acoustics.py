@@ -143,7 +143,8 @@ def _loss(p):
 
 
 def _min_loss_path(store, src_place, dst_place):
-    portals = [dict(r) for r in store.query("SELECT * FROM portals ORDER BY portal_id")]
+    from ..physical.space import _adjacency
+    adj = _adjacency(store)                                  # D-212: the portals of each place, read once
     heap = [(0.0, 0, (), src_place, ())]
     best = {}
     while heap:
@@ -153,9 +154,7 @@ def _min_loss_path(store, src_place, dst_place):
         if place in best:
             continue
         best[place] = (loss, n, key)
-        for p in portals:
-            if place not in (p["place_a"], p["place_b"]):
-                continue
+        for p in adj.get(place, ()):
             other = p["place_b"] if p["place_a"] == place else p["place_a"]
             if other in best:
                 continue
@@ -163,15 +162,42 @@ def _min_loss_path(store, src_place, dst_place):
     return None
 
 
+def _min_loss_paths(store, src_place):
+    """D-212: _min_loss_path from one place to every place it reaches, in one search: {place: (loss, seq)}. The
+    heap is the same, so each place's result is the one a search for it alone would return."""
+    from ..physical.space import _adjacency
+    adj = _adjacency(store)
+    heap = [(0.0, 0, (), src_place, ())]
+    best = {}
+    found = {}
+    while heap:
+        loss, n, key, place, seq = _heapq.heappop(heap)
+        found.setdefault(place, (loss, seq))
+        if place in best:
+            continue
+        best[place] = (loss, n, key)
+        for p in adj.get(place, ()):
+            other = p["place_b"] if p["place_a"] == place else p["place_a"]
+            if other in best:
+                continue
+            _heapq.heappush(heap, (loss + _loss(p), n + 1, key + (p["portal_id"],), other, seq + ((p, place, other),)))
+    return found
+
+
 def received_db(store: "Store | Tx", source_db: float, source: Point, listener: Point,
                 rules: "AcousticRules") -> tuple[float, tuple[str, ...]]:
+    same = source.place_id == listener.place_id
+    return _received(store, source_db, source, listener, rules,
+                     None if same else _min_loss_path(store, source.place_id, listener.place_id))
+
+
+def _received(store, source_db, source, listener, rules, r):
     from ..physical.space import portal_point
     sp = _row(store, "SELECT indoor FROM places WHERE place_id=?", (source.place_id,))
     k = rules.indoor_attenuation_per_doubling_db if sp["indoor"] else rules.attenuation_per_doubling_db
     if source.place_id == listener.place_id:
         d = _math.dist((source.x_m, source.y_m), (listener.x_m, listener.y_m))
         return source_db - k * _math.log2(max(d, 1)), ()
-    r = _min_loss_path(store, source.place_id, listener.place_id)
     if r is None:
         return float("-inf"), ()
     loss, seq = r
@@ -200,14 +226,15 @@ def receptions(store: "Store | Tx", source_db: float, source: Point, at_ms: int,
     exclude = exclude or set()
     masking = masking or {}
     out = []
+    paths = _min_loss_paths(store, source.place_id)          # D-212: one search for every listener
     for r in store.query("SELECT b.body_id, b.awareness, p.place_id, p.x_m, p.y_m FROM bodies b JOIN positions p ON p.body_id=b.body_id WHERE b.alive=1 ORDER BY b.body_id"):
         bid = r[0]
         if bid in exclude:
             continue
-        if not _linked(store, source.place_id, r[2]):
+        if r[2] != source.place_id and r[2] not in paths:
             continue
         lis = Point(r[2], r[3], r[4])
-        rec, path = received_db(store, source_db, source, lis, rules)
+        rec, path = _received(store, source_db, source, lis, rules, paths.get(r[2]))
         amb = max(ambient_db(store, r[2]), masking.get(bid, float("-inf")))
         pen = 0.0
         if store.query_one("SELECT 1 FROM events WHERE type='SPEECH' AND actor_id=? AND at>? AND at<=?", (bid, at_ms - 2000, at_ms)) or \

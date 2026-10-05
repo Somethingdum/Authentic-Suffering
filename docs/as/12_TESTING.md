@@ -821,6 +821,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p12_surfaces/test_intake.py` | A short document is one section; headings start sections that join while they fit; a block too big is cut between paragraphs and a paragraph too big is cut hard; the Writer's field list names every field with its kind and description (never schema, id, generation, writers_notes); a two-section document makes one call per section, each seeing its own text and the field list, and merges into one draft — a filled field never overwritten, lists grown — with the model's conflicts and the missing fields listed and progress per section; a section the model fails is listed; lore comes out as a `.md` draft; an empty document calls nothing; the Content screen's message answers at once with the number of sections, then pushes progress and the result — a draft, never canon |
 
+### 3.104 One search where many did (P3; D-212)
+
+| File | What it proves |
+|---|---|
+| `p03_perception/test_one_search.py` | One sound-path search from a place gives, for every place, what a search for that place alone gives (every pair on metal_fence); the route search gives the same distance and the same portals as the search before D-212 (kept in the test) for every pair of bodies in different places on three scenarios; a request schema made once still gives every caller its own copy (enums set on one never reach another) |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

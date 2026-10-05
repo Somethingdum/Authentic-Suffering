@@ -26,6 +26,15 @@ class Ctx:
     pass
 
 
+def _dist(c, t):
+    """physical.space.point_distance from the actor to ``t``, once per menu (D-212: nothing moves while one is built)."""
+    m = c.__dict__.setdefault("_dists", {})
+    if t not in m:
+        from ..physical import space
+        m[t] = space.point_distance(c.tx, c.me, t)
+    return m[t]
+
+
 def _ctx(tx, actor_id, at, turn_index, waking=False):
     from . import perception as P
     from ..physical import bodies
@@ -243,7 +252,7 @@ def _bindings(c, d):
             fond = {r[0] for r in c.tx.query("SELECT to_id FROM relationships WHERE from_id=? AND affection>=1", (c.me,))}
             cands = [t for t in c.known_bodies if t not in c.threats and (t in c.guardian_of or t in c.household or t in fond)]
         for t in cands:
-            dist = space.point_distance(c.tx, c.me, t) or 0.0
+            dist = _dist(c, t) or 0.0
             if d.id.startswith("shoot_"):
                 for it in c.held:
                     if c.canon.get(it["def_ref"]).firearm is not None:
@@ -275,7 +284,7 @@ def _bindings(c, d):
         for it in c.held:
             if d.id == "give_item":
                 for t in c.known_bodies:
-                    dist = space.point_distance(c.tx, c.me, t) or 0.0
+                    dist = _dist(c, t) or 0.0
                     if dist <= 1.5:
                         out.append({"item_id": it["item_id"], "target_id": t, "dist": dist})
             elif d.id == "throw_distraction":
@@ -380,7 +389,7 @@ def _bindings(c, d):
         for t in c.known_bodies:
             if _row(c.tx, "SELECT kind FROM bodies WHERE body_id=?", (t,))["kind"] == "infected":
                 continue                                    # nobody dresses a wound on the dead
-            if t in c.seen_clear and (space.point_distance(c.tx, c.me, t) or 99) <= 1.5:
+            if t in c.seen_clear and (_dist(c, t) or 99) <= 1.5:
                 for w in c.tx.query("SELECT wound_id FROM wounds WHERE body_id=? AND healed_at IS NULL ORDER BY wound_id", (t,)):
                     out.append({"wound_id": w[0], "wound_body": t, "target_id": t, "dist": 0.0})
         # medical item second referent
@@ -404,7 +413,7 @@ def _range_ok(c, d, o):
     r = d.range
     t = o.get("target_id")
     if r == "touch" and t and t.startswith("act_"):
-        return (space.point_distance(c.tx, c.me, t) or 99) <= 1.5
+        return (_dist(c, t) or 99) <= 1.5
     if r == "same_place" and t and t.startswith("act_"):
         return _row(c.tx, "SELECT place_id FROM positions WHERE body_id=?", (t,))["place_id"] == c.place
     return True
@@ -440,7 +449,7 @@ def _physical(c, d, o):
                             "WHERE p.holder_id=? AND p.turn_index=? AND p.at<=? AND p.channel='visual' "
                             "AND p.fidelity IN ('exact','partial') AND b.kind='infected' ORDER BY p.source_id",
                             (c.me, c.turn, c.at)):
-            dd = _sp.point_distance(c.tx, c.me, r[0])
+            dd = _dist(c, r[0])
             if dd is not None and dd <= q.infected_within_m:
                 near = True
                 break

@@ -297,8 +297,40 @@ def _parkour_ok(store, p, place, lim):
     return False
 
 
+def _adjacency(store):
+    """D-212: every portal by the places it joins, in portal_id order (a portal joining a place to itself joins
+    nothing) — one read of the table per search instead of a scan of it at every step."""
+    adj: dict = {}
+    for r in store.query("SELECT * FROM portals ORDER BY portal_id"):
+        p = dict(r)
+        if p["place_a"] == p["place_b"]:
+            continue
+        adj.setdefault(p["place_a"], []).append(p)
+        adj.setdefault(p["place_b"], []).append(p)
+    return adj
+
+
+def _point_finder(store):
+    """D-212: portal_point for portal rows already in hand, each anchor and place centre read once per search."""
+    anchors: dict = {}
+    centres: dict = {}
+
+    def point(p, place_id):
+        anc = p["anchor_a"] if p["place_a"] == place_id else p["anchor_b"]
+        if anc:
+            if anc not in anchors:
+                a = _row(store, "SELECT x_m, y_m FROM anchors WHERE anchor_id=?", (anc,))
+                anchors[anc] = (a["x_m"], a["y_m"])
+            return anchors[anc]
+        if place_id not in centres:
+            centres[place_id] = _place_centre(store, place_id)
+        return centres[place_id]
+    return point
+
+
 def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal, extra=None):
-    portals = [dict(r) for r in store.query("SELECT * FROM portals ORDER BY portal_id")]
+    adj = _adjacency(store)
+    point = _point_finder(store)
     # entries: (cost, done_flag, seq, n, place, point, legs); done entries (flag 0) win ties
     n = 0
     heap = [(0.0, 1, (), n, start_place, start_pt, ())]
@@ -315,16 +347,14 @@ def _dijkstra(store, start_place, start_pt, goal_place, goal_pt, ok_portal, extr
             final = distance_m(*pt, *goal_pt) if goal_pt is not None else 0.0
             n += 1
             _heapq.heappush(heap, (cost + final, 0, seq, n, place, pt, legs + ((None, goal_place, final),)))
-        for p in portals:
-            if place not in (p["place_a"], p["place_b"]) or p["place_a"] == p["place_b"]:
-                continue
+        for p in adj.get(place, ()):
             if not ok_portal(p, place):
                 continue
             other = p["place_b"] if p["place_a"] == place else p["place_a"]
             if other == start_place or any(pl == other for _, pl, _ in legs):
                 continue  # a route enters each place at most once
-            here = portal_point(store, p["portal_id"], place)
-            there = portal_point(store, p["portal_id"], other)
+            here = point(p, place)
+            there = point(p, other)
             if (other, there) in settled:
                 continue
             d = distance_m(*pt, *here) + (extra(p) if extra else 0.0)

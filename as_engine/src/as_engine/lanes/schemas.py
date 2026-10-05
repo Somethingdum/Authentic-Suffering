@@ -9,6 +9,8 @@ LM-Studio-safe schema (SCHEMA-01): ``to_lm_schema(model)`` returns
   * every object gets "additionalProperties": false;
   * "required" lists every property that has no default in the model (pydantic already does this);
   * "anyOf": [X, {"type": "null"}] is kept as-is (nullable).
+  (D-212) It is made once per model class in a process and every call returns a fresh copy (callers
+  set enums on it), so a turn does not rebuild the same schemas for every request.
 
 Dynamic enums (SCHEMA-02):
   cognition_schema(affordance_handles, entity_handles, *, consult_kinds=(), families=(),
@@ -105,11 +107,18 @@ OUTPUT_MODELS: dict[CallClass, type[BaseModel] | None] = {
 }
 
 
+_LM_SCHEMA_TEXT: dict = {}   # D-212: a model's schema is made once per process; every caller gets its own copy
+
+
 def to_lm_schema(model: type[BaseModel]) -> dict[str, Any]:
-    from ._impl_schemas import _inline, _close
-    raw = model.model_json_schema()
-    defs = raw.get("$defs", {})
-    return _close(_inline(raw, defs))
+    import json
+    text = _LM_SCHEMA_TEXT.get(model)
+    if text is None:
+        from ._impl_schemas import _inline, _close
+        raw = model.model_json_schema()
+        defs = raw.get("$defs", {})
+        text = _LM_SCHEMA_TEXT[model] = json.dumps(_close(_inline(raw, defs)))
+    return json.loads(text)
 
 
 def _set_enum_everywhere(node, key, enum):
