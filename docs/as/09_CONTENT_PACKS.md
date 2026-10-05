@@ -324,6 +324,7 @@ beliefs:
 tags: [infection, canon_cmg_42]
 about: ["bite", "bitten", "wet strain"]        # D-130: heard said, it comes to mind
 when: [bite_wound_seen, spreader_signs]         # D-130: these moments bring it to mind
+called: [{held_by: common, word: walker}]       # D-160: what its holders call what it is about (its entities)
 ---
 Long-form notes for humans and for on-demand depth (never loaded into a prompt by default).
 ```

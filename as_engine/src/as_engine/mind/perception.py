@@ -149,7 +149,14 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       acquaintance description when the holder has one, else describe_dossier(B's baseline
       dossier) (implemented below: height and build words from the numbers, never the prose
       fields), else for infected bodies 'shambling figure' (Shambler / Crawler) / 'fast figure'
-      (Runner) — the type name is NEVER used, because what a thing is has to be learned; (I1) for
+      (Runner) — the type name is NEVER used, because what a thing is has to be learned — unless
+      (D-160, LOOK-07) the holder has learned what people call it: called(tx, holder, B), the word
+      of a canon lore entry's ``called`` whose entities hold thing_ref(tx, B) (bodies.content_ref,
+      else for one of the dead the canon infected ref of its infected_state.type_id) and whose
+      held_by is the held_by of a belief of that entry the holder holds (lore_held), the most
+      particular first — a 'cohort:' word, then a faction's or a region's, then 'common' — and
+      among equals the first by lore ref, then the ``called`` order ('walker', 'runner',
+      'crawler'); None when there is none; (I1) for
       animal bodies the canon AnimalDef's ``words`` (bodies.content_ref names it: 'scrawny grey
       dog').
   Phrase helpers (implemented below, so every module words places the same way): with_article,
@@ -370,10 +377,54 @@ def describe(tx: "Tx", holder_id: str, subject_id: str) -> str:
         cr = _row(tx, "SELECT content_ref FROM bodies WHERE body_id=?", (subject_id,))["content_ref"]
         return _canon(tx).get(cr).words
     if b["kind"] == "infected":
+        word = called(tx, holder_id, subject_id)                     # LOOK-07 (D-160): what their world calls it
+        if word:
+            return word
         st = _row(tx, "SELECT type_id FROM infected_state WHERE body_id=?", (subject_id,))
         return "fast figure" if "RUNNER" in st["type_id"] else "shambling figure"
     a = _row(tx, "SELECT d.baseline_json FROM actors a JOIN dossiers d ON d.dossier_id=a.dossier_id WHERE a.actor_id=?", (subject_id,))
     return describe_dossier(_json.loads(a["baseline_json"]))
+
+
+def thing_ref(tx: "Tx", body_id: str) -> str | None:
+    """LOOK-07 (D-160): what kind of thing a body is, as content names it — bodies.content_ref, else for one of the
+    dead the canon infected ref whose id is its infected_state.type_id (the dead carry no content_ref)."""
+    r = _row(tx, "SELECT content_ref, kind FROM bodies WHERE body_id=?", (body_id,))
+    if r is None:
+        return None
+    if r["content_ref"]:
+        return r["content_ref"]
+    if r["kind"] != "infected":
+        return None
+    st = _row(tx, "SELECT type_id FROM infected_state WHERE body_id=?", (body_id,))
+    if st is None:
+        return None
+    return next((ref for ref in _canon(tx).refs("infected") if ref.rsplit("/", 1)[-1] == st["type_id"]), None)
+
+
+def called(tx: "Tx", holder_id: str, subject_id: str) -> str | None:
+    """LOOK-07 (D-160): the word the holder's world taught them for what this body is (describe(B) above)."""
+    cref = thing_ref(tx, subject_id)
+    if not cref:
+        return None
+    canon = _canon(tx)
+    held = {}
+    for h in tx.query("SELECT lore_ref, belief FROM lore_held WHERE holder_id=? ORDER BY lore_ref, belief", (holder_id,)):
+        held.setdefault(h[0], set()).add(h[1])
+    best = None
+    for ref in sorted(held):
+        if not canon.has(ref):
+            continue
+        e = canon.get(ref)
+        if not e.called or cref not in e.entities:
+            continue
+        groups = {e.beliefs[i].held_by for i in held[ref] if i < len(e.beliefs)}
+        for n in e.called:
+            if n.held_by in groups:
+                rank = 0 if n.held_by.startswith("cohort:") else 2 if n.held_by == "common" else 1
+                if best is None or rank < best[0]:
+                    best = (rank, n.word)
+    return best[1] if best else None
 
 
 def _art(s):

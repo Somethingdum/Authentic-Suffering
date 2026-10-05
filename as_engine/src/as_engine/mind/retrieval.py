@@ -32,7 +32,8 @@ LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict]
   LORE-02 — never beliefs: thirty things everyone says would crowd out what this person knows)
   whose lore entry (the canon record named by lore_ref) is brought to mind now — any of: a perceived speech row of MEM-11's selection whose words hold one
   of the entry's ``about`` phrases as whole words, any case; a body that is the source of a VISUAL
-  percept of that selection at EXACT or PARTIAL whose bodies.content_ref is one of the entry's
+  percept of that selection at EXACT or PARTIAL whose mind.perception.thing_ref (bodies.content_ref,
+  else — D-160 — for one of the dead its infected type's canon ref) is one of the entry's
   ``entities``, or who is a member (status member or probation) of a group whose content_ref is
   one, or an item that is such a source whose def_ref is one; mind.cues.cues_of(tx, holder,
   turn_index, at) meets the entry's ``when``. Each thing once before any twice: the entries ordered

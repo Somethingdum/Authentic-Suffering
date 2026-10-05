@@ -626,6 +626,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_when_it_is.py` | A room line on day 18 is told "When: Day 18 since the Fall (night)."; no fast-lane prompt says "years after the Fall" |
 
+### 3.72 What they call them (P3; D-160)
+
+| File | What it proves |
+|---|---|
+| `p03_perception/test_what_they_call_them.py` | One of the dead is known by its infected type (thing_ref); Owen, who holds what everyone says about walkers, sees "a walker" and what everyone says about them comes to mind; someone never told sees "a shambling figure" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

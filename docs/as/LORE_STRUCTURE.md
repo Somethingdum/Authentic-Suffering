@@ -64,6 +64,10 @@ the engine keeps it and pulls it into a prompt only when that topic is in play.
   (cm), highest drop (m), chance of falling on each (%).
 - *Alive or dead*; *false death* (yes/no, how many hours before it gets up); *what truly kills it*.
 - *Player-facing knowledge* (beliefs) and *truth*, as separate lists.
+- *Called*: what people call it, by who says it (everyone, a generation, a faction) — one word,
+  singular ("walker"). Whoever grew up hearing that lore sees one of them by that word; without
+  it they see only a shape ("a shambling figure"). Leave it out for anything people must not
+  recognise on sight.
 - *Tactics*, *weaknesses*, *quirks* (by id).
 - *How it chooses a target*: what makes it engage, what makes it wait, what makes it leave. For
   thinking hunters, write these as rules ("never engages an armed person"; "disengages after a

@@ -595,6 +595,12 @@ class LoreBelief(Strict):
     cues: list[str] = Field(default_factory=list, description="Belief cues granted to whoever holds this belief (seeded as lessons rows, AFF-10).")
 
 
+class LoreName(Strict):
+    """D-160: what the people who hold an entry call the thing it is about, in one word."""
+    held_by: str = Field(description="As a belief's held_by: 'common', 'cohort:<cohort>', a faction ContentRef, 'region:<tag>'.")
+    word: str = Field(min_length=2, max_length=40, description="Singular, lower case unless a proper name: 'walker'.")
+
+
 class LoreEntry(Strict):
     schema_id: Literal["as.lore.v1"] = Field(alias="schema", default="as.lore.v1")
     id: str = Field(pattern=SLUG_PATTERN)
@@ -608,6 +614,9 @@ class LoreEntry(Strict):
                              "mind when someone hears them said (whole words, any case): 'cure', 'clinic', 'the Fall'.")
     when: list[str] = Field(default_factory=list, description="D-130 (LORE-03): moment cues (cues.yaml) that bring this to "
                             "mind: 'corpse_seen', 'scream', 'bite_wound_seen'.")
+    called: list[LoreName] = Field(default_factory=list, description="D-160 (LOOK-07): what the holders of this entry call "
+                                   "its entities (the infected types it is about): someone who holds a belief of the entry "
+                                   "with that held_by sees one as 'a walker', not 'a shambling figure'.")
     body: str | None = Field(default=None, description="Set by the loader: the markdown below the front matter (depth text, pulled on demand; never put in a packet whole).")
     model_config = Strict.model_config | {"populate_by_name": True}
 

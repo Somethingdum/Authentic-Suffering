@@ -10,4 +10,5 @@ beliefs:
 tags: [lore_v1_4, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_CRAWLER01"]
 about: ["crawler", "crawlers", "under the car"]
+called: [{held_by: common, word: crawler}]
 ---

@@ -11,6 +11,7 @@ beliefs:
 tags: [lore_v1_4, canon_cmg_42_17, infected]
 entities: ["core:infected/ZOMBIE_VARIANT_ID_RUNNER01"]
 about: ["runner", "runners"]
+called: [{held_by: common, word: runner}]
 ---
 The "remember who they were" belief is sympathetic and wrong: name-sticking is working memory
 holding a sound for about fifteen seconds, nothing more.

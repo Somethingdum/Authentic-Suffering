@@ -74,8 +74,10 @@ def lore_lines(tx, holder_id, turn_index, at, n):
             continue
         r = tx.query_one("SELECT content_ref FROM bodies WHERE body_id=?", (p["source_id"],))
         if r is not None:
-            if r[0]:
-                seen.add(r[0])
+            from .perception import thing_ref
+            ref = thing_ref(tx, p["source_id"])                  # D-160: the dead are known by their type
+            if ref:
+                seen.add(ref)
             seen |= group_refs_of(tx, p["source_id"])
             continue
         r = tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (p["source_id"],))

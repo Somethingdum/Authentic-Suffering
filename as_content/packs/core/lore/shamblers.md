@@ -14,6 +14,7 @@ tags: [lore_v1_4, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_SHAMBLER01"]
 about: ["walker", "walkers", "shambler", "shamblers", "noise", "the wind"]
 when: [loud_noise]
+called: [{held_by: common, word: walker}]
 ---
 The smell belief is false (they are sound-led); it makes survivors waste effort on scent and not on
 noise discipline.
