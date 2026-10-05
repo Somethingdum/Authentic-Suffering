@@ -47,7 +47,13 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               whose believed owner of the item is themselves or one of
                                               their households (and not the taker's own, as there) —
                                               never the PC
-    bonded_onlookers_of(<path>)               (D-129) for a HARM with trigger.attacker: of
+    saw_them_steal(<path>)                    (D-225) for an ITEM_TRANSFER: of theft_witnesses_of, those
+                                              not among robbed_by (the thing was someone else's) — never
+                                              the PC, and not one who already trusts the taker less
+                                              for a taking that day (a trust RELATION_CHANGE of theirs
+                                              toward the taker, delta < 0, caused by an earlier
+                                              ITEM_TRANSFER of the taker on the same world day)
+    bonded_onlookers_of(<path>)             (D-129) for a HARM with trigger.attacker: of
                                               assault_onlookers_of, for a DEATH with trigger.killer: of
                                               onlookers_of — those bonded to the one hurt or killed
                                               (affection >= 1 toward them, or one household); (D-180)

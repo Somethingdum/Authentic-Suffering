@@ -1314,6 +1314,15 @@ def select(tx, selector, trigger):
     if fn == "robbed_by":                                            # D-129: they saw what is theirs taken
         from ..society._impl_society import _controller
         return [h for h in _theft_victims(tx, v) if _controller(tx, h) != "human"]
+    if fn == "saw_them_steal":                                       # D-225: they saw someone else's taken
+        from ..society._impl_society import _controller
+        victims, taker = set(_theft_victims(tx, v)), trigger.actor_id
+        seq = tx.query_one("SELECT seq FROM events WHERE event_id=?", (v,))[0]
+        return [h for h in _theft_witnesses(tx, v) if h not in victims and _controller(tx, h) != "human" and not tx.query_one(
+            "SELECT 1 FROM events r JOIN events t ON t.event_id=r.cause_event_id WHERE r.type='RELATION_CHANGE' AND r.actor_id=? "
+            "AND json_extract(r.payload,'$.to_id')=? AND json_extract(r.payload,'$.axis')='trust' AND "
+            "json_extract(r.payload,'$.delta')<0 AND t.type='ITEM_TRANSFER' AND t.actor_id=? AND t.seq<? AND t.at/86400000=?",
+            (h, taker, taker, seq, trigger.at // 86_400_000))]
     if fn == "bonded_onlookers_of":                                  # D-129: someone they love, hurt or killed
         missed = _missed(tx, trigger)
         if missed is not None:                                       # D-180: ... or nearly

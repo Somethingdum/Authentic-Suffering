@@ -1509,3 +1509,20 @@
       payload: {scale_by: bond_to_subject, cause: word_of_a_death}
   delay_s: 0
   cites: [D-222, D-123, docs/as/05_ACTORS.md#5]
+# D-225 — a theft seen. Whoever saw someone take what they know is another's carried the story (CAS-012), and a
+# listener who believed it trusted the thief less (CAS-018) — but the one who saw it with their own eyes did not:
+# hearsay cost more than what was seen. Now seeing it costs the same as hearing it, once a day however much is
+# taken; the one it was taken from is answered by CAS-039. The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-112
+  description: Seeing someone take what you know belongs to another costs them a little of your trust — a day's takings count once.
+  trigger_event: ITEM_TRANSFER
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_steal(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: saw_a_theft}
+  delay_s: 0
+  cites: [D-225, D-216, AFF-11]

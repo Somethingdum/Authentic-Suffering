@@ -278,6 +278,9 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Word of a death** (D-222, CAS-111): told, by someone they believe, that someone they are close to is dead,
   a person loses a point of Resolve — less than seeing it; a guardian told their child is dead is broken by it
   (CAS-030); a loss is grieved once however often it is told.
+- **A theft seen** (D-225, CAS-112): whoever sees someone take what they know is another's — not their own, which
+  is CAS-039's — trusts the taker a point less, once a day however much is taken, and carries the story (CAS-012).
+  Not knowing whose it is, or thinking it is the taker's own, costs nothing.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

@@ -899,6 +899,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p11_audits/test_turns_stay_fast.py` | After a passed gate the store carries where its events check reached; a gate passed inside a turn that then rolls back is not carried, so a bad event in the same place is seen (G09); a run saved before the new indexes gets them when it is opened |
 
+### 3.117 A theft seen (P9; D-225)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_theft_seen.py` | June, who saw Dale take the jerky she knows is Ruth's, trusts him one less (CAS-112); Nita, who has no idea whose it is, and Tess, who thinks it is his, are unchanged; Ruth, whose it was, is answered as the one robbed (CAS-039, -2) and not twice; the player's character is not changed; the bottle taken the same day costs nothing more, a theft the next day costs another point |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
