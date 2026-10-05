@@ -13,7 +13,11 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
   lines — two sources, merged and sorted by (at, seq, percept_id) (seq of the underlying event, 0
     when none; an event line's percept_id is '' so it comes first on a tie):
     * the PC's percept_log rows of this turn EXCEPT standing views (event_id 'scene:…'):
-      NarratorLine(seconds = max(0, at - t0) / 1000, kind = CHANNEL_KIND[channel], text); a speech
+      NarratorLine(seconds = max(0, at - t0) / 1000, kind = CHANNEL_KIND[channel], text) — (D-170)
+      with settings.narration_person 'third_limited' a line that is not speech is told of the PC,
+      as every line about the PC's own doing is: mind.perception.retell(text, 'third', the PC's
+      bodies.sex) outside double quotes ("A walker lunges and grabs at him.", never "at you" beside
+      "Owen chose to hit it"); a speech
       line also gets speaker = detail.speaker_known_as and words = detail.words (None when empty:
       only the tone was heard).
     * the PC's own events of this turn (events.actor_id = the PC), kind 'outcome' unless noted:

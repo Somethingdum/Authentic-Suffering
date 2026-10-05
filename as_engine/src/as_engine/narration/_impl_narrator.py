@@ -76,7 +76,10 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
             line = NarratorLine(seconds=max(0, p["at"] - t0) / 1000, kind="speech", text=p["text"],
                                 speaker=det.get("speaker_known_as"), words=det.get("words") or None)
         else:
-            line = NarratorLine(seconds=max(0, p["at"] - t0) / 1000, kind=kind, text=p["text"])
+            text = p["text"]
+            if settings.narration_person == "third_limited":            # D-170: of the PC, as every other line is
+                text = _of_pc(text, sex)
+            line = NarratorLine(seconds=max(0, p["at"] - t0) / 1000, kind=kind, text=text)
         entries.append((p["at"], p["ev_seq"] or 0, p["percept_id"], line))
     for e in tx.query("SELECT * FROM events WHERE actor_id=? AND turn_index=? ORDER BY seq", (pc_id, turn_index)):
         e = dict(e)
@@ -198,6 +201,13 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
                                                                           [ln for ln in lines if not (ln.kind == "speech" and ln.speaker == pc)],
                                                                           loc.description_lines if establish else [],
                                                                           people, looks_lines, numbers))
+
+
+def _of_pc(text, sex):
+    """D-170: a percept the PC had, told of the PC ('grabs at you' -> 'grabs at him'); quoted words are left as said."""
+    from ..mind.perception import retell
+    parts = text.split('"')
+    return '"'.join(retell(x, "third", sex) if i % 2 == 0 else x for i, x in enumerate(parts))
 
 
 def _unlicensed(block, lines, details, people, looks, numbers):

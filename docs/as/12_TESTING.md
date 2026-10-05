@@ -674,6 +674,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_worlds_words.py` | The player typed "the back door into the alley"; the story's own line says "through the back door into the rear alley": those word runs are the narrator's to use, while the player's own "quick as a stray cat" stays blocked |
 
+### 3.80 Of him (P7; D-170)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_of_him.py` | In a third-person story the PC's percepts reach the narrator told of him ("grabs at him", "his left arm"), quoted writing untouched; a second-person story keeps "you" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
