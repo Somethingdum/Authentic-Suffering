@@ -124,3 +124,17 @@
       payload: {cause: sleepless_night}
   delay_s: 0
   cites: [D-123, docs/as/05_ACTORS.md#5]
+# D-139 — 05 §5's last recovery: putting yourself between someone you look after and the danger gives a little back.
+# Once a day, however often: shielding someone is not a way to fill yourself back up.
+- schema: as.cascade.v1
+  id: CAS-058
+  description: Putting yourself between someone you look after and the danger gives back a little Resolve, once a day.
+  trigger_event: ACTION_START
+  where: {def_id: shield_dependent}
+  preconditions: []
+  effects:
+    - kind: recover_resolve
+      target: protecting_today(trigger.event_id)
+      payload: {cause: protected_dependent}
+  delay_s: 0
+  cites: [D-139, docs/as/05_ACTORS.md#5]

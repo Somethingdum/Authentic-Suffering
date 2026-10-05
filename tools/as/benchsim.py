@@ -133,6 +133,7 @@ class SimTransport:
                     prog.note_prefill(done, n_in, cached)
                     report()
             text = await self._answer(lane, request, m, n_in)
+            timer = [time.perf_counter(), 0.0]   # writing keeps its own clock: a late read never makes it write faster
             r_tokens = m.think_tokens if self._thinks(m, lane.thinking_mode, request.thinking) else 0
             r_out = min(r_tokens, request.max_tokens)
             t_out = min(tokens(text), request.max_tokens - r_out)

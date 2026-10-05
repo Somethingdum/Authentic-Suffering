@@ -75,6 +75,12 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               a threat in themselves (mind.firewall.classify_form without
                                               the weapon: "or I'll", "I'll kill you" — an armed "Quiet."
                                               is not one); never the speaker or the PC
+    protecting_today(<path>)                  (D-139) for an ACTION_START of a def tagged
+                                              'protect_dependent' (shield_dependent: offered only under a
+                                              threat, at someone the actor guards, lives with or loves):
+                                              its actor, alive, when no RESOLVE_CHANGE of theirs with
+                                              reason 'protected_dependent' falls in the 24 h up to it
+                                              (once a day, however often they do it)
     loved_ones_threatened(<path>)             (D-138) for a SPEECH: the holders of a speech or visual
                                               EXACT or PARTIAL percept of it bonded (affection >= 1, or
                                               one household) to someone it threatened at weapon point

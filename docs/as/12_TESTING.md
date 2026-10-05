@@ -512,6 +512,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_your_own.py` | Owen holds his Glock on June and threatens her: June fears him (CAS-038), Mara, who loves her, trusts him less and resents him (CAS-055), Alice is unmoved. Alice holds a knife on Owen: nothing is written into Owen, but June, who has come to love him, holds it against Alice. June lies dead and Alice strips her: Mara trusts Alice less and holds a grudge (CAS-056), CAS-057 does not fire (the dead are stripped every day). June out cold and stripped: Mara trusts Alice 2 less in all (CAS-056, CAS-057); Owen unchanged |
 
+### 3.53 Shielding (P9; D-139)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_shielding.py` | Mara puts herself between Eli and the danger: one point of Resolve back; again an hour later, nothing; the next day, one more (CAS-058, once a day). Waiting is not shielding: protecting_today selects no one |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -1002,6 +1002,23 @@ def select(tx, selector, trigger):
     if fn == "threatened_by":                                        # D-126: a threat at weapon point
         from ..society._impl_society import _controller
         return [h for h in _threatened(tx, trigger, v) if _controller(tx, h) != "human"]
+    if fn == "protecting_today":                                     # D-139: once a day, however often
+        ev = _row(tx, "SELECT type, actor_id, payload, at FROM events WHERE event_id=?", (v,))
+        if ev is None or ev["type"] != "ACTION_START" or not ev["actor_id"]:
+            return []
+        try:
+            d = _def(tx, json.loads(ev["payload"]).get("def_id") or "")
+        except KeyError:
+            return []
+        if "protect_dependent" not in d.tags:
+            return []
+        alive = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (ev["actor_id"],))
+        if not (alive and alive[0]) or not tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (ev["actor_id"],)):
+            return []
+        if tx.query_one("SELECT 1 FROM events WHERE type='RESOLVE_CHANGE' AND actor_id=? AND json_extract(payload,'$.reason')="
+                        "'protected_dependent' AND at>? AND at<=?", (ev["actor_id"], ev["at"] - 86_400_000, ev["at"])):
+            return []
+        return [ev["actor_id"]]
     if fn == "loved_ones_threatened":                                # D-138: someone you love, at gunpoint
         from ..society._impl_society import _controller
         them = _threatened(tx, trigger, v)

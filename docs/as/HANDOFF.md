@@ -125,10 +125,9 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   skeleton person (an acquaintance row) and they have been HOT, a quiet-hours job (service.background)
   rewrites their unlocked voice fields (capsule, tendencies, exemplars, examples) on the Writer — a few
   hundred tokens, a minute at 5 tokens a second — so the people who matter grow into themselves.
-- **Resolve, still open after D-122 / D-123 / D-129**: one drain of 05 §5 has nothing to hang on (a
+- **Resolve, still open after D-122 / D-123 / D-129 / D-139**: one drain of 05 §5 has nothing to hang on (a
   sustained fear scene: it needs a notion of a scene that goes on — the dead at the door for minutes, a
-  gun held on someone — that nothing records yet); protecting a dependent (+1) needs a once-a-day
-  limit before it can be built; hunger drains per stage (every 84 h without food), not per day — a daily
+  gun held on someone — that nothing records yet); hunger drains per stage (every 84 h without food), not per day — a daily
   tick would make it exact.
 - **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
   group talk, distinct voices. D-128 gives the people past the budget in the PC's place one short line each on lane B; still open:
