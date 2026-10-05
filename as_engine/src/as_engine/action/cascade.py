@@ -290,6 +290,14 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               one of assault_onlookers_of as such a member — not a group
                                               already given a STANDING_CHANGE toward the attacker caused
                                               by a HARM in the day before (a beating is one wrong)
+    groups_that_heard_threat(<path>)          (D-267) for a SPEECH: the groups someone it threatened (a
+                                              speech EXACT or PARTIAL percept of it addressed to them whose
+                                              words, as heard, are a threat — armed or not; the PC counted
+                                              among them) is a 'member' or 'probation' member of that have
+                                              another such member, not the speaker, holding an EXACT or
+                                              PARTIAL speech percept of it — not a group already given a
+                                              STANDING_CHANGE toward the speaker caused by a SPEECH in the
+                                              day before (an evening of threats is one wrong)
     groups_that_saw(<path>)                   (D-119) for a killing: the groups the dead was a 'member'
                                               or 'probation' member of that have one of
                                               onlookers_of(<path>) as a 'member' or 'probation' member —

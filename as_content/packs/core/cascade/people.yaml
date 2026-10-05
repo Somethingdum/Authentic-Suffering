@@ -1604,3 +1604,20 @@
       payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: insulted_your_own}
   delay_s: 0
   cites: [D-262, D-204]
+# D-267 — said in front of their people. Hurting one of a group's own in front of any of them costs a point of the
+# group's standing (CAS-110); threatening one of them, to their face and in the others' hearing, cost nothing with the
+# group however often it was done. Now it costs a point of that group's standing, once a day — an evening of threats is
+# one wrong. The player's character can lose standing like anyone (D-220).
+- schema: as.cascade.v1
+  id: CAS-118
+  description: Threatening one of a group's own in front of any of them costs a point of that group's standing — once a day.
+  trigger_event: SPEECH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: STANDING_CHANGE
+      target: groups_that_heard_threat(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", delta: -1}
+  delay_s: 0
+  cites: [D-267, D-220, STAND-02]

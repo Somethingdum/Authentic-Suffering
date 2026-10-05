@@ -1134,6 +1134,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_where_they_learned_to_talk.py` | A grown person sounds like their birthplace (its own line, no two alike, every birthplace has one); a child of the Fall like the camps, one born after it like this world; a child under 12 has no dialect; no line calls the person 'they' |
 
+### 3.156 Said in front of their people (P9; D-267)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_said_in_front_of_their_people.py` | Owen threatens June with Mara and Alice of the crew in earshot: the crew's standing toward him drops a point (CAS-118), once a day, and again the next day; behind a shut door with nobody of theirs to hear it, and words that are no threat, cost nothing |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

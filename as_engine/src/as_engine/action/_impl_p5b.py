@@ -1727,6 +1727,29 @@ def select(tx, selector, trigger):
                 continue                                             # once a day: a beating is one wrong, not ten
             out.append(g)
         return out
+    if fn == "groups_that_heard_threat":                             # D-267: one of their own threatened in front of them
+        ev = _row(tx, "SELECT actor_id, at FROM events WHERE event_id=? AND type='SPEECH'", (v,))
+        if ev is None or not ev["actor_id"]:
+            return []
+        who = ev["actor_id"]
+        rows = [(h, json.loads(d) if isinstance(d, str) else (d or {})) for h, d in tx.query(
+            "SELECT holder_id, detail FROM percept_log WHERE event_id=? AND channel='speech' AND fidelity IN ('exact','partial') "
+            "ORDER BY holder_id", (v,))]
+        them = sorted({h for h, d in rows if h != who and d.get("addressed_to_me") and _is_threat(d)})
+        heard = {h for h, _d in rows} - {who}
+        out = []
+        for t in them:
+            for (g,) in tx.query("SELECT group_id FROM group_members WHERE actor_id=? AND status IN ('member','probation') "
+                                 "ORDER BY group_id", (t,)):
+                if g in out or not any(tx.query_one("SELECT 1 FROM group_members WHERE group_id=? AND actor_id=? AND status IN "
+                                                    "('member','probation')", (g, h)) for h in sorted(heard - {t})):
+                    continue
+                if tx.query_one("SELECT 1 FROM events s JOIN events c ON c.event_id=s.cause_event_id WHERE s.type='STANDING_CHANGE' "
+                                "AND json_extract(s.payload,'$.group_id')=? AND json_extract(s.payload,'$.actor_id')=? AND "
+                                "c.type='SPEECH' AND s.at>?", (g, who, ev["at"] - 86_400_000)):
+                    continue                                         # once a day
+                out.append(g)
+        return out
     if fn == "groups_that_saw":                                      # D-119
         seen = _onlookers(tx, trigger, v)
         dead = (trigger.payload or {}).get("body_id")

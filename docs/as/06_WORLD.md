@@ -274,7 +274,8 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Cast out** (D-220, CAS-109/110): when a group's standing toward one of its own falls to -3 it casts them out —
   no longer of the group, out of their household and off their shift; they know they cannot stay and everyone else
   keeps them out. Hurting one of a group's own who was not fighting, in front of any of them, costs a point of
-  standing once a day; killing one costs three. The player's character can be cast out like anyone.
+  standing once a day; killing one costs three; (D-267, CAS-118) threatening one of them in the others' hearing costs
+  a point too, once a day. The player's character can be cast out like anyone.
 - **Word of a death** (D-222, CAS-111): told, by someone they believe, that someone they are close to is dead,
   a person loses a point of Resolve — less than seeing it; a guardian told their child is dead is broken by it
   (CAS-030); a loss is grieved once however often it is told.

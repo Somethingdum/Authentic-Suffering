@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-872 ids; 614 with their own statement, 258 named only in context.
+873 ids; 615 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -229,7 +229,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-107 | Being insulted to your face, even with nobody else there, is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py` |
 | CAS-108 | Being spat at or given the finger, even with nobody else there, is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py` |
 | CAS-109 | A group whose standing toward one of its own falls to the bottom casts them out. | as_content/packs/core/cascade/people.yaml | `as_engine/society/group.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
-| CAS-110 | Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
+| CAS-110 | Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py`, `contract/p09_society/test_said_in_front_of_their_people.py` |
 | CAS-111 | Word that someone you love is dead wears you down, if you believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_of_a_death.py` |
 | CAS-112 | Seeing someone take what you know belongs to another costs them a little of your trust — a day's takings count once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_theft_seen.py` |
 | CAS-113 | Hearing, from someone they believe, that a person insulted someone to their face costs that person some of the listener's respect. | as_content/packs/core/cascade/people.yaml | `as_engine/mind/temper.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_talked_about.py` |
@@ -237,6 +237,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-115 | Hearing someone you love threatened, even bare-handed, costs the one who did it your trust, and you resent them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_to_someone_you_love.py` |
 | CAS-116 | Hearing someone you love insulted to their face is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_to_someone_you_love.py` |
 | CAS-117 | Seeing someone you love spat at or given the finger is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_to_someone_you_love.py` |
+| CAS-118 | Threatening one of a group's own in front of any of them costs a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_said_in_front_of_their_people.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |
