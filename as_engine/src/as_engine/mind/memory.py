@@ -174,7 +174,12 @@ MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing
   of the room (its event a SPEECH whose payload has ambient: true) not said to them (payload 'to'
   does not hold the holder) — or a percept whose (channel, text) is not that
   of any of the holder's percept_log rows of turn_index - 1 (news is new: the same doors still shut,
-  the same woman still at the window are not); or one of the holder's own events of this turn
+  the same woman still at the window are not) — (D-254) and that is not someone else holding still (a
+  percept of an ACTION_START or ACTION_COMPLETE, by another, of an affordance whose verb is in QUIET_VERBS
+  without the 'threat_response' tag — a COMPLETE only with a clean or missing band: "Keisha stops and
+  watches"), nor, on the run's first turn (no percept_log row of turn_index - 1 at all), a standing view
+  (event_id 'scene:…': the people and the place they were already among); or one of the holder's own
+  events of this turn
   (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
   that is not quiet. Quiet: an ACTION_START
   whose affordance (canon.find('affordance', payload.def_id)) has its verb in QUIET_VERBS and (D-200) no
@@ -282,7 +287,26 @@ def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index:
         return True
     before = {(r[0], r[1]) for r in tx.query("SELECT channel, text FROM percept_log WHERE holder_id=? AND turn_index=?",
                                              (holder_id, turn_index - 1))}
-    if any((p.channel, p.text) not in before for p in packet.percepts):
+    first = tx.query_one("SELECT 1 FROM percept_log WHERE turn_index=? LIMIT 1", (turn_index - 1,)) is None
+
+    def still(p):                                                    # D-254: nothing in it to remember
+        r = tx.query_one("SELECT q.event_id, e.type, e.actor_id, e.payload FROM percept_log q LEFT JOIN events e ON "
+                         "e.event_id = q.event_id WHERE q.percept_id=?", (packet.handles.get(p.handle),))
+        if r is None:
+            return False
+        if first and (r[0] or "").startswith("scene:"):              # the run's first turn: where they already were
+            return True
+        if r[1] not in ("ACTION_START", "ACTION_COMPLETE") or r[2] == holder_id:
+            return False
+        pl = json.loads(r[3]) if isinstance(r[3], str) else (r[3] or {})
+        if r[1] == "ACTION_COMPLETE" and pl.get("band") not in (None, "clean"):
+            return False
+        try:
+            d = tx.canon.find("affordance", pl.get("def_id") or "")
+        except KeyError:
+            return False
+        return getattr(d.verb, "value", d.verb) in QUIET_VERBS and "threat_response" not in d.tags   # someone holding still
+    if any((p.channel, p.text) not in before and not still(p) for p in packet.percepts):
         return True
     quiet = set()
     for e in tx.query("SELECT event_id, type, cause_event_id, payload FROM events WHERE actor_id=? AND turn_index=? AND type IN "

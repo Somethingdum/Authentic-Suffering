@@ -1056,6 +1056,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_talked_about.py` | The player calls June a useless idiot (or says he'll kill her) to her face: she carries the story ("… insulted you.", "… threatened you."), once however often he says it, and nothing is written into the player's character; told by Finn, whom she believes, Kit loses a point of respect (insult, CAS-113) or trust (threat, CAS-114) toward Jude; shamed in front of others, June resents the player (CAS-042's RELATION_CHANGE is not hidden by its own drain) |
 
+### 3.143 Nothing in it to remember (P6; D-254)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_nothing_in_it_to_remember.py` | June seeing Mara start to watch or wait is not worth a memory; Mara heading for the back door or ducking into cover is; on the run's first turn, Mara standing by the counter where June already was is not, and Mara heading off still is |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
