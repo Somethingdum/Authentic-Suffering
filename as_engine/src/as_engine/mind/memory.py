@@ -55,6 +55,19 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                 PacketRules.max_lore), in its order: what this person grew up hearing about what
                 reached them, as their deciding packet has it — how they read what happened, which
                 can be wrong.
+  told          (D-226) what this person had been told before about what reached them: their live
+                believed holdings (believed 1, superseded_by NULL) acquired before the first of the
+                percept rows (``at`` when there are none) whose proposition's subject is one of the
+                packet's people ('body', a P-handle's id) or the place the holder is in ('place', its
+                id), and that came from someone else's words: provenance 'told_by:<id>' -> f'{Who} told
+                them {age}: {text}'; or provenance 'inferred' whose proposition's created_event is a
+                SPEECH event whose actor is not the holder (a belief they formed from what that one
+                said — not necessarily what they were told, so never worded as told) -> f'From what
+                {who} said {age}, they believed: {text}'. Newest first (acquired_at desc, claim_id), at
+                most TOLD_MAX. who = the speaker's P-handle when they are in the packet, else their
+                known name or described as mind.packet words them ({Who}: first letter upper-cased);
+                age as mind.packet's age_text. It can turn out not to be so; what they make of that —
+                a lie or a mistake — is theirs (AC09).
 
 MEM-03 writeback_groups(packets: dict[holder_id, AftermathPacket]) -> list[list[holder_id]]
   (B5, Actor Spec §13, AC11) Every named person reads what happened as themselves, even when
@@ -178,6 +191,8 @@ if TYPE_CHECKING:
 BONDED_KINDS: tuple[str, ...] = ("parent", "child", "sibling", "spouse", "partner")
 
 QUIET_VERBS: frozenset[str] = frozenset({"wait", "observe", "guard", "continue_task"})   # D-189: holding still
+
+TOLD_MAX: int = 4                                                  # D-226: what they had been told, at most
 
 
 def build_aftermath(tx: "Tx", holder_id: str, turn_index: int, at: int) -> AftermathPacket:

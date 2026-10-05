@@ -20,6 +20,9 @@ WHAT THEY PERCEIVED
 {% if a.lore %}WHAT THEY GREW UP HEARING ABOUT THIS (belief, not fact)
 {% for k in a.lore %}- {{ k }}
 {% endfor %}{% endif %}
+{% if a.told %}WHAT THEY HAD BEEN TOLD BEFORE (it may not have been so)
+{% for t in a.told %}- {{ t }}
+{% endfor %}{% endif %}
 {% if a.relationships %}HOW THEY FELT BEFORE
 {% for r in a.relationships %}- {{ r.handle }}: {{ r.text }}
 {% endfor %}{% endif %}

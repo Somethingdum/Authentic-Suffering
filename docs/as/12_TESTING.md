@@ -905,6 +905,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_theft_seen.py` | June, who saw Dale take the jerky she knows is Ruth's, trusts him one less (CAS-112); Nita, who has no idea whose it is, and Tess, who thinks it is his, are unchanged; Ruth, whose it was, is answered as the one robbed (CAS-039, -2) and not twice; the player's character is not changed; the bottle taken the same day costs nothing more, a theft the next day costs another point |
 
+### 3.118 Told before (P6; D-226)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_told_before.py` | Owen tells Mara June went out to the back lot and her memory forms it from his words; Nita tells her June has the watch; two hours later June walks in and Mara's aftermath carries "From what P1 said 2 hours ago, they believed: June went out to the back lot." and "P5 told them 2 hours ago: June has the watch tonight.", rendered under WHAT THEY HAD BEEN TOLD BEFORE with the rule that a lie or a mistake is hers to judge; what she saw for herself and what Nita told her about the man in the weeds, who is not there, are not brought up; in the turn it was said it is not "before" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

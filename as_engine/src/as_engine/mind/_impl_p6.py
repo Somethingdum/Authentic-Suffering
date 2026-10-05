@@ -324,7 +324,37 @@ def build_aftermath(tx, holder_id, turn_index, at):
     lore = [x["text"] for x in lore_lines(tx, holder_id, turn_index, at, tx.rules.packet.max_lore)]   # D-196
     return AftermathPacket(holder_id=holder_id, turn_index=turn_index, identity=compile_identity(d), percepts=percepts, utterances=utts, entities=entities, own_action_text=own,
                            own_expectation_text=expect, open_loops=loops, relationships=rel_lines, handles=handles,
-                           self_experiences=selfx, lore=lore)
+                           self_experiences=selfx, lore=lore, told=_told_before(tx, holder_id, ents, ph, rows, at))
+
+
+def _told_before(tx, holder_id, ents, ph, rows, at):
+    """D-226 (MEM-01 told): what the holder had been told about the people in this aftermath and the place they are."""
+    from ._impl_packet import _age, _name_or_desc
+    from .memory import TOLD_MAX
+    start = min((p["at"] for p in rows), default=at)
+    pos = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (holder_id,))
+    about = {("body", b) for b in ents} | ({("place", pos[0])} if pos else set())
+    out = []
+    for r in tx.query("SELECT h.claim_id, h.provenance, h.acquired_at, p.subject_type, p.subject_id, p.text, p.created_event "
+                      "FROM claim_holdings h JOIN propositions p ON p.prop_id=h.claim_id WHERE h.holder_id=? AND h.believed=1 "
+                      "AND h.superseded_by IS NULL AND h.acquired_at<? ORDER BY h.acquired_at DESC, h.claim_id", (holder_id, start)):
+        if (r["subject_type"], r["subject_id"]) not in about:
+            continue
+        prov, src, told = r["provenance"], None, False
+        if prov.startswith("told_by:"):
+            src, told = prov.split(":", 1)[1], True
+        elif prov == "inferred" and r["created_event"]:
+            e = tx.query_one("SELECT actor_id FROM events WHERE event_id=? AND type='SPEECH'", (r["created_event"],))
+            src = e[0] if e is not None and e[0] != holder_id else None
+        if not src:
+            continue
+        who = ph.get(src) or _name_or_desc(tx, holder_id, src)
+        age = _age(at - r["acquired_at"])
+        out.append(f"{who[:1].upper() + who[1:]} told them {age}: {r['text']}" if told
+                   else f"From what {who} said {age}, they believed: {r['text']}")
+        if len(out) >= TOLD_MAX:
+            break
+    return out
 
 
 def writeback_groups(packets):

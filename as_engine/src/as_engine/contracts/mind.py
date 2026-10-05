@@ -434,6 +434,9 @@ class AftermathPacket(Strict):
     relationships: list[RelationshipLine] = Field(default_factory=list)
     lore: list[str] = Field(default_factory=list, description="D-196: what this person grew up hearing about what "
                             "reached them (mind.retrieval.lore_lines), as in their Skull Packet.")
+    told: list[str] = Field(default_factory=list, description="D-226: what this person had been told before about the "
+                            "people in it and the place they are, and by whom (mind.memory build_aftermath) — which can "
+                            "turn out not to be so.")
     handles: dict[str, str] = Field(default_factory=dict)
 
 
