@@ -269,6 +269,25 @@ def team(tx, rng, group_id, at, turn_index, cause):
     return out
 
 
+def _voices_here(tx, settlement_id, group_id):
+    # D-203: the first lines of the voices of the living people of the enclave and of the faction
+    from ..mind.actor import fused
+    g = tx.query_one("SELECT group_id, place_id FROM settlements WHERE settlement_id=?", (settlement_id,))
+    ids = sorted({r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id=m.actor_id "
+                                         "JOIN actors a ON a.actor_id=m.actor_id WHERE m.group_id IN (?, ?) AND m.status IN "
+                                         "('member','probation') AND b.alive=1 AND a.controller != 'human'",
+                                         (g[0] if g else None, group_id))}
+                 | {r[0] for r in tx.query("SELECT p.body_id FROM positions p JOIN bodies b ON b.body_id=p.body_id JOIN actors a "
+                                           "ON a.actor_id=p.body_id WHERE p.place_id=? AND b.alive=1 AND a.controller != 'human'",
+                                           (g[1] if g else None,))})
+    out = []
+    for a in ids:
+        v = getattr(fused(tx, a), "voice", None)
+        if v is not None:
+            out.append(v.exemplars.low_stakes)
+    return tuple(out)
+
+
 def operator_dossier(rng, tx, group_id, k, sex, cause):
     from ..world.worldgen.people import PersonSeed, skeleton_dossier
     r = tx.query_one("SELECT content_ref, name FROM groups WHERE group_id=?", (group_id,))
@@ -288,7 +307,8 @@ def operator_dossier(rng, tx, group_id, k, sex, cause):
     seed = PersonSeed(name=f"{given} {family}", age=age, sex=sex, cohort=cohort_kind(age, dsf), occupation=D.occupation,
                       skills={"firearms": 2, "melee": 1, "athletics": 1}, special=special,
                       variant=rng.range_int(tx, "factions", f"decon_variant:{cause}:{k}", 0, 999),
-                      settlement_name=sname, group_name=r[1], climate_heat=int((wp.get("a") or {}).get("climate_heat", 5)))
+                      settlement_name=sname, group_name=r[1], climate_heat=int((wp.get("a") or {}).get("climate_heat", 5)),
+                      voices_taken=_voices_here(tx, s, group_id))
     d = skeleton_dossier(seed)
     d["id"] = d["id"] + f"_{k}_{(cause or 'x')[-6:]}"
     d["appearance"]["clothing_usual"] = D.appearance

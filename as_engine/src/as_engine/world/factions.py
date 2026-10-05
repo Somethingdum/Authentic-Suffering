@@ -85,7 +85,10 @@ FAC-04 DECON (B.decon; Ghosts_6: "If any Ghost is confirmed killed by human acti
   45); cohort from the age at the Fall (as WG-27); occupation = B.decon.occupation; skills
   {'firearms': 2, 'melee': 1, 'athletics': 1}; special = 4 + rng.range_int(..., f"decon_special:
   {cause}:{k}:{letter}", 0, 3) per letter; variant = rng.range_int(..., f"decon_variant:{cause}:
-  {k}", 0, 999); the enclave's and the group's names — then id += f"_{k}_{cause[-6:]}",
+  {k}", 0, 999); the enclave's and the group's names; (D-203) voices_taken = the low_stakes exemplar of
+  every living person (not the player's) who is a member or on probation in the enclave settlement's
+  group or ``group_id``, or is positioned at the enclave's place (a teammate just made), sorted by actor
+  id — a new operator does not sound like the people they live among — then id += f"_{k}_{cause[-6:]}",
   appearance.clothing_usual = B.decon.appearance, appearance.distinguishing_marks = ['a small smile
   stitched at the left chest'], social.memberships = [{faction: the record's ref, role 'operator',
   standing 1, since 'born inside'}].

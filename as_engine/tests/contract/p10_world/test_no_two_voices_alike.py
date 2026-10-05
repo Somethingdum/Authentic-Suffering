@@ -54,3 +54,26 @@ def test_born_after_the_fall_still_never_remembers_before():
         heard.append(first_line(d))
         text = " ".join(d["voice"]["exemplars"].values()) + " " + " ".join(d["voice"]["speech_tendencies"])
         assert "before" not in text and "old world" not in text, text
+
+
+def test_a_faction_team_does_not_sound_like_its_people(gw):
+    """D-203: a Ghost decontamination team made mid-game is dealt voices nobody in the Depot, or among the Ghosts,
+    already has — and no two operators share one."""
+    from as_engine.mind.actor import fused
+    from as_engine.world import factions
+    s = gw
+    g = s.store.query_one("SELECT group_id FROM groups WHERE content_ref = 'core:faction/ghosts'")[0]
+    stl = factions.enclave(s.store, g)
+    home = s.store.query_one("SELECT group_id, place_id FROM settlements WHERE settlement_id = ?", (stl,))
+    t = s.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with s.store.transaction() as tx:
+        here = {r[0] for r in tx.query("SELECT m.actor_id FROM group_members m JOIN bodies b ON b.body_id = m.actor_id WHERE "
+                                       "m.group_id IN (?, ?) AND m.status IN ('member', 'probation') AND b.alive = 1",
+                                       (home[0], g))}
+        before = {fused(tx, a).voice.exemplars.low_stakes for a in here
+                  if tx.query_one("SELECT controller FROM actors WHERE actor_id = ?", (a,))[0] != "human"}
+        team = factions.team(tx, s.rng, g, t, 0, None)
+        voices = [fused(tx, b).voice.exemplars.low_stakes for b in team]
+    assert team and len(set(voices)) == len(voices), voices
+    if len(before) + len(team) <= len(P._EXEMPLARS):
+        assert not set(voices) & before, "none sounds like someone already there"
