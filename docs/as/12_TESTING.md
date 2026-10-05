@@ -602,6 +602,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_people_you_know_of.py` | The player's character (no relationship rows, C06) keeps its crew in mind with where it last saw each ('June: last seen in the stockroom just now'); at most `max_known_elsewhere` of them, the most recently seen first, and never one it saw die; "I walk over to June and shove her." reaches an intake that lists June with where she was last seen and is told the first step is going there: the PC goes through the storeroom door and 'shove June' is the remainder |
 
+### 3.68 What the lint wants, said first (P7; D-154)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_what_the_lint_wants.py` | The narration prompt states the lint's rules before any draft (no three sentences in a row starting with the same word, the active voice, no moods named) and lists the names the PC knows, the packet's allowed_names; no names, no list |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

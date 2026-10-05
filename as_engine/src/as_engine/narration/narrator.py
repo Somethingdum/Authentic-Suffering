@@ -1,4 +1,4 @@
-"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,
+"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10..12, L9,
 DISC-01..04. Owner 'narration.narrator' (writes the narration row only). MUST NOT import
 kernel.truth: the narrator is a mind whose skull is the PC's.
 
@@ -88,6 +88,12 @@ narrate(client, packet, style_rules, numbers, *, config, all_known_names, turn_i
   .build_request(config, NARRATION, turn_index=turn_index, context=packet, k=packet, words =
   numbers.narration_words[packet.length], fix = a list of the last draft's errors as f"{rule}:
   {detail}" — [] until a draft has failed), sent with client.call(request) (no output model).
+  (D-154, NARR-12) The prompt says what the lint throws a draft away for before the first draft is
+  written, not only after: never three sentences in a row starting with the same word, the active
+  voice (few sentences of was / were and a participle), no mood named in the abstract, and a
+  person named only by a name of packet.allowed_names — listed as f"Names {pc} knows (use no other
+  proper name outside quoted speech; describe anyone else): {', '.join(allowed_names)}" when not
+  empty. Every draft thrown away is a whole new one on the slow lane.
   A call whose parse_status is not 'ok' or whose text is empty after strip() still counts as an
   attempt and leaves ``fix`` as it was. The draft is the text stripped. Each draft: report =
   lint.lint_prose(draft, packet, style_rules, numbers, all_known_names); when the code lint

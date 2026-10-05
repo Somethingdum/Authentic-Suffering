@@ -8,7 +8,8 @@ Write in {{ 'third person, limited to ' ~ k.pc_name if k.person == 'third_limite
 {% endif %}{% if k.player_input_echo_block %}Never repeat these word runs from the player: {{ k.player_input_echo_block | join('; ') }}
 {% endif %}
 TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
-{% if k.establish_place %}Establish the place (they have just arrived or it changed):
+{% if k.allowed_names %}Names {{ k.pc_name }} knows (use no other proper name outside quoted speech; describe anyone else): {{ k.allowed_names | join(', ') }}
+{% endif %}{% if k.establish_place %}Establish the place (they have just arrived or it changed):
 {% for d in k.place_details %}- {{ d }}
 {% endfor %}{% endif %}{% if k.people_present %}People they can perceive here:
 {% for p in k.people_present %}- {{ p }}
