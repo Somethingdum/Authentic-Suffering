@@ -301,6 +301,8 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
     not swear.', rare 'You rarely swear.', frequent 'You swear often.', constant 'You swear all the
     time.'); the dialect notes when not empty.
   where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given.
+  when: (D-159) world_time_text exactly as the SkullPacket words it for them (the clock only with a
+    timepiece) — the prompt no longer says "years after the Fall" of a world eighteen days into it.
   state: their body lines (as the SkullPacket's body) but 'Unhurt.', the first 3.
   said: their own last 3 voice_lines by (at, line_id), oldest first — never to be said again.
   knows: (D-130) the texts of mind.retrieval.lore_lines(tx, actor_id, turn_index, at, min(2,

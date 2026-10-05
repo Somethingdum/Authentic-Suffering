@@ -512,6 +512,7 @@ class AmbientPacket(Strict):
     name: str
     voice: list[str]                 # how they talk: the capsule, tendencies, the three exemplars, never-says
     where: str
+    when: str = ""                   # D-159: the time as they know it (the SkullPacket's world_time_text)
     doing: str = ""                  # what code has them doing (their continuation's label), or ''
     state: list[str] = Field(default_factory=list)   # how their body and mind are (max 3), or none
     reached: list[str]               # what has reached them since they last spoke, oldest first (max 4)

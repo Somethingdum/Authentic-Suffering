@@ -4,6 +4,9 @@ You are {{ ctx.name }}.
 {% endfor %}
 
 Where you are: {{ ctx.where }}.
+{% if ctx.when %}
+When: {{ ctx.when }}.
+{% endif %}
 {% if ctx.doing %}
 What you are doing: {{ ctx.doing }}
 {% endif %}

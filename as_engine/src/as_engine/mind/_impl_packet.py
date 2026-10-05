@@ -619,6 +619,10 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     name = _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (actor_id,))["display_name"]
     from .retrieval import lore_lines
     knows = [r["text"] for r in lore_lines(tx, actor_id, turn_index, at, min(2, tx.rules.packet.max_lore))]   # D-130
+    from ..kernel.clock import format_clock, world_time
+    wt = world_time(at)                                          # D-159: the time as they know it
+    when = (f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})" if _has_timepiece(tx, actor_id)
+            else f"Day {wt.day} since the Fall ({wt.part_of_day})")
     return AmbientPacket(actor_id=actor_id, name=name, voice=voice, where=place_phrase(pl["name"]) if pl else "",
-                         doing=doing, state=[x for x in _body_lines(tx, actor_id) if x != "Unhurt."][:3],
+                         when=when, doing=doing, state=[x for x in _body_lines(tx, actor_id) if x != "Unhurt."][:3],
                          reached=reached, said=said, knows=knows, people=people, handles=handles)

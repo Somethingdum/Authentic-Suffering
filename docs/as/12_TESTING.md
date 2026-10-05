@@ -620,6 +620,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_seen_not_caught.py` | A woman half seen behind the counter came through "only partly" (no "some words lost") and leaves "You could not make out all of S#." |
 
+### 3.71 When it is (P7; D-159)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_when_it_is.py` | A room line on day 18 is told "When: Day 18 since the Fall (night)."; no fast-lane prompt says "years after the Fall" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
