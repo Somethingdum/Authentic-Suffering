@@ -237,8 +237,10 @@ Per effect (result strings in quotes; 'done' unless noted):
                      posture_event('sitting').
   continue_task      (D-118) no active task but a paused one (the same task the menu named) ->
                      action.tasks.resume(tx, it, land_at, None, turn_index) first — it goes on from
-                     where it stood (TASK-02, CAS-014); then action.tasks.advance(actor, horizon)
-                     inside the landing; result 'working'.
+                     where it stood (TASK-02, CAS-014); then action.tasks.advance(actor,
+                     ctx.horizon_ms) inside the landing — (RESOLVE-08, D-177) the resolver's cut, so
+                     the work does not run ahead of the world's next timer (the turn pipeline
+                     advances active tasks to the window's end at S12); result 'working'.
   speak              the SPEECH was committed by the resolver at T; result 'said'.
   calm_person        C + persuasion check vs target.attr_mod.I; success -> mind.actor.adjust_stress
                      (target, -2 CLEAN / -1 COST); BREAK -> +1.

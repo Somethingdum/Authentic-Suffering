@@ -112,6 +112,8 @@ else:
     horizon = max(t0 + 3 s, the PC action's landing time)
 pull: whenever the PC holds a MATERIAL percept at m (a timer at stage 0, any wave, any timer inside
       the window), horizon = min(horizon, max(m + 3 s, the latest event already committed))
+      (D-177: a wave lands nothing past the world's next timer — later landings, speech and work
+      wait in the queue and come in time order — so "already committed" never runs ahead of it)
 end of window (stage 12): final = max(horizon, the latest committed event)   # a COST landing may
       complete after the horizon; anything still due before final fires first
 ```

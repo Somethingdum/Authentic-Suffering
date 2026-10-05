@@ -290,8 +290,9 @@ def _armed(tx, actor):
     return False
 
 
-def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
+def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms, land_by=None):
     from ..kernel import clock
+    cut = horizon_ms if land_by is None else min(horizon_ms, land_by)    # RESOLVE-08 (D-177)
     from .effects import EffectCtx, land_ms
     first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
     started = []
@@ -374,15 +375,15 @@ def resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms):
     for when, _k, _n, kind, item in timeline:
         if kind == "land":
             la, i, st = item
-            if la > horizon_ms:
+            if la > cut:
                 clock.schedule(tx, la, "ACTION_LAND", i.actor_id, {"intent": intent_to_dict(i), "start_event_id": st.event_id}, st.event_id)
                 continue
-            _land(tx, rng, i, la, EffectCtx(turn_index=turn_index, horizon_ms=horizon_ms, start_event_id=st.event_id, wave_start_ms=wave_at))
+            _land(tx, rng, i, la, EffectCtx(turn_index=turn_index, horizon_ms=cut, start_event_id=st.event_id, wave_start_ms=wave_at))
         else:
             due, speaker, k, pl, sid = item
             if pl["utterance_id"] in cut_off:
                 continue
-            if due > horizon_ms:
+            if due > cut:
                 clock.schedule(tx, due, "SPEECH_SEGMENT", speaker, pl, sid)
                 continue
             if not _say(tx, speaker, pl, sid, due, turn_index):

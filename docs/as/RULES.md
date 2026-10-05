@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-818 ids; 560 with their own statement, 258 named only in context.
+819 ids; 561 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -578,8 +578,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | HOR-01 | HOR-01 horizon(tx, pc_intent, t0, until=None) -> int (the end of the simulation window, ms) The PC's def is looked up in canon (tx.canon.find('affordance', def_id)). condition-ended (duration.condition_ended: watch, wai… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_a_wait_is_minutes.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
-| HOR-02 | HOR-02..04 pull(horizon_ms, trigger_at, last_event_at) -> int min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at)). When the PC holds a MATERIAL percept (action.reactions.material_holders) at trigger_at, th… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| HOR-03 | *horizon). Rules SEL-01..07, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| HOR-02 | HOR-02..04 pull(horizon_ms, trigger_at, last_event_at) -> int min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at)). When the PC holds a MATERIAL percept (action.reactions.material_holders) at trigger_at, th… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p07_slice/test_what_happens_first.py` |
+| HOR-03 | *horizon). Rules SEL-01..07, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p07_slice/test_what_happens_first.py` |
 | HOR-04 | *(HOR-03: G04 must hold), and a pull never lengthens the window (HOR-04). The pipeline applies* | as_engine/turn/select.py | `as_engine/turn/select.py` | — |
 
 ## HRD
@@ -997,6 +997,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | RESOLVE-05 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | `contract/p05_many_actors/test_resolve.py`, `contract/p07_slice/test_slice_checks.py` |
 | RESOLVE-06 | *Resolution (Stage 8, P5; D-107). Rules RESOLVE-01..07, SEG-03..04, GEST-03, FOCUS-02, G8. The resolver is the only place intents* | as_engine/action/resolve.py | `as_engine/action/resolve.py` | — |
 | RESOLVE-07 | RESOLVE-07 (D-107) "They have little capacity to speak ... rationally." When the speaker speaks broken (physical.bodies.speaks_broken(tx, speaker, at) — a shattered mind, or a broken one in its first hours) step 1 split… | as_engine/action/resolve.py | `as_engine/action/_impl_p5b.py`, `as_engine/action/resolve.py`, `as_engine/physical/bodies.py` | `contract/p12_surfaces/test_doom_deep.py` |
+| RESOLVE-08 | RESOLVE-08 (D-177) cut = horizon_ms, or min(horizon_ms, land_by) when land_by is given: a landing or a speech segment due after ``cut`` is queued (below) instead of committed in the wave — the turn pipeline passes the e… | as_engine/action/resolve.py | `as_engine/action/effects.py`, `as_engine/action/resolve.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_what_happens_first.py` |
 
 ## ROUT
 
@@ -1081,7 +1082,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | SEL-01 | SEL-01 active_area(tx, pc_id, turn_index) -> list[str] (sorted place ids) The PC's place, every place within 2 portal hops of it (physical.space.places_near(place, 2): walls and fences count as hops), and — for every NO… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p10_world/test_hordes.py` |
 | SEL-02 | SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=frozenset()) -> bool True when ANY of (a mandatory mind always gets a model call, even past the budget): * actor_id in ``forced`` (a pending r… | as_engine/turn/select.py | `as_engine/mind/temper.py`, `as_engine/turn/select.py` | `contract/p07_slice/test_breaking_point.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| SEL-03 | SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, bool] ``cands`` = the conscious candidates of this wave. Over this turn's percept rows up to the wave (percept_log, turn_index == turn_index… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p04_one_actor/test_conversation_thread.py`, `contract/p07_slice/test_breaking_point.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| SEL-03 | SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, bool] ``cands`` = the conscious candidates of this wave. Over this turn's percept rows up to the wave (percept_log, turn_index == turn_index… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p04_one_actor/test_conversation_thread.py`, `contract/p05_many_actors/test_news_is_new.py`, `contract/p07_slice/test_breaking_point.py`, `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-04 | SEL-04 salience(flags, is_mandatory, weights) -> float sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written before a flag existed still works) + weights['mandatory'] when manda… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-05 | SEL-05 conscious(tx, actor_id) -> bool bodies.alive = 1 and awareness in ('awake', 'drowsy'). Only conscious candidates are planned, offered options, or asked to decide. | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | SEL-06 | SEL-06 The PC is never a candidate, never planned and never reacts: the player decides for the PC (the pipeline passes exclude={pc} to action.reactions.next_wave). | as_engine/turn/select.py | `as_engine/society/group.py`, `as_engine/society/routine.py`, `as_engine/turn/select.py` | `contract/p09_society/test_routine.py`, `contract/p09_society/test_work.py` |
@@ -1211,7 +1212,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | TASK-01 | *Rules TASK-01..03, CROWD-04.* | as_engine/action/tasks.py | `as_engine/action/tasks.py` | `contract/p05_many_actors/test_tasks.py` |
-| TASK-02 | *where it stood (TASK-02, CAS-014); then action.tasks.advance(actor, horizon)* | as_engine/action/effects.py | `as_engine/action/effects.py`, `as_engine/action/tasks.py` | `contract/p05_many_actors/test_picking_up_work.py`, `contract/p05_many_actors/test_tasks.py` |
+| TASK-02 | *where it stood (TASK-02, CAS-014); then action.tasks.advance(actor,* | as_engine/action/effects.py | `as_engine/action/effects.py`, `as_engine/action/tasks.py` | `contract/p05_many_actors/test_picking_up_work.py`, `contract/p05_many_actors/test_tasks.py` |
 
 ## TELEPATHY
 

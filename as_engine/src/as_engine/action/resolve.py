@@ -2,8 +2,13 @@
 turn into state change (L2). Writer of ACTION_START / ACTION_COMPLETE / ACTION_BLOCKED /
 ACTION_INTERRUPT / CHECK_RESOLVED: 'action.resolve' (no table writes of its own).
 
-resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms) -> list[Event]
+resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms, land_by=None) -> list[Event]
   ``intents`` come from action.intent.barrier (an intent with .blocked set is not started).
+  RESOLVE-08 (D-177) cut = horizon_ms, or min(horizon_ms, land_by) when land_by is given: a
+  landing or a speech segment due after ``cut`` is queued (below) instead of committed in the
+  wave — the turn pipeline passes the earliest pending timer after the wave, so what the world
+  does first happens first (a walker's grab two seconds into a two-minute search is not
+  committed after the search's end).
   1. Starts, in actor_id order, all at wave_at:
      * blocked -> ACTION_BLOCKED {actor_id, def_id, cause: intent.blocked}; nothing else.
      * the actor's pending ACTION_LAND queue rows (kernel.clock.pending_for) are cancelled
@@ -40,7 +45,7 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms) -> list[Event
        say_at is that landing time (its segments are placed when step 2 has landed or queued the
        action, so a queued landing fires before its words). Segment 1 at wave_at is committed
        right after the start;
-       every other segment due at or before horizon_ms is committed at its due time among step 2's
+       every other segment due at or before cut is committed at its due time among step 2's
        landings (after the landings at the same ms); one due later is queued:
        kernel.clock.schedule(tx, due, 'SPEECH_SEGMENT', speaker, {the SPEECH payload},
        source_event_id = the start).
@@ -54,10 +59,10 @@ resolve_wave(tx, rng, intents, wave_at, turn_index, *, horizon_ms) -> list[Event
      wave_at). Order: (land_at, then within one land_at the precedence ladder for intents
      sharing a resource (conflict.precedence, groups in resource order, an intent placed at its
      first group), then actor_id).
-     * land_at > horizon_ms -> kernel.clock.schedule(tx, land_at, 'ACTION_LAND', actor_id,
+     * land_at > cut -> kernel.clock.schedule(tx, land_at, 'ACTION_LAND', actor_id,
        {intent: intent.intent_to_dict(i), start_event_id}, source_event_id = start) — it lands
        in a later transaction (land_pending).
-     * else Landing = effects.land(...); commit ACTION_BLOCKED {actor_id, def_id, cause} at land_at
+     * else Landing = effects.land(... EffectCtx(horizon_ms = cut, …)); commit ACTION_BLOCKED {actor_id, def_id, cause} at land_at
        when landing.blocked, else ACTION_COMPLETE {actor_id, def_id, result, band, visible: false}
        at landing.complete_at or land_at. Cause of both = the ACTION_START.
   3. Each intent resolves exactly once (G8). Every draw is in prng_ledger (the rng does that).
@@ -93,7 +98,7 @@ if TYPE_CHECKING:
 
 
 def resolve_wave(tx: "Tx", rng: "Rng", intents: list["Intent"], wave_at: int, turn_index: int, *,
-                 horizon_ms: int) -> list["Event"]:
+                 horizon_ms: int, land_by: int | None = None) -> list["Event"]:
     raise NotImplementedError("P5")
 
 

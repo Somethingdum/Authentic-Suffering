@@ -113,7 +113,10 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
         o_ev |= e
         o_src |= s
     my_src.discard(actor_id)
-    unique = bool(my_ev - o_ev) or bool({s for s in my_src if s not in o_src and s != pc_id and s not in others})
+    known = {r[0] for r in tx.query("SELECT DISTINCT source_id FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='visual' "
+                                    "AND fidelity IN ('exact','partial') AND source_id IS NOT NULL", (actor_id, turn_index - 1))}
+    unique = bool(my_ev - o_ev) or bool({s for s in my_src if s not in o_src and s != pc_id and s not in others
+                                         and s not in known})          # D-176: news is new
 
     def loud(h):
         dbs = [json.loads(p["detail"]).get("received_db", 0) or 0 for p in _percepts(tx, h, turn_index, at)

@@ -699,6 +699,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p07_slice/test_a_wait_is_minutes.py` | "Wait" runs at most five minutes in a quiet place; watching still runs until something happens; an out-cold PC's window runs to `until`; three "I wait." turns are minutes each, not a day |
 | `p05_many_actors/test_reactions_cascade_plan.py::test_plan_cognition_keeps_the_writer_for_what_matters` | Below the HOT threshold (and not mandatory) a mind is WARM on the fast lane; a mandatory mind is HOT whatever its salience |
 
+### 3.84 News is new (P5; D-176)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_news_is_new.py` | Nita's first sight of the man in the lot is news; the same man the next turn is not; after she lost sight of him, seeing him again is |
+
+### 3.85 What happens first, happens first (P7; D-177)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_what_happens_first.py` | A shout two seconds into a two-minute search closes the window seconds later; the search has not ended and waits in the queue for the player's next say; with nothing in the way, the search lands in the wave as before |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

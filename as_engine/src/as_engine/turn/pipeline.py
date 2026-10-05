@@ -101,7 +101,10 @@ simulate — stages 0-12 in ONE store transaction:
        pc_intent, t0, until = physical.bodies.comes_to_at(tx, pc, t0)) — to when he comes to. asks = {a: turn.cognition.asks_for(tx, a, T,
        answered) for a in sorted(intents)}.
     S7 barrier: action.intent.barrier(tx, [intents[a] for a in sorted(intents)]).
-    S8 resolve: action.resolve.resolve_wave(tx, rng, those, wave_at, T, horizon_ms=horizon);
+    S8 resolve: action.resolve.resolve_wave(tx, rng, those, wave_at, T, horizon_ms=horizon, land_by =
+       the earliest event_queue.due_at > wave_at of a pending row, None when there is none)
+       (RESOLVE-08, D-177: a landing after the world's next timer is queued and fires in time
+       order with it, so a pull can still end the window before the PC's own long act is over);
        answers = turn.cognition.record_responses(tx, intents, affs, asks, T, wave_at, the seq
        before resolving); answered += their (actor, event) pairs; the wave's events = everything
        committed since that seq.

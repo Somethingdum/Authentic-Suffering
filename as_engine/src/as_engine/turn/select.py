@@ -66,6 +66,9 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       (source id 'act_…') other than itself, the PC and the candidates that no
                       other candidate holds one of — Nita alone sees the man in the lot. Only
                       held (EXACT / PARTIAL) percepts count; items and silhouettes do not;
+                      (D-176) news is new: a body it already held a visual EXACT or PARTIAL
+                      percept of in the turn before (turn_index - 1) does not count — the man
+                      she has watched for an hour is not news every five minutes;
     loudest_percept   its loudest received_db (percept detail, auditory and speech channels, at
                       ANY fidelity: a sound too faint to make out is still loud; 0 when none) is
                       > 0 and >= every other candidate's;

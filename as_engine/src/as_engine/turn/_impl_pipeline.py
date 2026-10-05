@@ -177,7 +177,8 @@ async def simulate(ctx):
             # 8 resolve
             await _progress(ctx, 8)
             first = _max_seq(tx)
-            resolve_wave(tx, rng, ordered, wave_at, T, horizon_ms=ctx.horizon)
+            nxt_timer = tx.query_one("SELECT MIN(due_at) FROM event_queue WHERE status='pending' AND due_at > ?", (wave_at,))[0]
+            resolve_wave(tx, rng, ordered, wave_at, T, horizon_ms=ctx.horizon, land_by=nxt_timer)   # RESOLVE-08 (D-177)
             answers = cognition.record_responses(tx, intents, affs, asks, T, wave_at, first)
             ctx.answered |= {(a, e) for a, e, _r in answers}
             responses.extend(answers)
