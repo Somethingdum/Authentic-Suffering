@@ -1471,6 +1471,15 @@ def select(tx, selector, trigger):
         holders = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                                           "fidelity IN ('exact','partial')", (v,))} - {dead}
         return sorted({s for s in (_stl_of(tx, h) for h in holders) if s})
+    if fn == "heard_it":                                             # D-216: word gets around
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        who = pl.get("listener_id")
+        if trigger.type != EventType.RUMOUR_SPREAD or not who or not pl.get("believed") or who == pl.get("about_id") \
+                or _controller(tx, who) in (None, "human"):
+            return []
+        alive = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (who,))
+        return [who] if alive is not None and alive[0] else []
     if fn == "seen_clearly_by":                                      # D-123
         dead = (trigger.payload or {}).get("body_id")
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "

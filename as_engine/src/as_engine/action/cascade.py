@@ -219,6 +219,10 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)
+    heard_it(<path>)                          (D-216) for a RUMOUR_SPREAD: its listener (payload
+                                              listener_id) when payload believed is true, alive, not the
+                                              one it is about (payload about_id) — never the PC (what
+                                              the player's character makes of what he hears is his, C06)
     seen_clearly_by(<path>)                   (D-123) the holders of a visual EXACT or PARTIAL percept
                                               of that event (they saw who it was) — never the event's
                                               own body (payload body_id)

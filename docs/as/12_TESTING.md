@@ -845,6 +845,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_said_to_your_face.py` | A promise of violence is a threat however it is put — sworn at, typed with a phone's apostrophe, "you're dead", "I'll break your arm" — and kind words, warnings and "I'll cut your hair" are not; Owen's bare-handed threat costs him a point of Alice's trust and a point of resentment, not her fear, once an hour however often he says it; after she saw him cut Mara it frightens her too; at gunpoint it is CAS-038's fear and CAS-089's trust, not CAS-090; a threat to the player's character changes nothing in him |
 
+### 3.108 Word gets around (P9; D-216)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_word_gets_around.py` | For every story of a wrong — hurt, tried to kill, shut out, pushed to the dead, a captive beaten or killed, one who gave up hit or killed, a child hurt or left, spit in a mouth or the food, a killing, eating the dead, a theft — Kit, told by Finn whom she believes, trusts Jude less by what the rule says (and fears him for spreading the sickness), while Finn, who saw it, is not changed by telling it; Amos, who does not believe Jude, is not changed; told to the player's character, nothing is written into him |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

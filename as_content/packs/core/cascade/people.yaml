@@ -134,7 +134,7 @@
   effects:
     - kind: emit_event
       event_type: RELATION_CHANGE
-      target: actor(trigger.payload.listener_id)
+      target: heard_it(trigger.event_id)
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
   delay_s: 0
   cites: [SOC-03, INFO-02]
@@ -201,7 +201,7 @@
   effects:
     - kind: emit_event
       event_type: RELATION_CHANGE
-      target: actor(trigger.payload.listener_id)
+      target: heard_it(trigger.event_id)
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
   delay_s: 0
   cites: [D-119, INFO-02]
@@ -472,7 +472,7 @@
   effects:
     - kind: emit_event
       event_type: RELATION_CHANGE
-      target: actor(trigger.payload.listener_id)
+      target: heard_it(trigger.event_id)
       payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
   delay_s: 0
   cites: [D-133, INFO-02]
@@ -1198,3 +1198,171 @@
       payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: threatened_by_the_violent}
   delay_s: 0
   cites: [D-215, D-126]
+# D-216 — word gets around. The story of what someone did travelled (create_rumour), and whoever heard it, from
+# someone they believe, thought no less of them — only theft, a killing and eating the dead were ever answered
+# (CAS-018, CAS-028, CAS-048). Now every story of a wrong costs the one it is about some of the listener's trust,
+# never more than seeing it would. The player's character is never one of those changed (C06): heard_it.
+- schema: as.cascade.v1
+  id: CAS-091
+  description: Hearing, from someone they believe, that a person hurt someone who was not fighting back costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: hurt_someone, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-092
+  description: Hearing, from someone they believe, that a person tried to kill someone who was not fighting costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: tried_to_kill_someone, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-093
+  description: Hearing, from someone they believe, that a person shut the door on someone and left them with the dead costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: shut_someone_out, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-094
+  description: Hearing, from someone they believe, that a person pushed someone to the dead costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: fed_someone_to_the_dead, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -2, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-095
+  description: Hearing, from someone they believe, that a person beat someone who was held costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: beat_a_captive, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-096
+  description: Hearing, from someone they believe, that a person killed someone who was held costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: killed_a_captive, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-097
+  description: Hearing, from someone they believe, that a person hit someone who had their hands up costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: hit_one_who_gave_up, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-098
+  description: Hearing, from someone they believe, that a person killed someone who had given up costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: killed_one_who_gave_up, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-099
+  description: Hearing, from someone they believe, that a person hurt a child costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: hurt_a_child, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-100
+  description: Hearing, from someone they believe, that a person ran and left their own child behind costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: left_their_child, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-101
+  description: Hearing, from someone they believe, that a person spat into a sleeper's mouth costs that person some of the listener's trust and makes the listener afraid of them.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: spat_in_a_mouth, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: fear, delta: 1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]
+- schema: as.cascade.v1
+  id: CAS-102
+  description: Hearing, from someone they believe, that a person spat into what people eat and drink costs that person some of the listener's trust and makes the listener afraid of them.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: spoiled_the_food, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: fear, delta: 1, cause: rumour}
+  delay_s: 0
+  cites: [D-216, INFO-02]

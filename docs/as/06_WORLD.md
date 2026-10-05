@@ -257,6 +257,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   arm" — said to someone costs the one who said it a point of their trust and a point of resentment, once an
   hour however often it is said; from someone they have seen hurt a person it frightens them too (at weapon
   point, CAS-038's fear).
+- **Word gets around** (D-216, CAS-018/028/048, CAS-091..102): every story of a wrong, heard from someone the
+  listener believes, costs the one it is about some of the listener's trust — two for pushing someone to the dead,
+  a killing or eating the dead, one for the rest, and fear too for spreading the sickness — never more than seeing
+  it would. What the player's character hears is never written into him.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later
