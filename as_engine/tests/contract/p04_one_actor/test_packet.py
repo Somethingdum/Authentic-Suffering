@@ -324,7 +324,9 @@ def test_uncertainty_names_what_was_missed(scenario):
     p = packet_for(w, "nita", t + 1500)
     partial = [x for x in [*p.perceived_now, *p.utterances] if x.fidelity in (Fidelity.PARTIAL, Fidelity.TONE_ONLY)]
     assert partial
-    assert p.uncertainty == [f"You did not catch all of {x.handle}." for x in sorted(partial, key=lambda x: int(x.handle[1:]))]
+    assert p.uncertainty == [(f"You could not make out all of {x.handle}." if getattr(x, "channel", None) is not None and  # D-158
+                              x.channel.value == "visual" else f"You did not catch all of {x.handle}.")
+                             for x in sorted(partial, key=lambda x: int(x.handle[1:]))]
     (u,) = p.utterances
     assert u.speaker_handle is None and u.standing == Standing.STRANGER, "an unplaced voice has no standing"
 

@@ -292,8 +292,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
         h = f"S{i}"
         handles[h] = p["percept_id"]
         det = json.loads(p["detail"]) if isinstance(p["detail"], str) else (p["detail"] or {})
-        if p["fidelity"] in ("partial", "tone_only"):
-            unc.append(f"You did not catch all of {h}.")
+        if p["fidelity"] in ("partial", "tone_only"):                  # D-158: a sighting is made out, a sound caught
+            unc.append(f"You could not make out all of {h}." if p["channel"] == "visual" else f"You did not catch all of {h}.")
         if p["channel"] == "speech":
             words = det.get("words", "")
             st = classify_standing(tx, p["source_id"], actor_id, words) if p["source_id"] else Standing.STRANGER

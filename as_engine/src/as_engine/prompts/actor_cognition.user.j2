@@ -125,7 +125,7 @@ What was said here before this moment (oldest first)
 
 What reaches you
 {% for s in p.perceived_now %}
-- {{ s.handle }} ({{ s.channel.value }}, {{ fidelity_words[s.fidelity.value] }}{% if s.seconds_ago > 0 %}, {{ '%.0f' % s.seconds_ago }} seconds ago{% endif %}): {{ s.text }}
+- {{ s.handle }} ({{ s.channel.value }}, {{ percept_words.get(s.channel.value ~ ':' ~ s.fidelity.value, fidelity_words[s.fidelity.value]) }}{% if s.seconds_ago > 0 %}, {{ '%.0f' % s.seconds_ago }} seconds ago{% endif %}): {{ s.text }}
 {% else %}
 - Nothing new.
 {% endfor %}

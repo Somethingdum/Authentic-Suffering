@@ -614,6 +614,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_nobody_to_calm.py` | In a quiet room nobody is offered to calm (each is refused at the physical gate); someone heard shouting, then someone seen hurt, is |
 
+### 3.70 Seen, not caught (P4; D-158)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_seen_not_caught.py` | A woman half seen behind the counter came through "only partly" (no "some words lost") and leaves "You could not make out all of S#." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

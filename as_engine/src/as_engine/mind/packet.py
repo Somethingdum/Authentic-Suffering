@@ -216,7 +216,7 @@ Fields (second person, plain English):
                     (hands 0 for attention); hands_free = capacity(actor).hands_free. The prompt
                     lists them after the options; the answer may name one of each (INTENT-09).
   uncertainty       one line per PARTIAL or TONE_ONLY percept, in S order: f'You did not catch all
-                    of {S#}.'
+                    of {S#}.' — (D-158) a visual one f'You could not make out all of {S#}.'
   families          [] when reaction or consulted; else mind.consult.families(affordances, the
                     canon affordance defs by id) — CONSULT-03.
   consult_kinds     [] when reaction or consulted; else ['recall'] + ['more_actions'] when
