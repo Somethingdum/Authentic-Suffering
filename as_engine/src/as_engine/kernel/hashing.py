@@ -11,9 +11,10 @@ reads the whole history):
   state hash = sha256 over, for each included table in sorted(table name) order:
       b"T:" + name + b"\n" + table digest (hex) + b"\n".
   SQLite REAL values are formatted with repr(float) by canonical_json.
-  The carried-forward digest of an APPEND_ONLY table is used only when the row it ended on is still
-  there with the same content and the table holds exactly the rows it counted plus those after it
-  (a rolled-back transaction, or anything else, recomputes it whole).
+  The carried-forward digest of an APPEND_ONLY table is kept only once the transaction it was taken in
+  commits (D-224: Store.remember), and used only when the row it ended on is still there with the same
+  content and the table holds exactly the rows it counted plus those after it (anything else recomputes
+  it whole).
 Excluded tables: see kernel.ownership WORLD_HASH_EXCLUDED / FULL_HASH_EXCLUDED, plus sqlite
 internal tables and FTS shadow tables (names starting with 'episodes_fts').
 """
@@ -70,7 +71,12 @@ def _append_digest(store, t):
         b = canonical_json(list(r)[1:]).encode()
         h.update(b + b"\n")
         last_row, last_bytes = r[0], b
-    cache[t] = (n, last_row, last_bytes, h.copy())
+    entry = (n, last_row, last_bytes, h.copy())
+    remember = getattr(store, "remember", None) or getattr(getattr(store, "store", None), "remember", None)
+    if remember is not None:                                     # D-224: only what is committed is carried
+        remember(lambda: cache.__setitem__(t, entry))
+    else:
+        cache[t] = entry
     return h.hexdigest()
 
 

@@ -13,6 +13,13 @@ compute(tx, turn_index) -> GateResult(session, world, entities, global_, failure
   turn_index >= 1. Every other check is written so that an EMPTY world (fresh Store.memory())
   passes it — the P0 framework test computes all 58 bits = 1 on a fresh store at turn 0.
   failures lists the ids of the zero bits, in ALL_BITS order.
+  (D-224) History is checked once: the bits over rows that are only ever added to — events (W04's
+  ledger, W16, E16, G07, G08, G09, G12), prng_ledger (G11) and blobs (E15) — read only the rows past
+  the point the last passed gate on this store reached, once the transaction it ran in committed
+  (kernel.store.Store.remember), and only while that point still holds: the row it ended on is there
+  with the same content and nothing at or before it was removed (otherwise every row is read, as
+  before). A row from an earlier turn was checked by that turn's gate; G14 still reads every model
+  call.
 Turn pipeline behaviour (G12): all 58 must be 1 or the transaction does not commit. On a zero:
   roll back and rerun the turn once in strict mode (repair calls on, reactions capped at 1),
   recompute; if a bit is still 0, write error_repair_log(kind='rollback', stage = BIT_STAGE of the
@@ -174,6 +181,9 @@ def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
     def has_exhaust(t):
         return (t is None) or (t.strip() == "") or any(x.lower() in t.lower() for x in EXHAUST_STRINGS)
     bodies = {r[0] for r in q("SELECT body_id FROM bodies")}
+    st = getattr(store_or_tx, "store", store_or_tx)                # D-224: history checked once
+    seen = st.__dict__.setdefault("_gate_seen", {})
+    ev_lo, pr_lo, bl_lo = (_carried(q1, seen, t, k, f) for t, k, f in _CARRIED)
     def body_alive(b):
         r = q1("SELECT alive FROM bodies WHERE body_id=?", (b,))
         return r is not None and r[0] == 1
@@ -226,8 +236,10 @@ def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
                     used += (canon.get(c[0]).bulk if canon.has(c[0]) else 0) * c[1]
                 ok = ok and used <= d.container.capacity_bulk
     checks["W03"] = ok
-    ledger = {}
-    for r in q("SELECT type, payload FROM events WHERE type IN ('ITEM_CREATED','ITEM_DESTROYED')"):
+    carried = seen.get("item_ledger")
+    ledger = dict(carried[1]) if ev_lo and carried and carried[0] == ev_lo else {}
+    lo = ev_lo if ev_lo and carried and carried[0] == ev_lo else 0
+    for r in q("SELECT type, payload FROM events WHERE type IN ('ITEM_CREATED','ITEM_DESTROYED') AND seq > ?", (lo,)):
         pl = json.loads(r[1])
         ledger[pl["def_ref"]] = ledger.get(pl["def_ref"], 0) + (pl["qty"] if r[0] == "ITEM_CREATED" else -pl["qty"])
     have = {r[0]: r[1] for r in q("SELECT def_ref, SUM(qty) FROM items GROUP BY def_ref")}
@@ -255,7 +267,8 @@ def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
     checks["W13"] = ok
     checks["W14"] = not any(any(n in (r[0] or "") for n in RETIRED_NAMES) for r in q("SELECT text FROM narration WHERE turn_index=?", (T,)))
     checks["W15"] = all(q1("SELECT 1 FROM claims WHERE claim_id=?", (r[0],)) or q1("SELECT 1 FROM propositions WHERE prop_id=?", (r[0],)) for r in q("SELECT superseded_by FROM claim_holdings WHERE superseded_by IS NOT NULL"))
-    checks["W16"] = not q("SELECT 1 FROM events e WHERE cause_event_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM events c WHERE c.event_id=e.cause_event_id)")
+    checks["W16"] = not q("SELECT 1 FROM events e WHERE e.seq > ? AND cause_event_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM events c "
+                          "WHERE c.event_id=e.cause_event_id)", (ev_lo,))
     # ---- entities
     if pc:
         a = q1("SELECT dossier_id FROM actors WHERE actor_id=?", (pc,))
@@ -282,38 +295,71 @@ def compute(store_or_tx: "Store | Tx", turn_index: int) -> GateResult:
     checks["E12"] = all(q1("SELECT 1 FROM groups WHERE group_id=?", (r[0],)) and r[1] in bodies for r in q("SELECT group_id, actor_id FROM group_members"))
     checks["E13"] = not any(any(x.lower() in (r[0] or "").lower() for x in EXHAUST_STRINGS) for r in q("SELECT baseline_json FROM dossiers"))
     checks["E14"] = not q("SELECT 1 FROM events WHERE turn_index=? AND length(payload) > 65536", (T,))
-    checks["E15"] = all(r[0] == sha(r[1]) for r in q("SELECT hash, content FROM blobs"))
-    checks["E16"] = not q("SELECT 1 FROM events WHERE origin='migration' AND type!='MIGRATION_BACKFILL'")
+    checks["E15"] = all(r[0] == sha(r[1]) for r in q("SELECT hash, content FROM blobs WHERE rowid > ?", (bl_lo,)))
+    checks["E16"] = not q("SELECT 1 FROM events WHERE seq > ? AND origin='migration' AND type!='MIGRATION_BACKFILL'", (ev_lo,))
     # ---- global
     checks["G01"] = meta.get("schema_version") == str(SCHEMA_VERSION)
     checks["G02"] = all(k in meta for k in REQUIRED_META_KEYS)
     checks["G03"] = bool(meta.get("run_id"))
     checks["G04"] = not q("SELECT 1 FROM events WHERE at > ?", (now[0],))
-    checks["G05"] = all(q1("SELECT 1 FROM commit_gate_log WHERE turn_index=?", (t,)) for t in range(1, T))
+    checks["G05"] = T < 2 or q1("SELECT COUNT(*) FROM commit_gate_log WHERE turn_index >= 1 AND turn_index < ?", (T,))[0] == T - 1
     checks["G06"] = not q("SELECT 1 FROM turn_ledger WHERE turn_index > ?", (T,))
     ok = True
-    for r in q("SELECT type, payload FROM events WHERE type IN ('SPEECH','HARM','DEATH')"):
+    for r in q("SELECT type, payload FROM events WHERE seq > ? AND type IN ('SPEECH','HARM','DEATH')", (ev_lo,)):
         p = json.loads(r[1])
         ok = ok and ((r[0] == "SPEECH" and bool(p.get("words"))) or (r[0] == "HARM" and bool(p.get("wound_id"))) or (r[0] == "DEATH" and bool(p.get("cause"))))
     checks["G07"] = ok
     types = {t.value for t in EventType}
-    checks["G08"] = all(r[0] in types and r[1] in MODULES for r in q("SELECT type, writer FROM events"))
+    checks["G08"] = all(r[0] in types and r[1] in MODULES for r in q("SELECT type, writer FROM events WHERE seq > ?", (ev_lo,)))
     ok = True
-    for r in q("SELECT state_delta FROM events"):
+    for r in q("SELECT state_delta FROM events WHERE seq > ?", (ev_lo,)):
         try:
             ok = ok and isinstance(json.loads(r[0]), list)
         except Exception:
             ok = False
     checks["G09"] = ok
     checks["G10"] = not q("SELECT 1 FROM turn_ledger WHERE turn_index=? AND run_count > 3", (T,))
-    seqs = [r[0] for r in q("SELECT seq FROM prng_ledger ORDER BY seq")]
-    checks["G11"] = seqs == list(range(1, len(seqs) + 1))
-    seqs = [r[0] for r in q("SELECT seq FROM events ORDER BY seq")]
-    checks["G12"] = seqs == list(range(1, len(seqs) + 1))
+    seqs = [r[0] for r in q("SELECT seq FROM prng_ledger WHERE seq > ? ORDER BY seq", (pr_lo,))]
+    checks["G11"] = seqs == list(range(pr_lo + 1, pr_lo + len(seqs) + 1))
+    seqs = [r[0] for r in q("SELECT seq FROM events WHERE seq > ? ORDER BY seq", (ev_lo,))]
+    checks["G12"] = seqs == list(range(ev_lo + 1, ev_lo + len(seqs) + 1))
     checks["G13"] = all(q1("SELECT 1 FROM blobs WHERE hash=?", (r[0],)) for r in q("SELECT output_ref FROM turn_ledger WHERE output_ref IS NOT NULL"))
     checks["G14"] = all(re.fullmatch(r"[0-9a-f]{64}", r[0] or "") for r in q("SELECT request_hash FROM lm_calls"))
     bits = {b.id: ("1" if checks[b.id] else "0") for b in ALL_BITS}
     res = GateResult("".join(bits[b.id] for b in SESSION_BITS), "".join(bits[b.id] for b in WORLD_BITS),
                      "".join(bits[b.id] for b in ENTITY_BITS), "".join(bits[b.id] for b in GLOBAL_BITS),
                      [b.id for b in ALL_BITS if bits[b.id] == "0"])
+    if res.passed:                                               # D-224: what this gate saw need not be read again —
+        got = {t: _carry(q1, t, k, f) for t, k, f in _CARRIED}   # once it is committed
+        got["item_ledger"] = (got["events"][0], dict(ledger))
+        if hasattr(st, "remember"):
+            st.remember(lambda: seen.update(got))
+        else:
+            seen.update(got)
     return res
+
+
+_CARRIED = (("events", "seq", "event_id || ':' || type || ':' || writer || ':' || payload || ':' || state_delta || ':' || origin"),
+            ("prng_ledger", "seq", "stream || ':' || purpose || ':' || value"),
+            ("blobs", "rowid", "hash || ':' || content"))
+
+
+def _carried(q1, seen, table, key, fp):
+    """D-224: the key up to which an earlier passed gate on this store checked the rows of an append-only table, when
+    that is still so — the row it ended on is there with the same fingerprint and nothing at or before it was removed;
+    else 0 (check every row)."""
+    got = seen.get(table)
+    if not got or not got[0]:
+        return 0
+    k, n, f = got
+    r = q1(f"SELECT {fp} FROM {table} WHERE {key}=?", (k,))
+    if r is None or r[0] != f or q1(f"SELECT COUNT(*) FROM {table} WHERE {key}<=?", (k,))[0] != n:
+        return 0
+    return k
+
+
+def _carry(q1, table, key, fp):
+    k = q1(f"SELECT MAX({key}) FROM {table}")[0] or 0
+    n = q1(f"SELECT COUNT(*) FROM {table} WHERE {key}<=?", (k,))[0]
+    f = q1(f"SELECT {fp} FROM {table} WHERE {key}=?", (k,))[0] if k else None
+    return (k, n, f)

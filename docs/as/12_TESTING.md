@@ -893,6 +893,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p00_substrate/test_hash_keeps_up.py` | After more events and an rng draw the carried-forward digest is used and both state hashes equal a cold reading; a turn rolled back after it was hashed, its rows then taken by other events, is not carried; different events still hash differently |
 
+### 3.116 Turns that stay fast (P11; D-224)
+
+| File | What it proves |
+|---|---|
+| `p11_audits/test_turns_stay_fast.py` | After a passed gate the store carries where its events check reached; a gate passed inside a turn that then rolls back is not carried, so a bad event in the same place is seen (G09); a run saved before the new indexes gets them when it is opened |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

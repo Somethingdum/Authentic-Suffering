@@ -64,6 +64,10 @@ if TYPE_CHECKING:
 SCHEMA_VERSION = 1
 EVENT_SELF = "$event_id"
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
+LATER_INDEXES: tuple[str, ...] = (   # D-224: indexes added after runs were saved; they change no row and no hash
+    "CREATE INDEX IF NOT EXISTS ev_actor_type ON events(actor_id, type)",
+    "CREATE INDEX IF NOT EXISTS percept_event ON percept_log(event_id)",
+)
 
 
 def wall_clock_iso() -> str:
@@ -89,6 +93,7 @@ class Store:
         from ..contracts.settings import RulesConfig
         self.rules = RulesConfig()
         self._in_tx = False
+        self._after_commit: list = []   # D-224: what may be remembered only once this transaction has committed
 
     def attach(self, *, canon: Any = None, rules: Any = None) -> "Store":
         """Attach run context (implemented). Returns self."""
@@ -153,6 +158,8 @@ class Store:
         if row is None or row[0] != str(SCHEMA_VERSION):
             conn.close()
             raise SchemaError("schema version mismatch")
+        for ix in LATER_INDEXES:                                   # D-224: a run saved before an index existed gets it
+            conn.execute(ix)
         return cls(conn, str(path))
 
     @classmethod
@@ -178,10 +185,21 @@ class Store:
         except BaseException:
             self.conn.execute("ROLLBACK")
             self._in_tx = False
+            self._after_commit = []
             raise
         else:
             self.conn.execute("COMMIT")
             self._in_tx = False
+            done, self._after_commit = self._after_commit, []
+            for f in done:
+                f()
+
+    def remember(self, f) -> None:
+        """D-224: run ``f`` now outside a transaction, else once the current one commits (never if it rolls back)."""
+        if self._in_tx:
+            self._after_commit.append(f)
+        else:
+            f()
 
     def query(self, sql: str, params: tuple | dict = ()) -> list[sqlite3.Row]:
         return self.conn.execute(sql, params).fetchall()

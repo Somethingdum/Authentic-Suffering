@@ -87,7 +87,8 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
   whose payload awareness is 'awake' — waking, or coming to — among the events compile_scene reads
   (this turn's, at <= at; neither type is sensory) or compile_aftermath is given, is the moment they
   check what they carry. out = the at of their latest AWARENESS_CHANGE / POSTURE_CHANGE whose payload awareness is
-  'asleep' or 'unconscious', at or before it (none: nothing is checked). For every ITEM_TRANSFER with
+  'asleep' or 'unconscious', at or before it and (D-224) no more than GONE_LOOKBACK_MS (three days) before it
+  (none: nothing is checked). For every ITEM_TRANSFER with
   out < at <= the waking's at, in seq order, by someone else (actor_id set and not the holder),
   taken from them — payload from {kind 'body', id: the holder}, or {kind 'container', id: C} with C
   carried by the holder now (C, or the container holding C, up to a body, is in their hands, worn
@@ -582,12 +583,15 @@ def _carried_by(tx, item_id, holder):
     return False
 
 
+GONE_LOOKBACK_MS = 3 * 86_400_000    # D-224: a sleep or a faint is looked for in the three days before the waking
+
+
 def _gone(tx, holder, ev, turn_index):
     """GONE-01 (D-213): what was taken from the holder while they were out, found as they come back."""
     wake_at = ev["at"]
-    r = tx.query_one("SELECT MAX(at) FROM events WHERE type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND "
+    r = tx.query_one("SELECT MAX(at) FROM events WHERE +type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND "
                      "json_extract(payload,'$.body_id')=? AND json_extract(payload,'$.awareness') IN ('asleep','unconscious') "
-                     "AND at<=?", (holder, wake_at))
+                     "AND at<=? AND at>=?", (holder, wake_at, wake_at - GONE_LOOKBACK_MS))
     if r is None or r[0] is None:
         return []
     canon = _canon(tx)
@@ -896,7 +900,8 @@ def compile_aftermath(tx: "Tx", holder_id: str, events: list["Event"], at: int, 
     if not ids:
         return []
     ph = ",".join("?" * len(ids))
-    return [r[0] for r in tx.query(f"SELECT percept_id FROM percept_log WHERE holder_id=? AND event_id IN ({ph}) ORDER BY at, percept_id", (holder_id, *ids))]
+    return [r[0] for r in tx.query(f"SELECT percept_id FROM percept_log INDEXED BY percept_event WHERE holder_id=? AND event_id IN ({ph}) "
+                                   "ORDER BY at, percept_id", (holder_id, *ids))]   # D-224: by the event, not the holder's history
 
 
 PREPOSITIONS: frozenset[str] = frozenset({

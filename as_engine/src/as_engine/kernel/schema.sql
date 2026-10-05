@@ -92,6 +92,7 @@ CREATE INDEX ev_cause ON events(cause_event_id);
 CREATE INDEX ev_place_at ON events(place_id, at);
 CREATE INDEX ev_turn ON events(turn_index);
 CREATE INDEX ev_type ON events(type);
+CREATE INDEX ev_actor_type ON events(actor_id, type);   -- D-224: what one person did, without reading everyone's
 
 -- ===================================================================== turn
 -- OWNER turn.pipeline
@@ -604,6 +605,7 @@ CREATE TABLE percept_log (
   turn_index  INTEGER NOT NULL
 );
 CREATE INDEX percept_holder ON percept_log(holder_id, turn_index);
+CREATE INDEX percept_event ON percept_log(event_id);   -- D-224: who perceived an event, without reading every percept
 
 -- OWNER mind.perception
 CREATE TABLE known_places (
