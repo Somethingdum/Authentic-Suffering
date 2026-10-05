@@ -11,5 +11,5 @@ beliefs:
 tags: [canon_cmg_43_c, culture]
 entities: ["core:law/intake_screening", "core:law/contamination_quarantine"]
 about: ["bottle", "spoon", "share", "sharing", "quarantine", "kiss", "kissing", "your smoke"]
-when: [spreader_signs]
+when: [spreader_signs, bite_wound_seen]
 ---

@@ -1,0 +1,35 @@
+"""The mouth rules (D-193). Lore contamination_culture's `when` (LORE-03, mind/retrieval.py lore_lines).
+
+"Your bottle, your spoon, your smoke. Nobody else's. Ever." and "Nobody who's been in quarantine and failed comes back
+out." came to mind only on a spreader's signs: its entities are laws, which nobody sees, so the moment everyone
+thinks of them — a fresh bite on someone standing next to you — brought nothing but the wet strain's own lore.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+from as_engine.contracts.common import Anatomy, WoundSeverity, WoundType
+from as_engine.contracts.events import Event, EventType
+from as_engine.mind import perception, retrieval
+from as_engine.mind.cues import cues_of
+from as_engine.physical import bodies, space
+from as_engine.physical.bodies import WoundSpec
+
+pytestmark = pytest.mark.phase(9)
+
+
+def test_a_bite_beside_you_brings_the_mouth_rules_to_mind(scenario):
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in (("june", 5.0), ("mara", 6.0)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        c = tx.commit_event(Event(type=EventType.OVERRIDE, writer="audit", at=t, turn_index=0, payload={"what": "test"}))
+        bodies.apply_harm(tx, w.id("june"), WoundSpec(Anatomy.ARM_L, WoundType.BITE, WoundSeverity.SIGNIFICANT), t, c.event_id, 0, w.rng)
+    with w.store.transaction() as tx:
+        perception.compile_scene(tx, w.id("mara"), t + 1000, 0)
+        assert "bite_wound_seen" in cues_of(tx, w.id("mara"), 0, t + 1000)
+        said = {x["lore_id"] for x in retrieval.lore_lines(tx, w.id("mara"), 0, t + 1000, 6)}
+    assert {"core:lore/wet_strain", "core:lore/contamination_culture"} <= said, said

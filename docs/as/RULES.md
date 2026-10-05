@@ -783,7 +783,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | LORE-01 | *Content packs: load, validate, lint, compile (P2). Rules CNT-00..17, LORE-01.* | as_engine/content/pack.py | `as_engine/content/pack.py` | `contract/p02_space_bodies/test_content_pack.py` |
 | LORE-02 | LORE-02 (D-130): what everyone around them says, as they grew up hearing it. A person (an actors | as_engine/mind/actor.py | `as_engine/mind/_impl_lore.py`, `as_engine/mind/actor.py`, `as_engine/mind/retrieval.py`, `as_engine/world/worldgen/_impl_wg.py` | `contract/p06_memory/test_everyone_knows.py` |
-| LORE-03 | LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict] What people say about what is in front of the holder: its lore_held rows (mind.actor.seed_lore, | as_engine/mind/retrieval.py | `as_engine/mind/_impl_lore.py`, `as_engine/mind/actor.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py` | `contract/p03_perception/test_what_they_call_them.py`, `contract/p06_memory/test_everyone_knows.py` |
+| LORE-03 | LORE-03 (D-130) lore_lines(tx, holder_id, turn_index, at, n) -> list[dict] What people say about what is in front of the holder: its lore_held rows (mind.actor.seed_lore, | as_engine/mind/retrieval.py | `as_engine/mind/_impl_lore.py`, `as_engine/mind/actor.py`, `as_engine/mind/packet.py`, `as_engine/mind/retrieval.py` | `contract/p03_perception/test_what_they_call_them.py`, `contract/p06_memory/test_everyone_knows.py`, `contract/p09_society/test_mouth_rules.py` |
 
 ## MEM
 
