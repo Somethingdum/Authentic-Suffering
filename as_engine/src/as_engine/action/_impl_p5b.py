@@ -1749,7 +1749,8 @@ def _grieved(tx, actor, subject):
     """D-123: a loss is grieved once — an earlier grief drain of this actor whose cause names the subject."""
     return tx.query_one(
         "SELECT 1 FROM events r JOIN events c ON c.event_id = r.cause_event_id WHERE r.type='RESOLVE_CHANGE' AND "
-        "json_extract(r.payload,'$.actor_id')=? AND json_extract(r.payload,'$.reason') IN ('witness_bonded_death','lost_dependent') "
+        "json_extract(r.payload,'$.actor_id')=? AND json_extract(r.payload,'$.reason') IN ('witness_bonded_death','lost_dependent',"
+        "'word_of_a_death') "
         "AND (json_extract(c.payload,'$.body_id')=? OR json_extract(c.payload,'$.about_id')=?)",
         (actor, subject, subject)) is not None
 

@@ -226,6 +226,7 @@ class ResolveRules(Strict):
         "lost_dependent": 3, "made_to_watch": 2, "coerced": 1, "held_temper": 1,
         "self_disgust": 1, "resisting_urge": 1,
         "the_talk": 2,   # D-107 RES-06: what the talk costs a mind that holds
+        "word_of_a_death": 1,   # D-222: told that someone you are close to is dead (seeing it is witness_bonded_death)
     })
     recover_per_safe_night: int = 1
     recover_shock_passes: int = 1   # D-107 RES-07: a shattered mind's first hours pass

@@ -1493,3 +1493,19 @@
       payload: {toward: "$trigger.attacker", delta: -1}
   delay_s: 0
   cites: [D-220, D-126, STAND-02]
+# D-222 — word of a death. Seeing someone you love die wears you down (CAS-008), and a guardian told their child is
+# dead is broken by it (CAS-030); anyone else close to the dead, told it by someone they believe, felt nothing. Being
+# told costs less than seeing it, and a loss is grieved once however many times it is told. The player's character
+# is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-111
+  description: Word that someone you love is dead wears you down, if you believe it.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: dead, believed: true}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: heard_it(trigger.event_id)
+      payload: {scale_by: bond_to_subject, cause: word_of_a_death}
+  delay_s: 0
+  cites: [D-222, D-123, docs/as/05_ACTORS.md#5]

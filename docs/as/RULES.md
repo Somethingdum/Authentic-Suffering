@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-863 ids; 605 with their own statement, 258 named only in context.
+864 ids; 606 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -118,7 +118,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-005 | A water shortage cuts the settlement's ration level by one step. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-006 | A ration cut to level 2 or lower raises every dependent-holding household's tension toward the leadership, and forces the worst-hit household's head into a loyalty check. | as_content/packs/core/cascade/economy.yaml | `as_engine/society/group.py`, `as_engine/society/settlement.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p09_society/test_econ_chain.py` |
 | CAS-007 | A death leaves the dead person's household grieving and opens a vacancy in every role they held. | as_content/packs/core/cascade/people.yaml | `as_engine/society/household.py`, `as_engine/society/work.py`, `as_engine/world/worldmove.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_household.py` |
-| CAS-008 | Everyone bonded to the dead who sees it happen loses Resolve, and a guardian who sees their dependent die loses the most. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-008 | Everyone bonded to the dead who sees it happen loses Resolve, and a guardian who sees their dependent die loses the most. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py`, `contract/p09_society/test_word_of_a_death.py` |
 | CAS-009 | A very loud sound outdoors pulls nearby infected toward it over the following minutes. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
 | CAS-01 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-010 | Catching someone in a lie costs them trust with whoever caught them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | — |
@@ -143,7 +143,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-028 | Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_word_gets_around.py` |
 | CAS-029 | Keeping a promise steadies the one who kept it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_promises_answered.py`, `contract/p07_slice/test_sleep_rests_you.py` |
 | CAS-03 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
-| CAS-030 | Word that someone in their care is dead breaks a guardian's Resolve, if they believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
+| CAS-030 | Word that someone in their care is dead breaks a guardian's Resolve, if they believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py`, `contract/p09_society/test_word_of_a_death.py` |
 | CAS-031 | The first time someone kills a person, it weighs on them — whatever the reason. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-032 | Killing a child breaks something in the killer. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
 | CAS-033 | A severe wound's pain shakes a person's will. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p09_society/test_what_wears_the_will_down.py` |
@@ -230,6 +230,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-108 | Being spat at or given the finger, even with nobody else there, is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py` |
 | CAS-109 | A group whose standing toward one of its own falls to the bottom casts them out. | as_content/packs/core/cascade/people.yaml | `as_engine/society/group.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
 | CAS-110 | Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
+| CAS-111 | Word that someone you love is dead wears you down, if you believe it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_of_a_death.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |

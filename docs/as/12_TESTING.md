@@ -881,6 +881,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_friend_of_yours.py` | June, a friend of Cal's (affection 1), holds "Ray shoved Cal, a friend of yours, to the dead."; loving him (affection 2), "Ray shoved Cal, someone you love, to the dead." |
 
+### 3.114 Word of a death (P9; D-222)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_word_of_a_death.py` | Mae, told by Finn that her husband Hal is dead, loses a point of Resolve (word_of_a_death); Kit, not close to him, nothing; told again by Kit, Mae grieves once; Hal told his daughter Pip is dead is broken (lost_dependent, CAS-030) and not drained twice; the player's character told it is not changed |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

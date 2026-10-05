@@ -388,7 +388,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
                                              with the given cause; 'dependent_of_subject': only a guardian,
                                              'lost_dependent'. Either way a loss is grieved once: no drain
                                              when the target already has a RESOLVE_CHANGE of reason
-                                             witness_bonded_death or lost_dependent whose cause event's
+                                             witness_bonded_death, lost_dependent or (D-222)
+                                             word_of_a_death whose cause event's
                                              payload body_id or about_id is the subject, nor for the
                                              subject itself
   recover_resolve                            (D-122) mind.resolve.recover(tx, target, payload.cause,
