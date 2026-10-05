@@ -271,11 +271,15 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **To your face** (D-219, CAS-107/108): an insult, or spitting at someone or giving them the finger, with nobody
   else there leaves a point of resentment toward the one who did it, once an hour however often; with an audience
   it is the humiliation of CAS-042/079.
+- **Cast out** (D-220, CAS-109/110): when a group's standing toward one of its own falls to -3 it casts them out —
+  no longer of the group, out of their household and off their shift; they know they cannot stay and everyone else
+  keeps them out. Hurting one of a group's own who was not fighting, in front of any of them, costs a point of
+  standing once a day; killing one costs three. The player's character can be cast out like anyone.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later
   believes the teller trusts the killer 2 less. Each of the dead's groups with an onlooker among
-  its members gives the killer 2 less standing, even one of their own. The killer carries it
+  its members gives the killer 3 less standing (D-220), even one of their own. The killer carries it
   (stress +2) whether anyone saw or not. A figure going down in the dark names nobody; self-defence
   and defending someone else cost nothing beyond the death; the player's character is never made to
   feel anything about it (C06).

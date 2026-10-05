@@ -1601,6 +1601,33 @@ def select(tx, selector, trigger):
                                               "fidelity IN ('exact','partial')", (v,))} - {dead})
     if fn == "onlookers_of":                                         # D-119
         return _onlookers(tx, trigger, v)
+    if fn == "cast_out_by":                                          # D-220: the group is done with them
+        from ..society.group import CAST_OUT_AT
+        pl = trigger.payload or {}
+        g, who = pl.get("group_id"), pl.get("actor_id")
+        if trigger.type != EventType.STANDING_CHANGE or not g or not who or not (pl.get("new", 0) <= CAST_OUT_AT < pl.get("old", 0)):
+            return []
+        alive = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (who,))
+        return [g] if alive and alive[0] and tx.query_one("SELECT 1 FROM group_members WHERE group_id=? AND actor_id=? AND status IN "
+                                                          "('member','probation')", (g, who)) else []
+    if fn == "groups_that_saw_hurt":                                 # D-220: one of their own hurt in front of them
+        a = _assault(tx, trigger)
+        if a is None:
+            return []
+        hurt = (trigger.payload or {}).get("body_id")
+        seen = select(tx, "assault_onlookers_of(trigger.event_id)", trigger)
+        out = []
+        for (g,) in tx.query("SELECT group_id FROM group_members WHERE actor_id=? AND status IN ('member','probation') ORDER BY group_id",
+                             (hurt,)):
+            if not any(tx.query_one("SELECT 1 FROM group_members WHERE group_id=? AND actor_id=? AND status IN ('member','probation')",
+                                    (g, h)) for h in seen):
+                continue
+            if tx.query_one("SELECT 1 FROM events s JOIN events c ON c.event_id=s.cause_event_id WHERE s.type='STANDING_CHANGE' AND "
+                            "json_extract(s.payload,'$.group_id')=? AND json_extract(s.payload,'$.actor_id')=? AND c.type='HARM' AND "
+                            "s.at>?", (g, a[0], trigger.at - 86_400_000)):
+                continue                                             # once a day: a beating is one wrong, not ten
+            out.append(g)
+        return out
     if fn == "groups_that_saw":                                      # D-119
         seen = _onlookers(tx, trigger, v)
         dead = (trigger.payload or {}).get("body_id")
@@ -1832,6 +1859,10 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
                             "json_extract(payload,'$.awareness')='awake'", (E, target))
         if over is None:
             wake(tx, target, at, E, turn_index)
+    elif eff.kind == "emit_event" and et == "DEFECTION":                 # D-220: cast out
+        from ..society.group import cast_out
+        if pl.get("subject"):
+            cast_out(tx, target, pl["subject"], at, turn_index, E)
     elif eff.kind == "emit_event" and et == "STANDING_CHANGE":           # D-119
         from ..mind.mind import adjust_group_standing
         if pl.get("toward"):

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-860 ids; 602 with their own statement, 258 named only in context.
+863 ids; 605 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -139,7 +139,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-024 | Every bite someone sees the dead take out of a person or an animal wears them down; watching a whole feeding breaks people. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p10_world/test_feeding.py` |
 | CAS-025 | Killing someone who was not fighting costs the killer the trust of everyone who saw who did it, leaves them afraid of the killer, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_seen_before_swept.py`, `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_captives.py`, `contract/p09_society/test_fed_to_the_dead.py`, `contract/p09_society/test_hands_up.py` |
 | CAS-026 | Whoever kills someone who was not fighting carries it afterwards, whether anyone saw or not. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_seen_before_swept.py`, `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_fed_to_the_dead.py` |
-| CAS-027 | Killing one of a group's own, in front of any of them, when they were not fighting costs the killer that group's standing — even when the killer is one of them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py` |
+| CAS-027 | Killing one of a group's own, in front of any of them, when they were not fighting costs the killer that group's standing — even when the killer is one of them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_cast_out.py` |
 | CAS-028 | Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_word_gets_around.py` |
 | CAS-029 | Keeping a promise steadies the one who kept it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_promises_answered.py`, `contract/p07_slice/test_sleep_rests_you.py` |
 | CAS-03 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
@@ -228,6 +228,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-106 | Hearing, from someone they believe, that a person let the dead in on people costs that person some of the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_let_them_in.py` |
 | CAS-107 | Being insulted to your face, even with nobody else there, is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py` |
 | CAS-108 | Being spat at or given the finger, even with nobody else there, is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_to_your_face.py` |
+| CAS-109 | A group whose standing toward one of its own falls to the bottom casts them out. | as_content/packs/core/cascade/people.yaml | `as_engine/society/group.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
+| CAS-110 | Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |
@@ -569,6 +571,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | GRP-10 | GRP-10 day(tx, rng, row, fired, turn_index) -> list[Event] (the GROUP_DAY handler, daily at R.group_hour). g = row['subject_id'], at = row['due_at']. GD = GROUP_DAY {group_id, members: living members, pairs: len(pairs)}… | as_engine/society/group.py | `as_engine/society/group.py` | `contract/p09_society/test_group.py` |
 | GRP-11 | GRP-11 Standing — the world's memory of you — lives in group_standing (this owner's table); the functions are mind.mind.standing_toward / adjust_group_standing (they build their events with writer 'society.group'). | as_engine/society/group.py | `as_engine/society/group.py` | `contract/p09_society/test_group.py` |
 | GRP-12 | GRP-12 ensure_timers(tx, group_id, at, turn_index) -> list[str]: no pending GROUP_DAY row for the group -> kernel.clock.schedule(tx, society.settlement.next_hour(at, R.group_hour), 'GROUP_DAY', group_id, {'group_id': gr… | as_engine/society/group.py | `as_engine/society/group.py` | — |
+| GRP-13 | GRP-13 (D-220) cast_out(tx, group_id, actor_id, at, turn_index, cause_event_id) -> list[Event] (core | as_engine/society/group.py | `as_engine/society/_impl_society.py`, `as_engine/society/group.py`, `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_cast_out.py` |
 
 ## GUIDE
 

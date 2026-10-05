@@ -107,7 +107,7 @@ def test_a_squad_mate_killed_in_front_of_everybody(scenario):
     assert held, "Mara carries the story"
     assert stress(w, "pc") == min(10, owen_before + 2), "he carries it"
     with w.store.transaction() as tx:
-        assert mind.standing_toward(tx, crew, w.id("pc")) == max(-5, standing_before - 2), "the crew thinks less of him"
+        assert mind.standing_toward(tx, crew, w.id("pc")) == max(-5, standing_before - 3), "the crew is done with him (D-220)"
     assert rel(w, "pc", "pc", "trust") == 0 and not w.store.query(
         "SELECT 1 FROM rumours WHERE origin_holder IN (?, ?)", (w.id("pc"), w.id("alice"))), "never the killer or the dead"
 

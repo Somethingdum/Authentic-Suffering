@@ -189,9 +189,9 @@
     - kind: emit_event
       event_type: STANDING_CHANGE
       target: groups_that_saw(trigger.event_id)
-      payload: {toward: "$trigger.killer", delta: -2}
+      payload: {toward: "$trigger.killer", delta: -3}
   delay_s: 0
-  cites: [D-119, STAND-02]
+  cites: [D-119, D-220, STAND-02]
 - schema: as.cascade.v1
   id: CAS-028
   description: Hearing, from someone they believe, that a person killed someone who was not fighting back costs that person the listener's trust.
@@ -1462,3 +1462,34 @@
       payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: insulted}
   delay_s: 0
   cites: [D-219, D-204]
+# D-220 — cast out. A settlement's laws spoke of banishment and nothing ever banished anyone: a group's standing
+# toward one of its own could sink as low as it liked and they slept in the same house, drew the same ration and
+# worked the same shift. Now a group done with one of its own casts them out; and hurting one of a group's own in
+# front of any of them costs a point of the group's standing, and killing one now costs three (CAS-027, was two) —
+# a killing seen is the end of it for anyone not already high in the group's regard.
+- schema: as.cascade.v1
+  id: CAS-109
+  description: A group whose standing toward one of its own falls to the bottom casts them out.
+  trigger_event: STANDING_CHANGE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: DEFECTION
+      target: cast_out_by(trigger.event_id)
+      payload: {subject: "$trigger.payload.actor_id"}
+  delay_s: 0
+  cites: [D-220, GRP-13, STAND-02]
+- schema: as.cascade.v1
+  id: CAS-110
+  description: Hurting one of a group's own who was not fighting, in front of any of them, costs the attacker a point of that group's standing — once a day.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.attacker_provoked == false"]
+  effects:
+    - kind: emit_event
+      event_type: STANDING_CHANGE
+      target: groups_that_saw_hurt(trigger.event_id)
+      payload: {toward: "$trigger.attacker", delta: -1}
+  delay_s: 0
+  cites: [D-220, D-126, STAND-02]

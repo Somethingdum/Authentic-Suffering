@@ -95,6 +95,24 @@ GRP-11 Standing — the world's memory of you — lives in group_standing (this 
 GRP-12 ensure_timers(tx, group_id, at, turn_index) -> list[str]: no pending GROUP_DAY row for the
   group -> kernel.clock.schedule(tx, society.settlement.next_hour(at, R.group_hour), 'GROUP_DAY',
   group_id, {'group_id': group_id}, None). Returns the new queue ids.
+GRP-13 (D-220) cast_out(tx, group_id, actor_id, at, turn_index, cause_event_id) -> list[Event]   (core
+  CAS-109: a group whose standing toward one of its own falls to CAST_OUT_AT or below casts them out —
+  the laws' "banishment".) Not a 'member' or 'probation' group_members row of the group, or not alive
+  -> []. DEFECTION {actor_id, group_id, cast_out: true} (writer 'society.group', actor_id = them,
+  cause = cause_event_id) updating their group_members status to 'expelled'. N = the name of the
+  settlement whose group it is (the lowest settlement_id), else the group's name. With D the
+  DEFECTION id as cause: their household, when it belonged to that settlement before the DEFECTION
+  (society.settlement.settlement_of):
+  society.household.apply_change(..., 'member_left', them, ...); each of their work_assignments rows
+  at that settlement's workplaces (key order): ROLE_RELEASED {workplace_id, role, actor_id,
+  shift_start_hh, covering_for, reason: 'cast_out'} (writer 'society.work') deleting it, then
+  society.settlement.add_vacancy(...) for that post. They, when not controlled by 'human' (C06):
+  mind.mind.open_loop(tx, them, 'goal', f"{N} has cast you out. You cannot stay.", [], 3, D, ...).
+  Every other living 'member' or 'probation' member of the group (sorted ids) not controlled by
+  'human': open_loop(tx, m, 'goal', f"{Word} has been cast out of {N}. They are not to come back.",
+  [them], 2, D, ...) (Word = mind.perception.word_for(tx, m, them), first letter capitalised).
+  Leaving is theirs to do; keeping them out is everyone's. Returns every event committed, in seq
+  order.
 Leadership challenges, splintering and coalitions would ride on the same tension and pressure
 numbers; they are backlog, not v1 (DECISIONS D-49). P10 brings leaving a group (world.worldmove,
 DEFECTION).
@@ -162,4 +180,13 @@ def day(tx: "Tx", rng: "Rng", row: dict, fired: "Event", turn_index: int) -> lis
 
 def ensure_timers(tx: "Tx", group_id: str, at: int, turn_index: int) -> list[str]:
     raise NotImplementedError("P9")
+
+
+CAST_OUT_AT = -3    # D-220: the standing at which a group is done with one of its own (trade_terms refuses at it too)
+
+
+def cast_out(tx: "Tx", group_id: str, actor_id: str, at: int, turn_index: int,
+             cause_event_id: str | None) -> list["Event"]:
+    raise NotImplementedError("P9")
 from ._impl_society import g_members as members, leader_of, tension_of, adjust_tension, contacts, pairs, defection_pressure, loyalty_check, animosity, group_day as day, group_ensure as ensure_timers  # noqa
+from ._impl_society import cast_out  # noqa

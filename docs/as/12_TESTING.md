@@ -869,6 +869,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_to_your_face.py` | Owen calls June a useless idiot with nobody else there: she resents him a point more, once an hour however often he says it, and again an hour on; ordinary words are nothing; with Mara on the floor it is the humiliation (CAS-042), not this; the finger or spitting at her alone counts, pointing does not; an insult to the player's character changes nothing in him |
 
+### 3.112 Cast out (P9; D-220)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_cast_out.py` | Finn cast out of Pumpwell: expelled from the settlers, out of his household, off the watch with his post left vacant, told he cannot stay, and everyone else set to keep him out — once; a standing that falls to -3 casts Jude out, and not before; the player's character can be cast out, with nothing written into him; hurting one of their own in front of them costs a point once a day; Jude cutting Finn's throat in front of Wade and Kit is the end of it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

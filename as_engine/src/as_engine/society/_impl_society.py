@@ -1265,3 +1265,43 @@ def group_ensure(tx, group_id, at, turn_index):
     if clock.pending_for(tx, "GROUP_DAY", group_id):
         return []
     return [clock.schedule(tx, next_hour(at, _R(tx).group_hour), "GROUP_DAY", group_id, {"group_id": group_id}, None)]
+
+
+def cast_out(tx, group_id, actor_id, at, turn_index, cause_event_id):
+    """D-220 (GRP-13): a group done with one of its own."""
+    from ..mind.mind import open_loop
+    from ..mind.perception import word_for
+    m = _row(tx, "SELECT status FROM group_members WHERE group_id=? AND actor_id=?", (group_id, actor_id))
+    if m is None or m["status"] not in ("member", "probation") or not _alive(tx, actor_id):
+        return []
+    first = tx.query_one("SELECT COALESCE(MAX(seq),0) FROM events")[0]
+    hh = household_of(tx, actor_id)
+    home = settlement_of(tx, hh) if hh else None              # before they are out: a household of one is theirs
+    d = _commit(tx, type=EventType.DEFECTION, writer="society.group", at=at, turn_index=turn_index, actor_id=actor_id,
+                cause_event_id=cause_event_id, payload={"actor_id": actor_id, "group_id": group_id, "cast_out": True},
+                writes=[_W(WriteOp.UPDATE, "group_members", {"status": "expelled"}, {"group_id": group_id, "actor_id": actor_id})])
+    stl = _row(tx, "SELECT settlement_id, name FROM settlements WHERE group_id=? ORDER BY settlement_id LIMIT 1", (group_id,))
+    name = stl["name"] if stl else _row(tx, "SELECT name FROM groups WHERE group_id=?", (group_id,))["name"]
+    if stl:
+        if hh and home == stl["settlement_id"]:
+            apply_change(tx, hh, "member_left", actor_id, at, turn_index, d.event_id)
+        for w in _rows(tx, "SELECT a.* FROM work_assignments a JOIN workplaces p ON p.workplace_id=a.workplace_id WHERE "
+                           "a.actor_id=? AND p.settlement_id=? ORDER BY a.workplace_id, a.role, a.shift_start_hh",
+                       (actor_id, stl["settlement_id"])):
+            _commit(tx, type=EventType.ROLE_RELEASED, writer="society.work", at=at, turn_index=turn_index, actor_id=actor_id,
+                    cause_event_id=d.event_id,
+                    payload={"workplace_id": w["workplace_id"], "role": w["role"], "actor_id": actor_id,
+                             "shift_start_hh": w["shift_start_hh"], "covering_for": w["covering_for"], "reason": "cast_out"},
+                    writes=[_W(WriteOp.DELETE, "work_assignments", key={"workplace_id": w["workplace_id"], "actor_id": actor_id,
+                                                                        "role": w["role"], "shift_start_hh": w["shift_start_hh"]})])
+            add_vacancy(tx, stl["settlement_id"], w["workplace_id"], w["role"], actor_id, at, turn_index, d.event_id)
+    if _controller(tx, actor_id) != "human":
+        open_loop(tx, actor_id, "goal", f"{name} has cast you out. You cannot stay.", [], 3, d.event_id, at, turn_index)
+    for mm in g_members(tx, group_id):
+        if mm == actor_id or _controller(tx, mm) in (None, "human"):
+            continue
+        who = word_for(tx, mm, actor_id)
+        open_loop(tx, mm, "goal", f"{who[:1].upper() + who[1:]} has been cast out of {name}. They are not to come back.",
+                  [actor_id], 2, d.event_id, at, turn_index)
+    return _since(tx, first)
+

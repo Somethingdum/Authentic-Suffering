@@ -253,6 +253,16 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               player's character (what they feel about it is the
                                               player's, C06). A figure going down in the dark names
                                               nobody. No killer: []
+    cast_out_by(<path>)                       (D-220) for a STANDING_CHANGE that takes a group's standing
+                                              toward someone from above society.group.CAST_OUT_AT to it
+                                              or below (payload old, new): that group (payload group_id),
+                                              when they are alive and one of its 'member' or 'probation'
+                                              members
+    groups_that_saw_hurt(<path>)              (D-220) for a HARM with trigger.attacker: the groups the
+                                              one hurt is a 'member' or 'probation' member of that have
+                                              one of assault_onlookers_of as such a member — not a group
+                                              already given a STANDING_CHANGE toward the attacker caused
+                                              by a HARM in the day before (a beating is one wrong)
     groups_that_saw(<path>)                   (D-119) for a killing: the groups the dead was a 'member'
                                               or 'probation' member of that have one of
                                               onlookers_of(<path>) as a 'member' or 'probation' member —
@@ -345,6 +355,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
                                              body has woken since E (an AWARENESS_CHANGE or
                                              POSTURE_CHANGE of it with awareness 'awake' after E: that
                                              sleep is over)
+  emit_event DEFECTION                       (D-220) society.group.cast_out(tx, target (a group id),
+                                             p.subject, at, turn_index, E)
   emit_event STANDING_CHANGE                 (D-119) mind.mind.adjust_group_standing(tx, target (a group id),
                                              p.toward, int(p.delta), E, at, turn_index)
   emit_event INFECTED_DRIFT                  world.infected.attract(tx, target, p.toward (a place or body
