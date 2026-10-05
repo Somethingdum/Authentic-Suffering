@@ -377,13 +377,16 @@ _TEEN_VOICES = (
     ("polite to adults, savage to other kids", "keeps secrets badly"),
 )
 
+# D-143: each line set belongs to the voice at the same index — a person's lines sound like the person.
 _EXEMPLARS = (
-    ("Pump's running. Could be worse.", "Get inside. Now.", "I can't. I just can't do it again."),
-    ("You eaten today? Sit down a minute.", "Everybody quiet. Listen.", "Don't make me choose. Please."),
+    ("Work's done. Could be worse.", "Get inside. Now.", "I can't. I just can't do it again."),
+    ("You eaten today? Sit down a minute.", "Who's missing? Who's not here?", "Don't make me choose. Please."),
     ("Nice day for the end of the world.", "Move. Talk later.", "That's it. I'm done carrying this."),
     ("Here's how it works, and here's why.", "Stop. Think. Which way did it come?", "I told you. I told all of you."),
-    ("Morning. Don't touch my coffee.", "Hands where I can see them.", "Go on then. Do it. I'm tired."),
+    ("Ha. Sorry. Shit. It's not funny. It's a bit funny.", "Shit, shit, shit. Move!", "Why am I laughing? He's dead. Why am I laughing?"),
     ("If the Lord wanted us dead, friend, He's taking His time.", "Pray later. Run now.", "There's nobody listening. There never was."),
+    ("Did I ever tell you about the drive-in? Before? You'd have loved it.", "Okay, okay, I'm moving, I'm moving.",
+     "Say something. Anybody. I can't stand the quiet."),
     ("Mm-hm. Fine.", "Back. Back, I said.", "...Leave me be."),
     ("Three jugs, two cans, one knife. That's the lot.", "One: shut the door. Two: shut up.", "I counted them. I counted every one of them."),
     ("Sorry, sorry, is anyone sitting here?", "Please, please just stay behind me.", "I'm sorry. I'm so sorry. I couldn't hold on."),
@@ -391,34 +394,49 @@ _EXEMPLARS = (
     ("Take your time. Nothing but time now.", "Easy. Slow. Nobody shoots.", "I have nothing left to weigh it against."),
     ("Fine weather for burying, my mother used to say.", "Them. Behind the cars. Don't look.", "I keep seeing her face. Every time I close my eyes."),
     ("We'll want that wall patched by dark, won't we.", "We are leaving. Now.", "We? There's no we. There's just me."),
-    ("Hm-hm-hm... sorry, what was that?", "Quiet, love, quiet.", "I don't... I don't remember what I came in for."),
+    ("Hm-hm-hm... sorry, what was that?", "Quiet, quiet...", "I don't... I don't remember what I came in for."),
+    ("It's 'fewer', not 'less'. Old habits.", "Indoors, the lot of you. Hasten.", "There's no word for this. I looked. There isn't one."),
     ("That's that, then.", "No. That's final.", "You want to fight me? Fine. Outside."),
     ("Hello, pet. You look half starved.", "Pet, behind me. Don't argue.", "Not the little one. Take me instead."),
+    ("There's tea. If you want it.", "Shh. Down. Stay down.", "Don't shout. Please don't shout at me."),
+    ("Morning, Dad. Same as ever up here.", "Run, Sam. Ben. Whoever you are, run!", "You'd know what to do. You always knew. Tell me."),
 )
 _KID_EXEMPLARS = (
     ("Why is the sky that colour?", "Mum said we have to be quiet.", "I want to go home. I want to go home."),
-    ("I found a button. It's mine now.", "Is it them? Is it them?", "Don't leave me here. Please don't."),
-    ("Mr Bear says he's hungry.", "Shh. Shh. They'll hear.", "Wake up. Wake up. Why won't you wake up?"),
-    ("I can count to a hundred. Want to hear?", "I'm hiding. I'm good at hiding.", "I didn't mean to. I didn't!"),
-    ("When I'm big I'm going on the wall.", "I'll be brave. I'll be really brave.", "Where did everybody go?"),
-    ("Can I have the last bit? Please?", "Hold my hand. Hold it tight.", "I don't like it here anymore."),
+    ("Mr Bear says he's starving to death.", "Shh. Shh. They'll hear.", "Wake up. Wake up. Why won't you wake up?"),
+    ("Can I sit by you? I'll be quiet.", "Is it them? Is it them?", "Don't leave me here. Please don't."),
+    ("I can count to a hundred. Want to hear?", "I'm hiding. I'm the best at hiding.", "I didn't mean to. I didn't!"),
+    ("We have to ration it. That means a little bit every day.", "Everybody stay calm. That's what you say.", "Where did everybody go?"),
+    ("And the dog went under the fence and I said no and he did it anyway and", "Sorry! Sorry. I'm quiet now. I'm quiet.",
+     "I don't like it here anymore."),
 )
 _TEEN_EXEMPLARS = (
-    ("Whatever. It's fine.", "Run! Don't wait for me!", "Don't touch me. Don't you dare."),
-    ("I could do that run. I'm faster than you.", "Shut up and move.", "You don't get to tell me it's okay."),
+    ("Oh good. Beans again. My favourite.", "Run! Don't wait for me!", "You don't get to tell me it's okay."),
+    ("I could do that run. I'm faster than you.", "Shut up and move.", "Don't touch me. Don't you dare."),
+    ("Whatever. It's fine.", "Go. Just go.", "Leave me alone. Please, just leave me alone."),
+    ("Heard the watch talking about you.", "That rule's stupid and you know it. Move!", "I just want one normal day. One."),
     ("Is that a real gun? Can I hold it?", "Get down, get down!", "I hate this. I hate all of you."),
-    ("Nobody asked you.", "Go. I've got it. Go!", "I'm not a kid. Stop treating me like one."),
-    ("Heard the watch talking about you.", "Not a word. Not one word.", "I just want one normal day. One."),
-    ("My mum had a phone. Imagine that.", "Stay low. Follow me.", "Leave me alone. Please, just leave me alone."),
+    ("Nobody asked you.", "Not a word. Not one word.", "I'm not a kid. Stop treating me like one."),
+)
+# Elders draw from the adult voices and these (D-143): an old person is not only their age.
+_ELDER_VOICES = (
+    ("uses old words nobody uses now", "corrects people"),
+    ("fusses over everyone", "calls people 'love'"),
+    ("dry jokes", "talks about the old world as if it were still there"),
+    ("tells stories about before", "talks to fill a silence"),
+    ("blunt as a hammer", "worries out loud"),
+    ("speaks slowly", "reads the weather in their bones"),
 )
 _ELDER_EXEMPLARS = (
     ("In my day we had a word for this. Several.", "Get the young ones in first.", "I've buried enough. I'll not bury you."),
-    ("Sit, sit. Let an old woman fuss.", "Don't run. It only makes them faster.", "Let me go. I'm slowing you down."),
+    ("Sit, sit. Let me fuss.", "Don't run, love. It only makes them faster.", "Let me go. I'm slowing you down."),
     ("Kettle's on. Would be, if there were a kettle.", "Hush. Listen to the dogs.", "This was a school once. Children laughing."),
     ("Before all this I sold shoes. Imagine.", "Steady. Steady hands.", "Leave me the pistol and go."),
     ("You're too thin. Eat.", "Bar the door, quick now.", "It should have been me first. Not him."),
     ("Weather's turning. Knees never lie.", "Not that way, that's the river.", "I'm tired, love. So very tired."),
 )
+_PROFANITY = ("none", "rare", "frequent", "constant")
+
 
 _NEVER_SAY = (
     "Let them starve.", "Not my problem.", "Whatever you say, boss.", "Leave the kid behind.", "I'm done with all of you.",
@@ -585,17 +603,30 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     person's name, variant and the field — from pools for their age (a child under 12, a teen 12-17, an
     adult, an elder 60 and over), cohort (what they can remember losing: pre_fall_adult, fall_child,
     post_fall_born) and work, so no two people in a settlement share a whole inner life and a child never
-    talks like a pump mechanic. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace
-    every unlocked field of it."""
+    talks like a pump mechanic. (D-143) A voice and its lines are one draw — the lines sound like the voice
+    (an elder draws from the adult voices and the elders' own; nobody born after the Fall draws one that
+    remembers the world before it) — and the profanity follows it: someone who
+    swears when nervous swears at least 'frequent'ly, someone who quotes scripture or apologises for
+    everything never does. The temper still comes from ``variant`` (H1). WORLDGEN_ACTOR may replace every
+    unlocked field of it."""
     v = seed.variant
     first = seed.name.split()[0]
     adult = seed.age >= 16
     kid, teen, elder = seed.age < 12, 12 <= seed.age < 18, seed.age >= 60
     traits = _draw(seed, "traits", _KID_TRAITS if kid else _TRAITS, 2)
     t1, t2 = traits
-    tend = _draw(seed, "voice", _KID_VOICES if kid else _TEEN_VOICES if teen else _VOICES)
-    ex = _draw(seed, "exemplars", _KID_EXEMPLARS if kid else _TEEN_EXEMPLARS if teen else
-               _ELDER_EXEMPLARS if elder else _EXEMPLARS)
+    voices, lines = ((_KID_VOICES, _KID_EXEMPLARS) if kid else (_TEEN_VOICES, _TEEN_EXEMPLARS) if teen else
+                     (_VOICES + _ELDER_VOICES, _EXEMPLARS + _ELDER_EXEMPLARS) if elder else (_VOICES, _EXEMPLARS))
+    pairs = tuple(zip(voices, lines))
+    if seed.cohort == "post_fall_born":       # D-143: nobody born after the Fall tells stories about before it
+        pairs = tuple(p for p in pairs if not any(k in " ".join(p[0] + p[1]) for k in ("before", "old world", "old words",
+                                                                                      "old city", "used to say")))
+    tend, ex = _draw(seed, "voice", pairs)                             # D-143: the lines go with the voice
+    swear = _draw(seed, "profanity", ("none", "rare", "rare", "frequent", "constant"))
+    if any("swear" in x for x in tend):
+        swear = max(swear, "frequent", key=_PROFANITY.index)
+    elif any(k in x for x in tend for k in ("scripture", "polite to a fault", "says sorry")):
+        swear = "none"
     fmt = {"group": seed.group_name, "settlement": seed.settlement_name, "occupation": seed.occupation}
     motive, method = _draw(seed, "motive", _KID_MOTIVES if kid else _MOTIVES)
     wounds = _WOUNDS.get(seed.cohort) or _WOUNDS["pre_fall_adult"]
@@ -655,7 +686,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                   "speech_tendencies": list(tend),
                   "exemplars": {"low_stakes": ex[0], "under_pressure": ex[1], "at_the_limit": ex[2]},
                   "would_never_say": _draw(seed, "never", _KID_NEVER_SAY if kid else _NEVER_SAY, 3),
-                  "profanity": "none" if kid else _draw(seed, "profanity", ("none", "rare", "rare", "frequent", "constant")),
+                  "profanity": "none" if kid else swear,
                   "dialect_notes": "" if kid else _draw(seed, "dialect", _DIALECTS)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
         "life": {"aspiration": _draw(seed, "aspiration", _KID_ASPIRATIONS if kid else _ASPIRATIONS),

@@ -536,6 +536,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_left_behind.py` | June, bleeding from a deep cut, watches Mara (whom she loves) walk out: she trusts her 2 less and holds a grudge (CAS-059); a minute later it is not counted again. Owen walks out on her the same way (she has come to love him): the same, nothing written into Owen. A scratch, someone she does not love, or June out cold: nobody is left behind |
 
+### 3.57 A person's lines sound like the person (P10; D-143)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_voices_hang_together.py` | For adults, children, teens and elders the three lines are always the set that belongs to the voice drawn; elders are not only their age (a dozen or more voices among a hundred); nobody born after the Fall remembers the world before it; whoever swears when nervous swears, whoever quotes scripture or apologises for everything never does; no line names another trade's work or a sex |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

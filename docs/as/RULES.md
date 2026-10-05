@@ -478,7 +478,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| GEN-01 | *Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the* | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py` | `contract/p10_world/test_nobody_is_a_template.py` |
+| GEN-01 | *Plain but specific enough to pass CNT-10. D-127 (GEN-01): every field is its own draw — sha256 of the* | as_engine/world/worldgen/people.py | `as_engine/world/worldgen/people.py` | `contract/p10_world/test_nobody_is_a_template.py`, `contract/p10_world/test_voices_hang_together.py` |
 
 ## GEO
 
