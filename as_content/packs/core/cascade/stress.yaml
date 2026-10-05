@@ -138,3 +138,32 @@
       payload: {cause: protected_dependent}
   delay_s: 0
   cites: [D-139, docs/as/05_ACTORS.md#5]
+# D-146 — broken nights. Under that much strain sleep does not hold: three hours in, they wake and it does not come
+# back (no safe night, so no Resolve given back — CAS-021 asks for six hours). The player's character too: what wakes
+# them is the body's, not a feeling written into them.
+- schema: as.cascade.v1
+  id: CAS-061
+  description: Lying down to sleep under heavy strain, a person wakes three hours in.
+  trigger_event: POSTURE_CHANGE
+  where: {awareness: asleep}
+  preconditions: ["actor(trigger.payload.body_id).stress >= 8"]
+  effects:
+    - kind: schedule_event
+      event_type: AWARENESS_CHANGE
+      target: actor(trigger.payload.body_id)
+      payload: {due_s: 10800, cause: nightmare}
+  delay_s: 0
+  cites: [D-146, SLEEP-01]
+- schema: as.cascade.v1
+  id: CAS-062
+  description: Falling asleep where they stand under heavy strain, a person wakes three hours in.
+  trigger_event: AWARENESS_CHANGE
+  where: {awareness: asleep}
+  preconditions: ["actor(trigger.payload.body_id).stress >= 8"]
+  effects:
+    - kind: schedule_event
+      event_type: AWARENESS_CHANGE
+      target: actor(trigger.payload.body_id)
+      payload: {due_s: 10800, cause: nightmare}
+  delay_s: 0
+  cites: [D-146, SLEEP-01]

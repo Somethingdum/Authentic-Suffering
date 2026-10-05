@@ -203,7 +203,9 @@ A sustained fear scene has nothing to hang on yet). Recovery: +1 per night aslee
 place the Actor *believes* is safe; +1 fulfilled obligation; +1 protecting a dependent. (D-122: a night
 is six hours or more of unbroken sleep, given back on waking — CAS-021; sleeping through it is what
 "believes is safe" is read as. A promise kept: CAS-029. Protecting a dependent (D-139): putting yourself between someone you
-look after and the danger — CAS-058, once a day however often, so shielding is no way to refill.)
+look after and the danger — CAS-058, once a day however often, so shielding is no way to refill.
+D-146: under heavy strain — stress 8 and up — sleep breaks three hours in, CAS-061/062, so no safe night
+comes and nothing is given back.)
 
 **Sleep** (D-122, SLEEP-01/02, `physical/bodies.py`, `action/resolve.py`): while asleep a person's
 fatigue holds where it was; waking pays it off, two hours awake for every hour slept

@@ -62,7 +62,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    INTRUSION_MS of now, of a DEATH of a human, a HARM of type 'bite' (someone
                    eaten) or an ACTION_START of butcher_human — the worst things seen come back
                    unasked, oftener the worse the strain (a memory, not a feeling: what the PC
-                   makes of it is the player's).
+                   makes of it is the player's); then (D-146) BROKEN_NIGHT_LINE when the PC woke
+                   this turn from a night broken under strain: an AWARENESS_CHANGE of the PC to
+                   'awake' whose cause event is the PC's own falling asleep (action.cascade's
+                   scheduled wake, core CAS-061/062).
   comprehension    'low' when attr_mod(P) + attr_mod(I) <= 4, 'high' when >= 8, else 'average'
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of
@@ -126,6 +129,7 @@ if TYPE_CHECKING:
 URGE_LINE = "Your body did it before you could stop it."   # W1 (D-80): pc_state_lines
 INTRUSION_LINE = "It comes back unasked: {text}"             # D-145 (NARR-11): pc_state_lines
 INTRUSION_STRESS = 7
+BROKEN_NIGHT_LINE = "You come awake in the dark, a few hours in, and you are not rested."   # D-146: pc_state_lines
 INTRUSION_MS = 3 * 24 * 3600 * 1000
 CHANNEL_KIND: dict[str, str] = {"visual": "sight", "auditory": "sound", "speech": "speech", "tactile": "touch",
                                 "olfactory": "smell", "vibration": "sound"}

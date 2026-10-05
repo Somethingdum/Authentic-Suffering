@@ -554,6 +554,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_it_comes_back.py` | Owen watched Alice kill June: at stress 9 it comes back every second turn, at 10 every turn, in his own words for it ('It comes back unasked: June goes down and does not move.'), and the prose may name her; at stress 6 it does not, nor in the turn it happened, nor four days on |
 
+### 3.60 Broken nights (P9; D-146)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_broken_nights.py` | Mara lies down at stress 9: three hours in she is awake (CAS-061; slept 3 h) and nothing is given back. At stress 5 she sleeps through. A night already over is not broken (she woke at two hours and lay down again). Owen at stress 8 wakes the same way and the narrator's state lines say so that turn only |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

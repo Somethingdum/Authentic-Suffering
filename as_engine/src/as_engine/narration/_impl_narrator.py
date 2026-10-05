@@ -160,6 +160,12 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     back, back_names = _intrusion(tx, pc_id, turn_index, at)     # NARR-11 (D-145): what comes back
     if back:
         state.append(back)
+    if tx.query_one("SELECT 1 FROM events w JOIN events s ON s.event_id=w.cause_event_id WHERE w.type='AWARENESS_CHANGE' AND "
+                    "w.turn_index=? AND json_extract(w.payload,'$.body_id')=? AND json_extract(w.payload,'$.awareness')='awake' AND "
+                    "s.type IN ('AWARENESS_CHANGE','POSTURE_CHANGE') AND json_extract(s.payload,'$.body_id')=? AND "
+                    "json_extract(s.payload,'$.awareness')='asleep'", (turn_index, pc_id, pc_id)) is not None:
+        from .narrator import BROKEN_NIGHT_LINE                  # D-146: a night broken
+        state.append(BROKEN_NIGHT_LINE)
     allowed = {pc, _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"]}
     for r in tx.query("SELECT DISTINCT a.known_name FROM percept_log p JOIN acquaintance a ON a.holder_id=p.holder_id AND a.subject_id=p.source_id "
                       "WHERE p.holder_id=? AND p.turn_index=? AND a.known_name IS NOT NULL", (pc_id, turn_index)):

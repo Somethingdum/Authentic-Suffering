@@ -198,6 +198,12 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   emit_event TENSION_CHANGE                  society.group.adjust_tension(tx, target, p.toward, p.delta,
                                              p.cause, at, turn_index, E)
   emit_event LOYALTY_CHECK                   society.group.loyalty_check(tx, target, p.group, p.reason, ...)
+  emit_event AWARENESS_CHANGE                (D-146) physical.bodies.wake(tx, target, at, E, turn_index): an
+                                             asleep or drowsy body wakes (anyone else: nothing) — a
+                                             scheduled one is a night broken, and does nothing when the
+                                             body has woken since E (an AWARENESS_CHANGE or
+                                             POSTURE_CHANGE of it with awareness 'awake' after E: that
+                                             sleep is over)
   emit_event STANDING_CHANGE                 (D-119) mind.mind.adjust_group_standing(tx, target (a group id),
                                              p.toward, int(p.delta), E, at, turn_index)
   emit_event INFECTED_DRIFT                  world.infected.attract(tx, target, p.toward (a place or body

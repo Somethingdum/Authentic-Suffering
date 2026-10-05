@@ -1288,6 +1288,13 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
         soc.adjust_tension(tx, target, pl["toward"], int(pl["delta"]), pl.get("cause") or "", at, turn_index, E)
     elif eff.kind == "emit_event" and et == "LOYALTY_CHECK":
         soc.loyalty_check(tx, target, pl["group"], pl.get("reason") or "cascade", at, turn_index, E)
+    elif eff.kind == "emit_event" and et == "AWARENESS_CHANGE":         # D-146: a night broken
+        from ..physical.bodies import wake
+        over = tx.query_one("SELECT 1 FROM events WHERE seq > (SELECT seq FROM events WHERE event_id=?) AND type IN "
+                            "('AWARENESS_CHANGE','POSTURE_CHANGE') AND json_extract(payload,'$.body_id')=? AND "
+                            "json_extract(payload,'$.awareness')='awake'", (E, target))
+        if over is None:
+            wake(tx, target, at, E, turn_index)
     elif eff.kind == "emit_event" and et == "STANDING_CHANGE":           # D-119
         from ..mind.mind import adjust_group_standing
         if pl.get("toward"):
