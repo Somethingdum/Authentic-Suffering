@@ -1062,6 +1062,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p06_memory/test_nothing_in_it_to_remember.py` | June seeing Mara start to watch or wait is not worth a memory; Mara heading for the back door or ducking into cover is; on the run's first turn, Mara standing by the counter where June already was is not, and Mara heading off still is |
 
+### 3.144 Known since it happened (P10; D-255)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_known_since_it_happened.py` | Every history holding is dated to its event's day (never after the seeding moment), and a generated person's packet no longer says of what everyone says that they heard it "just now" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

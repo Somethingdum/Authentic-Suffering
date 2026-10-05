@@ -1351,6 +1351,8 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
         subj_ok = {s.group_id, s.settlement_id, s.zone_id}
         beliefs = [(r[0], r[1]) for r in tx.query("SELECT hist_id, belief_text, subject_ids FROM history_events ORDER BY day, hist_id")
                    if subj_ok & set(json.loads(r[2]))]
+        heard_at = {r[0]: min(at, max(0, r[1]) * 86_400_000 + 12 * 3_600_000)               # D-255: known since it happened
+                    for r in tx.query("SELECT hist_id, day FROM history_events")}
         for x in mine:
             ws = [W("known_places", {"holder_id": x[0], "place_id": p, "first_seen": at, "last_seen": at,
                                      "visited": 1 if p == s.site_id else 0}, WriteOp.UPSERT, {"holder_id": x[0], "place_id": p})
@@ -1371,7 +1373,8 @@ async def write_people(client, rng, tx, plan, region, params, canon, detail, at,
             if props:
                 commit(tx, EventType.PERCEIVE, "mind.perception", at, [
                     W("claim_holdings", {"holder_id": x[0], "claim_id": pid, "believed": 1, "confidence": 2, "provenance": "common",
-                                         "fidelity": "exact", "acquired_at": at, "acquired_via": ev.event_id}) for pid in props],
+                                         "fidelity": "exact", "acquired_at": heard_at.get(hid_, at), "acquired_via": ev.event_id})
+                    for pid, (hid_, _t) in zip(props, beliefs)],
                     {"holder_id": x[0], "seed": True, "beliefs": len(props)}, actor_id=x[0])
         ids = sorted(x[0] for x in mine)
         _gen = set(res.generated)

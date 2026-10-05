@@ -111,7 +111,9 @@ WG-29 Ties and knowledge (SOC-01), per settlement: every named person gets acqua
   different ways. History as belief: every named person holds, for every
   history event whose subjects include their group, settlement or zone, a proposition {subject_type
   'event', subject_id = hist_id, predicate 'history', text = belief_text} (believed 1, confidence 2,
-  provenance 'common', fidelity 'exact') — the propositions in their PERCEIVE, the holdings in a
+  provenance 'common', fidelity 'exact', (D-255) acquired_at = the event's day x DAY + 12 h — known since it
+  happened (a day before the Fall counts from the Fall), never after ``at``: "They say the Diallo People took
+  Crossroads." was told every prompt as heard "just now") — the propositions in their PERCEIVE, the holdings in a
   second PERCEIVE citing it (acquired_via), as the scenario loader does.
 
 async write_people(client, rng, tx, plan, region, params, canon, detail, at, progress=None) -> People
