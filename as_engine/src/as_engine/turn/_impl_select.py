@@ -143,7 +143,9 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
                 dep = True
     dep = dep and in_conflict                                        # D-228: at stake when there is danger
     vis = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? AND channel='visual' "
-                       "AND source_id=? AND fidelity IN ('exact','partial')", (pc_id, turn_index, at, actor_id)) is not None
+                       "AND source_id=? AND fidelity IN ('exact','partial')", (pc_id, turn_index, at, actor_id)) is not None \
+        and tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='visual' AND source_id=? "
+                         "AND fidelity IN ('exact','partial')", (pc_id, turn_index - 1, actor_id)) is None   # D-229: just come upon
     from ..mind import temper as _tm
     griev = False
     grudges = [json.loads(r[0]) for r in tx.query("SELECT subject_ids FROM open_loops WHERE holder_id=? AND kind='grudge' "

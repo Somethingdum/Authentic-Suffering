@@ -923,6 +923,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_standing_is_not_news.py` | June, tired past the pressing stage and never asked, has pressing_need; once she has decided it is gone, back when it gets worse (even in the turn she decided), gone when she decides again, back after NEED_NEWS_TURNS; Mara with Eli asleep beside her has no dependent_present until she is in conflict (something grabs her); Nita's question about the man with the axe counts out in the lot only when he comes out there |
 
+### 3.121 In view is not news (P7; D-229)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_in_view_is_not_news.py` | June, whom Owen sees this turn and did not the turn before, is visible_to_pc; seen both turns she is not; seen only the turn before she is not |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

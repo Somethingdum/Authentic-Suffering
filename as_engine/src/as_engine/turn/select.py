@@ -86,7 +86,10 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
                       (D-228) while it is in_conflict: a child of its own beside it is what is at stake
                       when there is danger, not a decision to make every quiet minute;
     visible_to_pc     the PC holds a visual percept of it this turn (up to ``at``) at EXACT or
-                      PARTIAL;
+                      PARTIAL — (D-229) and held none of it in the turn before (turn_index - 1): the
+                      player has just come upon them. Someone the player has been looking at all
+                      along is not news every turn; they take stock when 'restless', when anything
+                      else gives them salience, and the room's lines still reach them (AMB-02);
     grievance_near    (H1) another living body in its place toward which mind.temper.heat(tx, actor,
                       it, at) >= max(1, mind.temper.threshold(tx, actor) // 2), or about which it has
                       an open 'grudge' loop (subject_ids) — someone it can hardly stand is right there.
