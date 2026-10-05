@@ -1524,7 +1524,9 @@ def plan_cognition(candidates, config, turn_depth, lanes_up):
     warm_lane = warm if warm in lanes_up else next(l for l in (Lane.B, Lane.A) if l in lanes_up)
     i = 0
     if hot_lane in lanes_up:
-        for a, _s, _m in order[: S.max_hot[turn_depth]]:
+        for a, sal, mand in order[: S.max_hot[turn_depth]]:
+            if not mand and sal < S.hot_min_salience:      # D-175: nothing at stake, the fast lane thinks for them
+                break
             plan.lod[a] = LOD.HOT
             plan.lane[a] = hot_lane
             tot[hot_lane] += S.estimated_call_s["actor_cognition_hot"]

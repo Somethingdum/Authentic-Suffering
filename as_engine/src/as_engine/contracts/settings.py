@@ -236,6 +236,7 @@ class SchedulerRules(Strict):
     turn_budget_s: dict[str, float] = Field(default_factory=lambda: {"quick": 40.0, "balanced": 75.0, "deep": 150.0})
     reserve_narration_s: float = 25.0
     max_hot: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})
+    hot_min_salience: float = 3.0   # [SAND] D-175: below this (and not mandatory) a mind thinks on the warm lane
     max_ambient: dict[str, int] = Field(default_factory=lambda: {"quick": 1, "balanced": 2, "deep": 3})  # D-128 AMB-02
     max_reaction_waves: int = 3
     estimated_call_s: dict[str, float] = Field(default_factory=lambda: {
@@ -256,8 +257,10 @@ class MemoryRules(Strict):
 
 
 class PacketRules(Strict):
-    # [SAND] Actor Spec §5: 6000 deliberating, 4000 routine, 3000 a reaction, fixed text included
-    token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 6000, "warm": 4000, "reaction": 3000})
+    # [SAND] Actor Spec §5: 6000 deliberating, 3000 a reaction, fixed text included. (D-175) WARM was 4000: a
+    # fully written person (Mara's card alone is half of it) then lost what was just said in the room and how
+    # she feels about the people in it — LOD changes who thinks, never what they know (LOD-01).
+    token_budget: dict[str, int] = Field(default_factory=lambda: {"hot": 6000, "warm": 6000, "reaction": 3000})
     max_beliefs: int = 12
     max_lore: int = 3               # D-130 (LORE-03): what people say about what is in front of you, at most
     max_memories: int = 6

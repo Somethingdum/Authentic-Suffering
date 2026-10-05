@@ -577,7 +577,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| HOR-01 | HOR-01 horizon(tx, pc_intent, t0) -> int (the end of the simulation window, ms) The PC's def is looked up in canon (tx.canon.find('affordance', def_id)). condition-ended (duration.condition_ended: watch, wait, guard…):… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
+| HOR-01 | HOR-01 horizon(tx, pc_intent, t0, until=None) -> int (the end of the simulation window, ms) The PC's def is looked up in canon (tx.canon.find('affordance', def_id)). condition-ended (duration.condition_ended: watch, wai… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_a_wait_is_minutes.py`, `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p09_society/test_timers_society.py` |
 | HOR-02 | HOR-02..04 pull(horizon_ms, trigger_at, last_event_at) -> int min(horizon_ms, max(trigger_at + REACT_MARGIN_MS, last_event_at)). When the PC holds a MATERIAL percept (action.reactions.material_holders) at trigger_at, th… | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | HOR-03 | *horizon). Rules SEL-01..07, HOR-01..04, SKULL-10, TEMPER-06. docs/as/04_TURN_PIPELINE.md §3.1, §3.4.* | as_engine/turn/select.py | `as_engine/turn/select.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | HOR-04 | *(HOR-03: G04 must hold), and a pull never lengthens the window (HOR-04). The pipeline applies* | as_engine/turn/select.py | `as_engine/turn/select.py` | — |
@@ -855,7 +855,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | OUT-01 | OUT-01 (D-173) a living body of kind human, lurker or animal that lost no blood in the step gets some back: blood_loss_pct = max(0, blood_loss_pct - H.blood_regain_pct_per_h x the hours of the step after regain_from) —… | as_engine/physical/bodies.py | `as_engine/physical/bodies.py` | `contract/p07_slice/test_out_cold.py` |
-| OUT-02 | OUT-02 (1a, D-173) Out cold. When the PC is alive and its awareness is 'unconscious' (right after the scene compile, before the menu — a senseless body has none): no model call, nothing the player typed or picked is act… | as_engine/turn/intake.py | `as_engine/service/view.py`, `as_engine/turn/intake.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_out_cold.py` |
+| OUT-02 | OUT-02 (1a, D-173) Out cold. When the PC is alive and its awareness is 'unconscious' (right after the scene compile, before the menu — a senseless body has none): no model call, nothing the player typed or picked is act… | as_engine/turn/intake.py | `as_engine/service/view.py`, `as_engine/turn/intake.py`, `as_engine/turn/pipeline.py`, `as_engine/turn/select.py` | `contract/p07_slice/test_a_wait_is_minutes.py`, `contract/p07_slice/test_out_cold.py` |
 
 ## PARKOUR
 

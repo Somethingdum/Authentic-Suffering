@@ -167,6 +167,8 @@ class DurationSpec(Strict):
     base_s: float = Field(ge=0)
     per_meter_s: float = Field(default=0.0, ge=0)
     condition_ended: bool = False
+    max_s: float | None = Field(default=None, gt=0, description="D-174 HOR-01: a condition-ended act runs at most "
+                                "this long ('do nothing yet' is minutes, not the night); None: until something happens.")
 
 
 class CheckSpec(Strict):

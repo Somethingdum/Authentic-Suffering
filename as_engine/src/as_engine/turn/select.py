@@ -89,10 +89,12 @@ SEL-04 salience(flags, is_mandatory, weights) -> float
   before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules
   .salience_weights). lanes.scheduler.plan_cognition orders by it (ties by actor id).
 
-HOR-01 horizon(tx, pc_intent, t0) -> int   (the end of the simulation window, ms)
+HOR-01 horizon(tx, pc_intent, t0, until=None) -> int   (the end of the simulation window, ms)
   The PC's def is looked up in canon (tx.canon.find('affordance', def_id)).
   condition-ended (duration.condition_ended: watch, wait, guard…): the earliest of t0 +
-    MAX_WINDOW_MS, the earliest pending event_queue.due_at > t0, and the earliest actors.next_due_at
+    MAX_WINDOW_MS, (D-174) t0 + duration.max_s x 1000 when the def has one ("I wait" is a few
+    minutes, not the night) — or, when ``until`` is given, ``until`` in its place (OUT-02: an
+    out-cold PC's window runs to when he comes to) — the earliest pending event_queue.due_at > t0, and the earliest actors.next_due_at
     > t0 — "keep watching" runs to the next scheduled thing (task steps do not count: a colleague's
     counting is not news) — and never less than t0 + MIN_WINDOW_MS. P9: queue rows whose type is in
     kernel.clock.BACKGROUND_QUEUE_TYPES (shifts, draws, routines, group days, delayed
@@ -151,7 +153,7 @@ def salience(flags: dict[str, bool], is_mandatory: bool, weights: dict[str, Any]
     raise NotImplementedError("P7")
 
 
-def horizon(tx: "Tx", pc_intent: "Intent", t0: int) -> int:
+def horizon(tx: "Tx", pc_intent: "Intent", t0: int, until: int | None = None) -> int:
     raise NotImplementedError("P7")
 
 

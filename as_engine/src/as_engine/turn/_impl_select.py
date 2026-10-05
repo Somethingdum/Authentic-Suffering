@@ -165,10 +165,14 @@ def _def(tx, def_id):
     return tx.canon.find("affordance", def_id)
 
 
-def horizon(tx, pc_intent, t0):
+def horizon(tx, pc_intent, t0, until=None):
     d = _def(tx, pc_intent.bound.def_id)
     if d.duration.condition_ended:
         cands = [t0 + MAX_WINDOW_MS]
+        if until is not None:                      # OUT-02 (D-173): out cold until he comes to
+            cands.append(until)
+        elif d.duration.max_s is not None:         # D-174: "do nothing yet" is minutes
+            cands.append(t0 + int(d.duration.max_s * 1000))
         from ..kernel.clock import BACKGROUND_QUEUE_TYPES as _BG
         _qs = ",".join("?" * len(_BG))
         q = tx.query_one(f"SELECT MIN(due_at) FROM event_queue WHERE status='pending' AND due_at > ? AND type NOT IN ({_qs})",

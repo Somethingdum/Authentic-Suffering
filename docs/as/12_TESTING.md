@@ -692,6 +692,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_out_cold.py` | June out cold at 32 % with the bleeding long stopped comes to at exactly the moment four hours of blood are back (comes_to_at, progress), where she lay, and the blood keeps coming back; not while a wound bleeds, and nothing comes back in the first hour after a wound; the player's character out cold: whatever is typed, no model is asked and he does nothing, the time passes until he comes to and the story says so; the view offers one chip, "Let the time pass", and pressing it plays the turn |
 
+### 3.83 A wait is minutes; the Writer for what matters (P5, P7; D-174, D-175)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_a_wait_is_minutes.py` | "Wait" runs at most five minutes in a quiet place; watching still runs until something happens; an out-cold PC's window runs to `until`; three "I wait." turns are minutes each, not a day |
+| `p05_many_actors/test_reactions_cascade_plan.py::test_plan_cognition_keeps_the_writer_for_what_matters` | Below the HOT threshold (and not mandatory) a mind is WARM on the fast lane; a mandatory mind is HOT whatever its salience |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

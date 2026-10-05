@@ -96,8 +96,10 @@ change manner; never the verb, the target or a refusal (SYM-02).
 ```
 t0 = world_clock.now_ms
 if PC intent is condition-ended (watch, wait, guard):
-    horizon = min(t0 + 8 h, earliest pending queue due_at > t0, earliest actors.next_due_at > t0)
+    horizon = min(t0 + 8 h, t0 + the def's duration.max_s (D-174: "Wait" is 5 min),
+                  earliest pending queue due_at > t0, earliest actors.next_due_at > t0)
               and at least t0 + 3 s        # "keep watching" runs to the next scheduled thing;
+                                           # an out-cold PC's runs to when he comes to (D-173)
                                            # a colleague's task step is not news
               # P9: queue rows of kernel.clock.BACKGROUND_QUEUE_TYPES (ROUTINE_STEP,
               # PRODUCTION_CYCLE, SETTLEMENT_DAY, GROUP_DAY, LOYALTY_CHECK, CASCADE_EFFECT,
@@ -158,6 +160,9 @@ for the PC the window closes on it so the player answers.
 ### 3.3 Cognition (stage 6)
 
 - HOT: `EngineConfig.hot_cognition` (lane A, the Writer, thinking on, 4096 max tokens including reasoning; D-111).
+  Only for a mind that is mandatory or whose salience reaches `hot_min_salience` (D-175): a moment
+  with nothing at stake for someone is decided on the fast lane, and the Writer's time goes to the
+  people something is happening to, and to the story.
   Structured output with thinking depends on the probe result for the lane
   (`structured_with_thinking`): `supported` → json_schema on the call; otherwise the call is made
   without a schema, the JSON is extracted from the text, and a failure goes to one INTENT_REPAIR on

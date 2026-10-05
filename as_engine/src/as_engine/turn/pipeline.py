@@ -68,7 +68,8 @@ simulate — stages 0-12 in ONE store transaction:
   S1 intake: (pc_intent, info) = await turn.intake.intake(tx, session, submit, T, t0).
     Ledger 1 {signature, source}.
   S2 freeze: ledger 2 {full_state_hash: kernel.hashing.full_state_hash(store)}; horizon =
-    turn.select.horizon(tx, pc_intent, t0).
+    turn.select.horizon(tx, pc_intent, t0, until) — until = physical.bodies.comes_to_at(tx, pc,
+    t0) when info says 'senseless' (OUT-02, D-173), else None.
   Waves (wave 0 at t0; STRICT caps reaction waves at 1, else SchedulerRules.max_reaction_waves):
     S3 perceive: wave 0: cands = turn.select.candidates(tx, pc, T, horizon), perceivers = cands +
        the PC; a reaction wave: cands = perceivers = the reacting holders. perception.compile_scene(
@@ -96,8 +97,8 @@ simulate — stages 0-12 in ONE store transaction:
        reaction = wave > 0, answered = answered); wave 0 adds intents[pc] = (W1, D-80)
        turn.cognition.urge_pc(tx, rng, pc, pc_intent, T, wave_at) (the PC's intent goes through the
        same barrier and resolver as everyone's, L12) — except (OUT-02, D-173) when the intake's info
-       says 'senseless': the PC does nothing (no intents[pc]), and the window (select.horizon of the
-       placeholder wait) also ends at physical.bodies.comes_to_at(tx, pc, t0) when that is not None. asks = {a: turn.cognition.asks_for(tx, a, T,
+       says 'senseless': the PC does nothing (no intents[pc]), and the window is select.horizon(tx,
+       pc_intent, t0, until = physical.bodies.comes_to_at(tx, pc, t0)) — to when he comes to. asks = {a: turn.cognition.asks_for(tx, a, T,
        answered) for a in sorted(intents)}.
     S7 barrier: action.intent.barrier(tx, [intents[a] for a in sorted(intents)]).
     S8 resolve: action.resolve.resolve_wave(tx, rng, those, wave_at, T, horizon_ms=horizon);

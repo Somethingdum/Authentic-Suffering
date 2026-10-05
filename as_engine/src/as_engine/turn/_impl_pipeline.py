@@ -111,11 +111,8 @@ async def simulate(ctx):
         # ---------------- 2 freeze
         await _progress(ctx, 2)
         _ledger(tx, T, 2, "ok", {"full_state_hash": hashing.full_state_hash(store)}, 2 if ctx.strict else 1)
-        ctx.horizon = select.horizon(tx, ctx.pc_intent, t0)
-        if ctx.info.get("senseless"):                       # OUT-02 (D-173): out cold until he comes to
-            came = bodies.comes_to_at(tx, s.pc_id, t0)
-            if came is not None:
-                ctx.horizon = max(t0 + select.MIN_WINDOW_MS, min(ctx.horizon, came))
+        came = bodies.comes_to_at(tx, s.pc_id, t0) if ctx.info.get("senseless") else None
+        ctx.horizon = select.horizon(tx, ctx.pc_intent, t0, until=came)   # OUT-02 (D-173): out cold until he comes to
         # ---------------- waves
         wave_idx, wave_at, reacting = 0, t0, None
         catalog = tx.canon.all("affordance")

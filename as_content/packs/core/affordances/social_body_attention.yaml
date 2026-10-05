@@ -187,7 +187,7 @@
   ui_label: "Wait"
   binds: self
   range: self
-  duration: {base_s: 0, condition_ended: true}
+  duration: {base_s: 0, condition_ended: true, max_s: 300}
   noise_db: 0
   effect: wait
   tags: [wait, freeze]

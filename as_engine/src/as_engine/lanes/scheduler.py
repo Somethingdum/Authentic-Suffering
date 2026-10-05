@@ -18,7 +18,10 @@ plan_cognition(candidates, config, turn_depth, lanes_up) -> CognitionPlan   (P5)
   goes to the lane its regime names — it never spills onto the other lane to balance the load.
   2. HOT: when the hot lane (config.hot_cognition.lane; A by default) is up, the first
      min(S.max_hot[turn_depth], len) candidates of that order, each on that lane with est
-     S.estimated_call_s['actor_cognition_hot']. Hot lane down -> no HOT.
+     S.estimated_call_s['actor_cognition_hot'] — (D-175) stopping at the first that is not
+     mandatory and whose salience is below S.hot_min_salience: a moment with nothing at stake for
+     someone is decided on the fast lane, and the Writer keeps its time for the people something
+     is happening to (and for the story). Hot lane down -> no HOT.
   3. WARM: the following candidates in order, each on the warm lane (config.regimes
      [ACTOR_COGNITION].lane; when that lane is down, the up lane, B first — DEGRADE-01), est
      S.estimated_call_s['actor_cognition_warm'], while the wave wall-clock estimate

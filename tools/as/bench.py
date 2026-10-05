@@ -172,11 +172,14 @@ def effective_context(rows: list[dict], floor: float = RECALL_FLOOR) -> int:
 
 
 def capacity(depth: str) -> tuple[int, int]:
-    """How many HOT and WARM minds a turn of this depth admits by DESIGN (the planner on the default numbers)."""
+    """How many HOT and WARM minds a turn of this depth admits by DESIGN (the planner on the default numbers),
+    in a busy moment: everyone has something at stake (D-175: salience at the HOT threshold)."""
     from as_engine.contracts.common import LOD, Lane
     from as_engine.contracts.settings import EngineConfig
     from as_engine.lanes.scheduler import plan_cognition
-    p = plan_cognition([(f"c{i:02d}", 1.0, False) for i in range(CAPACITY_CANDIDATES)], EngineConfig(), depth,
+    cfg = EngineConfig()
+    sal = cfg.rules.scheduler.hot_min_salience
+    p = plan_cognition([(f"c{i:02d}", sal, False) for i in range(CAPACITY_CANDIDATES)], cfg, depth,
                        {Lane.A, Lane.B})
     lods = list(p.lod.values())
     return lods.count(LOD.HOT), lods.count(LOD.WARM)

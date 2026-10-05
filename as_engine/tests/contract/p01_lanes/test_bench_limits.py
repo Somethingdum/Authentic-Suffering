@@ -140,7 +140,8 @@ def test_the_settings_keep_the_design(fake_report, bench):
     assert S.estimated_call_s["actor_cognition_warm"] == round(fake_report["classes"]["actor_cognition_warm"]["mean_s"], 1)
     for depth in ("quick", "balanced", "deep"):
         hot_n, warm_n = bench.capacity(depth)
-        p = plan_cognition([(f"c{i:02d}", 1.0, False) for i in range(bench.CAPACITY_CANDIDATES)], new, depth, {Lane.A, Lane.B})
+        p = plan_cognition([(f"c{i:02d}", S.hot_min_salience, False) for i in range(bench.CAPACITY_CANDIDATES)], new, depth,
+                           {Lane.A, Lane.B})                              # a busy moment (D-175)
         lods = list(p.lod.values())
         assert lods.count(LOD.HOT) == hot_n and lods.count(LOD.WARM) >= warm_n, depth
     assert new.hot_cognition.lane == base.hot_cognition.lane and all(

@@ -222,7 +222,7 @@ def test_plan_cognition_follows_the_hot_lane_and_degrades_when_it_is_down():
     """D-111: HOT goes to hot_cognition.lane; with the warm lane down, WARM moves to the lane that is up."""
     cfg = EngineConfig()
     cfg.hot_cognition.lane = Lane.B                                    # the owner can put the HOT minds on the Clerk
-    p = plan_cognition([("a1", 5.0, True), ("a2", 1.0, False)], cfg, "deep", {Lane.A, Lane.B})
+    p = plan_cognition([("a1", 5.0, True), ("a2", 3.0, False)], cfg, "deep", {Lane.A, Lane.B})
     assert p.lod == {"a1": LOD.HOT, "a2": LOD.HOT} and p.lane == {"a1": Lane.B, "a2": Lane.B}
     five = [(f"a{i}", 5.0 - i, False) for i in range(5)]
     q = plan_cognition(five, EngineConfig(), "deep", {Lane.A})
@@ -246,6 +246,16 @@ def test_plan_cognition_budget_and_mandatory_overrun():
     optional = [(f"o{i:02d}", 1.0, False) for i in range(30)]
     q = plan_cognition(optional, cfg, "quick", {Lane.A, Lane.B})
     assert not q.overrun and LOD.COLD in q.lod.values()
+
+
+def test_plan_cognition_keeps_the_writer_for_what_matters():
+    """D-175: nothing at stake for someone (salience under hot_min_salience, not mandatory) — they think on the
+    fast lane, and the Writer's time goes to the people something is happening to."""
+    cfg = EngineConfig()
+    p = plan_cognition([("mara", 1.0, False), ("nita", 3.0, False), ("eli", 0.0, False)], cfg, "balanced", {Lane.A, Lane.B})
+    assert p.lod == {"nita": LOD.HOT, "mara": LOD.WARM, "eli": LOD.WARM}
+    q = plan_cognition([("june", 0.0, True), ("alice", 2.0, False)], cfg, "balanced", {Lane.A, Lane.B})
+    assert q.lod == {"june": LOD.HOT, "alice": LOD.WARM}, "a mandatory mind is HOT whatever its salience"
 
 
 def test_no_lanes_everyone_cold():
