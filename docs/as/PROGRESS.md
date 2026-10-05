@@ -243,7 +243,13 @@ do nothing.
    (D-157); sights were worded like speech ("some words lost") (D-158); the fast model was told the story was
    "years after the Fall" on day 18 (D-159); and everyone now calls the dead what their world calls them — a
    walker, a runner, a crawler — and seeing one brings to mind what people say about it (D-160). Your lore can
-   say what each kind of dead is called (LORE_STRUCTURE §2.1, "Called"). Nothing for you to do.
+   say what each kind of dead is called (LORE_STRUCTURE §2.1, "Called"). Since then: "say it my way" (off unless
+   you turn it on) no longer speaks stage directions aloud (D-164); feelings are worded by how strong they are —
+   "you are wary of them" is not "you do not trust them at all" (D-165); the prompts no longer read "spoke shout"
+   or "(peer)" (D-166, D-168); "You got any rounds? I'm down to six." is a question someone owes an answer to
+   (D-167); the story is free to name the back door the way the world does even when you typed the same words
+   (D-169 — three of twelve played turns had been thrown away for it); and what your character feels happen to
+   him is told of him, not as "you", in a third-person story (D-170). Nothing for you to do.
 
 ## Notes (builder)
 
