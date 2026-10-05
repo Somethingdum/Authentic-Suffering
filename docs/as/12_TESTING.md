@@ -578,6 +578,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_people_you_get_to_know.py` | June (made generated) and Owen exchange three lines: the boundary has a voicing job for her; it is asked with her card, the lines she actually said and her name; its answer becomes her voice (capsule, habits, example lines) and she is not voiced again, at this boundary or later. Unanswered (the fake model has nothing to say), her card stands and she is not asked again. An authored person, or someone who said one word to Owen, is never voiced |
 
+### 3.64 The quiet (P7; D-150)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_quiet.py` | A calm lit floor: nothing reached Mara, but in a quiet moment with people around she gets a packet with nothing reached and someone to talk to, and says one line (the prompt says it is a quiet moment); Alice says nothing. The next turn it is Alice's line. Not in a reaction wave, not when someone has already spoken in the room this turn (no call at all), and never alone in an empty street |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -549,7 +549,7 @@ _SWEARS = {"none": "You do not swear.", "rare": "You rarely swear.", "frequent":
            "constant": "You swear all the time."}
 
 
-def ambient_packet(tx, actor_id, turn_index, at, *, doing=""):
+def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     # AMB-01 (D-128): what a COLD person has to go on to say one thing — their own records only
     from ..contracts.mind import AmbientPacket, AmbientPerson
     from .actor import fused
@@ -559,7 +559,7 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing=""):
         "SELECT * FROM percept_log WHERE holder_id=? AND turn_index BETWEEN ? AND ? AND at<=? AND at>? AND "
         "event_id NOT LIKE 'scene:%' AND (source_id IS NULL OR source_id != ?) ORDER BY at DESC, percept_id DESC LIMIT 4",
         (actor_id, turn_index - 1, turn_index, at, -1 if last is None else last, actor_id))]
-    if not rows:
+    if not rows and not idle:
         return None
     PR = tx.rules.packet
     reached = []
@@ -595,6 +595,10 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing=""):
             t = _rel_text(rel).rstrip(".")
             parts.append(t[:1].lower() + t[1:])
         people.append(AmbientPerson(handle=h, word=word_for(tx, actor_id, b), feeling="; ".join(x for x in parts if x)))
+    if not rows and not tx.query_one(                             # D-150: a quiet moment needs someone to talk to
+            "SELECT 1 FROM positions a JOIN positions b ON b.place_id = a.place_id WHERE a.body_id=? AND b.body_id IN (%s)"
+            % ",".join("?" * len(handles)), (actor_id, *handles.values())) if handles else not rows:
+        return None
     name = _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (actor_id,))["display_name"]
     from .retrieval import lore_lines
     knows = [r["text"] for r in lore_lines(tx, actor_id, turn_index, at, min(2, tx.rules.packet.max_lore))]   # D-130

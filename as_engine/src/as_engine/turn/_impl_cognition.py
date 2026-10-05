@@ -98,7 +98,7 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
         st[a] = {"pkt": pkt, "req": req, "repair": False}
         jobs.append(j)
     cold = {a: plan_continuation(tx, a, affs[a], at, turn_index) for a in sorted(plan.lod) if plan.lod[a] == LOD.COLD}
-    room = _ambient_jobs(tx, session, plan, cold, turn_index, at)        # AMB-02 (D-128)
+    room = _ambient_jobs(tx, session, plan, cold, turn_index, at, reaction=reaction)   # AMB-02 (D-128), AMB-04 (D-150)
     jobs += [j for _pk, j in room.values()]
     results = await run_jobs(session.client, jobs) if jobs else {}
 
@@ -204,7 +204,7 @@ async def decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=
     return out
 
 
-def _ambient_jobs(tx, session, plan, cold, turn_index, at):
+def _ambient_jobs(tx, session, plan, cold, turn_index, at, *, reaction=False):
     # AMB-02 (D-128): {actor: (packet, Job)} — the COLD people in the PC's place who get a line
     from ..contracts.common import LOD, CallClass, Lane
     from ..contracts.mind import AmbientLine
@@ -219,9 +219,14 @@ def _ambient_jobs(tx, session, plan, cold, turn_index, at):
     if cap <= 0 or here is None or session.client.is_down(Lane.B):
         return {}
     out = {}
+
+    def job(a, pk):
+        req = build_request(cfg, CallClass.AMBIENT_LINE, turn_index=turn_index, actor_id=a, context=pk,
+                            json_schema=to_lm_schema(AmbientLine), ctx=pk)
+        return (pk, Job(job_id="ambient:" + a, call_class=CallClass.AMBIENT_LINE, request=req, output_model=AmbientLine,
+                        lane_pref=Lane.B, est_s=cfg.rules.scheduler.estimated_call_s["ambient_line"]))
+    able = []
     for a in plan.order:
-        if len(out) >= cap:
-            break
         if plan.lod.get(a) != LOD.COLD or a == session.pc_id or cold.get(a) is None:
             continue
         if tx.query_one("SELECT 1 FROM actors a JOIN positions p ON p.body_id = a.actor_id WHERE a.actor_id=? AND "
@@ -230,13 +235,21 @@ def _ambient_jobs(tx, session, plan, cold, turn_index, at):
         if tx.query_one("SELECT 1 FROM events WHERE type='SPEECH' AND actor_id=? AND turn_index=?", (a, turn_index)) is not None \
                 or pending_for(tx, "ACTION_LAND", a):
             continue
-        pk = ambient_packet(tx, a, turn_index, at, doing=cold[a].bound.label)
-        if pk is None:
+        able.append(a)
+        if len(out) >= cap:
             continue
-        req = build_request(cfg, CallClass.AMBIENT_LINE, turn_index=turn_index, actor_id=a, context=pk,
-                            json_schema=to_lm_schema(AmbientLine), ctx=pk)
-        out[a] = (pk, Job(job_id="ambient:" + a, call_class=CallClass.AMBIENT_LINE, request=req, output_model=AmbientLine,
-                          lane_pref=Lane.B, est_s=cfg.rules.scheduler.estimated_call_s["ambient_line"]))
+        pk = ambient_packet(tx, a, turn_index, at, doing=cold[a].bound.label)
+        if pk is not None:
+            out[a] = job(a, pk)
+    if out or reaction or not able or tx.query_one(
+            "SELECT 1 FROM events e JOIN positions p ON p.body_id = e.actor_id WHERE e.type='SPEECH' AND e.turn_index=? AND "
+            "p.place_id=?", (turn_index, here[0])) is not None:
+        return out
+    quiet = [(a, pk) for a in able for pk in [ambient_packet(tx, a, turn_index, at, doing=cold[a].bound.label, idle=True)]
+             if pk is not None]                                     # AMB-04 (D-150): the quiet
+    if quiet:
+        a, pk = quiet[turn_index % len(quiet)]
+        out[a] = job(a, pk)
     return out
 
 

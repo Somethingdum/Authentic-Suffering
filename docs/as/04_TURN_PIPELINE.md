@@ -174,6 +174,9 @@ for the PC the window closes on it so the player answers.
   are, who they can see and how they feel about them, their last lines, and the newest four things
   that reached them (`mind.packet.ambient_packet`). A line rides on their continuation as its
   speech; a null line, a failure or an echo is silence — never a repair, never a hold, never lane A.
+  (D-150, AMB-04) And a calm moment is not mute: when nobody got a line, nobody has spoken in the
+  PC's place this turn and it is not a reaction wave, one of them with someone to talk to gets an
+  idle line — who goes round with the turn.
 - The scheduler fills both lanes breadth-first: a WARM call beside a HOT call costs no wall-clock
   (plan §4.4). Mandatory actors always get a call, even past budget (`BUDGET_OVERRUN` logged).
 - Every generated speech line is checked against the echo ledger; an echo triggers one repair with

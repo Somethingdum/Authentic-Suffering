@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-805 ids; 548 with their own statement, 257 named only in context.
+806 ids; 549 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -49,9 +49,10 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| AMB-01 | AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacket / None (D-128) What a COLD person — someone past this moment's model budget — has to go on to say one short thing, or nothing (turn.cogni… | as_engine/mind/packet.py | `as_engine/contracts/mind.py`, `as_engine/mind/packet.py` | `contract/p07_slice/test_the_room_talks.py` |
+| AMB-01 | AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> AmbientPacket / None (D-128) What a COLD person — someone past this moment's model budget — has to go on to say one short thing, or nothing… | as_engine/mind/packet.py | `as_engine/contracts/mind.py`, `as_engine/mind/packet.py` | `contract/p07_slice/test_the_quiet.py`, `contract/p07_slice/test_the_room_talks.py` |
 | AMB-02 | AMB-02 gives the room's lines to the COLD people in it). LOD never changes competence, knowledge or morality (LOD-01); it only changes who calls a model. | as_engine/lanes/scheduler.py | `as_engine/lanes/scheduler.py`, `as_engine/mind/packet.py`, `as_engine/turn/cognition.py` | `contract/p07_slice/test_the_room_talks.py` |
 | AMB-03 | AMB-03 an answer with parse_status 'ok' that validates as AmbientLine, whose line — stripped, without surrounding quotes and without anything between asterisks — is not empty and does not echo (narration.lint.check_line… | as_engine/turn/cognition.py | `as_engine/turn/cognition.py` | — |
+| AMB-04 | AMB-04 (D-150) the quiet. When AMB-02 gave nobody a line, this is not a reaction wave, lane B is up and nobody has spoken in the PC's place this turn (no SPEECH event of turn_index whose speaker is positioned there), th… | as_engine/turn/cognition.py | `as_engine/turn/cognition.py` | `contract/p07_slice/test_the_quiet.py` |
 
 ## AUD
 

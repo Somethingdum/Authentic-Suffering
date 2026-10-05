@@ -32,7 +32,11 @@ What you said last (never say it again):
 {% endfor %}
 {% endif %}
 
+{% if ctx.reached %}
 What just reached you, oldest first:
 {% for r in ctx.reached %}
 - {{ r }}
 {% endfor %}
+{% else %}
+Nothing in particular has happened. It is a quiet moment, and you are not alone.
+{% endif %}

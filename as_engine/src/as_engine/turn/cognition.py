@@ -157,6 +157,12 @@ decide(tx, session, plan, affs, turn_index, at, *, reaction, answered=frozenset(
      and source 'ambient'. Anything else — a null line, a failure, a timeout, an echo — is silence:
      the continuation as it was, with no repair, no hold and no audit row (it was never a decision:
      what they do is code's either way; only their words were asked for).
+  AMB-04 (D-150) the quiet. When AMB-02 gave nobody a line, this is not a reaction wave, lane B is up
+     and nobody has spoken in the PC's place this turn (no SPEECH event of turn_index whose speaker is
+     positioned there), the COLD people that qualify for AMB-02 but for "something reached them" and
+     whose ambient_packet(..., idle=True) is not None (someone to talk to), in plan.order: the one at
+     index turn_index % their count gets one AMBIENT_LINE call, answered as AMB-03 — a quiet moment has
+     at most one line, and who says it goes round.
   Every call is logged by the pipeline through LaneClient.on_call; nothing here writes lm_calls.
 
 urge_pc(tx, rng, pc_id, intent, turn_index, at) -> Intent   (W1, D-80: actions pass through)

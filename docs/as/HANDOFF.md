@@ -129,8 +129,8 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   gun held on someone — that nothing records yet); hunger drains per stage (every 84 h without food), not per day — a daily
   tick would make it exact.
 - **Conversations** (steps 4-5, Actor Spec §11): per-person threads, topics, initiative, interruptions,
-  group talk, distinct voices. D-128 gives the people past the budget in the PC's place one short line each on lane B; still open:
-  lines between two background people with nothing reaching them (idle talk on code's time), and
+  group talk, distinct voices. D-128 gives the people past the budget in the PC's place one short line each on lane B,
+  and D-150 one idle line in a calm turn when nobody has spoken; still open:
   WARM writebacks for a very large crowd (they run in the narration's shadow on lane B and only a
   crowd past ~20 people would make the turn wait on them: defer the rest to the quiet hours).
 - **Willis / the cheat cure** (D-78, D-79) — with P12's cheat system.

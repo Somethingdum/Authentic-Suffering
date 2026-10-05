@@ -277,7 +277,7 @@ Budget (SKULL-09): tokens = estimate_tokens(system + '\n' + user) of
   nothing droppable is left the packet is returned over budget (the scheduler logs it).
 No instruction to forget anything is ever added (L1): what must not be used is absent.
 
-AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacket | None   (D-128)
+AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> AmbientPacket | None   (D-128)
   What a COLD person — someone past this moment's model budget — has to go on to say one short thing,
   or nothing (turn.cognition AMB-02). Their own records only (Skull Law), at <= ``at`` (SKULL-10).
   reached: their percept_log rows of this turn or the one before (turn_index - 1 .. turn_index) that
@@ -286,7 +286,8 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='') -> AmbientPacke
     4, oldest first. A speech percept reads f'{word} said' + (' to you' when addressed_to_me) +
     f': "{words}"' (word = perception.word_for, 'Someone' without a source; the words as heard, cut
     to PacketRules.max_heard_chars by cut_heard); any other its text. Nothing reached -> None:
-    nobody talks to the air on code's time.
+    nobody talks to the air on code's time — unless (D-150) ``idle``: then reached is [] (a quiet
+    moment), and None only when nobody of ``people`` (below) is in their place now (nobody to talk to).
   voice: the fused dossier's — the capsule; 'How you talk: ' + the tendencies, each a sentence (a '.' added to one
     that does not end in '.', '!', '?' or '"'), joined ' '; f'Easy:
     "{low_stakes}"', f'Under pressure: "{under_pressure}"', f'At the limit: "{at_the_limit}"';
@@ -341,7 +342,8 @@ def thread_lines(tx: "Tx", holder_id: str, turn_index: int, at: int, names, rule
     raise NotImplementedError("D-117")
 
 
-def ambient_packet(tx: "Tx", actor_id: str, turn_index: int, at: int, *, doing: str = "") -> "AmbientPacket | None":
+def ambient_packet(tx: "Tx", actor_id: str, turn_index: int, at: int, *, doing: str = "",
+                   idle: bool = False) -> "AmbientPacket | None":
     raise NotImplementedError("D-128")
 
 
