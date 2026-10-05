@@ -42,6 +42,8 @@ FIDELITY_WORDS = {
     "visual_only": "seen, not heard",
     "none": "not at all",
 }
+# D-166: how someone spoke, as a verb ('spoke normal to you', 'spoke shout' read as broken English to every mind)
+VOLUME_WORDS = {"whisper": "whispered", "low": "spoke quietly", "normal": "spoke", "raised": "called out", "shout": "shouted"}
 # D-158: how a percept that is not speech came through, by channel (FIDELITY_WORDS speak of words; a sighting is
 # not 'some words lost', a sound not 'seen, not heard'). Missing pairs fall back to FIDELITY_WORDS.
 PERCEPT_WORDS = {
@@ -53,7 +55,8 @@ PERCEPT_WORDS = {
 
 def render(call_class: CallClass, **ctx: Any) -> list[ChatMessage]:
     name = call_class.value
-    words = {"fidelity_words": FIDELITY_WORDS, "percept_words": PERCEPT_WORDS, "family_words": AFFORDANCE_FAMILIES}
+    words = {"fidelity_words": FIDELITY_WORDS, "percept_words": PERCEPT_WORDS, "volume_words": VOLUME_WORDS,
+             "family_words": AFFORDANCE_FAMILIES}
     system = _env.get_template(f"{name}.system.j2").render(**words, **ctx).strip()
     user = _env.get_template(f"{name}.user.j2").render(**words, **ctx).strip()
     return [ChatMessage(role="system", content=system), ChatMessage(role="user", content=user)]
