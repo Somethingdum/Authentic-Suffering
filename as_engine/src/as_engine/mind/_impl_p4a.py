@@ -155,7 +155,7 @@ def classify_form(text, *, weapon_pointed_at_receiver=False):
         return UtteranceForm.REQUEST
     if imp:
         return UtteranceForm.ORDER
-    if t.endswith("?"):
+    if "?" in t:                                                     # D-167: asked, then said why
         return UtteranceForm.QUESTION
     return UtteranceForm.STATEMENT
 

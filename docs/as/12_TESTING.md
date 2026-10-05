@@ -662,6 +662,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_how_they_spoke.py` | A heard line reads "spoke to you", "called out to you", "shouted to you" — never "spoke normal" or "spoke shout" |
 
+### 3.78 Asked, then said why (P4; D-167)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_asked_then_said.py` | A question followed by a reason is a question ("you got any rounds to spare? I'm down to six."); a request or an order with a question in it stays a request or an order |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

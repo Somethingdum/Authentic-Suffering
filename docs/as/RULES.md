@@ -571,7 +571,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | HOLD-01 | HOLD-01 a failed answer never becomes a choice (Actor Spec AC15, §14; AR10). When the decision is consequential (HOLD-02) -> raise DecisionHeld(actor, kind): turn.pipeline rolls the turn back — nothing happens, no time… | as_engine/turn/cognition.py | `as_engine/action/intent.py`, `as_engine/lanes/repair.py`, `as_engine/mind/consult.py`, `as_engine/turn/cognition.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_decision_v2.py` |
-| HOLD-02 | HOLD-02 consequential(tx, actor_id, affs[actor], turn_index, answered) -> bool: someone asked it something it has not answered (asks_for(tx, actor_id, turn_index, answered) is not empty) or it perceived a threat this tu… | as_engine/turn/cognition.py | `as_engine/mind/affordance.py`, `as_engine/turn/cognition.py` | `contract/p07_slice/test_decision_v2.py` |
+| HOLD-02 | HOLD-02 consequential(tx, actor_id, affs[actor], turn_index, answered) -> bool: someone asked it something it has not answered (asks_for(tx, actor_id, turn_index, answered) is not empty) or it perceived a threat this tu… | as_engine/turn/cognition.py | `as_engine/mind/affordance.py`, `as_engine/turn/cognition.py` | `contract/p04_one_actor/test_asked_then_said.py`, `contract/p07_slice/test_decision_v2.py` |
 
 ## HOR
 

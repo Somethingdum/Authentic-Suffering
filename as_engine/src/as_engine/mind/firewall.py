@@ -17,7 +17,8 @@ classify_form(text, *, weapon_pointed_at_receiver=False) -> UtteranceForm   (pur
            is in IMPERATIVE_VERBS ("Quiet." "Don't move!" "Stay there.")
   ORDER    if imperative (standing decides VALID_ORDER vs DEMAND later: ORDER form is only kept
            when standing == VALID_ORDER, otherwise the form becomes DEMAND)
-  QUESTION if it ends with "?"
+  QUESTION if it ends with "?" — or (D-167) any sentence in it does ("You got any rounds to spare?
+           I'm down to six." asks; people ask and then say why)
   STATEMENT otherwise.
 
 classify_standing(tx, speaker_id, receiver_id, text) -> Standing   (WILL-04)
