@@ -120,3 +120,16 @@ def test_a_body_that_needs_something_decides(scenario):
     w.store.conn.execute("UPDATE needs SET fatigue_stage = ? WHERE body_id = ?", (NEED_PRESSING, w.id("june")))
     assert flags()["pressing_need"] is True
     assert select.salience(flags(), False, EngineConfig().rules.scheduler.salience_weights) > 0
+
+
+def test_spoken_to_she_answers_when_she_hears_it(scenario):
+    """D-206 (SEL-02): Owen speaking to Mara no longer makes her decide at wave 0, before his words reach her — on
+    the Writer, for nothing; she answers in the reaction wave. Owen going for her still does."""
+    from helpers import make_intent
+    w = scenario("metal_fence")
+    t = now(w)
+    talk = make_intent(w, "pc", "speak", "mara", speech=("Mara. We need to talk about the rounds.", ["mara"], "normal"))
+    swing = make_intent(w, "pc", "punch", "mara")
+    with w.store.transaction() as tx:
+        assert not select.mandatory(tx, w.id("mara"), 1, t, t + 60_000, talk)
+        assert select.mandatory(tx, w.id("mara"), 1, t, t + 60_000, swing)

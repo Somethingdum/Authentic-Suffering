@@ -754,11 +754,11 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_law_kept.py` | Mae, who saw Hal bitten in Pumpwell's yard, holds the goal of the contamination quarantine in the law's own words; Otis in the shed holds nothing; Hal holds the fear of it; a second bite is the same law; with Owen bitten among his own, Mae means to see him quarantined and nothing is written into Owen; Hal seen spitting into sleeping Otis's mouth brings the law on both (Otis, asleep, does not know; Hal does), into the water on Hal alone |
 
-### 3.93 Nothing new (P7; D-189, D-190, D-191, D-198)
+### 3.93 Nothing new (P7; D-189, D-190, D-191, D-198, D-206)
 
 | File | What it proves |
 |---|---|
-| `p07_slice/test_nothing_new.py` | After two quiet turns, whoever perceived nothing that was not there the turn before is not sent to be remembered, and everyone sent has something; a non-mandatory mind with salience 0 is COLD; a mind takes stock with a model every third turn; after Mara's "Quiet." and June's "What was that?", everyone who heard any of it — and June, who asked — takes it in the next turn; (D-191) a goal formed the turn before gives a decision this turn, and not once let go; (D-198) a pressing need gives salience |
+| `p07_slice/test_nothing_new.py` | After two quiet turns, whoever perceived nothing that was not there the turn before is not sent to be remembered, and everyone sent has something; a non-mandatory mind with salience 0 is COLD; a mind takes stock with a model every third turn; after Mara's "Quiet." and June's "What was that?", everyone who heard any of it — and June, who asked — takes it in the next turn; (D-191) a goal formed the turn before gives a decision this turn, and not once let go; (D-198) a pressing need gives salience; (D-206) spoken to, Mara does not decide before the words reach her, and a blow aimed at her still makes her decide at once |
 | `p05_many_actors/test_reactions_cascade_plan.py` | (D-190) nothing at all for someone: no call |
 
 ### 3.94 Names called (P5; D-192, D-204, D-205)

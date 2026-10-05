@@ -225,6 +225,8 @@ immediate danger to its body or freedom (cues weapon_pointed, infected_close, gr
 dependent_in_danger; gripped; touched or hurt); addressed by name; one of its standing orders'
 triggers is present (a guard told to answer a loud noise hears one); its task ends inside the
 window; the PC's intent targets it.
+(D-206) The player speaking to someone does not make them mandatory: they hear the words when they land and
+answer in the reaction wave.
 
 Salience = Σ `SchedulerRules.salience_weights` over the true flags: `unique_info` (holds a
 PARTIAL+ percept no other candidate holds), `loudest_percept`, `addressed`, `in_conflict`,

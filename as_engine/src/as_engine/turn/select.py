@@ -50,7 +50,10 @@ SEL-02 mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=fro
     * it has a tactile percept this turn up to ``at`` (it was touched or hurt; SKULL-10);
     * its first active task (tasks with status 'active', ordered (started_at, task_id)) ends by the
       horizon: started_at + steps_total x round(step_s x 1000) <= horizon_ms;
-    * pc_intent is given and pc_intent.bound.target_id == actor_id (the PC acts on it);
+    * pc_intent is given and pc_intent.bound.target_id == actor_id (the PC acts on it) — (D-206) unless
+      the act is speech (pc_intent.bound.verb 'speak'): the words are heard when they land and answered
+      in the reaction wave (REACT-01: addressed speech is material), so a decision made before they
+      arrive is a model call — on the Writer, for the one spoken to — for nothing;
     * (H1) it snapped this wave: an INVOLUNTARY event with actor_id = actor_id, payload kind
       'outburst' and at == ``at`` (mind.temper TEMPER-05) — the person decides what they say.
   The pipeline passes pc_intent and ``forced`` at wave 0 only (a reaction wave passes None and an

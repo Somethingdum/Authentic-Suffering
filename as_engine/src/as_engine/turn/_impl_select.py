@@ -80,7 +80,8 @@ def mandatory(tx, actor_id, turn_index, at, horizon_ms, pc_intent, forced=frozen
     t = _row(tx, "SELECT * FROM tasks WHERE actor_id=? AND status='active' ORDER BY started_at, task_id LIMIT 1", (actor_id,))
     if t and t["started_at"] + t["steps_total"] * round(t["step_s"] * 1000) <= horizon_ms:
         return True
-    if pc_intent is not None and pc_intent.bound.target_id == actor_id:
+    if pc_intent is not None and pc_intent.bound.target_id == actor_id \
+            and getattr(pc_intent.bound.verb, "value", pc_intent.bound.verb) != "speak":      # D-206
         return True
     if tx.query_one("SELECT 1 FROM events WHERE type='INVOLUNTARY' AND actor_id=? AND at=? "
                     "AND json_extract(payload,'$.kind')='outburst'", (actor_id, at)) is not None:
