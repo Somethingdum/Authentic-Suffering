@@ -1008,6 +1008,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p06_memory/test_a_word_said.py` | June says "Quiet. Something's out back." and her own experience of the turn is that line alone — no "I did it." |
 
+### 3.135 Said once (P7; D-244)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_said_once.py` | Mara with a generated voice: the capsule once, no "How you talk:" repeating it, "How you sound: drops the 'g' on every -ing."; a written voice keeps its habits line |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -601,13 +601,17 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
         else:
             reached.append(p["text"])
     v = fused(tx, actor_id).voice
+    from .identity import end
+    held = (v.capsule or "").lower()
     voice = [v.capsule, "How you talk: " + " ".join(_cap(t if t.rstrip().endswith((".", "!", "?", '"')) else t.rstrip() + ".")
                                                    for t in v.speech_tendencies),
              f"Easy: \"{v.exemplars.low_stakes}\"", f"Under pressure: \"{v.exemplars.under_pressure}\"",
              f"At the limit: \"{v.exemplars.at_the_limit}\"",
              "You would never say: " + "; ".join(f"\"{x}\"" for x in v.would_never_say), _SWEARS[v.profanity]]
-    if v.dialect_notes:
-        voice.append(v.dialect_notes)
+    if all(t.lower().rstrip(".") in held for t in v.speech_tendencies):          # D-244: said once
+        voice.pop(1)
+    if v.dialect_notes.strip():
+        voice.append(f"How you sound: {end(v.dialect_notes)}")                  # D-244: as the card says it
     pl = _row(tx, "SELECT p.name FROM positions s JOIN places p ON p.place_id = s.place_id WHERE s.body_id=?", (actor_id,))
     said = [r[0] for r in tx.query("SELECT text FROM voice_lines WHERE actor_id=? AND at<=? ORDER BY at DESC, line_id DESC "
                                    "LIMIT 3", (actor_id, at))][::-1]

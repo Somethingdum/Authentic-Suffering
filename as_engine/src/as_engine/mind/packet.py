@@ -308,11 +308,13 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
     nobody talks to the air on code's time — unless (D-150) ``idle``: then reached is [] (a quiet
     moment), and None only when nobody of ``people`` (below) is in their place now (nobody to talk to).
   voice: the fused dossier's — the capsule; 'How you talk: ' + the tendencies, each a sentence (a '.' added to one
-    that does not end in '.', '!', '?' or '"'; D-237: its first letter upper-cased), joined ' '; f'Easy:
+    that does not end in '.', '!', '?' or '"'; D-237: its first letter upper-cased), joined ' ' (D-244: left
+    out when the capsule already holds every one of them, as a generated person's does); f'Easy:
     "{low_stakes}"', f'Under pressure: "{under_pressure}"', f'At the limit: "{at_the_limit}"';
     'You would never say: ' + each never-say in quotes joined '; '; the profanity line (none 'You do
     not swear.', rare 'You rarely swear.', frequent 'You swear often.', constant 'You swear all the
-    time.'); the dialect notes when not empty.
+    time.'); f'How you sound: {the dialect notes}' (D-244: as a sentence, as the card says it) when not
+    empty.
   where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given.
   when: (D-159) world_time_text exactly as the SkullPacket words it for them (the clock only with a
     timepiece) — the prompt no longer says "years after the Fall" of a world eighteen days into it.
