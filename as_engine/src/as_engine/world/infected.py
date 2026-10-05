@@ -155,7 +155,8 @@ step(tx, rng, row, fired, turn_index) -> list[Event]   (the INFECTED_STEP handle
   of its horde for ever). Then
   world.hordes.fold(tx, b, at, turn_index, fired.event_id) (HRD-18): not empty -> the body went
   back into its count; those events are returned and nothing else happens (no new row).
-  1 Arrive: payload.leg {to_place, x_m, y_m, portal_id} (None -> skip): the portal (when there is
+  1 Arrive: payload.leg {to_place, x_m, y_m, portal_id} (None -> skip; D-208: so is the leg of a body
+    held or tied, bodies.restrained — it strains where it is): the portal (when there is
     one) must be open and admit the body (physical.space.admits) -> commit physical.space.move_event(
     tx, b, to_place, None, x_m, y_m, at, cause, turn_index); otherwise it has walked up to the portal
     and is stopped there: when b stands more than 0.5 m from the portal's point on its side
@@ -245,6 +246,9 @@ rise(tx, rng, row, fired, turn_index) -> list[Event]   (the REANIMATION handler 
   item the corpse holds (holder_body = corpse, by item_id) -> physical.objects.transfer to new, same
   slot; MATERIALIZE inserting infected_state as spawn does, with risen_from = corpse; then attract(
   new, every living non-infected body it sees(...) in that place — the first by id, reason 'sight').
+  (D-208) A corpse that was tied rises tied: when the binding came across with its things
+  (physical.bodies.tied(new)), physical.bodies.tie_event(tx, new, it, the binding's props tied_by,
+  at, fired.event_id, turn_index) right after the transfers — it writhes against the rope.
   (mind.perception.word_for gives it the words "what was left of <name>" for anyone who knew the
   dead; F1a: it has the corpse's looks and wears the clothes it died in, filthy and caked in gore —
   physical.bodies.rise / create.)

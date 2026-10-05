@@ -28,7 +28,8 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
                     case-insensitive) the first word of the holder's own identity.name or any of
                     its dossier aliases
   grabbed_from_behind  a CONTROL_ESTABLISH event of this turn whose target is the holder and whose
-                    holder body has no visible P of this turn at an earlier ``at``
+                    holder body has no visible P of this turn at an earlier ``at`` (D-208: a tie has
+                    no holder body — never)
   weapon_pointed    a visible P of an ACTION_START whose def is shoot_center_mass / shoot_head
                     with target_id = the holder, or a speech P with detail.armed_at_me
   threat_seen       weapon_pointed, or a visible P of a HARM / ACTION_START with payload verb

@@ -120,6 +120,43 @@
   noise_db: 0
   effect: let_go
   tags: [control, release]
+# D-208: tying someone up — who cannot fight it: held, out cold, asleep, or given up.
+- schema: as.affordance.v1
+  id: tie_up
+  verb: manipulate
+  label: "Tie {target}'s hands and feet with {item}"
+  ui_label: "Tie up {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, held_item_tags: [binding], actor_kinds: [human]}
+  duration: {base_s: 30}
+  noise_db: 25
+  effect: tie_up
+  tags: [control, bind]
+- schema: as.affordance.v1
+  id: untie
+  verb: manipulate
+  label: "Untie {target}"
+  ui_label: "Untie {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1}
+  duration: {base_s: 20}
+  noise_db: 15
+  effect: untie
+  tags: [care, free]
+- schema: as.affordance.v1
+  id: work_free
+  verb: escape
+  label: "Work at the knots on your wrists until they give (slow)"
+  ui_label: "Work yourself free"
+  binds: self
+  range: self
+  duration: {base_s: 180}
+  noise_db: 10
+  check: {attribute: A, skill: athletics, resistance: binding}
+  effect: work_free
+  tags: [escape]
 - schema: as.affordance.v1
   id: shove
   verb: attack

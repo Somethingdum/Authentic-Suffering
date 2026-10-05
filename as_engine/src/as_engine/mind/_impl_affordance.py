@@ -167,6 +167,10 @@ def _bindings(c, d):
             return []
         if d.id == "surrender" and not c.threats:
             return []
+        if eff == "work_free":                               # D-208: only while bound
+            from ..physical.bodies import tied
+            if tied(c.tx, c.me) is None:
+                return []
         out.append({})
     elif b == "anchor":
         for a in c.anchors:
@@ -219,6 +223,20 @@ def _bindings(c, d):
             mine = {r[0] for r in c.tx.query("SELECT target_id FROM grips WHERE holder_id=?", (c.me,))}
             hold = set(grips_on(c.tx, c.me)) if eff == "break_grip" else mine
             cands = [t for t in c.known_bodies if t in hold]
+        if eff in ("tie_up", "untie"):                       # D-208
+            from ..physical.bodies import tied
+            if eff == "untie":
+                cands = [t for t in c.known_bodies if tied(c.tx, t)]
+            else:
+                mine = {r[0] for r in c.tx.query("SELECT target_id FROM grips WHERE holder_id=?", (c.me,))}
+                ok = []
+                for t in c.known_bodies:
+                    tb = _row(c.tx, "SELECT kind, alive, awareness, restrained FROM bodies WHERE body_id=?", (t,))
+                    if (tb is None or tb["kind"] != "human" or not tb["alive"] or tied(c.tx, t)):
+                        continue
+                    if t in mine or tb["restrained"] or tb["awareness"] not in ("alert", "awake", "drowsy") or _seen_give_up(c, t):
+                        ok.append(t)
+                cands = ok
         if d.id == "shield_dependent":
             if not c.threats:
                 return []
@@ -233,6 +251,11 @@ def _bindings(c, d):
             elif d.id in ("strike_melee", "strike_head", "finish_downed"):
                 for it in c.held:
                     if c.canon.get(it["def_ref"]).melee is not None:
+                        out.append({"target_id": t, "item_id": it["item_id"], "dist": dist})
+            elif eff == "tie_up":                            # D-208: the binding in hand
+                need = set(d.requires.held_item_tags)
+                for it in c.held:
+                    if need <= set(c.canon.get(it["def_ref"]).tags):
                         out.append({"target_id": t, "item_id": it["item_id"], "dist": dist})
             elif eff == "strip":
                 tb = _row(c.tx, "SELECT kind, age_years FROM bodies WHERE body_id=?", (t,))

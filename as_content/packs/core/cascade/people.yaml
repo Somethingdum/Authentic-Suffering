@@ -1052,3 +1052,63 @@
       payload: {toward: "$trigger.rescuer", axis: affection, delta: 1, cause: saved_someone_of_yours}
   delay_s: 0
   cites: [D-207]
+# D-208: tied up — and untied.
+- schema: as.cascade.v1
+  id: CAS-083
+  description: Being tied up by someone, awake to know who, leaves you afraid of them and angry with them, and you hold it against them.
+  trigger_event: CONTROL_ESTABLISH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: tied_up_by(trigger.event_id)
+      payload: {toward: "$trigger.payload.tied_by", axis: fear, delta: 1, cause: tied_up}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: tied_up_by(trigger.event_id)
+      payload: {toward: "$trigger.payload.tied_by", axis: resentment, delta: 1, cause: tied_up}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: tied_up_by(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.payload.tied_by", text: "{subject} tied you up.", strength: 2}
+  delay_s: 0
+  cites: [D-208, D-126]
+- schema: as.cascade.v1
+  id: CAS-084
+  description: Someone who unties you, when they are not the one who tied you, earns your trust and warmth, and you owe them.
+  trigger_event: CONTROL_RELEASE
+  where: {}
+  preconditions: ["trigger.payload.untied_by != ''"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: trust, delta: 2, cause: untied_by}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: rescued_by(trigger.event_id)
+      payload: {toward: "$trigger.rescuer", axis: affection, delta: 1, cause: untied_by}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: rescued_by(trigger.event_id)
+      payload: {kind: debt_owing, subject: "$trigger.rescuer", text: "{subject} untied you. You owe them.", strength: 3}
+  delay_s: 0
+  cites: [D-208, D-207]
+- schema: as.cascade.v1
+  id: CAS-085
+  description: Seeing someone tie up a person you love costs them your trust, and you resent it — unless you knew the one tied was infected.
+  trigger_event: CONTROL_ESTABLISH
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_tied(trigger.event_id)
+      payload: {toward: "$trigger.payload.tied_by", axis: trust, delta: -1, cause: tied_up_someone_of_yours}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_tied(trigger.event_id)
+      payload: {toward: "$trigger.payload.tied_by", axis: resentment, delta: 1, cause: tied_up_someone_of_yours}
+  delay_s: 0
+  cites: [D-208, D-202]

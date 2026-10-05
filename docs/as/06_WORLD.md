@@ -238,6 +238,14 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   you owe them your life (a debt of strength 3); out of a person's grip, when you were not fighting
   them, the same. Those who love you and saw it trust and warm to them by one. A hand that is dead,
   out cold, asleep or out of reach lets go; breaking free yourself owes nobody.
+- **Tied up** (D-208, CAS-083..085): someone who cannot fight it — held, out cold, asleep, or seen to give
+  up — can be tied hand and foot with a rope or tape. They cannot use their hands or walk, they know it
+  every turn, everyone who sees them sees it, and they can work at the knots (slow and hard). Being tied
+  leaves fear, anger and a grudge toward the one who did it; those who love them and saw it trust that
+  person less — unless they knew the one tied was infected (tying up the bitten is quarantine, D-202).
+  Whoever unties them, not being the one who tied them, earns two trust and one warmth, and they owe
+  them. A corpse that was tied rises tied. And anyone held — by a hand or the dead — knows it every
+  turn it lasts, not only the moment it happened.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

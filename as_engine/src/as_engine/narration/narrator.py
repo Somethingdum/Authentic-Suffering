@@ -68,7 +68,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    entity here (appearance_text at the best level and the distance, then
                    smell_text); none when text is empty. The prompt asks the prose to show someone
                    like that when they come in, and never to add to it.
-  pc_state_lines   per unhealed wound of the PC (created_at, wound_id): f"{SEVERITY_WORDS[severity]
+  pc_state_lines   (D-208) first what has hold of the PC: per body that grips them (physical.bodies
+                   .grips_on, by id) f"{word_for(pc, it) capitalised} has hold of {pc}."; then, when
+                   physical.bodies.tied(pc), f"{pc}'s hands and feet are tied."; then
+                   per unhealed wound of the PC (created_at, wound_id): f"{SEVERITY_WORDS[severity]
                    capitalised} {type} wound to the {ANATOMY_WORDS[anatomy]}" + ', bleeding' when
                    physical.bodies.effective_bleed > 0 + '.'; then, when impairment > 0,
                    f"{pc} is {location.impairment_word(impairment)}."; then (P10) the non-empty

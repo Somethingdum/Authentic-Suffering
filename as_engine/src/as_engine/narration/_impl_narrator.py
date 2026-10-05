@@ -26,6 +26,10 @@ BLOCKED_TEXT = {
 TRAILING_PAREN = re.compile(r"\s*\([^()]*\)\s*$")
 
 
+def _cap1(s):
+    return s[:1].upper() + s[1:]
+
+
 def _row(s, sql, p=()):
     r = s.query_one(sql, p)
     return dict(r) if r is not None else None
@@ -162,7 +166,10 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
             kn = _row(tx, "SELECT known_name FROM acquaintance WHERE holder_id=? AND subject_id=?", (pc_id, s))
             label = kn["known_name"] if kn and kn["known_name"] else with_article(word_for(tx, pc_id, s))
             looks_lines.append(f"{label}: {text}")
-    state = []
+    from ..physical.bodies import grips_on, tied
+    state = [f"{_cap1(word_for(tx, pc_id, h))} has hold of {pc}." for h in grips_on(tx, pc_id)]   # D-208
+    if tied(tx, pc_id):
+        state.append(f"{pc}'s hands and feet are tied.")
     for w in tx.query("SELECT * FROM wounds WHERE body_id=? AND healed_at IS NULL ORDER BY created_at, wound_id", (pc_id,)):
         w = dict(w)
         s = f"{SEVERITY_WORDS[w['severity']][:1].upper()}{SEVERITY_WORDS[w['severity']][1:]} {w['type']} wound to the {ANATOMY_WORDS[w['anatomy']]}"

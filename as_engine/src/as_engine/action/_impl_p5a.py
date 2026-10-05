@@ -342,7 +342,7 @@ def cues_of(tx, holder_id, turn_index, at):
                         out |= set(st.signs)
     for r in tx.query("SELECT payload, at FROM events WHERE type='CONTROL_ESTABLISH' AND turn_index=? AND at<=?", (turn_index, at)):
         pl = json.loads(r[0])
-        if pl.get("target_id") == holder_id:
+        if pl.get("target_id") == holder_id and pl.get("holder_id"):      # D-208: a tie is no grab
             saw = any(p["source_id"] == pl["holder_id"] and p["channel"] == "visual" and json.loads(p["detail"]).get("level") in ("clear", "partial")
                       and p["at"] < r[1] for p in ps)
             if not saw:

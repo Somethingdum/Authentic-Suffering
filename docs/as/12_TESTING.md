@@ -803,6 +803,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_pulled_free.py` | One of the dead shot through the head lets go of Cal (the CONTROL_RELEASE caused by its DEATH); a holder asleep or out cold lets go; a holder who walks off lets go when the walk lands; letting go is an act; break_grip is offered only from a hand that is there and let_go only of someone held; a shove that knocks the holder down breaks its hold; one of the dead keeps hold of a corpse while it feeds and lets go when it is done; Cal, pulled out of the dead's hands by a stranger, trusts him two more, feels one warmer and owes him his life, and June, who loves Cal and saw it, trusts him one more; still in another hand is not saved; breaking free yourself owes nobody; out of a person's grip, the same debt |
 
+### 3.101 Tied up (P9; D-208)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_tied_up.py` | Mara awake and free cannot be tied (not offered; tried, she resists); held, asleep, or seen showing empty hands, she can; tied with the rope she has no free hands and cannot walk, the hand that held her lets go, June sees "hands and feet tied with a length of rope" (not "carrying" it) and Dale, at a distance, "tied up"; her first body line is "Your hands and feet are tied.", she can work at the knots and nothing that needs hands or legs, and Owen can untie her; someone held is told what has hold of them a turn later; untied by June she is free, the rope in June's hand, two trust, one warmth and a debt; untied by the man who tied her she owes nothing; working free takes seven three-minute tries in the room's seed and drops the rope at her feet; tied, she fears and resents Owen and holds it against him, and June, who saw her friend tied, trusts him one less; a tied corpse rises tied; the story's state lines open with what has hold of Owen, then that his hands and feet are tied |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

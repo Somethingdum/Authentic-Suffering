@@ -761,6 +761,11 @@ def _rescue(tx, trig):
         return None
     pl = trig.payload or {}
     holder, held = pl.get("holder_id"), pl.get("target_id")
+    if pl.get("untied_by"):                                          # D-208: untied by someone else
+        who = pl["untied_by"]
+        if who in (held, pl.get("tied_by")) or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)) is None:
+            return None
+        return who, held, None, trig.cause_event_id
     c = _row(tx, "SELECT event_id, type, actor_id, cause_event_id, payload FROM events WHERE event_id=?",
              (trig.cause_event_id,)) if trig.cause_event_id else None
     if c is not None and c["type"] in ("DEATH", "FALSE_DEATH", "AWARENESS_CHANGE"):
@@ -789,6 +794,8 @@ def _freed(tx, r, at):
     b = tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (held,))
     if b is None or not b[0] or grips_on(tx, held):
         return False
+    if holder is None:                                               # D-208: untied
+        return True
     k = tx.query_one("SELECT kind FROM bodies WHERE body_id=?", (holder,))
     return (k is not None and k[0] == "infected") or not _was_fighting(tx, held, at)
 
@@ -1225,6 +1232,23 @@ def select(tx, selector, trigger):
             return [held]
         return [h for h in saw if h not in (who, held, holder) and _controller(tx, h) not in (None, "human")
                 and tx.query_one("SELECT alive FROM bodies WHERE body_id=?", (h,))[0] and _bonded_to(tx, h, held)]
+    if fn in ("tied_up_by", "saw_them_tied"):                        # D-208: tied up
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        who, by = pl.get("target_id"), pl.get("tied_by")
+        if not by or by == who or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (by,)) is None:
+            return []
+        if fn == "tied_up_by":
+            b = tx.query_one("SELECT alive, awareness FROM bodies WHERE body_id=?", (who,))
+            if b is None or not b[0] or b[1] not in ("awake", "drowsy") or _controller(tx, who) in (None, "human"):
+                return []
+            return [who]
+        if not trigger.cause_event_id:
+            return []
+        return [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                       "fidelity IN ('exact','partial') ORDER BY holder_id", (trigger.cause_event_id,))
+                if h not in (by, who) and _controller(tx, h) not in (None, "human") and _bonded_to(tx, h, who)
+                and not _knew_infected(tx, h, who, trigger.at)]
     if fn == "shielded_by":                                          # D-200: someone stood between you and it
         from ..society._impl_society import _controller
         pl = trigger.payload or {}

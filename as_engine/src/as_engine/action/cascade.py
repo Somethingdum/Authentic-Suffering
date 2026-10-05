@@ -93,10 +93,21 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               drowsy, held by nobody any more (bodies.grips_on empty:
                                               still in another hand is not saved), holds a visual EXACT
                                               or PARTIAL percept of the rescuer's act (it saw who), and
-                                              the holder was of kind 'infected' or the one held was not
-                                              fighting a person in the 10 minutes up to it (as
-                                              trigger.attacker_provoked) — never the player's character
-                                              (C06)
+                                              the holder was of kind 'infected', the release is an untie
+                                              (D-208), or the one held was not fighting a person in the
+                                              10 minutes up to it (as trigger.attacker_provoked) — never
+                                              the player's character (C06)
+    tied_up_by(<path>)                        (D-208) for a CONTROL_ESTABLISH whose payload carries
+                                              tied_by (a tie, physical.bodies.tie_event) by someone with
+                                              an actors row who is not the one tied: the one tied, when
+                                              it has an actors row, is alive and awake or drowsy (it
+                                              knew) — never the player's character (C06)
+    saw_them_tied(<path>)                     (D-208) for such a tie: the holders of a visual EXACT or
+                                              PARTIAL percept of its cause (the tie_up ACTION_START)
+                                              bonded to the one tied (affection >= 1 toward them, or one
+                                              household), never the one who tied, the one tied or the PC,
+                                              and — D-202, tying up the bitten is quarantine — none who
+                                              knew the one tied was infected
     saw_them_saved(<path>)                    (D-207) for such a release (the holder and the one held as
                                               in rescued_by: alive, free, the holder infected or the held
                                               not fighting): the holders of a visual EXACT or PARTIAL
@@ -418,8 +429,11 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     the cause is a DEATH, FALSE_DEATH or AWARENESS_CHANGE of the holder (payload body_id) — that
     event's own cause: an ACTION_START itself, a HARM the HARM's cause. That act must be an
     ACTION_START with payload verb 'attack' and target_id the holder, by someone with an actors row who
-    is neither the holder nor the one held; otherwise missing (letting go, breaking free, a hand that
-    walked off, the dead done feeding — nobody's rescue).
+    is neither the holder nor the one held; (D-208) for a CONTROL_RELEASE whose payload carries untied_by
+    (an untie): that untier, when it has an actors row and is neither the one held nor the one who
+    tied them (payload tied_by) — the act is the release's cause, the untie's ACTION_START; otherwise
+    missing (letting go, breaking free, working free, a hand that walked off, the dead done feeding —
+    nobody's rescue).
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""

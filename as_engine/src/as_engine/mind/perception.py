@@ -255,12 +255,15 @@ LOOK-03 appearance_text(tx, holder_id, subject_id, level, distance_m) -> str: wh
               at 'torso', else the SHOWN 'body' piece (neither: nothing), and nothing more.
   insignia  (level 'clear'): the insignia of the SHOWN pieces that carry one, in SHOWN order,
             joined with ', '.
+  bound     (D-208; level 'clear' or 'partial') a body that is tied (physical.bodies.tied): 'hands and
+            feet tied with ' + with_article(the binding's ItemDef.name) at 'clear', 'tied up' at
+            'partial'.
   gear      (level 'clear'): 'carrying ' + with_article(ItemDef.name) of each item in G that is
-            not in a hand (hands are render_visual's), as a list.
+            not in a hand (hands are render_visual's) nor the binding, as a list.
   condition (level 'clear'; at 'partial' only the gore and blood words for values >= 4): gore
             2-3 'smeared with gore', 4-5 'caked in gore'; blood 3-4 'bloodied', 5 'soaked in blood';
             grime 3 'grimy', 4-5 'filthy'; wet 2-3 'soaked through'; in that order, joined ', '.
-  The non-empty parts, in the order features, clothes, insignia, gear, condition, joined with '; ',
+  The non-empty parts, in the order features, clothes, insignia, bound, gear, condition, joined with '; ',
   the first letter capitalised, ending with '.'; nothing to say -> ''. Deterministic: the same world
   and the same arguments give the same text.
 
@@ -1189,16 +1192,23 @@ def appearance_text(tx: "Tx", holder_id: str, subject_id: str, level: str, dista
                 key = [o for o in shown if o["clothing"]["slot"] == "torso"] or [o for o in shown if o["clothing"]["slot"] == "body"]
                 if key:
                     parts.append("in " + _piece(key[0]))
+    from ..physical.bodies import tied
+    bound = tied(tx, subject_id)                                   # D-208
+    canon = tx.canon if getattr(tx, "canon", None) is not None else tx.store.canon
     if level == "clear":
         ins = [o["insignia"] for o in shown if o["insignia"]]
         if ins:
             parts.append(", ".join(ins))
-        canon = tx.canon if getattr(tx, "canon", None) is not None else tx.store.canon
+        if bound:
+            parts.append("hands and feet tied with " + with_article(
+                canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (bound,))[0]).name))
         hands = {r[0] for r in tx.query("SELECT item_id FROM items WHERE holder_body=? AND holder_slot IN ('hand_l','hand_r')", (subject_id,))}
-        g = [i for i in visible_gear(tx, subject_id) if i not in hands]
+        g = [i for i in visible_gear(tx, subject_id) if i not in hands and i != bound]
         if g:
             names = [with_article(canon.get(tx.query_one("SELECT def_ref FROM items WHERE item_id=?", (i,))[0]).name) for i in g]
             parts.append("carrying " + _list(names))
+    elif bound:
+        parts.append("tied up")
     cw = []
     if level == "clear":
         if C.gore >= 4: cw.append("caked in gore")

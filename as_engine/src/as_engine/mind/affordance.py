@@ -228,6 +228,14 @@ enumerate it too, one option per combination (then capped by the selection rules
                        requires.held_item_tags (the gun, the blade — never the other hand's thing)
   shoot_*, strike_*, finish_downed   body x the held weapon (item = the weapon)
   punch, grapple, shove, disarm, break_grip, calm_person, signal, watch_target  body only
+  tie_up               (D-208) body x each held item carrying every requires.held_item_tags (the rope,
+                       the tape); only a living human body that is not tied (physical.bodies.tied)
+                       and cannot fight it: one the actor grips, one held (bodies.restrained), one not
+                       awake (awareness not alert / awake / drowsy), or one the actor saw give up
+                       (as torture's D-135 reading: a surrender seen in the last 10 minutes with no
+                       attack seen after it)
+  untie                (D-208) only a body that is tied; work_free (binds self) only while the actor is
+                       tied
   break_grip / let_go  (D-207) only a body that grips the actor (physical.bodies.grips_on(actor)) /
                        only a body the actor grips (a grips row with the actor as holder) — you
                        feel a hand on you; nobody is offered to break a grip that is not there

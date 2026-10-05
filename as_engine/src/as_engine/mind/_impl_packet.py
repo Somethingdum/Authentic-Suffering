@@ -146,9 +146,12 @@ def _rel_text(r):
 
 
 def _body_lines(tx, actor_id):
-    from ..physical.bodies import effective_bleed
+    from ..physical.bodies import effective_bleed, grips_on, tied
+    from .perception import word_for
     H = tx.rules.harm
-    out = []
+    out = [f"{_cap(word_for(tx, actor_id, h))} has hold of you." for h in grips_on(tx, actor_id)]   # D-208
+    if tied(tx, actor_id):
+        out.append("Your hands and feet are tied.")
     for w in tx.query("SELECT * FROM wounds WHERE body_id=? AND healed_at IS NULL ORDER BY created_at, wound_id", (actor_id,)):
         bleed = ", bleeding" if effective_bleed(tx, w["wound_id"]) > 0 else ""
         out.append(f"{_cap(SEVERITY_WORDS[w['severity']])} {w['type']} wound to your {ANATOMY_WORDS[w['anatomy']]}{bleed}.")

@@ -254,6 +254,8 @@ def resistance(tx, intent, key, land_at):
         return {"minor": 0, "significant": 1, "severe": 2, "catastrophic": 4}[w["severity"]]
     if key == "observer.best_perception":
         return _best_observer(tx, intent, land_at)
+    if key == "binding":                                     # D-208: a rope or tape tied tight
+        return 2
     raise ValueError(f"unknown resistance key {key}")
 
 
@@ -1147,6 +1149,63 @@ def h_shove(tx, rng, intent, land_at, ctx, d):
     return _done("braced", CheckBand.FAIL)
 
 
+def h_tie_up(tx, rng, intent, land_at, ctx, d):
+    from ..action._impl_p5b import _yielded_when
+    from ..physical.bodies import capacity, release_event, tie_event, tied
+    from ..physical.objects import Holder, transfer
+    t = intent.bound.target_id
+    tb = _body(tx, t)
+    if tb is None or not tb["alive"] or tb["kind"] != "human" or tied(tx, t):
+        return _done("resisted", CheckBand.FAIL)
+    if capacity(tx, t).conscious and not tb["restrained"] and not _yielded_when(tx, t, land_at):
+        return _done("resisted", CheckBand.FAIL)
+    iid = intent.bound.item_id
+    transfer(tx, iid, Holder(kind="body", id=t, slot="worn"), None, land_at, intent.actor_id, ctx.start_event_id,
+             ctx.turn_index, props_update={"tied": True, "tied_by": intent.actor_id})
+    tie_event(tx, t, iid, intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+    if tx.query_one("SELECT 1 FROM grips WHERE holder_id=? AND target_id=?", (intent.actor_id, t)):
+        release_event(tx, intent.actor_id, t, land_at, ctx.start_event_id, ctx.turn_index)
+    _noise(tx, intent, "tie_up", d.noise_db, land_at, ctx)
+    return _done("tied")
+
+
+def _binding_off(tx, iid, to, intent, land_at, ctx):
+    from ..physical.objects import transfer
+    transfer(tx, iid, to, None, land_at, intent.actor_id, ctx.start_event_id, ctx.turn_index,
+             props_update={"tied": None, "tied_by": None})
+
+
+def h_untie(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import tied, untie_event
+    from ..physical.objects import Holder
+    t = intent.bound.target_id
+    iid = tied(tx, t)
+    if iid is None:
+        return _done("free")
+    untie_event(tx, t, intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+    slot = next((s for s in ("hand_r", "hand_l") if not tx.query_one(
+        "SELECT 1 FROM items WHERE holder_body=? AND holder_slot=?", (intent.actor_id, s))), "pack")
+    _binding_off(tx, iid, Holder(kind="body", id=intent.actor_id, slot=slot), intent, land_at, ctx)
+    _noise(tx, intent, "untie", d.noise_db, land_at, ctx)
+    return _done("untied")
+
+
+def h_work_free(tx, rng, intent, land_at, ctx, d):
+    from ..physical.bodies import tied, untie_event
+    from ..physical.objects import Holder
+    iid = tied(tx, intent.actor_id)
+    if iid is None:
+        return _done("free")
+    band = _check(tx, rng, intent, d, land_at, ctx).band
+    _noise(tx, intent, "work_free", d.noise_db, land_at, ctx)
+    if band in (CheckBand.CLEAN, CheckBand.COST):
+        untie_event(tx, intent.actor_id, intent.actor_id, land_at, ctx.start_event_id, ctx.turn_index)
+        p = _pos(tx, intent.actor_id)
+        _binding_off(tx, iid, Holder(kind="place", id=p["place_id"], anchor_id=p["anchor_id"]), intent, land_at, ctx)
+        return _done("worked_free", band)
+    return _done("still_tied", band)
+
+
 def h_let_go(tx, rng, intent, land_at, ctx, d):
     from ..physical.bodies import release_event              # D-207
     t = intent.bound.target_id
@@ -1593,7 +1652,7 @@ HANDLERS = {
     "barricade_portal": h_barricade, "unbarricade_portal": h_unbarricade, "force_portal": h_force, "peek_portal": h_peek,
     "pick_up": h_pick_up, "drop_item": h_drop, "give_item": h_give, "take_from": h_take_from, "put_into": h_put_into,
     "search_container": h_search, "search_place": h_search, "equip": h_equip, "holster": h_holster, "reload": h_reload,
-    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "let_go": h_let_go, "shove": h_shove, "shove_toward": h_shove_toward, "butcher": h_butcher, "spit": h_spit, "wash": h_wash, "smear": h_smear, "take_off": h_take_off,
+    "strike_melee": h_strike, "shoot": h_shoot, "grapple": h_grapple, "break_grip": h_break_grip, "let_go": h_let_go, "tie_up": h_tie_up, "untie": h_untie, "work_free": h_work_free, "shove": h_shove, "shove_toward": h_shove_toward, "butcher": h_butcher, "spit": h_spit, "wash": h_wash, "smear": h_smear, "take_off": h_take_off,
     "change_into": h_change_into, "strip": h_strip,
     "disarm": h_disarm, "take_cover": h_take_cover, "hide": h_take_cover, "crouch": h_posture, "stand": h_posture,
     "go_prone": h_posture, "observe": h_hold, "wait": h_hold, "guard": h_hold, "sleep": h_hold, "rest": h_hold,

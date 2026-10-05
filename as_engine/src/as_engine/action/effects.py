@@ -214,6 +214,24 @@ Per effect (result strings in quotes; 'done' unless noted):
   break_grip         opposed S + brawling vs the gripper's S + brawling; wins -> release_event.
   let_go             (D-207) the actor's grip on the target -> release_event (cause the
                      ACTION_START); 'let_go'. No grip -> 'free'. No check, no noise.
+  tie_up             (D-208) the target must be alive, of kind 'human', not tied
+                     (physical.bodies.tied), and unable to resist: not conscious (capacity), held
+                     (bodies.restrained), or given up (a surrender in the 10 minutes up to the landing
+                     with no attack of theirs since, as cascade trigger.victim_yielded) — else
+                     'resisted' (FAIL, nothing changes). Otherwise the binding (intent.bound.item_id)
+                     -> physical.objects.transfer to Holder('body', target, 'worn'), props_update
+                     {tied: true, tied_by: actor}; bodies.tie_event(target, it, actor, land_at, the
+                     ACTION_START, turn_index); then every grip the actor holds on the target ->
+                     release_event (the hands it took are free again); 'tied'. No check.
+  untie              (D-208) the target tied -> bodies.untie_event(target, actor, land_at, the
+                     ACTION_START, turn_index); then the binding -> objects.transfer to the actor's
+                     first empty hand (hand_r, then hand_l), else 'pack', props_update {tied: null,
+                     tied_by: null} (the keys removed); 'untied'. Not tied -> 'free'. No check.
+  work_free          (D-208) the actor tied, else 'free'. The def's check (A + athletics, resistance
+                     'binding'): CLEAN / COST -> bodies.untie_event(actor, actor, ...) and the binding
+                     drops where they are (objects.transfer to Holder('place', their place, their
+                     anchor), props_update {tied: null, tied_by: null}); 'worked_free'. FAIL ->
+                     'still_tied'.
   shove              opposed S + brawling vs S; wins -> target posture 'lying' ('knocked_down');
                      (D-207) and a body knocked down loses its hold: every grip the target holds
                      (bodies.grips_on rows with it as holder, by target_id) -> release_event (cause
@@ -422,7 +440,8 @@ EFFECT_IDS: tuple[str, ...] = (
     "close_portal", "lock_portal", "unlock_portal", "barricade_portal", "unbarricade_portal",
     "force_portal", "peek_portal", "pick_up", "drop_item", "give_item", "take_from", "put_into",
     "search_container", "search_place", "equip", "holster", "reload", "strike_melee", "shoot",
-    "grapple", "break_grip", "let_go", "shove", "disarm", "take_cover", "hide", "crouch", "stand",
+    "grapple", "break_grip", "let_go", "tie_up", "untie", "work_free", "shove", "disarm", "take_cover", "hide", "crouch",
+    "stand",
     "go_prone", "observe", "wait", "guard", "speak", "signal", "treat_wound", "apply_tourniquet",
     "eat", "drink", "sleep", "rest", "continue_task", "flee", "surrender", "climb",
     "throw_distraction", "shove_toward", "butcher", "spit", "wash", "smear", "take_off", "change_into",
@@ -489,6 +508,9 @@ SEEN: dict[str, str | None] = {
     "strip_clothing": "pulls {item} off {target}",
     "break_grip": "twists against {target}'s grip",
     "let_go": "lets go of {target}",                            # D-207
+    "tie_up": "ties {target}'s hands and feet with {item}",     # D-208
+    "untie": "unties {target}",
+    "work_free": "twists and works at the knots on their wrists",
     "shove": "shoves {target}",
     "disarm": "grabs for {target}'s weapon",
     "pick_up_item": "reaches for {target}",
@@ -577,6 +599,7 @@ NOISE_TEXT: dict[str, str] = {
     "throw_distraction": "something clattering", "click": "a dry click",
     "wash": "water splashing", "smear": "a wet slapping", "take_off": "a rustle of clothes",
     "change_into": "a rustle of clothes", "strip": "a rustle of clothes",
+    "tie_up": "a scuffle and the creak of rope", "untie": "a rustle", "work_free": "a scuffle",
 }
 
 

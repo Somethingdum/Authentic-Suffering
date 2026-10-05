@@ -48,7 +48,8 @@ wall 5) · `container.lock_quality` · `wound.severity` (medicine: minor 0, sign
 catastrophic 4) · `observer.best_perception` (stealth: best observer's attr_mod(P), +1 if alert) ·
 (D-108) `climb.class` (a face: ≤2.5 m 1, ≤4 m 2, ≤7 m 3, ≤10 m 4, higher 5; down one less) ·
 `gap.class` (≤1 m 1, ≤1.5 m 2, ≤2 m 3, ≤2.5 m 4, ≤3 m 5, wider 6; +1 landing more than 0.5 m higher,
-−1 landing 1 m or more lower) · `drop.class` (≤2 m 0, ≤3.5 m 1, ≤5 m 2, ≤7 m 3, higher 4).
+−1 landing 1 m or more lower) · `drop.class` (≤2 m 0, ≤3.5 m 1, ≤5 m 2, ≤7 m 3, higher 4) ·
+(D-208) `binding` 2 (a rope or tape tied tight, working free of it).
 
 ### 1.3 Opposed checks
 Both sides draw; higher margin wins; difference ≥ 3 clean, 1–2 winner pays a cost, 0 → established

@@ -40,7 +40,7 @@ Capacity (``capacity``):
                hobbles: you can walk, not run)
   hands_free = the number of hands (l, r) that hold nothing (no item in hand_l / hand_r) AND are
                not disabled; a hand is disabled when an unhealed wound on that side's arm or hand
-               has function_loss 2 (ANATOMY_SIDE)
+               has function_loss 2 (ANATOMY_SIDE); (D-208) 0 for a body that is tied (tied())
   can_speak  = conscious and no unhealed catastrophic neck wound
   impairment = bodies.impairment
 
@@ -1357,6 +1357,8 @@ def capacity(store: "Store | Tx", body_id: str, as_awake: bool = False) -> Capac
         held = store.query_one("SELECT 1 FROM items WHERE holder_body=? AND holder_slot=?", (body_id, slot)) is not None
         if not disabled and not held:
             free += 1
+    if free and tied(store, body_id):                       # D-208: hands tied
+        free = 0
     can_speak = conscious and not any(w["severity"] == "catastrophic" and ANATOMY_GROUP[w["anatomy"]] == "neck" for w in ws)
     hobbled = any(ANATOMY_GROUP[w["anatomy"]] in ("leg", "foot") and w["function_loss"] >= 1 for w in ws)
     return Capacity(mobile=mobile, hands_free=free, can_speak=can_speak, conscious=conscious, impairment=b["impairment"],
@@ -1528,18 +1530,65 @@ def grip_event(tx: "Tx", holder_id: str, target_id: str, at: int, cause_event_id
 def release_event(tx: "Tx", holder_id: str, target_id: str, at: int, cause_event_id: str | None,
                   turn_index: int) -> Event:
     """P5. Commit CONTROL_RELEASE {holder_id, target_id} deleting the grips row; the target's
-    restrained becomes 0 when no other grip on it remains. No such grip -> ValueError. A body
-    that dies or falls unconscious keeps no grips (D-207: loosen)."""
+    restrained becomes 0 when no other grip on it remains and it is not tied (D-208, tied()). No
+    such grip -> ValueError. A body that dies or falls unconscious keeps no grips (D-207: loosen)."""
     from ..contracts.events import Event, EventType, WriteOp, WriteRecord
     if not tx.query_one("SELECT 1 FROM grips WHERE holder_id=? AND target_id=?", (holder_id, target_id)):
         raise ValueError("no such grip")
     others = [h for h in grips_on(tx, target_id) if h != holder_id]
     writes = [WriteRecord(op=WriteOp.DELETE, table="grips", key={"holder_id": holder_id, "target_id": target_id})]
-    if not others:
+    if not others and not tied(tx, target_id):
         writes.append(WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": target_id}, values={"restrained": 0}))
     return tx.commit_event(Event(type=EventType.CONTROL_RELEASE, writer="physical.bodies", at=at, turn_index=turn_index,
                                  actor_id=holder_id, cause_event_id=cause_event_id, target_ids=[target_id], writes=writes,
                                  payload={"holder_id": holder_id, "target_id": target_id}))
+
+
+def tied(store: "Store | Tx", body_id: str) -> str | None:
+    """D-208 — the binding on a body: the item_id of the first (by item_id) item it holds in slot 'worn'
+    whose props carry tied: true (action.effects tie_up puts a rope or tape there); None without one."""
+    import json as _json
+    for iid, props in store.query("SELECT item_id, props FROM items WHERE holder_body=? AND holder_slot='worn' "
+                                  "ORDER BY item_id", (body_id,)):
+        if (_json.loads(props or "{}")).get("tied"):
+            return iid
+    return None
+
+
+def tie_event(tx: "Tx", body_id: str, item_id: str, by: str, at: int, cause_event_id: str | None,
+              turn_index: int) -> Event:
+    """D-208. Commit CONTROL_ESTABLISH {holder_id: None, target_id: body_id, item_id, tied_by: by} (writer
+    'physical.bodies', actor_id = by, target_ids [body_id]) setting bodies.restrained = 1 — a body held by
+    no hand: tied. The binding must already be on it (tied(body) == item_id: action.effects tie_up moves it
+    there first, physical.objects) -> ValueError otherwise."""
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    if tied(tx, body_id) != item_id:
+        raise ValueError("the binding is not on them")
+    return tx.commit_event(Event(type=EventType.CONTROL_ESTABLISH, writer="physical.bodies", at=at, turn_index=turn_index,
+                                 actor_id=by, cause_event_id=cause_event_id, target_ids=[body_id],
+                                 writes=[WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id},
+                                                     values={"restrained": 1})],
+                                 payload={"holder_id": None, "target_id": body_id, "item_id": item_id, "tied_by": by}))
+
+
+def untie_event(tx: "Tx", body_id: str, by: str, at: int, cause_event_id: str | None, turn_index: int) -> Event:
+    """D-208. Commit CONTROL_RELEASE {holder_id: None, target_id: body_id, item_id: tied(body), tied_by: the
+    tied_by of the latest CONTROL_ESTABLISH with that item_id (None when there is none), untied_by: by} (writer
+    'physical.bodies', actor_id = by) setting bodies.restrained = 0 when no grip on it remains. Not tied ->
+    ValueError. The binding stays where it is: the caller moves it off them right after (action.effects
+    untie / work_free), and until then tied() still names it."""
+    from ..contracts.events import Event, EventType, WriteOp, WriteRecord
+    iid = tied(tx, body_id)
+    if iid is None:
+        raise ValueError("not tied")
+    r = tx.query_one("SELECT json_extract(payload,'$.tied_by') FROM events WHERE type='CONTROL_ESTABLISH' AND "
+                     "json_extract(payload,'$.item_id')=? ORDER BY seq DESC LIMIT 1", (iid,))
+    writes = [] if grips_on(tx, body_id) else [WriteRecord(op=WriteOp.UPDATE, table="bodies", key={"body_id": body_id},
+                                                            values={"restrained": 0})]
+    return tx.commit_event(Event(type=EventType.CONTROL_RELEASE, writer="physical.bodies", at=at, turn_index=turn_index,
+                                 actor_id=by, cause_event_id=cause_event_id, target_ids=[body_id], writes=writes,
+                                 payload={"holder_id": None, "target_id": body_id, "item_id": iid,
+                                          "tied_by": r[0] if r else None, "untied_by": by}))
 
 
 GRIP_REACH_M = 1.5   # D-207: as far as a hand on someone reaches (the 'touch' range, mind.affordance)

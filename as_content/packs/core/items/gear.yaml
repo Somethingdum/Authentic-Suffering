@@ -125,7 +125,7 @@
   kind: tool
   mass_g: 300
   bulk: 1
-  tags: [tool, repair]
+  tags: [tool, repair, binding]
   barter_value: 6
   description: Half a roll. Fixes almost anything for a while.
 - schema: as.item.v1
@@ -135,7 +135,7 @@
   kind: tool
   mass_g: 900
   bulk: 2
-  tags: [tool, rope]
+  tags: [tool, rope, binding]
   barter_value: 8
   description: Ten metres of nylon rope.
 - schema: as.item.v1

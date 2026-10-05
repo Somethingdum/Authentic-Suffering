@@ -88,6 +88,11 @@ Fields (second person, plain English):
                     failed writeback never makes a person forget what they just said or saw).
                     The prompt shows them under 'Still raw from before' when there are any.
   body_lines        in this order, each a full sentence:
+                    * (D-208) what has hold of you: per body that grips the actor
+                      (physical.bodies.grips_on, by id) f'{perception.word_for(actor, it),
+                      capitalised} has hold of you.' ('One of the dead has hold of you.'); then,
+                      when physical.bodies.tied(actor), 'Your hands and feet are tied.' — held
+                      after the moment it happened, a person still knows it;
                     * per unhealed wound (created_at, wound_id): f'{SEVERITY_WORDS[severity]
                       capitalised} {type} wound to your {ANATOMY_WORDS[anatomy]}{", bleeding" when
                       physical.bodies.effective_bleed > 0}.'  ('A deep stab wound to your left

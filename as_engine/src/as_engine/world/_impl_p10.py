@@ -471,6 +471,8 @@ def step(tx, rng, row, fired, turn_index):
         return [ev]
     out = []
     leg = p.get("leg")
+    if leg and (_body(tx, b) or {}).get("restrained"):       # D-208: held or tied, it goes nowhere
+        leg = None
     if leg:
         ok = True
         if leg.get("portal_id"):
@@ -715,6 +717,10 @@ def rise(tx, rng, row, fired, turn_index):
     for it in tx.query("SELECT item_id, qty, holder_slot FROM items WHERE holder_body=? ORDER BY item_id", (corpse,)):
         out.append(objects.transfer(tx, it[0], objects.Holder("body", new, it[2] or "pack"), it[1], at, None, fired.event_id,
                                     turn_index))
+    rope = bodies.tied(tx, new)
+    if rope is not None:                                     # D-208: it rises tied
+        by = json.loads(tx.query_one("SELECT props FROM items WHERE item_id=?", (rope,))[0] or "{}").get("tied_by")
+        out.append(bodies.tie_event(tx, new, rope, by, at, fired.event_id, turn_index))
     out.append(E(tx, EventType.MATERIALIZE, "world.infected", at, turn_index,
                  [W("infected_state", _state_row(tx, rng, new, ty, at, risen_from=corpse))],
                  {"body_id": new, "type_id": ty, "risen_from": corpse}, cause=fired.event_id, actor_id=new))
