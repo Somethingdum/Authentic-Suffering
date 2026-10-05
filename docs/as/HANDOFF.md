@@ -117,7 +117,7 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   killing someone who was not fighting costs the killer the onlookers' trust and makes them afraid,
   starts a story that costs trust with whoever believes it, costs standing with the dead's groups that
   saw it, and the killer carries it (stress). Since: a child (D-123), someone loved (D-129), a captive
-  (D-134), eating the dead (D-133). Still open: surrendering (hands up, no grip), tension and loyalty checks after a killing, a settlement's law response (a law
+  (D-134), someone who gave up (D-135), eating the dead (D-133). Still open: tension and loyalty checks after a killing, a settlement's law response (a law
   against killing changes what worldgen writes — the owner's call), the PC's nerve, intrusive memories
   and sleep.
 - **People the PC gets to know** (after D-127): a generated person's skeleton now has its own voice and

@@ -522,3 +522,53 @@
       payload: {toward: "$trigger.killer", axis: trust, delta: -2, cause: killed_a_captive}
   delay_s: 0
   cites: [D-134, D-119]
+# D-135 — hands up. Someone who gave up (the surrender option, or holding up empty hands) and has not swung since is
+# no fighter any more: hitting them is seen for what it is, and killing them is killing a prisoner — even when they
+# had been fighting before they gave up. (Held and gave up both: the captive rules above answer it, once.)
+- schema: as.cascade.v1
+  id: CAS-052
+  description: Seeing someone hit a person who had their hands up costs them your trust, shakes you, and the story travels.
+  trigger_event: HARM
+  where: {}
+  preconditions: ["trigger.victim_yielded == true and trigger.victim_held == false"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: hit_one_who_gave_up}
+    - kind: adjust_stress
+      target: assault_onlookers_of(trigger.event_id)
+      amount: 1
+    - kind: create_rumour
+      target: assault_onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.attacker", claim: hit_one_who_gave_up}
+  delay_s: 0
+  cites: [D-135, D-126]
+- schema: as.cascade.v1
+  id: CAS-053
+  description: Seeing someone kill a person who had given up shakes everyone who saw it, and the story travels.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.victim_yielded == true and trigger.victim_held == false"]
+  effects:
+    - kind: adjust_stress
+      target: onlookers_of(trigger.event_id)
+      amount: 1
+    - kind: create_rumour
+      target: onlookers_of(trigger.event_id)
+      payload: {about: "$trigger.killer", claim: killed_one_who_gave_up}
+  delay_s: 0
+  cites: [D-135, D-119]
+- schema: as.cascade.v1
+  id: CAS-054
+  description: Killing someone who had given up costs the killer the trust of everyone who saw it, even when they had been fighting before.
+  trigger_event: DEATH
+  where: {}
+  preconditions: ["trigger.victim_yielded == true and trigger.victim_held == false and trigger.killer_provoked == true"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_of(trigger.event_id)
+      payload: {toward: "$trigger.killer", axis: trust, delta: -2, cause: killed_one_who_gave_up}
+  delay_s: 0
+  cites: [D-135, D-119]

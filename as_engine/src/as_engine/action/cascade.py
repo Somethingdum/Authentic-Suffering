@@ -275,7 +275,11 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     lore cold_start — is no one hurt); otherwise missing — (D-134) trigger.victim_held — for a HARM: the one
     hurt was held when it landed; for a DEATH someone caused: when the killing blow landed (grips
     taken on it up to then — CONTROL_ESTABLISH — outnumber those let go, or it is restrained now and
-    alive); otherwise missing — and trigger.attacker_provoked —
+    alive); otherwise missing — (D-135) trigger.victim_yielded — for a HARM: the one hurt had given up
+    when it landed — in the 10 minutes up to it their latest surrender (an ACTION_START with payload
+    verb 'surrender' or a GESTURE 'empty_hands', by them) with no ACTION_START with payload verb
+    'attack' by them after it (one in the same instant counts after: a feint is no surrender); for a
+    DEATH someone caused: when the killing blow landed; otherwise missing — and trigger.attacker_provoked —
     true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
     settlement_of(<path>).<column or derived column>, workplace_of(<path>).<column>.
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the

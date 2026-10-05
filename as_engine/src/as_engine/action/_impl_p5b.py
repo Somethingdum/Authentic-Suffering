@@ -629,16 +629,17 @@ def _path(tx, path, trig):
         if k is None:
             return _MISSING
         return k[0] if path == "trigger.killer" else k[1]
-    if path == "trigger.victim_held":                             # D-134: a captive
+    if path in ("trigger.victim_held", "trigger.victim_yielded"):  # D-134 a captive, D-135 one who gave up
+        how = _held_when if path == "trigger.victim_held" else _yielded_when
         typ = trig.type.value if hasattr(trig.type, "value") else trig.type
         body = (trig.payload or {}).get("body_id")
         if typ == "HARM" and body:
-            return _held_when(tx, body, trig.at)
+            return how(tx, body, trig.at)
         if typ == "DEATH":
             k = _killing(tx, trig)
             if k is None:
                 return _MISSING
-            return _held_when(tx, body, tx.query_one("SELECT at FROM events WHERE event_id=?", (k[2],))[0])
+            return how(tx, body, tx.query_one("SELECT at FROM events WHERE event_id=?", (k[2],))[0])
         return _MISSING
     if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
         a = _assault(tx, trig)
@@ -818,6 +819,25 @@ def _held_when(tx, body_id, at):
         return True
     b = tx.query_one("SELECT restrained, alive FROM bodies WHERE body_id=?", (body_id,))
     return b is not None and bool(b[0]) and bool(b[1])
+
+
+def _yielded_when(tx, body_id, at):
+    """D-135: had given up when it happened: in the 10 minutes up to ``at`` their latest surrender (ACTION_START verb
+    'surrender', GESTURE 'empty_hands') with no attack of theirs after it (an attack in the same instant counts after)."""
+    rows = tx.query("SELECT type, payload, at, seq FROM events WHERE actor_id=? AND type IN ('ACTION_START','GESTURE') "
+                    "AND at BETWEEN ? AND ?", (body_id, at - 600_000, at))
+    return _gave_up([(r[2], r[3], r[0], json.loads(r[1])) for r in rows])
+
+
+def _gave_up(seen):
+    """D-135: of (at, order, event type, payload) rows about one person, whether the latest surrender stands."""
+    out = False
+    for _at, _o, typ, pl in sorted(seen, key=lambda x: (x[0], x[2] == "ACTION_START" and x[3].get("verb") == "attack", x[1])):
+        if (typ == "GESTURE" and pl.get("gesture") == "empty_hands") or (typ == "ACTION_START" and pl.get("verb") == "surrender"):
+            out = True
+        elif typ == "ACTION_START" and pl.get("verb") == "attack":
+            out = False
+    return out
 
 
 def _theft_victims(tx, event_id):

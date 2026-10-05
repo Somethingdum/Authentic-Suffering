@@ -130,7 +130,13 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index) -> AffordanceSet
     torture           (D-134) an attack-verb option on a human who is held (bodies.restrained:
                       gripped or tied) — hurting someone who cannot fight back or get away;
     execute_prisoner  (D-134) such an option that also carries kill_human or kill_child: killing
-                      a captive.
+                      a captive — or (D-135) killing someone this actor saw give up: of this
+                      actor's percepts of the target in the 10 minutes up to now (percept_log,
+                      source_id the target), the latest that was a surrender (an ACTION_START with
+                      payload verb 'surrender', or a GESTURE 'empty_hands') with no ACTION_START
+                      with payload verb 'attack' after it (one in the same instant counts after: a
+                      feint is no surrender). A blow that does not kill is attack_unarmed already
+                      (giving up drops what you hold).
   A THREAT this turn = a known body that is infected (bodies.kind 'infected': its shape and gait
   show it, though not its type), or the actor of an event this actor perceived this turn that was
   a HARM, an ACTION_START with payload verb 'attack', or a SPEECH whose percept detail has

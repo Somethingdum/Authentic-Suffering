@@ -488,6 +488,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_captives.py` | Alice holds Mara; Owen hits her: she was held when it landed, Alice and June saw it, June trusts Owen less, is shaken and tells it (CAS-049). Mara had swung at Owen, was taken, and Owen kills her: CAS-025 does not count it (she had been fighting), CAS-050/051 do — June is shaken, tells it, and trusts him 2 less. June's card says never 'torture': with Mara free she may hit her; with Mara held the blow is off her menu (gate 'moral') |
 
+### 3.49 Hands up (P9; D-135)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_hands_up.py` | Mara holds up empty hands; Owen hits her: she had given up, June trusts him less, is shaken and tells it — once (CAS-052; CAS-049 does not count it, she was not held). A surrender in the same instant as an attack is a feint, one followed by an attack is over, and one more than 10 minutes before is not this fight. Mara swung at Owen, then gave up (the surrender option), and Owen kills her: CAS-025 and the captive rules do not count it, CAS-053/054 do — June is shaken, tells it and trusts him 2 less. Mara's card says never 'execute_prisoner': knife in hand, she may cut Alice down until she sees Alice's hands go up, and again once Alice swings at her; hitting her stays offered throughout |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

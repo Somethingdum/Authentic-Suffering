@@ -473,10 +473,13 @@ def _moral_tags(c, d, o):
                 if not armed:
                     tags.append("attack_unarmed")
                 held = _row(c.tx, "SELECT restrained FROM bodies WHERE body_id=?", (t,))
+                kills = "kill_human" in tags or "kill_child" in tags
                 if held and held["restrained"]:                 # D-134: someone who cannot fight or get away
                     tags.append("torture")
-                    if "kill_human" in tags or "kill_child" in tags:
+                    if kills:
                         tags.append("execute_prisoner")
+                elif kills and _seen_give_up(c, t):             # D-135: killing someone you saw give up
+                    tags.append("execute_prisoner")
     if t and t.startswith("itm_") and d.binds in ("item_reachable", "container"):
         hh = {r[0] for r in c.tx.query("SELECT household_id FROM household_members WHERE actor_id=?", (c.me,))}
         owners = [r[0] for r in c.tx.query(
@@ -496,6 +499,20 @@ def _moral_tags(c, d, o):
                         "SELECT 1 FROM wounds WHERE body_id=? AND healed_at IS NULL AND clotted=0 AND severity IN ('severe','catastrophic')", (b,)):
                     tags.append("leave_wounded")
     return tags
+
+
+def _seen_give_up(c, t):
+    """D-135: of this actor's percepts of ``t`` in the last 10 minutes, the latest surrender with no attack seen after it."""
+    out = False
+    for r in c.tx.query("SELECT e.type, e.payload FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? "
+                        "AND p.source_id=? AND p.at BETWEEN ? AND ? AND e.type IN ('ACTION_START','GESTURE') ORDER BY p.at, "
+                        "(e.type='ACTION_START' AND json_extract(e.payload,'$.verb')='attack'), e.seq", (c.me, t, c.at - 600_000, c.at)):
+        pl = json.loads(r[1])
+        if (r[0] == "GESTURE" and pl.get("gesture") == "empty_hands") or (r[0] == "ACTION_START" and pl.get("verb") == "surrender"):
+            out = True
+        elif r[0] == "ACTION_START" and pl.get("verb") == "attack":
+            out = False
+    return out
 
 
 def _duty(c, d, o, tags):

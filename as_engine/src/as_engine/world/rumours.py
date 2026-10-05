@@ -93,6 +93,8 @@ CLAIM_TEXT: dict[str, str] = {
     "ate_the_dead": "{about} cut meat from a dead person's body.",           # D-133
     "beat_a_captive": "{about} beat someone who was held and could not fight back.",   # D-134
     "killed_a_captive": "{about} killed someone who was held.",              # D-134
+    "hit_one_who_gave_up": "{about} hit someone who had their hands up.",   # D-135
+    "killed_one_who_gave_up": "{about} killed someone who had given up.",   # D-135
     "lost_it": "{about} lost it and went for someone.",
     "fell_out": "{about} had a screaming row with someone.",
 }
