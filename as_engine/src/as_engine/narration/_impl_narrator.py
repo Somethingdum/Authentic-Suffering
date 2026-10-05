@@ -123,12 +123,12 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         elif e["type"] == "ACTION_BLOCKED" and pl.get("cause") in BLOCKED_TEXT:
             text = BLOCKED_TEXT[pl["cause"]].format(pc=pc)
         elif e["type"] == "MOVE" and pl.get("from_place") is not None:
-            if pl.get("to_anchor"):
-                an = _row(tx, "SELECT name FROM anchors WHERE anchor_id=?", (pl["to_anchor"],))["name"]
-                text = f"{pc} moves {to_phrase(an)}."
-            elif pl["to_place"] != pl["from_place"]:
+            if pl["to_place"] != pl["from_place"]:                         # D-178: into the yard, first
                 nm = _row(tx, "SELECT name FROM places WHERE place_id=?", (pl["to_place"],))["name"]
                 text = f"{pc} goes into {place_phrase(nm)}."
+            elif pl.get("to_anchor"):
+                an = _row(tx, "SELECT name FROM anchors WHERE anchor_id=?", (pl["to_anchor"],))["name"]
+                text = f"{pc} moves {to_phrase(an)}."
         if text:
             entries.append((e["at"], e["seq"], "", NarratorLine(seconds=sec, kind=kind, text=text)))
     entries.sort(key=lambda x: (x[0], x[1], x[2]))
@@ -212,6 +212,10 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     if me["alive"] and me["awareness"] in ("asleep", "unconscious"):      # D-172: asleep at the end
         people, looks_lines = [], []
         hint = f"{pc} asleep" if me["awareness"] == "asleep" else f"{pc} senseless"
+    details = loc.description_lines if establish else []
+    if settings.narration_person == "third_limited":                   # D-178: the place told of him
+        details = [_of_pc(x, sex) for x in details]
+        people = [_of_pc(x, sex) for x in people]
     when = f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})"
     if at - t0 >= LONG_TURN_MS:
         when = f"{format_clock(t0)} to {when}"
@@ -221,13 +225,13 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     return NarratorPacket(
         turn_index=turn_index, world_time_text=when,
         place_text=place["name"], pc_name=pc, pc_state_lines=state, comprehension=_comprehension(tx, pc_id), lines=lines,
-        establish_place=establish, place_details=loc.description_lines if establish else [], people_present=people,
+        establish_place=establish, place_details=details, people_present=people,
         people_looks=looks_lines,
         choice_prompt_hint=hint, allowed_names=sorted(allowed), style=style, length=settings.narration_length,
         person=settings.narration_person, tense=settings.narration_tense, banned_phrases=list(rules.banned_phrases),
         intensity=settings.intensity, player_input_echo_block=_unlicensed(echo_block(tx, turn_index, numbers),
                                                                           [ln for ln in lines if not (ln.kind == "speech" and ln.speaker == pc)],
-                                                                          loc.description_lines if establish else [],
+                                                                          details,
                                                                           people, looks_lines, numbers))
 
 

@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-819 ids; 561 with their own statement, 258 named only in context.
+820 ids; 561 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -134,7 +134,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-02 | *Cascade table (Stage 10, P5/P9). Rules CAS-01..04. Secondary consequences are a DECLARATIVE* | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-020 | Hunger and thirst past the first pangs wear a person down. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
 | CAS-021 | A night's unbroken sleep takes the edge off and gives back a little Resolve. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/people.yaml`, `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py`, `contract/p07_slice/test_sleep_rests_you.py`, `contract/p09_society/test_broken_nights.py` |
-| CAS-022 | Shoving someone to the dead costs the one who did it the trust of everyone who saw it, and the story travels. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py`, `contract/p09_society/test_eating_the_dead.py` |
+| CAS-022 | Shoving someone to the dead costs the one who did it the trust of everyone who saw it, and the story travels. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py`, `contract/p09_society/test_eating_the_dead.py`, `contract/p09_society/test_who_it_was.py` |
 | CAS-023 | Whoever was shoved to the dead, if they live, never forgets it. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p05_many_actors/test_betrayal.py` |
 | CAS-024 | Every bite someone sees the dead take out of a person or an animal wears them down; watching a whole feeding breaks people. | as_content/packs/core/cascade/stress.yaml | `as_content/packs/core/cascade/stress.yaml` | `contract/p10_world/test_feeding.py` |
 | CAS-025 | Killing someone who was not fighting costs the killer the trust of everyone who saw who did it, leaves them afraid of the killer, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p07_slice/test_seen_before_swept.py`, `contract/p09_society/test_a_killing_seen.py`, `contract/p09_society/test_captives.py`, `contract/p09_society/test_hands_up.py` |
@@ -184,7 +184,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-065 | Seeing someone leave their own child behind with the danger costs them your trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_a_child.py` |
 | CAS-066 | Someone tried to kill you — a shot or a blade that missed — when you were not fighting them; you will not trust them, you are afraid of them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
 | CAS-067 | Someone went for you — a blow, a grab, a shove that did not hurt — when you were not fighting them; you trust them less and resent it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
-| CAS-068 | Seeing someone try to kill a person who was not fighting them costs them your trust, makes you wary of them, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py` |
+| CAS-068 | Seeing someone try to kill a person who was not fighting them costs them your trust, makes you wary of them, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_it_missed.py`, `contract/p09_society/test_who_it_was.py` |
 | CAS-069 | Someone shut the door on you and left you out there with the danger; you will not trust them, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_the_door_shut.py` |
 | CAS-07 | CAS-07 an effect whose target resolves to no ids is a no-op, not an error; the rule still counts as fired for the decision audit. | as_engine/action/cascade.py | `as_engine/action/cascade.py`, `as_content/packs/core/cascade/economy.yaml` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-070 | Seeing someone shut the door on a person you love, with the danger on their side, costs them your trust, and the story travels. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_the_door_shut.py` |
@@ -678,7 +678,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INFO-04 | INFO-04 holders(store, rumour_id) -> list[tuple[str, int]]: (holder_id, confidence) of every live believed holding on the rumour's (subject_type, subject_id, predicate), sorted by holder_id. | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-05 | INFO-05 spread_day(tx, group_id, at, turn_index, cause_event_id) -> list[Event] (society.group.day calls it.) For each rumours row (by rumour_id) with created_at > at - R.rumour_quiet_days * DAY: tellers = the living me… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py` |
 | INFO-06 | INFO-06 Retelling (P10; service/background.py runs the RUMOUR_DISTORT calls between turns): what a holder passes on is their own version. retell(tx, rumour_id, holder_id, answer, at, turn_index) -> Event / None: answer… | as_engine/world/rumours.py | `as_engine/service/background.py`, `as_engine/world/rumours.py` | `contract/p09_society/test_rumours.py`, `contract/p10_world/test_background.py` |
-| INFO-07 | INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type='body', seen=False) -> str (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed theft, CAS-013 f… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_it_missed.py` |
+| INFO-07 | INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type='body', seen=False, whom_id=None) -> str (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed th… | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_it_missed.py` |
+| INFO-08 | *upper-cased. INFO-08 (D-179) with a whom_word and a CLAIM_WHOM template for the claim, that* | as_engine/world/rumours.py | `as_engine/world/rumours.py` | `contract/p09_society/test_who_it_was.py` |
 
 ## INT
 
@@ -696,7 +697,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTAKE-04 | INTAKE-04 (4) mode 'say': words = the text; with settings.pc_voice == 'my_way' one SAY_MY_WAY call (lanes.requests.build_request(config, SAY_MY_WAY, turn_index = T, actor_id = the PC, context and ctx = SayMyWayContext(p… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_my_way_words_only.py` |
 | INTAKE-05 | INTAKE-05 (5) mode 'do': quotes = lanes.parse.extract_quotes(text); rest = the text with every quoted span ("…" or “…”) replaced by ' ', stripped; addressee = addressee_for(...) — ALWAYS called here, before anything els… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_a_line_they_dont_cross.py` |
 | INTAKE-06 | INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time passes and the input is not consumed (the player can rephrase). | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
-| INTAKE-07 | INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the call answers 'NONE' with a none_… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_second_look.py`, `contract/p07_slice/test_waking_up.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
+| INTAKE-07 | INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the call answers 'NONE' with a none_… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_place_told_of_him.py`, `contract/p07_slice/test_the_second_look.py`, `contract/p07_slice/test_waking_up.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
 | INTAKE-08 | INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up: the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is lanes.schemas.intake_schem… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_players_hands.py` |
 
 ## INTENT
@@ -1239,7 +1240,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| TEXT-01 | TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara', | as_engine/mind/perception.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py`, `as_engine/narration/narrator.py`, `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p07_slice/test_in_the_right_person.py` |
+| TEXT-01 | TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara', | as_engine/mind/perception.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py`, `as_engine/narration/narrator.py`, `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p07_slice/test_in_the_right_person.py`, `contract/p07_slice/test_the_place_told_of_him.py` |
 
 ## THREAD
 

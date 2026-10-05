@@ -213,6 +213,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   emit_event LOOP_OPENED                     mind.mind.open_loop(holder = target, kind = payload.kind,
                                              text = payload.text, subject_ids = [payload.subject] or [],
                                              strength = payload.strength or 2, cause = E)               (P6)
+                                             (D-179) '{whom}' in the text is the holder's word for
+                                             payload.whom (perception.word_for; 'you' when it is them)
                                              (E = the triggering event's id; '$trigger.…' payload values
                                              are resolved like targets, CAS-05)
   (P9; p = the effect payload with '$' values resolved, E = the trigger, at, turn_index as given)
@@ -252,7 +254,8 @@ CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (targe
   create_rumour                              world.rumours.seed(tx, target, p.about, p.claim, at,
                                              turn_index, E, confidence = p.confidence or 3, seen =
                                              bool(p.seen) — D-162: true for a rule whose targets saw
-                                             it happen, an eyewitness's own account)                    (P9)
+                                             it happen, an eyewitness's own account; whom_id = p.whom —
+                                             D-179: the one it was done to, whom they saw it done to)   (P9)
   drain_resolve                              mind.resolve.drain(target, reason = payload.cause or
                                              'coerced', ...) for a target that is a living actor (anyone
                                              else: no-op). (D-123) payload.scale_by — the subject is
@@ -350,10 +353,10 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     'attack' by them after it (one in the same instant counts after: a feint is no surrender); for a
     DEATH someone caused: when the killing blow landed; otherwise missing — and trigger.attacker_provoked —
     true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
-    (D-161) trigger.missed_attacker, trigger.missed_provoked, trigger.missed_lethal — for an
+    (D-161) trigger.missed_attacker, trigger.missed_target (D-179), trigger.missed_provoked, trigger.missed_lethal — for an
     ACTION_COMPLETE whose cause is an ACTION_START of an affordance whose verb is 'attack', by someone
     with an actors row on a human body, at someone else with an actors row on a human body alive when
-    it started, that put no HARM on them (no HARM of that body caused by the start): the attacker;
+    it started, that put no HARM on them (no HARM of that body caused by the start): the attacker; the one it was made on;
     whether the one it was made on was fighting a person in the 10 minutes up to the start (as
     attacker_provoked); whether the def is tagged 'lethal' (a shot, a blade) — a miss, a dry click,
     a grab that slips is still an attack; otherwise missing.

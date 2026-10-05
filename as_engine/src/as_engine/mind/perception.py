@@ -954,7 +954,9 @@ def retell(text: str, person: str, sex: str | None = None) -> str:
         its -s form ('know' -> 'knows', 'watch' -> 'watches', 'carry' -> 'carries', 'have' ->
         'has'); an adverb between them (RETELL_ADVERBS: 'you never know') passes the agreement to
         the word after it, and a word of RETELL_NOT_VERBS ('you and Mara', 'you all') or a past
-        tense (ending 'ed' but not 'eed', or RETELL_PAST: 'you knew') takes none.
+        tense (ending 'ed' but not 'eed', or RETELL_PAST: 'you knew') takes none; (D-178) a
+        contraction agrees too: you're -> I'm / he's / she's / they're, you've -> I've / he's /
+        she's / they've, and you'll / you'd keep theirs (I'll, he'd).
     Everything else is unchanged, punctuation and spacing included."""
     key = "first" if person == "first" else (sex if sex in ("male", "female") else "they")
     subj, obj, poss, poss_pron, refl = _RETELL_WORDS[key]
@@ -967,7 +969,10 @@ def retell(text: str, person: str, sex: str | None = None) -> str:
         lw = w.lower()
         new = None
         if agree == i:
-            if lw == "are":
+            if lw in ("re", "ve", "ll", "d") and parts[i - 1] in ("'", "\u2019"):     # D-178: a contraction
+                new = {"re": {"first": "m", "male": "s", "female": "s"}.get(key, "re"),
+                       "ve": "s" if key in ("male", "female") else "ve"}.get(lw, w)
+            elif lw == "are":
                 new = {"first": "am", "male": "is", "female": "is"}.get(key, "are")
             elif lw == "were":
                 new = "were" if key == "they" else "was"

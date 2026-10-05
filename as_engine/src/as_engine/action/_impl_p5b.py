@@ -671,11 +671,12 @@ def _path(tx, path, trig):
                 return _MISSING
             return how(tx, body, tx.query_one("SELECT at FROM events WHERE event_id=?", (k[2],))[0])
         return _MISSING
-    if path in ("trigger.missed_attacker", "trigger.missed_provoked", "trigger.missed_lethal"):   # D-161
+    if path in ("trigger.missed_attacker", "trigger.missed_target", "trigger.missed_provoked", "trigger.missed_lethal"):   # D-161
         a = _missed(tx, trig)
         if a is None:
             return _MISSING
-        return {"trigger.missed_attacker": a[0], "trigger.missed_provoked": a[2], "trigger.missed_lethal": a[3]}[path]
+        return {"trigger.missed_attacker": a[0], "trigger.missed_target": a[1], "trigger.missed_provoked": a[2],
+                "trigger.missed_lethal": a[3]}[path]
     if path in ("trigger.attacker", "trigger.attacker_provoked"):  # D-126: someone hurt
         a = _assault(tx, trig)
         if a is None:
@@ -1366,7 +1367,11 @@ def _dispatch(tx, rule, eff, target, trig, depth, at, turn_index):
             ev = relate(tx, target, pl["toward"], pl["axis"], int(pl["delta"]), trig.event_id, at, turn_index)
             return [] if ev is None else [ev]
         before = tx.query_one("SELECT MAX(seq) FROM events")[0] or 0
-        open_loop(tx, target, pl["kind"], pl.get("text") or "", [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
+        text = pl.get("text") or ""
+        if "{whom}" in text and pl.get("whom"):                       # D-179: who it was done to, in their word
+            from ..mind.perception import word_for
+            text = text.replace("{whom}", "you" if pl["whom"] == target else word_for(tx, target, pl["whom"]))
+        open_loop(tx, target, pl["kind"], text, [pl["subject"]] if pl.get("subject") else [], int(pl.get("strength") or 2),
                   trig.event_id, at, turn_index)
         return _events_since(tx, before)
     if eff.kind == "recover_resolve":                                # D-122
@@ -1444,7 +1449,7 @@ def _dispatch_p9(tx, rule, eff, target, trig, at, turn_index):
             raise ValueError(f"adjust cannot target {target}")
     elif eff.kind == "create_rumour":
         rum.seed(tx, target, pl["about"], pl["claim"], at, turn_index, E, confidence=int(pl.get("confidence") or 3),
-                 seen=bool(pl.get("seen")))                     # D-162: an eyewitness saw it
+                 seen=bool(pl.get("seen")), whom_id=pl.get("whom"))   # D-162: an eyewitness saw it; D-179: and to whom
     elif eff.kind == "emit_event" and et == "INFECTED_DRIFT":
         from ..world import infected
         infected.attract(tx, target, pl["toward"], at, E, turn_index, reason=pl.get("reason") or "noise")

@@ -164,7 +164,7 @@ def test_hurt_someone_she_loves_and_it_is_not_forgiven(store_floor):
         assert cascade.select(tx, "bonded_onlookers_of(trigger.event_id)", ev) == [w.id("mara")]
     sweep(w, [ev], t + 1000, ("CAS-037", "CAS-040"))
     assert rel(w, "mara", "pc", "trust") == max(-3, mara - 2) and rel(w, "alice", "pc", "trust") == max(-3, alice - 1)
-    assert grudges(w, "mara", "hurt someone you love") and not grudges(w, "alice", "hurt someone you love")
+    assert grudges(w, "mara", "hurt June, someone you love") and not grudges(w, "alice", "someone you love")   # D-179: who
 
 
 def test_killed_someone_she_loved(store_floor):
@@ -172,8 +172,8 @@ def test_killed_someone_she_loved(store_floor):
     t = now(w)
     death = kill(w, "pc", "june", t)
     sweep(w, [death], t + 2000, ("CAS-041",))
-    assert [r[0] for r in grudges(w, "mara", "killed someone you loved")] == [3]
-    assert not grudges(w, "alice", "killed someone you loved")
+    assert [r[0] for r in grudges(w, "mara", "killed June, someone you loved")] == [3]   # D-179: who
+    assert not grudges(w, "alice", "someone you loved")
 
 
 def test_shamed_in_front_of_others(store_floor):

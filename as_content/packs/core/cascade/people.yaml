@@ -164,7 +164,7 @@
       payload: {kind: fear, subject: "$trigger.killer", text: "{subject} killed someone in front of you, and they were not fighting back.", strength: 3}
     - kind: create_rumour
       target: onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.killer", claim: killed_someone, seen: true}
+      payload: {about: "$trigger.killer", claim: killed_someone, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-119, docs/as/06_WORLD.md#2.5, docs/as/06_WORLD.md#6]
 - schema: as.cascade.v1
@@ -294,7 +294,7 @@
       payload: {toward: "$trigger.attacker", axis: trust, delta: -1, cause: saw_them_hurt_someone}
     - kind: create_rumour
       target: assault_onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.attacker", claim: hurt_someone, seen: true}
+      payload: {about: "$trigger.attacker", claim: hurt_someone, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-126, docs/as/06_WORLD.md#6]
 - schema: as.cascade.v1
@@ -349,7 +349,7 @@
     - kind: emit_event
       event_type: LOOP_OPENED
       target: bonded_onlookers_of(trigger.event_id)
-      payload: {kind: grudge, subject: "$trigger.attacker", text: "{subject} hurt someone you love.", strength: 2}
+      payload: {kind: grudge, subject: "$trigger.attacker", text: "{subject} hurt {whom}, someone you love.", strength: 2, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-129, TEMPER-03]
 - schema: as.cascade.v1
@@ -362,7 +362,7 @@
     - kind: emit_event
       event_type: LOOP_OPENED
       target: bonded_onlookers_of(trigger.event_id)
-      payload: {kind: grudge, subject: "$trigger.killer", text: "{subject} killed someone you loved.", strength: 3}
+      payload: {kind: grudge, subject: "$trigger.killer", text: "{subject} killed {whom}, someone you loved.", strength: 3, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-129, D-119]
 - schema: as.cascade.v1
@@ -428,7 +428,7 @@
       amount: 2
     - kind: create_rumour
       target: onlookers_of_act(trigger.event_id)
-      payload: {about: "$trigger.actor_id", claim: ate_the_dead, seen: true}
+      payload: {about: "$trigger.actor_id", claim: ate_the_dead, seen: true, whom: "$trigger.payload.target_id"}
   delay_s: 0
   cites: [D-133]
 - schema: as.cascade.v1
@@ -441,7 +441,7 @@
     - kind: emit_event
       event_type: LOOP_OPENED
       target: onlookers_bonded_to_target(trigger.event_id)
-      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} cut meat from the body of someone you loved.", strength: 3}
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} cut meat from the body of {whom}, someone you loved.", strength: 3, whom: "$trigger.payload.target_id"}
   delay_s: 0
   cites: [D-133]
 - schema: as.cascade.v1
@@ -491,7 +491,7 @@
       amount: 1
     - kind: create_rumour
       target: assault_onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.attacker", claim: beat_a_captive, seen: true}
+      payload: {about: "$trigger.attacker", claim: beat_a_captive, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-134]
 - schema: as.cascade.v1
@@ -506,7 +506,7 @@
       amount: 1
     - kind: create_rumour
       target: onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.killer", claim: killed_a_captive, seen: true}
+      payload: {about: "$trigger.killer", claim: killed_a_captive, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-134, D-119]
 - schema: as.cascade.v1
@@ -541,7 +541,7 @@
       amount: 1
     - kind: create_rumour
       target: assault_onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.attacker", claim: hit_one_who_gave_up, seen: true}
+      payload: {about: "$trigger.attacker", claim: hit_one_who_gave_up, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-135, D-126]
 - schema: as.cascade.v1
@@ -556,7 +556,7 @@
       amount: 1
     - kind: create_rumour
       target: onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.killer", claim: killed_one_who_gave_up, seen: true}
+      payload: {about: "$trigger.killer", claim: killed_one_who_gave_up, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-135, D-119]
 - schema: as.cascade.v1
@@ -606,7 +606,7 @@
     - kind: emit_event
       event_type: LOOP_OPENED
       target: onlookers_bonded_to_target(trigger.event_id)
-      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} stripped the clothes off someone you loved while they lay there.", strength: 2}
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} stripped the clothes off {whom}, someone you loved, while they lay there.", strength: 2, whom: "$trigger.payload.target_id"}
   delay_s: 0
   cites: [D-138]
 - schema: as.cascade.v1
@@ -680,7 +680,7 @@
       amount: 1
     - kind: create_rumour
       target: assault_onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.attacker", claim: hurt_a_child, seen: true}
+      payload: {about: "$trigger.attacker", claim: hurt_a_child, seen: true, whom: "$trigger.payload.body_id"}
   delay_s: 0
   cites: [D-148, D-126]
 - schema: as.cascade.v1
@@ -775,7 +775,7 @@
       payload: {toward: "$trigger.missed_attacker", axis: fear, delta: 1, cause: saw_them_try_to_kill}
     - kind: create_rumour
       target: attack_onlookers_of(trigger.event_id)
-      payload: {about: "$trigger.missed_attacker", claim: tried_to_kill_someone, seen: true}
+      payload: {about: "$trigger.missed_attacker", claim: tried_to_kill_someone, seen: true, whom: "$trigger.missed_target"}
   delay_s: 0
   cites: [D-161, D-126, docs/as/06_WORLD.md#6]
 # D-163 — the door shut on them (the owner: "If I treat them like shit, or do something just absolutely evil.

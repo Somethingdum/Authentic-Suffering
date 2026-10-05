@@ -52,11 +52,13 @@ def _detail(words, addressed, known_as):
             "received_db": 60, "via_portal": None, "armed_at_me": False}
 
 
-def seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type="body", seen=False):
-    from ..mind.perception import BeliefFromPercept, grant
+def seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *, subject_type="body", seen=False,
+         whom_id=None):
+    from ..mind.perception import BeliefFromPercept, grant, word_for
     from ..world.rumours import claim_sentence
     rid = tx.mint("rum")
-    sentence = claim_sentence(claim, _about_word(tx, holder_id, subject_type, about_id))
+    whom = None if whom_id is None else ("you" if whom_id == holder_id else word_for(tx, holder_id, whom_id))   # D-179
+    sentence = claim_sentence(claim, _about_word(tx, holder_id, subject_type, about_id), whom)
     if seen:                                                     # D-162: they saw it — they did not hear it said
         grant(tx, holder_id, event_id=f"rumour:{rid}", channel="visual", fidelity="exact", text=sentence, source_id=None,
               at=at, turn_index=turn_index, beliefs=[BeliefFromPercept(subject_type, about_id, claim, sentence)],

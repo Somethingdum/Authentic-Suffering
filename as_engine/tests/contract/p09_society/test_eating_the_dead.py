@@ -74,7 +74,7 @@ def test_seen_loved_and_carried(scenario):
     assert (rel(w, "mara", "alice", "trust"), rel(w, "mara", "alice", "fear")) == (max(-3, trust - 2), min(3, fear + 1))
     assert actor_row(w, "mara", "stress") == min(10, stress + 2)
     assert w.store.query("SELECT strength FROM open_loops WHERE holder_id = ? AND kind = 'grudge' AND text LIKE ?",
-                         (w.id("mara"), "%cut meat from the body of someone you loved%"))[0][0] == 3
+                         (w.id("mara"), "%cut meat from the body of June, someone you loved%"))[0][0] == 3   # D-179
     assert w.store.query("SELECT 1 FROM rumours WHERE origin_holder = ?", (w.id("mara"),))
     assert rumours.CLAIM_TEXT["ate_the_dead"] == "{about} cut meat from a dead person's body."
     assert (actor_row(w, "alice", "stress"), actor_row(w, "alice", "resolve_cur")) == (min(10, a_stress + 2), max(0, a_res - 1))

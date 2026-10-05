@@ -711,6 +711,18 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_what_happens_first.py` | A shout two seconds into a two-minute search closes the window seconds later; the search has not ended and waits in the queue for the player's next say; with nothing in the way, the search lands in the wave as before |
 
+### 3.86 The place told of him (P7; D-178)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_the_place_told_of_him.py` | retell turns "You're alone." into "He's alone." / "I'm alone." / "They're alone.", "You've" into "He's", and keeps "You'll" / "You'd" as "He'll" / "I'd"; going out the garage's side door is told "Owen goes into the yard.", and the yard is described of him, with no "you" left in the place or the people |
+
+### 3.87 Who it was (P9; D-179)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_who_it_was.py` | The sentence names the one it was done to when there is a word for them ("Owen tried to kill Mara, who was not fighting."; "you" when it was the holder) and not otherwise; June, who saw Owen fire at Mara, believes it of Mara; Alice, told it by June, hears "someone" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

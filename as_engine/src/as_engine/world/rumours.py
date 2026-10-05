@@ -7,10 +7,13 @@ truth (INFO-03). Every function that returns an Event has committed it (writer '
 at and turn_index as given). R = RulesConfig().society, DAY = 86_400_000 ms.
 
 CLAIM_TEXT: claim slug -> sentence template ('{about}' = the listener's own word for the subject,
-  mind.perception.word_for). claim_sentence(claim, about_word) -> str: the template filled in, or
-  for an unknown slug f"{about_word}: {slug with '_' as spaces}."; the first letter upper-cased.
+  mind.perception.word_for). claim_sentence(claim, about_word, whom_word=None) -> str: the template
+  filled in, or for an unknown slug f"{about_word}: {slug with '_' as spaces}."; the first letter
+  upper-cased. INFO-08 (D-179) with a whom_word and a CLAIM_WHOM template for the claim, that
+  template instead ('{whom}' = the word): "Owen tried to kill Mara, who was not fighting." — the one
+  who saw it knows who it was done to; talk passed on says "someone" (spread_one never names them).
 INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, confidence=3, *,
-             subject_type='body', seen=False) -> str
+             subject_type='body', seen=False, whom_id=None) -> str
   (the cascade 'create_rumour' dispatch — core CAS-012 for a witnessed theft, CAS-013 for an
   off-screen death — and anything else that starts talk). rumour_id = tx.mint('rum'). First
   grant(tx, holder, event_id=f'rumour:{rumour_id}', channel 'speech', fidelity 'exact', text =
@@ -28,6 +31,9 @@ INFO-07 seed(tx, holder_id, about_id, claim, at, turn_index, cause_event_id, con
   holder saw it happen (an eyewitness rumour — a rule's payload seen: true): the grant is channel
   'visual', fidelity 'exact', text = the sentence (no 'Word is: '), detail {} — so the belief's
   provenance is 'witnessed' ("you saw it"), never talk they overheard; everything else is the same.
+  (D-179, INFO-08) ``whom_id`` (the one it was done to — a rule's payload whom): sentence =
+  claim_sentence(claim, about word, whom word) with whom word 'you' when whom_id is the holder, else
+  word_for(tx, holder, whom_id).
 INFO-02 spread_one(tx, rumour_id, teller_id, listener_id, at, turn_index, cause_event_id) -> Event
   The teller's live (superseded_by NULL) believed holding on the rumour's (subject_type,
   subject_id, predicate) must have confidence >= 1 — else ValueError. confidence = that - 1;
@@ -105,6 +111,19 @@ CLAIM_TEXT: dict[str, str] = {
     "lost_it": "{about} lost it and went for someone.",
     "fell_out": "{about} had a screaming row with someone.",
 }
+CLAIM_WHOM: dict[str, str] = {                                             # D-179 INFO-08: the one it was done to
+    "killed_someone": "{about} killed {whom}, who was not fighting back.",
+    "hurt_someone": "{about} hurt {whom}, who was not fighting back.",
+    "tried_to_kill_someone": "{about} tried to kill {whom}, who was not fighting.",
+    "shut_someone_out": "{about} shut the door on {whom} and left them out there with it.",
+    "fed_someone_to_the_dead": "{about} pushed {whom} to the dead to save themselves.",
+    "ate_the_dead": "{about} cut meat from the body of {whom}.",
+    "beat_a_captive": "{about} beat {whom}, who was held and could not fight back.",
+    "killed_a_captive": "{about} killed {whom}, who was held.",
+    "hit_one_who_gave_up": "{about} hit {whom}, who had their hands up.",
+    "killed_one_who_gave_up": "{about} killed {whom}, who had given up.",
+    "hurt_a_child": "{about} hurt {whom}, a child.",
+}
 
 
 def retell(tx: "Tx", rumour_id: str, holder_id: str, answer, at: int, turn_index: int):
@@ -112,15 +131,19 @@ def retell(tx: "Tx", rumour_id: str, holder_id: str, answer, at: int, turn_index
     raise NotImplementedError("P10")
 
 
-def claim_sentence(claim: str, about_word: str) -> str:
-    """CLAIM_TEXT filled in (implemented)."""
+def claim_sentence(claim: str, about_word: str, whom_word: str | None = None) -> str:
+    """CLAIM_TEXT filled in (implemented); CLAIM_WHOM when there is a whom_word (D-179)."""
+    if whom_word and claim in CLAIM_WHOM:
+        text = CLAIM_WHOM[claim].format(about=about_word, whom=whom_word)
+        return text[:1].upper() + text[1:]
     tpl = CLAIM_TEXT.get(claim)
     text = tpl.format(about=about_word) if tpl else f"{about_word}: {claim.replace('_', ' ')}."
     return text[:1].upper() + text[1:]
 
 
 def seed(tx: "Tx", holder_id: str, about_id: str, claim: str, at: int, turn_index: int,
-         cause_event_id: str | None, confidence: int = 3, *, subject_type: str = "body", seen: bool = False) -> str:
+         cause_event_id: str | None, confidence: int = 3, *, subject_type: str = "body", seen: bool = False,
+         whom_id: str | None = None) -> str:
     raise NotImplementedError("P9")
 
 

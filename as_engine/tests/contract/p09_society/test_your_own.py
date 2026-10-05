@@ -137,7 +137,7 @@ def test_stripping_her_dead(floor):
     assert {e.rule_cited for e in out} == {"CAS-056"}
     assert rel(w, "mara", "alice", "trust") == max(-3, trust - 1)
     assert w.store.query("SELECT strength FROM open_loops WHERE holder_id = ? AND kind = 'grudge' AND text LIKE ?",
-                         (w.id("mara"), "%stripped the clothes off someone you loved%"))[0][0] == 2
+                         (w.id("mara"), "%stripped the clothes off June, someone you loved%"))[0][0] == 2   # D-179
     assert rel(w, "pc", "alice", "trust") == owen
 
 

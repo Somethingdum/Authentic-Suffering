@@ -33,9 +33,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
         CHECK_RESOLVED  BAND_TEXT[payload.band] (bands not listed: no line);
         ACTION_COMPLETE  RESULT_TEXT[payload.result].format(pc=pc) (results not listed: no line);
         ACTION_BLOCKED  BLOCKED_TEXT[payload.cause].format(pc=pc) (causes not listed: no line);
-        MOVE (from_place not null)  f"{pc} moves {perception.to_phrase(to anchor name)}." when it
-          has a to_anchor, else f"{pc} goes into {perception.place_phrase(place name)}." when the
-          place changed.
+        MOVE (from_place not null)  f"{pc} goes into {perception.place_phrase(place name)}." when the
+          place changed (D-178: going out the side door is going into the yard, whatever anchor he
+          arrives at), else f"{pc} moves {perception.to_phrase(to anchor name)}." when it has a
+          to_anchor.
         (D-171, SLEEP-03) sleeping and waking — the PC's POSTURE_CHANGE whose payload awareness is
           'asleep', and every AWARENESS_CHANGE of this turn whose payload body_id is the PC (it
           carries no actor_id): to 'asleep' f"{pc} fell asleep."; 'asleep' -> 'awake'
@@ -52,7 +53,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    was said — nothing to answer, nothing faced.
   place_text       the PC's place name.       pc_name  pc.
   establish_place  turn_index == 1, or the PC has a MOVE this turn from one place to another;
-                   place_details = narration.location.describe(tx, pc_id, now).description_lines then.
+                   place_details = narration.location.describe(tx, pc_id, now).description_lines then
+                   — (D-178) with settings.narration_person 'third_limited' each told of the PC as the
+                   lines are (retell by the PC's sex: "He's alone.", "The gap would hide him."), and
+                   so is people_present ("A walker shambles toward him.").
   people_present   the text of every latest_view row (narration.location.latest_view) whose source
                    is a body or which is a silhouette.
   people_looks     (F1a-2, NARR-10: the prose shows how people look and smell) for each body other
