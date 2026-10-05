@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-799 ids; 542 with their own statement, 257 named only in context.
+800 ids; 543 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -802,16 +802,17 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | NARR-00 | *handle to any table except narration/narrator_state/echo_ledger (NARR-00). MUST NOT import* | as_engine/narration/__init__.py | `as_engine/narration/__init__.py` | `contract/p07_slice/test_narration_lint.py` |
-| NARR-01 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| NARR-02 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p07_slice/test_slice_checks.py` |
-| NARR-03 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| NARR-04 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
-| NARR-05 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| NARR-01 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| NARR-02 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py`, `contract/p07_slice/test_slice_checks.py` |
+| NARR-03 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| NARR-04 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
+| NARR-05 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_p07_slice_metal_fence.py` |
 | NARR-06 | NARR-06. Owner 'narration.lint' (writes echo_ledger only, through ECHO_RECORD events). Code decides; | as_engine/narration/lint.py | `as_engine/contracts/narration.py`, `as_engine/narration/lint.py`, `as_engine/narration/narrator.py` | `contract/p07_slice/test_narration_lint.py` |
-| NARR-07 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_narration_lint.py` |
+| NARR-07 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py`, `as_engine/turn/pipeline.py` | `contract/p07_slice/test_narration_lint.py` |
 | NARR-08 | *Output shape (NARR-08): one uninterrupted scene — no headings, labels, stat blocks, lists or* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | — |
 | NARR-09 | *Narrator continuity state (P11). Rules STYLE-03, NARR-09. Owner 'narration.narrator'.* | as_engine/narration/style.py | `as_engine/narration/style.py`, `as_engine/turn/pipeline.py` | `contract/p11_audits/test_style.py` |
-| NARR-10 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_narration_looks.py` |
+| NARR-10 | *Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,* | as_engine/narration/narrator.py | `as_engine/narration/narrator.py` | `contract/p07_slice/test_narration_looks.py` |
+| NARR-11 | NARR-11 (D-145): the worst thing the PC saw lately comes back unasked, oftener the worse the strain. | as_engine/narration/_impl_narrator.py | `as_engine/narration/_impl_narrator.py`, `as_engine/narration/narrator.py` | `contract/p07_slice/test_it_comes_back.py` |
 
 ## OBJ
 

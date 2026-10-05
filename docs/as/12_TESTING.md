@@ -548,6 +548,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_one_of_our_own.py` | Owen kills Alice in front of June and Mara, all of Delgado's crew: the crew is the group they shared, June and Mara the crew who saw it; their grievance with the crew rises 20 (CAS-060) and an hour later each has a LOYALTY_CHECK for the crew, reason 'killed_one_of_us'. Mara kills the stranger: he was never one of theirs, nobody's loyalty is asked |
 
+### 3.59 It comes back (P7; D-145)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_it_comes_back.py` | Owen watched Alice kill June: at stress 9 it comes back every second turn, at 10 every turn, in his own words for it ('It comes back unasked: June goes down and does not move.'), and the prose may name her; at stress 6 it does not, nor in the turn it happened, nor four days on |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

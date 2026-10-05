@@ -118,8 +118,8 @@ Owner requirements queued (2026-09-24, in the owner's words where it matters; sp
   starts a story that costs trust with whoever believes it, costs standing with the dead's groups that
   saw it, and the killer carries it (stress). Since: a child (D-123), someone loved (D-129), a captive
   (D-134), someone who gave up (D-135), eating the dead (D-133), one of their own group (D-144: grievance and a loyalty check). Still open: a settlement's law response (a law
-  against killing changes what worldgen writes — the owner's call), the PC's nerve, intrusive memories
-  and sleep.
+  against killing changes what worldgen writes — the owner's call), the PC's nerve and sleep (intrusive
+  memories: D-145).
 - **People the PC gets to know** (after D-127): a generated person's skeleton now has its own voice and
   inner life, but only a model can give them their own words and history. Proposed: when the PC has met a
   skeleton person (an acquaintance row) and they have been HOT, a quiet-hours job (service.background)

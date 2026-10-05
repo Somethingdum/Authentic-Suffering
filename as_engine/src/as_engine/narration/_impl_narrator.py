@@ -157,12 +157,16 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         state.append(URGE_LINE)
     from ..mind._impl_packet import _f1c_lines
     state += _f1c_lines(tx, pc_id)
+    back, back_names = _intrusion(tx, pc_id, turn_index, at)     # NARR-11 (D-145): what comes back
+    if back:
+        state.append(back)
     allowed = {pc, _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"]}
     for r in tx.query("SELECT DISTINCT a.known_name FROM percept_log p JOIN acquaintance a ON a.holder_id=p.holder_id AND a.subject_id=p.source_id "
                       "WHERE p.holder_id=? AND p.turn_index=? AND a.known_name IS NOT NULL", (pc_id, turn_index)):
         allowed.add(r[0])
     for r in tx.query("SELECT pl.name FROM known_places k JOIN places pl ON pl.place_id=k.place_id WHERE k.holder_id=?", (pc_id,)):
         allowed.add(r[0])
+    allowed |= back_names
     hint = None
     for p in tx.query("SELECT detail FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='speech' AND fidelity IN ('exact','partial') "
                       "ORDER BY at, percept_id", (pc_id, turn_index)):
@@ -257,3 +261,32 @@ def write_narration(tx, turn_index, prose, packet, passed, attempts):
                                  writes=[WriteRecord(op=WriteOp.INSERT, table="narration",
                                                      values={"turn_index": turn_index, "text": prose, "packet_hash": h,
                                                              "lint_passed": int(bool(passed)), "attempts": attempts})]))
+
+
+def _intrusion(tx, pc_id, turn_index, at):
+    """NARR-11 (D-145): the worst thing the PC saw lately comes back unasked, oftener the worse the strain."""
+    from .narrator import INTRUSION_LINE, INTRUSION_MS, INTRUSION_STRESS
+    r = tx.query_one("SELECT stress FROM actors WHERE actor_id=?", (pc_id,))
+    stress = int(r[0]) if r and r[0] is not None else 0
+    if stress < INTRUSION_STRESS or turn_index % max(1, 11 - stress):
+        return None, set()
+    for text, typ, pl, src in tx.query(
+            "SELECT p.text, e.type, e.payload, p.source_id FROM percept_log p JOIN events e ON e.event_id=p.event_id WHERE p.holder_id=? "
+            "AND p.channel='visual' AND p.fidelity IN ('exact','partial') AND p.turn_index<? AND p.at>=? AND "
+            "e.type IN ('DEATH','HARM','ACTION_START') ORDER BY p.at DESC, p.percept_id DESC", (pc_id, turn_index, at - INTRUSION_MS)):
+        pl = json.loads(pl)
+        if typ == "DEATH":
+            k = tx.query_one("SELECT kind FROM bodies WHERE body_id=?", (pl.get("body_id"),))
+            if not (k and k[0] == "human"):
+                continue
+        elif typ == "HARM" and pl.get("type") != "bite":
+            continue
+        elif typ == "ACTION_START" and pl.get("def_id") != "butcher_human":
+            continue
+        names = set()
+        for b in {src, pl.get("body_id"), pl.get("target_id"), pl.get("actor_id")} - {None}:
+            kn = tx.query_one("SELECT known_name FROM acquaintance WHERE holder_id=? AND subject_id=?", (pc_id, b))
+            if kn and kn[0]:
+                names.add(kn[0])
+        return INTRUSION_LINE.format(text=text), names
+    return None, set()

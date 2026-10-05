@@ -1,4 +1,4 @@
-"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, L9,
+"""Narrator packet, narration call and the narration row (Stages 16-18). Rules NARR-01..08, NARR-10, NARR-11, L9,
 DISC-01..04. Owner 'narration.narrator' (writes the narration row only). MUST NOT import
 kernel.truth: the narrator is a mind whose skull is the PC's.
 
@@ -55,11 +55,19 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
                    this turn: URGE_LINE ("Your body did it before you could stop it."); then (F1c)
                    the cold and what the PC has on, exactly as mind.packet's body_lines words them
                    (mind.packet.COLD_LINES, BARE_LINES) — the prose knows when the PC is freezing
-                   or naked, and what the people who see it make of it is theirs.
+                   or naked, and what the people who see it make of it is theirs; then (D-145,
+                   NARR-11) what comes back: when the PC's actors.stress >= INTRUSION_STRESS and
+                   turn_index % (11 - stress) == 0, INTRUSION_LINE with the text of the PC's own
+                   latest visual EXACT or PARTIAL percept, of a turn before this one and within
+                   INTRUSION_MS of now, of a DEATH of a human, a HARM of type 'bite' (someone
+                   eaten) or an ACTION_START of butcher_human — the worst things seen come back
+                   unasked, oftener the worse the strain (a memory, not a feeling: what the PC
+                   makes of it is the player's).
   comprehension    'low' when attr_mod(P) + attr_mod(I) <= 4, 'high' when >= 8, else 'average'
                    (NARR-05: how much of a tactic the prose may explain; never which facts).
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of
-                   its percepts this turn, the names of the places it knows (known_places).
+                   its percepts this turn, the names of the places it knows (known_places), and
+                   (D-145) the PC's known_name for the bodies of what came back (NARR-11).
   choice_prompt_hint  the LAST speech percept of the turn addressed to the PC at EXACT or PARTIAL ->
                    f"answer {speaker_known_as or 'them'}" (percepts ordered by (at, percept_id));
                    else, when mind.cues.cues_of(tx, pc_id, turn_index, now) includes threat_seen or
@@ -116,6 +124,9 @@ if TYPE_CHECKING:
     from ..lanes.client import LaneClient
 
 URGE_LINE = "Your body did it before you could stop it."   # W1 (D-80): pc_state_lines
+INTRUSION_LINE = "It comes back unasked: {text}"             # D-145 (NARR-11): pc_state_lines
+INTRUSION_STRESS = 7
+INTRUSION_MS = 3 * 24 * 3600 * 1000
 CHANNEL_KIND: dict[str, str] = {"visual": "sight", "auditory": "sound", "speech": "speech", "tactile": "touch",
                                 "olfactory": "smell", "vibration": "sound"}
 BAND_TEXT: dict[str, str] = {"clean": "It goes cleanly.", "cost": "It works, at a cost.", "fail": "It doesn't work.",
