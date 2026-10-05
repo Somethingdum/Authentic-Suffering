@@ -746,12 +746,52 @@ def _killing(tx, trig):
         blow = _row(tx, "SELECT event_id, actor_id, at FROM events WHERE type='HARM' AND json_extract(payload, '$.body_id')=? "
                         "AND at<=? AND json_extract(payload, '$.wound_id') IN (SELECT wound_id FROM wounds WHERE body_id=? AND "
                         "healed_at IS NULL) ORDER BY at DESC, seq DESC LIMIT 1", (dead, trig.at, dead))
-    if blow is None or not blow["actor_id"] or blow["actor_id"] == dead:
+    if blow is None or blow["actor_id"] == dead:
         return None
     killer = blow["actor_id"]
-    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (killer,)) is None:
-        return None
+    if not killer or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (killer,)) is None:
+        f = _fed(tx, dead, trig.at) if _by_the_dead(tx, blow["event_id"]) else None     # D-214: fed to the dead
+        if f is None:
+            return None
+        return f[0], _was_fighting(tx, dead, f[2]), f[1]
     return killer, _was_fighting(tx, dead, blow["at"]), blow["event_id"]
+
+
+FED_BITE_MS = 2 * 60_000        # D-214: the dead were on them within two minutes of the shove
+FED_DEATH_MS = 10 * 60_000      # and it killed them within ten
+
+
+def _by_the_dead(tx, harm_id):
+    """D-214: the HARM's cause is an act by one of the dead (its HARM carries no actor: physical.bodies.apply_harm)."""
+    return tx.query_one("SELECT 1 FROM events h JOIN events c ON c.event_id=h.cause_event_id JOIN bodies b ON "
+                        "b.body_id=c.actor_id WHERE h.event_id=? AND b.kind='infected'", (harm_id,)) is not None
+
+
+def _fed(tx, victim, at):
+    """D-214: (shover, the shove's ACTION_START id, its at, the dead's first HARM on them after it) when ``victim``
+    was shoved to the dead — the latest ACTION_COMPLETE with result 'shoved_to_the_dead' at most FED_DEATH_MS before
+    ``at`` whose cause is an ACTION_START at them, of an affordance tagged 'feed_to_dead', by someone else with an
+    actors row — and the first HARM on them by one of the dead (its cause an act by an infected body) after it came
+    within FED_BITE_MS of it; else None."""
+    for done_at, sid, who, s_at, def_id in tx.query(
+            "SELECT c.at, s.event_id, s.actor_id, s.at, json_extract(s.payload,'$.def_id') FROM events c JOIN events s ON "
+            "s.event_id=c.cause_event_id WHERE c.type='ACTION_COMPLETE' AND json_extract(c.payload,'$.result')='shoved_to_the_dead' "
+            "AND s.type='ACTION_START' AND json_extract(s.payload,'$.target_id')=? AND c.at<=? AND c.at>=? "
+            "ORDER BY c.at DESC, c.seq DESC", (victim, at, at - FED_DEATH_MS)):
+        try:
+            if "feed_to_dead" not in _def(tx, def_id or "").tags:
+                continue
+        except KeyError:
+            continue
+        if not who or who == victim or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (who,)) is None:
+            continue
+        first = tx.query_one("SELECT h.event_id, h.at FROM events h JOIN events c ON c.event_id=h.cause_event_id JOIN bodies b ON "
+                             "b.body_id=c.actor_id WHERE h.type='HARM' AND json_extract(h.payload,'$.body_id')=? AND "
+                             "b.kind='infected' AND h.at>=? ORDER BY h.at, h.seq LIMIT 1", (victim, done_at))
+        if first is None or first[1] > done_at + FED_BITE_MS:
+            return None
+        return who, sid, s_at, first[0]
+    return None
 
 
 def _rescue(tx, trig):
@@ -813,20 +853,24 @@ def _was_fighting(tx, who, until):
 
 
 def _assault(tx, trig):
-    """D-126: (attacker, provoked) for a HARM one person did to another, else None."""
+    """D-126: (attacker, provoked, the act's at, the act's event id — the HARM itself, or D-214 the shove that fed them
+    to the dead) for a HARM one person did to another, else None."""
     if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "HARM":
         return None
     pl = trig.payload or {}
     victim, attacker = pl.get("body_id"), pl.get("actor_id") or trig.actor_id
-    if not attacker or attacker == victim:
+    if attacker == victim or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (victim,)) is None:
         return None
-    if tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (attacker,)) is None or \
-            tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (victim,)) is None:
-        return None
+    act_at, act_id = trig.at, trig.event_id
+    if not attacker or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (attacker,)) is None:
+        f = _fed(tx, victim, trig.at) if _by_the_dead(tx, trig.event_id) else None   # D-214: the dead's first bite is the shover's
+        if f is None or f[3] != trig.event_id:
+            return None
+        attacker, act_id, act_at = f[0], f[1], f[2]
     dead = tx.query_one("SELECT dead_at FROM bodies WHERE body_id=?", (victim,))
     if dead is not None and dead[0] is not None and dead[0] < trig.at:
         return None                     # D-132: the dead put down — as everyone must — is no one hurt
-    return attacker, _was_fighting(tx, victim, trig.at)
+    return attacker, _was_fighting(tx, victim, act_at), act_at, act_id
 
 
 def _missed(tx, trig):
@@ -900,7 +944,7 @@ def _onlookers(tx, trigger, event_id):
     out = []
     dead = (trigger.payload or {}).get("body_id")
     for h in sorted(saw - {killer, dead}):
-        if _controller(tx, h) == "human" or _knew_infected(tx, h, dead, trigger.at):      # D-202
+        if _controller(tx, h) == "human" or _knew_infected(tx, h, dead, blow_at):         # D-202, judged when it was done
             continue
         named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity IN "
                              "('exact','partial') AND at>=? AND at<=?", (h, killer, blow_at - 10_000, trigger.at)) is not None
@@ -1291,15 +1335,15 @@ def select(tx, selector, trigger):
         a = _assault(tx, trigger)
         if a is None:
             return []
-        attacker, victim = a[0], (trigger.payload or {}).get("body_id")
+        attacker, victim, act_at, act_id = a[0], (trigger.payload or {}).get("body_id"), a[2], a[3]
         out = []
-        for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
-                             "fidelity IN ('exact','partial') ORDER BY holder_id", (v,)):
-            if h in (attacker, victim) or _controller(tx, h) == "human" or _knew_infected(tx, h, victim, trigger.at):  # D-202
+        for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id IN (?, ?) AND channel='visual' AND "
+                             "fidelity IN ('exact','partial') ORDER BY holder_id", (v, act_id)):
+            if h in (attacker, victim) or _controller(tx, h) == "human" or _knew_infected(tx, h, victim, act_at):  # D-202
                 continue
             named = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND source_id=? AND channel='visual' AND fidelity "
-                                 "IN ('exact','partial') AND at>=? AND at<=?", (h, attacker, trigger.at - 10_000, trigger.at))
-            if named is not None or visibility(tx, h, attacker, trigger.at) in ("clear", "partial"):
+                                 "IN ('exact','partial') AND at>=? AND at<=?", (h, attacker, act_at - 10_000, trigger.at))
+            if named is not None or visibility(tx, h, attacker, act_at) in ("clear", "partial"):
                 out.append(h)
         return out
     if fn == "threatened_by":                                        # D-126: a threat at weapon point

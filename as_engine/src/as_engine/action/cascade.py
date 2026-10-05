@@ -123,17 +123,20 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     (D-202) A safety precaution, not a killing (the owner: "An infected person is a threat to every non
     infected."): onlookers_of, assault_onlookers_of and attack_onlookers_of — and so bonded_onlookers_of,
     kin_onlookers_of and groups_that_saw, which are made from them — leave out every holder who knew the
-    one it was done to was infected: a visual EXACT or PARTIAL percept, at or before the trigger, of a
-    HARM of type 'bite' on that body or of an ACTION_START by that body of an affordance tagged
-    'compulsion', or an open loop about that body opened for a contamination LAW_APPLIED (D-188).
+    one it was done to was infected: a visual EXACT or PARTIAL percept, at or before the act (the HARM; the
+    killing blow; the trigger for attack_onlookers_of), of a HARM of type 'bite' on that body or of an
+    ACTION_START by that body of an affordance tagged 'compulsion', or an open loop about that body opened
+    for a contamination LAW_APPLIED (D-188).
     Grief (seen_clearly_by), strain (witnesses_of), the killer's own burden (actor(...)) and what the
     one hurt feels themself (hurt_by_someone, attacked_by_someone) are untouched.
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
                                               (trigger.attacker present): the one hurt — never the
                                               player's character (what they feel is theirs, C06)
     assault_onlookers_of(<path>)              (D-126) for such a HARM: the holders of a visual EXACT or
-                                              PARTIAL percept of it who also saw who did it (as
-                                              onlookers_of), never the attacker, the one hurt or the PC
+                                              PARTIAL percept of it (D-214: or of the shove that fed
+                                              them to the dead) who also saw who did it (as
+                                              onlookers_of, the act's time for the blow's), never the
+                                              attacker, the one hurt or the PC
     threatened_by(<path>)                     (D-126) for a SPEECH: the holders of a speech percept of
                                               it addressed to them with the weapon on them (detail
                                               addressed_to_me and armed_at_me) whose words, as heard, are
@@ -404,7 +407,13 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     neck_wound or harm): the actor of the killing blow — its cause event when that is a HARM to the
     dead body, else the latest HARM (at <= the death) whose wound_id is a wound still open on the dead
     body; the blow's actor must have an actors row and not be the dead; otherwise missing (hunger, the
-    cold, infection, an infected's bite never have a killer) — and trigger.killer_provoked — true
+    cold, infection never have a killer; an infected's bite has one only when the dead were fed — D-214:
+    when the blow carries no actor or one without an actors row and its cause is an act by an infected
+    body, the killer is whoever shoved the dead one to the dead — the latest ACTION_COMPLETE with payload
+    result 'shoved_to_the_dead', at most 10 minutes before the death, whose cause is an ACTION_START at
+    them of an affordance tagged 'feed_to_dead' by someone else with an actors row, when the first HARM
+    on them after it whose cause is an act by an infected body came within 2 minutes of it; the killing
+    blow is then that ACTION_START) — and trigger.killer_provoked — true
     when, in the 10 minutes up to the blow, the dead was fighting a person (any actor but the dead,
     so defending someone else counts): a HARM by the dead to them, an ACTION_START by the dead with
     verb 'attack' at them, or an armed SPEECH by the dead (payload armed true) to them or to
@@ -412,7 +421,9 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     true when no DEATH committed before this one has the same trigger.killer, false otherwise,
     missing when there is no killer; body(<path>).<column> — a bodies column (age_years, kind, ...),
     (D-126) trigger.attacker — for a HARM: its actor (payload actor_id, else the event's), when that and
-    the one hurt both have actors rows and differ, and (D-132) the one hurt was not already dead when it
+    the one hurt both have actors rows and differ — (D-214) for the first HARM on someone by the dead
+    after such a shove (as for trigger.killer: the act is then the shove) the shover — and (D-132) the one
+    hurt was not already dead when it
     landed (bodies.dead_at earlier than the HARM: the dead put down — head, or fire, as everyone must,
     lore cold_start — is no one hurt); otherwise missing — (D-134) trigger.victim_held — for a HARM: the one
     hurt was held when it landed; for a DEATH someone caused: when the killing blow landed (grips
@@ -422,7 +433,8 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     verb 'surrender' or a GESTURE 'empty_hands', by them) with no ACTION_START with payload verb
     'attack' by them after it (one in the same instant counts after: a feint is no surrender); for a
     DEATH someone caused: when the killing blow landed; otherwise missing — and trigger.attacker_provoked —
-    true when the one hurt was fighting a person in the 10 minutes up to it (as killer_provoked),
+    true when the one hurt was fighting a person in the 10 minutes up to it (D-214: up to the act) (as
+    killer_provoked),
     (D-161) trigger.missed_attacker, trigger.missed_target (D-179), trigger.missed_provoked, trigger.missed_lethal — for an
     ACTION_COMPLETE whose cause is an ACTION_START of an affordance whose verb is 'attack', by someone
     with an actors row on a human body, at someone else with an actors row on a human body alive when

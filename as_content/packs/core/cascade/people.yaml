@@ -1139,3 +1139,28 @@
       payload: {kind: goal, text: "Someone went through your things while you were out. Find out who.", strength: 2}
   delay_s: 0
   cites: [D-213, D-129]
+# D-214 — fed to the dead. Watching someone shove a person you love into the dead's reach was judged like any
+# onlooker's (CAS-022): trust lost, a story told. It is not that for the ones who love them. (Whatever the dead do
+# to them after is the shover's too: trigger.attacker, trigger.killer.) The player's character is never one of
+# those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-088
+  description: Seeing someone shove a person you love to the dead is never forgiven.
+  trigger_event: ACTION_START
+  where: {def_id: shove_toward_dead}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: fed_my_own_to_the_dead}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 2, cause: fed_my_own_to_the_dead}
+    - kind: emit_event
+      event_type: LOOP_OPENED
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {kind: grudge, subject: "$trigger.actor_id", text: "{subject} shoved {whom}, someone you love, to the dead.", strength: 3, whom: "$trigger.payload.target_id"}
+  delay_s: 0
+  cites: [D-214, D-129, TEMPER-06]

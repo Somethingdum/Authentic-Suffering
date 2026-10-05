@@ -249,6 +249,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Gone when you wake** (D-213, CAS-086/087): what someone else took from a sleeper, or from a bag still
   on them, is found when they wake or come to ("Your pack of jerky is gone."), once; they do not know
   who, and they set out to find out. A theft seen is D-129's.
+- **Fed to the dead** (D-214, CAS-022/023/088): shoving someone into the dead's reach costs the shover the
+  trust of whoever saw it and starts the story; the one shoved holds it against them for good, and so does
+  whoever loves them and saw it. The first bite the dead land on them within two minutes is the shover's, and
+  so is their death within ten: it is answered as hurting and killing someone who was not fighting.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

@@ -833,6 +833,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_gone_when_you_wake.py` | Mara, robbed in her sleep of the jerky in her pocket and the bottle in the pack on her back, wakes to "Your pack of jerky is gone." and "Your bottle of water is gone." and sets out to find out who — not knowing who; the same loss is found once; what she saw taken and what she moved herself are not gone; a slamming door that wakes her has her find it at once; the player's character finds it too, with nothing written into him |
 
+### 3.106 Fed to the dead (P9; D-214)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_fed_to_the_dead.py` | Ray shoves Cal to the dead in front of June, who loves him, and Nita, who does not: June loses three trust and holds a grudge for the shove itself, Nita two, the player's character nothing; the dead's first bite is Ray's — Cal, June and Nita answer it as an assault, though they saw the bite (they did not know he carried it when he was shoved), and the later bites are the dead's; Cal's death of it is Ray's killing — June's grudge for someone she loved, Nita's fear and her story, Ray's own burden; a bite three minutes on is nobody's |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
