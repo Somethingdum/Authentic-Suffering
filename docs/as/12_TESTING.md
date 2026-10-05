@@ -929,6 +929,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_in_view_is_not_news.py` | June, whom Owen sees this turn and did not the turn before, is visible_to_pc; seen both turns she is not; seen only the turn before she is not |
 
+### 3.122 Watching on (P5; D-230)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_watching_on.py` | On the lit sales floor Mara sees June stop and watch once; June going on watching is not seen again (seen null, no percept); June turning to watch the storeroom door is; crouching twice is seen twice |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -23,7 +23,10 @@ How an action runs (action.resolve drives it; handlers only LAND actions)
   visible: false} at complete_at, or ACTION_BLOCKED {actor_id, def_id, cause} at land_at.
 
 ACTION_START payload: {actor_id, def_id, verb, target_id, destination_id, item_id,
-  est_duration_s, visible (= AffordanceDef.visible_act), seen (= SEEN[def_id] or null),
+  est_duration_s, visible (= AffordanceDef.visible_act), seen (= SEEN[def_id] or null — (D-230) null
+  too for a holding act carried on: a def whose verb is in mind.memory.QUIET_VERBS when the actor's
+  latest ACTION_START (by seq) has the same def_id, target_id, destination_id and item_id; going on
+  watching is not a new act to see, and the standing view still shows where they are),
   continues_task (true only for keep_working), label (= intent.bound.label, the option as the
   actor was offered it), goal (= intent.goal), attention (B4 FOCUS-02: intent.attention, None
   without one)}. label and goal are the actor's own record of what

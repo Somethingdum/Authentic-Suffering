@@ -271,13 +271,23 @@ def precedence(tx, rng, resource, members, land_at):
 
 # ============================================================ resolve
 def _start_event(tx, intent, at, turn_index):
+    from ..mind.memory import QUIET_VERBS
     from .effects import SEEN
     b = intent.bound
     d = _def(tx, b.def_id)
+    verb = b.verb.value if hasattr(b.verb, "value") else b.verb
+    seen = b.label if b.def_id == "forced_act" else SEEN.get(b.def_id)
+    if seen and verb in QUIET_VERBS:                                 # D-230: watching on is not a new act to see
+        last = tx.query_one("SELECT payload FROM events WHERE actor_id=? AND type='ACTION_START' ORDER BY seq DESC LIMIT 1",
+                            (intent.actor_id,))
+        pl = json.loads(last[0]) if last is not None else {}
+        if (pl.get("def_id"), pl.get("target_id"), pl.get("destination_id"), pl.get("item_id")) == \
+                (b.def_id, b.target_id, b.destination_id, b.item_id):
+            seen = None
     return tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=at, turn_index=turn_index, actor_id=intent.actor_id,
-                                 payload={"actor_id": intent.actor_id, "def_id": b.def_id, "verb": b.verb.value if hasattr(b.verb, "value") else b.verb,
+                                 payload={"actor_id": intent.actor_id, "def_id": b.def_id, "verb": verb,
                                           "target_id": b.target_id, "destination_id": b.destination_id, "item_id": b.item_id,
-                                          "est_duration_s": b.est_duration_s, "visible": d.visible_act, "seen": b.label if b.def_id == "forced_act" else SEEN.get(b.def_id),
+                                          "est_duration_s": b.est_duration_s, "visible": d.visible_act, "seen": seen,
                                           "continues_task": b.def_id == "keep_working", "label": b.label, "goal": intent.goal,
                                           "attention": intent.attention}))
 
