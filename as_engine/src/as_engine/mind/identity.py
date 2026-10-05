@@ -50,7 +50,10 @@ IDN-01 compile_identity(dossier, *, minimum=False) -> IdentityCard   (``dossier`
                                                                   persona.public.presented_affiliation]
     f'What you hide: {end(concealed_history)}'                   [persona.private.concealed_history]
     f'What you really want: {true_goals in words}.'              [persona.private.true_goals]
+      (D-268, said once) without a goal that is what they want most (motive.motive, compared bare and
+      case-blind); none left, no line
     f'Who you really stand with: {end(real_affiliation)}'        [persona.private.real_affiliation]
+      (D-268) no line when it is who they say they stand with (presented_affiliation, compared so)
     f'A secret you keep: {end(content)} If it came out: {end(exposure_consequence)}' per secret i
                                                                  [life.secrets[i].content,
                                                                   life.secrets[i].exposure_consequence]
@@ -255,8 +258,12 @@ def compile_identity(dossier: ActorDossier | PCDossier, *, minimum: bool = False
         f"{end(pub.claimed_history)} Who you say you stand with: {end(pub.presented_affiliation)}",
         "persona.public.shown_traits", "persona.public.claimed_history", "persona.public.presented_affiliation")
     add("private_life", f"What you hide: {end(pri.concealed_history)}", "persona.private.concealed_history")
-    add("private_life", f"What you really want: {in_words(pri.true_goals)}.", "persona.private.true_goals")
-    add("private_life", f"Who you really stand with: {end(pri.real_affiliation)}", "persona.private.real_affiliation")
+    same = lambda a, b: bare(a).lower() == bare(b).lower()                     # noqa: E731  D-268: said once
+    goals = [g for g in pri.true_goals if not same(g, mo.motive)]
+    if goals:
+        add("private_life", f"What you really want: {in_words(goals)}.", "persona.private.true_goals")
+    if not same(pri.real_affiliation, pub.presented_affiliation):
+        add("private_life", f"Who you really stand with: {end(pri.real_affiliation)}", "persona.private.real_affiliation")
     for i, sec in enumerate(life.secrets):
         add("private_life", f"A secret you keep: {end(sec.content)} If it came out: {end(sec.exposure_consequence)}",
             f"life.secrets[{i}].content", f"life.secrets[{i}].exposure_consequence")

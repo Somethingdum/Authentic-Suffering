@@ -1140,6 +1140,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_said_in_front_of_their_people.py` | Owen threatens June with Mara and Alice of the crew in earshot: the crew's standing toward him drops a point (CAS-118), once a day, and again the next day; behind a shut door with nobody of theirs to hear it, and words that are no threat, cost nothing |
 
+### 3.157 What you really want, said once (P10; D-268)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_what_you_really_want.py` | A generated card whose hidden goal is its stated want has no 'What you really want' line; a different hidden want stays alone on it; an allegiance said once; the pack's cards keep theirs |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
