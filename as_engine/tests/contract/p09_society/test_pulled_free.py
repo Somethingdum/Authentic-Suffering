@@ -258,3 +258,22 @@ def test_freed_from_someone_s_grip(yard):
     blow(w, "pc", "mara", t + 1000, severity=WoundSeverity.CATASTROPHIC)
     assert rel(w, "cal", "pc") == (2, 1)
     assert debts(w, "cal") == [("A tall, heavyset man got you free of a woman. You owe them.", 3)]
+
+
+def test_seen_in_its_grip(yard):
+    """D-211 (LOOK-03): what has hold of Cal shows to June as long as it does — and to Owen, holding him, as his own."""
+    w = yard()
+    t = now(w)
+    grab(w, "dead", "cal", t)
+    with w.store.transaction() as tx:
+        seen = perception.appearance_text(tx, w.id("june"), w.id("cal"), "clear", 2.5)
+        far = perception.appearance_text(tx, w.id("june"), w.id("cal"), "partial", 9.0)
+    assert (seen, far) == ("In the grip of a walker.", "In the grip of a walker."), "her word for the dead (D-160)"
+    w.store.conn.execute("DELETE FROM grips")
+    grab(w, "pc", "cal", t + 100)
+    with w.store.transaction() as tx:
+        assert perception.appearance_text(tx, w.id("pc"), w.id("cal"), "clear", 1.5) == "In your grip."
+    blow(w, "pc", "dead", t + 1000, seen=())
+    w.store.conn.execute("DELETE FROM grips")
+    with w.store.transaction() as tx:
+        assert "grip" not in perception.appearance_text(tx, w.id("june"), w.id("cal"), "clear", 2.5)

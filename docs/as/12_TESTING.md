@@ -797,11 +797,11 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_safety_precaution.py` | June, who saw Alice bitten, does not judge Owen for putting her down — trust kept, no story told — while Mara, who did not, sees a killing; June still grieves; seeing Alice spit into a sleeper's mouth is knowing too |
 
-### 3.100 Pulled free (P9; D-207)
+### 3.100 Pulled free (P9; D-207, D-211)
 
 | File | What it proves |
 |---|---|
-| `p09_society/test_pulled_free.py` | One of the dead shot through the head lets go of Cal (the CONTROL_RELEASE caused by its DEATH); a holder asleep or out cold lets go; a holder who walks off lets go when the walk lands; letting go is an act; break_grip is offered only from a hand that is there and let_go only of someone held; a shove that knocks the holder down breaks its hold; one of the dead keeps hold of a corpse while it feeds and lets go when it is done; Cal, pulled out of the dead's hands by a stranger, trusts him two more, feels one warmer and owes him his life, and June, who loves Cal and saw it, trusts him one more; still in another hand is not saved; breaking free yourself owes nobody; out of a person's grip, the same debt |
+| `p09_society/test_pulled_free.py` | One of the dead shot through the head lets go of Cal (the CONTROL_RELEASE caused by its DEATH); a holder asleep or out cold lets go; a holder who walks off lets go when the walk lands; letting go is an act; break_grip is offered only from a hand that is there and let_go only of someone held; a shove that knocks the holder down breaks its hold; one of the dead keeps hold of a corpse while it feeds and lets go when it is done; Cal, pulled out of the dead's hands by a stranger, trusts him two more, feels one warmer and owes him his life, and June, who loves Cal and saw it, trusts him one more; still in another hand is not saved; breaking free yourself owes nobody; out of a person's grip, the same debt; (D-211) June sees Cal "In the grip of a walker." as long as it holds him, Owen holding him sees "In your grip.", and once he is free nothing says grip |
 
 ### 3.101 Tied up (P9; D-208)
 
