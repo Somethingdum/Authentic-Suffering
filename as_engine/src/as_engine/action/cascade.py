@@ -220,6 +220,10 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)
+    saw_them_let_in(<path>)                   (D-218) for a MOVE with trigger.let_in_by: the holders of a
+                                              visual EXACT or PARTIAL percept of the opening PORTAL_CHANGE
+                                              who are alive, with an actors row, in the place the dead
+                                              came into — never the opener or the PC
     saw_the_bite(<path>)                      (D-217) for a HARM of payload type 'bite': the holders of a
                                               visual EXACT or PARTIAL percept of it — never the one bitten
                                               (payload body_id) or the PC
@@ -462,6 +466,12 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     whether the one it was made on was fighting a person in the 10 minutes up to the start (as
     attacker_provoked); whether the def is tagged 'lethal' (a shot, a blade) — a miss, a dry click,
     a grab that slips is still an attack; otherwise missing.
+    (D-218) trigger.let_in_by — for a MOVE of an infected body from one place into another (payload from_place,
+    to_place) that has a living body with an actors row in it: through a portal between the two, open (is_open 1,
+    barricade 0), whose latest PORTAL_CHANGE touching is_open, barricade or is_locked — at most 5 minutes before the
+    MOVE — opened it (is_open 0 -> 1, or a barricade to 0), the actor of that PORTAL_CHANGE when they have an actors
+    row; not when, between it and the MOVE, another infected body or a living one other than the opener made the
+    same crossing (not the first of the dead through; someone let in, and the dead followed); otherwise missing.
     (D-207) trigger.rescuer — for a CONTROL_RELEASE (payload holder_id, target_id): who pulled the one
     held free. The act behind the release is its cause event when that is an ACTION_START, or — when
     the cause is a DEATH, FALSE_DEATH or AWARENESS_CHANGE of the holder (payload body_id) — that

@@ -857,6 +857,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_word_of_a_bite.py` | June, who saw Alice bitten, carries the story — never Alice or Owen; Mara, told it by June, believes it and is afraid of Alice; Owen putting Alice down a minute later is a precaution to both of them; told only after he did it, Mara saw a killing |
 
+### 3.110 Let them in (P9; D-218)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_let_them_in.py` | June opens the back door with one of the dead in the alley and it walks in on Mara and Alice: both trust her two less, hold it against her and tell it — never June or Owen judging — and only the first of the dead through counts; Owen opening it is judged like anyone; opened for Nita, who comes in with the dead behind her, it is a rescue; six minutes on, or the living coming in, is nothing |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

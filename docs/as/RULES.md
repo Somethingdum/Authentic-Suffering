@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-856 ids; 598 with their own statement, 258 named only in context.
+858 ids; 600 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -224,6 +224,8 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-102 | Hearing, from someone they believe, that a person spat into what people eat and drink costs that person some of the listener's trust and makes the listener afraid of them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_gets_around.py` |
 | CAS-103 | Whoever sees a person bitten carries the story, and talk spreads it from them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_of_a_bite.py` |
 | CAS-104 | Hearing, from someone they believe, that a person was bitten makes the listener afraid of them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_word_of_a_bite.py` |
+| CAS-105 | Seeing someone open the way and let the dead in on you costs them your trust, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_let_them_in.py` |
+| CAS-106 | Hearing, from someone they believe, that a person let the dead in on people costs that person some of the listener's trust. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_let_them_in.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |

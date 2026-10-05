@@ -1395,3 +1395,40 @@
       payload: {toward: "$trigger.payload.about_id", axis: fear, delta: 1, cause: rumour}
   delay_s: 0
   cites: [D-217, INFO-02]
+# D-218 — let them in. Opening the way with the dead on the other side of it, onto people who then had them among
+# them, cost nothing. Whatever the reason, whoever saw who opened it and is in there with the dead now trusts that
+# person less and holds it against them, and the story travels. Someone let in by it, with the dead behind them,
+# is a rescue, not this. The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-105
+  description: Seeing someone open the way and let the dead in on you costs them your trust, and you hold it against them.
+  trigger_event: MOVE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_let_in(trigger.event_id)
+      payload: {toward: "$trigger.let_in_by", axis: trust, delta: -2, cause: let_the_dead_in}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: saw_them_let_in(trigger.event_id)
+      payload: {toward: "$trigger.let_in_by", axis: resentment, delta: 1, cause: let_the_dead_in}
+    - kind: create_rumour
+      target: saw_them_let_in(trigger.event_id)
+      payload: {about: "$trigger.let_in_by", claim: let_the_dead_in, seen: true}
+  delay_s: 0
+  cites: [D-218, D-163, docs/as/06_WORLD.md#6]
+- schema: as.cascade.v1
+  id: CAS-106
+  description: Hearing, from someone they believe, that a person let the dead in on people costs that person some of the listener's trust.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: let_the_dead_in, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: trust, delta: -1, cause: rumour}
+  delay_s: 0
+  cites: [D-218, INFO-02]

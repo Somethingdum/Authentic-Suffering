@@ -264,6 +264,10 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Word of a bite** (D-217, CAS-103/104): whoever sees a person bitten carries the story ("Alice was bitten.") and
   talk spreads it; whoever believes it is afraid of the one bitten; and knowing it — seen, or told before it was
   done — makes putting them down a precaution, not a killing (D-202).
+- **Let them in** (D-218, CAS-105/106): when the first of the dead comes through a way someone opened in the five
+  minutes before, onto living people, whoever saw who opened it and has the dead among them trusts that person two
+  less and holds it against them, and the story ("let the dead in") travels. Opening it to let someone in, with
+  the dead behind them, is a rescue.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

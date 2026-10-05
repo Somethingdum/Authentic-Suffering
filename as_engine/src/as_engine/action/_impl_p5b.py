@@ -683,6 +683,9 @@ def _path(tx, path, trig):
             return _MISSING
         return {"trigger.missed_attacker": a[0], "trigger.missed_target": a[1], "trigger.missed_provoked": a[2],
                 "trigger.missed_lethal": a[3]}[path]
+    if path == "trigger.let_in_by":                                # D-218: the dead let in
+        r = _let_in(tx, trig)
+        return _MISSING if r is None else r[0]
     if path == "trigger.rescuer":                                  # D-207: pulled free
         r = _rescue(tx, trig)
         return _MISSING if r is None else r[0]
@@ -759,6 +762,55 @@ def _killing(tx, trig):
 
 FED_BITE_MS = 2 * 60_000        # D-214: the dead were on them within two minutes of the shove
 FED_DEATH_MS = 10 * 60_000      # and it killed them within ten
+
+
+LET_IN_MS = 5 * 60_000           # D-218: the dead came through within five minutes of the way being opened
+
+
+def _let_in(tx, trig):
+    """D-218: (opener, the opening PORTAL_CHANGE's id, its at, the place let into) for a MOVE of one of the dead into a
+    place with living people in it, through a way someone opened in the LET_IN_MS before — the first of the dead
+    through since, and nobody living let in by it in between; else None."""
+    if (trig.type.value if hasattr(trig.type, "value") else trig.type) != "MOVE":
+        return None
+    pl = trig.payload or {}
+    body, frm, to = pl.get("body_id") or trig.actor_id, pl.get("from_place"), pl.get("to_place")
+    if not body or not frm or not to or frm == to or not _of_the_dead(tx, body):
+        return None
+    if tx.query_one("SELECT 1 FROM positions p JOIN actors a ON a.actor_id=p.body_id JOIN bodies b ON b.body_id=p.body_id "
+                    "WHERE p.place_id=? AND b.alive=1 LIMIT 1", (to,)) is None:
+        return None
+    ways = {r[0] for r in tx.query("SELECT portal_id FROM portals WHERE is_open=1 AND barricade=0 AND ((place_a=? AND place_b=?) "
+                                   "OR (place_a=? AND place_b=?))", (frm, to, to, frm))}
+    if not ways:
+        return None
+    seq = tx.query_one("SELECT seq FROM events WHERE event_id=?", (trig.event_id,))
+    seq = seq[0] if seq else (tx.query_one("SELECT MAX(seq) FROM events")[0] or 0) + 1
+    last = {}
+    for eid, actor, at, s_, payload in tx.query("SELECT event_id, actor_id, at, seq, payload FROM events WHERE type='PORTAL_CHANGE' "
+                                                "AND at>=? AND at<=? AND seq<? ORDER BY at, seq", (trig.at - LET_IN_MS, trig.at, seq)):
+        p_ = json.loads(payload) if isinstance(payload, str) else (payload or {})
+        ch = p_.get("changes") or {}
+        if p_.get("portal_id") in ways and ({"is_open", "barricade", "is_locked"} & set(ch)):
+            last[p_["portal_id"]] = (eid, actor, at, s_, ch, p_.get("before") or {})
+    for pid in sorted(last):
+        eid, actor, at, s_, ch, before = last[pid]
+        opened = (before.get("is_open") == 0 and ch.get("is_open") == 1) or ((before.get("barricade") or 0) > 0 and ch.get("barricade") == 0)
+        if not opened or not actor or tx.query_one("SELECT 1 FROM actors WHERE actor_id=?", (actor,)) is None:
+            continue
+        came = [r for r in tx.query("SELECT json_extract(e.payload,'$.body_id'), b.kind, b.alive FROM events e JOIN bodies b ON "
+                                    "b.body_id=json_extract(e.payload,'$.body_id') WHERE e.type='MOVE' AND e.seq>? AND e.seq<? AND "
+                                    "json_extract(e.payload,'$.from_place')=? AND json_extract(e.payload,'$.to_place')=?",
+                                    (s_, seq, frm, to))]
+        if any(k == "infected" for _b, k, _a in came) or any(b_ != actor and k != "infected" for b_, k, _a in came):
+            continue                                             # not the first of them; or someone was let in — and they followed
+        return actor, eid, at, to
+    return None
+
+
+def _of_the_dead(tx, body_id):
+    r = tx.query_one("SELECT kind FROM bodies WHERE body_id=?", (body_id,))
+    return r is not None and r[0] == "infected"
 
 
 def _by_the_dead(tx, harm_id):
@@ -1475,6 +1527,17 @@ def select(tx, selector, trigger):
         holders = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                                           "fidelity IN ('exact','partial')", (v,))} - {dead}
         return sorted({s for s in (_stl_of(tx, h) for h in holders) if s})
+    if fn == "saw_them_let_in":                                      # D-218: the dead let in on them
+        from ..society._impl_society import _controller
+        r = _let_in(tx, trigger)
+        if r is None:
+            return []
+        opener, opening, _at, inside = r
+        return sorted({h for (h,) in tx.query(
+            "SELECT DISTINCT p.holder_id FROM percept_log p JOIN positions s ON s.body_id=p.holder_id JOIN bodies b ON "
+            "b.body_id=p.holder_id JOIN actors a ON a.actor_id=p.holder_id WHERE p.event_id=? AND p.channel='visual' AND "
+            "p.fidelity IN ('exact','partial') AND s.place_id=? AND b.alive=1", (opening, inside))
+            if h != opener and _controller(tx, h) not in (None, "human")})
     if fn == "saw_the_bite":                                         # D-217: word of a bite
         from ..society._impl_society import _controller
         pl = trigger.payload or {}

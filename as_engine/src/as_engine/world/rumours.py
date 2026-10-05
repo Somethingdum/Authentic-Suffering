@@ -110,6 +110,7 @@ CLAIM_TEXT: dict[str, str] = {
     "left_their_child": "{about} ran and left their own child behind.",     # D-148
     "spat_in_a_mouth": "{about} spat into someone's mouth while they slept.",   # D-186
     "spoiled_the_food": "{about} spat into what people eat and drink.",         # D-186
+    "let_the_dead_in": "{about} opened the way and let the dead in on people.",   # D-218
     "lost_it": "{about} lost it and went for someone.",
     "fell_out": "{about} had a screaming row with someone.",
 }
