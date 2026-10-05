@@ -911,6 +911,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p06_memory/test_told_before.py` | Owen tells Mara June went out to the back lot and her memory forms it from his words; Nita tells her June has the watch; two hours later June walks in and Mara's aftermath carries "From what P1 said 2 hours ago, they believed: June went out to the back lot." and "P5 told them 2 hours ago: June has the watch tonight.", rendered under WHAT THEY HAD BEEN TOLD BEFORE with the rule that a lie or a mistake is hers to judge; what she saw for herself and what Nita told her about the man in the weeds, who is not there, are not brought up; in the turn it was said it is not "before" |
 
+### 3.119 A voice through the wall (P6; D-227)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_a_voice_through_the_wall.py` | Mara, who caught only the tone of Owen's normal voice, said to everyone, and nothing else that turn, is not sent to be remembered; words made out (partial or exact), a raised or shouted voice, or words said to her are |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

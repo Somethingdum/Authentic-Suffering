@@ -167,7 +167,9 @@ MEM-19 (B5, fidelity C10; Actor Spec §13) A memory job is never lost to a faile
     before this person's next decision, what they did and saw is in their packet even when the
     summary failed (mind.packet 'unprocessed').
 MEM-20 (D-189) worth_writing(tx, holder_id, packet, turn_index) -> bool. Nothing new is not sent to be
-  remembered. True when the packet holds an utterance; or a percept whose (channel, text) is not that
+  remembered. True when the packet holds an utterance — (D-227) one whose words they made out (fidelity
+  exact or partial), or said to them (addressed_to_me), or raised or shouted: a voice through a wall,
+  too low to make out and said to someone else, is not by itself worth a memory; or a percept whose (channel, text) is not that
   of any of the holder's percept_log rows of turn_index - 1 (news is new: the same doors still shut,
   the same woman still at the window are not); or one of the holder's own events of this turn
   (actor_id = holder, this turn_index, type SPEECH, ACTION_START, ACTION_COMPLETE or ACTION_BLOCKED)
@@ -266,7 +268,8 @@ def unprocessed(store: "Store | Tx", holder_id: str) -> list[tuple[int, list[str
     return out
 def worth_writing(tx: "Tx", holder_id: str, packet: AftermathPacket, turn_index: int) -> bool:
     import json
-    if packet.utterances:
+    if any(u.fidelity.value in ("exact", "partial") or u.addressed_to_me or u.volume.value in ("raised", "shout")
+           for u in packet.utterances):                                  # D-227: a voice through the wall is not
         return True
     before = {(r[0], r[1]) for r in tx.query("SELECT channel, text FROM percept_log WHERE holder_id=? AND turn_index=?",
                                              (holder_id, turn_index - 1))}
