@@ -45,7 +45,10 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      and ctx = SayMyWayContext(packet, seed_text = text, behavior_notes =
      mind.actor.fused(tx, pc).behavior_law's [topic_handling, plan_carry, distortion, pressure]
      when it has one, else []), json_schema = lanes.schemas.to_lm_schema(SayMyWayOutput)), output SayMyWayOutput) and
-     words = its ``line`` when parse_status is 'ok' (else the text as typed). addressee =
+     words = its ``line`` when parse_status is 'ok' (else the text as typed) — (D-164) its words only,
+     action.intent.said_aloud(line); a line that is nothing but stage directions is the text as typed,
+     unless it was 'withheld': then Rejected('wont', NONE_MESSAGES['wont']) — they keep it to
+     themselves, and no time passes; addressee =
      addressee_for(...); the speech intent; info['addressee'] = addressee; record_pc_input(text)
      (what the player typed, not the rewritten line); record_input(mode, text, {signature, words,
      addressee}).

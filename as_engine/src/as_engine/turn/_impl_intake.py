@@ -201,7 +201,12 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
                                 json_schema=to_lm_schema(SayMyWayOutput), ctx=ctx)
             resp = await session.client.call(req, SayMyWayOutput)
             if resp.parse_status == "ok":
-                words = resp.parsed["line"]
+                from ..action.intent import said_aloud
+                words = said_aloud(resp.parsed["line"] or "")              # D-164: a model's line, words only
+                if not words:
+                    if resp.parsed.get("survived") == "withheld":
+                        raise Rejected("wont", NONE_MESSAGES["wont"])
+                    words = text
         addressee = addressee_for(session, pkt, submit)
         it = _speech_intent(pkt, aff, words, addressee, lod)
         info["addressee"] = addressee

@@ -30,7 +30,8 @@ to_intent(packet, affordances, output, *, lod, source, reaction=False) -> Intent
     so are double quotes (the story quotes the words itself); whitespace is collapsed — before the
     length rule; nothing left
     -> no speech (a SPEAK choice then -> IntentError 'empty'). The player's own words are never
-    touched.
+    touched. said_aloud(text) -> str is that rule as a helper (D-164: turn.intake applies it to the
+    line SAY_MY_WAY writes for the player's character — a model's line, not the player's).
   * SEG-02 speech takes time (TIME-05; Actor Spec §9): an utterance of n words takes u = n / 2.5
     seconds, however short. A SPEAK choice: est_duration_s = max(its est_duration_s, u). Any other
     choice: timing 'alongside' -> max(est_duration_s, u) (the words overlap the attempt); 'before'
@@ -207,5 +208,11 @@ def intent_to_dict(intent: Intent) -> dict:
 
 def intent_from_dict(d: dict) -> Intent:
     raise NotImplementedError("P5")
+
+
+def said_aloud(text: str) -> str:
+    """INTENT-10 (D-151): the words alone — stage directions, stray double quotes and extra spaces gone."""
+    raise NotImplementedError("D-151")
 from ._impl_intent import to_intent  # noqa
+from ._impl_intent import _said_aloud as said_aloud  # noqa: E402,F811
 from ._impl_p5b import barrier, plan_continuation, intent_to_dict, intent_from_dict  # noqa

@@ -644,6 +644,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_the_door_shut.py` | June shuts the back door on Nita with one of the dead in the alley: Nita trusts her 2 less, resents her and holds it (strength 3); Mara, who loves Nita and saw it, trusts June less, resents it and tells it; Alice, who saw it but has no tie to Nita, nothing; locking the door after is the same act, not a second grudge; with no danger out there, shutting a door is nothing |
 
+### 3.75 My way, words only (P7; D-164)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_my_way_words_only.py` | With "say it my way" on, a rewritten line keeps its words ("*shrugs* Fine. (looks away) Whatever." says "Fine. Whatever."); a line that is only a direction says what was typed; a line withheld is "Your character won't do that" and nothing is said |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
