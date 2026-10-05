@@ -4,6 +4,10 @@
 The wet strain makes its host spit into sleepers' mouths and into what people eat and drink (W1, D-77) — code's act,
 never a choice. Until now anyone who saw it happen shrugged it off: nothing changed for them, nobody told anyone, and
 the mother of the boy it was done to held nothing against the one who did it.
+
+And what everyone says about it (D-187): "Bitten people get friendly — want to share your bottle, your smoke. That's how
+you know." The act itself is the surest sign there is, but the 'spreader_signs' cue came only from a close, clear look
+at a host's face, so the one who watched it from across the room never thought of it.
 """
 
 from __future__ import annotations
@@ -12,7 +16,8 @@ import pytest
 
 from as_engine.action import cascade
 from as_engine.contracts.events import Event, EventType
-from as_engine.mind import perception
+from as_engine.mind import perception, retrieval
+from as_engine.mind.cues import cues_of
 from as_engine.physical import bodies, space
 
 pytestmark = pytest.mark.phase(9)
@@ -72,3 +77,25 @@ def test_alice_spits_into_the_water(scenario):
     claims = [r[0] for r in w.store.query("SELECT p.predicate FROM rumours r JOIN propositions p ON p.prop_id = r.prop_id "
                                           "WHERE r.origin_holder = ?", (w.id("june"),))]
     assert claims == ["spoiled_the_food"]
+
+
+def test_june_knows_what_it_means(scenario):
+    """D-187: seeing the act is a spreader sign, from any distance, and what June grew up hearing about it comes to mind."""
+    w = scenario("metal_fence")
+    t = lit_room(w)
+    with w.store.transaction() as tx:
+        tx.commit_event(space.move_event(tx, w.id("june"), w.id("sales_floor"), None, 12.0, 4.0, t, None, 0))
+    act(w, "alice", "spit_in_mouth", t + 100, target="eli", seen="bends over {target}'s sleeping face")
+    with w.store.transaction() as tx:
+        assert "spreader_signs" in cues_of(tx, w.id("june"), 0, t + 400)
+        assert "spreader_signs" not in cues_of(tx, w.id("alice"), 0, t + 400), "not from your own act"
+        said = [x["lore_id"] for x in retrieval.lore_lines(tx, w.id("june"), 0, t + 400, 4)]
+    assert set(said) & {"core:lore/wet_strain", "core:lore/contamination_culture"}, said
+
+
+def test_an_ordinary_act_is_no_sign(scenario):
+    w = scenario("metal_fence")
+    t = lit_room(w)
+    act(w, "alice", "observe_area", t, seen="looks about")
+    with w.store.transaction() as tx:
+        assert "spreader_signs" not in cues_of(tx, w.id("june"), 0, t + 400)

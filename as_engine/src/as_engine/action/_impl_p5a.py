@@ -294,6 +294,12 @@ def cues_of(tx, holder_id, turn_index, at):
             if ev["type"] == "ACTION_START" and pl.get("verb") == "attack" and pl.get("target_id") in guard_of \
                     and _alive_at(tx, pl["target_id"], ev["at"]):
                 out.add("dependent_in_danger")
+            if ev["type"] == "ACTION_START" and pl.get("def_id") and ev["actor_id"] != holder_id:
+                try:                                         # D-187: the act itself is the surest sign
+                    if "compulsion" in tx.canon.find("affordance", pl["def_id"]).tags:
+                        out.add("spreader_signs")
+                except KeyError:
+                    pass
             if ev["type"] == "PORTAL_CHANGE" and "damage" in pl.get("changes", {}):
                 out.add("door_forced")
             if ev["type"] == "MOVE" and ev["actor_id"] and ev["actor_id"] != holder_id:

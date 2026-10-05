@@ -58,6 +58,9 @@ cues_of(tx, holder_id, turn_index, at) -> set[str]
   bite_wound_seen   a sighting of a B with an unhealed wound of type 'bite';
   (stage signs)     every cue id in the ``signs`` of each stage physical.bodies.stages(B) returns
                     (content: fever_seen, spreader_signs, ...), for a sighting of that B.
+  spreader_signs    (D-187) also: a visible P (any distance) of another body's ACTION_START whose def
+                    (canon.find('affordance', payload.def_id)) carries the tag 'compulsion' — the act
+                    itself seen: someone bent over a sleeper's mouth, spitting into the water.
   Not detected before their phase (never present until then): fire_seen, smoke_smell (no fire
   model yet); whisper_seen, sudden_silence (P7 observed_social); shift_change,
   ration_cut (P9). Belief cues ('knows_*') are HELD, not present: mind.affordance reads them from

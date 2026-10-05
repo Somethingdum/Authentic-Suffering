@@ -742,6 +742,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_seen_spreading_it.py` | June watching Alice spit into sleeping Eli's mouth trusts her two less, fears her, and holds "Alice spat into the mouth of Eli while they slept."; Mara, his mother, holds a grudge that names him; the player's character holds nothing; spitting into the water is answered and told too |
 
+### 3.91 The act is the sign (P9; D-187)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_seen_spreading_it.py` | June, across the room, watching Alice spit into sleeping Eli's mouth has the `spreader_signs` cue and what she grew up hearing about the wet strain or the mouth rules comes to mind; Alice's own act is no sign to her; an ordinary act is no sign |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
