@@ -60,9 +60,12 @@ def test_how_they_talk_reads_as_english(age):
         first, rest = d["voice"]["capsule"].split(" ", 1)
         tend = d["voice"]["speech_tendencies"]
         assert rest == f"{tend[0]}; {tend[1]}." and first.startswith("Victor")
-        card = identity.compile_identity(ActorDossier.model_validate(d))
-        [said] = [ln.text.removeprefix("How you tend to speak: ") for sec in card.sections for ln in sec.lines
-                  if ln.text.startswith("How you tend to speak: ")]
+        texts = [ln.text for sec in identity.compile_identity(ActorDossier.model_validate(d)).sections for ln in sec.lines]
+        assert d["voice"]["capsule"] in texts and not any(t.startswith("How you tend to speak") for t in texts), \
+            "the capsule says the habits, once (D-246)"
+        d["voice"]["capsule"] = f"{first} keeps to the point."               # a card whose habits say more than it
+        texts = [ln.text for sec in identity.compile_identity(ActorDossier.model_validate(d)).sections for ln in sec.lines]
+        [said] = [t.removeprefix("How you tend to speak: ") for t in texts if t.startswith("How you tend to speak: ")]
         assert all(s[:1].isupper() for s in re.split(r"(?<=\.) ", said)), said
 
 

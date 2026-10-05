@@ -975,7 +975,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p10_world/test_a_voice_that_reads.py` | Every generated habit starts with something they do and calls them nothing like "they"; a generated person's capsule is their name and their two habits, and the card lists each habit as a sentence, for a child, a teenager, an adult and an elder; a way named "the way to the alley" is "The way to the alley is open." and is watched as "Watch the way to the alley" |
+| `p10_world/test_a_voice_that_reads.py` | Every generated habit starts with something they do and calls them nothing like "they"; a generated person's capsule is their name and their two habits, and the card says them once (D-246) — given a capsule that says less, it lists each habit as a sentence — for a child, a teenager, an adult and an elder; a way named "the way to the alley" is "The way to the alley is open." and is watched as "Watch the way to the alley" |
 | `p12_surfaces/test_the_door_by_name.py` | "Open the office door" tells the Boss "The office door is open now." |
 
 ### 3.130 What they are in the middle of (P10; D-238)
@@ -1019,6 +1019,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | File | What it proves |
 |---|---|
 | `p10_world/test_no_two_strangers_alike.py` | A standard world (seed 7, where three pairs of strangers shared a voice) has no two generated people with the same first line; a seed whose every voice but one has been heard gets that one |
+
+### 3.137 Said once on every card (P10; D-246)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_said_once_on_every_card.py` | A generated Victor's decision card has his capsule and no "How you tend to speak" echo while Mara's written card keeps it; the card her voice is written from, once her capsule holds her habits, has no "Habits of speech" line |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

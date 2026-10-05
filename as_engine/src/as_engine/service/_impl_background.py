@@ -263,9 +263,10 @@ def _voice_context(tx, actor):
     d = fused(tx, actor)
     i, v, m = d.identity, d.voice, d.motive
     name = (tx.query_one("SELECT display_name FROM actors WHERE actor_id=?", (actor,))[0] or i.name).split()[0]
+    held = all(t.lower().rstrip(".") in (v.capsule or "").lower() for t in v.speech_tendencies)   # D-246: said once
     card = [f"{i.age}, {i.sex}; {i.occupation_now} (before: {i.occupation_before})",
             _COHORT_WORDS.get(getattr(i.cohort, "value", i.cohort), ""),
-            f"How they talk: {v.capsule}", f"Habits of speech: {'; '.join(v.speech_tendencies)}",
+            f"How they talk: {v.capsule}", "" if held else f"Habits of speech: {'; '.join(v.speech_tendencies)}",
             f'When nothing is at stake: "{v.exemplars.low_stakes}"', f'Under pressure: "{v.exemplars.under_pressure}"',
             f'At the end of their rope: "{v.exemplars.at_the_limit}"', f"What they want: {m.motive}",
             f"What happened to them: {m.past_wound}"]
