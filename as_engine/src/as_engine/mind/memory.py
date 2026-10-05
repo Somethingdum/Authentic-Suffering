@@ -28,7 +28,9 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                 joined with one space:
                   SPEECH        f'Said: "{payload.words}"'
                   ACTION_START  f'Chose to {label}.' — label = payload.label without a trailing
-                                parenthesised part (' (4 m, about 3 seconds)'), first letter
+                                parenthesised part (' (4 m, about 3 seconds)'), told in the first
+                                person (D-152, TEXT-01: mind.perception.retell(label, 'first'):
+                                'take my .38 revolver into my hand', not 'your'), first letter
                                 lower-cased; skipped for def_id 'speak' (its SPEECH says it).
                 e.g. 'Said: "Quiet." Chose to move to the rear shelving.'
   own_expectation_text   payload.goal of the holder's LAST ACTION_START this turn when it is not

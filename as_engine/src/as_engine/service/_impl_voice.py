@@ -59,8 +59,10 @@ def _place_name(store, place_id):
 def _describe(store, e):
     p, t = e["payload"], e["type"]
     who = _name(store, e["actor_id"]) if e["actor_id"] else None
-    if t == "ACTION_START":
-        return f"{who or 'someone'}: {p.get('label') or p.get('def_id') or 'did something'}"
+    if t == "ACTION_START":                                       # TEXT-01 (D-152): of them, not to them
+        from ..mind.perception import retell
+        sex = store.query_one("SELECT sex FROM bodies WHERE body_id=?", (e["actor_id"],)) if e["actor_id"] else None
+        return f"{who or 'someone'}: {retell(p.get('label') or p.get('def_id') or 'did something', 'third', sex[0] if sex else None)}"
     if t == "MOVE":
         return f"{who or 'something'} went to the {_place_name(store, p.get('to_place'))}"
     if t == "NOISE":

@@ -156,7 +156,9 @@ not know (a known name = acquaintance.known_name; the holder's own name is never
       at_phrase(anchor name) ('at the counter', 'behind the counter', 'at the doors'),
       from_phrase(anchor or place name) ('from the counter', 'from behind the counter'),
       to_phrase(anchor name) ('to the counter', 'behind the counter', 'to the doors'),
-      place_phrase, thing_phrase.
+      place_phrase, thing_phrase, and (D-152, TEXT-01) retell: a menu label, written to the one
+      choosing ('Take your .38 revolver into your hand'), told in the first person ('take my .38
+      revolver into my hand') or of them ('take his .38 revolver into his hand').
   render_visual(holder, B, level), present tense, one sentence:
       clear:   f'{Ref} {posture_verb} {where}{held}{wounds}.'  held = ', <item name> in the
                <left|right> hand' per held item (hand_l, hand_r order); wounds = ', bleeding
@@ -288,6 +290,7 @@ class BeliefFromPercept:
 
 
 import json as _json
+import re
 
 from ..contracts.events import Event as _Event, EventType as _ET, WriteOp as _Op, WriteRecord as _W
 
@@ -860,6 +863,89 @@ def thing_phrase(name: str) -> str:
     """'counter' -> 'the counter'; a name that already starts with 'the ' is unchanged (implemented)."""
     return name if name.lower().startswith("the ") else f"the {name}"
 
+
+RETELL_OBJECT_AFTER = frozenset({"on", "from", "to", "at", "with", "for", "behind", "near", "toward", "towards", "around",
+                                 "past", "beside", "against", "over", "under", "into", "onto", "of", "by", "about",
+                                 "between", "after", "before", "like", "than", "off", "without"})
+RETELL_MODALS = frozenset({"can", "could", "will", "would", "shall", "should", "may", "might", "must"})
+RETELL_ADVERBS = frozenset({"never", "always", "still", "just", "already", "really", "also", "only", "often", "ever",
+                            "even", "then", "first", "once"})
+RETELL_NOT_VERBS = frozenset({"and", "or", "not", "too", "all", "both", "alone", "yourself", "two", "three"})
+RETELL_PAST = frozenset({"knew", "saw", "did", "had", "went", "came", "took", "made", "said", "got", "heard", "left",
+                         "thought", "found", "kept", "held", "ran", "fell", "gave", "told", "felt", "lost", "brought"})
+_RETELL_WORDS = {"first": ("I", "me", "my", "mine", "myself"), "male": ("he", "him", "his", "his", "himself"),
+                 "female": ("she", "her", "her", "hers", "herself"), "they": ("they", "them", "their", "theirs", "themselves")}
+
+
+def _verb_s(v: str) -> str:
+    lv = v.lower()
+    if lv == "have":
+        return v[:2] + "s"
+    if lv.endswith(("s", "sh", "ch", "x", "z", "o")):
+        return v + "es"
+    if len(lv) > 1 and lv.endswith("y") and lv[-2] not in "aeiou":
+        return v[:-1] + "ies"
+    return v + "s"
+
+
+def retell(text: str, person: str, sex: str | None = None) -> str:
+    """TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara',
+    'the nearest way out you know', 'Break the man's grip on you') — told in another person
+    (implemented). ``person`` 'first' -> I / me / my / mine / myself; 'third' -> by ``sex``:
+    'male' he / him / his / his / himself, 'female' she / her / her / hers / herself, anything
+    else they / them / their / theirs / themselves. Whole words only, case-insensitive; a word
+    that began with a capital keeps one ('I' always has one):
+      'yourself' -> the reflexive; 'yours' -> the possessive pronoun; 'your' -> the possessive;
+      'you' -> the object form when the word before it is in RETELL_OBJECT_AFTER or no word
+        follows it in the text ('grip on you' -> 'grip on him'); else the subject form, and the
+        word after it agrees: 'are' -> am / is / are, 'were' -> was / was / were, a modal
+        (RETELL_MODALS) or any other word for I and they unchanged, any other word for he / she
+        its -s form ('know' -> 'knows', 'watch' -> 'watches', 'carry' -> 'carries', 'have' ->
+        'has'); an adverb between them (RETELL_ADVERBS: 'you never know') passes the agreement to
+        the word after it, and a word of RETELL_NOT_VERBS ('you and Mara', 'you all') or a past
+        tense (ending 'ed' but not 'eed', or RETELL_PAST: 'you knew') takes none.
+    Everything else is unchanged, punctuation and spacing included."""
+    key = "first" if person == "first" else (sex if sex in ("male", "female") else "they")
+    subj, obj, poss, poss_pron, refl = _RETELL_WORDS[key]
+    parts = re.split(r"([A-Za-z]+)", text)
+    words = [i for i in range(1, len(parts), 2)]
+    out = list(parts)
+    agree = None
+    for n, i in enumerate(words):
+        w = parts[i]
+        lw = w.lower()
+        new = None
+        if agree == i:
+            if lw == "are":
+                new = {"first": "am", "male": "is", "female": "is"}.get(key, "are")
+            elif lw == "were":
+                new = "were" if key == "they" else "was"
+            elif key in ("male", "female") and lw not in RETELL_MODALS | RETELL_PAST and \
+                    not (lw.endswith("ed") and not lw.endswith("eed")):
+                new = _verb_s(lw)
+        elif lw == "yourself":
+            new = refl
+        elif lw == "yours":
+            new = poss_pron
+        elif lw == "your":
+            new = poss
+        elif lw == "you":
+            prev = parts[words[n - 1]].lower() if n > 0 else None
+            nxt = words[n + 1] if n + 1 < len(words) else None
+            if prev in RETELL_OBJECT_AFTER or nxt is None:
+                new = obj
+            else:
+                new = subj
+                k = n + 1
+                while k < len(words) and parts[words[k]].lower() in RETELL_ADVERBS:
+                    k += 1
+                if k < len(words) and parts[words[k]].lower() not in RETELL_NOT_VERBS:
+                    agree = words[k]
+        if new is not None:
+            if w[:1].isupper() or new == "I":
+                new = new[:1].upper() + new[1:]
+            out[i] = new
+    return "".join(out)
 
 
 def _fill_seen(tx, holder, payload, at):

@@ -96,7 +96,9 @@ truth_reveal(store, pc_id) -> list[str]
     it (positions), by their true names (actors.display_name; one of the dead is "one of the dead"),
     grouped by place: "In the Sales floor: Mara Voss, Alice Reyes, one of the dead.";
   - who decided what: the ACTION_START events of anyone but the PC in the death's turn and the one
-    before, in order: f"{name}: {label}" + (f' — "{goal}"' when the payload has a goal), prefixed
+    before, in order: f"{name}: {label}" + (f' — "{goal}"' when the payload has a goal), the label
+    told of them (D-152, TEXT-01: mind.perception.retell(label, 'third', their bodies.sex) — "Mara
+    Voss: take her .38 revolver into her hand", never "your", which Willis would read as yours), prefixed
     "You never saw it: " when the PC has no percept of that event.
 """
 

@@ -590,6 +590,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_words_only.py` | A model's speech keeps only the words: '*sighs* Fine.' says 'Fine.', bracketed and parenthesised directions and double quotes go, spaces are collapsed; nothing but a direction is no speech (a speak choice is 'empty', any other choice goes ahead silent); the player's own '*waves* Hi.' is said as typed |
 
+### 3.66 In the right person (P7; D-152)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_in_the_right_person.py` | `retell` tells a second-person menu label in the first person and of a man, a woman or someone else (possessives, reflexives, 'you' as subject or object, 'are'/'were'/-s agreement, modals and past tenses untouched; a label with no 'you' is unchanged); the narrator's line of the PC's own choice is told of him ('Owen chose to take his Glock 19 into his hand.', no 'your'); a person's own memory of a choice is in the first person ('Chose to take my .38 revolver into my hand.', 'I chose to …') |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

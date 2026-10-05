@@ -56,7 +56,9 @@ chain_beats(store, pc_id, doom) -> list[ChainBeat]
   - an ACTION_START of the PC -> 'choice', text = its label, said = the raw_text of that turn's
     player_inputs row when its mode is 'do' or 'say';
   - a DEATH or HARM of anyone but the PC -> 'consequence': f"{name} died" / f"{name} was hurt";
-  - any other event on the chain the PC has no percept of -> 'unseen', text = describe(event);
+  - any other event on the chain the PC has no percept of -> 'unseen', text = describe(event) (an
+    ACTION_START: f"{name}: {label}", the label told of them — D-152, TEXT-01:
+    mind.perception.retell(label, 'third', their bodies.sex));
   - a percept of the PC's, with no source it could tell (source_id NULL), of an event on the chain
     -> 'clue', text = the percept's text.
   Names are the true ones (service.death's: actors.display_name, else "one of the dead").

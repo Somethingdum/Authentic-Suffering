@@ -287,7 +287,9 @@ def truth_reveal(store, pc_id):
         if not label:
             continue
         goal = (p.get("goal") or "").strip()
-        line = f"{_name(store, r[1])}: {label}" + (f" — \"{goal}\"" if goal else "")
+        from ..mind.perception import retell                      # TEXT-01 (D-152): of them, not to them
+        sex = store.query_one("SELECT sex FROM bodies WHERE body_id=?", (r[1],))
+        line = f"{_name(store, r[1])}: {retell(label, 'third', sex[0] if sex else None)}" + (f" — \"{goal}\"" if goal else "")
         if store.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND event_id=?", (pc_id, r[0])) is None:
             line = "You never saw it: " + line
         lines.append(line)

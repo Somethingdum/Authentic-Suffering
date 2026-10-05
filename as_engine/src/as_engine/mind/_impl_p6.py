@@ -240,6 +240,7 @@ def build_aftermath(tx, holder_id, turn_index, at):
     from ._impl_packet import _name_or_desc, _rel_text, _sp, cut_heard, seen_appearance, whereabouts
     from .actor import fused
     from .firewall import classify_form, classify_standing, effective_form
+    from .perception import retell
     rows = select_percepts(tx, holder_id, turn_index, at)
     ents = entity_ids(tx, holder_id, rows)
     handles, ph = {}, {}
@@ -287,7 +288,7 @@ def build_aftermath(tx, holder_id, turn_index, at):
             last_start = pl
             if pl["def_id"] == "speak":
                 continue
-            lab = _PAREN.sub("", pl.get("label") or pl["def_id"])
+            lab = retell(_PAREN.sub("", pl.get("label") or pl["def_id"]), "first")     # TEXT-01 (D-152)
             lab = lab[:1].lower() + lab[1:]
             sentences.append(f"Chose to {lab}.")
     own = " ".join(sentences) if sentences else None
@@ -305,7 +306,7 @@ def build_aftermath(tx, holder_id, turn_index, at):
         elif e["type"] == "ACTION_START":
             if pl["def_id"] == "speak":
                 continue
-            lab = _PAREN.sub("", pl.get("label") or pl["def_id"])
+            lab = retell(_PAREN.sub("", pl.get("label") or pl["def_id"]), "first")     # TEXT-01 (D-152)
             txt = f"I chose to {lab[:1].lower() + lab[1:]}."
         elif e["type"] == "ACTION_COMPLETE":
             txt = band_words.get(pl.get("band"), "I did it.")

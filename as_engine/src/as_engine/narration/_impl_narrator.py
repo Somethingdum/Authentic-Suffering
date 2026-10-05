@@ -58,12 +58,13 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     from ..contracts.common import ANATOMY_WORDS, SEVERITY_WORDS
     from ..contracts.narration import NarratorLine, NarratorPacket, NarratorStyle
     from ..kernel.clock import format_clock, now, world_time
-    from ..mind.perception import place_phrase, to_phrase
+    from ..mind.perception import place_phrase, retell, to_phrase
     from ..physical.bodies import effective_bleed, impairment
     from .lint import echo_block
     from .location import describe
     at = now(tx)
     pc = pc_first_name(tx, pc_id)
+    sex = (_row(tx, "SELECT sex FROM bodies WHERE body_id=?", (pc_id,)) or {"sex": None})["sex"]
     wt = world_time(at)
     entries = []
     for p in tx.query("SELECT pl.*, e.seq AS ev_seq FROM percept_log pl LEFT JOIN events e ON e.event_id=pl.event_id "
@@ -86,7 +87,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         if e["type"] == "ACTION_START" and pl.get("def_id") == "wonder":     # CHEAT-14: it simply happens
             text = f"{pc} {pl.get('seen') or pl.get('label')}."
         elif e["type"] == "ACTION_START" and pl.get("def_id") != "speak":
-            lbl = TRAILING_PAREN.sub("", pl.get("label") or pl.get("def_id", ""))
+            lbl = retell(TRAILING_PAREN.sub("", pl.get("label") or pl.get("def_id", "")), "third", sex)   # TEXT-01 (D-152)
             text = f"{pc} chose to {lbl[:1].lower() + lbl[1:]}."
         elif e["type"] == "SPEECH":
             entries.append((e["at"], e["seq"], "", NarratorLine(seconds=sec, kind="speech", text=f'{pc} says, "{pl["words"]}"',

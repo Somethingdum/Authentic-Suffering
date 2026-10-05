@@ -18,8 +18,11 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
       only the tone was heard).
     * the PC's own events of this turn (events.actor_id = the PC), kind 'outcome' unless noted:
         ACTION_START (not the 'speak' def) f"{pc} chose to {label}." — label = payload.label (else
-          payload.def_id) with a trailing parenthetical removed (TRAILING_PAREN) and its first
-          letter lower-cased ("Owen chose to climb over the high chain-link fence."); the 'wonder' def
+          payload.def_id) with a trailing parenthetical removed (TRAILING_PAREN), told of the PC
+          (D-152, TEXT-01: mind.perception.retell(label, 'third', the PC's bodies.sex) — the menu
+          spoke to the player, the line speaks of the character) and its first letter lower-cased
+          ("Owen chose to climb over the high chain-link fence.", "Owen chose to take his .38
+          revolver into his hand."); the 'wonder' def
           (P12, CHEAT-14: the Boss's wonder, cheats.commands.take_wonder) f"{pc} {seen}." — it is
           not chosen and tried, it happens ("Willis walks straight through the wall.");
         SPEECH  kind 'speech', text f'{pc} says, "{words}"', speaker pc, words = payload.words;

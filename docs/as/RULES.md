@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-807 ids; 550 with their own statement, 257 named only in context.
+808 ids; 551 with their own statement, 257 named only in context.
 
 
 ## ABUSE
@@ -1218,6 +1218,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | TEMPER-08 | TEMPER-08 (H1) A person knows their own state: body_lines gains the strain line, each entity its PacketEntity.feeling, and a snap of outlet 'words' this wave sets SkullPacket.outburst — all as mind.temper TEMPER-08 word… | as_engine/mind/packet.py | `as_engine/mind/packet.py`, `as_engine/mind/temper.py` | `contract/p05_many_actors/test_temper_in_packet.py` |
 | TEMPER-09 | TEMPER-09 (F1c, D-86) What people cannot stand to be near — the owner: smeared in the dead "I'm going to smell like hell, look like hell. And people aren't gonna want to be around me for very long till I shower"; and wa… | as_engine/mind/temper.py | `as_engine/mind/temper.py` | `contract/p05_many_actors/test_care.py`, `contract/p07_slice/test_narration_care.py` |
 | TEMPER-10 | TEMPER-10 (P12, D-79, D-102 — the owner, on Willis: "he's completely unphased by most blatant disrespect ... unless he has on his own whim provided you with something valuable"; "he hates being asked for magical gifts,… | as_engine/mind/temper.py | `as_engine/action/effects.py`, `as_engine/mind/temper.py`, `as_content/packs/cheat_admin/pcs/willis.yaml` | `contract/p12_surfaces/test_willis.py` |
+
+## TEXT
+
+| Id | Statement | Stated in | Enforced in | Tested by |
+|---|---|---|---|---|
+| TEXT-01 | TEXT-01 (D-152): a menu label — written to the one choosing it ('Keep your eyes on Mara', | as_engine/mind/perception.py | `as_engine/mind/memory.py`, `as_engine/mind/perception.py`, `as_engine/narration/narrator.py`, `as_engine/service/death.py`, `as_engine/service/voice.py` | `contract/p07_slice/test_in_the_right_person.py` |
 
 ## THREAD
 
