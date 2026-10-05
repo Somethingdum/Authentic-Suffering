@@ -947,6 +947,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_the_rooms_lines.py` | Mara's ambient "Cold again tonight." to nobody, heard clearly by June, sets neither of them thinking the next turn and is not worth a memory to either; said to June it is both for her; the same words not from the room's lines are talk as before; the resolver marks an ambient intent's SPEECH ambient and no other |
 
+### 3.125 The dead coming on (P5; D-233)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_the_dead_coming_on.py` | The shambler coming on at 6.3 m is material to Sam; a step closer at 5.7 m is not; within 5 m it is; the next turn its first step is news again; a second of the dead behind the first, 5.1 m off, is not news, and is when it is upon him |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

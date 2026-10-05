@@ -581,12 +581,27 @@ def material_holders(tx, new_events, turn_index):
                 if kind is not None and kind[0] == "infected":      # P10: the dead coming near
                     dd = distance_to_point(tx, h, pl["to_place"], pl["x_m"], pl["y_m"])
                     if dd is not None and dd <= 20:
-                        mat = True
+                        from .reactions import DEAD_NEAR_M
+                        mat = dd <= DEAD_NEAR_M or not _dead_seen_near(tx, h, ev, turn_index)   # D-233
             if not mat:
                 mat = _looks_up(tx, h, ev, pl, bonded)               # D-137
         if mat and h not in found:
             found[h] = p["at"]
     return sorted(found.items(), key=lambda kv: (kv[1], kv[0]))
+
+
+def _dead_seen_near(tx, h, ev, turn_index):
+    """D-233: the holder saw an earlier MOVE of one of the dead this turn that ended within 20 m of where it is now."""
+    from ..physical.space import distance_to_point
+    seq = ev.seq if ev.seq is not None else tx.query_one("SELECT seq FROM events WHERE event_id=?", (ev.event_id,))[0]
+    for (raw,) in tx.query("SELECT e.payload FROM percept_log p JOIN events e ON e.event_id=p.event_id JOIN bodies b "
+                           "ON b.body_id=e.actor_id WHERE p.holder_id=? AND p.turn_index=? AND p.channel='visual' AND "
+                           "e.type='MOVE' AND b.kind='infected' AND e.seq<?", (h, turn_index, seq)):
+        q = json.loads(raw)
+        d = distance_to_point(tx, h, q["to_place"], q["x_m"], q["y_m"])
+        if d is not None and d <= 20:
+            return True
+    return False
 
 
 def _looks_up(tx, h, ev, pl, bonded):

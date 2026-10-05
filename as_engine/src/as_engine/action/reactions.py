@@ -18,7 +18,11 @@ material_holders(tx, new_events, turn_index) -> list[tuple[str, int]]
       def), ending within 20 m of the holder (a sentinel noticing a stranger);
     (P10) a visual percept of a MOVE by an infected body (bodies.kind 'infected'), however made,
       ending within 20 m of the holder (physical.space.distance_to_point): the dead coming near
-      are always news, and a watch ends when they do;
+      are always news, and a watch ends when they do — (D-233) the first such move of any of the
+      dead the holder sees this turn (no visual percept of the holder's, this turn_index, of an
+      earlier MOVE — by seq — of an infected body that ended within 20 m of where the holder is now),
+      and after it only a move ending within DEAD_NEAR_M of the holder: the dead already seen coming
+      are news again when one is upon them, not at every step nor with every one that follows;
     (D-137) a visual percept of an ACTION_START of equip_item whose item is a weapon (its def has a
       firearm or a melee block) by a body within 20 m of the holder (a weapon drawn);
     a visual percept of an ACTION_START with verb 'manipulate' whose target is the holder or a
@@ -52,6 +56,8 @@ next_wave(tx, rng, new_events, turn_index, wave_index, horizon_ms, *, exclude=fr
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
+DEAD_NEAR_M: float = 5.0      # D-233: one of the dead already seen coming is news again this close
 
 if TYPE_CHECKING:
     from ..contracts.events import Event
