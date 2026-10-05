@@ -63,6 +63,8 @@ def test_she_tells_it_as_she_talks_and_feels(scenario, fake):
     assert "How they feel about the one it is about: She mostly trusts them" in user
     assert "People they know by name: Mara, " in user
     assert "never as \"I\", \"we\" or \"you\"" in system
+    assert "Keep the one it is about in it" in system and "it stays their doing" in system, \
+        "a story's wrong is charged to the one it is about (D-216): a twist may not hand it to someone else"
 
 
 def test_what_a_story_brings_to_mind(scenario):
