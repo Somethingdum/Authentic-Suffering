@@ -961,8 +961,14 @@ async def main(argv=None, *, sim_models=None, sim_scale: float = 0.002) -> int:
         jpath.write_text(json.dumps(rep, indent=1), encoding="utf-8")
 
     try:
-        report = await bench.run([Lane(x) for x in (args.lane or ["A", "B"])], stages, resume=old, save=save,
-                                 keep_budgets=args.keep_budgets)
+        if args.fake:                                    # simulated lanes run on virtual time: exact, never late
+            from benchsim import VirtualClock
+            with VirtualClock().installed():
+                report = await bench.run([Lane(x) for x in (args.lane or ["A", "B"])], stages, resume=old, save=save,
+                                         keep_budgets=args.keep_budgets)
+        else:
+            report = await bench.run([Lane(x) for x in (args.lane or ["A", "B"])], stages, resume=old, save=save,
+                                     keep_budgets=args.keep_budgets)
     finally:
         save(bench.report)
         try:

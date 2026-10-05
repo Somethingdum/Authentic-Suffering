@@ -5,7 +5,10 @@ the bench finds what is there. Each lane is a ``SimModel``: how much context it 
 reports it, how fast it reads a prompt and writes, how many requests it serves at once, how far into a long
 prompt it still finds a fact, whether it keeps the last prompt cached, how its thinking switch works, how
 much it thinks, and whether it reports prompt-processing progress. Time is simulated: one simulated second
-lasts ``scale`` real seconds, and ``clock()`` reads simulated seconds.
+lasts ``scale`` seconds of the running loop, and ``clock()`` reads simulated seconds. Under ``VirtualClock``
+(bench.py --fake installs it) the loop's seconds are virtual too: whenever nothing is ready the loop jumps
+to its next timer instead of sleeping, so what the bench measures is exact however busy the machine is
+(at real time, a test run beside five others once measured four slots where there are two).
 
 Answers: a request with a ``context`` (a real call class, from the prompt samples) gets the engine's fake
 model's answer (testing/fake_lm.FakeTransport), or "Done." when the fake has none; the bench's own prompts
@@ -19,6 +22,7 @@ import json
 import math
 import re
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 
 
@@ -59,6 +63,44 @@ def tokens(text: str) -> int:
     return math.ceil(len(text.split()) * TOKENS_PER_WORD)
 
 
+def _now() -> float:
+    """The running loop's time (virtual under VirtualClock); real time outside a loop."""
+    try:
+        return asyncio.get_running_loop().time()
+    except RuntimeError:
+        return time.perf_counter()
+
+
+class VirtualClock:
+    """Virtual time for the running asyncio loop: loop.time() reads ``now``, and a select that would wait for a
+    timer returns at once with ``now`` moved to that timer — sleeping costs nothing and is never late."""
+
+    def __init__(self) -> None:
+        self.now = 0.0
+
+    @contextmanager
+    def installed(self):
+        loop = asyncio.get_running_loop()
+        sel = loop._selector                                     # noqa: SLF001 — the loop's own selector
+        real_select = sel.select
+
+        def select(timeout=None):
+            if timeout is None:                                  # nothing scheduled: only I/O can wake it
+                return real_select(None)
+            if timeout > 0:
+                self.now += timeout
+            return real_select(0)
+
+        self.now = loop.time()
+        loop.time = lambda: self.now
+        sel.select = select
+        try:
+            yield self
+        finally:
+            sel.select = real_select
+            del loop.time
+
+
 class SimTransport:
     """A Transport (lanes/transport.py) over simulated models. ``sink`` gets CallProgress like HttpTransport's."""
 
@@ -72,13 +114,13 @@ class SimTransport:
         self._cached: dict[str, str] = {}
 
     def clock(self) -> float:
-        return time.perf_counter() / self.scale
+        return _now() / self.scale
 
     async def _wait(self, timer: list, seconds: float) -> None:
         """Advance this request's own timeline by ``seconds`` (simulated), sleeping against its start so the
-        small sleeps do not add up to drift: timer = [real start, simulated seconds so far]."""
+        small sleeps do not add up to drift: timer = [loop time at the start, simulated seconds so far]."""
         timer[1] += seconds
-        await asyncio.sleep(max(0.0, timer[0] + timer[1] * self.scale - time.perf_counter()))
+        await asyncio.sleep(max(0.0, timer[0] + timer[1] * self.scale - _now()))
 
     # -- the Transport protocol -------------------------------------------------------------------------
 
@@ -118,7 +160,7 @@ class SimTransport:
         prog = CallProgress(request.call_class, request.lane, expected_s=request.deadline_s)
         report = (lambda: self.sink(request, prog)) if self.sink else (lambda: None)
         async with self._slots[key]:
-            timer = [time.perf_counter(), 0.0]
+            timer = [_now(), 0.0]
             old = self._cached.get(key, "")
             same = len(_common_prefix(old, prompt))
             cached = int(n_in * same / max(len(prompt), 1)) if same > 200 else 0
@@ -133,7 +175,7 @@ class SimTransport:
                     prog.note_prefill(done, n_in, cached)
                     report()
             text = await self._answer(lane, request, m, n_in)
-            timer = [time.perf_counter(), 0.0]   # writing keeps its own clock: a late read never makes it write faster
+            timer = [_now(), 0.0]   # writing keeps its own clock: a late read never makes it write faster
             r_tokens = m.think_tokens if self._thinks(m, lane.thinking_mode, request.thinking) else 0
             r_out = min(r_tokens, request.max_tokens)
             t_out = min(tokens(text), request.max_tokens - r_out)
