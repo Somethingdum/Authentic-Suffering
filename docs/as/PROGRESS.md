@@ -214,7 +214,10 @@ do nothing.
    Generated people's lines now sound like their voice (D-143). Since then: a shot that misses is still
    trying to kill someone — they know it, and so does whoever saw it (D-161) — and a door shut on someone with
    the dead outside is remembered by them and by whoever loves them (D-163); whoever saw a thing done holds it
-   as seen, not as talk (D-162). Nothing for you to do.
+   as seen, not as talk (D-162). And now: stealing in front of someone who knows whose it was costs your
+   character their trust, not only the trust of whoever they tell (D-225); and lies can be found out — when
+   the truth walks in, the memory of whoever believed your character sees what he told them and when, and
+   whether it was a lie is theirs to judge (D-226). Nothing for you to do.
 20. **Your character's own lines** (your call). Each player character's card has things they will never do
    (Owen: leave someone wounded, hurt a kid; Addison: hit someone unarmed; Ruth: leave a wounded person,
    execute a prisoner, feed anyone to the dead), and the spec (L12) takes those options off the player's
@@ -302,7 +305,28 @@ do nothing.
    what survivors say about them — each faction's own words, which nothing read before (D-201). And no two people in one settlement
    share a voice any more: there are twice as many voices, and a place's people are dealt different ones
    until there are none left (D-199) — the people you talk with still get their own, written from what
-   they said (D-149). Nothing for you to do.
+   they said (D-149). And a long game no longer slows down: the state hash and the commit audit read only
+   what was added since the last turn, and the lookups that read everything have indexes — three hundred
+   turns in, a turn takes what it took at turn one (D-223, D-224). And crowds: with your character in a
+   room of twelve, every quiet turn had all twelve deciding on the Clerk because he could see them, and
+   every one of them "stopped and watched" again in the story; now people take stock when something happens
+   to them, when he comes upon them, or every third turn — a third of the room at a time — and going on
+   watching is not news (D-229, D-230, D-231): seventy-two decisions in six quiet turns became twenty-four,
+   and the room still talks on the fast lane. A voice through the wall nobody could make out is not sent to
+   be remembered (D-227: eleven memory calls a spoken turn became one), and a standing hunger, a child
+   asleep beside a parent, or old business with your character elsewhere no longer has the same people
+   deciding every turn (D-228). Nothing for you to do.
+
+24. **Memories written while you read** (your call; a proposal, not built). After the story of a turn is
+   written, everyone who lived through something new has it written down as a memory — one call each on
+   the Clerk — and the turn waits for all of them before you see the story. With the Clerk taking one call
+   at a time, a turn after which a dozen people have something to remember waits about forty-five seconds
+   for them, though the story was ready in twenty. They could instead be written while you read, the way
+   the quiet hours already are (BG-01: every one finished before your next move begins, so nothing changes
+   with how fast you type). That moves when those memories and what they set off (a promise kept or broken)
+   are recorded — between the turns instead of inside one — so I have not done it unasked. Left alone:
+   nothing changes; giving the Clerk a second slot (Settings → Models → concurrency, if the bench says it
+   helps) halves the wait.
 
 ## Notes (builder)
 
