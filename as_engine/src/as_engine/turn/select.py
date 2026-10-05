@@ -95,6 +95,9 @@ SEL-03 salience_flags(tx, actor_id, cands, pc_id, turn_index, at) -> dict[str, b
     talk_last_turn    (D-190) in turn_index - 1 it held a speech percept (any fidelity) whose source is
                       not itself, or committed a SPEECH itself: a conversation is going on, and what
                       was said after it last decided is still to be taken in.
+    fresh_loop        (D-191) it holds an 'open' loop (open_loops) whose created_event is an event of
+                      turn_index - 1: a goal, a fear, a grudge, a plan formed since it last decided —
+                      what it now wants is acted on, not left for when it next takes stock.
 SEL-04 salience(flags, is_mandatory, weights) -> float
   sum(weights[flag] for true flags — a flag the weights do not name counts 0, so a config written
   before a flag existed still works) + weights['mandatory'] when mandatory (SchedulerRules

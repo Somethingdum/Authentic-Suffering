@@ -158,9 +158,11 @@ def salience_flags(tx, actor_id, cands, pc_id, turn_index, at):
     talk = tx.query_one("SELECT 1 FROM percept_log WHERE holder_id=? AND turn_index=? AND channel='speech' "
                         "AND (source_id IS NULL OR source_id != ?)", (actor_id, turn_index - 1, actor_id)) is not None \
         or tx.query_one("SELECT 1 FROM events WHERE actor_id=? AND turn_index=? AND type='SPEECH'", (actor_id, turn_index - 1)) is not None
+    fresh = tx.query_one("SELECT 1 FROM open_loops l JOIN events e ON e.event_id = l.created_event WHERE l.holder_id=? "
+                         "AND l.status='open' AND e.turn_index=?", (actor_id, turn_index - 1)) is not None          # D-191
     return {"unique_info": unique, "loudest_percept": loudest, "addressed": addressed, "in_conflict": in_conflict,
             "interrupt_trigger": interrupt, "open_loop_with_pc": loop_pc, "dependent_present": dep, "visible_to_pc": vis,
-            "grievance_near": griev, "owed_answer": owed, "restless": restless, "talk_last_turn": talk}
+            "grievance_near": griev, "owed_answer": owed, "restless": restless, "talk_last_turn": talk, "fresh_loop": fresh}
 
 
 def salience(flags, is_mandatory, weights):

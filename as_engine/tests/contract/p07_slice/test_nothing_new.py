@@ -83,3 +83,23 @@ def test_talk_is_taken_in_the_next_turn(scenario, fake):
             assert select.salience_flags(tx, w.id(who), [w.id(who)], w.id("pc"), T + 1, now(w))["talk_last_turn"], who
     called = {r.actor_id for r in fake.calls(CallClass.ACTOR_COGNITION)}
     assert {w.id("june"), w.id("alice")} <= called
+
+
+def test_what_they_now_want_is_acted_on(scenario):
+    """D-191: a goal formed since someone last decided — Mae's quarantine goal, a plan from what was said — gives
+    them something to decide the next turn, not three turns on."""
+    from as_engine.mind import mind
+    w = scenario("metal_fence")
+    t = now(w)
+
+    def fresh(turn):
+        with w.store.transaction() as tx:
+            return select.salience_flags(tx, w.id("eli"), [w.id("eli")], w.id("pc"), turn, t)["fresh_loop"]
+
+    assert not fresh(4)
+    with w.store.transaction() as tx:
+        lid = mind.open_loop(tx, w.id("eli"), "goal", "Find out who has been at the water.", [], 2, "test:1", t, 3)
+    assert [fresh(n) for n in (3, 4, 5)] == [False, True, False], "the turn after it was formed"
+    with w.store.transaction() as tx:
+        mind.close_loop(tx, lid, "abandoned", "test:2", t, 3)
+    assert not fresh(4), "a loop let go is nothing to act on"
