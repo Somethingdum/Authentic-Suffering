@@ -261,6 +261,9 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   listener believes, costs the one it is about some of the listener's trust — two for pushing someone to the dead,
   a killing or eating the dead, one for the rest, and fear too for spreading the sickness — never more than seeing
   it would. What the player's character hears is never written into him.
+- **Word of a bite** (D-217, CAS-103/104): whoever sees a person bitten carries the story ("Alice was bitten.") and
+  talk spreads it; whoever believes it is afraid of the one bitten; and knowing it — seen, or told before it was
+  done — makes putting them down a precaution, not a killing (D-202).
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

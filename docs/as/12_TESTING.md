@@ -851,6 +851,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_word_gets_around.py` | For every story of a wrong — hurt, tried to kill, shut out, pushed to the dead, a captive beaten or killed, one who gave up hit or killed, a child hurt or left, spit in a mouth or the food, a killing, eating the dead, a theft — Kit, told by Finn whom she believes, trusts Jude less by what the rule says (and fears him for spreading the sickness), while Finn, who saw it, is not changed by telling it; Amos, who does not believe Jude, is not changed; told to the player's character, nothing is written into him |
 
+### 3.109 Word of a bite (P9; D-217)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_word_of_a_bite.py` | June, who saw Alice bitten, carries the story — never Alice or Owen; Mara, told it by June, believes it and is afraid of Alice; Owen putting Alice down a minute later is a precaution to both of them; told only after he did it, Mara saw a killing |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

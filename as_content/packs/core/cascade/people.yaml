@@ -1366,3 +1366,32 @@
       payload: {toward: "$trigger.payload.about_id", axis: fear, delta: 1, cause: rumour}
   delay_s: 0
   cites: [D-216, INFO-02]
+# D-217 — word of a bite. The most important thing anyone can know about a person in this world was never told:
+# a bite seen started no story ('bitten' was in the vocabulary, and nothing made it). Now whoever saw it tells it,
+# whoever believes the telling fears the bitten one, and knowing it — seen or told — makes putting them down a
+# precaution, not a killing (D-202). The player's character is never one of those changed (C06).
+- schema: as.cascade.v1
+  id: CAS-103
+  description: Whoever sees a person bitten carries the story, and talk spreads it from them.
+  trigger_event: HARM
+  where: {type: bite}
+  preconditions: ["body(trigger.payload.body_id).kind == 'human'"]
+  effects:
+    - kind: create_rumour
+      target: saw_the_bite(trigger.event_id)
+      payload: {about: "$trigger.payload.body_id", claim: bitten, seen: true}
+  delay_s: 0
+  cites: [D-217, D-202, docs/as/06_WORLD.md#6]
+- schema: as.cascade.v1
+  id: CAS-104
+  description: Hearing, from someone they believe, that a person was bitten makes the listener afraid of them.
+  trigger_event: RUMOUR_SPREAD
+  where: {claim: bitten, believed: true}
+  preconditions: ["trigger.payload.hops >= 1"]
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: heard_it(trigger.event_id)
+      payload: {toward: "$trigger.payload.about_id", axis: fear, delta: 1, cause: rumour}
+  delay_s: 0
+  cites: [D-217, INFO-02]

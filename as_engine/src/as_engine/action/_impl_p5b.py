@@ -923,6 +923,10 @@ def _knew_infected(tx, holder, body, at):
                 return True
         except KeyError:
             pass
+    if tx.query_one("SELECT 1 FROM claim_holdings h JOIN propositions p ON p.prop_id=h.claim_id WHERE h.holder_id=? AND "
+                    "h.believed=1 AND h.superseded_by IS NULL AND p.subject_id=? AND p.predicate='bitten' AND h.acquired_at<=?",
+                    (holder, body, at)):
+        return True                     # D-217: told it, by someone they believe
     return tx.query_one("SELECT 1 FROM open_loops l JOIN events o ON o.event_id=l.created_event JOIN events la ON "
                         "la.event_id=o.cause_event_id WHERE l.holder_id=? AND l.status='open' AND la.type='LAW_APPLIED' AND "
                         "json_extract(la.payload,'$.kind')='contamination' AND la.actor_id=?", (holder, body)) is not None
@@ -1471,6 +1475,15 @@ def select(tx, selector, trigger):
         holders = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
                                           "fidelity IN ('exact','partial')", (v,))} - {dead}
         return sorted({s for s in (_stl_of(tx, h) for h in holders) if s})
+    if fn == "saw_the_bite":                                         # D-217: word of a bite
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        body = pl.get("body_id")
+        if trigger.type != EventType.HARM or pl.get("type") != "bite" or not body:
+            return []
+        return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
+                                              "fidelity IN ('exact','partial')", (v,))
+                       if r[0] != body and _controller(tx, r[0]) not in (None, "human")})
     if fn == "heard_it":                                             # D-216: word gets around
         from ..society._impl_society import _controller
         pl = trigger.payload or {}

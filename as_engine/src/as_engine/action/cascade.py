@@ -126,7 +126,8 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     one it was done to was infected: a visual EXACT or PARTIAL percept, at or before the act (the HARM; the
     killing blow; the trigger for attack_onlookers_of), of a HARM of type 'bite' on that body or of an
     ACTION_START by that body of an affordance tagged 'compulsion', or an open loop about that body opened
-    for a contamination LAW_APPLIED (D-188).
+    for a contamination LAW_APPLIED (D-188), or (D-217) a believed claim holding, not superseded, of
+    predicate 'bitten' about that body acquired at or before it (told by someone they believe).
     Grief (seen_clearly_by), strain (witnesses_of), the killer's own burden (actor(...)) and what the
     one hurt feels themself (hurt_by_someone, attacked_by_someone) are untouched.
     hurt_by_someone(<path>)                   (D-126) for a HARM one person did to another
@@ -219,6 +220,9 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     settlements_seeing(<path>)                (D-124) the settlements (society.settlement.settlement_of)
                                               of the holders of a visual EXACT or PARTIAL percept of that
                                               event, never counting the event's own body (payload body_id)
+    saw_the_bite(<path>)                      (D-217) for a HARM of payload type 'bite': the holders of a
+                                              visual EXACT or PARTIAL percept of it — never the one bitten
+                                              (payload body_id) or the PC
     heard_it(<path>)                          (D-216) for a RUMOUR_SPREAD: its listener (payload
                                               listener_id) when payload believed is true, alive, not the
                                               one it is about (payload about_id) — never the PC (what
