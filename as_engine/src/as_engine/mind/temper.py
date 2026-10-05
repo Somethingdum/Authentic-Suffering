@@ -173,6 +173,12 @@ WISH_WORDS: tuple[str, ...] = (
 INSULT_WORDS: tuple[str, ...] = (
     "idiot", "moron", "stupid", "dumbass", "coward", "useless", "pathetic", "worthless", "loser", "freak",
     "shut up", "screw you", "fuck you", "fuck off", "asshole", "bastard", "bitch", "prick", "piece of shit",
+    # D-192: names people are called and things said to wound — only what is almost never innocent said to you
+    "imbecile", "halfwit", "dumbfuck", "dumb fuck", "jackass", "dipshit", "shithead", "dickhead", "motherfucker",
+    "cocksucker", "son of a bitch", "cunt", "twat", "wanker", "whore", "slut", "scum", "scumbag", "lowlife",
+    "maggot", "weakling", "crybaby", "go to hell", "drop dead", "kill yourself", "go fuck yourself", "fuck yourself",
+    "get fucked", "piss off", "eat shit", "waste of space", "waste of air", "nobody wants you", "you disgust me",
+    "you're nothing", "you're trash", "you're garbage",
 )
 
 
@@ -225,7 +231,8 @@ def threshold(store: "Store | Tx", actor_id: str) -> int:
 
 def _words_have(words, entry):
     import re
-    return re.search(r"(?<![a-z])" + re.escape(entry) + r"(?![a-z])", words.lower()) is not None
+    words = words.lower().replace("\u2019", "'")                  # D-192: "you’re" as typed on a phone
+    return re.search(r"(?<![a-z])" + re.escape(entry) + r"(?![a-z])", words) is not None
 
 
 def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Provocation]:
