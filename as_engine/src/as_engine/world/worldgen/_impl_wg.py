@@ -681,7 +681,7 @@ def skeleton(rng, tx, params, plan, region, tier):
     dsf = params.days_since_fall
     zones = list(region.zones)
     zname = {z.zone_id: z.name for z in zones}
-    gname = {g.group_id: g.name for g in plan.groups}
+    gname = {g.group_id: ("the " + g.name[4:] if g.name.startswith("The ") else g.name) for g in plan.groups}   # D-256: in a sentence
     stl_of = {s.group_id: s for s in plan.settlements}
     evs = []   # (key, day, kind, subjects, cause, fmt)
 

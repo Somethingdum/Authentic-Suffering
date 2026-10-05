@@ -1068,6 +1068,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_known_since_it_happened.py` | Every history holding is dated to its event's day (never after the seeding moment), and a generated person's packet no longer says of what everyone says that they heard it "just now" |
 
+### 3.145 Names in a sentence (P10; D-256)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_names_in_a_sentence.py` | In a standard world (seed 7) no history line carries a 'The …' group's name capitalised inside it; no generated motive says "pump mechanic work" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

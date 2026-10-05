@@ -538,7 +538,7 @@ _MOTIVES = (
     ("make up for something done in the first winter", "takes the worst shifts without a word"),
     ("get the children through to spring", "trades away rations for milk and medicine"),
     ("leave {settlement} for somewhere quieter", "trades for goods in secret, against the day"),
-    ("keep the {occupation} work going", "fixes what breaks before anyone asks"),
+    ("keep {settlement} running, whatever breaks", "fixes what breaks before anyone asks"),
     ("see every one of the dead put down properly", "goes out with a spade when the watch allows"),
     ("pay back the people who opened the gate that first winter", "gives more than is asked"),
     ("keep the peace between the families", "listens to everyone and repeats nothing"),

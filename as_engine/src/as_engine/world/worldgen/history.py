@@ -72,7 +72,8 @@ WG-19 skeleton(rng, tx, params, plan, region, tier) -> list[PlannedEvent]
     deposed_leader, discovery and betrayal; [the zone id] for the others (a is drawn either way).
   Every draw's purpose names the event: f"{kind}:{n}:<what>" with n its position in creation order.
   The history horizon is dsf, never a constant (WG-31). Returned sorted by (day, creation order);
-  text = atlas.HISTORY_SKELETON[kind] filled with day, a / b (group names), zone (zone name) and
+  text = atlas.HISTORY_SKELETON[kind] filled with day, a / b (group names — D-256: as they read inside a sentence, a
+  leading 'The ' as 'the ': "the Diallo People and the Ghosts fought"), zone (zone name) and
   resource (atlas.SHORTAGE_RESOURCE_WORDS).
 
 WG-20 async write_history(client, tx, events, plan, region, params, at, progress=None) -> list[str]
