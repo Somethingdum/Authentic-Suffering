@@ -1094,6 +1094,18 @@ def select(tx, selector, trigger):
         seen = select(tx, "assault_onlookers_of(trigger.event_id)", trigger) if _assault(tx, trigger) is not None \
             else _onlookers(tx, trigger, v)
         return [h for h in seen if _bonded_to(tx, h, body)]
+    if fn == "humiliated_by" and trigger.type == EventType.GESTURE:   # D-204: contempt shown in front of others
+        from ..action.effects import CONTEMPT_GESTURES
+        from ..society._impl_society import _controller
+        pl = trigger.payload or {}
+        who = pl.get("target_id")
+        if pl.get("gesture") not in CONTEMPT_GESTURES or not who or who == trigger.actor_id or _controller(tx, who) in (None, "human"):
+            return []
+        saw = {r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND fidelity IN "
+                                      "('exact','partial')", (v,))}
+        if who not in saw or not (saw - {who, trigger.actor_id}) or _drained_lately(tx, who, "humiliated_publicly", trigger.at):
+            return []
+        return [who]
     if fn == "humiliated_by":                                        # D-129: insulted in front of others
         from ..mind.temper import INSULT_WORDS, _words_have
         from ..society._impl_society import _controller

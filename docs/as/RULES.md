@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-830 ids; 571 with their own statement, 259 named only in context.
+831 ids; 572 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -196,6 +196,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-076 | Being given something by someone earns them a little of your trust — a day's gifts count once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
 | CAS-077 | Someone who tends your wounds while you are awake to know it earns your trust and warmth, and you owe them — a day's care counts once. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
 | CAS-078 | Seeing someone put themselves between you and the danger earns them your trust and warmth — once a day. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_kindness.py` |
+| CAS-079 | Being spat at or given the finger in front of others wears a person down, and they resent the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p05_many_actors/test_names_called.py` |
 | CAS-08 | CAS-08 sweep order and bookkeeping. ``deltas`` are the events committed by stages 8–9 of this wave, in seq order. For each event E (then, depth-first, for each event a rule produced, up to depth 3): for each rule in rul… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py`, `contract/p09_society/test_econ_chain.py` |
 | CAS-09 | CAS-09 DISPATCH — kind (and event_type) -> the owning module's function (target = one id): emit_event TASK_STEP {status: paused} action.tasks.interrupt(task_id = target) emit_event RELATION_CHANGE mind.mind.relate(from_… | as_engine/action/cascade.py | `as_engine/action/cascade.py` | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-099 | (named only by tests) |  | — | `contract/p11_audits/test_release.py` |

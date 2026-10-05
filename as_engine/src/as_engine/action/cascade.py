@@ -59,7 +59,11 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               someone else besides the speaker heard it too (an
                                               audience), and no RESOLVE_CHANGE of theirs with reason
                                               'humiliated_publicly' in the hour up to it; never the
-                                              speaker or the PC
+                                              speaker or the PC. (D-204) For a GESTURE whose gesture is
+                                              in action.effects.CONTEMPT_GESTURES: its target, when it
+                                              holds a visual EXACT or PARTIAL percept of it and so does
+                                              someone besides it and the one who made it, under the same
+                                              hour rule; never the PC
     made_to_watch(<path>)                     (D-129) for a HARM or DEATH: the holders of a visual EXACT
                                               or PARTIAL percept of it who are held (bodies.restrained)
                                               and bonded to the one hurt (as above), never that body or

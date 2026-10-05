@@ -58,3 +58,34 @@ def test_contempt_without_a_word(scenario, gesture, wounds_her):
     assert gesture in GESTURES
     if gesture == "spit_at":
         assert seen[0] == "Owen spits at your feet.", seen
+
+@pytest.mark.parametrize("audience", [True, False])
+def test_shamed_in_front_of_others(scenario, audience):
+    """D-204 (CAS-079): given the finger with Mara watching, June is worn down and resents Owen; with nobody else
+    there it is only an insult (TEMPER-03)."""
+    from as_engine.action import cascade
+    from as_engine.contracts.events import Event, EventType
+    from as_engine.mind import perception
+    from as_engine.physical import space
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    there = ("pc", "june", "mara") if audience else ("pc", "june")
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in zip(there, (5.0, 6.5, 8.0)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        if not audience:
+            tx.commit_event(space.move_event(tx, w.id("mara"), w.id("office"), None, 2.0, 2.0, t, None, 0))
+    before = w.store.query_one("SELECT resentment FROM relationships WHERE from_id = ? AND to_id = ?", (w.id("june"), w.id("pc")))
+    before = before[0] if before else 0
+    with w.store.transaction() as tx:
+        ev = tx.commit_event(Event(type=EventType.GESTURE, writer="action.propagate", at=t + 100, turn_index=0, actor_id=w.id("pc"),
+                                   payload={"actor_id": w.id("pc"), "gesture": "the_finger", "target_id": w.id("june")}))
+        for x in ("june", "mara"):
+            perception.compile_aftermath(tx, w.id(x), [ev], t + 200, 0)
+        cascade.sweep(tx, [ev], [r for r in w.canon.all("cascade") if r.id == "CAS-079"], t + 300, 0)
+    after = w.store.query_one("SELECT resentment FROM relationships WHERE from_id = ? AND to_id = ?", (w.id("june"), w.id("pc")))
+    after = after[0] if after else 0
+    shamed = w.store.query("SELECT 1 FROM events WHERE type = 'RESOLVE_CHANGE' AND actor_id = ? AND "
+                           "json_extract(payload, '$.reason') = 'humiliated_publicly'", (w.id("june"),))
+    assert (after == min(3, before + 1)) is audience and bool(shamed) is audience

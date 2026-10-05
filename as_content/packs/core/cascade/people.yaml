@@ -976,3 +976,19 @@
       payload: {toward: "$trigger.actor_id", axis: affection, delta: 1, cause: shielded_by}
   delay_s: 0
   cites: [D-200, D-195]
+- schema: as.cascade.v1
+  id: CAS-079
+  description: Being spat at or given the finger in front of others wears a person down, and they resent the one who did it.
+  trigger_event: GESTURE
+  where: {}
+  preconditions: []
+  effects:
+    - kind: drain_resolve
+      target: humiliated_by(trigger.event_id)
+      payload: {cause: humiliated_publicly}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: humiliated_by(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: humiliated}
+  delay_s: 0
+  cites: [D-204, D-129]
