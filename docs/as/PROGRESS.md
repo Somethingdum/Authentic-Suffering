@@ -9,7 +9,7 @@ Status words: **not started** · **in progress** · **observed implementation, n
 - Current phase: record the gates P0–P7 (the engine is built), then P8 steps 4–6
 - Next task: `python tools/as/gate.py --phase 0`, then `--phase 1` … `--phase 7`, one at a time (13_BUILD_ORDER §4.0 step 1). Then P8 step 4 — `src/talemate/server/as_game_plugin.py` (02 §6).
 - Blocked by: nothing
-- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2148 passed (2155 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, D-129 what is done to you and yours lasts, D-130 everyone knows, D-131 the Writer sees what it is asked to write, D-132 putting down the dead is not hurting anyone, D-133 eating the dead, D-134 captives, D-135 hands up, D-136 the player's hands, D-137 what makes you look up, D-138 your own, D-139 shielding, D-140 the guide knows what the character grew up hearing, D-141 seen going, D-142 left behind, D-143 a person's lines sound like the person, D-144 one of our own, D-145 it comes back, D-146 broken nights, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
+- Kit status: the engine is built — P0–P11, the sim soak, Actor v2 B1–B6 and the owner's F1a, F1b, H1, I1, W1 and F1c (13_BUILD_ORDER §4.0; the bodies are in `_impl_*.py` files or built in place, AGENTS.md §4). The engine suite: 2149 passed (2156 collected; D-110 added the stall watchdog, D-111 the Writer / Clerk lane split, D-112 the limits bench, D-114 the models at work under the bar, D-115 the Cheat field's command words and dictionary, D-116 character examples, D-117 what was said here, D-118 work picked up again, D-119 a killing seen, D-120 seen before swept, D-121 the second look, D-122 sleep rests you, D-123 what wears the will down, D-124 a bite seen, D-125 promises answered, D-126 being hurt leaves a mark, D-127 nobody is a template, D-128 the room talks, D-129 what is done to you and yours lasts, D-130 everyone knows, D-131 the Writer sees what it is asked to write, D-132 putting down the dead is not hurting anyone, D-133 eating the dead, D-134 captives, D-135 hands up, D-136 the player's hands, D-137 what makes you look up, D-138 your own, D-139 shielding, D-140 the guide knows what the character grew up hearing, D-141 seen going, D-142 left behind, D-143 a person's lines sound like the person, D-144 one of our own, D-145 it comes back, D-146 broken nights, D-147 a line they don't cross, and their tests); the 7 that fail are yours to build: the owner's sessions browser and hard delete (RUN-12/13, D-76: `wipe_tree`, the one-step delete, `list_runs`' `final`, `on_run_delete`) and a P10 genesis that names no run (`Store.backup_to(..., as_world=)`). Also not built: P8's Talemate plugin and upstream patches, the frontend toolchain and the P8 Play UI screens (the P10 screens are built) — 13_BUILD_ORDER §4.0 has the order. After the P10 gate, record the P11 gate (built: it only writes the evidence), then stop and write "waiting for the kit update (P12)" here.
 
 ## Phases
 
@@ -202,6 +202,25 @@ do nothing.
    and a job. The test model read the hidden parts directly, so nothing ever failed. Now each prompt
    carries what it needs — for a person: how long since the Fall, what their generation remembers, the
    sketch that makes them different, what happened here, and what everyone around them says (D-131).
+
+19. **The evil you do is answered** (your "If I treat them like shit, or do something just absolutely evil")
+   — built while you were away: eating the dead (D-133); torture and executing a prisoner — someone held, or
+   someone who put their hands up (D-134, D-135); a gun held on someone's child, stripping someone's dead
+   (D-138); walking out on someone who loves you while they bleed (D-142); killing one of your own crew,
+   which sets the crew weighing whether to stay (D-144). People now react inside the moment to a knife
+   drawn, a hand on their things, a gesture, a surrender (D-137), and see people leave a room (D-141 — before,
+   nobody ever saw anyone go). Your character can nod, shrug and put their hands up (D-136); under strain
+   the worst thing they saw comes back unasked (D-145) and their nights break after three hours (D-146).
+   Generated people's lines now sound like their voice (D-143). Nothing for you to do.
+20. **Your character's own lines** (your call). Each player character's card has things they will never do
+   (Owen: leave someone wounded, hurt a kid; Addison: hit someone unarmed; Ruth: leave a wounded person,
+   execute a prisoner, feed anyone to the dead), and the spec (L12) takes those options off the player's
+   menu exactly as it does for everyone else. Since D-134/D-135 that includes killing someone held or
+   someone with their hands up, and Owen's "leave someone wounded" keeps him in a room while someone he
+   loves bleeds. Until now the player was told "That can't be done from where you are."; now they are told
+   "Your character won't do that. It's a line they don't cross." (D-147). Left alone: the lines stay
+   absolute. Your options: keep them; make them a cost instead (the act is allowed and the character pays
+   — nerve, stress, what comes back at night); or let the player choose per run.
 
 ## Notes (builder)
 

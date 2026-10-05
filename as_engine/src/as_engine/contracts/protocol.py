@@ -285,7 +285,7 @@ class OutTurnResult(Strict):
 
 
 class OutTurnRejected(Strict):
-    reason_code: Literal["impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action", "busy", "dead",
+    reason_code: Literal["impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action", "wont", "busy", "dead",
                          "no_run", "empty", "suggestion_stale", "intake_failed", "no_models", "model_swapped", "turn_failed",
                          "decision_held", "doomed_words"]
     message: str

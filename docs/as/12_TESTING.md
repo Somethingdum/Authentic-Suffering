@@ -560,6 +560,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_broken_nights.py` | Mara lies down at stress 9: three hours in she is awake (CAS-061; slept 3 h) and nothing is given back. At stress 5 she sleeps through. A night already over is not broken (she woke at two hours and lay down again). Owen at stress 8 wakes the same way and the narrator's state lines say so that turn only |
 
+### 3.61 A line they don't cross (P7; D-147)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_a_line_they_dont_cross.py` | The intake is shown what Owen will never do (his card's wont list, in the prompt); answered 'wont', the player is told "Your character won't do that. It's a line they don't cross." and no second look is made |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

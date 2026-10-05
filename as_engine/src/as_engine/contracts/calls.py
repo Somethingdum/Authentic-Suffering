@@ -21,6 +21,8 @@ class IntakeContext(Strict):
     packet: SkullPacket = Field(description="The PC's own packet (L12: built by the same builder).")
     player_text: str
     quoted_speech: list[str] = Field(default_factory=list, description="Text inside quotes, extracted by code; speech only.")
+    wont: list[str] = Field(default_factory=list, description="D-147: what the character will never do (its dossier's "
+                            "moral_line.wont) — the menu leaves out what crosses those lines (L12).")
 
 
 class RepairContext(Strict):

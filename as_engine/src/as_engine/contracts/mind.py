@@ -349,11 +349,12 @@ class IntakeOutput(Strict):
     player's words reach the same action vocabulary as an actor's: ``pace`` is the mechanical mode
     ('carefully', 'quietly' -> careful; 'quickly', 'in a hurry' -> rushed) where the option supports
     it; ``manner`` is colour only; (D-136) ``gesture`` is a G# handle of the packet when the words
-    make one of its gestures alongside the option (a nod, a shrug, empty hands held up)."""
+    make one of its gestures alongside the option (a nod, a shrug, empty hands held up); (D-147) a
+    none_reason 'wont' is a line the character does not cross (its own card's, L12)."""
 
     choice: str = Field(description="Affordance handle or 'NONE'.")
     none_reason: Literal[
-        "impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action"
+        "impossible", "not_here", "not_holding", "not_trained", "unclear", "not_an_action", "wont"
     ] | None = None
     pace: Literal["normal", "careful", "rushed"] = "normal"
     manner: str = Field(default="", max_length=120)

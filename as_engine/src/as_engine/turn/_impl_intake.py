@@ -13,6 +13,7 @@ NONE_MESSAGES = {
     "not_trained": "You don't know how to do that.",
     "unclear": "It isn't clear what you want to do.",
     "not_an_action": "That isn't something you do in the world. Use Ask for questions.",
+    "wont": "Your character won't do that. It's a line they don't cross.",
 }
 PLAYER_REASON = "The player chose this."
 QUOTE_SPAN = re.compile(r'"[^"]*"|“[^”]*”')
@@ -216,7 +217,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         info["addressee"] = addressee
     else:
         async def ask(packet):
-            ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes)
+            ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes, wont=wont)
             req = build_request(session.config, CallClass.INTAKE, turn_index=turn_index, actor_id=pc, context=ctx,
                                 json_schema=intake_schema([a.handle for a in packet.affordances],
                                                           [g.handle for g in packet.gestures]), ctx=ctx)
@@ -224,8 +225,9 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
             if resp.parse_status != "ok":
                 raise Rejected("intake_failed", "That didn't come through clearly. Try saying it another way.")
             return IntakeOutput.model_validate(resp.parsed)
+        wont = list(fused(tx, pc).motive.moral_line.wont)       # D-147: the lines the PC does not cross
         out = await ask(pkt)
-        if out.choice == "NONE" and (out.none_reason or "unclear") != "not_an_action":
+        if out.choice == "NONE" and (out.none_reason or "unclear") not in ("not_an_action", "wont"):
             # INTAKE-07 (D-121): the menu is a short first list; the player may mean anything the PC could do
             shown = {o.signature for o in aff.options}
             rest = [o for o in (aff.pool or []) if o.signature not in shown]

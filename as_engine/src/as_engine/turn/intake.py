@@ -55,7 +55,8 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      turn. Quotes and no ASCII letter ([A-Za-z]) left in rest -> a speech intent with the quotes
      joined by ' ' (each stripped) to that addressee, info['addressee'] = addressee. Otherwise the
      INTAKE call (build_request(config, INTAKE, turn_index = T, actor_id = the PC, context and ctx =
-     IntakeContext(packet, player_text = text, quoted_speech = quotes), json_schema =
+     IntakeContext(packet, player_text = text, quoted_speech = quotes, wont = (D-147) the PC's fused
+     dossier motive.moral_line.wont), json_schema =
      lanes.schemas.intake_schema(the packet's affordance handles)), output IntakeOutput) — at most
      two (INTAKE-07):
        parse_status != 'ok' -> Rejected('intake_failed', "That didn't come through clearly. Try
@@ -76,13 +77,14 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
   "mode" in record_input is 'do' when the text came from a remainder chip, else submit.mode.
   INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding
      (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the
-     call answers 'NONE' with a none_reason other than 'not_an_action' and aff.pool holds options
+     call answers 'NONE' with a none_reason other than 'not_an_action' or (D-147) 'wont' (a line the
+     PC does not cross is not on any list) and aff.pool holds options
      that aff.options does not (by signature), the packet is rebuilt with them appended in pool
      order — build_packet(tx, pc, LOD.WARM, aff, turn_index, t0, consulted =
      mind.consult.Consulted('more_actions', [], those options)): the first handles keep their
      meaning, the rest are A{n+1}.. — and ONE more INTAKE call is made with it; its answer is the
      answer (a 'NONE' there is the rejection, with its reason and clarify). Nothing more to show,
-     or 'not_an_action': no second call.
+     or 'not_an_action' or 'wont': no second call.
   INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up:
      the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is
      lanes.schemas.intake_schema(the packet's affordance handles, its gesture handles), and its
@@ -134,6 +136,7 @@ NONE_MESSAGES: dict[str, str] = {
     "not_trained": "You don't know how to do that.",
     "unclear": "It isn't clear what you want to do.",
     "not_an_action": "That isn't something you do in the world. Use Ask for questions.",
+    "wont": "Your character won't do that. It's a line they don't cross.",
 }
 PLAYER_REASON = "The player chose this."
 DOOMED_WORDS = "The words won't come. Not those words."

@@ -12,5 +12,7 @@ Options:
 {% endfor %}{% if ctx.packet.gestures %}Gestures (only alongside an option):
 {% for g in ctx.packet.gestures %}- {{ g.handle }}: {{ g.label }}
 {% endfor %}{% endif %}
-The player typed:
+{% if ctx.wont %}What {{ ctx.packet.identity.name }} will never do:
+{% for w in ctx.wont %}- {{ w }}
+{% endfor %}{% endif %}The player typed:
 {{ ctx.player_text }}
