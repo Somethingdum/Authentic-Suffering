@@ -51,6 +51,8 @@ class NarratorPacket(Strict):
     people_present: list[str] = Field(default_factory=list, description="As the PC perceives them.")
     people_looks: list[str] = Field(default_factory=list, description="F1a-2 NARR-10: how someone looks and smells "
                                     "to the PC, when they first come into the scene ('Mara: shoulder-length…').")
+    pc_beliefs: list[str] = Field(default_factory=list, description="D-197: what the PC grew up hearing about what is in "
+                                  "front of them, the turn it first comes up — their belief, never the story's fact.")
     choice_prompt_hint: str | None = None
     allowed_names: list[str] = Field(default_factory=list, description="Proper names the PC knows and may be written.")
     style: NarratorStyle = Field(default_factory=NarratorStyle)

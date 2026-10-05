@@ -57,3 +57,27 @@ def test_she_remembers_it_as_she_was_raised_to(scenario):
         memory.queue_writeback(tx, w.id("mara"), 0, t + 1000)
     ((turn, texts),) = memory.unprocessed(w.store, w.id("mara"))
     assert turn == 0 and texts, "a memory not yet written is still read back raw, from the store"
+
+
+def test_what_owen_was_always_told(scenario):
+    """D-197: the story lets what the player's character grew up hearing come to mind — the turn it first comes up,
+    not every turn the bitten woman is still standing there."""
+    from as_engine.contracts.common import CallClass
+    from as_engine.narration.narrator import build_narrator_packet
+    from as_engine.prompts.render import render
+    w = scenario("metal_fence")
+    t = w.store.query_one("SELECT now_ms FROM world_clock")[0]
+    with w.store.transaction() as tx:
+        space.change_place(tx, w.id("sales_floor"), {"light_level": 4}, "test", t, None, 0)
+        for who, x in (("june", 5.0), ("pc", 6.0)):
+            tx.commit_event(space.move_event(tx, w.id(who), w.id("sales_floor"), None, x, 4.0, t, None, 0))
+        c = tx.commit_event(Event(type=EventType.OVERRIDE, writer="audit", at=t, turn_index=1, payload={"what": "test"}))
+        bodies.apply_harm(tx, w.id("june"), WoundSpec(Anatomy.ARM_L, WoundType.BITE, WoundSeverity.SIGNIFICANT), t, c.event_id, 1, w.rng)
+        perception.compile_scene(tx, w.id("pc"), t + 1000, 1)
+        first = build_narrator_packet(tx, w.id("pc"), 1, t, w.session().settings)
+        perception.compile_scene(tx, w.id("pc"), t + 2000, 2)
+        second = build_narrator_packet(tx, w.id("pc"), 2, t + 1000, w.session().settings)
+    assert first.pc_beliefs and any("bite" in b.lower() for b in first.pc_beliefs), first.pc_beliefs
+    user = render(CallClass.NARRATION, k=first, words=w.store.rules.style.narration_words[first.length], fix=[])[1].content
+    assert "What Owen grew up hearing about this" in user
+    assert second.pc_beliefs == [], "it came to mind once; she is still there, and it is not said again"

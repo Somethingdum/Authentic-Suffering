@@ -219,6 +219,10 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     when = f"{format_clock(at)}, day {wt.day} since the Fall ({wt.part_of_day})"
     if at - t0 >= LONG_TURN_MS:
         when = f"{format_clock(t0)} to {when}"
+    from ..mind._impl_lore import lore_lines                                     # D-197
+    n_lore = tx.rules.packet.max_lore
+    heard = {x["text"] for x in lore_lines(tx, pc_id, turn_index - 1, at, n_lore)} if turn_index > 0 else set()
+    beliefs = [x["text"] for x in lore_lines(tx, pc_id, turn_index, at, n_lore) if x["text"] not in heard]
     style = NarratorStyle.model_validate_json(_row(tx, "SELECT style_json FROM narrator_state WHERE id=1")["style_json"])
     rules = tx.canon.find("style", "narration")
     numbers = tx.rules.style
@@ -226,7 +230,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         turn_index=turn_index, world_time_text=when,
         place_text=place["name"], pc_name=pc, pc_state_lines=state, comprehension=_comprehension(tx, pc_id), lines=lines,
         establish_place=establish, place_details=details, people_present=people,
-        people_looks=looks_lines,
+        people_looks=looks_lines, pc_beliefs=beliefs,
         choice_prompt_hint=hint, allowed_names=sorted(allowed), style=style, length=settings.narration_length,
         person=settings.narration_person, tense=settings.narration_tense, banned_phrases=list(rules.banned_phrases),
         intensity=settings.intensity, player_input_echo_block=_unlicensed(echo_block(tx, turn_index, numbers),

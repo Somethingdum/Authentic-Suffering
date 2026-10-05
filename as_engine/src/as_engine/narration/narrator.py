@@ -94,6 +94,11 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
   allowed_names    sorted: pc, the PC's full display name, the PC's known_name for every source of
                    its percepts this turn, the names of the places it knows (known_places), and
                    (D-145) the PC's known_name for the bodies of what came back (NARR-11).
+  pc_beliefs       (D-197) the texts of mind.retrieval.lore_lines(tx, pc_id, turn_index, now,
+                   PacketRules.max_lore) that are not among the texts of lore_lines(tx, pc_id,
+                   turn_index - 1, now, the same n): what the PC grew up hearing about what is in front
+                   of them, on the turn it first comes up — the prose may let it come to mind as the
+                   PC's belief (which can be wrong), never tell it as the story's fact.
   choice_prompt_hint  the LAST speech percept of the turn addressed to the PC at EXACT or PARTIAL ->
                    f"answer {speaker_known_as or 'them'}" (percepts ordered by (at, percept_id));
                    else, when mind.cues.cues_of(tx, pc_id, turn_index, now) includes threat_seen or

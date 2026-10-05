@@ -17,6 +17,8 @@ TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
 {% for p in k.people_looks %}- {{ p }}
 {% endfor %}{% endif %}{% if k.pc_state_lines %}{{ k.pc_name }} right now:
 {% for l in k.pc_state_lines %}- {{ l }}
+{% endfor %}{% endif %}{% if k.pc_beliefs %}What {{ k.pc_name }} grew up hearing about this (a belief, and it can be wrong; if it fits, it may come to mind — never tell it as fact):
+{% for b in k.pc_beliefs %}- {{ b }}
 {% endfor %}{% endif %}
 WHAT {{ k.pc_name | upper }} PERCEIVED, IN ORDER
 {% for l in k.lines %}{% set who = l.speaker or 'Someone' %}- at +{{ '%.1f' % l.seconds }}s ({{ l.kind }}): {% if l.kind == 'speech' and l.words %}{{ who[:1] | upper }}{{ who[1:] }} said: "{{ l.words }}"{% else %}{{ l.text }}{% endif %}
