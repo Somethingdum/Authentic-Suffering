@@ -1182,6 +1182,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p06_memory/test_a_sign_seen.py` | Mara in front of claw gouges in a door frame has 'that's lurker ground' come to mind (not without them); in front of dragging footprints, 'Noise brings them'; at the Ghosts' smile cut into a body, what everyone says of it; a horde's claw marks on a barricade are not lurker ground |
 
+### 3.164 A card at odds with itself (P10; D-276)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_a_card_at_odds_with_itself.py` | Across 600 drawn people of each age, nothing someone would never say is said, word for word, in their own lines; nobody devout or quoting scripture would never say 'God is good.', nobody who says sorry would never say 'I'm sorry.', nobody polite to a fault 'Thank you.', nobody generous 'Keep it. It's yours.'; a grown man learned in the camps from 'the ones who knew how', a child when it came from the grown-ups |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

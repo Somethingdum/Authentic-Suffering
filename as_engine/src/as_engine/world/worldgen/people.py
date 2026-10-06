@@ -529,6 +529,22 @@ _KID_NEVER_SAY = (
     "I'm not hungry.", "I'll go outside on my own.", "Grown-ups are always right.", "I don't need a hug.",
     "I'm too big to be scared.", "I like the dark.", "I'll stay here by myself.", "That doesn't hurt.",
 )
+# D-276: the voices, habits, priorities and ways that have someone say a line — never one they would never say
+_SAID_BY: dict[str, tuple[str, ...]] = {
+    "God is good.": ("devout", "scripture", "faith"),
+    "I was wrong. I'm sorry.": ("sorry", "apologises"),
+    "Thank you.": ("polite to a fault",),
+    "Rules are rules.": ("survival rules", "procedures"),
+    "Let's just talk about it.": ("counsellor", "talking it out"),
+    "Take my share, I don't need it.": ("generous",),
+    "Keep it. It's yours.": ("generous",),
+    "I'd rather die than run.": ("brave",),
+    "I miss the old world.": ("stories about before", "the old world"),
+    "It'll all go back to normal.": ("as if it were still there",),
+    "Nobody's coming to save us.": ("grim and literal",),
+    "I like the dark.": ("comfortable in the dark",),
+    "I'll stay here by myself.": ("comfortable alone", "left alone"),
+}
 
 _MOTIVES = (
     ("keep {group} fed and safe", "does the work assigned, and some more"),
@@ -1030,7 +1046,20 @@ def _learned(seed: "PersonSeed", domain: str, i: int, work: str, before: str) ->
     if i == 0 and before in _FIT_BEFORE.get(work, ()):
         return f"Years of it before the Fall, as {_a(before)}."
     pool = _LEARNED if seed.cohort != "post_fall_born" else tuple(x for x in _LEARNED if "first winter" not in x and "wall went up" not in x)
-    return _draw(seed, f"learned:{domain}", pool).format(settlement=seed.settlement_name)
+    got = _draw(seed, f"learned:{domain}", pool).format(settlement=seed.settlement_name)
+    return got.replace("the grown-ups", "the ones") if seed.cohort == "pre_fall_adult" else got    # D-276: grown already
+
+
+def _words(text: str) -> list[str]:
+    return "".join(c if c.isalpha() or c == "'" else " " for c in text.casefold().replace("’", "'")).split()
+
+
+def _says_it(line: str, own_lines, ways) -> bool:
+    # D-276: their own lines say it, word for word, or their voice, habits, priorities or ways would have them say it
+    w = _words(line)
+    if any(x[i:i + len(w)] == w for x in map(_words, own_lines) for i in range(len(x) - len(w) + 1)):
+        return True
+    return any(k in way for k in _SAID_BY.get(line, ()) for way in ways)
 
 
 def skeleton_dossier(seed: PersonSeed) -> dict:
@@ -1070,8 +1099,11 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     (voice.dialect_notes) follows where they learned to talk: grown before the Fall, the town they come from (_SOUNDS
     by birthplace; another place, _DIALECTS); a child when it came, the camps they grew up in (_CAMP_SOUNDS); born
     after it, the only world they know (_BORN_SOUNDS — 'before-times' for the old world, as their generation says
-    it); each of the two fresh as the rest; a child under 12 has none. WORLDGEN_ACTOR may replace every
-    unlocked field of it."""
+    it); each of the two fresh as the rest; a child under 12 has none. (D-276) The things they would never say are
+    none their own lines say word for word, nor any their voice, habits, priorities or ways have them say (_SAID_BY: a
+    devout woman may well say 'God is good.', a man polite to a fault 'Thank you.'); and someone grown when the Fall
+    came picked a skill up in the camps watching 'the ones who knew how', not 'the grown-ups'. WORLDGEN_ACTOR may
+    replace every unlocked field of it."""
     v = seed.variant
     first = seed.name.split()[0]
     adult = seed.age >= 16
@@ -1117,6 +1149,9 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
     one_line = f"{_a(shown).capitalize()} {'child' if not adult else work} at {seed.settlement_name} who {signature}."
     if len(one_line) > 140:
         one_line = f"{_a(shown).capitalize()} {'child' if not adult else work} at {seed.settlement_name}."
+    settles = (_SETTLERS if adult else _KID_SETTLERS)[(v // 13) % len(_SETTLERS if adult else _KID_SETTLERS)]
+    ways = (*tend, t1[0], t2[0], *stack, motive.format(**fmt), silence[2], settles)
+    unsaid = tuple(x for x in (_KID_NEVER_SAY if kid else _NEVER_SAY) if not _says_it(x, ex, ways))    # D-276
     return {
         "schema": "as.actor.v1", "id": "gen_" + "".join(c if c.isalnum() else "_" for c in seed.name.lower()),
         "generation": "generated",
@@ -1166,7 +1201,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
         "voice": {"capsule": f"{first} {tend[0]}; {tend[1]}.",
                   "speech_tendencies": list(tend),
                   "exemplars": {"low_stakes": ex[0], "under_pressure": ex[1], "at_the_limit": ex[2]},
-                  "would_never_say": _draw(seed, "never", _fresh(seed, _KID_NEVER_SAY if kid else _NEVER_SAY, n=3), 3),
+                  "would_never_say": _draw(seed, "never", _fresh(seed, unsaid, n=3), 3),
                   "profanity": "none" if kid else swear,
                   "dialect_notes": "" if kid else _sound(seed, born)},
         "social": {"household_role": "", "relations": [], "dependents": [], "guardians": [], "memberships": []},
@@ -1177,7 +1212,7 @@ def skeleton_dossier(seed: PersonSeed) -> dict:
                         "encounter_default": _draw(seed, "encounter", _ENCOUNTER)},
         "temper": {"fuse": _FUSES[(v // 5) % len(_FUSES)], "outlet": _OUTLETS[(v // 11) % len(_OUTLETS)],
                    "grudge": (v // 7) % 4, "pet_peeves": [(_PEEVES if adult else _KID_PEEVES)[(v // 3) % len(_PEEVES if adult else _KID_PEEVES)]],
-                   "cools_down_by": (_SETTLERS if adult else _KID_SETTLERS)[(v // 13) % len(_SETTLERS if adult else _KID_SETTLERS)]},
+                   "cools_down_by": settles},
         "tags": ["generated"],
     }
 
