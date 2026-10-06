@@ -4,7 +4,10 @@ material_holders(tx, new_events, turn_index) -> list[tuple[str, int]]
   For each LIVING, conscious actor (actors row; not controller-dependent — the PC is included and
   the pipeline decides what to do with it, L12) that holds a percept of one of ``new_events``
   (percept_log.event_id in their ids), the percept is MATERIAL (REACT-01) when any of:
-    a speech percept addressed to the holder at EXACT or PARTIAL;
+    a speech percept addressed to the holder at EXACT or PARTIAL — (D-287) of the last piece of its
+      utterance (SEG-01: payload segment == segments, or neither set), or of an earlier piece whose
+      words, as heard, already wound (a threat or an insult, as below): people let the speaker finish
+      the sentence, and answer the whole of it;
     (D-262) a speech percept at EXACT or PARTIAL of a SPEECH whose payload 'to' names a bonded body
       (as below; not the holder or the speaker) and whose words, as heard, are a threat
       (mind.firewall.classify_form, no weapon) or hold an entry of mind.temper.INSULT_WORDS —

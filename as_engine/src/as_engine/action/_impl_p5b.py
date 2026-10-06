@@ -547,7 +547,8 @@ def material_holders(tx, new_events, turn_index):
         vis = p["channel"] == "visual" and det.get("level") in ("clear", "partial")
         mat = False
         if p["channel"] == "speech" and det.get("addressed_to_me") and p["fidelity"] in ("exact", "partial"):
-            mat = True
+            more = ev.type == EventType.SPEECH and (pl.get("segment") or 1) < (pl.get("segments") or 1)
+            mat = not more or _wounding(det.get("words") or "")      # D-287: they let the speaker finish
         if p["channel"] == "speech" and det.get("armed_at_me"):
             mat = True
         if p["channel"] == "speech" and not mat and ev.type == EventType.SPEECH and p["fidelity"] in ("exact", "partial") \

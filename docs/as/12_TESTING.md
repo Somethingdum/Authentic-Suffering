@@ -1248,6 +1248,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_holding_down_the_bitten.py` | Mara saw June bitten: when Owen grabs June, or ties her, Mara is not provoked and her trust and resentment toward him stand; had she not seen it, the grab provokes her and she resents him a point |
 
+### 3.175 Let him finish (P7; D-287)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_let_him_finish.py` | Owen's long line to Mara lands in pieces and she reacts once, having heard every piece; a threat in the first piece ('Mara, I'll break your arm if you move,') is enough for her to react to it alone |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
