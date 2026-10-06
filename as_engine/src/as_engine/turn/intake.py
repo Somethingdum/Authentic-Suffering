@@ -82,7 +82,11 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
        without -> to_intent(packet, aff, the IntakeOutput, WARM, 'human');
        an IntentError -> Rejected('unclear', NONE_MESSAGES['unclear'], output.clarify).
      info['remainder'] = output.remainder (the pipeline offers it as the first chip next turn:
-     "Continue: …"). record_pc_input(text); record_input(mode, text, {signature, addressee:
+     "Continue: …"). (D-279) The prompt's lines of what the PC perceives end with the source's P-handle,
+     as an actor's do (D-277: 'A walker stands in the rear alley. (P2)'), and it says that doing
+     something to someone seen in another place, with no option for it from where the PC stands,
+     starts with going there (the rest is the remainder) — a blow is never offered across a doorway
+     (D-278). record_pc_input(text); record_input(mode, text, {signature, addressee:
      info['addressee']}) (None for a do without speech).
   "mode" in record_input is 'do' when the text came from a remainder chip, else submit.mode.
   INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding

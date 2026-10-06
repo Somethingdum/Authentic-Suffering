@@ -1200,6 +1200,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_within_reach.py` | Owen in a yard with an axe in hand is offered no blow, shove, grapple or disarm on one of the dead beyond a chain-link fence, a shut window or an open gate, and it is still the threat; on his side of the fence it is struck, struck at the head and shoved |
 
+### 3.167 Over there (P7; D-279)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_over_there.py` | With one of the dead two metres past the open back door, Owen's intake reads the walker's line ('… rear alley.') ending with its handle, and the rule that doing something to someone seen in another place starts with going there |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
