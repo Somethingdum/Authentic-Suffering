@@ -102,7 +102,9 @@ arrived, within thirty minutes — as they heard them, their own lines among the
 as they know them and whether it was to them; a question put to them that they have not answered says
 so; never the whole transcript, and nothing said before they arrived: that reaches them only through
 memory); **What reaches you** (percepts with fidelity
-words: *clearly / only partly, some words lost / only the tone, no words*); **What you heard**
+words: *clearly / only partly, some words lost / only the tone, no words*; one from someone they can account
+for ends with that person's handle, *(P2)*, so a woman half seen at the counter is Alice and the axe is in
+Owen's hand, D-277); **What you heard**
 (utterances with form and the receiver's standing; a flood of words past 800 characters is cut
 where a word ends, with " …" — heard, not obeyed, and never crowding the person out of their own
 context); **People you can account for** (by name if known, else description, and where they are
@@ -111,7 +113,8 @@ ago*, or *not seen*: being someone's son never puts him in the room, Actor Spec 
 *here*, a line under theirs says what this person sees and smells of them — hair, clothes, a badge,
 a gun on the belt, blood and filth, the reek of the dead — at that distance and in that light,
 LOOK-06, SMELL-04); **Your
-understanding of them**; **What remains uncertain**; and the **Possibilities you notice**
+understanding of them**; **What remains uncertain** (the doubts of many percepts said once each way, *You
+could not make out S1, S2 or S5 in full.*, D-277); and the **Possibilities you notice**
 (affordances A1…).
 
 The instructions around it are a person's own (Actor Spec §6, AC01): *"You are the person described

@@ -17,7 +17,8 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                 SKULL-11) mind.packet's known_elsewhere; L1..Ln its open
                 loops (below). ``handles`` maps each handle to its id (percept_id, body id, loop_id).
   percepts      non-speech rows as PerceivedItem(handle, channel, fidelity, text, source_handle =
-                the P-handle of source_id or None, seconds_ago = (at - row.at) / 1000).
+                the P-handle of source_id or None, seconds_ago = (at - row.at) / 1000); (D-277) the
+                WRITEBACK prompt says whose it is after the text — 'A walker moves into the crossroads. (P1)'.
   utterances    speech rows as UtteranceView, built exactly as mind.packet builds them.
   entities      PacketEntity per P-handle, as mind.packet (known_name, description,
                 relation_summary, whereabouts, appearance — F1a, from the same percept rows).

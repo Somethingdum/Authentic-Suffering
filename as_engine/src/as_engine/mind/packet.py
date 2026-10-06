@@ -122,7 +122,8 @@ Fields (second person, plain English):
                     the sales floor'), or f'in {place_phrase(place name)}' with no anchor.
   perceived_now     every non-speech percept of this turn as PerceivedItem(handle, channel,
                     fidelity, text = percept text, source_handle = the P-handle of source_id or
-                    None, seconds_ago = (at - percept.at) / 1000).
+                    None, seconds_ago = (at - percept.at) / 1000). (D-277) The prompt says whose it is
+                    after the text — 'A short woman stands at the gap behind the counter. (P2)'.
   utterances        every speech percept as UtteranceView: words / volume / addressed_to_me from
                     percept_log.detail; words longer than PacketRules.max_heard_chars are cut to
                     their first max_heard_chars characters, then back to the last space among
@@ -230,7 +231,8 @@ Fields (second person, plain English):
                     (hands 0 for attention); hands_free = capacity(actor).hands_free. The prompt
                     lists them after the options; the answer may name one of each (INTENT-09).
   uncertainty       one line per PARTIAL or TONE_ONLY percept, in S order: f'You did not catch all
-                    of {S#}.' — (D-158) a visual one f'You could not make out all of {S#}.'
+                    of {S#}.' — (D-158) a visual one f'You could not make out all of {S#}.' (D-277: the
+                    prompt says them once each way, prompts.render.doubts.)
   families          [] when reaction or consulted; else mind.consult.families(affordances, the
                     canon affordance defs by id) — CONSULT-03.
   consult_kinds     [] when reaction or consulted; else ['recall'] + ['more_actions'] when

@@ -11,6 +11,10 @@ KV-cache law (PROMPT-01): the system template must not contain any volatile valu
 names of present people); stable per-actor content goes FIRST in the user template, volatile
 content LAST. PROMPT-02: no pseudo-code in anything the model reads — plain organised English;
 JSON appears only as the required answer shape.
+
+(D-277) doubts(lines), the 'doubts' filter: the actor prompt's What remains uncertain says the doubts of many
+percepts once each way — 'You could not make out S1, S2 or S5 in full.', 'You did not catch S3 or S4 in full.' — a
+single one as the packet has it, and any other line as it is, in order.
 """
 
 from __future__ import annotations
@@ -55,6 +59,30 @@ PERCEPT_WORDS = {
     "auditory:exact": "clearly", "auditory:partial": "not clearly", "auditory:tone_only": "barely",
     "olfactory:exact": "clearly", "olfactory:partial": "faintly",
 }
+
+
+# D-277: the doubts of many percepts said once each way ('You could not make out S1, S2 or S5 in full.')
+_DOUBTS = {"You could not make out all of ": "You could not make out {} in full.",
+           "You did not catch all of ": "You did not catch {} in full."}
+
+
+def doubts(lines: list[str]) -> list[str]:
+    heads: dict[str, list[str]] = {}
+    out: list[str] = []
+    for ln in lines:
+        head = next((h for h in _DOUBTS if ln.startswith(h) and ln.endswith(".")), None)
+        if head is None:
+            out.append(ln)
+            continue
+        if head not in heads:
+            heads[head] = []
+            out.append(head)
+        heads[head].append(ln[len(head):-1])
+    return [ln if ln not in heads else f"{ln}{heads[ln][0]}." if len(heads[ln]) == 1 else
+            _DOUBTS[ln].format(", ".join(heads[ln][:-1]) + " or " + heads[ln][-1]) for ln in out]
+
+
+_env.filters["doubts"] = doubts
 
 
 def render(call_class: CallClass, **ctx: Any) -> list[ChatMessage]:

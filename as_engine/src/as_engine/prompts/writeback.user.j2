@@ -2,7 +2,7 @@ WHO
 {{ a.identity.as_text() }}
 
 WHAT THEY PERCEIVED
-{% for s in a.percepts %}- {{ s.handle }} ({{ s.channel.value }}, {{ percept_words.get(s.channel.value ~ ':' ~ s.fidelity.value, fidelity_words[s.fidelity.value]) }}): {{ s.text }}
+{% for s in a.percepts %}- {{ s.handle }} ({{ s.channel.value }}, {{ percept_words.get(s.channel.value ~ ':' ~ s.fidelity.value, fidelity_words[s.fidelity.value]) }}): {{ s.text }}{{ ' (' ~ s.source_handle ~ ')' if s.source_handle else '' }}
 {% else %}- Nothing clear.
 {% endfor %}{% for u in a.utterances %}- {{ u.handle }}: {{ u.speaker_handle or "someone" }} said{{ " to them" if u.addressed_to_me else "" }}: {{ ('"' ~ u.words ~ '"') if u.words else "(only the tone)" }}
 {% endfor %}

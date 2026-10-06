@@ -1188,6 +1188,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_a_card_at_odds_with_itself.py` | Across 600 drawn people of each age, nothing someone would never say is said, word for word, in their own lines; nobody devout or quoting scripture would never say 'God is good.', nobody who says sorry would never say 'I'm sorry.', nobody polite to a fault 'Thank you.', nobody generous 'Keep it. It's yours.'; a grown man learned in the camps from 'the ones who knew how', a child when it came from the grown-ups |
 
+### 3.165 Who it is (P4; D-277)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_who_it_is.py` | In Mara's prompt every line of What reaches you from a person ends with that person's handle, a handle of the People list, and no other line does; four doubts and a free line render as 'You could not make out S1, S2 or S5 in full.', 'You did not catch all of S3.' and the free line, in order; her memory's WHAT THEY PERCEIVED lines say whose they are the same way |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
