@@ -1194,6 +1194,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_who_it_is.py` | In Mara's prompt every line of What reaches you from a person ends with that person's handle, a handle of the People list, and no other line does; four doubts and a free line render as 'You could not make out S1, S2 or S5 in full.', 'You did not catch all of S3.' and the free line, in order; her memory's WHAT THEY PERCEIVED lines say whose they are the same way |
 
+### 3.166 Within reach (P5; D-278)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_within_reach.py` | Owen in a yard with an axe in hand is offered no blow, shove, grapple or disarm on one of the dead beyond a chain-link fence, a shut window or an open gate, and it is still the threat; on his side of the fence it is struck, struck at the head and shoved |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

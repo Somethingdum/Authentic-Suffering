@@ -56,8 +56,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> Af
                    that is not infected (P10: the dead do not listen).
     wound          its own unhealed wounds, and those of known bodies within touch seen at clear
                    that are not infected (P10: nobody dresses a wound on the dead).
-  Ranges: self; touch <= 1.5 m (space.point_distance); reach / same_place = in the actor's place
-  (the effect walks there — duration base_s + per_meter_s x distance); visible = a known body /
+  Ranges: self; touch <= 1.5 m (space.point_distance) in the actor's place; reach / same_place = in the actor's place
+  (the effect walks there — duration base_s + per_meter_s x distance) — (D-278) a body beyond a fence, a window or
+  a doorway is never in touch or in reach, however near (EFF-02 would block it 'target_gone'); visible = a known body /
   portal / item (it perceived it this turn); audible = a known body or 'everyone';
   adjacent_place = through a portal of its place.
   For each AffordanceDef in catalog order and each binding, run the gates IN THIS ORDER and record

@@ -415,10 +415,12 @@ def _range_ok(c, d, o):
     from ..physical import space
     r = d.range
     t = o.get("target_id")
+    if r in ("touch", "reach", "same_place") and t and t.startswith("act_"):
+        # D-278: a body beyond a fence, a window or a doorway is not within reach (EFF-02 'target_gone')
+        if _row(c.tx, "SELECT place_id FROM positions WHERE body_id=?", (t,))["place_id"] != c.place:
+            return False
     if r == "touch" and t and t.startswith("act_"):
         return (_dist(c, t) or 99) <= 1.5
-    if r == "same_place" and t and t.startswith("act_"):
-        return _row(c.tx, "SELECT place_id FROM positions WHERE body_id=?", (t,))["place_id"] == c.place
     return True
 
 

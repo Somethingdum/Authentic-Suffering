@@ -461,7 +461,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
 | EFF-01 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
-| EFF-02 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py`, `contract/p07_slice/test_slice_checks.py` |
+| EFF-02 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py`, `as_engine/mind/affordance.py` | `contract/p05_many_actors/test_effects.py`, `contract/p05_many_actors/test_within_reach.py`, `contract/p07_slice/test_slice_checks.py` |
 | EFF-03 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 | EFF-04 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
 | EFF-05 | *Effect handlers (P5). One handler per AffordanceDef.effect id. Rules EFF-01..08. Owner of* | as_engine/action/effects.py | `as_engine/action/effects.py` | `contract/p05_many_actors/test_effects.py` |
