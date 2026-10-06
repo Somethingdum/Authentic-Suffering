@@ -44,7 +44,7 @@ def test_she_hears_him_out(scenario, fake):
     w = scenario("metal_fence")
     pieces, calls = said_to_mara(w, fake, LONG)
     assert len(calls) == 1, "one answer"
-    assert heard(calls[0]) == pieces, "to the whole of it"
+    assert heard(calls[0]) == [" ".join(pieces)], "to the whole of it, as one line (D-288)"
 
 
 def test_a_threat_she_cuts_into(scenario, fake):

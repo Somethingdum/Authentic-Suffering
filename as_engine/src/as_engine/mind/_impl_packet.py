@@ -267,6 +267,8 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
                                           "ORDER BY at, percept_id", (actor_id, turn_index, at))]   # SKULL-10
     scene_at = max((p["at"] for p in percepts if str(p["event_id"]).startswith("scene:")), default=None)
     percepts = [p for p in percepts if not str(p["event_id"]).startswith("scene:") or p["at"] == scene_at]
+    from ._impl_p6 import fold_pieces
+    percepts = fold_pieces(tx, percepts)                            # D-288: one utterance, one line
     body_ids = {r[0] for r in tx.query("SELECT body_id FROM bodies")}
     ents = []
 

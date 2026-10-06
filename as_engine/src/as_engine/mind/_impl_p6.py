@@ -213,6 +213,35 @@ def select_percepts(tx, holder, turn_index, at):
     return [p for p in rows if not str(p["event_id"]).startswith("scene:") or p["at"] == scene_at]
 
 
+def fold_pieces(tx, rows):
+    """D-288: the speech rows of one utterance's pieces (SEG-01: the same SPEECH payload utterance_id, from the same
+    source) are one row at the first piece's place: its words joined (' …' for a piece of which only the tone came),
+    their fidelity when they share one, else partial (some of it made out), addressed or armed if any piece was."""
+    out, first = [], {}
+    for r in rows:
+        if r["channel"] != "speech":
+            out.append(r)
+            continue
+        u = tx.query_one("SELECT json_extract(payload,'$.utterance_id') FROM events WHERE event_id=?", (r["event_id"],))
+        key = (u[0], r["source_id"]) if u and u[0] else None
+        if key is None or key not in first:
+            if key is not None:
+                first[key] = len(out)
+            out.append(r)
+            continue
+        i = first[key]
+        a, b = _j(out[i]["detail"]) or {}, _j(r["detail"]) or {}
+        wa = a.get("words") if out[i]["fidelity"] != "tone_only" else ""
+        wb = b.get("words") if r["fidelity"] != "tone_only" else ""
+        words = " ".join(x or "…" for x in (wa, wb))
+        fid = r["fidelity"] if out[i]["fidelity"] == r["fidelity"] else "partial"
+        det = {**a, "words": "" if words == "… …" else words,
+               "addressed_to_me": bool(a.get("addressed_to_me") or b.get("addressed_to_me")),
+               "armed_at_me": bool(a.get("armed_at_me") or b.get("armed_at_me"))}
+        out[i] = {**out[i], "fidelity": fid, "detail": json.dumps(det)}
+    return out
+
+
 def entity_ids(tx, holder, rows):
     body_ids = {r[0] for r in tx.query("SELECT body_id FROM bodies")}
     ents = []
@@ -244,7 +273,7 @@ def build_aftermath(tx, holder_id, turn_index, at):
     from .actor import fused
     from .firewall import classify_form, classify_standing, effective_form
     from .perception import retell
-    rows = select_percepts(tx, holder_id, turn_index, at)
+    rows = fold_pieces(tx, select_percepts(tx, holder_id, turn_index, at))          # D-288
     ents = entity_ids(tx, holder_id, rows)
     handles, ph = {}, {}
     rels = {r["to_id"]: dict(r) for r in tx.query("SELECT * FROM relationships WHERE from_id=? ORDER BY to_id", (holder_id,))}

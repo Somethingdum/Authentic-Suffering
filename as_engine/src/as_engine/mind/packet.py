@@ -41,8 +41,13 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
           ordered (at, percept_id),
           EXCEPT standing-view rows (event_id starting 'scene:') older than the latest standing
           view among those rows (only the rows with the greatest ``at`` among them count: a
-          room described twice is shown once, as it is now); ONE numbering over perceived_now
-          and utterances together.
+          room described twice is shown once, as it is now); (D-288) the speech rows of one
+          utterance's pieces (SEG-01: the same SPEECH payload utterance_id, from the same source)
+          are ONE row, at the first piece's place and with its percept_id: their words joined by
+          one space (' …' standing for a piece of which only the tone came), the fidelity they
+          share, else partial (some of it made out), addressed_to_me / armed_at_me if any was —
+          what was said once is one line, judged (form, standing) on the whole of it; ONE
+          numbering over perceived_now and utterances together.
   P1..Pn  bodies, each once, never the holder: (1) the source_id of those percepts, in percept
           order, when source_id is a body (items and portals are sources too — they are not
           entities); (2) bodies the holder has relationships rows toward, by to_id; (3) the other

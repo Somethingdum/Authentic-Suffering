@@ -1254,6 +1254,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_let_him_finish.py` | Owen's long line to Mara lands in pieces and she reacts once, having heard every piece; a threat in the first piece ('Mara, I'll break your arm if you move,') is enough for her to react to it alone |
 
+### 3.176 Heard whole (P7; D-288)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_heard_whole.py` | Owen's long question to Mara lands in pieces, the first of them no question on its own; her reaction packet shows it as one utterance with every word and the form question, and her aftermath of the turn agrees |
+| `p07_slice/test_let_him_finish.py` | (amended) what she reacts to is the whole line as one utterance |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
