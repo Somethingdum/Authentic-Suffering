@@ -53,7 +53,9 @@ TEMPER-03 provocations(tx, holder_id, turn_index, at) -> list[Provocation]: read
     manhandled_bonded (D-282) a visual percept of an ACTION_START by the source whose payload def_id is
                    'shove', 'grapple', 'disarm' or 'tie_up' and whose payload target_id is a living body, not the
                    source, the holder has affection >= 2 toward — someone they love shoved, grabbed or tied up in
-                   front of them
+                   front of them — (D-286) unless the holder knew they carried the infection when it was done
+                   (action.cascade.knew_infected at the percept's at, D-202): holding down the bitten is a safety
+                   precaution
     threatened_bonded (D-262) a speech percept NOT addressed to the holder, of a SPEECH whose payload 'to'
                    names a living body, not the source, the holder has affection >= 2 toward, whose words
                    (classify_form(detail.words, weapon_pointed_at_receiver = the event payload's armed and the
@@ -328,7 +330,9 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 add(src, "grabbed", eid)
         if ch == "visual" and typ == "ACTION_START" and human_src and pl.get("def_id") in ("shove", "grapple", "disarm", "tie_up") \
                 and loved(pl.get("target_id"), src):                                                         # D-282
-            add(src, "manhandled_bonded", eid)
+            from ..action.cascade import knew_infected
+            if not knew_infected(tx, holder_id, pl["target_id"], p["at"]):        # D-286: holding down the bitten
+                add(src, "manhandled_bonded", eid)
         if ch == "speech" and human_src and det.get("addressed_to_me"):
             words = det.get("words", "") or ""
             form = classify_form(words, weapon_pointed_at_receiver=bool(det.get("armed_at_me")))

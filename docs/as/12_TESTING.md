@@ -1242,6 +1242,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_remembered_once.py` | Owen's seventeen-word line to Mara lands in pieces; his aftermath packet says it once — own_action_text 'Said: "…"' with the whole line, and one 'I said: "…"' among what he did |
 
+### 3.174 Holding down the bitten (P9; D-286)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_holding_down_the_bitten.py` | Mara saw June bitten: when Owen grabs June, or ties her, Mara is not provoked and her trust and resentment toward him stand; had she not seen it, the grab provokes her and she resents him a point |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

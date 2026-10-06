@@ -293,6 +293,7 @@ at 1 ×1.5), and returns the reasons as plain sentences.
 - **Hands on someone you love** (D-282, TEMPER-03 manhandled_bonded, CAS-119..122): seeing someone they love shoved,
   grabbed and held, grabbed at for what is in their hand, or tied hand and foot angers them (heat 3, as if it were done
   to them) and is resented, a point each time — tied up, it costs a point of trust too; hurt, it is CAS-040's as well.
+  (D-286) Not for whoever knew the one held down was infected (D-202): holding down the bitten is a safety precaution.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

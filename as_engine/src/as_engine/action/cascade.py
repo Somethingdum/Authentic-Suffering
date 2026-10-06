@@ -43,6 +43,10 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
     onlookers_bonded_to_target(<path>)        (D-133) of onlookers_of_act, those bonded to the event's
                                               payload target_id (affection >= 1 toward it, or one
                                               household)
+    bonded_onlookers_unknowing(<path>)        (D-286) of onlookers_bonded_to_target, those who did not
+                                              know the target carried the infection when it was done
+                                              (knew_infected at the event's at, D-202): holding down a
+                                              bitten man is a safety precaution
     robbed_by(<path>)                         (D-129) for an ITEM_TRANSFER: of theft_witnesses_of, those
                                               whose believed owner of the item is themselves or one of
                                               their households (and not the taker's own, as there) —
@@ -546,5 +550,15 @@ def evaluate_precondition(tx: "Tx", expr: str, trigger: "Event") -> bool:
     Literals: integers, floats, true/false, quoted strings. A missing payload key makes the
     comparison false (never an exception)."""
     raise NotImplementedError("P5")
+def knew_infected(tx: "Tx", holder_id: str, body_id: str, at: int) -> bool:
+    """D-202 (D-286 makes it public): ``holder_id`` knew ``body_id`` carried the infection by ``at`` — from its own
+    records only: a visual EXACT or PARTIAL percept, at or before ``at``, of a HARM of type 'bite' to it, or of an
+    ACTION_START of its of a def tagged 'compulsion' (spreading it); a live believed holding of the proposition
+    (subject it, predicate 'bitten') acquired by then (D-217: told, and believed); or an open loop the holder keeps
+    from a contamination LAW_APPLIED on it (D-188). False for no body."""
+    raise NotImplementedError("D-202")
+
+
 from ._impl_p5b import sweep, select, evaluate_precondition  # noqa
+from ._impl_p5b import _knew_infected as knew_infected  # noqa: E402,F811
 from ._impl_p5b import fire_scheduled  # noqa

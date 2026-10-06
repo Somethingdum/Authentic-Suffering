@@ -1388,6 +1388,11 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "bonded_onlookers_unknowing":                           # D-286: a safety precaution, hands on
+        at_ = trigger.at
+        tgt = (trigger.payload or {}).get("target_id")
+        return [h for h in select(tx, "onlookers_bonded_to_target(trigger.event_id)", trigger)
+                if not _knew_infected(tx, h, tgt, at_)]
     if fn in ("onlookers_of_act", "onlookers_bonded_to_target"):   # D-133
         from ..society._impl_society import _controller
         out = [h for (h,) in tx.query("SELECT DISTINCT holder_id FROM percept_log WHERE event_id=? AND channel='visual' AND "
