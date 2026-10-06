@@ -601,11 +601,15 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     from ..contracts.mind import AmbientPacket, AmbientPerson
     from .actor import fused
     from .perception import place_phrase, word_for
+    from .memory import QUIET_VERBS
     last = tx.query_one("SELECT MAX(at) FROM events WHERE type='SPEECH' AND actor_id=? AND at<=?", (actor_id, at))[0]
     rows = [dict(r) for r in tx.query(
-        "SELECT * FROM percept_log WHERE holder_id=? AND turn_index BETWEEN ? AND ? AND at<=? AND at>? AND "
-        "event_id NOT LIKE 'scene:%' AND (source_id IS NULL OR source_id != ?) ORDER BY at DESC, percept_id DESC LIMIT 4",
+        "SELECT p.*, e.type AS ev_type, json_extract(e.payload,'$.verb') AS ev_verb FROM percept_log p "
+        "LEFT JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? AND p.turn_index BETWEEN ? AND ? AND p.at<=? "
+        "AND p.at>? AND p.event_id NOT LIKE 'scene:%' AND (p.source_id IS NULL OR p.source_id != ?) "
+        "ORDER BY p.at DESC, p.percept_id DESC LIMIT 40",
         (actor_id, turn_index - 1, turn_index, at, -1 if last is None else last, actor_id))]
+    rows = [p for p in rows if not (p["ev_type"] == "ACTION_START" and p["ev_verb"] in QUIET_VERBS)][:4]   # D-293
     if not rows and not idle:
         return None
     PR = tx.rules.packet
@@ -614,8 +618,10 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
         if p["channel"] == "speech":
             det = json.loads(p["detail"]) if isinstance(p["detail"], str) else (p["detail"] or {})
             who = word_for(tx, actor_id, p["source_id"]) if p["source_id"] else "Someone"
-            reached.append(f"{_cap(who)} said{' to you' if det.get('addressed_to_me') else ''}: "
-                           f"\"{cut_heard(det.get('words', ''), PR.max_heard_chars)}\"")
+            words = cut_heard(det.get("words", "") or "", PR.max_heard_chars)
+            to_you = " to you" if det.get("addressed_to_me") else ""
+            reached.append(f"{_cap(who)} said{to_you}: \"{words}\"" if words.strip()
+                           else f"{_cap(who)} said something{to_you} you could not make out")      # D-293
         else:
             reached.append(p["text"])
     v = fused(tx, actor_id).voice
@@ -634,10 +640,12 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     said = [r[0] for r in tx.query("SELECT text FROM voice_lines WHERE actor_id=? AND at<=? ORDER BY at DESC, line_id DESC "
                                    "LIMIT 3", (actor_id, at))][::-1]
     people, handles = [], {}
-    for (b,) in tx.query("SELECT p.source_id FROM percept_log p JOIN bodies b ON b.body_id = p.source_id WHERE "
-                         "p.holder_id=? AND p.turn_index=? AND p.at<=? AND p.source_id != ? AND b.alive=1 AND "
-                         "b.kind='human' GROUP BY p.source_id ORDER BY MIN(p.at), MIN(p.percept_id) LIMIT 6",
-                         (actor_id, turn_index, at, actor_id)):
+    seen_now = [r[0] for r in tx.query("SELECT p.source_id FROM percept_log p JOIN bodies b ON b.body_id = p.source_id WHERE "
+                                       "p.holder_id=? AND p.turn_index=? AND p.at<=? AND p.source_id != ? AND b.alive=1 AND "
+                                       "b.kind='human' GROUP BY p.source_id ORDER BY MIN(p.at), MIN(p.percept_id)",
+                                       (actor_id, turn_index, at, actor_id))]
+    first = [p["source_id"] for p in reversed(rows) if p["source_id"] in seen_now]   # D-293: who reached them, first
+    for b in list(dict.fromkeys(first + seen_now))[:6]:
         h = f"P{len(people) + 1}"
         handles[h] = b
         rel = _row(tx, "SELECT * FROM relationships WHERE from_id=? AND to_id=?", (actor_id, b))

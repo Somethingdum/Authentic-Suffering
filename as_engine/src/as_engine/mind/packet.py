@@ -318,9 +318,12 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
   reached: their percept_log rows of this turn or the one before (turn_index - 1 .. turn_index) that
     are not scene percepts (event_id 'scene:...'), whose source is not themselves, at <= ``at`` and
     later than their own latest SPEECH event (what they spoke after has had its answer); the newest
-    4, oldest first. A speech percept reads f'{word} said' + (' to you' when addressed_to_me) +
+    4, oldest first — (D-293) never a percept of someone's quiet hold (an ACTION_START whose payload
+    verb is in mind.memory.QUIET_VERBS: "Ernesto Medina stops and watches." is no news, and four of
+    them made a room of people each get a call to remark on nothing). A speech percept reads f'{word} said' + (' to you' when addressed_to_me) +
     f': "{words}"' (word = perception.word_for, 'Someone' without a source; the words as heard, cut
-    to PacketRules.max_heard_chars by cut_heard); any other its text. Nothing reached -> None:
+    to PacketRules.max_heard_chars by cut_heard) — (D-293) with no words caught, f'{word} said
+    something' + (' to you') + ' you could not make out', never 'said: ""'; any other its text. Nothing reached -> None:
     nobody talks to the air on code's time — unless (D-150) ``idle``: then reached is [] (a quiet
     moment), and None only when nobody of ``people`` (below) is in their place now (nobody to talk to).
   voice: the fused dossier's — the capsule; 'How you talk: ' + the tendencies, each a sentence (a '.' added to one
@@ -331,7 +334,8 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
     not swear.', rare 'You rarely swear.', frequent 'You swear often.', constant 'You swear all the
     time.'); f'How you sound: {the dialect notes}' (D-244: as a sentence, as the card says it) when not
     empty.
-  where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given.
+  where: perception.place_phrase(their place's name). name: actors.display_name. doing: as given (the
+    prompt says it as a choice, D-293: 'You chose to lie down and sleep.').
   when: (D-159) world_time_text exactly as the SkullPacket words it for them (the clock only with a
     timepiece) — the prompt no longer says "years after the Fall" of a world eighteen days into it.
   state: their body lines (as the SkullPacket's body) but 'Unhurt.', the first 3.
@@ -349,7 +353,8 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
     turn_index mod their count and the one after it (wrapping): a room's small talk is about their lives and
     what their world says, a different thing from turn to turn — never the same few words of the weather.
   people: the living human bodies, not themselves, that are the source of a percept of theirs this
-    turn at <= ``at``, in order of first percept, at most 6: handle P1.., word = word_for, feeling =
+    turn at <= ``at`` — (D-293) the sources of ``reached`` first, in its order (whoever a line speaks
+    of is someone they can see), then the rest in order of first percept — at most 6: handle P1.., word = word_for, feeling =
     the TEMPER-08 words and then their relationship line (as the SkullPacket's), lower-cased and
     joined '; ' ('' with neither). handles: P# -> body id.
 """

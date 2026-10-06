@@ -8,7 +8,7 @@ Where you are: {{ ctx.where }}.
 When: {{ ctx.when }}.
 {% endif %}
 {% if ctx.doing %}
-What you are doing: {{ ctx.doing }}
+You chose to {{ ctx.doing[:1] | lower }}{{ ctx.doing[1:] }}.
 {% endif %}
 {% if ctx.state %}
 How you are: {{ ctx.state | join(' ') }}

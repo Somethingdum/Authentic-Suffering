@@ -1286,6 +1286,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_a_hand_on_the_shoulder.py` | Within reach Owen can put a hand on anyone's shoulder, hug them or kiss them, but kiss no child; touch options sit last on his menu; a touch is felt — in the dark "Someone puts a hand on your shoulder." with no source — and named when seen; welcome (a partner's kiss, a friend's hug) it changes nothing and angers no one; unwelcome (a stranger's hand, arms or kiss, a friend's kiss, a partner feared) it costs trust, is resented, frightens (a kiss) and provokes touched_unwanted / kissed_unwanted, never 'struck' |
 
+### 3.181 Watching is no news (P7; D-293)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_watching_is_no_news.py` | June, Alice and Nita settling in to watch reach Mara as nothing to remark on (no ambient packet); when Alice speaks and June watches, only Alice's words reached her, Alice is the first person she sees, and the prompt says "You chose to stay put and watch everything you can see and hear."; a voice whose words she did not catch reads "Someone said something you could not make out" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
