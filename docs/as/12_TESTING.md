@@ -1292,6 +1292,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_watching_is_no_news.py` | June, Alice and Nita settling in to watch reach Mara as nothing to remark on (no ambient packet); when Alice speaks and June watches, only Alice's words reached her, Alice is the first person she sees, and the prompt says "You chose to stay put and watch everything you can see and hear."; a voice whose words she did not catch reads "Someone said something you could not make out" |
 
+### 3.182 Theirs to doubt (P10; D-294)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_theirs_to_doubt.py` | Every WG6 brief of a generated world gives the sayings under the header that leaves what they make of them to the person, never "and they believe too" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

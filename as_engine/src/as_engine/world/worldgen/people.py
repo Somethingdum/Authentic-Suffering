@@ -64,7 +64,9 @@ WG-27 Posts and people. generated = max(T['detailed_actors'] - placed pack actor
   voice capsule, (D-271) dialect notes ('How they sound', when any), motive, past wound, inner conflict, aspiration, fears,
   signature behaviour and (D-260) current project as
   '- <what>: <text>' lines; 'What happened here, as people tell it:' then the history belief texts
-  (at most 8); 'What people around them say, and they believe too (...)' then every core-lore
+  (at most 8); (D-294) 'What people around them say — they grew up hearing all of it, and some of it contradicts the
+  rest; which of it they swear by, doubt or laugh at is theirs (let it show only where it would):' (it said "and they
+  believe too", and every person was written believing every saying alike) then every core-lore
   belief held by 'common', their cohort or their group's faction (content_ref) — the Writer wrote
   people from a name, an age and a job, blind to the world they live in — and last 'Write their
   dossier: how they look, move, speak and decide.'; fields={'skeleton':

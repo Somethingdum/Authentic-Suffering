@@ -1071,8 +1071,8 @@ def _brief_person(seed, role, skel=None, history=(), dsf=None, lore=()):
         lines.append("What happened here, as people tell it:")
         lines += [f"- {h}" for h in list(history)[:8]]
     if lore:
-        lines.append("What people around them say, and they believe too (nothing in the dossier contradicts it; "
-                     "let it show only where it would):")
+        lines.append("What people around them say — they grew up hearing all of it, and some of it contradicts the "
+                     "rest; which of it they swear by, doubt or laugh at is theirs (let it show only where it would):")   # D-294
         lines += [f"- {x}" for x in lore]
     lines.append("Write their dossier: how they look, move, speak and decide.")
     return "\n".join(lines)
