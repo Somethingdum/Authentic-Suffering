@@ -67,10 +67,13 @@ def lore_lines(tx, holder_id, turn_index, at, n):
             if d.get("words"):
                 speech.append(d["words"])
     seen = set()
+    signs = []                                                        # D-275: a sign seen — gouges, tracks — not a person
     for p in rows:
         if p["channel"] != "visual" or p["fidelity"] not in ("exact", "partial") or not p["source_id"]:
             continue
         r = tx.query_one("SELECT content_ref FROM bodies WHERE body_id=?", (p["source_id"],))
+        if r is None and p["text"] and p["source_id"].startswith("trc_"):
+            signs.append(p["text"])
         if r is not None:
             from .perception import thing_ref
             ref = thing_ref(tx, p["source_id"])                  # D-160: the dead are known by their type
@@ -95,7 +98,7 @@ def lore_lines(tx, holder_id, turn_index, at, n):
             continue
         e = tx.canon.get(ref)
         if ref not in hit:
-            hit[ref] = any(_says(w, a) for w in speech for a in e.about) or bool(set(e.entities) & seen)
+            hit[ref] = any(_says(w, a) for w in speech + signs for a in e.about) or bool(set(e.entities) & seen)
             if not hit[ref] and e.when:
                 if cues is None:
                     cues = cues_of(tx, holder_id, turn_index, at)

@@ -1176,6 +1176,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_his_own_words_quoted.py` | The narration prompt still has every speaker's words quoted exactly, and its echo block forbids the player's word runs only outside quotation marks |
 
+### 3.163 A sign seen (P6; D-275)
+
+| File | What it proves |
+|---|---|
+| `p06_memory/test_a_sign_seen.py` | Mara in front of claw gouges in a door frame has 'that's lurker ground' come to mind (not without them); in front of dragging footprints, 'Noise brings them' |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
