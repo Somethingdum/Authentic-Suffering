@@ -362,6 +362,11 @@ def _legal(tx, intent, land_at):
             return "not_admitted"
     if d.effect == "peek_portal" and _portal(tx, t)["is_open"]:
         return "portal_open"
+    if d.effect == "unbarricade_portal" and t and t.startswith("prt_"):     # D-281: built on the other side
+        from ..physical.space import barricade_side
+        side = barricade_side(tx, t)
+        if side is not None and side != pos["place_id"]:
+            return "wrong_side"
     if d.effect == "climb" and t and t.startswith("prt_"):           # D-280: a window shut or boarded since
         p = _portal(tx, t)
         if p["kind"] == "window" and not (p["is_open"] and p["barricade"] == 0):
@@ -717,9 +722,13 @@ def _lock_quality_up(tx, intent, p, land_at, ctx):
 
 
 def h_barricade(tx, rng, intent, land_at, ctx, d):
+    from ..physical.space import portal_change_event
     _walk_portal(tx, intent, land_at, ctx)
     p = _portal(tx, intent.bound.target_id)
-    _pchange(tx, intent, {"barricade": min(3, p["barricade"] + 1)}, land_at, ctx)
+    ev = portal_change_event(tx, intent.bound.target_id, {"barricade": min(3, p["barricade"] + 1)}, land_at, intent.actor_id,
+                             ctx.start_event_id, ctx.turn_index)
+    ev.payload["side"] = _pos(tx, intent.actor_id)["place_id"]          # D-281: the side it is built on
+    tx.commit_event(ev)
     _noise(tx, intent, "barricade_portal", d.noise_db, land_at, ctx)
     return _done("done")
 

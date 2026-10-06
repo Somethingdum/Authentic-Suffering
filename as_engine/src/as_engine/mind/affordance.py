@@ -30,7 +30,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> Af
     portal         every known portal; per effect: move_through_portal / climb need the far side
                    (always known); open_portal is_open 0 and barricade 0; close_portal is_open 1;
                    lock/unlock/pick_lock kinds door/gate/window, is_open 0; barricade_portal
-                   is_open 0 and barricade < 3; unbarricade_portal barricade > 0; force_portal
+                   is_open 0 and barricade < 3; unbarricade_portal barricade > 0 and (D-281)
+                   space.barricade_side None or the actor's place (cleared from the side it was built
+                   on, forced from the other); force_portal
                    is_open 0; climb_obstacle height_cm > 0 and kind fence or window;
                    peek_portal is_open 0 (a gap); watch_portal any. (D-108) Nothing opens, closes,
                    locks, barricades, forces, peeks through or walks through a fence, a 'climb',

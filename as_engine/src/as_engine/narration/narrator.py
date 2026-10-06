@@ -203,7 +203,7 @@ BLOCKED_TEXT: dict[str, str] = {
     "target_dead": "They are already dead.", "item_gone": "It isn't there any more.",
     "referent_missing": "It isn't where {pc} thought it was.", "portal_closed": "The way is shut.",
     "not_admitted": "{pc} can't fit through.", "out_of_reach": "It's out of reach.", "hands_full": "{pc}'s hands are full.",
-    "portal_open": "It's already open.",
+    "portal_open": "It's already open.", "wrong_side": "{pc} can't get at it from this side.",
 }
 TRAILING_PAREN = re.compile(r"\s*\([^()]*\)\s*$")
 

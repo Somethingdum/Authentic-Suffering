@@ -206,6 +206,8 @@ def _bindings(c, d):
                 continue
             if f == "unbarricade_portal" and not p["barricade"] > 0:
                 continue
+            if f == "unbarricade_portal" and space.barricade_side(c.tx, p["portal_id"]) not in (None, c.place):
+                continue                                    # D-281: from the other side it is forced, not cleared
             if f == "force_portal" and not (p["is_open"] == 0 and p["kind"] not in _NOWALK):
                 continue
             if f == "climb_obstacle" and not (p["height_cm"] > 0 and p["kind"] in ("fence", "window")):

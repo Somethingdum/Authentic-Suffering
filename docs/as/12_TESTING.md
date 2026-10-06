@@ -1212,6 +1212,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_through_the_glass.py` | Mara at the boarded front window is offered no climb or vault over it, boarded or merely shut; opened and unboarded, she is offered the climb; shut again before she gets there, the climb is blocked 'portal_closed' and she is still on the sales floor; Nita is still offered the climb over the chain-link fence |
 
+### 3.169 From the other side (P5; D-281)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_from_the_other_side.py` | The store's front door, barricaded from the start, is the sales floor's to clear: Mara inside is offered it, Nita on Maple Street only forcing it; Nita's clearing from the street is blocked 'wrong_side' and the barricade stands; a barricade Nita builds from the alley names the alley as its side, and Alice in the storeroom is not offered to clear it |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

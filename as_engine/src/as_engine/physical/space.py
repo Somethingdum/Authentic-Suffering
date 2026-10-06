@@ -403,6 +403,25 @@ def point_distance(store: "Store | Tx", a_body: str, b_body: str) -> float | Non
     return None if r is None else r[0]
 
 
+def barricade_side(store: "Store | Tx", portal_id: str) -> str | None:
+    """(D-281) The place a portal's barricade was built from — it is cleared from there, and only forced from
+    the other side: the ``side`` of the latest PORTAL_CHANGE of the portal that raised its barricade and
+    names one (action.effects barricade_portal writes it); else, for one there from the start (worldgen, a
+    scenario), the indoor one of its two places when exactly one is indoor; else None (either side). None
+    too when it is not barricaded."""
+    import json as _json
+    p = _row(store, "SELECT barricade, place_a, place_b FROM portals WHERE portal_id=?", (portal_id,))
+    if p is None or not p["barricade"]:
+        return None
+    for r in store.query("SELECT payload FROM events WHERE type='PORTAL_CHANGE' AND actor_id IS NOT NULL "
+                         "AND json_extract(payload,'$.side') IS NOT NULL AND json_extract(payload,'$.portal_id')=? "
+                         "ORDER BY seq DESC LIMIT 1", (portal_id,)):
+        return _json.loads(r[0])["side"]
+    ins = [pl for pl in (p["place_a"], p["place_b"])
+           if (_row(store, "SELECT indoor FROM places WHERE place_id=?", (pl,)) or {"indoor": 1})["indoor"]]
+    return ins[0] if len(ins) == 1 else None
+
+
 def line_of_sight(store: "Store | Tx", observer_id: str, subject_id: str) -> bool:
     """Same place -> True. Adjacent place through ONE portal that is open or transparent (a wall
     never; a fence only when transparent) -> True when observer or subject is within 3.0 m of that

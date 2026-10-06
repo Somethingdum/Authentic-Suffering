@@ -53,6 +53,8 @@ Legality at landing (EFF-02) — the state as it stands NOW (earlier landings al
   'portal_closed'     move_through_portal / peek through a portal that is closed (peek needs it
                       closed: blocked 'portal_open' when it is open) / flee path blocked / (D-280)
                       a climb over a window that is shut or barricaded now
+  'wrong_side'        (D-281) unbarricade_portal from the side the barricade was not built on
+                      (physical.space.barricade_side is another place): from there it is forced
   'not_admitted'      space.admits() false for the actor
   'out_of_reach'      a touch-range target farther than 1.5 m at landing
   'hands_full'        pick_up / take_from / equip with no free hand (hand_r, then hand_l)
@@ -142,7 +144,9 @@ Per effect (result strings in quotes; 'done' unless noted):
   lock_portal / unlock_portal  needs a carried item tagged 'key' -> {is_locked}; else 'no_key'.
   pick_lock          check vs portal.lock_quality; success -> {is_locked: false}; FAIL
                      'no_progress'; BREAK 'jammed' (no state change; the noise is the cost).
-  barricade_portal / unbarricade_portal  {barricade: +1 / -1}.
+  barricade_portal / unbarricade_portal  {barricade: +1 / -1}; (D-281) barricade_portal's PORTAL_CHANGE payload
+                     also names the side it is built on, ``side`` = the actor's place (physical.space
+                     barricade_side).
   force_portal       S check vs lock_and_barricade; success -> {is_locked: false, barricade: 0,
                      is_open: true, damage: +1}; FAIL 'held'; BREAK 'held' + a minor blunt wound to
                      arm_r of the actor.
