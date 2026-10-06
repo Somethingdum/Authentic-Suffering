@@ -1230,6 +1230,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_in_one_breath.py` | On a quiet turn Owen's seventeen-word line to Mara lands in pieces, with two of the crew settling in meanwhile, and the narrator is handed it as one speech line, 'Owen says, "…"' with the whole line as said |
 
+### 3.172 Heard in one breath (P7; D-284)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_heard_in_one_breath.py` | Owen's seventeen-word question to Mara lands in pieces; on the next turn her thread holds it as one line to her, in his words as said, and waiting on one answer |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

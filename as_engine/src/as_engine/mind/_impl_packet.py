@@ -521,19 +521,31 @@ def thread_lines(tx, holder_id, turn_index, at, names, rules):
         since = max(since, moved[0])
     rows = []
     for r in tx.query("SELECT p.percept_id, p.at, p.fidelity, p.source_id, p.detail, "
-                      "(SELECT seq FROM events e WHERE e.event_id = p.event_id) AS seq FROM percept_log p "
+                      "(SELECT seq FROM events e WHERE e.event_id = p.event_id) AS seq, "
+                      "(SELECT json_extract(e.payload, '$.utterance_id') FROM events e WHERE e.event_id = p.event_id) AS utt "
+                      "FROM percept_log p "
                       "WHERE p.holder_id=? AND p.channel='speech' AND p.turn_index<? AND p.at>=? AND p.at<=? "
                       "AND (p.source_id IS NULL OR p.source_id<>?)", (holder_id, turn_index, since, at, holder_id)):
         det = json.loads(r["detail"]) if isinstance(r["detail"], str) else (r["detail"] or {})
         words = "" if r["fidelity"] == "tone_only" else cut_heard(det.get("words", ""), rules.max_heard_chars)
         rows.append((r["at"], r["seq"] or 0, r["percept_id"], {
             "speaker": names(r["source_id"]) if r["source_id"] else "Someone", "to_me": bool(det.get("addressed_to_me")),
-            "words": words}))
+            "words": words, "utt": r["utt"]}))
     for r in tx.query("SELECT v.line_id, v.at, v.text, (SELECT MIN(e.seq) FROM events e WHERE e.type='SPEECH' AND "
                       "e.cause_event_id = v.event_id AND e.actor_id = v.actor_id AND e.at = v.at) AS seq FROM voice_lines v "
                       "WHERE v.actor_id=? AND v.at>=? AND v.at<?", (holder_id, since, at)):
         rows.append((r["at"], r["seq"] or 0, r["line_id"], {"speaker": "you", "to_me": False, "words": r["text"]}))
     rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    one = []                                     # D-284: the pieces of one utterance, heard one after another, are one line
+    for row in rows:
+        f, prev = row[3], (one[-1][3] if one else None)
+        if f.get("utt") and prev is not None and prev.get("utt") == f["utt"] and prev["speaker"] == f["speaker"]:
+            w = " ".join(x or "…" for x in (prev["words"], f["words"]))
+            one[-1] = (one[-1][0], one[-1][1], one[-1][2], {**prev, "to_me": prev["to_me"] or f["to_me"],
+                                                            "words": "" if w == "… …" else cut_heard(w, rules.max_heard_chars)})
+            continue
+        one.append(row)
+    rows = one
     out = []
     for i, (t, _k, _id, f) in enumerate(rows):
         ans = (f["to_me"] and f["words"] and classify_form(f["words"]) == UtteranceForm.QUESTION

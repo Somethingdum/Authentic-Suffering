@@ -255,7 +255,10 @@ THREAD-01 thread_lines(tx, holder_id, turn_index, at, names, rules) -> list[Thre
   Heard: the holder's percept_log rows of channel 'speech' with turn_index < turn_index (this turn's are
   the utterances), since <= at' <= at (SKULL-10) and source_id distinct from the holder: speaker =
   names(source_id) ('Someone' when source_id is NULL), words = cut_heard(detail.words, max_heard_chars) —
-  '' when the fidelity is tone_only — to_me = detail.addressed_to_me. Said: the holder's voice_lines
+  '' when the fidelity is tone_only — to_me = detail.addressed_to_me; (D-284) heard pieces of one utterance
+  (SEG-01: the same SPEECH payload utterance_id, from the same speaker) that follow one another in the merged
+  order below are one line at the first's time: words joined with one space ('…' for a piece of which only the
+  tone came through; '' when none did), cut_heard again, to_me if any piece was. Said: the holder's voice_lines
   with since <= at' < at: speaker 'you', to_me False. Merged by (at, then the event order: the heard
   SPEECH's seq, or the seq of the speaker's own SPEECH that wrote the line, then id),
   the last rules.max_thread_lines kept, oldest first; ago_text = the beliefs' age words for at - at'.
