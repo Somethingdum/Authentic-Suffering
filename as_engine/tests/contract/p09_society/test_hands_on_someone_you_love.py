@@ -1,7 +1,7 @@
-"""Hands on someone you love (D-282). mind/temper.py TEMPER-03 (manhandled_bonded); core cascade CAS-119..121.
+"""Hands on someone you love (D-282). mind/temper.py TEMPER-03 (manhandled_bonded); core cascade CAS-119..122.
 
 Someone Mara loves hurt in front of her was answered (CAS-040), nearly killed (D-180), threatened or called names
-(D-262) — but shoved about, grabbed and pinned, grabbed at for what was in her hand: nothing. Owen could push June
+(D-262) — but shoved about, grabbed and pinned, grabbed at for what was in her hand, tied hand and foot: nothing. Owen could push June
 around the sales floor all evening and Mara thought no worse of him, and did not so much as bristle. Now hands put on
 someone she loves anger her as if it were done to her, and she holds it against him, each time.
 """
@@ -19,7 +19,7 @@ from as_engine.physical import space
 
 pytestmark = pytest.mark.phase(9)
 
-RULES = ("CAS-119", "CAS-120", "CAS-121")
+RULES = ("CAS-119", "CAS-120", "CAS-121", "CAS-122")
 
 
 def now(w):
@@ -64,3 +64,28 @@ def test_june_manhandled_in_front_of_mara(scenario, def_id):
     assert ("manhandled_bonded", "pc") in got["mara"], got
     assert not got["alice"], "Alice has no bond with June"
     assert resentment(w, "mara") == before[0] + 1 and resentment(w, "alice") == before[1]
+
+
+def trust(w, who):
+    r = w.store.query_one("SELECT trust FROM relationships WHERE from_id = ? AND to_id = ?", (w.id(who), w.id("pc")))
+    return r[0] if r else 0
+
+
+def test_june_tied_up_in_front_of_mara(scenario):
+    """The rope and the knots are the PC's business (D-208); what Mara sees is June's hands and feet tied by him."""
+    from as_engine.contracts.events import Event, EventType
+    w = scenario("metal_fence")
+    scene(w)
+    t = now(w)
+    before = trust(w, "mara"), resentment(w, "mara")
+    with w.store.transaction() as tx:
+        ev = tx.commit_event(Event(type=EventType.ACTION_START, writer="action.resolve", at=t, turn_index=0, actor_id=w.id("pc"),
+                                   payload={"actor_id": w.id("pc"), "def_id": "tie_up", "verb": "manipulate",
+                                            "target_id": w.id("june"), "label": "Tie June's hands and feet with the rope",
+                                            "visible": True, "seen": "ties {target}'s hands and feet with a rope"}))
+        for who in ("mara", "alice"):
+            perception.compile_aftermath(tx, w.id(who), [ev], t + 500, 0)
+        got = {who: [p.kind for p in temper.provocations(tx, w.id(who), 0, t + 1000)] for who in ("mara", "alice")}
+        cascade.sweep(tx, [ev], [r for r in w.canon.all("cascade") if r.id in RULES], t + 1000, 0)
+    assert "manhandled_bonded" in got["mara"] and not got["alice"], got
+    assert (trust(w, "mara"), resentment(w, "mara")) == (before[0] - 1, before[1] + 1)

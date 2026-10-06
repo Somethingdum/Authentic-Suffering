@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-876 ids; 618 with their own statement, 258 named only in context.
+877 ids; 619 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -241,6 +241,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | CAS-119 | Seeing someone you love shoved is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_on_someone_you_love.py` |
 | CAS-120 | Seeing someone you love grabbed and held is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_on_someone_you_love.py` |
 | CAS-121 | Seeing someone you love grabbed at is something you hold against the one who did it. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_on_someone_you_love.py` |
+| CAS-122 | Seeing someone you love tied hand and foot costs the one who did it your trust, and you hold it against them. | as_content/packs/core/cascade/people.yaml | `as_content/packs/core/cascade/people.yaml` | `contract/p09_society/test_hands_on_someone_you_love.py` |
 | CAS-900 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-901 | (named only by tests) |  | — | `contract/p05_many_actors/test_reactions_cascade_plan.py` |
 | CAS-999 | (named only by tests) |  | — | `contract/p09_society/test_timers_society.py` |

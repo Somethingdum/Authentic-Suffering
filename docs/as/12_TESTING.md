@@ -1222,7 +1222,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p09_society/test_hands_on_someone_you_love.py` | Owen shoves June, or grabs and pins her, in front of Mara and Alice: Mara, who loves June, is provoked (manhandled_bonded, toward Owen) and resents him a point more; Alice, who has no bond with June, neither |
+| `p09_society/test_hands_on_someone_you_love.py` | Owen shoves June, or grabs and pins her, in front of Mara and Alice: Mara, who loves June, is provoked (manhandled_bonded, toward Owen) and resents him a point more; Alice, who has no bond with June, neither; June tied hand and foot in front of them costs Owen a point of Mara's trust as well |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

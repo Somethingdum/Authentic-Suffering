@@ -1663,3 +1663,20 @@
       payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: manhandled_your_own}
   delay_s: 0
   cites: [D-282, D-262]
+- schema: as.cascade.v1
+  id: CAS-122
+  description: Seeing someone you love tied hand and foot costs the one who did it your trust, and you hold it against them.
+  trigger_event: ACTION_START
+  where: {def_id: tie_up}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: tied_your_own}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: tied_your_own}
+  delay_s: 0
+  cites: [D-282, D-208]
