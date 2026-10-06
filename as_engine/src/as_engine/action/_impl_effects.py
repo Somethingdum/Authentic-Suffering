@@ -362,6 +362,10 @@ def _legal(tx, intent, land_at):
             return "not_admitted"
     if d.effect == "peek_portal" and _portal(tx, t)["is_open"]:
         return "portal_open"
+    if d.effect == "climb" and t and t.startswith("prt_"):           # D-280: a window shut or boarded since
+        p = _portal(tx, t)
+        if p["kind"] == "window" and not (p["is_open"] and p["barricade"] == 0):
+            return "portal_closed"
     if d.range == "touch" and t and (t.startswith("act_") or t.startswith("wnd_")):
         tb = t if t.startswith("act_") else _row(tx, "SELECT body_id FROM wounds WHERE wound_id=?", (t,))["body_id"]
         if tb != intent.actor_id:

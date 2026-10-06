@@ -212,6 +212,8 @@ def _bindings(c, d):
                 continue
             if f == "vault_obstacle" and not (0 < p["height_cm"] <= 130 and p["kind"] in ("fence", "window")):   # D-108
                 continue
+            if f in ("climb_obstacle", "vault_obstacle") and p["kind"] == "window" and not (p["is_open"] and p["barricade"] == 0):
+                continue                                    # D-280: through a window's opening, never its glass or boards
             if f == "climb_face" and p["kind"] != "climb":
                 continue
             if f == "jump_gap" and p["kind"] != "gap":

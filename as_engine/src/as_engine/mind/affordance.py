@@ -35,7 +35,9 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> Af
                    peek_portal is_open 0 (a gap); watch_portal any. (D-108) Nothing opens, closes,
                    locks, barricades, forces, peeks through or walks through a fence, a 'climb',
                    a 'gap' or an 'edge'; vault_obstacle a fence or window with 0 < height_cm <=
-                   130; climb_face a 'climb' (destination: the other place); jump_gap a 'gap'
+                   130 — (D-280) a window, for either, only open and unbarricaded: it is climbed
+                   through its opening, never its glass or boards; climb_face a 'climb' (destination:
+                   the other place); jump_gap a 'gap'
                    (the other place); drop_down an 'edge' from its higher side (space.drop_m > 0;
                    destination: the landing place).
     body           every known body (not the actor).

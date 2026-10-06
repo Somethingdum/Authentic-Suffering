@@ -1206,6 +1206,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_over_there.py` | With one of the dead two metres past the open back door, Owen's intake reads the walker's line ('… rear alley.') ending with its handle, and the rule that doing something to someone seen in another place starts with going there |
 
+### 3.168 Through the glass (P5; D-280)
+
+| File | What it proves |
+|---|---|
+| `p05_many_actors/test_through_the_glass.py` | Mara at the boarded front window is offered no climb or vault over it, boarded or merely shut; opened and unboarded, she is offered the climb; shut again before she gets there, the climb is blocked 'portal_closed' and she is still on the sales floor; Nita is still offered the climb over the chain-link fence |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

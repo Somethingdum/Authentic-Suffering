@@ -51,7 +51,8 @@ Legality at landing (EFF-02) — the state as it stands NOW (earlier landings al
                  inside the container for take_from)
   'referent_missing'  set by the barrier (a believed referent that never existed at T0)
   'portal_closed'     move_through_portal / peek through a portal that is closed (peek needs it
-                      closed: blocked 'portal_open' when it is open) / flee path blocked
+                      closed: blocked 'portal_open' when it is open) / flee path blocked / (D-280)
+                      a climb over a window that is shut or barricaded now
   'not_admitted'      space.admits() false for the actor
   'out_of_reach'      a touch-range target farther than 1.5 m at landing
   'hands_full'        pick_up / take_from / equip with no free hand (hand_r, then hand_l)
@@ -133,7 +134,8 @@ Per effect (result strings in quotes; 'done' unless noted):
                      a low one, D-108). CLEAN/COST: MOVE to the far side (COST
                      also a minor 'cut' to hand_r instead of the time cost); FAIL: 'no_progress';
                      BREAK: 'fell' — a blunt wound to leg_l, significant when height_cm > 200 else
-                     minor, and posture 'lying'. Ignores admits(): climbing is how a fence is crossed.
+                     minor, and posture 'lying'. Ignores admits(): climbing is how a fence is crossed
+                     (a window only through its opening, D-280: EFF-02 'portal_closed').
   open_portal / close_portal   portal_change_event {is_open: true/false}; open on a locked or
                      barricaded portal -> 'blocked_by_lock' (a result, not ACTION_BLOCKED: you
                      tried the handle and learned something).
