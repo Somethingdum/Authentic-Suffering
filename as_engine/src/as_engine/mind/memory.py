@@ -34,7 +34,10 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
                                 person (D-152, TEXT-01: mind.perception.retell(label, 'first'):
                                 'take my .38 revolver into my hand', not 'your'), first letter
                                 lower-cased; skipped for def_id 'speak' (its SPEECH says it).
-                e.g. 'Said: "Quiet." Chose to move to the rear shelving.'
+                e.g. 'Said: "Quiet." Chose to move to the rear shelving.' (D-285) The pieces of one
+                utterance (SEG-01: SPEECH events with the same payload utterance_id, one after another
+                among the holder's own) are one sentence, their words joined with one space — here
+                and in self_experiences, whose one O-handle is the first piece's event.
   own_expectation_text   payload.goal of the holder's LAST ACTION_START this turn when it is not
                 empty and differs from that start's payload.label; else None.
   self_experiences (B5, Actor Spec §13, AC10) the holder's own events of this turn (actor_id =

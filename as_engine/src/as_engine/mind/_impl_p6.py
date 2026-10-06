@@ -281,19 +281,26 @@ def build_aftermath(tx, holder_id, turn_index, at):
         handles[f"L{i}"] = r["loop_id"]
         loops.append(LoopLine(handle=f"L{i}", kind=r["kind"], text=r["text"]))
     rel_lines = [RelationshipLine(handle=ph[b], text=_rel_text(rels[b])) for b in ents if b in rels]
-    sentences, last_start = [], None
+    sentences, last_start, said = [], None, None
     for e in tx.query("SELECT type, payload FROM events WHERE actor_id=? AND turn_index=? AND type IN ('SPEECH','ACTION_START') ORDER BY seq",
                       (holder_id, turn_index)):
         pl = _j(e["payload"])
         if e["type"] == "SPEECH":
-            sentences.append(f'Said: "{pl["words"]}"')
-        else:
-            last_start = pl
-            if pl["def_id"] == "speak":
+            u = pl.get("utterance_id")
+            if u and said and said[0] == u:                               # D-285: one utterance, said once
+                said = (u, f'{said[1]} {pl["words"]}')
+                sentences[-1] = f'Said: "{said[1]}"'
                 continue
-            lab = retell(_PAREN.sub("", pl.get("label") or pl["def_id"]), "first")     # TEXT-01 (D-152)
-            lab = lab[:1].lower() + lab[1:]
-            sentences.append(f"Chose to {lab}.")
+            said = (u, pl["words"])
+            sentences.append(f'Said: "{pl["words"]}"')
+            continue
+        said = None
+        last_start = pl
+        if pl["def_id"] == "speak":
+            continue
+        lab = retell(_PAREN.sub("", pl.get("label") or pl["def_id"]), "first")     # TEXT-01 (D-152)
+        lab = lab[:1].lower() + lab[1:]
+        sentences.append(f"Chose to {lab}.")
     own = " ".join(sentences) if sentences else None
     expect = None
     if last_start is not None and last_start.get("goal") and last_start.get("goal") != last_start.get("label"):
@@ -302,9 +309,15 @@ def build_aftermath(tx, holder_id, turn_index, at):
     selfx = []
     band_words = {"clean": "It went cleanly.", "cost": "It worked, at a cost.", "fail": "It did not work.", "break": "It went badly wrong."}
     spoke = set()                                                        # D-242: saying it is not a deed to report done
+    said = None
     for e in tx.query("SELECT event_id, type, payload, cause_event_id FROM events WHERE actor_id=? AND turn_index=? AND at<=? "
                       "AND type IN ('SPEECH','ACTION_START','ACTION_COMPLETE','ACTION_BLOCKED') ORDER BY seq", (holder_id, turn_index, at)):
         pl = _j(e["payload"])
+        if e["type"] == "SPEECH" and pl.get("utterance_id") and said and said[0] == pl["utterance_id"]:
+            said = (said[0], f'{said[1]} {pl["words"]}')                  # D-285: one utterance, one O-line
+            selfx[-1] = SelfExperience(handle=selfx[-1].handle, text=f'I said: "{said[1]}"')
+            continue
+        said = (pl.get("utterance_id"), pl["words"]) if e["type"] == "SPEECH" else None
         if e["type"] == "SPEECH":
             txt = f'I said: "{pl["words"]}"'
         elif e["type"] == "ACTION_START":
