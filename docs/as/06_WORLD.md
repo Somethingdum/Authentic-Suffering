@@ -290,6 +290,9 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   nothing in the speaker's hand; at weapon point it is CAS-055 — trusts the one who said it a point less and resents
   them; hearing them called names, or seeing them spat at or given the finger, is resented. Once an hour, however
   often it is said; it angers them there and then (heat, and a reaction this turn), and enough of it breaks them.
+- **Hands on someone you love** (D-282, TEMPER-03 manhandled_bonded, CAS-119..121): seeing someone they love shoved,
+  grabbed and held, or grabbed at for what is in their hand angers them (heat 3, as if it were done to them) and is
+  resented, a point each time — hurt, it is CAS-040's as well.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

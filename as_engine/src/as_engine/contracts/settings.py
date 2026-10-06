@@ -398,6 +398,7 @@ class TemperRules(Strict):
         "struck": 4, "shoved": 3, "grabbed": 3, "threatened": 3, "harmed_bonded": 4, "stole_from": 3,
         "insulted": 2, "ordered_about": 1, "quarreled": 3, "reeked": 1, "bared": 2,
         "threatened_bonded": 3, "insulted_bonded": 2,   # D-262: said to someone you love, in front of you
+        "manhandled_bonded": 3,                         # D-282: hands put on someone you love, in front of you
         "worshipped": 20, "wished_upon": 20, "ingratitude": 20, "wish_forgiven": 0,   # D-102 (TEMPER-10)
     })
     stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1,

@@ -1218,6 +1218,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p05_many_actors/test_from_the_other_side.py` | The store's front door, barricaded from the start, is the sales floor's to clear: Mara inside is offered it, Nita on Maple Street only forcing it; Nita's clearing from the street is blocked 'wrong_side' and the barricade stands; a barricade Nita builds from the alley names the alley as its side, and Alice in the storeroom is not offered to clear it |
 
+### 3.170 Hands on someone you love (P9; D-282)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_hands_on_someone_you_love.py` | Owen shoves June, or grabs and pins her, in front of Mara and Alice: Mara, who loves June, is provoked (manhandled_bonded, toward Owen) and resents him a point more; Alice, who has no bond with June, neither |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

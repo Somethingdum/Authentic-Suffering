@@ -1621,3 +1621,45 @@
       payload: {toward: "$trigger.actor_id", delta: -1}
   delay_s: 0
   cites: [D-267, D-220, STAND-02]
+# D-282 — hands on someone you love. Someone they love hurt (CAS-040) or nearly killed (D-180) in front of them was answered;
+# shoved about or grabbed and pinned in front of them, nothing: a man could push a woman's son around all evening and she
+# thought no worse of him. Now it is held against him, each time.
+- schema: as.cascade.v1
+  id: CAS-119
+  description: Seeing someone you love shoved is something you hold against the one who did it.
+  trigger_event: ACTION_START
+  where: {def_id: shove}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: manhandled_your_own}
+  delay_s: 0
+  cites: [D-282, D-262]
+- schema: as.cascade.v1
+  id: CAS-120
+  description: Seeing someone you love grabbed and held is something you hold against the one who did it.
+  trigger_event: ACTION_START
+  where: {def_id: grapple}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: manhandled_your_own}
+  delay_s: 0
+  cites: [D-282, D-262]
+- schema: as.cascade.v1
+  id: CAS-121
+  description: Seeing someone you love grabbed at is something you hold against the one who did it.
+  trigger_event: ACTION_START
+  where: {def_id: disarm}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: onlookers_bonded_to_target(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: manhandled_your_own}
+  delay_s: 0
+  cites: [D-282, D-262]
