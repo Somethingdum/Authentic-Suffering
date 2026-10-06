@@ -47,7 +47,12 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
        'suggestion_stale'); record_input(mode 'suggestion', raw_text = the entry's label (else the
        option's ui_label), {signature}); no echo record (the player typed nothing).
   INTAKE-03 (3) Empty text -> Rejected('empty', "Type something first.").
-  INTAKE-04 (4) mode 'say': words = the text; with settings.pc_voice == 'my_way' one SAY_MY_WAY call
+  INTAKE-04 (4) mode 'say' (D-290: a text with no quoted span that tells what the PC says rather
+     than saying it — turn._impl_intake.REPORTED: 'I' and a telling verb with someone after it, 'I
+     ask the nearest person what's going on', 'I tell Mara to watch the door', or a saying verb with
+     'to', 'that', 'for', 'what', 'if', … after it, 'I shout for help' — is taken as mode 'do'
+     when settings.pc_voice is not 'my_way'; 'I say we go' and 'I tell you, it wasn't me' are
+     words; record_input keeps mode 'say'): words = the text; with settings.pc_voice == 'my_way' one SAY_MY_WAY call
      (lanes.requests.build_request(config, SAY_MY_WAY, turn_index = T, actor_id = the PC, context
      and ctx = SayMyWayContext(packet, seed_text = text, behavior_notes =
      mind.actor.fused(tx, pc).behavior_law's [topic_handling, plan_carry, distortion, pressure]
@@ -106,6 +111,13 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      made is dropped); with quotes the speech intent built above carries the gesture the IntakeOutput
      alone would give (to_intent of the IntakeOutput; none when that is an IntentError). A gesture and
      nothing else is the option to stay where you are (core wait_here), which the prompt says.
+  INTAKE-09 (D-290) In so many words. The player tells what the PC says without quoting it: the
+     INTAKE call's answer carries ``words``, the words said aloud ('I ask Mara where the keys are'
+     -> 'Mara, where are the keys?'). Without quotes and with words (action.intent.said_aloud of
+     them, empty -> none): when the chosen option's target is a body with an entity handle in the
+     packet, the addressee is that body; a chosen 'speak' option -> the speech intent with those
+     words to the addressee; any other option -> the 'with quotes' intent above with those words as
+     the speech. Words the player quoted are never replaced.
   INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time
   passes and the input is not consumed (the player can rephrase).
 

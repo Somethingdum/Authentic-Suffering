@@ -1268,6 +1268,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p10_world/test_two_of_a_kind.py` | Over twelve standard regions no site name is numbered and none repeats in its zone; a second shop of a kind is named for a family of the names record ("Okafor's Gas Station"), a second hall for a church of atlas.CHURCH_NAMES, a second utility by a qualifier of atlas.SITE_QUALIFIERS, a second house for another family; every name reads after 'in' without a doubled article |
 | `p10_world/test_region.py` | (vector amended) seed 8's two repeated wild places carry new names; every draw on 'worldgen:region' is as it was |
 
+### 3.178 In so many words (P7; D-290)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_in_so_many_words.py` | "I ask Mara where the water came from." in the Do box and in the Say box reaches the intake, whose prompt names the "words" field, and Owen says its words ('Mara, where did the water come from?') to Mara; "I say we leave tonight." and "I tell you, it wasn't me." in the Say box are said as typed, with no intake call |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

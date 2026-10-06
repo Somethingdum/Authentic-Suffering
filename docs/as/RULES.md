@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-877 ids; 619 with their own statement, 258 named only in context.
+878 ids; 620 with their own statement, 258 named only in context.
 
 
 ## ABUSE
@@ -752,11 +752,12 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 | INTAKE-01 | INTAKE-01 (1) perception.compile_scene(tx, pc, t0, turn_index); aff = mind.affordance.enumerate_affordances(tx, pc, tx.canon.all('affordance'), t0, turn_index, waking=True) (SLEEP-03, D-171: asleep, the player still cho… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_waking_up.py` |
 | INTAKE-02 | INTAKE-02 (2) A suggestion chip (submit.suggestion_ref): entry = session.extras['suggestions'][ref] (service.view writes them) — missing -> Rejected('suggestion_stale', "That option is gone; things have changed."). * an… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-03 | INTAKE-03 (3) Empty text -> Rejected('empty', "Type something first."). | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
-| INTAKE-04 | INTAKE-04 (4) mode 'say': words = the text; with settings.pc_voice == 'my_way' one SAY_MY_WAY call (lanes.requests.build_request(config, SAY_MY_WAY, turn_index = T, actor_id = the PC, context and ctx = SayMyWayContext(p… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_my_way_words_only.py` |
+| INTAKE-04 | INTAKE-04 (4) mode 'say' (D-290: a text with no quoted span that tells what the PC says rather than saying it — turn._impl_intake.REPORTED: 'I' and a telling verb with someone after it, 'I ask the nearest person what's… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_in_so_many_words.py`, `contract/p07_slice/test_my_way_words_only.py` |
 | INTAKE-05 | INTAKE-05 (5) mode 'do': quotes = lanes.parse.extract_quotes(text); rest = the text with every quoted span ("…" or “…”) replaced by ' ', stripped; addressee = addressee_for(...) — ALWAYS called here, before anything els… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_a_line_they_dont_cross.py`, `contract/p07_slice/test_over_there.py` |
 | INTAKE-06 | INTAKE-06 Rejected leaves the transaction to roll back: nothing of the turn is kept, no time passes and the input is not consumed (the player can rephrase). | as_engine/turn/intake.py | `as_engine/turn/intake.py` | — |
 | INTAKE-07 | INTAKE-07 (D-121) The second look. The menu is a short first list ranked for a mind deciding (AFF-07, PacketRules.max_affordances); the player may mean anything the PC could do. When the call answers 'NONE' with a none_… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_place_told_of_him.py`, `contract/p07_slice/test_the_second_look.py`, `contract/p07_slice/test_waking_up.py`, `contract/p08_ui_protocol/test_turns_protocol.py` |
 | INTAKE-08 | INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up: the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is lanes.schemas.intake_schem… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_the_players_hands.py` |
+| INTAKE-09 | INTAKE-09 (D-290) In so many words. The player tells what the PC says without quoting it: the INTAKE call's answer carries ``words``, the words said aloud ('I ask Mara where the keys are' -> 'Mara, where are the keys?')… | as_engine/turn/intake.py | `as_engine/turn/intake.py` | `contract/p07_slice/test_in_so_many_words.py` |
 
 ## INTENT
 

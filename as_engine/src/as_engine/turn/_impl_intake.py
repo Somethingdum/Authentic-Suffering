@@ -17,6 +17,13 @@ NONE_MESSAGES = {
 }
 PLAYER_REASON = "The player chose this."
 QUOTE_SPAN = re.compile(r'"[^"]*"|“[^”]*”')
+# D-290: a Say line that tells what the PC says rather than saying it ("I ask the nearest person what's going on")
+REPORTED = re.compile(
+    r"^\s*[Ii]\s+(?:(?:ask|tell|order|beg|warn|remind|urge|instruct|inform|command|invite|assure|threaten)\s+"
+    r"(?!you\b)(?:him|her|them|everyone|everybody|anyone|anybody|someone|somebody|the|a|an|my|his|their|[A-Z][\w'-]*)\b"
+    r"|(?:say|shout|yell|whisper|call|mutter|scream|holler|murmur|reply|answer|explain|admit|insist|plead|announce|"
+    r"suggest|swear|confess|cry|snap|growl|hiss|ask)\s+(?:to|that\s|at|for|back|out|loudly|quietly|softly|calmly|"
+    r"firmly|if|whether|what|where|why|how|who|when)\b)")
 
 
 class Rejected(Exception):
@@ -199,6 +206,8 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         raw_mode = mode
     if not text:
         raise Rejected("empty", "Type something first.")
+    if mode == "say" and session.settings.pc_voice != "my_way" and not QUOTE_SPAN.search(text) and REPORTED.match(text):
+        mode = "do"                       # D-290: the player told what the PC says; the intake finds the words
     if mode == "say":
         words = text
         if session.settings.pc_voice == "my_way":
@@ -253,14 +262,23 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         if out.choice == "NONE":
             code = out.none_reason or "unclear"
             raise Rejected(code, NONE_MESSAGES[code], out.clarify)
-        if quotes:
+        sig = pkt.handles.get(out.choice)
+        chosen = next((o for o in (aff.pool or aff.options) if o.signature == sig), None)
+        words = None
+        if not quotes and out.words:                                   # D-290: what the player said the PC says
+            from ..action.intent import said_aloud
+            words = said_aloud(out.words) or None
+            if chosen is not None and chosen.target_id and _entity_handle(pkt, chosen.target_id):
+                addressee = chosen.target_id                           # 'I ask Mara …': to Mara
+        if words and chosen is not None and chosen.def_id == "speak":
+            it = _speech_intent(pkt, aff, words, addressee, lod)
+            info["addressee"] = addressee
+        elif quotes or words:
             eh = _entity_handle(pkt, addressee) if addressee else None
-            sig = pkt.handles.get(out.choice)
-            chosen = next((o for o in (aff.pool or aff.options) if o.signature == sig), None)
             pace = out.pace if chosen is not None and out.pace in chosen.paces else "normal"
             co = ActionPayload(choice=out.choice, pace=pace,
-                               speech={"text": " ".join(q.strip() for q in quotes), "to": [eh] if eh else ["everyone"],
-                                       "volume": "normal"},
+                               speech={"text": " ".join(q.strip() for q in quotes) if quotes else words,
+                                       "to": [eh] if eh else ["everyone"], "volume": "normal"},
                                goal=(out.manner or _label(pkt, out.choice)), private_reason=PLAYER_REASON)
             it = to_intent(pkt, aff, co, lod=lod, source="human")
             if not isinstance(it, IntentError):

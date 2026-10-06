@@ -350,7 +350,9 @@ class IntakeOutput(Strict):
     ('carefully', 'quietly' -> careful; 'quickly', 'in a hurry' -> rushed) where the option supports
     it; ``manner`` is colour only; (D-136) ``gesture`` is a G# handle of the packet when the words
     make one of its gestures alongside the option (a nod, a shrug, empty hands held up); (D-147) a
-    none_reason 'wont' is a line the character does not cross (its own card's, L12)."""
+    none_reason 'wont' is a line the character does not cross (its own card's, L12); (D-290) ``words``
+    is what the character says aloud when the player told it without quotation marks ('I ask Mara
+    where the keys are' -> 'Mara, where are the keys?'), else null."""
 
     choice: str = Field(description="Affordance handle or 'NONE'.")
     none_reason: Literal[
@@ -361,6 +363,8 @@ class IntakeOutput(Strict):
     gesture: str | None = Field(default=None, description="G# handle of a gesture the player's words make, or null.")
     remainder: str | None = Field(default=None, max_length=200, description="Rest of a multi-step instruction, queued as a suggestion.")
     clarify: str | None = Field(default=None, max_length=200)
+    words: str | None = Field(default=None, max_length=300,
+                              description="What the character says aloud when the player only told it, or null.")
 
 
 class BeliefWrite(Strict):
