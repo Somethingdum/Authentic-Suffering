@@ -29,4 +29,4 @@ WHAT THEY PERCEIVED
 {% if a.open_loops %}THINGS HANGING OVER THEM
 {% for l in a.open_loops %}- {{ l.handle }} ({{ l.kind.value | replace('_', ' ') }}): {{ l.text }}
 {% endfor %}{% endif %}
-Cue words you may use for a lesson: {{ cue_ids | join(', ') }}
+{% if cue_ids %}Cue words you may use for a lesson: {{ cue_ids | join(', ') }}{% endif %}

@@ -498,12 +498,15 @@ async def after_commit(ctx, notices):
 
         async def do_writeback():
             from ..lanes.scheduler import Job, run_jobs
+            from ..mind.cues import cues_of
             groups = writeback_groups(packets) + [[k] for k in retry_packets]
             jobs = []
+            every = {c.id for c in _cues(store)}
+            wb_now = store.query_one("SELECT now_ms FROM world_clock")[0]
             for g in groups:
                 a = allp[g[0]]
                 ctxw = WritebackContext(aftermath=a)
-                cue_ids = [c.id for c in _cues(store)]
+                cue_ids = sorted(cues_of(store, a.holder_id, T, wb_now) & every)        # D-273: what is in this moment
                 sch = writeback_schema([x.handle for x in a.percepts] + [u.handle for u in a.utterances] + [o.handle for o in a.self_experiences] or ["S1"],
                                        [e.handle for e in a.entities], [l.handle for l in a.open_loops])
                 req = build_request(s.config, CallClass.WRITEBACK, turn_index=T, actor_id=a.holder_id, context=ctxw, json_schema=sch,

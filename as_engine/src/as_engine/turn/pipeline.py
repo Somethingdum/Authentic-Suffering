@@ -206,7 +206,10 @@ after_commit — stages 13-19, each in its own transaction; a failure here never
     WRITEBACK, turn_index=T, actor_id = the packet's holder, context=WritebackContext(
     aftermath=packet), json_schema = lanes.schemas.writeback_schema(its percept handles + its
     utterance handles + (B5) its self-experience O handles, entity handles, open-loop handles),
-    a=packet, cue_ids = the sorted ids of every canon cue); Job(job_id = the group's first entry,
+    a=packet, cue_ids = (D-273) the sorted ids of the canon cues present for the packet's holder now
+    (mind.cues.cues_of(store, holder, T, world_clock.now_ms)) — a lesson drawn from this moment names what is
+    in it, and seventy words of registry were in every memory call; apply_writeback still accepts every
+    canon cue); Job(job_id = the group's first entry,
     call_class WRITEBACK, request, output_model WritebackOutput, lane_pref = request.lane, est_s =
     SchedulerRules.estimated_call_s['writeback']). (P11, PORT-06) Then, for the i-th entry of
     retro = audit.portrayal.jobs(config, the Judged decisions every wave's decide collected
