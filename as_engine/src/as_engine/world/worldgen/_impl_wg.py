@@ -316,6 +316,28 @@ def _first_names_record(canon):
     return canon.get(canon.refs("names")[0])
 
 
+SN = "worldgen:sites"
+
+
+def _another_name(rng, tx, a, fam, seen, key):
+    """D-289: a name for a second building of archetype ``a`` in a zone, not in ``seen``, drawn on its own stream (the
+    region's draws stay as they were): a house or apartment of another family; a shop after the family that ran it
+    ("Okafor's Gas Station"); a hall after its church ("Trinity Church Hall"); anything else by where it stands ("the
+    lower pump house"). None when every one is taken."""
+    title = " ".join(w[:1].upper() + w[1:] for w in a.name.split())
+    if a.kind in ("house", "apartment"):
+        noun = "house" if a.kind == "house" else "apartment"
+        pool = [f"The {f} {noun}" for f in fam]
+    elif a.kind == "shop":
+        pool = [f"{f}'s {title}" for f in fam]
+    elif a.kind == "hall":
+        pool = [f"{c} {title}" for c in atlas.CHURCH_NAMES]
+    else:
+        pool = [f"{q} {a.name.lower()}" for q in atlas.SITE_QUALIFIERS]
+    pool = [x for x in pool if x not in seen]
+    return rng.choice(tx, SN, f"name:{key}", pool) if pool else None
+
+
 def build_region(rng, tx, params, detail, canon, at):
     from .region import Region, Route, Zone, danger
     T = tables.DETAIL_TIERS[detail]
@@ -351,6 +373,9 @@ def build_region(rng, tx, params, detail, canon, at):
             sid = tx.mint("plc")
             if not arch:
                 name = rng.choice(tx, SR, f"outdoor:{i}:{j}", list(atlas.OUTDOOR_PLACE_NAMES))
+                left = [x for x in atlas.OUTDOOR_PLACE_NAMES if x not in seen]
+                if name in seen and left:                              # D-289: not a second 'hunting blind'
+                    name = rng.choice(tx, SN, f"outdoor:{i}:{j}", left)
                 vals = {"place_id": sid, "zone_id": zid, "parent_id": None, "kind": "outdoor", "archetype_ref": None,
                         "width_m": 20.0, "depth_m": 20.0, "indoor": 0, "material": "open_air", "light_level": 3,
                         "ambient_db": 30.0, "layout_generated": 1, "held": 0, "props": {}}
@@ -363,13 +388,18 @@ def build_region(rng, tx, params, detail, canon, at):
                     name = f"The {f} {'house' if a.kind == 'house' else 'apartment'}"
                 else:
                     name = a.name
+                if name in seen:                                       # D-289: two of a kind
+                    name = _another_name(rng, tx, a, fam, seen, f"{i}:{j}") or name
                 vals = {"place_id": sid, "zone_id": zid, "parent_id": None, "kind": "building", "archetype_ref": ref,
                         "width_m": 15.0, "depth_m": 10.0, "indoor": 0, "material": "open_air", "light_level": 3,
                         "ambient_db": 32.0, "layout_generated": 0, "held": 0, "props": {}}
                 anc = ("the front", 7.5, 1.0)
-            seen[name] = seen.get(name, 0) + 1
-            if seen[name] > 1:
-                name = f"{name} ({seen[name]})"
+            if name in seen:
+                k = 2
+                while f"{name} ({k})" in seen:
+                    k += 1
+                name = f"{name} ({k})"
+            seen[name] = 1
             vals["name"] = name
             ws.append(W("places", vals))
             aid = tx.mint("anc")

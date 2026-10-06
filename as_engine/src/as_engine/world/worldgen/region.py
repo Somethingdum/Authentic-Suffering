@@ -25,15 +25,25 @@ build_region(rng, tx, params, detail, canon, at) -> Region
         the street' (kind 'feature', x 30, y 10, cover 0, concealment 0);
       T['places_per_zone'] SITES, j = 0.. in order. Archetypes = the canon building records whose
         kind is in atlas.ZONE_BUILDING_KINDS[kind], by ref. None -> an OUTDOOR site: kind 'outdoor',
-        name = rng.choice(atlas.OUTDOOR_PLACE_NAMES, purpose f"outdoor:{i}:{j}"), width 20, depth 20,
+        name = rng.choice(atlas.OUTDOOR_PLACE_NAMES, purpose f"outdoor:{i}:{j}") — (D-289) a name already
+        used in this zone is drawn again among the outdoor names not yet used here, on the stream
+        'worldgen:sites' (same purpose), while there are any — width 20, depth 20,
         indoor 0, open_air, light 3, ambient_db 30, layout_generated 1, anchor 'the middle' (feature,
         10, 10). Otherwise a BUILDING site: ref = rng.choice(archetype refs, purpose f"building:{i}:{j}");
         kind 'building', archetype_ref = ref, layout_generated 0 (rooms come at discovery,
         physical.space.discover_layout), width 15, depth 10, indoor 0, open_air, light 3, ambient_db
         32, anchor 'the front' (feature, 7.5, 1); name: archetype kind 'house' -> f"The {family}
         house", 'apartment' -> f"The {family} apartment" (family = rng.choice(the family names of the
-        first canon names record by id, purpose f"family:{i}:{j}")), else the archetype's name; a name
-        already used in this zone gets f" ({k})" with k = 2, 3, …;
+        first canon names record by id, purpose f"family:{i}:{j}")), else the archetype's name; (D-289)
+        a name already used in this zone is replaced by rng.choice on the stream 'worldgen:sites'
+        (purpose f"name:{i}:{j}"; the region's own stream is not drawn, so its draws stay as they
+        were) among the names not yet used here: house / apartment f"The {family} house|apartment"
+        over every family; 'shop' f"{family}'s {Archetype Name In Title Case}" ("Okafor's Gas
+        Station": the family that ran it); 'hall' f"{church} {Title}" over atlas.CHURCH_NAMES
+        ("Trinity Church Hall"); any other kind f"{qualifier} {archetype name lower-cased}" over
+        atlas.SITE_QUALIFIERS ("the lower pump house"). Only when none is left (and for an outdoor
+        name past the eighth) does a name already used get f" ({k})", k = 2, 3, … the first not
+        taken;
       per site its FRONTAGE, an anchor of the hub (kind 'feature', cover 0, concealment 0, x =
         round(60 x (j + 0.5) / T['places_per_zone'], 1), y = 1 when j is even, else 19) named
         f"the front of {perception.place_phrase(site name)}" for a building site, f"the path to

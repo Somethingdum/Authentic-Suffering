@@ -1261,6 +1261,13 @@ config reads the repository's packs (where `cheat_admin` lives).
 | `p07_slice/test_heard_whole.py` | Owen's long question to Mara lands in pieces, the first of them no question on its own; her reaction packet shows it as one utterance with every word and the form question, and her aftermath of the turn agrees |
 | `p07_slice/test_let_him_finish.py` | (amended) what she reacts to is the whole line as one utterance |
 
+### 3.177 Two of a kind (P10; D-289)
+
+| File | What it proves |
+|---|---|
+| `p10_world/test_two_of_a_kind.py` | Over twelve standard regions no site name is numbered and none repeats in its zone; a second shop of a kind is named for a family of the names record ("Okafor's Gas Station"), a second hall for a church of atlas.CHURCH_NAMES, a second utility by a qualifier of atlas.SITE_QUALIFIERS, a second house for another family; every name reads after 'in' without a doubled article |
+| `p10_world/test_region.py` | (vector amended) seed 8's two repeated wild places carry new names; every draw on 'worldgen:region' is as it was |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

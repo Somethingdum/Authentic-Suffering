@@ -83,6 +83,15 @@ OUTDOOR_PLACE_NAMES: tuple[str, ...] = (
     "a clearing", "the old campsite", "a dry creek bed", "a fallen water tower", "a burnt-out barn",
     "a hunting blind", "a ranger's lookout", "a wrecked bus",
 )
+# D-289: what a second building of a kind in one zone is called instead of 'Gas station (2)': a shop after the family
+# that ran it ("Okafor's Gas Station"), a hall after its church ("Trinity Church Hall"), anything else by where it stands
+CHURCH_NAMES: tuple[str, ...] = (
+    "Trinity", "Grace", "St. Jude's", "First Baptist", "Holy Cross", "St. Brendan's", "Good Shepherd", "Calvary",
+    "St. Agnes'", "Bethel", "Mount Zion", "St. Michael's",
+)
+SITE_QUALIFIERS: tuple[str, ...] = (
+    "the old", "the lower", "the upper", "the north", "the south", "the east", "the west", "the new",
+)
 # infected / hostile density modifiers by zone kind (added to the C-block values, then clamped 0..10)
 ZONE_DANGER_MOD: dict[str, dict[str, int]] = {
     "downtown": {"shambler": 2, "horde": 1}, "residential": {}, "industrial": {"hostile": 1},
