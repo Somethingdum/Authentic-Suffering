@@ -9,7 +9,8 @@ MEM-01 build_aftermath(tx, holder_id, turn_index, at) -> AftermathPacket   (Stag
   percept rows  the holder's percept_log rows with this turn_index and at <= ``at`` (SKULL-10; at
                 stage 13 ``at`` is the end of the window, so every row of the turn), except
                 standing-view rows (event_id 'scene:…') older than the latest standing view among
-                them, ordered (at, percept_id); (D-288) the pieces of one utterance are one row,
+                them, ordered (at, percept_id), (D-295) and no eyewitness story's visual 'rumour:'
+                row; (D-288) the pieces of one utterance are one row,
                 exactly as in the Skull Packet's S1..Sn (mind.packet).
   handles       S1..Sn over percepts and utterances together, in that order (one numbering);
                 P1..Pn bodies, each once, never the holder: the source_id of those rows when it is

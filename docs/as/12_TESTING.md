@@ -1298,6 +1298,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p10_world/test_theirs_to_doubt.py` | Every WG6 brief of a generated world gives the sayings under the header that leaves what they make of them to the person, never "and they believe too" |
 
+### 3.183 Heard once, said right (P7; D-295)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_heard_once_said_right.py` | Owen calls Mara a coward: the story is hers (a 'rumour:' row), it is among her beliefs, and it is not among what she perceives — not in her reaction packet, not in her memory of the turn — so "insulted you." is said once in her prompt; an order, an offer and a threat "came across as an order", "an offer", "a threat" |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

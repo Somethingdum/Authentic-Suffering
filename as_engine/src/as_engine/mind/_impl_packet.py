@@ -267,6 +267,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
                                           "ORDER BY at, percept_id", (actor_id, turn_index, at))]   # SKULL-10
     scene_at = max((p["at"] for p in percepts if str(p["event_id"]).startswith("scene:")), default=None)
     percepts = [p for p in percepts if not str(p["event_id"]).startswith("scene:") or p["at"] == scene_at]
+    percepts = [p for p in percepts if not _story_seen(p)]          # D-295: what they saw is there; the story is a belief
     from ._impl_p6 import fold_pieces
     percepts = fold_pieces(tx, percepts)                            # D-288: one utterance, one line
     body_ids = {r[0] for r in tx.query("SELECT body_id FROM bodies")}
@@ -596,6 +597,11 @@ _SWEARS = {"none": "You do not swear.", "rare": "You rarely swear.", "frequent":
            "constant": "You swear all the time."}
 
 
+def _story_seen(p):
+    """D-295: the percept an eyewitness story is granted on (world.rumours.seed seen=True) — a visual 'rumour:' row."""
+    return str(p["event_id"]).startswith("rumour:") and p["channel"] == "visual"
+
+
 def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     # AMB-01 (D-128): what a COLD person has to go on to say one thing — their own records only
     from ..contracts.mind import AmbientPacket, AmbientPerson
@@ -606,7 +612,8 @@ def ambient_packet(tx, actor_id, turn_index, at, *, doing="", idle=False):
     rows = [dict(r) for r in tx.query(
         "SELECT p.*, e.type AS ev_type, json_extract(e.payload,'$.verb') AS ev_verb FROM percept_log p "
         "LEFT JOIN events e ON e.event_id = p.event_id WHERE p.holder_id=? AND p.turn_index BETWEEN ? AND ? AND p.at<=? "
-        "AND p.at>? AND p.event_id NOT LIKE 'scene:%' AND (p.source_id IS NULL OR p.source_id != ?) "
+        "AND p.at>? AND p.event_id NOT LIKE 'scene:%' AND NOT (p.event_id LIKE 'rumour:%' AND p.channel = 'visual') "
+        "AND (p.source_id IS NULL OR p.source_id != ?) "
         "ORDER BY p.at DESC, p.percept_id DESC LIMIT 40",
         (actor_id, turn_index - 1, turn_index, at, -1 if last is None else last, actor_id))]
     rows = [p for p in rows if not (p["ev_type"] == "ACTION_START" and p["ev_verb"] in QUIET_VERBS)][:4]   # D-293

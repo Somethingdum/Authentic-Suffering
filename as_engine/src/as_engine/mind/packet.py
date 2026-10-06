@@ -41,7 +41,10 @@ Handles (never an internal id in anything rendered — SKULL-06 is tested over t
           ordered (at, percept_id),
           EXCEPT standing-view rows (event_id starting 'scene:') older than the latest standing
           view among those rows (only the rows with the greatest ``at`` among them count: a
-          room described twice is shown once, as it is now); (D-288) the speech rows of one
+          room described twice is shown once, as it is now); (D-295) never the visual row an
+          eyewitness story is granted on (event_id 'rumour:…', world.rumours.seed seen=True: "Owen
+          insulted you.") — what they saw or heard is its own row, and the story is a belief
+          ("What you believe"), not a second thing perceived; (D-288) the speech rows of one
           utterance's pieces (SEG-01: the same SPEECH payload utterance_id, from the same source)
           are ONE row, at the first piece's place and with its percept_id: their words joined by
           one space (' …' standing for a piece of which only the tone came), the fidelity they
@@ -318,7 +321,7 @@ AMB-01 ambient_packet(tx, actor_id, turn_index, at, *, doing='', idle=False) -> 
   reached: their percept_log rows of this turn or the one before (turn_index - 1 .. turn_index) that
     are not scene percepts (event_id 'scene:...'), whose source is not themselves, at <= ``at`` and
     later than their own latest SPEECH event (what they spoke after has had its answer); the newest
-    4, oldest first — (D-293) never a percept of someone's quiet hold (an ACTION_START whose payload
+    4, oldest first — (D-295) never an eyewitness story's visual 'rumour:' row; (D-293) never a percept of someone's quiet hold (an ACTION_START whose payload
     verb is in mind.memory.QUIET_VERBS: "Ernesto Medina stops and watches." is no news, and four of
     them made a room of people each get a call to remark on nothing). A speech percept reads f'{word} said' + (' to you' when addressed_to_me) +
     f': "{words}"' (word = perception.word_for, 'Someone' without a source; the words as heard, cut

@@ -140,7 +140,7 @@ What reaches you
 
 What you heard
 {% for u in p.utterances %}
-- {{ u.handle }}: {% if u.speaker_handle %}{{ u.speaker_handle }}{% else %}Someone you could not place{% endif %} ({{ standing_words[u.standing.value] }}) {{ volume_words[u.volume.value] }}{% if u.addressed_to_me %} to you{% endif %}, and you heard it {{ fidelity_words[u.fidelity.value] }}: {% if u.words %}"{{ u.words }}"{% else %}(no words){% endif %} It came across as a {{ u.form.value }}.
+- {{ u.handle }}: {% if u.speaker_handle %}{{ u.speaker_handle }}{% else %}Someone you could not place{% endif %} ({{ standing_words[u.standing.value] }}) {{ volume_words[u.volume.value] }}{% if u.addressed_to_me %} to you{% endif %}, and you heard it {{ fidelity_words[u.fidelity.value] }}: {% if u.words %}"{{ u.words }}"{% else %}(no words){% endif %} It came across as {{ 'an' if u.form.value[:1] in 'aeiou' else 'a' }} {{ u.form.value }}.
 {% endfor %}
 {% endif %}
 

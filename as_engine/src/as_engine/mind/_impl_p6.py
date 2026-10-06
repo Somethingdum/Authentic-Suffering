@@ -210,7 +210,8 @@ def select_percepts(tx, holder, turn_index, at):
     rows = [dict(r) for r in tx.query("SELECT * FROM percept_log WHERE holder_id=? AND turn_index=? AND at<=? "
                                       "ORDER BY at, percept_id", (holder, turn_index, at))]   # SKULL-10
     scene_at = max((p["at"] for p in rows if str(p["event_id"]).startswith("scene:")), default=None)
-    return [p for p in rows if not str(p["event_id"]).startswith("scene:") or p["at"] == scene_at]
+    from ._impl_packet import _story_seen
+    return [p for p in rows if (not str(p["event_id"]).startswith("scene:") or p["at"] == scene_at) and not _story_seen(p)]
 
 
 def fold_pieces(tx, rows):
