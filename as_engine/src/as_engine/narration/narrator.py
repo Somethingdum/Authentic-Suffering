@@ -36,6 +36,12 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
           (P12, CHEAT-14: the Boss's wonder, cheats.commands.take_wonder) f"{pc} {seen}." — it is
           not chosen and tried, it happens ("Willis walks straight through the wall.");
         SPEECH  kind 'speech', text f'{pc} says, "{words}"', speaker pc, words = payload.words;
+          (D-283) in one breath: the speech lines of the pieces of one utterance (SEG-01; the same SPEECH
+          payload utterance_id — the PC's own, or the percepts of another's) are one line, at the first
+          piece's place in the order below, words joined with one space and the text the first's with its
+          quoted words replaced — when every line between them is a sight or a smell and both pieces'
+          words were caught (never across another voice or a sound: a shot mid-sentence is told where it
+          fell);
         CHECK_RESOLVED  BAND_TEXT[payload.band] (bands not listed: no line);
         ACTION_COMPLETE  RESULT_TEXT[payload.result].format(pc=pc) (results not listed: no line);
         ACTION_BLOCKED  BLOCKED_TEXT[payload.cause].format(pc=pc) (causes not listed: no line);

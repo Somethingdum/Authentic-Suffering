@@ -35,6 +35,26 @@ def _row(s, sql, p=()):
     return dict(r) if r is not None else None
 
 
+def _one_breath(lines, breath):
+    # D-283: the pieces of one utterance are one line, at the first piece's place — across what was only seen or
+    # smelt meanwhile, never across another voice or a sound (a shot mid-sentence is told where it fell)
+    out, last = [], {}
+    for ln in lines:
+        u = breath.get(id(ln)) if ln.kind == "speech" else None
+        i = last.get(u) if u else None
+        if i is not None:
+            prev = out[i]
+            quiet = all(x.kind in ("sight", "smell") for x in out[i + 1:])
+            if quiet and prev.words and ln.words and f'"{prev.words}"' in prev.text:
+                joined = f"{prev.words} {ln.words}"
+                out[i] = prev.model_copy(update={"words": joined, "text": prev.text.replace(f'"{prev.words}"', f'"{joined}"', 1)})
+                continue
+        if u:
+            last[u] = len(out)
+        out.append(ln)
+    return out
+
+
 def pc_first_name(tx, pc_id):
     return _row(tx, "SELECT display_name FROM actors WHERE actor_id=?", (pc_id,))["display_name"].split()[0]
 
@@ -122,6 +142,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     sex = (_row(tx, "SELECT sex FROM bodies WHERE body_id=?", (pc_id,)) or {"sex": None})["sex"]
     wt = world_time(at)
     entries = []
+    breath = {}
     for p in tx.query("SELECT pl.*, e.seq AS ev_seq FROM percept_log pl LEFT JOIN events e ON e.event_id=pl.event_id "
                       "WHERE pl.holder_id=? AND pl.turn_index=? AND pl.event_id NOT LIKE 'scene:%'", (pc_id, turn_index)):
         p = dict(p)
@@ -130,6 +151,8 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         if kind == "speech":
             line = NarratorLine(seconds=max(0, p["at"] - t0) / 1000, kind="speech", text=p["text"],
                                 speaker=det.get("speaker_known_as"), words=det.get("words") or None)
+            u = tx.query_one("SELECT json_extract(payload,'$.utterance_id') FROM events WHERE event_id=?", (p["event_id"],))
+            breath[id(line)] = u[0] if u else None                        # D-283
         else:
             text = p["text"]
             if settings.narration_person == "third_limited":            # D-170: of the PC, as every other line is
@@ -151,8 +174,9 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
             lbl = retell(TRAILING_PAREN.sub("", pl.get("label") or pl.get("def_id", "")), "third", sex)   # TEXT-01 (D-152)
             text = f"{pc} chose to {lbl[:1].lower() + lbl[1:]}."
         elif e["type"] == "SPEECH":
-            entries.append((e["at"], e["seq"], "", NarratorLine(seconds=sec, kind="speech", text=f'{pc} says, "{pl["words"]}"',
-                                                                speaker=pc, words=pl["words"])))
+            line = NarratorLine(seconds=sec, kind="speech", text=f'{pc} says, "{pl["words"]}"', speaker=pc, words=pl["words"])
+            breath[id(line)] = pl.get("utterance_id")                     # D-283
+            entries.append((e["at"], e["seq"], "", line))
             continue
         elif e["type"] == "CHECK_RESOLVED" and pl.get("band") in BAND_TEXT:
             text = BAND_TEXT[pl["band"]]
@@ -171,7 +195,7 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
             entries.append((e["at"], e["seq"], "", NarratorLine(seconds=sec, kind=kind, text=text)))
     entries = _as_one(tx, pc_id, entries)                             # D-265: the room as one
     entries.sort(key=lambda x: (x[0], x[1], x[2]))
-    lines = [x[3] for x in entries]
+    lines = _one_breath([x[3] for x in entries], breath)                 # D-283: one utterance, one line
     pos = _row(tx, "SELECT place_id FROM positions WHERE body_id=?", (pc_id,))
     place = _row(tx, "SELECT name FROM places WHERE place_id=?", (pos["place_id"],))
     moved = tx.query_one("SELECT 1 FROM events WHERE type='MOVE' AND actor_id=? AND turn_index=? "

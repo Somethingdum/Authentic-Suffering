@@ -1224,6 +1224,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p09_society/test_hands_on_someone_you_love.py` | Owen shoves June, or grabs and pins her, in front of Mara and Alice: Mara, who loves June, is provoked (manhandled_bonded, toward Owen) and resents him a point more; Alice, who has no bond with June, neither; June tied hand and foot in front of them costs Owen a point of Mara's trust as well |
 
+### 3.171 In one breath (P7; D-283)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_in_one_breath.py` | On a quiet turn Owen's seventeen-word line to Mara lands in pieces, with two of the crew settling in meanwhile, and the narrator is handed it as one speech line, 'Owen says, "…"' with the whole line as said |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
