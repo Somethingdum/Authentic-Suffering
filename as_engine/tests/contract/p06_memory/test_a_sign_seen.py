@@ -45,3 +45,15 @@ def test_dragging_footprints_bring_the_dead_to_mind(scenario):
     w = scenario("metal_fence")
     got = mara_sees(w, "Dragging footprints in the dust, many of them, heading this way.")
     assert "Noise brings them. Always." in got, got
+
+
+def test_the_ghosts_signature(scenario):
+    w = scenario("metal_fence")
+    got = mara_sees(w, "A small, neat smile has been cut into the body — deliberate, a signature, a warning.")
+    assert "If you find a body with a smile cut into it, somebody crossed the Ghosts." in got, got
+
+
+def test_a_horde_at_the_barricade_is_not_lurker_ground(scenario):
+    """The dead clawing at a barricade leave marks too; only the lurkers' own gouges are lurker ground."""
+    w = scenario("metal_fence")
+    assert LURKER_GROUND not in mara_sees(w, "Claw marks and dents all along the barricade.")

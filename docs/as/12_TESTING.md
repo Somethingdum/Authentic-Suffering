@@ -1180,7 +1180,7 @@ config reads the repository's packs (where `cheat_admin` lives).
 
 | File | What it proves |
 |---|---|
-| `p06_memory/test_a_sign_seen.py` | Mara in front of claw gouges in a door frame has 'that's lurker ground' come to mind (not without them); in front of dragging footprints, 'Noise brings them' |
+| `p06_memory/test_a_sign_seen.py` | Mara in front of claw gouges in a door frame has 'that's lurker ground' come to mind (not without them); in front of dragging footprints, 'Noise brings them'; at the Ghosts' smile cut into a body, what everyone says of it; a horde's claw marks on a barricade are not lurker ground |
 
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 

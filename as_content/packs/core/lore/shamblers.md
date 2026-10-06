@@ -12,7 +12,7 @@ beliefs:
   - {held_by: "cohort:post_fall_born", text: "Walkers are sleepwalking people. Wake them up and they get angry.", confidence: 1}
 tags: [lore_v1_4, infected]
 entities: ["core:infected/ZOMBIE_ARCHETYPE_SHAMBLER01"]
-about: ["walker", "walkers", "shambler", "shamblers", "noise", "the wind", "dragging footprints"]
+about: ["walker", "walkers", "shambler", "shamblers", "noise", "the wind", "dragging footprints", "thousands of feet"]
 when: [loud_noise]
 called: [{held_by: common, word: walker}]
 ---
