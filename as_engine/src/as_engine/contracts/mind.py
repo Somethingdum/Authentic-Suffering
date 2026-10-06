@@ -175,6 +175,7 @@ class ExpressionOption(Strict):
 
 class Commitments(Strict):
     current_task: str | None = None
+    plan_goal: str | None = None
     plan_step: str | None = None
     standing_orders: list[str] = Field(default_factory=list)
     deadline: str | None = None

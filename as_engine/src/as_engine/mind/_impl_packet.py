@@ -365,6 +365,9 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
                                     + (", put down for now)" if put_down else ")")) if task else None,
                       plan_step=steps[0] if steps else None,
                       standing_orders=[f"On {_sp(o['trigger'])}: {o['response']}." for o in orders])
+    goal = ((plan["goal_text"] or "").strip() if plan else "") or None   # D-291: what they set out to do
+    if goal and not any(goal.lower() in ln.text.lower() for ln in loops):
+        com = com.model_copy(update={"plan_goal": goal})
     deps = []
     srcs = {p["source_id"] for p in percepts}
     for h in hh:
@@ -375,7 +378,7 @@ def _assemble(tx, actor_id, lod, affordances, turn_index, at, reaction=False, co
     stakes = Stakes(dependents=deps, obligations=obl, would_lose=[])
     resources = _resources(tx, actor_id)
     if any(u.addressed_to_me for u in utts):
-        if com.current_task is None:
+        if com.current_task is None and not (com.plan_goal or com.plan_step or com.standing_orders):   # D-291
             com = com.model_copy(update={"current_task": "You are not in the middle of anything."})
         if not stakes.would_lose:
             stakes = stakes.model_copy(update={"would_lose": ["Nothing you can name."]})

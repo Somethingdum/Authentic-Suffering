@@ -56,7 +56,14 @@ What people say about this (what you grew up hearing, not what you saw):
 
 What matters to you now
 What you are in the middle of:
-- {{ p.commitments.current_task or "Nothing in particular." }}
+{% if p.commitments.current_task %}
+- {{ p.commitments.current_task }}
+{% elif not (p.commitments.plan_goal or p.commitments.plan_step or p.commitments.standing_orders or p.commitments.deadline) %}
+- Nothing in particular.
+{% endif %}
+{% if p.commitments.plan_goal %}
+- What you set out to do: {{ p.commitments.plan_goal }}
+{% endif %}
 {% if p.commitments.plan_step %}
 - Next step of your plan: {{ p.commitments.plan_step }}
 {% endif %}

@@ -212,6 +212,10 @@ Fields (second person, plain English):
                     'active' task by started_at -> f'{label} ({steps_done} of {steps_total} done)';
                     (D-118) none -> the paused task keep_working would name -> f'{label} ({steps_done}
                     of {steps_total} done, put down for now)' — interrupted work is not forgotten;
+                    (D-291) plan_goal = plans.goal_text (stripped; empty -> None) unless an open
+                    loop line of the packet already holds it (case-insensitive) — what the person
+                    set out to do, which a scenario, worldgen, a reflection or the gang that means
+                    to rob the stranger wrote, and which no mind was ever shown;
                     plan_step = plans.steps[0] when the plans row has steps; standing_orders =
                     f'On {trigger with _ as spaces}: {response}.' per plans.standing_orders entry
                     ('On loud noise: find the source and cover it.'); deadline = None (P6+).
@@ -228,8 +232,9 @@ Fields (second person, plain English):
                     rounds, charge or other props — what is in a gun is a belief, not a fact
                     the mind can read off its own inventory.
                     e.g. 'You have: a .38 revolver (holstered), 11 .38 rounds.'
-  WILL-C fill       when any utterance has addressed_to_me: current_task None -> 'You are not in
-                    the middle of anything.'; empty stakes.would_lose -> ['Nothing you can name.'];
+  WILL-C fill       when any utterance has addressed_to_me: current_task None (D-291: and no
+                    plan_goal, plan_step or standing order) -> 'You are not in the middle of
+                    anything.'; empty stakes.would_lose -> ['Nothing you can name.'];
                     empty resources -> ['You carry nothing.'].
   affordances       AffordanceOption(A#, verb, label, cost_note, risk_note) per option.
   gestures / attention_points   (B4) ExpressionOption(G# | F#, label, hands) per handle above

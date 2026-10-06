@@ -1274,6 +1274,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_in_so_many_words.py` | "I ask Mara where the water came from." in the Do box and in the Say box reaches the intake, whose prompt names the "words" field, and Owen says its words ('Mara, where did the water come from?') to Mara; "I say we leave tonight." and "I tell you, it wasn't me." in the Say box are said as typed, with no intake call |
 
+### 3.179 What they set out to do (P4; D-291)
+
+| File | What it proves |
+|---|---|
+| `p04_one_actor/test_what_they_set_out_to_do.py` | Mara's packet carries her plan goal and her prompt says "- What you set out to do: watch the front window" above her standing order, with no "Nothing in particular."; spoken to, she is not told she is in the middle of nothing; a want already among her open loops is not repeated as her plan; Eli, awake with no task, plan or order, reads "- Nothing in particular." |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |
