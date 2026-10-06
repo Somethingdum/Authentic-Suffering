@@ -470,6 +470,8 @@ def _physical(c, d, o):
             return "not at the end of their rope"
     if q.target_distressed and not _distressed(c, o.get("target_id")):     # D-155
         return "they are not in a state"
+    if q.adults_only and not (_f1c_adult(c) and _grown(c, o.get("target_id"))):     # D-292
+        return "not between grown-ups"
     if c.cap.hands_free < q.hands_free:
         return "hands full"
     if not _range_ok(c, d, o):
@@ -703,7 +705,7 @@ def _group(c, opt):
         return 0
     if c.threats and (v == Verb.ATTACK or "threat_response" in opt.tags):
         return 1
-    if "posture" in opt.tags:
+    if "posture" in opt.tags or "touch" in opt.tags:       # D-292: a hand on someone never crowds out doing something
         return 6
     if v == Verb.SPEAK:
         return 2
@@ -800,7 +802,7 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
             return 1
         if ba.verb == Verb.GUARD:
             return 2
-        return 3
+        return 4 if "touch" in ba.tags else 3
     key = lambda x: (_group(c, x[2]), inner(x[2]), _opt_distance(c, x[2], att, x[1]), x[0], x[2].target_id or "")  # noqa: E731
     cands.sort(key=key)
     rules = tx.rules.packet
@@ -839,3 +841,8 @@ def enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False):
 def _f1c_adult(c):
     r = _row(c.tx, "SELECT age_years FROM bodies WHERE body_id=?", (c.me,))
     return r["age_years"] is not None and r["age_years"] >= 18
+
+
+def _grown(c, b):
+    r = _row(c.tx, "SELECT age_years FROM bodies WHERE body_id=?", (b,)) if b else None
+    return r is not None and r["age_years"] is not None and r["age_years"] >= 18

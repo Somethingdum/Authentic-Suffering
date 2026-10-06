@@ -1024,6 +1024,26 @@ def _knew_infected(tx, holder, body, at):
                         "json_extract(la.payload,'$.kind')='contamination' AND la.actor_id=?", (holder, body)) is not None
 
 
+def _welcome_touch(tx, holder, toucher, def_id):
+    """D-292 (cascade.welcome_touch): the holder's own feelings about the one whose hands these are."""
+    from ..mind.memory import BONDED_KINDS
+    r = _row(tx, "SELECT * FROM relationships WHERE from_id=? AND to_id=?", (holder, toucher))
+    if r is not None and (r["fear"] >= 2 or r["resentment"] >= 2):
+        return False
+    if r is not None and r["kind"] in ("spouse", "partner"):
+        return True
+    try:
+        intimate = "intimate" in _def(tx, def_id).tags
+    except KeyError:
+        intimate = False
+    if intimate:
+        return r is not None and r["affection"] >= 2
+    if r is not None and (r["kind"] in BONDED_KINDS + ("family", "friend", "comrade") or r["affection"] >= 1):
+        return True
+    return tx.query_one("SELECT 1 FROM household_members a JOIN household_members b ON a.household_id=b.household_id "
+                        "WHERE a.actor_id=? AND b.actor_id=?", (holder, toucher)) is not None
+
+
 def _onlookers(tx, trigger, event_id):
     """D-119: who saw the death or the blow land, and saw who did it."""
     from ..sense.optics import visibility
@@ -1389,6 +1409,15 @@ def select(tx, selector, trigger):
         return sorted({r[0] for r in tx.query("SELECT holder_id FROM percept_log WHERE event_id=?", (v,))})
     if fn == "theft_witnesses_of":
         return _theft_witnesses(tx, v)
+    if fn == "unwelcome_touched":                                    # D-292: hands nobody asked for
+        from ..society._impl_society import _controller
+        tgt = (trigger.payload or {}).get("target_id")
+        actor = trigger.actor_id
+        if not tgt or not actor or tgt == actor or _controller(tx, tgt) in (None, "human"):
+            return []
+        felt = tx.query_one("SELECT 1 FROM percept_log WHERE event_id=? AND holder_id=? AND channel='tactile' AND source_id=?",
+                            (v, tgt, actor))
+        return [tgt] if felt and not _welcome_touch(tx, tgt, actor, (trigger.payload or {}).get("def_id") or "") else []
     if fn == "bonded_onlookers_unknowing":                           # D-286: a safety precaution, hands on
         at_ = trigger.at
         tgt = (trigger.payload or {}).get("target_id")

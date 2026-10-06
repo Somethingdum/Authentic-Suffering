@@ -26,6 +26,42 @@
   effect: speak
   tags: [speech, calm, negotiable]
 - schema: as.affordance.v1
+  id: touch_shoulder
+  verb: signal
+  label: "Put a hand on {target}'s shoulder"
+  ui_label: "Hand on {target}'s shoulder"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, target_kinds: [human]}
+  duration: {base_s: 3}
+  noise_db: 0
+  effect: signal
+  tags: [touch, quiet]
+- schema: as.affordance.v1
+  id: embrace
+  verb: signal
+  label: "Put your arms around {target}"
+  ui_label: "Hug {target}"
+  binds: body
+  range: touch
+  requires: {hands_free: 1, target_kinds: [human]}
+  duration: {base_s: 5}
+  noise_db: 0
+  effect: signal
+  tags: [touch, quiet]
+- schema: as.affordance.v1
+  id: kiss
+  verb: signal
+  label: "Kiss {target}"
+  ui_label: "Kiss {target}"
+  binds: body
+  range: touch
+  requires: {target_kinds: [human], adults_only: true}
+  duration: {base_s: 2}
+  noise_db: 0
+  effect: signal
+  tags: [touch, intimate, quiet]
+- schema: as.affordance.v1
   id: signal
   verb: signal
   label: "Signal to {target} without speaking"

@@ -30,7 +30,11 @@ TEMPER-03 provocations(tx, holder_id, turn_index, at) -> list[Provocation]: read
   kind, event_id = the percept's event_id); toward_id is the percept's source_id — a body other
   than the holder (someone it can tell did it) — except for harmed_bonded. Kinds, each at most once
   per event, in this order:
-    struck         a tactile percept (the holder was hurt by the source)
+    struck         a tactile percept (the holder was hurt by the source) — (D-292) not a touch's
+    touched_unwanted (D-292) a tactile touch percept (detail.touch) of an ACTION_START by the source that
+                   the holder does not action.cascade.welcome_touch — a hand on the shoulder or arms around
+                   them from someone they do not want it from; kissed_unwanted: the same, of a def tagged
+                   'intimate' (a kiss)
     shoved         a visual percept of an ACTION_START by the source whose payload target_id is the
                    holder and whose payload def_id is 'shove'; grabbed: def_id 'grapple' or 'disarm'
     threatened     a speech percept with detail.addressed_to_me whose form
@@ -313,7 +317,15 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
         det = _j.loads(p["detail"]) if isinstance(p["detail"], str) else (p["detail"] or {})
         human_src = bool(src) and src != holder_id and src.startswith("act_")
         ch = p["channel"]
-        if ch == "tactile" and human_src:
+        if ch == "tactile" and human_src and det.get("touch"):                                       # D-292
+            from ..action.cascade import welcome_touch
+            if typ == "ACTION_START" and not welcome_touch(tx, holder_id, src, pl.get("def_id") or ""):
+                try:
+                    intimate = "intimate" in tx.canon.find("affordance", pl.get("def_id") or "").tags
+                except KeyError:
+                    intimate = False
+                add(src, "kissed_unwanted" if intimate else "touched_unwanted", eid)
+        elif ch == "tactile" and human_src:
             add(src, "struck", eid)
         if ch == "visual" and typ == "GESTURE" and human_src and pl.get("target_id") == holder_id:      # D-204
             from ..action.effects import CONTEMPT_GESTURES
@@ -386,7 +398,8 @@ def provocations(tx: "Tx", holder_id: str, turn_index: int, at: int) -> list[Pro
                 got.add(("ingratitude", pv.event_id))
                 kept.append(Provocation(pv.toward_id, "ingratitude", pv.event_id))
         out = kept
-    order = {k: i for i, k in enumerate(("struck", "shoved", "grabbed", "threatened", "ordered_about", "insulted",
+    order = {k: i for i, k in enumerate(("struck", "touched_unwanted", "kissed_unwanted", "shoved", "grabbed", "threatened",
+                                          "ordered_about", "insulted",
                                           "harmed_bonded", "manhandled_bonded", "threatened_bonded", "insulted_bonded", "stole_from",
                                           "worshipped", "wished_upon", "wish_forgiven", "ingratitude"))}
     # per event, kinds in the documented order; events in percept order

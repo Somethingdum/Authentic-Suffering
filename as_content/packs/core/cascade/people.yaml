@@ -1680,3 +1680,54 @@
       payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: tied_your_own}
   delay_s: 0
   cites: [D-282, D-286, D-208]
+- schema: as.cascade.v1
+  id: CAS-123
+  description: A hand on your shoulder from someone you do not want it from is held against them.
+  trigger_event: ACTION_START
+  where: {def_id: touch_shoulder}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: touched_unwanted}
+  delay_s: 0
+  cites: [D-292]
+- schema: as.cascade.v1
+  id: CAS-124
+  description: Arms put around you by someone you do not want them from cost them your trust, and you hold it against them.
+  trigger_event: ACTION_START
+  where: {def_id: embrace}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -1, cause: held_unwanted}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 1, cause: held_unwanted}
+  delay_s: 0
+  cites: [D-292]
+- schema: as.cascade.v1
+  id: CAS-125
+  description: A kiss forced on you costs the one who did it your trust, frightens you, and is not forgiven soon.
+  trigger_event: ACTION_START
+  where: {def_id: kiss}
+  preconditions: []
+  effects:
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: trust, delta: -2, cause: kissed_unwanted}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: resentment, delta: 2, cause: kissed_unwanted}
+    - kind: emit_event
+      event_type: RELATION_CHANGE
+      target: unwelcome_touched(trigger.event_id)
+      payload: {toward: "$trigger.actor_id", axis: fear, delta: 1, cause: kissed_unwanted}
+  delay_s: 0
+  cites: [D-292]

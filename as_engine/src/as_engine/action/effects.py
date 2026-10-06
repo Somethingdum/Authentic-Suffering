@@ -566,6 +566,9 @@ SEEN: dict[str, str | None] = {
     "speak": None,
     "calm_person": "talks to {target} slowly and steadily",
     "signal": "signals to {target}",
+    "touch_shoulder": "puts a hand on {target}'s shoulder",          # D-292
+    "embrace": "puts both arms around {target}",
+    "kiss": "kisses {target}",
     "surrender": "raises empty hands",
     "apply_pressure": "presses on {target}'s wound",
     "bandage_wound": "bandages {target}",

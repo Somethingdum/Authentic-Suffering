@@ -1280,6 +1280,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p04_one_actor/test_what_they_set_out_to_do.py` | Mara's packet carries her plan goal and her prompt says "- What you set out to do: watch the front window" above her standing order, with no "Nothing in particular."; spoken to, she is not told she is in the middle of nothing; a want already among her open loops is not repeated as her plan; Eli, awake with no task, plan or order, reads "- Nothing in particular." |
 
+### 3.180 A hand on the shoulder (P9; D-292)
+
+| File | What it proves |
+|---|---|
+| `p09_society/test_a_hand_on_the_shoulder.py` | Within reach Owen can put a hand on anyone's shoulder, hug them or kiss them, but kiss no child; touch options sit last on his menu; a touch is felt — in the dark "Someone puts a hand on your shoulder." with no source — and named when seen; welcome (a partner's kiss, a friend's hug) it changes nothing and angers no one; unwelcome (a stranger's hand, arms or kiss, a friend's kiss, a partner feared) it costs trust, is resented, frightens (a kiss) and provokes touched_unwanted / kissed_unwanted, never 'struck' |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

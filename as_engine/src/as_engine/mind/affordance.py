@@ -84,7 +84,8 @@ enumerate_affordances(tx, actor_id, catalog, at, turn_index, waking=False) -> Af
               the bound target in distress: a speech percept whose source is the target with
               detail.volume 'raised' or 'shout', or one of a NOISE event of payload kind 'screaming'
               or 'scream' whose source is the target, or one of a HARM event whose payload body_id
-              is the target: "they are not in a state")
+              is the target: "they are not in a state"); (D-292) requires.adults_only (the actor's
+              and the bound target's bodies.age_years both >= 18: "not between grown-ups")
     skill     (requires.skill min_rank, OR requires.skill_or_belief_cue held as a belief cue; a def
               with only skill_or_belief_cue needs the cue)
     belief    (every requires.belief_cues held — e.g. 'knows_headshot_rule')
@@ -189,7 +190,8 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
     5 attack     verb ATTACK (no threat this turn)
     6 hold       everything else (OBSERVE, WAIT, GUARD, rest, sleep), and outside a threat every
                  def tagged 'posture' (crouch, go_prone, stand_up: changing how you stand is
-                 waiting, not doing — it must not crowd out picking something up)
+                 waiting, not doing — it must not crowd out picking something up); (D-292) every
+                 def tagged 'touch' (a hand on a shoulder, arms around someone, a kiss), last in it
   Sort key: (group, inner, DISTANCE, catalog index, target id). inner is 0 except:
     threat group  0 an ATTACK on a threat, 1 a def tagged 'protect_dependent', 2 verbs FLEE /
                   ESCAPE, 3 (H1) a def tagged 'feed_to_dead' (someone else between you and the
@@ -209,7 +211,9 @@ Selection (AFF-07). Every surviving option gets a GROUP, by rank:
                   doing something;
     hold group    0 defs tagged 'freeze' and (D-182, only with no threat this turn) defs tagged
                   'rest' when fatigue_stage >= NEED_PRESSING — the exhausted see sleep; 1 verb
-                  OBSERVE, 2 verb GUARD, 3 the rest (so 'stay where you are' and 'watch' are never
+                  OBSERVE, 2 verb GUARD, 3 the rest, (D-292) 4 a def tagged 'touch' — one per person
+                  within reach would fill a crowded menu; the player's second look (INTAKE-07) and a
+                  mind's 'more_actions' ('expression') reach them (so 'stay where you are' and 'watch' are never
                   crowded out by 'sleep' — unless they can hardly keep their eyes open).
   DISTANCE for an option bound to an anchor or portal = metres from that point to the actor's
   ATTENTION POINT; for any other referent = metres from the actor; 0 with no referent. The

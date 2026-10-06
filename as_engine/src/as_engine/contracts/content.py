@@ -161,6 +161,8 @@ class AffordanceRequires(Strict):
     target_distressed: bool = Field(default=False, description="D-155: offered only toward someone the actor heard "
                                     "shout or scream, or saw or heard hurt, this turn or the one before (talking a "
                                     "calm person down is no option, and it took a slot on every menu).")
+    adults_only: bool = Field(default=False, description="D-292: offered only when the actor and the target are both "
+                              "grown (bodies.age_years >= 18): a kiss is between adults.")
 
 
 class DurationSpec(Strict):

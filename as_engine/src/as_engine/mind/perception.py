@@ -36,7 +36,7 @@ DETAIL (percept_log.detail, JSON) — what later stages need without re-reading 
             via_portal = the last portal of the acoustic path (the one nearest the listener), or
             null when the source is in the listener's place
   visual:   {level}  ('clear' | 'partial' | 'silhouette')
-  tactile:  {wound_id}
+  tactile:  {wound_id}; (D-292) a touch: {touch: true, level}
   olfactory: {odour, strength}  (F1b: the sense.olfaction kind and the strongest source's strength)
 
 Which events are sensory (SENSORY_TYPES) and how each is perceived:
@@ -67,6 +67,12 @@ Which events are sensory (SENSORY_TYPES) and how each is perceived:
            visible false: results are perceived through the state events they caused).
   HARM also grants the harmed body itself a TACTILE exact percept (when conscious after the
            harm): render_pain; source_id = the event's actor when the holder can see it, else NULL.
+  ACTION_START of a def tagged 'touch' (D-292: a hand on a shoulder, arms around someone, a kiss)
+           grants the one it is done to (payload target_id, conscious) a TACTILE exact percept INSTEAD
+           of a visual one — it is felt, seen or not, in the dark too: f"{Ref} {seen}." with Ref as
+           above when it sees the actor at clear or partial, else 'Someone', and seen filled as for
+           any ACTION_START ('Owen kisses you.', "Someone puts a hand on your shoulder."); source_id =
+           the actor when seen at clear or partial, else NULL; detail {touch: true, level}.
   GESTURE  (B4, GEST-03; P5 adds it to SENSORY_TYPES) visual only — a gesture is never heard — for
            holders who see the actor at clear or partial (a silhouette's hands are not read):
            fidelity exact / partial; text f"{Ref} {seen}." with Ref as for ACTION_START and seen
@@ -723,6 +729,14 @@ def _perceive_event(tx, holder, ev, turn_index):
     if t in ("MOVE", "ACTION_START", "ACTION_COMPLETE", "ITEM_TRANSFER"):
         if actor is None or actor == holder:
             return out
+        if t == "ACTION_START" and payload.get("target_id") == holder and payload.get("seen") and _touch(tx, payload):
+            lvl = optics.visibility(tx, holder, actor, ev["at"])          # D-292: felt, seen or not
+            known = lvl in ("clear", "partial")
+            rf = _cap(ref(tx, holder, actor, lvl)) if known else "Someone"
+            out.append(grant(tx, holder, event_id=ev["event_id"], channel="tactile", fidelity="exact",
+                             text=f"{rf} {_fill_seen(tx, holder, payload, ev['at'])}.", source_id=actor if known else None,
+                             at=ev["at"], turn_index=turn_index, detail={"touch": True, "level": lvl}))
+            return out
         if t.startswith("ACTION_") and not (payload.get("visible") and payload.get("seen")):
             return out
         if t == "MOVE" and payload.get("from_place") is None:
@@ -1176,6 +1190,14 @@ def retell(text: str, person: str, sex: str | None = None) -> str:
                 new = new[:1].upper() + new[1:]
             out[i] = new
     return "".join(out)
+
+
+def _touch(tx, payload):
+    """D-292: an act of a def tagged 'touch' (a hand on a shoulder, arms around someone, a kiss)."""
+    try:
+        return "touch" in _canon(tx).find("affordance", payload.get("def_id") or "").tags
+    except KeyError:
+        return False
 
 
 def _fill_seen(tx, holder, payload, at):

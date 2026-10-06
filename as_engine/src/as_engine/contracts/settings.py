@@ -399,10 +399,12 @@ class TemperRules(Strict):
         "insulted": 2, "ordered_about": 1, "quarreled": 3, "reeked": 1, "bared": 2,
         "threatened_bonded": 3, "insulted_bonded": 2,   # D-262: said to someone you love, in front of you
         "manhandled_bonded": 3,                         # D-282: hands put on someone you love, in front of you
+        "touched_unwanted": 2, "kissed_unwanted": 4,    # D-292: hands nobody asked for
         "worshipped": 20, "wished_upon": 20, "ingratitude": 20, "wish_forgiven": 0,   # D-102 (TEMPER-10)
     })
     stress_from: dict[str, int] = Field(default_factory=lambda: {"struck": 1, "threatened": 1, "harmed_bonded": 1,
-                                                                 "bared": 1, "threatened_bonded": 1})
+                                                                 "bared": 1, "threatened_bonded": 1,
+                                                                 "kissed_unwanted": 1})
     heat_decay_min: int = 60       # [SAND] anger fades by one point per this many minutes
     hold_per_resolve: float = 0.1  # [SAND] the chance to swallow it, per point of Resolve left
     hold_max: float = 0.8          # [SAND] nobody always holds it in

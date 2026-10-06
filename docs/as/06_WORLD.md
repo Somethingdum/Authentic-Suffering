@@ -294,6 +294,12 @@ at 1 ×1.5), and returns the reasons as plain sentences.
   grabbed and held, grabbed at for what is in their hand, or tied hand and foot angers them (heat 3, as if it were done
   to them) and is resented, a point each time — tied up, it costs a point of trust too; hurt, it is CAS-040's as well.
   (D-286) Not for whoever knew the one held down was infected (D-202): holding down the bitten is a safety precaution.
+- **A hand on the shoulder** (D-292, core touch_shoulder / embrace / kiss, CAS-123..125, TEMPER-03 touched_unwanted /
+  kissed_unwanted): a hand on a shoulder, arms around someone, a kiss between grown-ups (requires.adults_only). It is felt
+  (a TACTILE percept, in the dark too — "Someone puts a hand on your shoulder.") and reacted to there and then; whether it
+  is welcome is the one touched's own (action.cascade.welcome_touch): unwelcome, a hand is resented (a point), arms cost
+  a point of trust and are resented, a kiss costs two of trust, frightens and is resented twice over — and it angers
+  them (heat 2, a kiss 4). A touch is never a blow ('struck'). On a menu it comes last, after waiting and watching.
 - **A killing seen** (D-119, CAS-025..028): killing someone who was not fighting anyone costs the
   killer the trust of everyone who saw who fell and who did it (−2), makes them afraid of the
   killer (+2 fear and a fear they hold) and starts the story (`killed_someone`); whoever later

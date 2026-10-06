@@ -47,6 +47,11 @@ CAS-05 target selectors (CascadeEffect.target). '<path>' is any precondition pat
                                               know the target carried the infection when it was done
                                               (knew_infected at the event's at, D-202): holding down a
                                               bitten man is a safety precaution
+    unwelcome_touched(<path>)                 (D-292) for an ACTION_START of a def tagged 'touch': its
+                                              payload target_id, when that is an actor not controlled by
+                                              the player (C06), holding a tactile percept of the event
+                                              whose source_id is the actor (it felt it, and knew whose
+                                              hands), that does not welcome_touch it
     robbed_by(<path>)                         (D-129) for an ITEM_TRANSFER: of theft_witnesses_of, those
                                               whose believed owner of the item is themselves or one of
                                               their households (and not the taker's own, as there) —
@@ -559,6 +564,16 @@ def knew_infected(tx: "Tx", holder_id: str, body_id: str, at: int) -> bool:
     raise NotImplementedError("D-202")
 
 
+def welcome_touch(tx: "Tx", holder_id: str, toucher_id: str, def_id: str) -> bool:
+    """D-292: ``holder_id`` welcomes ``toucher_id``'s touch of def ``def_id`` (an affordance tagged 'touch'), from
+    the holder's own relationship row toward the toucher (relationships from the holder), first match: fear >= 2 or
+    resentment >= 2 -> no (a hand from someone you fear or hate is not comfort); kind 'spouse' or 'partner' -> yes;
+    a def tagged 'intimate' (a kiss) -> affection >= 2; else kind in mind.memory.BONDED_KINDS, 'family', 'friend' or
+    'comrade', affection >= 1, or one household with the toucher -> yes; else no (a stranger's hands)."""
+    raise NotImplementedError("D-292")
+
+
 from ._impl_p5b import sweep, select, evaluate_precondition  # noqa
 from ._impl_p5b import _knew_infected as knew_infected  # noqa: E402,F811
+from ._impl_p5b import _welcome_touch as welcome_touch  # noqa: E402,F811
 from ._impl_p5b import fire_scheduled  # noqa
