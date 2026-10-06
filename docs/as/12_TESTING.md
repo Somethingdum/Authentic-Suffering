@@ -1170,6 +1170,12 @@ config reads the repository's packs (where `cheat_admin` lives).
 |---|---|
 | `p07_slice/test_what_is_in_this_moment.py` | On the anchor turn Mara's memory call offers 'metal_crash' and a handful of other cue words present for her — not the registry |
 
+### 3.162 His own words, quoted (P7; D-274)
+
+| File | What it proves |
+|---|---|
+| `p07_slice/test_his_own_words_quoted.py` | The narration prompt still has every speaker's words quoted exactly, and its echo block forbids the player's word runs only outside quotation marks |
+
 ## 4. Shared fixtures (`as_engine/tests/conftest.py`, protected)
 
 | Fixture | Gives you |

@@ -447,7 +447,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 
 | Id | Statement | Stated in | Enforced in | Tested by |
 |---|---|---|---|---|
-| ECHO-01 | ECHO-01 each sorted n-gram of content_ngrams(unquoted text, numbers.echo_n, numbers.echo_min_content_tokens) that is in packet.player_input_echo_block (quoted speech is licensed: the PC's own words may be quoted) passed… | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py`, `contract/p07_slice/test_the_worlds_words.py` |
+| ECHO-01 | ECHO-01 each sorted n-gram of content_ngrams(unquoted text, numbers.echo_n, numbers.echo_min_content_tokens) that is in packet.player_input_echo_block (quoted speech is licensed: the PC's own words may be quoted) passed… | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/narration/narrator.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_his_own_words_quoted.py`, `contract/p07_slice/test_narration_lint.py`, `contract/p07_slice/test_the_worlds_words.py` |
 | ECHO-02 | *Render lint (Stage 18) and the echo ledger (P7). Rules STYLE-01..06, DISC-01..04, ECHO-01..03,* | as_engine/narration/lint.py | `as_engine/narration/lint.py`, `as_engine/turn/cognition.py`, `as_engine/turn/intake.py` | `contract/p07_slice/test_narration_lint.py` |
 
 ## ECON

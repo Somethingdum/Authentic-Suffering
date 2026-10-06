@@ -120,7 +120,10 @@ build_narrator_packet(tx, pc_id, turn_index, t0, settings) -> NarratorPacket   (
   (content_ngrams of each line's text and words — but the PC's own speech lines, which are the
   player's words — the place details, the people present and their looks, with the same n and
   minimum): what the world says itself ("goes through the back door into the rear alley") is the
-  narrator's to use, even when the player happened to type it too.
+  narrator's to use, even when the player happened to type it too. (D-274) The prompt lists it as
+  f"Never repeat these word runs from the player outside quotation marks (what {pc} says aloud is quoted
+  as said): …" — the system prompt has every speaker's exact words quoted, the PC's own included, and
+  the lint never counts quoted words (ECHO-01); told only 'never repeat', a model dropped the PC's line.
 
 narrate(client, packet, style_rules, numbers, *, config, all_known_names, turn_index)
     -> (prose, findings, attempts, passed)   (NARR-06..08)

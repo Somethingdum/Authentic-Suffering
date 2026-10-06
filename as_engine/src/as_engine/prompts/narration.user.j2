@@ -5,7 +5,7 @@ Write in {{ 'third person, limited to ' ~ k.pc_name if k.person == 'third_limite
 {% endif %}Narrator texture: pacing {{ k.style.pacing }}, detail {{ k.style.descriptive_density }}, sentences {{ k.style.sentence_length }}, register {{ k.style.vocabulary_register }}, mood {{ k.style.emotional_register }}.
 {% if k.style.recently_used_images %}Images already used recently (do not reuse): {{ k.style.recently_used_images | join('; ') }}
 {% endif %}{% if k.banned_phrases %}Never use these phrases: {{ k.banned_phrases | join('; ') }}
-{% endif %}{% if k.player_input_echo_block %}Never repeat these word runs from the player: {{ k.player_input_echo_block | join('; ') }}
+{% endif %}{% if k.player_input_echo_block %}Never repeat these word runs from the player outside quotation marks (what {{ k.pc_name }} says aloud is quoted as said): {{ k.player_input_echo_block | join('; ') }}
 {% endif %}
 TIME AND PLACE: {{ k.world_time_text }}. {{ k.place_text }}
 {% if k.allowed_names %}Names {{ k.pc_name }} knows (use no other proper name outside quoted speech; describe anyone else): {{ k.allowed_names | join(', ') }}
