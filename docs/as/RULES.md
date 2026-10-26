@@ -13,7 +13,7 @@ A statement in *italics* is context, not a definition: the id is only named insi
 sentence there, and its behaviour is specified by the module docstring or doc section named under
 *Stated in* (read that; the contract tests pin it).
 
-881 ids; 623 with their own statement, 258 named only in context.
+882 ids; 623 with their own statement, 259 named only in context.
 
 
 ## ABUSE
@@ -86,6 +86,7 @@ sentence there, and its behaviour is specified by the module docstring or doc se
 |---|---|---|---|---|
 | BENCH-01 | (named only by tests) |  | — | `contract/p01_lanes/test_bench_limits.py` |
 | BENCH-03 | */ O5 / Resolve formula / Decided / `3 + floor((E+C)/4) + trait_mod`, drains/recoveries as in 05 §5, all in `RulesConfig.resolve`, tagged `[SAND]` and calibrated by `tools/as/eval.py` (BENCH-03). /* | DECISIONS §1 | — | — |
+| BENCH-06 | */ 3.3 / 57–61 / The long run: 100 turns through the server on the fake, with a reconnect every 10 turns, Stop mid-turn, save and load mid-life, the quiet hours, a death; then the 100-day world soak per difficulty (B…* | 14_THREE_DAYS §5 | — | — |
 
 ## BG
 
