@@ -24,7 +24,7 @@ Three days fix exactly those four things, in that order of risk, and nothing els
 
 ## 1. Done means this (the owner's acceptance run)
 
-On your Windows desktop, with LM Studio running and LM Link on:
+On your Windows desktop, with your models served by LM Studio (LM Link on) or by PolyStrata on each PC (15 §2):
 
 1. `install-game.bat` once. It finishes with "Installed." No Talemate install, no torch, no TTS.
 2. `python tools\as\tune.py` once (overnight). It finds each model's thinking switch, measures your machines, plays
@@ -48,7 +48,7 @@ If 1–9 hold, the release is done. Everything else is a supplemental update (§
 | # | Feature | State today | Work in the three days |
 |---|---|---|---|
 | 1 | **Sealed and private** | built (SEAL-01..05) | the new server installs the seal before it opens a port, listens on 127.0.0.1 only, and logs refusals |
-| 2 | **Your two models** — Writer (A) and Clerk (B) through one LM Studio over LM Link | built (lanes, probe, limits bench) | `fit.py` (quality per call, critical path), `tune.py` (one command: probe → bench → fit → write settings) |
+| 2 | **Your two models** — Writer (A) and Clerk (B), on LM Studio over LM Link **or on PolyStrata** (one per PC, D-297) | LM Studio built (lanes, probe, limits bench); PolyStrata not | PolyStrata as a host (block 1.3); `fit.py` (quality per call, critical path), `tune.py` (one command: probe → bench → fit → write settings) |
 | 3 | **Connect** — pick the Main and Second model from LM Studio's one list, Test each | protocol built (P8 steps 1–3) | the screen |
 | 4 | **New life** — wizard, worldgen, loading bar | built, screens built (P10) | wire into the real app; end-to-end test |
 | 5 | **Play** — the story, Act / Say / Cheat, people who react and remember, Stop, Ask, turn progress, the side tabs | engine built; screen a placeholder | the Play screen and its panels, to the protected specs |
@@ -66,10 +66,11 @@ If 1–9 hold, the release is done. Everything else is a supplemental update (§
 4. The gaps found in play-testing on the fake model: an insult is shown to the hearer as "a statement"; people
    who love someone kissed against their will have no rule for it; generated worlds have no barricades. (The
    first goes in on Day 3 if there is time: §5, block 3.7.)
-5. The Talemate plugin and patches (02 §4.1, §6), so the Workshop can sit beside the game; Read aloud (local TTS).
-6. Worlds: list, export, import, a new life in the same world after a death (RUN-07, P12 step 4).
-7. Migrations (P12 step 5).
-8. The Content screen's imports (character cards, documents, dossier intake) and the developer panel beyond what
+5. **The game hosted by another app** of the owner's: its lanes on that app's model API, then that app starting it with Play in its menu.
+6. The Talemate plugin and patches (02 §4.1, §6), so the Workshop can sit beside the game; Read aloud (local TTS).
+7. Worlds: list, export, import, a new life in the same world after a death (RUN-07, P12 step 4).
+8. Migrations (P12 step 5).
+9. The Content screen's imports (character cards, documents, dossier intake) and the developer panel beyond what
    its spec pins.
 
 ## 4. The one change of course: the game serves itself
@@ -102,14 +103,15 @@ non-stop work; about a quarter of each day is kept as slack and is spent on what
 |---|---|---|---|
 | 1.1 | 0–1 | Fresh environment (engine venv, frontend `pnpm install`); the full suite as a baseline | 2681 / 2688 as recorded |
 | 1.2 | 1–4 | **The seven red tests.** RUN-12 / RUN-13 in `_impl_runs.py` (`wipe_tree`, `delete_run`, `list_runs`' `final`) and `on_run_delete`; `Store.backup_to(…, as_world=)` and worldgen's GENESIS step (D-76) | the suite: 2688 / 2688 |
-| 1.3 | 4–11 | **`tools/as/fit.py`, the turn's own path.** Plays the game's real calls (captured from scripted scenes on the fake: an insult, a question, a kiss unwanted and welcome, a shove, a shooting seen, the room after a crash) on your models: intake, WARM and HOT decisions, reactions (HOT and WARM), narration, the lint judge. Each as set, with thinking flipped, and the HOT calls on the other lane too. Graded by code: parsed; the intake picked the right option (gold answers); a person spoken to answers; no name they cannot know; no refusal or out-of-story talk; the narration passes the game's own lint. Then a **turn-time table** for three profiles — Quality (as set), Balanced, Fast — and `--accept quality|balanced|fast` writes the profile you pick. `--fake`, `--quick`, `--resume`; reports under `as_runs/reports/fit.md` | a contract test on the fake: the cases build, the grading separates a good answer from a bad one, a profile writes the settings it lists, nothing outside the configured lane URLs is touched |
-| 1.4 | 11–12 | **`tools/as/tune.py`**: probe `--write`, then `bench.py --quick --accept`, then `fit.py --quick`, printing the profile table and the command that accepts one | runs end to end on `--fake` |
-| 1.5 | 12–17 | **`as-engine serve`.** `websockets` server on 127.0.0.1:5050: `/ws` speaks 10 §3's protocol to `GameService` (one tab at a time, pushes to the open tab, a reload reconnects to the running game), every other path serves the built Play UI; the seal installed before the port opens, refusals logged; `--fake` for tests | contract tests through the server's handler with an in-memory connection (no sockets): hello round-trips, a second tab gets the other-tab message, a turn's pushes arrive, the seal is on |
-| 1.6 | 17–19 | **Owner checkpoint 1 package**: `install-game.sh` / `.bat`, `play.sh` / `.bat` (`play` opens the browser), README_FIRST's "Play it" section rewritten for this path | the `.sh` pair, run in a clean folder here, ends with the server answering on 5050 |
-| 1.7 | 19–24 | Slack; then the records (DECISIONS, CHANGELOG, 12_TESTING, PROGRESS, the references and the manifest); push | gate `--docstrings` OK, the source scan clean, pushed |
+| 1.3 | 4–8 | **PolyStrata as a host** (15 §1): the probe knows a PolyStrata server (`/health`'s `"service": "strata"`) and sets its lane to `structured_mode: prompt_only`; the transport reads a `structured_output_failed` stream event as that call's grammar failure, never a dead lane; a PolyStrata lane sends nothing when its model is not the one loaded (`/health`, `/props`); new optional `LaneConfig.thinking_budget` (sent as `reasoning_budget_tokens` on thinking calls) and `LaneConfig.sampling` (`top_k`, `min_p`, … sent with each call); the bench reads PolyStrata's own `/props`, `/v1/status` and `/api/models` where it read LM Studio's native API | contract tests against a fake PolyStrata built from its source through `httpx.MockTransport` (no sockets): a bad JSON answer is one repaired call and the lane stays up; an unloaded model is never called; the budget and sampling reach the body; the probe picks `prompt_only` |
+| 1.4 | 8–14 | **`tools/as/fit.py`, the turn's own path.** Plays the game's real calls (captured from scripted scenes on the fake: an insult, a question, a kiss unwanted and welcome, a shove, a shooting seen, the room after a crash) on your models: intake, WARM and HOT decisions, reactions (HOT and WARM), narration, the lint judge. Each as set, with thinking flipped, and the HOT calls on the other lane too. Graded by code: parsed; the intake picked the right option (gold answers); a person spoken to answers; no name they cannot know; no refusal or out-of-story talk; the narration passes the game's own lint. Then a **turn-time table** for three profiles — Quality (as set), Balanced, Fast — and `--accept quality|balanced|fast` writes the profile you pick. `--fake`, `--quick`, `--resume`; reports under `as_runs/reports/fit.md`. Works the same on LM Studio and PolyStrata lanes | a contract test on the fake: the cases build, the grading separates a good answer from a bad one, a profile writes the settings it lists, nothing outside the configured lane URLs is touched |
+| 1.5 | 14–15 | **`tools/as/tune.py`**: probe `--write`, then `bench.py --quick --accept`, then `fit.py --quick`, printing the profile table and the command that accepts one | runs end to end on `--fake`, with one lane a fake LM Studio and the other a fake PolyStrata |
+| 1.6 | 15–19 | **`as-engine serve`.** `websockets` server on 127.0.0.1:5050: `/ws` speaks 10 §3's protocol to `GameService` (one tab at a time, pushes to the open tab, a reload reconnects to the running game), every other path serves the built Play UI; the seal installed before the port opens, refusals logged; `--fake` for tests; the address and the data folder from the command line (so another app can host it later) | contract tests through the server's handler with an in-memory connection (no sockets): hello round-trips, a second tab gets the other-tab message, a turn's pushes arrive, the seal is on |
+| 1.7 | 19–21 | **Owner checkpoint 1 package**: `install-game.sh` / `.bat`, `play.sh` / `.bat` (`play` opens the browser), README_FIRST's "Play it" section rewritten for this path, with both hosts | the `.sh` pair, run in a clean folder here, ends with the server answering on 5050 |
+| 1.8 | 21–24 | Slack; then the records (DECISIONS, CHANGELOG, 12_TESTING, PROGRESS, the references and the manifest); push | gate `--docstrings` OK, the source scan clean, pushed |
 
-**Owner checkpoint 1** (end of Day 1, §6): pull, `install-game.bat`, `python tools\as\tune.py` overnight, and three
-turns in the terminal (`as-engine play`).
+**Owner checkpoint 1** (end of Day 1, §6): pull, `install-game.bat`, your models on LM Studio or PolyStrata (15 §2),
+`python tools\as\tune.py` overnight, and three turns in the terminal (`as-engine play`).
 
 ### Day 2 — the Play UI (hours 24–48)
 
@@ -151,6 +153,7 @@ shown becomes the first supplemental update.
 ```
 git pull
 install-game.bat
+(PolyStrata: set up the two PCs as 15 §2 says, and put both addresses in as_config.yaml)
 python tools\as\tune.py            (leave it overnight; it prints a table at the end)
 as-engine new-run core:pc/owen_marsh --detail gotta_go_to_work_soon
 as-engine play <the run id it printed>      (three moves, then quit)
@@ -170,6 +173,8 @@ and `as_runs\logs\` if a turn failed.
 | A model does not answer in the shapes the game reads | its calls fail; people hold still; the story is told plainly | the fallbacks are built (repair, hold, plain narration), so the game still plays; `fit.md` shows which calls, and Day 3 fixes them |
 | Turns are too slow on your pair | minutes per move | `tune.py` measures it and offers Balanced and Fast; turn depth Quick in Settings; Stop always works |
 | No working thinking switch for a model | it always or never thinks | the probe reports it; the profile accounts for it |
+| Boulesis does not run on PolyStrata (a fine-tune nobody has tried there) | the Writer cannot move | the Writer stays on LM Studio and only the Clerk moves to PolyStrata; lanes are per-address, so the two hosts mix |
+| PolyStrata has no grammar decoder | more answers that are not the JSON asked for | `prompt_only` plus the one repair call (LANE-06); `fit.md` shows the parse rate per call, and the profile can move a call whose rate is low |
 | The Windows scripts fail on your machine | no one-click start | `as-engine serve` and `as-engine play` from a prompt do the same thing; checkpoint 1 finds it on Day 1, not Day 3 |
 | The Play UI is not finished by hour 48 | fewer screens | the order of Day 2 leaves Connect, Home, Play and Your lives first; the terminal plays the same game |
 | A protected test turns out wrong | it stays red | an entry in SPEC_ISSUES.md (AGENTS.md §2.2); it does not block the release unless it is a real fault |

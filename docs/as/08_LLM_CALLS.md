@@ -36,6 +36,8 @@ conservation, cascade application, scoring, selection, commit, save and replay a
    model still finds facts, how long each of the game's calls takes, and writes the settings that follow into
    `as_config.yaml`. (`python tools/as/probe.py --write` alone does the thinking switch in minutes.)
 
+**Or PolyStrata (D-297).** Each PC can serve its model with PolyStrata instead (much faster on the same cards; one model per PC, no LM Link: each lane gets its own address). Setup and what the game does differently: `15_POLYSTRATA.md`.
+
 **The Writer and the Clerk (D-111, D-113).** The two models are not equals. **Lane A, the Writer**
 (Boulesis v2.1 26B-A4B, a Gemma 4) is many times smarter and by far the better writer: it keeps a long context
 consistent, holds extra directions, and tells in-story from meta. It is also slow on a consumer card — about
