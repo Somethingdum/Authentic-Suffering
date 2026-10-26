@@ -20,14 +20,19 @@ made and played today in a terminal on the fake model (`as-engine new-run …`, 
 * **seven tests are red** (the sessions browser and a world that names no run);
 * **no one-click start** on your Windows desktop.
 
-Three days fix exactly those four things, in that order of risk, and nothing else.
+Three days fix exactly those four things, in that order of risk, and spend the speed your models now have (§4a).
+
+**Your models now** (the owner, 2026-10-26): *"my models run between 70 and 130 tokens per second now. We can make
+many more calls. And we run two models at a time."* That is up to six times what the plan was sized for (the
+Writer wrote about 5 a second, the Clerk about 19). Writing is no longer what a turn waits for; the plan is set
+against that (§4a) and no longer treats turn time as the main risk.
 
 ## 1. Done means this (the owner's acceptance run)
 
 On your Windows desktop, with your models served by LM Studio (LM Link on) or by PolyStrata on each PC (15 §2):
 
 1. `install-game.bat` once. It finishes with "Installed." No Talemate install, no torch, no TTS.
-2. `python tools\as\tune.py` once (overnight). It finds each model's thinking switch, measures your machines, plays
+2. `python tools\as\tune.py` once (about an hour at your speeds). It finds each model's thinking switch, measures your machines, plays
    the game's own calls on both models and writes the settings into `as_config.yaml`.
 3. `play.bat`. A browser tab opens at `http://127.0.0.1:5050`. Connect shows both models by name, each **Test**
    passes.
@@ -39,7 +44,8 @@ On your Windows desktop, with your models served by LM Studio (LM Link on) or by
 7. **Die** (walk into the dead): the Doom, the death screen, Willis's roast. Back to Home; start another life.
 8. The whole time nothing in the game connected anywhere but LM Studio (the seal's refusal list in
    `as_runs/logs/seal.log` is empty or lists only what it blocked).
-9. A turn takes about what `tune.py` said it would.
+9. A turn takes about what `tune.py` said it would, inside the targets of §4a (Quick under 30 s, Balanced about a
+   minute, Deep under 3 minutes), with both models working at once and neither ever given two prompts.
 
 If 1–9 hold, the release is done. Everything else is a supplemental update (§3).
 
@@ -48,7 +54,7 @@ If 1–9 hold, the release is done. Everything else is a supplemental update (§
 | # | Feature | State today | Work in the three days |
 |---|---|---|---|
 | 1 | **Sealed and private** | built (SEAL-01..05) | the new server installs the seal before it opens a port, listens on 127.0.0.1 only, and logs refusals |
-| 2 | **Your two models** — Writer (A) and Clerk (B), on LM Studio over LM Link **or on PolyStrata** (one per PC, D-297) | LM Studio built (lanes, probe, limits bench); PolyStrata not | PolyStrata as a host (block 1.3); `fit.py` (quality per call, critical path), `tune.py` (one command: probe → bench → fit → write settings) |
+| 2 | **Your two models** — Writer (A) and Clerk (B), on LM Studio over LM Link **or on PolyStrata** (one per PC, D-297) | LM Studio built (lanes, probe, limits bench); PolyStrata not | PolyStrata as a host (block 1.3); `fit.py` (quality per call, every call the game makes), `tune.py` (one command: probe → bench → fit → write settings) |
 | 3 | **Connect** — pick the Main and Second model from LM Studio's one list, Test each | protocol built (P8 steps 1–3) | the screen |
 | 4 | **New life** — wizard, worldgen, loading bar | built, screens built (P10) | wire into the real app; end-to-end test |
 | 5 | **Play** — the story, Act / Say / Cheat, people who react and remember, Stop, Ask, turn progress, the side tabs | engine built; screen a placeholder | the Play screen and its panels, to the protected specs |
@@ -61,16 +67,15 @@ If 1–9 hold, the release is done. Everything else is a supplemental update (§
 ## 3. What waits (supplemental updates, in this order)
 
 1. Anything the owner's acceptance run turns up that is not a blocker.
-2. The full model benchmark: `fit.py` over every call class (the release measures the turn's own path only).
-3. The owner's lore, ready when you are: the Willis card update, the Lurkers, Addison's canon story, the Codex.
-4. The gaps found in play-testing on the fake model: an insult is shown to the hearer as "a statement"; people
+2. The owner's lore, ready when you are: the Willis card update, the Lurkers, Addison's canon story, the Codex.
+3. The gaps found in play-testing on the fake model: an insult is shown to the hearer as "a statement"; people
    who love someone kissed against their will have no rule for it; generated worlds have no barricades. (The
-   first goes in on Day 3 if there is time: §5, block 3.7.)
-5. **The game hosted by another app** of the owner's: its lanes on that app's model API, then that app starting it with Play in its menu.
-6. The Talemate plugin and patches (02 §4.1, §6), so the Workshop can sit beside the game; Read aloud (local TTS).
-7. Worlds: list, export, import, a new life in the same world after a death (RUN-07, P12 step 4).
-8. Migrations (P12 step 5).
-9. The Content screen's imports (character cards, documents, dossier intake) and the developer panel beyond what
+   first goes in on Day 3 if there is time: §5, block 3.8.)
+4. **The game hosted by another app** of the owner's: its lanes on that app's model API, then that app starting it with Play in its menu.
+5. The Talemate plugin and patches (02 §4.1, §6), so the Workshop can sit beside the game; Read aloud (local TTS).
+6. Worlds: list, export, import, a new life in the same world after a death (RUN-07, P12 step 4).
+7. Migrations (P12 step 5).
+8. The Content screen's imports (character cards, documents, dossier intake) and the developer panel beyond what
    its spec pins.
 
 ## 4. The one change of course: the game serves itself
@@ -92,6 +97,41 @@ Talemate plugin of 02 §6 still drops in later unchanged. The browser loads the 
 serves from `as_engine/src/as_engine/service/ui/`, built by `tools/as/build_ui.py` from a play-only Vite entry and
 committed, so your machine needs no Node. A test fails when the committed build is older than its sources.
 
+## 4a. Planned against your speed
+
+At 70–130 tokens a second written, and PolyStrata's reading speeds on the same cards (1,600–2,200 a second on the
+8 GB laptop), a call costs seconds ("then": the Writer at 5 a second and reading about 150, the Clerk at 19 and
+reading about 200):
+
+| Call | Tokens it reads / writes (thinking included) | Then (5 / 19 a second) | Now (about 100 a second) |
+|---|---|---|---|
+| Intake (Clerk) | 3,000 / 150, or 650 thinking | 25–50 s | 3–9 s |
+| A person's decision (HOT, Writer, thinking) | 6,000 / 1,200 | about 4½ minutes | 15–20 s |
+| A reaction or a WARM decision (Clerk) | 4,000 / 300 | about 35 s | 4–6 s |
+| The narration (Writer, thinking) | 5,000 / 1,900 | about 7 minutes | 20–30 s |
+| The lint judge, a portrayal audit (Clerk, thinking) | 3,000 / 800 | about 1 minute | 8–13 s |
+
+So the release spends it, by these rules:
+
+1. **Two models busy at once, one prompt each.** The Writer's PC and the Clerk's PC each serve one call at a time
+   (one prompt per PC: a second prompt at once can crash the 8 GB laptop). Two lanes that point at the same PC share
+   that one turn. The turn's work is laid out so both are busy: the Writer decides for the HOT people while the
+   Clerk does the WARM ones, the reactions and the audits; the Writer narrates while the Clerk writes the memories,
+   and at Deep the Clerk judges the first draft while the Writer writes the second. `fit.py` measures the overlap, and a turn that leaves one PC idle while the other works is a
+   finding.
+2. **Thinking where it is worth it**, measured: every call is tried with thinking on and off, and on is kept wherever
+   it scores better, since it now costs seconds, not minutes.
+3. **More people think each turn**: the HOT minds per depth (today 1 / 2 / 3) rise to what fits the targets on your
+   measured speeds; fewer people are left to a one-line ambient remark.
+4. **Fuller memories in every prompt**: the Skull Packet budgets (today 6,000 / 6,000 / 3,000 tokens) rise as far as
+   the bench's recall ladder says each model still finds the facts; more remembered moments, more of what was said
+   here, more of how a person sounds.
+5. **The time while you read is used.** The quiet-hours runner (BG-01) already works while the game waits for you:
+   memories, reflection, the people out of sight. At these speeds it gets through far more of it.
+6. **Two drafts at the Deep depth**: the Writer writes the moment twice, the lint and the judge pick the better one.
+7. **Targets, not ceilings**: Quick under 30 s, Balanced about a minute, Deep under 3 minutes. `tune.py` sets the
+   budgets to hit them on your PCs; Stop still ends any turn.
+
 ## 5. The plan, block by block
 
 Each block ends with its **exit check**; a block is not done until its check passes. Hours are working hours of
@@ -103,15 +143,15 @@ non-stop work; about a quarter of each day is kept as slack and is spent on what
 |---|---|---|---|
 | 1.1 | 0–1 | Fresh environment (engine venv, frontend `pnpm install`); the full suite as a baseline | 2681 / 2688 as recorded |
 | 1.2 | 1–4 | **The seven red tests.** RUN-12 / RUN-13 in `_impl_runs.py` (`wipe_tree`, `delete_run`, `list_runs`' `final`) and `on_run_delete`; `Store.backup_to(…, as_world=)` and worldgen's GENESIS step (D-76) | the suite: 2688 / 2688 |
-| 1.3 | 4–8 | **PolyStrata as a host** (15 §1): the probe knows a PolyStrata server (`/health`'s `"service": "strata"`) and sets its lane to `structured_mode: prompt_only`; the transport reads a `structured_output_failed` stream event as that call's grammar failure, never a dead lane; a PolyStrata lane sends nothing when its model is not the one loaded (`/health`, `/props`); new optional `LaneConfig.thinking_budget` (sent as `reasoning_budget_tokens` on thinking calls) and `LaneConfig.sampling` (`top_k`, `min_p`, … sent with each call); the bench reads PolyStrata's own `/props`, `/v1/status` and `/api/models` where it read LM Studio's native API | contract tests against a fake PolyStrata built from its source through `httpx.MockTransport` (no sockets): a bad JSON answer is one repaired call and the lane stays up; an unloaded model is never called; the budget and sampling reach the body; the probe picks `prompt_only` |
-| 1.4 | 8–14 | **`tools/as/fit.py`, the turn's own path.** Plays the game's real calls (captured from scripted scenes on the fake: an insult, a question, a kiss unwanted and welcome, a shove, a shooting seen, the room after a crash) on your models: intake, WARM and HOT decisions, reactions (HOT and WARM), narration, the lint judge. Each as set, with thinking flipped, and the HOT calls on the other lane too. Graded by code: parsed; the intake picked the right option (gold answers); a person spoken to answers; no name they cannot know; no refusal or out-of-story talk; the narration passes the game's own lint. Then a **turn-time table** for three profiles — Quality (as set), Balanced, Fast — and `--accept quality|balanced|fast` writes the profile you pick. `--fake`, `--quick`, `--resume`; reports under `as_runs/reports/fit.md`. Works the same on LM Studio and PolyStrata lanes | a contract test on the fake: the cases build, the grading separates a good answer from a bad one, a profile writes the settings it lists, nothing outside the configured lane URLs is touched |
+| 1.3 | 4–8 | **PolyStrata as a host** (15 §1): the probe knows a PolyStrata server (`/health`'s `"service": "strata"`) and sets its lane to `structured_mode: prompt_only`; the transport reads a `structured_output_failed` stream event as that call's grammar failure, never a dead lane; a PolyStrata lane sends nothing when its model is not the one loaded (`/health`, `/props`); new optional `LaneConfig.thinking_budget` (sent as `reasoning_budget_tokens` on thinking calls) and `LaneConfig.sampling` (`top_k`, `min_p`, … sent with each call); the bench reads PolyStrata's own `/props`, `/v1/status` and `/api/models` where it read LM Studio's native API; **one prompt per PC**: two lanes whose address is the same machine share one call at a time (§4a rule 1) | contract tests against a fake PolyStrata built from its source through `httpx.MockTransport` (no sockets): a bad JSON answer is one repaired call and the lane stays up; an unloaded model is never called; the budget and sampling reach the body; the probe picks `prompt_only`; two lanes on one host never have two calls in flight |
+| 1.4 | 8–14 | **`tools/as/fit.py`, every call the game makes.** Plays the game's real calls (captured from scripted scenes on the fake: an insult, a question, a kiss unwanted and welcome, a shove, a shooting seen, the room after a crash, a new world, a death; the prompt samples for the rest) on your models: intake, WARM and HOT decisions, reactions, narration, the judges and audits, memories, rumours, the room's remarks, the guide, the cheat interpreter, worldgen. Each as set, with thinking flipped, and on the other model too. Graded by code: parsed; the intake picked the right option (gold answers); a person spoken to answers; no name they cannot know; no refusal or out-of-story talk; the narration passes the game's own lint; the judges catch planted faults. Then **a turn on both models at once** (§4a rule 1), and the profiles against §4a's targets: **Best** (the highest-scoring settings that still meet the targets: thinking, HOT minds per depth, packet budgets, two drafts at Deep), **Balanced** and **Quick**; `--accept best|balanced|quick` writes the one you pick. About an hour at your speeds. `--fake`, `--quick`, `--resume`; reports under `as_runs/reports/fit.md`. The same on LM Studio and PolyStrata lanes | a contract test on the fake: the cases build, the grading separates a good answer from a bad one, the overlap is measured, a profile writes the settings it lists, nothing outside the configured lane URLs is touched |
 | 1.5 | 14–15 | **`tools/as/tune.py`**: probe `--write`, then `bench.py --quick --accept`, then `fit.py --quick`, printing the profile table and the command that accepts one | runs end to end on `--fake`, with one lane a fake LM Studio and the other a fake PolyStrata |
 | 1.6 | 15–19 | **`as-engine serve`.** `websockets` server on 127.0.0.1:5050: `/ws` speaks 10 §3's protocol to `GameService` (one tab at a time, pushes to the open tab, a reload reconnects to the running game), every other path serves the built Play UI; the seal installed before the port opens, refusals logged; `--fake` for tests; the address and the data folder from the command line (so another app can host it later) | contract tests through the server's handler with an in-memory connection (no sockets): hello round-trips, a second tab gets the other-tab message, a turn's pushes arrive, the seal is on |
 | 1.7 | 19–21 | **Owner checkpoint 1 package**: `install-game.sh` / `.bat`, `play.sh` / `.bat` (`play` opens the browser), README_FIRST's "Play it" section rewritten for this path, with both hosts | the `.sh` pair, run in a clean folder here, ends with the server answering on 5050 |
 | 1.8 | 21–24 | Slack; then the records (DECISIONS, CHANGELOG, 12_TESTING, PROGRESS, the references and the manifest); push | gate `--docstrings` OK, the source scan clean, pushed |
 
 **Owner checkpoint 1** (end of Day 1, §6): pull, `install-game.bat`, your models on LM Studio or PolyStrata (15 §2),
-`python tools\as\tune.py` overnight, and three turns in the terminal (`as-engine play`).
+`python tools\as\tune.py` (about an hour), and three turns in the terminal (`as-engine play`).
 
 ### Day 2 — the Play UI (hours 24–48)
 
@@ -136,12 +176,13 @@ went wrong (§6).
 | Block | Hours | Work | Exit check |
 |---|---|---|---|
 | 3.1 | 48–54 | **What checkpoints 1 and 2 found.** Every call that failed to parse, every prompt your models misread, every stall, every slow call: a fix with a test that fails without it | the fake-model test for each, and `fit.py --fake` on the changed prompts |
-| 3.2 | 54–57 | The defaults in `as_config.example.yaml` and `contracts/settings.default_regimes` set from your measurements, so a fresh install starts where `tune.py` would put it | the settings tests; `tune.py --fake` shows nothing left to change |
-| 3.3 | 57–61 | **The long run**: 100 turns through the server on the fake, with a reconnect every 10 turns, Stop mid-turn, save and load mid-life, the quiet hours, a death; then the 100-day world soak per difficulty (BENCH-06) | no crash, no lost turn, replay says "all the same" |
-| 3.4 | 61–64 | Gates: `gate.py --phase 0` … `--phase 11` recorded one by one (P8's row says the plugin test waits for §3 item 5) | each row written by the gate |
-| 3.5 | 64–66 | The Windows scripts read line by line against the tested `.sh` pair; README_FIRST and the Play UI smoke checklist rewritten for the release path | — |
-| 3.6 | 66–68 | Records, references, manifest; push | pushed, clean |
-| 3.7 | 68–72 | Slack. If unused: an insult reaches the hearer as an insult, not "a statement" (§3 item 4), with its test | — |
+| 3.2 | 54–57 | **Spend the speed** (§4a): the defaults in `as_config.example.yaml` and `contracts/settings` (regimes' thinking, `max_hot` per depth, the packet budgets, `estimated_call_s`, the turn budgets) set from your measurements, so a fresh install starts where `tune.py` would put it; the turn's work checked for idle stretches on either PC, and reordered where one waits for nothing | the settings tests; `tune.py --fake` shows nothing left to change; the fake two-PC turn keeps both lanes busy |
+| 3.3 | 57–60 | **Two drafts at Deep** (§4a rule 6): the Writer writes the narration twice, one after the other on its PC; the code lint and the judge pick the better (a draft that fails the lint never wins); Quick and Balanced write once | a test on the fake: of a draft that fails the lint and one that passes, the passing one is shown; one draft at Balanced |
+| 3.4 | 60–63 | **The long run**: 100 turns through the server on the fake, with a reconnect every 10 turns, Stop mid-turn, save and load mid-life, the quiet hours, a death; then the 100-day world soak per difficulty (BENCH-06) | no crash, no lost turn, replay says "all the same" |
+| 3.5 | 63–65 | Gates: `gate.py --phase 0` … `--phase 11` recorded one by one (P8's row says the plugin test waits for §3 item 5) | each row written by the gate |
+| 3.6 | 65–67 | The Windows scripts read line by line against the tested `.sh` pair; README_FIRST and the Play UI smoke checklist rewritten for the release path | — |
+| 3.7 | 67–69 | Records, references, manifest; push | pushed, clean |
+| 3.8 | 69–72 | Slack. If unused: an insult reaches the hearer as an insult, not "a statement" (§3 item 3), with its test | — |
 
 ## 6. Owner checkpoints
 
@@ -149,12 +190,12 @@ Your machines are the only place the real models are, so three things only you c
 them: if a checkpoint does not happen, the next day's work goes ahead on the fake, and what your models would have
 shown becomes the first supplemental update.
 
-**Checkpoint 1 (end of Day 1, takes you 10 minutes plus a night):**
+**Checkpoint 1 (end of Day 1, takes you 10 minutes plus an hour of tuning):**
 ```
 git pull
 install-game.bat
 (PolyStrata: set up the two PCs as 15 §2 says, and put both addresses in as_config.yaml)
-python tools\as\tune.py            (leave it overnight; it prints a table at the end)
+python tools\as\tune.py            (about an hour; it prints the profiles at the end)
 as-engine new-run core:pc/owen_marsh --detail gotta_go_to_work_soon
 as-engine play <the run id it printed>      (three moves, then quit)
 ```
@@ -171,10 +212,12 @@ and `as_runs\logs\` if a turn failed.
 | Risk | What happens | Fallback |
 |---|---|---|
 | A model does not answer in the shapes the game reads | its calls fail; people hold still; the story is told plainly | the fallbacks are built (repair, hold, plain narration), so the game still plays; `fit.md` shows which calls, and Day 3 fixes them |
-| Turns are too slow on your pair | minutes per move | `tune.py` measures it and offers Balanced and Fast; turn depth Quick in Settings; Stop always works |
+| A turn waits on one PC while the other sits idle | turns slower than the speeds allow | `fit.py` measures the overlap; block 3.2 reorders the work; Quick in Settings; Stop always works |
+| Two prompts at once on one PC | the laptop crashes | one prompt per PC in the lanes (block 1.3), whatever the server would accept |
+| Your speeds are lower in the game than in PolyStrata's tables (long prompts, thinking) | turns over the targets | `tune.py` sets the budgets from what it measured, not from the tables |
 | No working thinking switch for a model | it always or never thinks | the probe reports it; the profile accounts for it |
 | Boulesis does not run on PolyStrata (a fine-tune nobody has tried there) | the Writer cannot move | the Writer stays on LM Studio and only the Clerk moves to PolyStrata; lanes are per-address, so the two hosts mix |
-| PolyStrata has no grammar decoder | more answers that are not the JSON asked for | `prompt_only` plus the one repair call (LANE-06); `fit.md` shows the parse rate per call, and the profile can move a call whose rate is low |
+| PolyStrata has no grammar decoder | more answers that are not the JSON asked for | `prompt_only` plus the one repair call (LANE-06), cheap at these speeds; `fit.md` shows the parse rate per call, and the profile can move a call whose rate is low |
 | The Windows scripts fail on your machine | no one-click start | `as-engine serve` and `as-engine play` from a prompt do the same thing; checkpoint 1 finds it on Day 1, not Day 3 |
 | The Play UI is not finished by hour 48 | fewer screens | the order of Day 2 leaves Connect, Home, Play and Your lives first; the terminal plays the same game |
 | A protected test turns out wrong | it stays red | an entry in SPEC_ISSUES.md (AGENTS.md §2.2); it does not block the release unless it is a real fault |
@@ -186,5 +229,5 @@ and `as_runs\logs\` if a turn failed.
 * The Play UI: every vitest spec green.
 * `gate.py --phase 0..11` rows recorded; `gate.py --docstrings` OK; the source scan clean; `protect.py --verify`
   clean (its one expected problem aside: `.claude/settings.json` is never committed).
-* The browser script of block 2.6 and the long run of block 3.3 pass.
+* The browser script of block 2.6 and the long run of block 3.4 pass.
 * The acceptance run of §1, by you.
