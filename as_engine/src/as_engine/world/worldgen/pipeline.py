@@ -38,7 +38,8 @@ async run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id, wo
          With no model calls to make (total 0) nothing is reported.
     GENESIS (after WG7, before WG8; no progress message of its own): world_dir is made; store.backup_to(world_dir /
          'genesis.sqlite', as_world=world_id) — the finished world before any PC exists, naming no
-         run (RUN-09) — and world.json =
+         run (RUN-09) — and world.json = (D-299, HOST-02: world_dir None — a hosted run — writes no
+         file: report.genesis = store.to_bytes(as_world=world_id) and report.world = that dict)
          {world_id, title = f"{climate_descriptor capitalised} — {atlas.ERA_LABELS[era]}, day {dsf}", difficulty,
          era, day_at_genesis: dsf, climate_text, factions: [planned faction names], created_real:
          kernel.store.wall_clock_iso(), source 'generated', seed, detail} (sorted keys, 2-space indent).
@@ -119,6 +120,8 @@ class WorldgenReport:
     skipped_actors: list[tuple[str, str]] = field(default_factory=list)
     retries: list[str] = field(default_factory=list)
     model_calls: int = 0
+    genesis: bytes | None = None        # D-299: a hosted world (world_dir None): GENESIS's bytes, as_world
+    world: dict | None = None           # D-299: and its world.json, which the host keeps instead of a file
 
 
 async def run_worldgen(store, client, canon, pc_ref: str, settings, config, *, run_id: str, world_id: str,

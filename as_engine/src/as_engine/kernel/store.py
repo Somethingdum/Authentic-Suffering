@@ -163,6 +163,58 @@ class Store:
         return cls(conn, str(path))
 
     @classmethod
+    def create_memory(cls, *, run_id: str, seed: int, settings_json: str = "{}", content_hash: str = "",
+                      start_ms: int = 0, rules_json: str = "{}") -> "Store":
+        """D-299 (HOST-02): ``create`` for a run that lives in memory — a hosted run, whose host keeps
+        its bytes. The same schema and meta rows as ``create`` (created_at_real = wall_clock_iso());
+        no file is touched."""
+        conn = cls._connect(None, memory=True)
+        cls._init(conn, run_id, seed, settings_json, content_hash, start_ms, rules_json, wall_clock_iso())
+        return cls(conn, ":memory:")
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> "Store":
+        """D-299 (HOST-02): a store in memory from the bytes ``to_bytes`` made (or any run file's bytes).
+        Header bytes 18-19 (the journal mode a file was written in) are set to 1, rollback: a file
+        written in WAL mode opens in memory only so. The same checks as ``open``: meta.schema_version
+        must be SCHEMA_VERSION (else SchemaError, STORE-04) and LATER_INDEXES are made."""
+        from ..kernel.errors import SchemaError
+        if len(data) < 100 or not data.startswith(b"SQLite format 3\x00"):
+            raise SchemaError("not a run's bytes")
+        buf = bytearray(data)
+        buf[18] = buf[19] = 1
+        conn = sqlite3.connect(":memory:", isolation_level=None)
+        conn.deserialize(bytes(buf))
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys=ON")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        row = conn.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+        if row is None or row[0] != str(SCHEMA_VERSION):
+            conn.close()
+            raise SchemaError("schema version mismatch")
+        for ix in LATER_INDEXES:
+            conn.execute(ix)
+        return cls(conn, ":memory:")
+
+    def to_bytes(self, *, as_world: str | None = None) -> bytes:
+        """D-299 (HOST-02): the whole store as bytes — a consistent copy through the backup API into a
+        fresh memory database, serialised, header bytes 18-19 set to 1. ``as_world`` as ``backup_to``:
+        in the copy only, meta run_id becomes it, every lm_calls row goes and the copy is vacuumed."""
+        dst = sqlite3.connect(":memory:", isolation_level=None)
+        try:
+            self.conn.backup(dst)
+            if as_world is not None:
+                dst.execute("PRAGMA secure_delete = ON")
+                dst.execute("UPDATE meta SET value = ? WHERE key = 'run_id'", (as_world,))
+                dst.execute("DELETE FROM lm_calls")
+                dst.execute("VACUUM")
+            buf = bytearray(dst.serialize())
+        finally:
+            dst.close()
+        buf[18] = buf[19] = 1
+        return bytes(buf)
+
+    @classmethod
     def memory(cls, *, run_id: str = "test_run", seed: int = 1, start_ms: int = 0) -> "Store":
         conn = cls._connect(None, memory=True)
         cls._init(conn, run_id, seed, "{}", "", start_ms, "{}", "1970-01-01T00:00:00Z")

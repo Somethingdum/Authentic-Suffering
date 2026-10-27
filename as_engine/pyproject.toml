@@ -34,7 +34,7 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 timeout = 120
 markers = [
-    "phase(n): contract test belonging to build phase n (0-12)",
+    "phase(n): contract test belonging to build phase n (0-13; 13 is the hosted engine, D-299)",
     "live: requires a real LM Studio endpoint (AS_LIVE=1)",
     "slow: long-running soak test",
 ]

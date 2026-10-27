@@ -69,8 +69,9 @@ right after the slice (P8) so the human can play and judge it early.
 
 ### 4.0 Where this copy starts (2026-09-25)
 
-**Until the three-day release is done, `14_THREE_DAYS.md` is the plan (D-296)**: its blocks come before the steps
-below, and its §3 lists what waits. The steps below stay the map once it is done.
+**The engine is moving into the owner's harness (D-299)**: `16_HOSTED.md` and phase P13 (`tests/contract/p13_hosted/`)
+come first; `14_THREE_DAYS.md`'s standalone release (D-296) waits behind it (its block 1.2, the seven red tests, is
+green). The steps below stay the map.
 
 The engine side of P0–P10 is **built**, and so is everything added to it since (owner,
 2026-09-25: the kit-maker's working implementations go into the final system): Actor v2 B1–B6

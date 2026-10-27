@@ -158,11 +158,16 @@ async def simulate(ctx):
                                            "'actor_reaction') AND status='ok' LIMIT 1", (a,)) is not None)
             due = -(-len(only) // max(1, tx.rules.scheduler.rethink_turns))           # D-231: spread out, not all at once
             sel = [(a, select.salience({**f, "restless": False} if a in only[due:] else f, m, W), m) for a, f, m in flagged]
-            plan = plan_cognition(sel, cfg, s.settings.turn_depth, ctx.lanes_up)
+            gov = getattr(s.client.transport, "governor", None)            # D-299 (HOST-07): a hosted turn
+            if gov is not None:
+                plan = await gov.plan_cognition(sel, cfg, wave_idx, ctx.lanes_up)
+            else:
+                plan = plan_cognition(sel, cfg, s.settings.turn_depth, ctx.lanes_up)
             if plan.overrun:
                 log_repair(tx, "budget_overrun", 4, "SCHED-01", {"notes": plan.notes}, T, wave_at)
             plans.append({"wave": wave_idx, "at": wave_at, "lod": {a: l.value for a, l in plan.lod.items()},
-                          "salience": {a: sc for a, sc, _m in sel}, "mandatory": sorted(a for a, _s, m in sel if m)})
+                          "salience": {a: sc for a, sc, _m in sel}, "mandatory": sorted(a for a, _s, m in sel if m),
+                          **({"steps": dict(gov.plan_steps), "tier": gov.tier, "focus": gov.focus} if gov is not None else {})})
             # CHEAT-11: a standing-brief actor (always cheat-made: quarantine 1) is briefed once a turn
             from ..cheats.commands import standing_brief
             from ..contracts.common import LOD as _LOD
@@ -632,6 +637,14 @@ class ReuseTransport:
 
     def __init__(self, inner, cache):
         self.inner, self.cache = inner, cache
+
+    @property
+    def routed(self):            # LANE-12: a host-routed run stays routed on its strict retry
+        return getattr(self.inner, "routed", False)
+
+    @property
+    def governor(self):          # D-299: and governed by the same budget, with the same decisions
+        return getattr(self.inner, "governor", None)
 
     async def send(self, lane, request):
         from ..contracts.lanes import LMResponse

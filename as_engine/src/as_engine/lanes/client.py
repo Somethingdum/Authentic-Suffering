@@ -36,6 +36,15 @@ default). A call of an ablated class never reaches the transport: it returns par
 'cancelled' with error 'ablated' at once, logged through ``on_call`` like any other call, so every
 caller takes the fallback path it already has for a call that did not come back
 (tools/as/eval.py --ablate).
+
+Routed transports (LANE-12, D-299): a transport whose ``routed`` attribute is true hands every call
+to a host that chooses the model itself (as_engine.host). Over it the client never decides what is
+available: ``client.routed`` is true, ``mark_down`` changes nothing (no lane is ever down),
+``refresh_health`` answers every configured lane up without probing, and ``check_models`` checks
+nothing. The transport may raise two more errors: LaneRefused -> parse_status 'lane_error' with its
+message (the lane stays up), and CallSkipped (the host left an optional call out for time) ->
+'cancelled' with error f"skipped: {message}", as an ablated call answers. Both are logged through
+``on_call`` like any other call.
 """
 
 from __future__ import annotations
@@ -60,6 +69,7 @@ class LaneClient:
         self.ablated: set = set()
         self.on_progress: Callable[[LMRequest, dict | None], None] | None = None
         self.live: dict[int, dict] = {}
+        self.routed: bool = bool(getattr(transport, "routed", False))     # LANE-12
         if hasattr(transport, "sink"):
             transport.sink = LaneClient.dispatch
 
@@ -74,7 +84,7 @@ class LaneClient:
 
     async def call(self, request: LMRequest, output_model: type[BaseModel] | None = None) -> LMResponse:
         import asyncio, time
-        from .errors import LaneTimeout, LaneUnavailable
+        from .errors import CallSkipped, LaneRefused, LaneTimeout, LaneUnavailable
         from .parse import strip_think, extract_json, validate
         base = dict(call_class=request.call_class, lane=request.lane)
         if request.call_class in self.ablated:
@@ -94,6 +104,12 @@ class LaneClient:
         except LaneUnavailable as e:
             self.mark_down(request.lane)
             resp = LMResponse(**base, parse_status="lane_error", error=str(e))
+            self._log(request, resp); return resp
+        except LaneRefused as e:                                          # LANE-12: the lane stays up
+            resp = LMResponse(**base, parse_status="lane_error", error=str(e) or "refused")
+            self._log(request, resp); return resp
+        except CallSkipped as e:                                          # LANE-12: as LANE-09 ablation
+            resp = LMResponse(**base, parse_status="cancelled", error=f"skipped: {e}" if str(e) else "skipped")
             self._log(request, resp); return resp
         finally:
             self.live.pop(id(request), None)
@@ -131,12 +147,16 @@ class LaneClient:
             self.on_call(q, r)
 
     def mark_down(self, lane: Lane, down: bool = True) -> None:
+        if self.routed:                      # LANE-12: the host knows what is available, not the engine
+            return
         (self._down.add if down else self._down.discard)(lane)
 
     def is_down(self, lane: Lane) -> bool:
         return lane in self._down
 
     async def refresh_health(self) -> dict[Lane, bool]:
+        if self.routed:                      # LANE-12: every lane is up; the host routes or refuses each call
+            return {lane: True for lane in self.config.lanes}
         out = {}
         for lane, cfg in self.config.lanes.items():
             ok = await self.transport.health(lane, cfg)
@@ -146,6 +166,8 @@ class LaneClient:
 
     async def check_models(self) -> None:
         from .errors import ModelSwapped
+        if self.routed:                      # LANE-12: which model answers is the host's to know
+            return
         for lane, cfg in self.config.lanes.items():
             if self.is_down(lane) or not cfg.model:
                 continue

@@ -25,7 +25,9 @@ run_turn(session, submit, progress=None) -> TurnOutcome
     restored afterwards whatever happens.
     ReuseTransport(inner, reuse): send pops the first cached text for the request's hash and
     returns LMResponse(call_class, lane = request.lane, text, model 'reused') (the client parses
-    it again); no cached text -> inner.send. list_models and health forward to ``inner``.
+    it again); no cached text -> inner.send. list_models and health forward to ``inner``, and so
+    do ``routed`` (LANE-12) and ``governor`` (D-299: a hosted turn's retry has the same budget and
+    the same answers, HOST-08).
     Rejected -> TurnOutcome(ok=False, turn_index=cur, rejected_code, rejected_message, clarify):
       nothing is kept, no time passes, the input is not consumed. A turn.cognition.DecisionHeld
       (HOLD-01: a consequential decision whose answer could not be used) is a Rejected: the same
@@ -93,9 +95,12 @@ simulate — stages 0-12 in ONE store transaction:
        the first ceil(n / SchedulerRules.rethink_turns) keep it this wave: a room that took stock
        together does not all take stock again in the same turn; the rest stay restless and come up
        in the next; plan = lanes.scheduler.plan_cognition(
-       [(a, salience, mandatory)], config, settings.turn_depth, lanes_up); plan.overrun ->
+       [(a, salience, mandatory)], config, settings.turn_depth, lanes_up) — (D-299, HOST-07) or, when
+       session.client.transport has a ``governor`` (a hosted turn: the host's budget decides),
+       await governor.plan_cognition([(a, salience, mandatory)], config, wave, lanes_up); plan.overrun ->
        audit.log.repair('budget_overrun', 4, 'SCHED-01', {notes}). The wave's record {wave, at,
-       lod: {actor: lod value}, salience: {actor: number}, mandatory: sorted ids} goes into the
+       lod: {actor: lod value}, salience: {actor: number}, mandatory: sorted ids} — hosted, also
+       steps: the governor's plan_steps {step: answer}, tier and focus (HOST-08) — goes into the
        stage-4 ledger detail {'waves': [...]} (the PC is never in it).
     (P12, CHEAT-11) Then, for each actor of plan.lod that is HOT or WARM and not yet seen this turn
        (sorted), whose actors.quarantine is 1 (only cheat-made people can carry a standing brief):

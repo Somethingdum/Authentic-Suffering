@@ -18,10 +18,14 @@ request's turn_index (0 when None) and the same request_hash that this transport
 yet (rows in seq order); each row replays once. Concurrent calls finish in any order, so a call is
 found by what was asked, not by position (P7). No such row -> ReplayMismatch (the simulation
 diverged before this call). A row recorded with status 'timeout' raises LaneTimeout and one with
-'lane_error' raises LaneUnavailable (a replayed failure fails the same way); any other row returns
+'lane_error' raises LaneUnavailable (a replayed failure fails the same way); (LANE-12, D-299) one
+with 'cancelled' — an ablated call, or one a host skipped for time — raises CallSkipped, so it
+answers 'cancelled' again rather than 'empty'; any other row returns
 LMResponse(call_class, lane, text = response_text, prompt_tokens, completion_tokens, latency_ms,
 model 'replay') — the client parses it again exactly as it did the first time. list_models
-returns [lane.model]; health is always True.
+returns [lane.model]; health is always True. ``ReplayTransport(store, routed=True)`` replays a run
+a host routed (as_engine.host): its ``routed`` attribute makes the client behave as it did then
+(LANE-12: no lane is ever marked down, so a replayed 'lane_error' leaves the next call alone).
 """
 
 from __future__ import annotations
@@ -63,12 +67,13 @@ def record(tx: "Tx", request: LMRequest, response: LMResponse) -> int:
 
 
 class ReplayTransport:
-    def __init__(self, store: "Store"):
+    def __init__(self, store: "Store", routed: bool = False):
         self.store = store
+        self.routed = routed
         self._used: set = set()
 
     async def send(self, lane: LaneConfig, request: LMRequest) -> LMResponse:
-        from .errors import LaneTimeout, LaneUnavailable
+        from .errors import CallSkipped, LaneTimeout, LaneUnavailable
         t = request.turn_index if request.turn_index is not None else 0
         h = request_hash(request)
         row = None
@@ -83,6 +88,8 @@ class ReplayTransport:
             raise LaneTimeout("replayed timeout")
         if row["status"] == "lane_error":
             raise LaneUnavailable("replayed lane error")
+        if row["status"] == "cancelled":
+            raise CallSkipped("replayed")
         return LMResponse(call_class=request.call_class, lane=request.lane, text=row["response_text"],
                           prompt_tokens=row["prompt_tokens"], completion_tokens=row["completion_tokens"],
                           latency_ms=row["latency_ms"], model="replay")

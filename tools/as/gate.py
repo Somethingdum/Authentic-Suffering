@@ -47,7 +47,7 @@ import protect  # noqa: E402
 PHASE_NAMES = {0: "P0 Substrate", 1: "P1 Lane harness", 2: "P2 Bodies, space, objects, content",
                3: "P3 Perception", 4: "P4 One Actor", 5: "P5 Many Actors", 6: "P6 Memory",
                7: "P7 The Slice", 8: "P8 Play UI", 9: "P9 Society", 10: "P10 Wide world",
-               11: "P11 Audits", 12: "P12 Surfaces"}
+               11: "P11 Audits", 12: "P12 Surfaces", 13: "P13 Hosted"}
 UPSTREAM_ALLOWED = {
     "src/talemate/server/websocket_server.py", "talemate_frontend/src/App.vue",
     "talemate_frontend/package.json", "talemate_frontend/pnpm-lock.yaml",

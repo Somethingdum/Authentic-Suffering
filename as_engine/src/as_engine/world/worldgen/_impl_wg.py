@@ -2058,16 +2058,22 @@ async def run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id
         report.skipped_actors = list(people.skipped)
         await run_stage("WG7", lambda tx: (polity_mod.write_laws(tx, plan, params, canon, at), _group_lore(tx, at)))
         # genesis
-        wd = Path(world_dir)
-        wd.mkdir(parents=True, exist_ok=True)
-        store.backup_to(wd / "genesis.sqlite", as_world=world_id)
+        if world_dir is not None:
+            wd = Path(world_dir)
+            wd.mkdir(parents=True, exist_ok=True)
+            store.backup_to(wd / "genesis.sqlite", as_world=world_id)
+        else:                                       # D-299 (HOST-02): a hosted world's genesis goes back as bytes
+            report.genesis = store.to_bytes(as_world=world_id)
         era = str(Era(settings.era).value)
         cd = params.climate_descriptor
         wj = {"world_id": world_id, "title": f"{cd[:1].upper() + cd[1:]} — {atlas.ERA_LABELS[era]}, day {params.days_since_fall}",
               "difficulty": str(Difficulty(settings.difficulty).value), "era": era, "day_at_genesis": params.days_since_fall,
               "climate_text": cd, "factions": [g.name for g in plan.groups if g.kind == "faction"],
               "created_real": wall_clock_iso(), "source": "generated", "seed": seed, "detail": detail}
-        (wd / "world.json").write_text(json.dumps(wj, sort_keys=True, indent=2), encoding="utf-8")
+        if world_dir is not None:
+            (wd / "world.json").write_text(json.dumps(wj, sort_keys=True, indent=2), encoding="utf-8")
+        else:
+            report.world = wj
 
         async def wg8(tx):
             ctx["opening"] = await opening_mod.place_pc(client, rng, tx, pc_ref, pc, params, ctx["placement"], plan, region, people, canon,
