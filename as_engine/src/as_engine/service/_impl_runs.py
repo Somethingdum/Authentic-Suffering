@@ -241,7 +241,8 @@ def list_runs(config):
         lp = m["last_played_real"]
         out.append((lp, m["run_id"], RunSummaryView(run_id=m["run_id"], title=m["title"], pc_name=m["pc_name"], day=m["day"], alive=m["alive"],
                                                     difficulty=m["difficulty"], last_played_text=lp[:16].replace("T", " "),
-                                                    sandbox=m["sandbox"], ironman=m["ironman"], world_id=m.get("world_id"))))
+                                                    sandbox=m["sandbox"], ironman=m["ironman"], world_id=m.get("world_id"),
+                                                    final=bool(m.get("final", False)))))
     out.sort(key=lambda x: (x[0], x[1]), reverse=True)
     return [x[2] for x in out]
 
@@ -250,7 +251,8 @@ def delete_run(config, run_id):
     rd = runs_dir(config) / run_id
     if not (rd / MANIFEST).exists():
         raise RunError("not_found", f"There is no run called {run_id}.")
-    shutil.rmtree(rd)
+    from .runs import wipe_tree
+    wipe_tree(rd)
 
 
 # ============================================================ P10: create_run (worldgen path)
@@ -324,8 +326,12 @@ async def create_run(config, pc_ref, settings, transport, progress=None, world_i
                 store.close()
             except Exception:  # noqa: BLE001
                 pass
-        shutil.rmtree(rd, ignore_errors=True)
-        shutil.rmtree(wdir, ignore_errors=True)
+        from .runs import wipe_tree
+        for d in (rd, wdir):            # a half-made run leaves nothing it wrote (RUN-12)
+            try:
+                wipe_tree(d)
+            except OSError:
+                shutil.rmtree(d, ignore_errors=True)
         raise
     s = _open_session(config, rd, transport, dirs, canon=canon)
     s.extras["pack_dirs"] = [str(p) for p in dirs]

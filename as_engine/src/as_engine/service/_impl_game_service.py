@@ -338,12 +338,16 @@ class GameService:
         return [out("saved", OutSaved(slot=Path(p).stem, label=msg.slot_name, turn_index=t))]
 
     async def on_run_delete(self, msg):
-        from .runs import delete_run
-        G = _G()
-        if self.session is not None and self.session.run_id == msg.run_id:
-            raise G.ServiceError("run_open", G.RUN_OPEN)
-        delete_run(self.config, msg.run_id)
-        return await self.on_runs_list(None)
+        from ..contracts.protocol import OutRunDeleted
+        from .runs import RunError, delete_run
+        self._not_busy()
+        await self.background.cancel()
+        self._close()
+        try:
+            delete_run(self.config, msg.run_id)
+        except RunError as e:
+            return [_err(e.code, e.message)]
+        return [out("run_deleted", OutRunDeleted(run_id=msg.run_id))] + await self.on_runs_list(None)
 
     async def on_view_get(self, msg):
         from ..contracts.protocol import OutView

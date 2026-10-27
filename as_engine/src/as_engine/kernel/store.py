@@ -216,11 +216,19 @@ class Store:
         the copy is a world's genesis: in the copy only, meta run_id becomes ``as_world`` and every
         lm_calls row is removed (a world names no run and keeps no model traffic; the live store
         is not changed)."""
-        if as_world is not None:
-            raise NotImplementedError("P10")
         dst = sqlite3.connect(str(path))
-        self.conn.backup(dst)
-        dst.close()
+        try:
+            self.conn.backup(dst)
+            if as_world is not None:
+                # The copy only: its meta names the world, its model traffic is gone, and VACUUM
+                # rewrites the file so the removed rows leave nothing in its free pages.
+                dst.execute("PRAGMA secure_delete = ON")
+                dst.execute("UPDATE meta SET value = ? WHERE key = 'run_id'", (as_world,))
+                dst.execute("DELETE FROM lm_calls")
+                dst.commit()
+                dst.execute("VACUUM")
+        finally:
+            dst.close()
 
     def rebuild_fts(self) -> None:
         """Rebuild the episodes full-text index from ``episodes`` (implemented; used by

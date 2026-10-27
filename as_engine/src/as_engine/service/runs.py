@@ -228,7 +228,51 @@ def autosave(session: "Session") -> Path:
 
 
 def wipe_tree(path: str | Path) -> None:
-    raise NotImplementedError("P8")
+    import os
+
+    root = Path(path)
+    if not root.exists() and not root.is_symlink():
+        return
+    if root.is_symlink() or root.is_file():
+        _wipe_file(root)
+        return
+    # Deepest first: a folder's files, then its sub-folders, then the folder itself.
+    for dirpath, dirnames, filenames in os.walk(root, topdown=False, followlinks=False):
+        here = Path(dirpath)
+        for name in sorted(filenames):
+            _wipe_file(here / name)
+        for name in sorted(dirnames):
+            sub = here / name
+            if sub.is_symlink():
+                sub.unlink()
+            else:
+                sub.rmdir()
+    root.rmdir()
+
+
+_WIPE_CHUNK = 1 << 20
+
+
+def _wipe_file(p: Path) -> None:
+    """Zeros over the file's own length, flushed and fsynced, then the name removed. A link is
+    removed without writing through it: what it points at is not the run's."""
+    import os
+
+    if p.is_symlink():
+        p.unlink()
+        return
+    size = p.stat().st_size
+    if size:
+        with open(p, "r+b", buffering=0) as f:
+            left = size
+            zero = bytes(min(_WIPE_CHUNK, size))
+            while left:
+                n = min(left, len(zero))
+                f.write(zero[:n])
+                left -= n
+            f.flush()
+            os.fsync(f.fileno())
+    p.unlink()
 
 
 def delete_run(config: "EngineConfig", run_id: str) -> None:

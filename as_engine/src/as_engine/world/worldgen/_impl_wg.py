@@ -2060,7 +2060,7 @@ async def run_worldgen(store, client, canon, pc_ref, settings, config, *, run_id
         # genesis
         wd = Path(world_dir)
         wd.mkdir(parents=True, exist_ok=True)
-        store.backup_to(wd / "genesis.sqlite")
+        store.backup_to(wd / "genesis.sqlite", as_world=world_id)
         era = str(Era(settings.era).value)
         cd = params.climate_descriptor
         wj = {"world_id": world_id, "title": f"{cd[:1].upper() + cd[1:]} — {atlas.ERA_LABELS[era]}, day {params.days_since_fall}",
