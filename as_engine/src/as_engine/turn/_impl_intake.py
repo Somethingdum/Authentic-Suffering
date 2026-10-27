@@ -16,6 +16,7 @@ NONE_MESSAGES = {
     "wont": "Your character won't do that. It's a line they don't cross.",
 }
 PLAYER_REASON = "The player chose this."
+HOSTED_NONE = {"not_an_action": "That isn't something you do in the world."}   # INTAKE-10: the host has its own way to ask
 QUOTE_SPAN = re.compile(r'"[^"]*"|“[^”]*”')
 # D-290: a Say line that tells what the PC says rather than saying it ("I ask the nearest person what's going on")
 REPORTED = re.compile(
@@ -241,7 +242,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         info["addressee"] = addressee
     else:
         async def ask(packet):
-            ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes, wont=wont)
+            ctx = IntakeContext(packet=packet, player_text=text, quoted_speech=quotes, wont=wont, closest=hosted)
             req = build_request(session.config, CallClass.INTAKE, turn_index=turn_index, actor_id=pc, context=ctx,
                                 json_schema=intake_schema([a.handle for a in packet.affordances],
                                                           [g.handle for g in packet.gestures]), ctx=ctx)
@@ -250,6 +251,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
                 raise Rejected("intake_failed", "That didn't come through clearly. Try saying it another way.")
             return IntakeOutput.model_validate(resp.parsed)
         wont = list(fused(tx, pc).motive.moral_line.wont)       # D-147: the lines the PC does not cross
+        hosted = bool(getattr(session.client, "routed", False))  # INTAKE-10 (D-299): a hosted story never asks
         out = await ask(pkt)
         if out.choice == "NONE" and (out.none_reason or "unclear") not in ("not_an_action", "wont"):
             # INTAKE-07 (D-121): the menu is a short first list; the player may mean anything the PC could do
@@ -261,6 +263,8 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
                 out = await ask(pkt)
         if out.choice == "NONE":
             code = out.none_reason or "unclear"
+            if hosted:
+                raise Rejected(code, HOSTED_NONE.get(code, NONE_MESSAGES[code]))
             raise Rejected(code, NONE_MESSAGES[code], out.clarify)
         sig = pkt.handles.get(out.choice)
         chosen = next((o for o in (aff.pool or aff.options) if o.signature == sig), None)
@@ -288,7 +292,7 @@ async def intake(tx, session, submit, turn_index, t0, calls=None):
         else:
             it = to_intent(pkt, aff, out, lod=lod, source="human")
         if isinstance(it, IntentError):
-            raise Rejected("unclear", NONE_MESSAGES["unclear"], out.clarify)
+            raise Rejected("unclear", NONE_MESSAGES["unclear"], None if hosted else out.clarify)
         info["remainder"] = out.remainder
     record_pc_input(tx, turn_index, text, tx.rules.style)
     record_input(tx, turn_index, raw_mode, text, {"signature": it.bound.signature, "addressee": info["addressee"]})

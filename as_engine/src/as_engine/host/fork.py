@@ -78,8 +78,12 @@ async def fork(config: Any, base_bytes: bytes, head_bytes: bytes, turn: int) -> 
     from ..turn.pipeline import run_turn
     from .governor import RecordedGovernor
     bh, base = unpack(base_bytes)
-    hh, head = unpack(head_bytes)
-    keep_head = False
+    try:
+        hh, head = unpack(head_bytes)
+    except BaseException:
+        base.close()
+        raise
+    kept = None                           # the store handed back in the session
     try:
         K, N = int(bh.get("turn", 0)), int(hh.get("turn", 0))
         if turn < K or turn > N:
@@ -90,10 +94,10 @@ async def fork(config: Any, base_bytes: bytes, head_bytes: bytes, turn: int) -> 
             raise WorldError("not_ancestor", "Those two saved moments are not from the same story.")
         packs = hh.get("packs") or ["core"]
         if turn == N:
-            keep_head = True
-            base.close()
+            kept = head
             return open_session(config, head, ReplayTransport(head, routed=True), packs)
         tr = ForkTransport(head)
+        kept = base
         s = open_session(config, base, tr, packs)
         if turn == K:
             return s
@@ -132,9 +136,15 @@ async def fork(config: Any, base_bytes: bytes, head_bytes: bytes, turn: int) -> 
             exp = head.query_one("SELECT detail FROM turn_ledger WHERE turn_index=? AND stage=19", (T,))
             want = json.loads(exp[0]).get("full_state_hash") if exp is not None else None
             if not out.ok or want is None or full_state_hash(s.store) != want:
-                s.store.close()
                 raise WorldError("diverged", DIVERGED)
         return s
+    except BaseException:
+        kept = None
+        raise
     finally:
-        if not keep_head:
-            head.close()
+        for st in (base, head):
+            if st is not kept:
+                try:
+                    st.close()
+                except Exception:  # noqa: BLE001 — closed already (open_session closes a store it refuses)
+                    pass

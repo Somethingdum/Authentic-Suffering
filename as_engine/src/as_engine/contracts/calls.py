@@ -23,6 +23,8 @@ class IntakeContext(Strict):
     quoted_speech: list[str] = Field(default_factory=list, description="Text inside quotes, extracted by code; speech only.")
     wont: list[str] = Field(default_factory=list, description="D-147: what the character will never do (its dossier's "
                             "moral_line.wont) — the menu leaves out what crosses those lines (L12).")
+    closest: bool = Field(default=False, description="D-299 INTAKE-10: a hosted story never asks the player a question — "
+                          "an unclear move is read as the offered option nearest to it.")
 
 
 class PersonVoiceContext(Strict):

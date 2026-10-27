@@ -102,6 +102,8 @@ Validation (CNT-*), each error names file + field in plain language:
   CNT-16 (P10) a QuipList's keys each name a progress plan (service.progress.PLANS: kind), one of
          its phases (f"{kind}.{phase}") or a sub-phase of that phase (f"{kind}.{phase}.{sub}"); no
          line is empty or longer than 80 characters.
+  CNT-18 (D-299) an affordance tagged 'intimate' must require adults_only (D-292: offered only when the
+         actor and the target are both grown) — an error on field 'requires.adults_only'.
   CNT-17 (F1a) looks: an actor or pc dossier without appearance.looks is a warning (others will
          see its height and build only). With looks, each an error on field
          'appearance.looks.outfit[i]' / 'appearance.looks.outfit' / 'starting_inventory[i]':
@@ -628,6 +630,9 @@ def _load_canon(pack_dirs: list[str | Path]) -> tuple[Canon, list[ContentIssue]]
             for j, pt in enumerate(rec.exterior_portals):
                 if pt.to_room not in ids:
                     err(p, rel, "CNT-04", f"exterior_portals[{j}].to_room", f"to_room '{pt.to_room}' is not one of its rooms.")
+        if kind == "affordance" and "intimate" in (rec.tags or []) and not rec.requires.adults_only:
+            err(p, rel, "CNT-18", "requires.adults_only", "an intimate act is offered only between two adults: "
+                                                          "add adults_only: true to its requires.")
         if kind in ("actor", "pc"):
             lk = rec.appearance.looks
             if lk is None:

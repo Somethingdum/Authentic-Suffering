@@ -61,14 +61,13 @@ class LaneConfig(Strict):
 
 
 def default_lanes() -> dict[Lane, LaneConfig]:
-    return {
-        # D-111: lane A is the Writer, lane B the Clerk — the owner's models; the Connect screen changes them
-        # (LM Studio's list) and the swap guard (LANE-05) checks them.
-        Lane.A: LaneConfig(name="Main model — the Writer (Boulesis v2.1 26B-A4B, a Gemma 4)",
-                           model="boulesis-v2.1-26b-a4b-i1"),
-        Lane.B: LaneConfig(name="Second model — the Clerk (Nemotron 3.5 Lightning 30B-A3B)",
-                           model="nvidia-nemotron-3.5-lightning-30b-a3b-mtp"),
-    }
+    """D-111: lane A is the Writer, lane B the Clerk — the owner's models; the Connect screen changes them
+    (LM Studio's list) and the swap guard (LANE-05) checks them. (D-299) Which models they are is data,
+    contracts/default_lanes.json ({lane: {name, model}}), never code: no model is named in the engine's code."""
+    import json
+    from pathlib import Path
+    data = json.loads((Path(__file__).with_name("default_lanes.json")).read_text(encoding="utf-8"))
+    return {Lane(k): LaneConfig(name=v["name"], model=v["model"]) for k, v in sorted(data.items())}
 
 
 class CallRegime(Strict):

@@ -160,6 +160,10 @@ narrate(client, packet, style_rules, numbers, *, config, all_known_names, turn_i
   after the last attempt, returned with passed False — the world is never rolled back for prose.
   No draft at all -> (code_render(packet), [LintFinding('NARR-FALLBACK', 'no draft came back; the
   moment is told plainly', severity 'warning')], attempts, False).
+  (D-299, LIMIT-01) A draft with a LIMIT-01 finding is never kept and never returned: when every
+  draft that came back had one, the result is (code_render(packet), [LintFinding('LIMIT-01', 'every
+  draft crossed the one hard limit; the moment is told plainly', severity 'warning')], attempts,
+  False).
 code_render(packet) -> str
   The moment told plainly by code: the place details when establishing, then each line — a speech
   line with words as f'{speaker or "Someone"}: "{words}"', any other line's text — joined by ' '

@@ -104,6 +104,11 @@ intake(tx, session, submit, turn_index, t0) -> (Intent, info)       raises Rejec
      meaning, the rest are A{n+1}.. — and ONE more INTAKE call is made with it; its answer is the
      answer (a 'NONE' there is the rejection, with its reason and clarify). Nothing more to show,
      or 'not_an_action' or 'wont': no second call.
+  INTAKE-10 (D-299) a hosted intake never asks. When session.client.routed (a host routes the
+     story's calls), IntakeContext.closest is True: the INTAKE prompt tells the model never to answer
+     'unclear' or ask anything but to pick the listed option nearest to what the player typed, and a
+     Rejected never carries a clarify question (None); 'not_an_action' says HOSTED_NONE's line, without
+     the Play UI's own advice. Everything else is as above.
   INTAKE-08 (D-136) The player's hands. A nod, a shrug, a finger to the lips, empty hands held up:
      the words reach the PC's gestures as an Actor's answer does. Every INTAKE call's json_schema is
      lanes.schemas.intake_schema(the packet's affordance handles, its gesture handles), and its

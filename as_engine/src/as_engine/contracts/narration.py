@@ -62,6 +62,8 @@ class NarratorPacket(Strict):
     banned_phrases: list[str] = Field(default_factory=list)
     intensity: Literal["full", "softer"] = "full"
     player_input_echo_block: list[str] = Field(default_factory=list, description="PC 4-grams the narrator must not repeat.")
+    minors_present: bool = Field(default=False, description="D-299 LIMIT-01: a body under 18, alive or dead, is in the PC's "
+                                 "place (the PC included). The prompt never shows it; the lint reads it.")
 
 
 class LintFinding(Strict):

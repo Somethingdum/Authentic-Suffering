@@ -38,12 +38,12 @@ import json
 import re
 
 THINK = re.compile(r"<think>(.*?)</think>", re.S | re.I)
-GEMMA_THOUGHT = re.compile(r"<\|channel>thought\s*(.*?)<channel\|>", re.S)
-GEMMA_OPEN = re.compile(r"^(\s*)<\|channel>thought\s*", re.S)
+CHANNEL_THOUGHT = re.compile(r"<\|channel>thought\s*(.*?)<channel\|>", re.S)
+CHANNEL_OPEN = re.compile(r"^(\s*)<\|channel>thought\s*", re.S)
 
 
 def strip_think(text: str) -> tuple[str, str | None]:
-    text = GEMMA_OPEN.sub(r"\1<think>", GEMMA_THOUGHT.sub(lambda m: "<think>" + m.group(1) + "</think>", text))
+    text = CHANNEL_OPEN.sub(r"\1<think>", CHANNEL_THOUGHT.sub(lambda m: "<think>" + m.group(1) + "</think>", text))
     inner = THINK.findall(text)
     vis = THINK.sub("", text)
     m = re.match(r"\s*<think>(.*)$", vis, re.S | re.I)

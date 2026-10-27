@@ -26,10 +26,11 @@ HOST-07 the governed plan (replaces lanes.scheduler.plan_cognition's time arithm
   hosted; the order and the rules about who has anything to decide are the scheduler's own):
   order = mandatory candidates, then the rest, each by (salience desc, actor_id); plan.order = it.
   shape = TIERS[tier]; focus = the host's focus count for the tier, else shape's.
+  0. A wave of 2 or later first asks 'waves:2+'; refused, only its mandatory minds decide.
   1. In focus (HOT, lane A): the first ``focus`` of the order, stopping at the first that is not
-     mandatory when shape['mandatory_focus'], at the first not mandatory whose salience is below
-     SchedulerRules.hot_min_salience (D-175), and at the first whose focus step the host refuses
-     (and every one after it, HOST-06's upper set).
+     mandatory when shape['mandatory_focus'] or when 'waves:2+' was refused, at the first not
+     mandatory whose salience is below SchedulerRules.hot_min_salience (D-175), and at the first
+     whose focus step the host refuses (and every one after it, HOST-06's upper set).
   2. The rest in order (a person refused full voice in 1 included): a mandatory mind is WARM on
      config.regimes[ACTOR_COGNITION].lane whatever the time. A mind that is not mandatory becomes
      COLD, with every one after it, when its salience is 0 (D-190), when the shape keeps background
@@ -203,16 +204,16 @@ class Governor:
                                   "promptTokens": prompt}})
         if steps:
             await self.declare(steps)
-        # 1. in focus
-        hot_n = 0
-        for a, _sal, _mand in hot_cands:
+        waves_ok = True if wave < 2 else await self.may("waves:2+")
+        # 1. in focus (a late wave the host refused keeps only the mandatory minds)
+        for a, _sal, mand in hot_cands:
+            if not waves_ok and not mand:
+                break
             if not await self.may(f"focus:{wave}:{a}"):
                 break
             plan.lod[a] = LOD.HOT
             plan.lane[a] = hot_lane
-            hot_n += 1
         # 2. everyone else
-        waves_ok = True if wave < 2 else await self.may("waves:2+")
         warm_ok = {a for a, _s, _m in warm_cands}
         cold = False
         for a, sal, mand in order:

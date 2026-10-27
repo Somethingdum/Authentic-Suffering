@@ -129,6 +129,15 @@ def _as_one(tx, pc_id, entries):
     return [e for i, e in enumerate(entries) if i not in drop] + add
 
 
+def _minors_present(tx, pc_id):
+    # LIMIT-01 (D-299): anyone under 18 where the PC is, alive or dead, the PC included
+    here = tx.query_one("SELECT place_id FROM positions WHERE body_id=?", (pc_id,))
+    if here is None:
+        return False
+    return tx.query_one("SELECT 1 FROM bodies b JOIN positions p ON p.body_id = b.body_id WHERE p.place_id = ? "
+                        "AND b.age_years IS NOT NULL AND b.age_years < 18 LIMIT 1", (here[0],)) is not None
+
+
 def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
     from ..contracts.common import ANATOMY_WORDS, SEVERITY_WORDS
     from ..contracts.narration import NarratorLine, NarratorPacket, NarratorStyle
@@ -300,7 +309,8 @@ def build_narrator_packet(tx, pc_id, turn_index, t0, settings):
         people_looks=looks_lines, pc_beliefs=beliefs,
         choice_prompt_hint=hint, allowed_names=sorted(allowed), style=style, length=settings.narration_length,
         person=settings.narration_person, tense=settings.narration_tense, banned_phrases=list(rules.banned_phrases),
-        intensity=settings.intensity, player_input_echo_block=_unlicensed(echo_block(tx, turn_index, numbers),
+        intensity=settings.intensity, minors_present=_minors_present(tx, pc_id),
+        player_input_echo_block=_unlicensed(echo_block(tx, turn_index, numbers),
                                                                           [ln for ln in lines if not (ln.kind == "speech" and ln.speaker == pc)],
                                                                           details,
                                                                           people, looks_lines, numbers))
@@ -353,6 +363,7 @@ async def narrate(client, packet, style_rules, numbers, *, config, all_known_nam
     words = numbers.narration_words[packet.length]
     fix = []
     best = None
+    crossed = False
     attempts = 0
     for i in range(numbers.max_narration_attempts):
         attempts += 1
@@ -375,12 +386,17 @@ async def narrate(client, packet, style_rules, numbers, *, config, all_known_nam
                         findings.append(LintFinding(rule="DISC-JUDGE", detail=f"{u.reason}: {sents[u.sentence_index]}",
                                                     sentence_index=u.sentence_index))
         errors = [f for f in findings if f.severity == "error"]
-        if best is None or len(errors) < best[2]:
+        limit = any(f.rule == "LIMIT-01" for f in errors)          # D-299: the one hard limit is never shown
+        crossed = crossed or limit
+        if not limit and (best is None or len(errors) < best[2]):
             best = (prose, findings, len(errors))
         if not errors:
             return prose, findings, attempts, True
         fix = [f"{f.rule}: {f.detail}" for f in errors]
     if best is None:
+        if crossed:
+            return code_render(packet), [LintFinding(rule="LIMIT-01", detail="every draft crossed the one hard limit; the "
+                                                     "moment is told plainly", severity="warning")], attempts, False
         return code_render(packet), [LintFinding(rule="NARR-FALLBACK", detail="no draft came back; the moment is told plainly",
                                                  severity="warning")], attempts, False
     return best[0], best[1], attempts, False

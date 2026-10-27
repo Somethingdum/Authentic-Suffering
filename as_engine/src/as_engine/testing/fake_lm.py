@@ -43,7 +43,7 @@ from ..contracts.common import CallClass, Lane, Verb
 from ..contracts.lanes import LMRequest, LMResponse
 from ..contracts.mind import SkullPacket
 from ..contracts.narration import NarratorPacket
-from ..contracts.settings import LaneConfig
+from ..contracts.settings import LaneConfig, default_lanes
 from ..lanes.errors import LaneTimeout, LaneUnavailable
 
 Response = dict | str | Callable[[LMRequest], "dict | str"]
@@ -155,8 +155,8 @@ class FakeTransport:
         self._scripts: dict[tuple[CallClass, str | None], deque] = defaultdict(deque)
         self._down: set[Lane] = set()
         self._models = models or {
-            Lane.A: ["boulesis-v2.1-26b-a4b-i1"],
-            Lane.B: ["nvidia-nemotron-3.5-lightning-30b-a3b-mtp"],
+            Lane.A: [default_lanes()[Lane.A].model],          # D-299: the owner's models are data
+            Lane.B: [default_lanes()[Lane.B].model],
         }
 
     # ------------------------------------------------------------------ scripting

@@ -57,6 +57,12 @@ lint_prose(text, packet, style, numbers, all_known_names) -> LintReport   (STYLE
                     empty span is skipped; it must reach difflib.SequenceMatcher(None, span, words)
                     .ratio() >= 0.9 against the normalised words of at least one packet line of kind
                     'speech' with words — else invented dialogue (NARR-06); detail = the span as written
+    LIMIT-01        (D-299, the one hard limit) packet.minors_present and SEXUAL_RE finds a match in
+                    the WHOLE text, quoted speech included — detail "sexual content with someone
+                    under 18 present"; the narrator never shows such a draft (narration.narrator)
+    META-01         (D-299) META_RE finds a match in the unquoted text — the model stepping out of
+                    the story to refuse, apologise, add a note or talk about itself; detail = the match
+                    (a character may say any of it in quotes)
     ECHO-01         each sorted n-gram of content_ngrams(unquoted text, numbers.echo_n,
                     numbers.echo_min_content_tokens) that is in packet.player_input_echo_block
                     (quoted speech is licensed: the PC's own words may be quoted)
@@ -83,9 +89,24 @@ check_line(tx, text, numbers) -> list[str]
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 from ..contracts.narration import LintReport, NarratorPacket, ProseMetrics
+
+# D-299 LIMIT-01: words that make a passage sexual. Fiction may be as dark as the writer wants; this is the
+# one limit, and it applies only where someone under 18 is present.
+SEXUAL_RE = re.compile(
+    r"\b(sexual\w*|sexy|(?:have|has|had|having) sex|erection|orgasm\w*|genital\w*|penis|vagina\w*|clitor\w*|"
+    r"intercourse|masturbat\w*|molest\w*|rap(?:e|es|ed|ing|ist)|porn\w*|ma(?:ke|kes|de|king) love)\b",
+    re.IGNORECASE)
+# D-299 META-01: the writer stepping out of the story.
+META_RE = re.compile(
+    r"(\bI(?:'m| am) sorry,? but\b|\bI can(?:'|no)t (?:help|continue|write|assist|do that|comply|create|generate|provide)\b|"
+    r"\bI (?:won't|will not|cannot) (?:write|continue|describe|depict|create|generate)\b|\bas an AI\b|\bas a language model\b|"
+    r"\bcontent (?:policy|guidelines)\b|\b(?:this|that) (?:request|content|scene) (?:violates|goes against|is not appropriate)\b|"
+    r"(?:^|(?<=[.!?] ))\s*(?:\(|\[)?\s*(?:note|author's note|ooc|disclaimer)\s*[:\]]|\bI'm (?:not able|unable) to\b)",
+    re.IGNORECASE | re.MULTILINE)
 
 if TYPE_CHECKING:
     from ..contracts.content import StyleRules

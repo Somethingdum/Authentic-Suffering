@@ -66,13 +66,28 @@ The latest world of a branch holds every answer its branch got (the call log) an
 `fork {base, head, turn}` rebuilds the world at `turn` from the nearest kept world `base`, replaying each turn with no
 model call and checking every turn's state hash; anything else is refused with the reason.
 
-## 6. The world's own lore
+## 6. What a hosted story never does
+
+- **It never asks the player a question** (INTAKE-10): an unclear move is read as the offered option nearest to it;
+  a move that cannot be played is one plain statement, never a question. Out-of-character talk is the host's.
+- **The one hard limit holds whatever model writes** (LIMIT-01): where anyone under 18 is present — alive or dead,
+  the player's character included — a draft with sexual content is never shown; when every draft has it, the moment
+  is told plainly by code. The words it looks for are only unambiguous ones, so ordinary survival prose ("he gropes
+  for the flashlight", "the noise aroused the dead") passes. Nothing else is limited: the story may be as dark as the
+  writer wants. An intimate act is offered only between two adults (D-292), and a pack that offers one otherwise does
+  not load (CNT-18).
+- **The writer never steps out of the story** (META-01): a draft that refuses, apologises, adds a note or talks about
+  being a model is written again (a character may say any of it, in quotes).
+- **No model is named in the engine's code**: the owner's two models are configuration
+  (`contracts/default_lanes.json`); the hosted engine never uses them at all.
+
+## 7. The world's own lore
 
 The owner ruled "Keep the lore in": the engine ships with its world — the core pack, the Fall, the strains and the
 infected, the hordes, the Doom and the Voice, Willis, its people and places — wherever it is hosted. The owner's own
 saved stories and private documents are theirs and are never read by tests or builds.
 
-## 7. Where the code goes
+## 8. Where the code goes
 
 The engine moves into the owner's harness (the owner's choice), under that harness's own licence: the engine is the
 owner's own code — nothing in it is Talemate's (BOUND-01) — so the AGPL of this repository's Talemate fork does

@@ -144,6 +144,12 @@ def lint_prose(text, packet, style, numbers, all_known_names):
             continue
         if not any(difflib.SequenceMatcher(None, nqq, h).ratio() >= 0.9 for h in heard):
             err("DISC-SPEECH", q)
+    from .lint import META_RE, SEXUAL_RE
+    if packet.minors_present and SEXUAL_RE.search(text):          # LIMIT-01 (D-299): the one hard limit
+        err("LIMIT-01", "sexual content with someone under 18 present")
+    hit = META_RE.search(nq)                                       # META-01 (D-299): out of the story
+    if hit:
+        err("META-01", hit.group(0).strip())
     block = set(packet.player_input_echo_block)
     for g in sorted(content_ngrams(nq, numbers.echo_n, numbers.echo_min_content_tokens) & block):
         err("ECHO-01", g)

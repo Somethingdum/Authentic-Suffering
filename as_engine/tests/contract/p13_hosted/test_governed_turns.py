@@ -92,9 +92,10 @@ async def test_the_fast_tiers_keep_background_minds_out(config, tier):
 async def test_late_waves_wait_on_the_host(config):
     g = Scripted(tier=4, refuse={"waves:2+"})
     plan = await g.plan_cognition(CANDS, config, 2, {"A", "B"})
-    assert plan.lod["act_a"] in (LOD.HOT, LOD.WARM)
-    assert all(plan.lod[a] in (LOD.COLD, LOD.HOT) for a in ("act_d",))
-    assert plan.lod["act_d"] == LOD.COLD
+    assert plan.lod["act_a"] in (LOD.HOT, LOD.WARM), "the people it is about still decide"
+    assert [plan.lod[a] for a in ("act_b", "act_c", "act_d", "act_e")] == [LOD.COLD] * 4, \
+        "a refused late wave leaves nobody else thinking, in focus or not"
+    assert g.asked[0] == "waves:2+"
 
 
 async def test_an_answer_is_given_once_a_turn(config):

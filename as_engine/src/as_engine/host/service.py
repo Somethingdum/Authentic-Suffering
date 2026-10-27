@@ -33,8 +33,11 @@ HOST-16 requests:
   turn {mode, text, suggestion_ref, addressee_refs, tier, focus, answers, decisions} and compose {act,
     say, cheat, to, tier, focus, answers, decisions} (HOST-17) -> the Play UI's turn_submit /
     turn_compose, played to the end; {messages, steps: the budget's decisions, world…}.
-  cancel -> the Play UI's turn_cancel: before stage 12 the turn rolls back; after it, 'too_late' (the
-    world stands; a stopped write ends the drafting, HOST-12).
+  cancel -> while a world is being made (begin): it is cancelled and nothing of it is kept (begin
+    answers error 'cancelled'); else the Play UI's turn_cancel: before stage 12 the turn rolls back;
+    after it, 'too_late' (the world stands; a stopped write ends the drafting, HOST-12). A world
+    creation's own refusals keep their words: WorldgenAborted -> error 'worldgen_aborted', a
+    SettingsError -> 'bad_settings'.
   view, story, settings_get, settings_set {patch}, code_enter {code}, cheat_dictionary, death_reveal
     -> the Play UI's handlers of those names.
   quiet {answers} -> the quiet hours (service.background catch-up) for the turn just played;
@@ -210,6 +213,7 @@ class HostService(GameService):
             settings = RunSettings.model_validate(p.settings)
         except Exception as e:  # noqa: BLE001 — pydantic's message names the field, never content
             raise HostError("bad_settings", "Those settings are not valid: " + str(e).splitlines()[0][:200]) from e
+        self.host_transport.new_turn()
         self.host_transport.add_recorded([a.model_dump() for a in p.answers])
         await self.background.cancel()
         self._close()
@@ -219,8 +223,14 @@ class HostService(GameService):
             await self.push(out("worldgen_progress", _wg_progress(pr)))
         self.worldgen_task = loop.create_task(create_world(self.config, p.pc_ref, settings, self.host_transport,
                                                            self.link, progress))
+        from ..kernel.errors import SettingsError
+        from ..world.worldgen.pipeline import WorldgenAborted
         try:
             s, report = await self.worldgen_task
+        except WorldgenAborted as e:
+            raise HostError("worldgen_aborted", str(e)) from e
+        except SettingsError as e:
+            raise HostError("bad_settings", str(e)) from e
         finally:
             self.worldgen_task = None
         self.session = s
@@ -242,6 +252,8 @@ class HostService(GameService):
         if self.session is None:
             raise HostError("no_run", "No story is open.")
         gov = LinkGovernor(self.link.request, tier=play.tier, focus=play.focus, recorded=dict(play.decisions))
+        if not self.busy:
+            self.host_transport.new_turn()
         self.host_transport.add_recorded([a.model_dump() for a in play.answers])
         self.host_transport.governor = gov
         try:
@@ -270,6 +282,11 @@ class HostService(GameService):
         return await self._hosted(_Play(p, lambda: self.on_turn_compose(msg)))
 
     async def h_cancel(self, p):
+        w = self.worldgen_task
+        if w is not None and not w.done():          # Stop while a world is made: nothing of it is kept
+            w.cancel()
+            await asyncio.wait({w})
+            return {"messages": []}
         return {"messages": await self.on_turn_cancel(None)}
 
     async def h_view(self, p):
@@ -299,6 +316,7 @@ class HostService(GameService):
         if self.session is None:
             raise HostError("no_run", "No story is open.")
         self._not_busy()
+        self.host_transport.new_turn()
         self.host_transport.add_recorded([a.model_dump() for a in p.answers])
 
         async def quiet_progress(done, total):

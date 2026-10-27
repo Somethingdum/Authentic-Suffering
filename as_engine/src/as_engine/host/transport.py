@@ -36,6 +36,8 @@ HOST-10 send(lane_cfg, request) -> LMResponse. ``lane_cfg`` is never read: no ad
 HOST-12 Stop while writing: the world was committed at stage 12, so it stands; a stopped write ends
   the drafting and the turn is told plainly (narration.narrator's NARR-FALLBACK), never drafted
   again behind the player's back.
+  new_turn() (the host service, as each hosted turn starts) forgets all of that, so a turn played
+  again under the same number starts clean.
 HOST-13 recorded answers: a list of {turn_index, request_hash, result} — the host's own earlier
   answers, each the dict it returned. The first unused one with the call's (turn_index,
   request_hash) is the answer (read as HOST-11), so a turn or a world interrupted by a crash plays
@@ -75,6 +77,14 @@ class HostTransport:
         self._decision: dict[tuple[int, str], str] = {}
         self._draft: dict[int, tuple[str, int]] = {}
         self._stopped: set[int] = set()
+
+    def new_turn(self) -> None:
+        """A turn starts: what the transport remembers of turns (stopped writing, drafts, decisions) is
+        forgotten, so a turn played again under the same number (a Retry after a fork) starts clean."""
+        self._decision.clear()
+        self._draft.clear()
+        self._stopped.clear()
+        self._recorded.clear()          # answers left from an earlier try are never this try's
 
     def add_recorded(self, recorded: list[dict]) -> None:
         for r in recorded or []:
